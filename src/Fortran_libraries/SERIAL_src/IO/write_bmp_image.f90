@@ -178,7 +178,8 @@
 !* image data
       itmp = ihpixf * jvpixf * 3
       write(frmtstr,'(''('',i8.8,''A,$)'')') itmp
-      write(id_img,fmt=frmtstr) ((rgb(3:1:-1,i,j),i=1,ihpixf),j=1,jvpixf)
+      write(id_img,fmt=frmtstr)                                         &
+     &                        ((rgb(3:1:-1,i,j),i=1,ihpixf),j=1,jvpixf)
 ! writing in BGR order, not RGB.
       close(id_img)
 !

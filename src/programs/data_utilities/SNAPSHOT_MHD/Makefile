@@ -4,13 +4,8 @@
 
 SPH_SNAP_MAINDIR =   $$(DATA_UTILS_DIR)/SNAPSHOT_MHD
 
-<<<<<<< HEAD
-TARGET_SPH_VIZS_SNAP =  sph_snapshot_vizs
-TARGET_SPH_PSF_SNAP =   sph_snapshot
-=======
-TARGET_SPH_SNAP =    sph_snapshot
-
->>>>>>> refs/heads/Ver.2.0_alpha
+TARGET_SPH_VIZS_SNAP =  sph_snapshot
+TARGET_SPH_PSF_SNAP =   sph_snapshot_w_psf
 
 SOURCES = $(shell ls *.f90)
 
@@ -32,22 +27,13 @@ dir_list:
 	@echo 'SPH_SNAP_MAINDIR = $(SPH_SNAP_MAINDIR)' >> $(MAKENAME)
 
 target_list:
-<<<<<<< HEAD
-	@echo 'TARGET_SPH_PSF_SNAP =      $$(BUILDDIR)/$(TARGET_SPH_PSF_SNAP)'>> $(MAKENAME)
+	@echo 'TARGET_SPH_PSF_SNAP =  $$(BUILDDIR)/$(TARGET_SPH_PSF_SNAP)'>> $(MAKENAME)
 	@echo 'TARGET_SPH_VIZS_SNAP = $$(BUILDDIR)/$(TARGET_SPH_VIZS_SNAP)' >> $(MAKENAME)
-=======
-	@echo 'TARGET_SPH_SNAP =    $$(BUILDDIR)/$(TARGET_SPH_SNAP)'>> $(MAKENAME)
->>>>>>> refs/heads/Ver.2.0_alpha
 	@echo >> $(MAKENAME)
 
 target_task:
 	@echo sph_snapshots: \
-<<<<<<< HEAD
-	 '$$(TARGET_SPH_PSF_SNAP)'    \
 	 '$$(TARGET_SPH_VIZS_SNAP)' \
-=======
-	 '$$(TARGET_SPH_SNAP)'    \
->>>>>>> refs/heads/Ver.2.0_alpha
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '$$(TARGET_SPH_PSF_SNAP):  $$(MOD_SPH_SNAP_PSF_MAIN)  $$(LIB_FILES_SPH_MHD)' \
@@ -56,29 +42,21 @@ target_task:
 	-o '$$(TARGET_SPH_PSF_SNAP)' '$$(MOD_SPH_SNAP_PSF_MAIN)' \
 	'-L. $$(LIBS_SPH_MHD)  $$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
-<<<<<<< HEAD
 	@echo '$$(TARGET_SPH_VIZS_SNAP):  $$(MOD_SPH_SNAP_VIZS_MAIN)  $$(LIB_FILES_SPH_MHD)' \
 	>> $(MAKENAME)
 	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
 	-o '$$(TARGET_SPH_VIZS_SNAP)' '$$(MOD_SPH_SNAP_VIZS_MAIN)' \
 	'-L. $$(LIBS_SPH_MHD)  $$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
-=======
->>>>>>> refs/heads/Ver.2.0_alpha
 
 
 lib_name:
 
 mod_list:
-<<<<<<< HEAD
 	@echo  MOD_SPH_SNAP_PSF_MAIN=  \\ >> $(MAKENAME)
 	@echo  $(MOD_SPH_SNAP_PSF_MAIN) >> $(MAKENAME)
 	@echo  MOD_SPH_SNAP_VIZS_MAIN=  \\ >> $(MAKENAME)
 	@echo  $(MOD_SPH_SNAP_VIZS_MAIN) >> $(MAKENAME)
-=======
-	@echo  MOD_SPH_SNAP_MAIN=  \\ >> $(MAKENAME)
-	@echo  $(MOD_SPH_SNAP_MAIN) >> $(MAKENAME)
->>>>>>> refs/heads/Ver.2.0_alpha
 	@echo  '#' >> $(MAKENAME)
 
 

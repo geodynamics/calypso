@@ -116,6 +116,7 @@
 !
       call bcast_section_def_control(pvr_scts_c%psf_def_c)
       call bcast_ctl_type_r1(pvr_scts_c%opacity_ctl)
+      call bcast_ctl_type_c1(pvr_scts_c%zeroline_ctl)
 !
       end subroutine bcast_pvr_section_ctl
 !

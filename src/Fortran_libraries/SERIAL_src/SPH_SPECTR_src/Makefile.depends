@@ -30,12 +30,6 @@ load_data_for_sph_IO.o: $(SPH_SPECTR_DIR)/load_data_for_sph_IO.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_spheric_constants.o: $(SPH_SPECTR_DIR)/m_spheric_constants.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-output_sph_pwr_layer_file.o: $(SPH_SPECTR_DIR)/output_sph_pwr_layer_file.f90 m_precision.o m_constants.o t_time_data.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o sph_mean_spectr_header_IO.o set_parallel_file_name.o t_read_sph_spectra.o t_buffer_4_gzip.o gz_open_sph_layer_mntr_file.o gz_layer_mean_monitor_IO.o sph_power_spectr_data_text.o gz_layer_spectr_monitor_IO.o
-	$(F90) -c $(F90OPTFLAGS) $<
-output_sph_pwr_volume_file.o: $(SPH_SPECTR_DIR)/output_sph_pwr_volume_file.f90 m_precision.o m_constants.o t_time_data.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o sph_mean_spectr_header_IO.o m_base_field_labels.o set_parallel_file_name.o t_read_sph_spectra.o t_buffer_4_gzip.o gz_open_sph_vol_mntr_file.o gz_volume_spectr_monitor_IO.o sph_monitor_data_text.o select_gz_stream_file_IO.o
-	$(F90) -c $(F90OPTFLAGS) $<
-output_sph_volume_ave_file.o: $(SPH_SPECTR_DIR)/output_sph_volume_ave_file.f90 m_precision.o m_constants.o t_time_data.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o sph_mean_spectr_header_IO.o set_parallel_file_name.o output_sph_pwr_volume_file.o
-	$(F90) -c $(F90OPTFLAGS) $<
 radial_int_for_sph_spec.o: $(SPH_SPECTR_DIR)/radial_int_for_sph_spec.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 schmidt_poly_on_rtm_grid.o: $(SPH_SPECTR_DIR)/schmidt_poly_on_rtm_grid.f90 m_precision.o m_constants.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o t_gauss_points.o t_work_4_sph_trans.o t_schmidt_poly_on_rtm.o spherical_harmonics.o m_machine_parameter.o schmidt_fix_m.o

@@ -19,7 +19,8 @@
 !!      ...
 !!    end section_ctl
 !!
-!!    opacity_ctl       0.9
+!!    opacity_ctl           0.9
+!!    zeroline_switch_ctl   On
 !!  end array section_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -43,6 +44,7 @@
         character(len = kchara) :: fname_sect_ctl
         type(psf_define_ctl) :: psf_def_c
         type(read_real_item) :: opacity_ctl
+        type(read_character_item) :: zeroline_ctl
 !
         integer(kind = kint) :: i_pvr_sect_ctl = 0
       end type pvr_section_ctl
@@ -66,6 +68,8 @@
 !
       call copy_real_ctl(org_pvr_sect_c%opacity_ctl,                    &
      &                   new_pvr_sect_c%opacity_ctl)
+      call copy_chara_ctl(org_pvr_sect_c%zeroline_ctl,                  &
+     &                   new_pvr_sect_c%zeroline_ctl)
 !
       end subroutine dup_pvr_section_ctl
 !
@@ -78,6 +82,7 @@
 !
       call dealloc_cont_dat_4_psf_def(pvr_sect_ctl%psf_def_c)
       pvr_sect_ctl%opacity_ctl%iflag = 0
+      pvr_sect_ctl%zeroline_ctl%iflag = 0
       pvr_sect_ctl%i_pvr_sect_ctl =    0
 !
       end subroutine dealloc_pvr_section_ctl

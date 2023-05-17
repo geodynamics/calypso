@@ -131,11 +131,12 @@
 !
       integer(kind = kint) :: iflag_notrace
       integer(kind = kint) :: isf_tgt, isurf_end, iele, isf_org
-      integer(kind = kint) :: i_iso, i_psf, iflag, iflag_hit
+      integer(kind = kint) :: i_iso, i_psf, iflag_hit
       real(kind = kreal) :: screen4_tgt(4), c_tgt(1), c_org(1)
       real(kind = kreal) :: xx4_model_sf(4,num_linear_sf,nsurf_4_ele)
       real(kind = kreal) :: grad_tgt(3), xx4_tgt(4), rflag, rflag2
       real(kind = kreal) :: opacity_bc
+      logical :: flag_sect
 !
 !
       if(isurf_org(1) .eq. 0) return
@@ -230,23 +231,30 @@
      &        = side_of_plane(draw_param%coefs(1:10,i_psf), xx4_st(1))
             rflag2                                                      &
      &        = side_of_plane(draw_param%coefs(1:10,i_psf), xx4_tgt(1))
+!
+            flag_sect = .FALSE.
             if     (rflag .ge. -TINY9 .and. rflag2 .le. TINY9) then
-              iflag = 1
+              flag_sect = .TRUE.
               iflag_hit = 1
             else if(rflag .le. TINY9 .and. rflag2 .ge. -TINY9) then
-              iflag = 1
+              flag_sect = .TRUE.
               iflag_hit = 1
-            else
-              iflag = 0
             end if
 
-            if(iflag .ne. 0) then
+            if(flag_sect) then
               call cal_normal_of_plane                                  &
      &           (draw_param%coefs(1:10,i_psf), xx4_tgt(1), grad_tgt)
               call color_plane_with_light                               &
      &           (viewpoint_vec, xx4_tgt, c_tgt(1), grad_tgt,           &
      &            draw_param%sect_opacity(i_psf), color_param,          &
      &            rgba_ray)
+              if(draw_param%iflag_psf_zeoline(i_psf) .gt. 0             &
+     &            .and. c_org(1)*c_tgt(1) .le. TINY9) then
+                call black_plane_with_light                             &
+     &             (viewpoint_vec, xx4_tgt, grad_tgt,                   &
+     &             draw_param%sect_opacity(i_psf), color_param,         &
+     &             rgba_ray)
+              end if
             end if
           end do
 !
@@ -256,7 +264,7 @@
             if((c_tgt(1) - draw_param%iso_value(i_iso)) .eq. zero       &
      &        .or. rflag .lt. zero) then
               grad_tgt(1:3) = field_pvr%grad_ele(iele,1:3)              &
-     &                       * draw_param%itype_isosurf(i_iso)
+     &                       * dble(draw_param%itype_isosurf(i_iso))
               call color_plane_with_light(viewpoint_vec, xx4_tgt,       &
      &            draw_param%iso_value(i_iso), grad_tgt,                &
      &            draw_param%iso_opacity(i_iso), color_param, rgba_ray)

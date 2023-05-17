@@ -49,7 +49,8 @@
 !!      ...
 !!    end section_ctl
 !!
-!!    opacity_ctl       0.9
+!!    opacity_ctl           0.9
+!!    zeroline_switch_ctl   On
 !!  end array section_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -72,14 +73,15 @@
       implicit  none
 !
 !   Labels
-      integer(kind = kint), parameter :: n_label_pvr_section =   2
+      integer(kind = kint), parameter, private                          &
+     &                   :: n_label_pvr_section =   3
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                  :: hd_surface_define =  'surface_define'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                  :: hd_pvr_opacity =   'opacity_ctl'
-!
-      private :: hd_pvr_opacity, hd_surface_define, n_label_pvr_section
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_pvr_sec_zeroline = 'zeroline_switch_ctl'
 !
       private :: sel_read_ctl_pvr_section_def
       private :: read_ctl_file_pvr_section_def
@@ -114,6 +116,8 @@
 !
         call read_real_ctl_type                                         &
      &     (c_buf, hd_pvr_opacity, pvr_sect_ctl%opacity_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_pvr_sec_zeroline, pvr_sect_ctl%zeroline_ctl)
       end do
       pvr_sect_ctl%i_pvr_sect_ctl = 1
 !
@@ -137,6 +141,7 @@
 !
       if(pvr_sect_ctl%i_pvr_sect_ctl .le. 0) return
       maxlen = len_trim(hd_pvr_opacity)
+      maxlen = max(maxlen,len_trim(hd_pvr_sec_zeroline))
 !
       write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
@@ -147,6 +152,8 @@
       write(id_control,'(a1)') '!'
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_pvr_opacity, pvr_sect_ctl%opacity_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_pvr_sec_zeroline, pvr_sect_ctl%zeroline_ctl)
       level = write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_pvr_section_ctl
@@ -278,8 +285,9 @@
      &                         :: names(n_label_pvr_section)
 !
 !
-      call set_control_labels(hd_surface_define, names( 1))
-      call set_control_labels(hd_pvr_opacity,    names( 2))
+      call set_control_labels(hd_surface_define,   names( 1))
+      call set_control_labels(hd_pvr_opacity,      names( 2))
+      call set_control_labels(hd_pvr_sec_zeroline, names( 3))
 !
       end subroutine set_label_pvr_section
 !

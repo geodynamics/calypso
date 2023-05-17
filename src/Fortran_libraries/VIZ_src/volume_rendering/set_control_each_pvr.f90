@@ -211,6 +211,7 @@
       type(rendering_parameter), intent(inout) :: draw_param
 !
       integer(kind = kint) :: id_section_method, ierr, i
+      character(len=kchara) :: tmpchara
 !
 !
       draw_param%num_sections = pvr_scts_c%num_pvr_sect_ctl
@@ -227,6 +228,13 @@
           if(pvr_scts_c%pvr_sect_ctl(i)%opacity_ctl%iflag .gt. 0) then
             draw_param%sect_opacity(i)                                  &
      &        = pvr_scts_c%pvr_sect_ctl(i)%opacity_ctl%realvalue
+          end if
+!
+          draw_param%iflag_psf_zeoline(i) = 0
+          if(pvr_scts_c%pvr_sect_ctl(i)%zeroline_ctl%iflag .gt. 0) then
+            tmpchara                                                    &
+     &         = pvr_scts_c%pvr_sect_ctl(i)%zeroline_ctl%charavalue
+            if(yes_flag(tmpchara)) draw_param%iflag_psf_zeoline(i) = 1
           end if
         end do
       end if

@@ -75,8 +75,8 @@
      &    modelview_inv, posi_zero(1), vec_tmp(1))
       viewpoint_vec(1:3) = vec_tmp(1:3)
 !
-      if(my_rank .eq. 0) then
-!      if (iflag_debug .gt. 0) then
+!      if(my_rank .eq. 0) then
+      if (iflag_debug .gt. 0) then
         write(*,*) 'modelview'
         do i = 1, 4
           write(*,'(1p4e16.7)') modelview_mat(i,1:4)

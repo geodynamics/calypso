@@ -13,11 +13,12 @@
 !!      subroutine color_plane_with_light                               &
 !!     &         (viewpoint_vec, xout_model, c_data, grad,              &
 !!     &          opa_current, color_param, rgba_pixel)
-!!      subroutine plane_rendering_with_light                           &
-!!     &         (viewpoint_vec, xout_model, surf_normal,               &
-!!     &          opa_current, color_param, rgba_pixel)
-!!      subroutine set_rgba_4_surface_boundary                          &
-!!     &         (viewpoint_vec, xout_model, surf_normal,               &
+!!      subroutine black_plane_with_light(viewpoint_vec, xout_model,    &
+!!     &          grad, opa_current, color_param, rgba_pixel)
+!!      subroutine plane_rendering_with_light(viewpoint_vec, x4_model,  &
+!!     &          surf_normal, opa_current, color_param, rgba_pixel)
+!!      subroutine surface_rendering_with_light                         &
+!!     &         (viewpoint_vec, x4_model, surf_normal, color_surf,     &
 !!     &          opa_current, color_param, rgba_pixel)
 !!
 !!      subroutine compute_opacity(transfer_function_style, opa_value,  &
@@ -158,9 +159,31 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine plane_rendering_with_light                             &
-     &         (viewpoint_vec, x4_model, surf_normal,                   &
-     &          opa_current, color_param, rgba_pixel)
+      subroutine black_plane_with_light(viewpoint_vec, x4out_model,     &
+     &          grad, opa_current, color_param, rgba_pixel)
+!
+      use t_control_params_4_pvr
+      use set_color_4_pvr
+!
+      real(kind = kreal), intent(in) :: viewpoint_vec(3)
+      real(kind = kreal), intent(in) :: grad(3)
+      real(kind = kreal), intent(in) :: x4out_model(4)
+      real(kind = kreal), intent(in) :: opa_current
+      type(pvr_colormap_parameter), intent(in) :: color_param
+!
+      real(kind = kreal), intent(inout) :: rgba_pixel(4)
+!
+      real(kind = kreal), parameter :: black(3) = (/0.0, 0.0, 0.0/)
+!
+      call surface_rendering_with_light(viewpoint_vec, x4out_model,     &
+     &    grad, black, opa_current, color_param, rgba_pixel)
+!
+      end subroutine black_plane_with_light
+!
+! ----------------------------------------------------------------------
+!
+      subroutine plane_rendering_with_light(viewpoint_vec, x4_model,    &
+     &          surf_normal, opa_current, color_param, rgba_pixel)
 !
       use t_control_params_4_pvr
       use set_color_4_pvr
@@ -173,17 +196,40 @@
 !
       real(kind = kreal), intent(inout) :: rgba_pixel(4)
 !
-      real(kind = kreal) :: color(3)
+      real(kind = kreal), parameter :: color(3) = (/0.2, 0.2, 0.2/)
+!
+      call surface_rendering_with_light(viewpoint_vec, x4_model,        &
+     &    surf_normal, color, opa_current, color_param, rgba_pixel)
+!
+      end subroutine plane_rendering_with_light
+!
+! ----------------------------------------------------------------------
+!
+      subroutine surface_rendering_with_light                           &
+     &         (viewpoint_vec, x4_model, surf_normal, color_surf,       &
+     &          opa_current, color_param, rgba_pixel)
+!
+      use t_control_params_4_pvr
+      use set_color_4_pvr
+!
+      real(kind = kreal), intent(in) :: viewpoint_vec(3)
+      real(kind = kreal), intent(in) :: x4_model(4)
+      real(kind = kreal), intent(in) :: surf_normal(3)
+      real(kind = kreal), intent(in) :: color_surf(3)
+      real(kind = kreal), intent(in) :: opa_current
+      type(pvr_colormap_parameter), intent(in) :: color_param
+!
+      real(kind = kreal), intent(inout) :: rgba_pixel(4)
+!
       real(kind = kreal), allocatable :: rgb(:)
 !
 !
       allocate(rgb(4))
-      color(1:3) = 0.2
 !
       call phong_reflection(viewpoint_vec,                              &
      &    color_param%num_pvr_lights, color_param%xyz_pvr_lights,       &
      &    surf_normal, color_param%pvr_lighting_real,                   &
-     &    x4_model(1), x4_model(1), color, rgb(1))
+     &    x4_model(1), x4_model(1), color_surf, rgb(1))
 !
       rgb(1:3) = rgb(1:3) * opa_current
       rgb(4) =   opa_current
@@ -191,7 +237,7 @@
       call composite_alpha_blending(rgb, rgba_pixel)
       deallocate(rgb)
 !
-      end subroutine plane_rendering_with_light
+      end subroutine surface_rendering_with_light
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -211,6 +257,8 @@
       real(kind = kreal) ::  mint, t
 !
 !
+      mint = 1.0d-17
+      min_type = 1
       opacity_local = zero
       if     (transfer_function_style .eq. iflag_anbient) then
         opacity_local = opa_value

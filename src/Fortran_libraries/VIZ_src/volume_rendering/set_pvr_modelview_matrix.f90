@@ -122,8 +122,9 @@
         view_param%perspective_xy_ratio                                 &
      &          = proj%perspective_xy_ratio_ctl%realvalue
       else
-        view_param%perspective_xy_ratio = view_param%n_pvr_pixel(1)     &
-     &                                   / view_param%n_pvr_pixel(2)
+        view_param%perspective_xy_ratio                                 &
+     &          = dble(view_param%n_pvr_pixel(1))                       &
+     &           / dble(view_param%n_pvr_pixel(2))
       end if
 !
       if (proj%perspective_near_ctl%iflag .gt. 0) then

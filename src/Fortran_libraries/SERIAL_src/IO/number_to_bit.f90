@@ -8,10 +8,18 @@
 !!      character(len=4) function num2bit4_little(inum)
 !!      character(len=2) function num2bit2_little(inum)
 !!        integer, intent(in) :: inum
+!!      integer(kind = kint) function bit4_to_int_little(a)
+!!        character(len = 1), intent(in) :: a(4)
+!!      integer(kind = kint) function bit2_to_int_little(a)
+!!        character(len = 1), intent(in) :: a(2)
 !!
 !!      character(len=4) function num2bit4_big(inum)
 !!      character(len=2) function num2bit2_big(inum)
 !!        integer, intent(in) :: inum
+!!      integer(kind = kint) function bit4_to_int_big(a)
+!!        character(len = 1), intent(in) :: a(4)
+!!      integer(kind = kint) function bit2_to_int_big(a)
+!!        character(len = 1), intent(in) :: a(2)
 !!
 !!      subroutine crc32_4_png(ilength, cbuf, i_crc)
 !!        integer(kind = 4), intent(in) :: ilength
@@ -84,11 +92,45 @@
 !------------------------------------------------------------------------
 !------------------------------------------------------------------------
 !
+      integer(kind = kint) function bit4_to_int_little(a)
+!
+      character(len = 1), intent(in) :: a(4)
+      integer(kind = kint) :: i
+!
+      i = iachar(a(1)) + 256*iachar(a(2)) + 65536 * iachar(a(3))
+      if(iachar(a(4)) .ge. 128) then
+        i = i + 16777216 * (iachar(a(4)) - 128) - 2147483647 - 1
+      else
+        i = i + 16777216 * iachar(a(4))
+      end if
+      bit4_to_int_little = i
+!
+      end function bit4_to_int_little
+!
+!------------------------------------------------------------------------
+!
+      integer(kind = kint) function bit2_to_int_little(a)
+!
+      character(len = 1), intent(in) :: a(2)
+      integer(kind = kint) :: i
+!
+      if(iachar(a(2)) .ge. 128) then
+        i = iachar(a(1)) + 256 * (iachar(a(2)) - 128) - 65535 - 1
+      else
+        i = iachar(a(1)) + 256 * iachar(a(2))
+      end if
+      bit2_to_int_little = i
+!
+      end function bit2_to_int_little
+!
+!------------------------------------------------------------------------
+!------------------------------------------------------------------------
+!
       character(len=4) function num2bit4_big(inum)
 !
       integer, intent(in) :: inum
 !
-      integer :: itmp0, itmp1, itmp2
+      integer :: itmp1, itmp2
 !
 !
       if(inum .lt. 0) then
@@ -118,7 +160,7 @@
 !
       integer, intent(in) :: inum
 !
-      integer :: itmp0, itmp1, itmp2
+      integer :: itmp1, itmp2
 !
 !
       if(inum .lt. 0) then
@@ -135,6 +177,39 @@
       num2bit2_big(2:2) = char(itmp1)
 !
       end function num2bit2_big
+!
+!------------------------------------------------------------------------
+!
+      integer(kind = kint) function bit4_to_int_big(a)
+!
+      character(len = 1), intent(in) :: a(4)
+      integer(kind = kint) :: i
+!
+      i = iachar(a(4)) + 256*iachar(a(3)) + 65536 * iachar(a(2))
+      if(iachar(a(1)) .ge. 128) then
+        i = i + 16777216 * (iachar(a(1)) - 128) - 2147483647 - 1
+      else
+        i = i + 16777216 * iachar(a(1))
+      end if
+      bit4_to_int_big = i
+!
+      end function bit4_to_int_big
+!
+!------------------------------------------------------------------------
+!
+      integer(kind = kint) function bit2_to_int_big(a)
+!
+      character(len = 1), intent(in) :: a(2)
+      integer(kind = kint) :: i
+!
+      if(iachar(a(1)) .ge. 128) then
+        i = iachar(a(2)) + 256 * (iachar(a(2)) - 128) - 65535 - 1
+      else
+        i = iachar(a(2)) + 256 * iachar(a(2))
+      end if
+      bit2_to_int_big = i
+!
+      end function bit2_to_int_big
 !
 !------------------------------------------------------------------------
 !------------------------------------------------------------------------

@@ -61,6 +61,8 @@
 !>    flag for rendering element
         integer(kind = kint), allocatable :: iflag_used_ele(:)
 !
+!>    Number of surface to be enhansed
+        integer(kind = kint) :: num_enhanse
 !>    integer flag for surface boundaries
         integer(kind = kint), allocatable :: iflag_enhanse(:)
 !>    Opacity value for surface boundaries
@@ -68,6 +70,8 @@
 !
 !>    Number of sections
         integer(kind = kint) :: num_sections
+!>    Number of sections
+        integer(kind = kint), allocatable :: iflag_psf_zeoline(:)
 !>    fiale value for isosurfaces
         real(kind = kreal), allocatable :: coefs(:,:)
 !>    Opacity value for isosurfaces
@@ -136,11 +140,12 @@
       type(rendering_parameter), intent(inout) :: draw_param
 !
 !
+      draw_param%num_enhanse = surf_grp%num_grp
       allocate(draw_param%iflag_enhanse(surf_grp%num_grp))
       allocate(draw_param%enhansed_opacity(surf_grp%num_grp))
 !
       if(surf_grp%num_grp .gt. 0) draw_param%iflag_enhanse = 0
-      if(surf_grp%num_grp .gt. 0) draw_param%enhansed_opacity = 0
+      if(surf_grp%num_grp .gt. 0) draw_param%enhansed_opacity = 0.0d0
 !
       end subroutine alloc_iflag_pvr_boundaries
 !
@@ -165,9 +170,13 @@
 !
       allocate(draw_param%coefs(10,draw_param%num_sections))
       allocate(draw_param%sect_opacity(draw_param%num_sections))
+      allocate(draw_param%iflag_psf_zeoline(draw_param%num_sections))
 !
-      if(draw_param%num_sections .gt. 0) draw_param%coefs =        zero
-      if(draw_param%num_sections .gt. 0) draw_param%sect_opacity = zero
+      if(draw_param%num_sections .le. 0) return
+!
+      draw_param%coefs(1:10,1:draw_param%num_sections) = zero
+      draw_param%sect_opacity(1:draw_param%num_sections) = zero
+      draw_param%iflag_psf_zeoline(1:draw_param%num_sections) = izero
 !
       end subroutine alloc_pvr_sections
 !
@@ -197,6 +206,7 @@
 !
 !
       deallocate(draw_param%coefs, draw_param%sect_opacity)
+      deallocate(draw_param%iflag_psf_zeoline)
 !
       end subroutine dealloc_pvr_sections
 !
