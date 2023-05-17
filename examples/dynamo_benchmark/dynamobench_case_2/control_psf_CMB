@@ -8,7 +8,7 @@ begin cross_section_ctl
   begin surface_define
     section_method    sphere
 !
-    array center_position    3
+    array center_position
       center_position  x   0.0
       center_position  y   0.0
       center_position  z   0.0
@@ -16,13 +16,13 @@ begin cross_section_ctl
 !
     radius             1.5384
 !
-    array section_area_ctl 1
+    array section_area_ctl
       section_area_ctl   all
     end array section_area_ctl
   end surface_define
 !
   begin output_field_define
-    array output_field   2
+    array output_field
       output_field  magnetic_field        vector
       output_field  magnetic_field        radial
     end array output_field

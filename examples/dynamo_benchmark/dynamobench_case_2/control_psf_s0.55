@@ -8,25 +8,25 @@ begin cross_section_ctl
   begin surface_define
     section_method    ellipsoid
 !
-    array center_position    3
+    array center_position
       center_position  x   0.0
       center_position  y   0.0
       center_position  z   0.0
     end array center_position
 !
-    array axial_length   3
+    array axial_length
       axial_length  x   0.55
       axial_length  y   0.55
       axial_length  z   -1.0
     end array axial_length
 !
-    array section_area_ctl 1
+    array section_area_ctl
       section_area_ctl   all   end
     end array section_area_ctl
   end surface_define
 !
   begin output_field_define
-    array output_field   9
+    array output_field
       output_field  temperature           scalar
       output_field  velocity              vector
       output_field  velocity              cylinder_r     

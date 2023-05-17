@@ -10,8 +10,8 @@ begin MHD_control
     debug_flag_ctl            'OFF'
     num_subdomain_ctl            4
 !
-    sph_file_prefix             'sph_lm31r48c_4/in'
-    sph_file_fmt_ctl           'merged'
+    sph_file_prefix            'sph_lm31r48c_4/in'
+    sph_file_fmt_ctl           'merged_gzip'
   end data_files_def
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!

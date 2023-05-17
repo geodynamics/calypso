@@ -8,7 +8,7 @@ begin cross_section_ctl
   begin surface_define
     section_method    equation
 !
-    array coefs_ctl  10
+    array coefs_ctl
       coefs_ctl  x2     1.0
       coefs_ctl  y2     1.0
       coefs_ctl  z2     0.0
@@ -21,13 +21,13 @@ begin cross_section_ctl
       coefs_ctl  const -0.3025
     end array coefs_ctl
 !
-    array section_area_ctl 1
+    array section_area_ctl
       section_area_ctl   all   end
     end array section_area_ctl
   end surface_define
 !
   begin output_field_define
-    array output_field   9
+    array output_field
       output_field  temperature           scalar
       output_field  velocity              vector
       output_field  velocity              cylinder_r     
