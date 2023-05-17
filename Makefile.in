@@ -72,16 +72,15 @@ HDF5_FLIBS=     @HDF5_PFLIBS@
 #
 #  --- Please do not chenge the following ---
 #
-MAKE_MOD_DEP= $(BUILDDIR)/make_f90depends
+MAKE_MOD_DEP= $(BUILDDIR)/utilities/make_f90depends
 #
 
 all: makemake
 	cd $(MAKEDIR); make
 
 $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
-	if [ ! -d $(BUILDDIR) ]; then \
-		mkdir $(BUILDDIR); \
-	fi
+	mkdir -p $(BUILDDIR)
+	mkdir -p $(BUILDDIR)/utilities
 	$(F90_LOCAL) $< -o $@
 
 depends: $(MAKE_MOD_DEP)
