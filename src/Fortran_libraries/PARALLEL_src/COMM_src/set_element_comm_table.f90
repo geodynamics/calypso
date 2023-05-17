@@ -277,7 +277,7 @@
       call calypso_mpi_barrier
       call calypso_mpi_allreduce_one_int(icou, num_gl, MPI_SUM)
 !
-      if(my_rank .eq. 0) write(*,*)                                     &
+      if(num_gl.gt.0 .and. my_rank .eq. 0) write(*,*)                    &
      &   'Failed export by set_element_export_item', num_gl
 !
       end subroutine set_element_export_item

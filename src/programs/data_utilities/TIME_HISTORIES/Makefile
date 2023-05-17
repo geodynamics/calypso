@@ -4,7 +4,7 @@
 
 SPH_UTILS_DIR = $$(DATA_UTILS_DIR)/TIME_HISTORIES
 
-TARGET_TAVE_SPH_ENE_SPEC =   t_ave_monitor_data
+TARGET_TAVE_SPH_ENE_SPEC =   utilities/t_ave_monitor_data
 TARGET_SPH_ENE_CHECK =       tests/sph_ene_check
 
 SOURCES = $(shell ls *.f90 *.F90)

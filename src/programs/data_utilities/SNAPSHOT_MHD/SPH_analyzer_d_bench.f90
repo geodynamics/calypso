@@ -116,11 +116,10 @@
 !
 ! ---------------------------------
 !
-      if (iflag_debug.gt.0) write(*,*) 'init_reference_scalars'
-      call init_reference_scalars                                       &
-     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd,                      &
-     &    SPH_model%ref_temp, SPH_model%ref_comp, SPH_MHD%fld,          &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
+      if (iflag_debug.gt.0) write(*,*) 'init_reference_fields '
+      call init_reference_fields                                        &
+     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd, SPH_model%refs,      &
+     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
       if (iflag_debug.eq.1) write(*,*) 'const_radial_mat_sph_snap'
       call const_radial_mat_sph_snap                                    &
@@ -132,10 +131,10 @@
 !  set original spectr mesh data for extension of B
 !
       call init_radial_sph_interpolation(MHD_files%org_rj_file_IO,      &
-     &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj)
+     &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj, SPH_WK%rj_itp)
 !
-      if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr_4_mhd'
-      call init_rms_4_sph_spectr_4_mhd                                  &
+      if(iflag_debug.gt.0) write(*,*) 'init_sph_spectr_data_and_file'
+      call init_sph_spectr_data_and_file                                &
      &   (SPH_MHD%sph, SPH_MHD%fld, SPH_WK%monitor)
 !
 !* -----  find mid-equator point -----------------
@@ -174,11 +173,13 @@
       call read_alloc_sph_rst_4_snap(i_step,                            &
      &    MHD_files%org_rj_file_IO, MHD_files%fst_file_IO,              &
      &    MHD_step1%rst_step, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld,   &
-     &    MHD_step1%init_d)
+     &    MHD_step1%init_d, SPH_WK%rj_itp)
       call copy_time_data(MHD_step1%init_d, MHD_step1%time_d)
 !
-      call sync_temp_by_per_temp_sph(SPH_model,                         &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
+      if (iflag_debug.eq.1) write(*,*)' sync_temp_by_per_temp_sph'
+      call sync_temp_by_per_temp_sph                                    &
+     &   (SPH_model%MHD_prop, SPH_model%refs,                           &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !* obtain linear terms for starting
 !*
@@ -191,8 +192,9 @@
 !*
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+5)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
-      call trans_per_temp_to_temp_sph(SPH_model,                        &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
+      call trans_per_temp_to_temp_sph                                   &
+     &   (SPH_model%MHD_prop, SPH_model%refs,                           &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !*
       if(lead_field_data_flag(i_step, MHD_step1)) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'

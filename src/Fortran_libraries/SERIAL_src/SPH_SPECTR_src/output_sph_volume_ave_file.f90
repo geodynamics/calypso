@@ -45,8 +45,8 @@
       subroutine write_sph_vol_ave_file                                 &
      &         (ene_labels, time_d, sph_params, sph_rj, pwr)
 !
-      use sph_mean_spectr_IO
       use set_parallel_file_name
+      use output_sph_pwr_volume_file
 !
 !
       type(energy_label_param), intent(in) :: ene_labels
@@ -67,14 +67,9 @@
 !
         fname_rms = add_dat_extension(pwr%v_spectr(i)%fhead_ave)
         write(mode_label,'(a)') 'EMPTY'
-        call open_sph_vol_mean_sq_file                                  &
-     &     (id_file_rms, fname_rms, mode_label,                         &
-     &      ene_labels, sph_params, sph_rj, pwr%v_spectr(i))
-!
-        write(id_file_rms,'(i15,1pe23.14e3,1p200e23.14e3)')             &
-     &     time_d%i_time_step, time_d%time,                             &
-     &     pwr%v_spectr(i)%v_ave(1:pwr%ntot_comp_sq)
-      close(id_file_rms)
+        call write_sph_volume_pwr_file(fname_rms, mode_label,           &
+     &      ene_labels, time_d, sph_params, sph_rj,                     &
+     &     pwr%v_spectr(i), pwr%v_spectr(i)%v_ave(1))
       end do
 !
       end subroutine write_sph_vol_ave_file

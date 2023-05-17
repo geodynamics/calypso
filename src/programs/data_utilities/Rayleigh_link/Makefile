@@ -4,7 +4,7 @@
 
 RAYLEIGH_LINK_DIR = $$(DATA_UTILS_DIR)/Rayleigh_link
 
-TARGET_CVT_RAYLEIGH_SPH =   convert_rayleigh_sph
+TARGET_CVT_RAYLEIGH_SPH =   utilities/convert_rayleigh_sph
 
 
 SOURCES = $(shell ls *.f90)

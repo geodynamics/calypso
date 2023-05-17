@@ -10,7 +10,10 @@
 !!    start_time_ctl     1.0
 !!    end_time_ctl       2.0
 !!
-!!    picked_sph_prefix        'picked_mode'
+!!    array picked_sph_prefix
+!!      picked_sph_prefix        'monitor/picked_mode'
+!!      picked_sph_prefix        'monitor/picked_mode_l2_m0c'
+!!    end array picked_sph_prefix
 !!  end time_averaging_sph_monitor
 !! -----------------------------------------------------------------
 !
@@ -19,174 +22,26 @@
       use m_precision
       use m_constants
 !
-      use t_picked_sph_spectr_data_IO
       use t_ctl_data_tave_sph_monitor
+      use t_ctl_param_sph_series_util
+      use time_ave_picked_sph_spectr
 !
       implicit  none
 !
 !>      Structure for control data
       type(tave_sph_monitor_ctl), save :: tave_sph_ctl1
+      type(sph_spectr_file_param), save :: spec_evo_p1
 !
-      type(picked_spectrum_data_IO), save :: pick_IO
-!
-      real(kind = kreal), allocatable :: prev_spec(:,:)
-      real(kind = kreal), allocatable :: ave_spec(:,:)
-      real(kind = kreal), allocatable :: rms_spec(:,:)
-      real(kind = kreal), allocatable :: sdev_spec(:,:)
-!
-      character(len=kchara) :: evo_header
-      character(len=kchara) :: tave_header
-      character(len=kchara) :: trms_header
-      character(len=kchara) :: sdev_header
-      integer(kind = kint), parameter :: id_pick = 15
-!
-      integer(kind = kint) :: i_step, ierr, icou, i, nd
-      real(kind = kreal) :: acou, time, prev_time
-      real(kind = kreal) :: start_time, end_time, true_start
-!
+      integer(kind = kint) :: i
 !
       call read_control_file_sph_monitor(0, tave_sph_ctl1)
+      call set_spec_series_file_and_time(tave_sph_ctl1, spec_evo_p1)
 !
-      if(tave_sph_ctl1%picked_mode_head_ctl%iflag .eq. 0) then
-        write(*,*) 'Set File prefix for Gauss coefficients'
-        stop
-      end if
-      evo_header = tave_sph_ctl1%picked_mode_head_ctl%charavalue
-!
-      if(tave_sph_ctl1%start_time_ctl%iflag .eq. 0) then
-        write(*,*) 'Set start time'
-        stop
-      end if
-      start_time = tave_sph_ctl1%start_time_ctl%realvalue
-!
-      if(tave_sph_ctl1%end_time_ctl%iflag .eq. 0) then
-        write(*,*) 'Set end time'
-        stop
-      end if
-      end_time = tave_sph_ctl1%end_time_ctl%realvalue
-!
-!
-      write(tave_header,'(a6,a)') 't_ave_', trim(evo_header)
-      write(trms_header,'(a8,a)') 't_rms_', trim(evo_header)
-      write(sdev_header,'(a8,a)') 't_sigma_', trim(evo_header)
-!
-!      Open picked mode file
-!
-      call open_sph_spec_read(id_pick, evo_header, pick_IO)
-!
-      allocate(prev_spec(pick_IO%ntot_comp,pick_IO%ntot_pick_spectr))
-      allocate(ave_spec(pick_IO%ntot_comp,pick_IO%ntot_pick_spectr))
-      allocate(rms_spec(pick_IO%ntot_comp,pick_IO%ntot_pick_spectr))
-      allocate(sdev_spec(pick_IO%ntot_comp,pick_IO%ntot_pick_spectr))
-!
-!$omp parallel workshare
-      prev_spec =  0.0d0
-      ave_spec =   0.0d0
-      rms_spec =   0.0d0
-      sdev_spec =  0.0d0
-!$omp end parallel workshare
-!
-!       Evaluate time average
-!
-      icou = 0
-      true_start = start_time
-      prev_time = true_start
-      do
-        call read_sph_spec_monitor                                      &
-     &     (id_pick, i_step, time, pick_IO, ierr)
-        if(ierr .gt. 0) exit
-!
-        if(time .ge. start_time) then
-          if(icou .eq. 0) then
-            true_start = time
-          else
-!
-!$omp parallel
-            do i = 1, pick_IO%ntot_pick_spectr
-!$omp do
-              do nd = 1, pick_IO%ntot_comp
-                ave_spec(nd,i) = ave_spec(nd,i) + half                  &
-     &           * (pick_IO%d_pk(nd,i) + prev_spec(nd,i))               &
-     &           * (time - prev_time)
-                rms_spec(nd,i) = rms_spec(nd,i) + half                  &
-     &           * (pick_IO%d_pk(nd,i)**2 + prev_spec(nd,i)**2)         &
-     &           * (time - prev_time)
-              end do
-!$omp end do nowait
-            end do
-!$omp end parallel
-          end if
-!
-!$omp parallel
-          do i = 1, pick_IO%ntot_pick_spectr
-!$omp do
-            do nd = 1, pick_IO%ntot_comp
-              prev_spec(nd,i) = pick_IO%d_pk(nd,i)
-            end do
-!$omp end do nowait
-          end do
-!$omp end parallel
-!
-          icou = icou + 1
-          write(*,*) 'step ', i_step,                                   &
-     &        ' is added for time average: count is  ', icou, time
-        end if
-        prev_time = time
-!
-        if(time .ge. end_time) exit
+      do i = 1, spec_evo_p1%pick_spec_series%num_file
+        call s_time_ave_picked_sph_spectr                               &
+     &     (.TRUE., spec_evo_p1%pick_spec_series%evo_file_name(i),      &
+     &      spec_evo_p1%start_time, spec_evo_p1%end_time)
       end do
-      close(id_pick)
-!
-      acou = one / (time - true_start)
-!$omp parallel
-      do i = 1, pick_IO%ntot_pick_spectr
-!$omp do
-        do nd = 1, pick_IO%ntot_comp
-          sdev_spec(nd,i) = rms_spec(nd,i) - ave_spec(nd,i)**2
-!
-          ave_spec(nd,i) =   ave_spec(nd,i) * acou
-          rms_spec(nd,i) =   sqrt(rms_spec(nd,i) * acou)
-          sdev_spec(nd,i) =  sqrt(sdev_spec(nd,i) * acou)
-        end do
-!$omp end do nowait
-      end do
-!$omp end parallel
-!
-!    output time average
-!
-      do i = 1, pick_IO%ntot_pick_spectr
-        do nd = 1, pick_IO%ntot_comp
-          pick_IO%d_pk(nd,i) = ave_spec(nd,i)
-        end do
-      end do
-!
-      call write_tave_sph_spec_monitor                                  &
-     &   (tave_header, i_step, time, true_start, pick_IO)
-!
-!    output RMS deviation
-!
-      do i = 1, pick_IO%ntot_pick_spectr
-        do nd = 1, pick_IO%ntot_comp
-          pick_IO%d_pk(nd,i) = rms_spec(nd,i)
-        end do
-      end do
-!
-      call write_tave_sph_spec_monitor                                  &
-     &   (trms_header, i_step, time, true_start, pick_IO)
-!
-!    output standard deviation
-!
-      do i = 1, pick_IO%ntot_pick_spectr
-        do nd = 1, pick_IO%ntot_comp
-          pick_IO%d_pk(nd,i) = sdev_spec(nd,i)
-        end do
-      end do
-!
-      call write_tave_sph_spec_monitor                                  &
-     &   (sdev_header, i_step, time, true_start, pick_IO)
-!
-      call dealloc_pick_sph_monitor_IO(pick_IO)
-      deallocate(prev_spec, ave_spec, sdev_spec)
 !
       write(*,*) '***** program finished *****'
       stop

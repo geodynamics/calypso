@@ -32,6 +32,8 @@
 !
       implicit  none
 !
+      private :: set_ctl_params_vol_sph_spectr
+!
 ! -----------------------------------------------------------------------
 !
       contains
@@ -43,12 +45,16 @@
       use t_ctl_data_4_sph_monitor
       use t_pickup_sph_spectr_data
       use t_rms_4_sph_spectr
+      use t_multi_flag_labels
+!
+      use m_file_format_labels
       use skip_comment_f
 !
       type(sph_monitor_control), intent(in) :: smonitor_ctl
       type(sph_mean_squares), intent(inout) :: pwr
 !
-      integer(kind = kint) :: i, j, num_vspec
+      integer(kind = kint) :: num_vspec
+      character(len = kchara) :: input_flag
 !
 !
       if(smonitor_ctl%num_vspec_ctl .lt. 0) then
@@ -71,42 +77,87 @@
         pwr%v_spectr(1)%fhead_ave                                       &
      &         = smonitor_ctl%volume_average_prefix%charavalue
       end if
+!
+      pwr%v_spectr(1)%gzip_flag_vol_spec = .FALSE.
+      if(smonitor_ctl%volume_pwr_spectr_format%iflag .gt. 0) then
+        input_flag = smonitor_ctl%volume_pwr_spectr_format%charavalue
+        if(check_mul_flags(input_flag, gzip_flags))                     &
+     &                     pwr%v_spectr(1)%gzip_flag_vol_spec = .TRUE.
+      end if
+!
       pwr%v_spectr(1)%r_inside =  -1.0
       pwr%v_spectr(1)%r_outside = -1.0
 !
+      call set_ctl_params_vol_sph_spectr                                &
+     &   (smonitor_ctl%num_vspec_ctl, smonitor_ctl%v_pwr,               &
+     &    pwr%num_vol_spectr, pwr%v_spectr)
 !
-      do j = 2, num_vspec
-        i = j - 1
-        pwr%v_spectr(j)%iflag_volume_rms_spec                           &
-     &        = smonitor_ctl%v_pwr(i)%volume_spec_file_ctl%iflag
-        if(pwr%v_spectr(j)%iflag_volume_rms_spec .gt. 0) then
-          pwr%v_spectr(j)%fhead_rms_v                                   &
-     &       = smonitor_ctl%v_pwr(i)%volume_spec_file_ctl%charavalue
+      end subroutine set_ctl_params_sph_spectr
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_ctl_params_vol_sph_spectr                          &
+     &         (num_vspec_ctl, v_pwr_ctl, num_vspec, v_spectr)
+!
+      use t_ctl_data_4_sph_monitor
+      use t_pickup_sph_spectr_data
+      use t_rms_4_sph_spectr
+      use t_multi_flag_labels
+!
+      use m_file_format_labels
+      use skip_comment_f
+!
+      integer(kind = kint), intent(in) :: num_vspec_ctl
+      type(volume_spectr_control), intent(in)                           &
+     &                            :: v_pwr_ctl(num_vspec_ctl)
+      integer(kind = kint), intent(in) :: num_vspec
+      type(sph_vol_mean_squares), intent(inout) :: v_spectr(num_vspec)
+!
+      integer(kind = kint) :: i, j
+      character(len = kchara) :: input_flag
+!
+!
+      do i = 1, num_vspec_ctl
+        j = i + 1
+        v_spectr(j)%iflag_volume_rms_spec                               &
+     &        = v_pwr_ctl(i)%volume_spec_file_ctl%iflag
+        if(v_spectr(j)%iflag_volume_rms_spec .gt. 0) then
+          v_spectr(j)%fhead_rms_v                                       &
+     &       = v_pwr_ctl(i)%volume_spec_file_ctl%charavalue
         end if
 !
-        pwr%v_spectr(j)%iflag_volume_ave_sph                            &
-     &        =  smonitor_ctl%v_pwr(i)%volume_ave_file_ctl%iflag
-        if(pwr%v_spectr(j)%iflag_volume_ave_sph .gt. 0) then
-          pwr%v_spectr(j)%fhead_ave                                     &
-     &        = smonitor_ctl%v_pwr(i)%volume_ave_file_ctl%charavalue
+        v_spectr(j)%iflag_volume_ave_sph                                &
+     &        = v_pwr_ctl(i)%volume_ave_file_ctl%iflag
+        if(v_spectr(j)%iflag_volume_ave_sph .gt. 0) then
+          v_spectr(j)%fhead_ave                                         &
+     &       = v_pwr_ctl(i)%volume_ave_file_ctl%charavalue
         end if
 !
-        if(smonitor_ctl%v_pwr(i)%inner_radius_ctl%iflag .gt. 0) then
-          pwr%v_spectr(j)%r_inside                                      &
-     &        = smonitor_ctl%v_pwr(i)%inner_radius_ctl%realvalue
+        v_spectr(j)%gzip_flag_vol_spec = .FALSE.
+        if(v_pwr_ctl(i)%volume_spec_format_ctl%iflag .gt. 0) then
+          input_flag                                                    &
+     &        = v_pwr_ctl(i)%volume_spec_format_ctl%charavalue
+          if(check_mul_flags(input_flag, gzip_flags))                   &
+     &                     v_spectr(j)%gzip_flag_vol_spec = .TRUE.
+        end if
+!
+!
+        if(v_pwr_ctl(i)%inner_radius_ctl%iflag .gt. 0) then
+          v_spectr(j)%r_inside                                          &
+     &        = v_pwr_ctl(i)%inner_radius_ctl%realvalue
         else
-          pwr%v_spectr(j)%r_inside = -1.0
+          v_spectr(j)%r_inside = -1.0
         end if
 !
-        if(smonitor_ctl%v_pwr(i)%outer_radius_ctl%iflag .gt. 0) then
-          pwr%v_spectr(j)%r_outside                                     &
-     &        = smonitor_ctl%v_pwr(i)%outer_radius_ctl%realvalue
+        if(v_pwr_ctl(i)%outer_radius_ctl%iflag .gt. 0) then
+          v_spectr(j)%r_outside                                         &
+     &        = v_pwr_ctl(i)%outer_radius_ctl%realvalue
         else
-          pwr%v_spectr(j)%r_outside = -1.0
+          v_spectr(j)%r_outside = -1.0
         end if
       end do
 !
-      end subroutine set_ctl_params_sph_spectr
+      end subroutine set_ctl_params_vol_sph_spectr
 !
 ! -----------------------------------------------------------------------
 !
@@ -115,10 +166,15 @@
       use t_ctl_data_sph_layer_spectr
       use t_pickup_sph_spectr_data
       use t_rms_4_sph_spectr
+      use t_multi_flag_labels
+!
+      use m_file_format_labels
       use skip_comment_f
 !
       type(layerd_spectr_control), intent(in) :: lp_ctl
       type(sph_mean_squares), intent(inout) :: pwr
+!
+      character(len = kchara) :: input_flag
 !
 !
       if(no_flag(lp_ctl%degree_spectr_switch%charavalue))               &
@@ -135,6 +191,15 @@
       if(pwr%iflag_layer_rms_spec .gt. 0) then
         pwr%fhead_rms_layer                                             &
      &        = lp_ctl%layered_pwr_spectr_prefix%charavalue
+      end if
+!
+      pwr%gzip_flag_rms_layer = .FALSE.
+      if(pwr%iflag_layer_rms_spec .gt. 0) then
+        if(lp_ctl%layered_pwr_spectr_format%iflag .gt. 0) then
+          input_flag = lp_ctl%layered_pwr_spectr_format%charavalue
+          if(check_mul_flags(input_flag, gzip_flags))                   &
+     &                             pwr%gzip_flag_rms_layer = .TRUE.
+        end if
       end if
 !
 !   set pickup layer
@@ -162,8 +227,10 @@
       use t_ctl_data_pick_sph_spectr
       use t_pickup_sph_spectr_data
       use t_rms_4_sph_spectr
+      use t_multi_flag_labels
 !
       use m_base_field_labels
+      use m_file_format_labels
       use skip_comment_f
 !
       type(pick_spectr_control), intent(in) :: pspec_ctl
@@ -171,12 +238,20 @@
       type(picked_spectrum_data), intent(inout) :: picked_sph
 !
       integer(kind = kint) :: inum
+      character(len = kchara) :: input_flag
 !
 !   Define spectr pick up
 !
       if(pspec_ctl%picked_mode_head_ctl%iflag .gt. 0) then
         picked_sph%file_prefix                                          &
      &        = pspec_ctl%picked_mode_head_ctl%charavalue
+!
+        picked_sph%flag_gzip = .FALSE.
+        if(pspec_ctl%picked_mode_fmt_ctl%iflag .gt. 0) then
+          input_flag = pspec_ctl%picked_mode_fmt_ctl%charavalue
+          if(check_mul_flags(input_flag, gzip_flags))                   &
+     &                           picked_sph%flag_gzip = .TRUE.
+        end if
       else
         pick_list%num_modes =  0
         pick_list%num_degree = 0
@@ -248,12 +323,15 @@
 !
       use t_ctl_data_gauss_coefs
       use t_pickup_sph_spectr_data
+      use t_multi_flag_labels
+      use m_file_format_labels
 !
       type(gauss_spectr_control), intent(in) :: g_pwr
       type(pickup_mode_list), intent(inout) :: gauss_list
       type(picked_spectrum_data), intent(inout) :: gauss_coef
 !
       integer(kind = kint) :: inum
+      character(len = kchara) :: input_flag
 !
 !
 !   set pickup gauss coefficients
@@ -268,6 +346,13 @@
         call alloc_pick_sph_l(gauss_list)
         call alloc_pick_sph_m(gauss_list)
         return
+      end if
+!
+      gauss_coef%flag_gzip = .FALSE.
+      if(g_pwr%gauss_coefs_format%iflag .gt. 0) then
+        input_flag = g_pwr%gauss_coefs_format%charavalue
+        if(check_mul_flags(input_flag, gzip_flags))                     &
+     &                     gauss_coef%flag_gzip = .TRUE.
       end if
 !
       gauss_coef%num_layer = 1

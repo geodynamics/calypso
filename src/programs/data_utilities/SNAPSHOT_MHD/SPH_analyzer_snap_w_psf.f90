@@ -74,6 +74,7 @@
       use sph_mhd_rst_IO_control
       use check_dependency_for_MHD
       use input_control_sph_MHD
+      use cal_write_sph_monitor_data
 !
       type(MHD_file_IO_params), intent(in) :: MHD_files
       type(phys_address), intent(in) :: iphys
@@ -110,11 +111,10 @@
 !
 ! ---------------------------------
 !
-      if (iflag_debug.gt.0) write(*,*) 'init_reference_scalars'
-      call init_reference_scalars                                       &
-     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd,                      &
-     &    SPH_model%ref_temp, SPH_model%ref_comp, SPH_MHD%fld,          &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
+      if (iflag_debug.gt.0) write(*,*) 'init_reference_fields '
+      call init_reference_fields                                        &
+     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd, SPH_model%refs,      &
+     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 ! ---------------------------------
 !
@@ -128,12 +128,14 @@
 !  set original spectr mesh data for extension of B
 !
       call init_radial_sph_interpolation(MHD_files%org_rj_file_IO,      &
-     &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj)
+     &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj, SPH_WK%rj_itp)
 !*
-      if(iflag_debug .gt. 0) write(*,*) 'open_sph_vol_rms_file_mhd'
-      call open_sph_vol_rms_file_mhd                                    &
-     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld,                       &
-     &    SPH_WK%monitor, SR_sig)
+      if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
+      if(iflag_debug .gt. 0) write(*,*) 'init_rms_sph_mhd_control'
+      call init_rms_sph_mhd_control                                     &
+     &   (SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%r_2nd,       &
+     &    SPH_MHD, SPH_WK%MHD_mats, SPH_WK%monitor, SR_sig)
+      if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
       end subroutine SPH_init_sph_snap_psf
 !
@@ -165,7 +167,7 @@
       call read_alloc_sph_rst_4_snap                                    &
      &   (i_step, MHD_files%org_rj_file_IO, MHD_files%fst_file_IO,      &
      &    MHD_step%rst_step, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld,    &
-     &    MHD_step%init_d)
+     &    MHD_step%init_d, SPH_WK%rj_itp)
       call extend_by_potential_with_j                                   &
      &   (SPH_MHD%sph%sph_rj, SPH_model%sph_MHD_bc%sph_bc_B,            &
      &    SPH_MHD%ipol%base%i_magne, SPH_MHD%ipol%base%i_current,       &
@@ -173,8 +175,9 @@
       call copy_time_data(MHD_step%init_d, MHD_step%time_d)
 !
       if (iflag_debug.eq.1) write(*,*)' sync_temp_by_per_temp_sph'
-      call sync_temp_by_per_temp_sph(SPH_model,                         &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
+      call sync_temp_by_per_temp_sph                                    &
+     &   (SPH_model%MHD_prop, SPH_model%refs,                           &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !* obtain linear terms for starting
 !*
@@ -198,8 +201,9 @@
 !*
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+5)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
-      call trans_per_temp_to_temp_sph(SPH_model,                        &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
+      call trans_per_temp_to_temp_sph                                   &
+     &   (SPH_model%MHD_prop, SPH_model%refs,                           &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !*
       if(lead_field_data_flag(i_step, MHD_step)) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
@@ -218,7 +222,8 @@
      &                write(*,*) 'output_rms_sph_mhd_control'
         call output_rms_sph_mhd_control(MHD_step%time_d, SPH_MHD,       &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc,                   &
-     &      SPH_WK%r_2nd, SPH_WK%trans_p%leg, SPH_WK%monitor, SR_sig)
+     &      SPH_WK%r_2nd, SPH_WK%trans_p%leg, SPH_WK%MHD_mats,          &
+     &      SPH_WK%monitor, SR_sig)
       end if
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+7)
 !
