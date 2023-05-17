@@ -37,10 +37,13 @@ builtin(include,src/confdb/pkg.m4)
 AC_CONFIG_SRCDIR([src/programs/SPH_MHD/main_sph_MHD_w_psf.f90])
 # AC_CONFIG_HEADER([config.h])
 
-AC_ARG_ENABLE(fftw3,
-	[  --enable-fftw3          Use fftw3 library],[USE_fftw3='yes'],[USE_fftw3='no'])
+AC_ARG_WITH(fftw3,
+	[  --with-fftw3            Use fftw3 library],[USE_fftw3='yes'],[USE_fftw3='no'])
+AC_ARG_WITH(libpng,
+	[  --with-libpng           Use libpng library],[USE_libpng='yes'],[USE_libpng='no'])
 
-AC_MSG_RESULT(enable_fftw3... "${USE_fftw3}")
+AC_MSG_RESULT(with-fftw3...   "${USE_fftw3}")
+AC_MSG_RESULT(enable-libpng..."${USE_libpng}")
 AC_MSG_RESULT(with-blas...    "${with_blas}")
 
 # Checks for programs.
@@ -179,6 +182,23 @@ then
 	AC_SUBST(ZLIB_LIBS)
 fi
 
+# Check libpng
+if test ${USE_libpng} = "yes"
+then
+	PKG_CHECK_MODULES([PNG], libpng, have_libpng=yes, AC_MSG_ERROR(Cannot find libpng))
+	echo "have_libpng=$have_libpng"
+fi
+if test ${have_libpng} = "yes"
+then
+	PKGFLAGS_PNG="png"
+else
+	PKGFLAGS_PNG=""
+	PNG_CFLAGS=""
+	PNG_LIBS=""
+fi
+AC_SUBST(PKGFLAGS_PNG)
+AC_SUBST(PNG_CFLAGS)
+AC_SUBST(PNG_LIBS)
 
 AC_MSG_RESULT()
 AC_MSG_RESULT(-----   Configuration summary   -------------------------------)
@@ -214,6 +234,11 @@ if test -n "${ZLIB_LIBS}"; then
         AC_MSG_RESULT(    Use zlib at ...       yes)
 else
         AC_MSG_RESULT(    Use zlib ...           no)
+fi
+if test -n "${PNG_LIBS}"; then
+        AC_MSG_RESULT(    Use libpng output...  yes)
+else
+        AC_MSG_RESULT(    Use libpng output...   no)
 fi
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------------------------------------------------------)

@@ -40,6 +40,11 @@ C_INCLUDE = -I.
 
 CPP_FLAGS =
 
+ifdef PNG_LIBS
+  CPP_FLAGS += -DPNG_OUTPUT
+  C_INCLUDE+= $$(PNG_CFLAGS) 
+  F90LIBS+= $$(PNG_LIBS)
+endif
 ifdef ZLIB_LIBS
   CPP_FLAGS += -DZLIB_IO
   C_INCLUDE+= $$(ZLIB_CFLAGS) 
@@ -160,6 +165,11 @@ makemake:
 	@echo '#' >> $(MAKENAME)
 	@echo 'ZLIB_CFLAGS = $(ZLIB_CFLAGS)' >> $(MAKENAME)
 	@echo 'ZLIB_LIBS =   $(ZLIB_LIBS)'   >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# libpng settings' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'PNG_CFLAGS = $(PNG_CFLAGS)'   >> $(MAKENAME)
+	@echo 'PNG_LIBS =    $(PNG_LIBS)'    >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '# BLAS settings' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)

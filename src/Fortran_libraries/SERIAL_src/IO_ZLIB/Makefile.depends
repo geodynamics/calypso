@@ -118,8 +118,6 @@ sel_gz_read_sph_mtr_header.o: $(ZLIB_IO_DIR)/sel_gz_read_sph_mtr_header.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 skip_gz_comment.o: $(ZLIB_IO_DIR)/skip_gz_comment.f90 m_precision.o m_constants.o m_file_format_switch.o t_buffer_4_gzip.o gzip_file_access.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_png_file_access.o: $(ZLIB_IO_DIR)/t_png_file_access.f90 m_precision.o m_constants.o
-	$(F90) -c $(F90OPTFLAGS) $<
 zlib_convert_ascii_vector.o: $(ZLIB_IO_DIR)/zlib_convert_ascii_vector.f90 m_precision.o m_constants.o t_buffer_4_gzip.o data_IO_to_textline.o gzip_defleate.o gzip_infleate.o field_data_IO.o field_data_MPI_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 zlib_convert_text.o: $(ZLIB_IO_DIR)/zlib_convert_text.f90 m_precision.o m_constants.o m_machine_parameter.o data_IO_to_textline.o t_buffer_4_gzip.o gzip_defleate.o gzip_infleate.o field_data_IO.o field_data_MPI_IO.o
