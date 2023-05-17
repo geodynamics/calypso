@@ -8,23 +8,27 @@
 !!
 !!@verbatim
 !!      subroutine init_rms_sph_mhd_control(MHD_prop, sph_MHD_bc,       &
-!!     &          r_2nd, SPH_MHD, MHD_mats, monitor, SR_sig)
+!!     &          r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats, monitor,  &
+!!     &          SR_sig, SR_r)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(parameters_4_sph_trans), intent(in) :: trans_p
+!!        type(phys_data), intent(in) :: nod_fld
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(MHD_radial_matrices), intent(inout) :: MHD_mats
 !!        type(sph_mhd_monitor_data), intent(inout) :: monitor
 !!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine output_rms_sph_mhd_control(time_d, SPH_MHD, MHD_prop,&
-!!     &          sph_MHD_bc, r_2nd, leg, MHD_mats, monitor, SR_sig)
+!!     &          sph_MHD_bc, r_2nd, trans_p, MHD_mats, monitor, SR_sig)
 !!      subroutine output_sph_monitor_data(time_d, sph_params, sph_rj,  &
 !!     &          sph_bc_U, ipol, rj_fld, monitor, SR_sig)
 !!        type(time_data), intent(in) :: time_d
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(fdm_matrices), intent(in) :: r_2nd
-!!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(SPH_mesh_field_data), intent(in) :: SPH_MHD
 !!        type(sph_mhd_monitor_data), intent(inout) :: monitor
 !!        type(phys_address), intent(in) :: ipol
@@ -75,7 +79,7 @@
       use t_phys_data
       use t_boundary_data_sph_MHD
       use t_boundary_sph_spectr
-      use t_schmidt_poly_on_rtm
+      use t_work_4_sph_trans
       use t_time_data
       use t_rms_4_sph_spectr
       use t_sum_sph_rms_data
@@ -89,6 +93,8 @@
       use t_radial_matrices_sph_MHD
       use t_sph_matrix
 !
+      implicit none
+!
       private :: cal_sph_monitor_data
 !
 !  --------------------------------------------------------------------
@@ -98,21 +104,28 @@
 !  --------------------------------------------------------------------
 !
       subroutine init_rms_sph_mhd_control(MHD_prop, sph_MHD_bc,         &
-     &          r_2nd, SPH_MHD, MHD_mats, monitor, SR_sig)
+     &          r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats, monitor,    &
+     &          SR_sig, SR_r)
 !
       use t_solver_SR
       use cal_heat_source_Nu
+      use field_at_mid_equator
+      use const_data_4_dynamobench
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(fdm_matrices), intent(in) :: r_2nd
+      type(parameters_4_sph_trans), intent(in) :: trans_p
+      type(phys_data), intent(in) :: nod_fld
 !
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(MHD_radial_matrices), intent(inout) :: MHD_mats
       type(sph_mhd_monitor_data), intent(inout) :: monitor
       type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
       character(len=kchara) :: mat_name
+      integer(kind = kint) :: i
 !
 !
      if(monitor%heat_Nusselt%iflag_Nusselt .eq. iflag_source_Nu) then
@@ -134,13 +147,35 @@
       call open_sph_vol_rms_file_mhd(SPH_MHD%sph, sph_MHD_bc%sph_bc_U,  &
      &   SPH_MHD%ipol, SPH_MHD%fld, monitor, SR_sig)
 !
+      if(monitor%bench%iflag_dynamobench .gt. 0) then
+        call init_circle_field_name_dbench(SPH_MHD%ipol,                &
+     &      monitor%circ_mid_eq%d_circle, monitor%bench)
+        call init_mid_equator_point_global(SPH_MHD%sph,                 &
+     &                                     monitor%circ_mid_eq)
+        call init_circle_point_global                                   &
+     &     (SPH_MHD%sph, SPH_MHD%comms, trans_p,                        &
+     &      monitor%circ_mid_eq, SR_sig, SR_r)
+        call alloc_dynamobench_monitor(monitor%circ_mid_eq%d_circle,    &
+     &                                 monitor%bench)
+      end if
+!
+      do i = 1, monitor%mul_circle%num_circles
+        call dup_phys_name                                              &
+     &     (nod_fld, monitor%mul_circle%cdat(i)%d_circle)
+        call init_circle_point_global                                   &
+     &     (SPH_MHD%sph, SPH_MHD%comms, trans_p,                        &
+     &      monitor%mul_circle%cdat(i), SR_sig, SR_r)
+        call set_circle_transfer_address(nod_fld, SPH_MHD%fld,          &
+     &                                   monitor%mul_circle%cdat(i))
+      end do
+!
       end subroutine init_rms_sph_mhd_control
 !
 !  --------------------------------------------------------------------
 !  --------------------------------------------------------------------
 !
       subroutine output_rms_sph_mhd_control(time_d, SPH_MHD, MHD_prop,  &
-     &          sph_MHD_bc, r_2nd, leg, MHD_mats, monitor, SR_sig)
+     &          sph_MHD_bc, r_2nd, trans_p, MHD_mats, monitor, SR_sig)
 !
       use t_solver_SR
       use t_time_data
@@ -149,7 +184,7 @@
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(fdm_matrices), intent(in) :: r_2nd
-      type(legendre_4_sph_trans), intent(in) :: leg
+      type(parameters_4_sph_trans), intent(in) :: trans_p
       type(SPH_mesh_field_data), intent(in) :: SPH_MHD
       type(MHD_radial_matrices), intent(in) :: MHD_mats
 !
@@ -158,21 +193,21 @@
 !
 !
       call cal_sph_monitor_data                                         &
-     &   (SPH_MHD%sph, MHD_prop, sph_MHD_bc, r_2nd, leg,                &
+     &   (time_d, SPH_MHD%sph, MHD_prop, sph_MHD_bc, r_2nd, trans_p,    &
      &    MHD_mats, SPH_MHD%ipol, SPH_MHD%fld, monitor)
 !
       call output_sph_monitor_data                                      &
      &   (time_d, SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj,           &
-     &    sph_MHD_bc%sph_bc_U, SPH_MHD%ipol, SPH_MHD%fld,               &
-     &    monitor, SR_sig)
+     &    sph_MHD_bc, SPH_MHD%ipol, SPH_MHD%fld, monitor, SR_sig)
 !
       end subroutine output_rms_sph_mhd_control
 !
 !  --------------------------------------------------------------------
 !  --------------------------------------------------------------------
 !
-      subroutine cal_sph_monitor_data(sph, MHD_prop, sph_MHD_bc,        &
-     &          r_2nd, leg, MHD_mats, ipol, rj_fld, monitor)
+      subroutine cal_sph_monitor_data(time_d, sph, MHD_prop,            &
+     &          sph_MHD_bc, r_2nd, trans_p, MHD_mats, ipol, rj_fld,     &
+     &          monitor)
 !
       use cal_rms_fields_by_sph
       use pickup_sph_spectr_data
@@ -180,12 +215,15 @@
       use cal_heat_source_Nu
       use cal_CMB_dipolarity
       use cal_typical_scale
+      use const_data_4_dynamobench
+      use sph_fwd_trans_on_circles
 !
+      type(time_data), intent(in) :: time_d
       type(sph_grids), intent(in) :: sph
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(fdm_matrices), intent(in) :: r_2nd
-      type(legendre_4_sph_trans), intent(in) :: leg
+      type(parameters_4_sph_trans), intent(in) :: trans_p
       type(MHD_radial_matrices), intent(in) :: MHD_mats
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(in) :: rj_fld
@@ -194,8 +232,8 @@
 !
 !
       if(iflag_debug.gt.0)  write(*,*) 'cal_rms_sph_outer_core'
-      call cal_mean_squre_in_shell(sph%sph_params, sph%sph_rj,          &
-     &    ipol, rj_fld, leg%g_sph_rj, monitor%pwr, monitor%WK_pwr)
+      call cal_mean_squre_in_shell(sph%sph_params, sph%sph_rj, ipol,    &
+     &    rj_fld, trans_p%leg, monitor%pwr, monitor%WK_pwr)
 !
        if(monitor%heat_Nusselt%iflag_Nusselt .ne. 0) then
         call sel_Nusselt_routine(ipol%base%i_temp,                      &
@@ -223,28 +261,41 @@
       if(iflag_debug.gt.0)  write(*,*) 'cal_typical_scales'
       call cal_typical_scales(monitor%pwr, monitor%tsl)
 !
+!
+      call const_dynamobench_data                                       &
+     &  (time_d, sph%sph_params, sph%sph_rj, sph_MHD_bc, trans_p,       &
+     &   ipol, rj_fld, monitor%pwr, monitor%circ_mid_eq, monitor%bench)
+!
+      call sph_forward_trans_on_circles(trans_p%iflag_FFT,              &
+     &    sph%sph_rj, rj_fld, monitor%mul_circle%num_circles,           &
+     &    monitor%mul_circle%cdat(1))
+!
       end subroutine cal_sph_monitor_data
 !
 !  --------------------------------------------------------------------
 !
       subroutine output_sph_monitor_data(time_d, sph_params, sph_rj,    &
-     &          sph_bc_U, ipol, rj_fld, monitor, SR_sig)
+     &          sph_MHD_bc, ipol, rj_fld, monitor, SR_sig)
 !
       use t_solver_SR
       use output_sph_pwr_volume_file
       use write_picked_sph_spectr
       use write_sph_gauss_coefs
       use write_typical_scale
+      use write_dynamo_benchmark_file
+      use write_monitors_circle_file
 !
       type(time_data), intent(in) :: time_d
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(sph_boundary_type), intent(in) :: sph_bc_U
+      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(in) :: rj_fld
 !
       type(sph_mhd_monitor_data), intent(inout) :: monitor
       type(send_recv_status), intent(inout) :: SR_sig
+!
+      integer(kind = kint) :: i
 !
 !
       if(iflag_debug.gt.0)  write(*,*) 'write_total_energy_to_screen'
@@ -275,12 +326,24 @@
       end if
 !
       call write_typical_scales(time_d%i_time_step, time_d%time,        &
-     &    sph_params, sph_rj, sph_bc_U, monitor%pwr, monitor%tsl)
+     &    sph_params, sph_rj, sph_MHD_bc%sph_bc_U,                      &
+     &    monitor%pwr, monitor%tsl)
 !
       call write_picked_spectrum_files                                  &
      &   (time_d, sph_params, sph_rj, rj_fld, monitor%pick_coef)
       call append_sph_gauss_coefs_file(time_d, sph_params, sph_rj,      &
      &    ipol, rj_fld, monitor%gauss_coef, SR_sig)
+!
+      call write_dynamobench_files                                      &
+     &   (sph_params, sph_rj, ipol, sph_MHD_bc,                         &
+     &    monitor%pwr%v_spectr(monitor%bench%ipwr_ocore), time_d,       &
+     &    monitor%circ_mid_eq%circle%gzip_flag_circle,                  &
+     &    monitor%circ_mid_eq, monitor%bench)
+!
+      do i = 1, monitor%mul_circle%num_circles
+        call write_mtr_on_circle_file(my_rank, sph_params, time_d,      &
+     &                                monitor%mul_circle%cdat(i))
+      end do
 !
       end subroutine output_sph_monitor_data
 !

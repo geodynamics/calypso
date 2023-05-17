@@ -9,8 +9,7 @@ LIB_MHD_FILE= libcalypso_MHD.a
 
 SUBDIRS = \
 IO \
-sph_MHD \
-field_data
+sph_MHD
 
 #
 #  -------------------------------------------------------------------------

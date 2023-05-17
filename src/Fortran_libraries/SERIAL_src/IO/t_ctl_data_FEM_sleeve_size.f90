@@ -124,7 +124,10 @@
 !
       integer(kind = kint) :: maxlen = 0
 !
-      maxlen = max(maxlen, len_trim(hd_sleeve_extension_mode))
+!
+      if(sleeve_ctl%i_FEM_sleeve_ctl .le. 0) return
+!
+      maxlen = len_trim(hd_sleeve_extension_mode)
       maxlen = max(maxlen, len_trim(hd_sleeve_level))
       maxlen = max(maxlen, len_trim(hd_sleeve_size))
       maxlen = max(maxlen, len_trim(hd_reference_vector))

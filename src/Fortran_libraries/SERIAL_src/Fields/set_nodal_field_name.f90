@@ -13,9 +13,6 @@
 !!      subroutine ordering_field_by_comp_viz(field_ctl, fld)
 !!        type(ctl_array_c3), intent(in) :: field_ctl
 !!        type(phys_data), intent(inout) :: fld
-!!      subroutine count_field_4_monitor                                &
-!!     &         (fld, num_field_monitor, ntot_comp_monitor)
-!!        type(phys_data), intent(in) :: fld
 !!@endverbatim
 !
       module set_nodal_field_name
@@ -105,31 +102,6 @@
       end do
 !
       end subroutine ordering_field_by_comp_viz
-!
-! -----------------------------------------------------------------------
-!
-      subroutine count_field_4_monitor                                  &
-     &         (fld, num_field_monitor, ntot_comp_monitor)
-!
-      type(phys_data), intent(in) :: fld
-!
-      integer(kind = kint), intent(inout) :: num_field_monitor
-      integer(kind = kint), intent(inout) :: ntot_comp_monitor
-!
-      integer(kind = kint) :: i
-!
-!    count number of components for monitoring
-!
-      num_field_monitor = 0
-      ntot_comp_monitor = 0
-      do i = 1, fld%num_phys
-        if(fld%flag_monitor(i)) then
-          num_field_monitor = num_field_monitor + 1
-          ntot_comp_monitor = ntot_comp_monitor + fld%num_component(i)
-        end if
-      end do
-!
-      end subroutine count_field_4_monitor
 !
 ! -----------------------------------------------------------------------
 !

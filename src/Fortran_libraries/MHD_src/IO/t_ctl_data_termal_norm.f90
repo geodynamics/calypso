@@ -12,10 +12,23 @@
 !!     &         (id_control, hd_block, heat_ctl, c_buf)
 !!      subroutine read_composition_eq_ctl                              &
 !!     &         (id_control, hd_block, comp_ctl, c_buf)
-!!      subroutine bcast_thermal_ctl(heat_ctl)
-!!      subroutine dealloc_thermal_ctl(heat_ctl)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(heat_equation_control), intent(inout) :: heat_ctl
 !!        type(heat_equation_control), intent(inout) :: comp_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_thermal_ctl                                    &
+!!     &         (id_control, hd_block, heat_ctl, level)
+!!      subroutine write_composition_eq_ctl                             &
+!!     &         (id_control, hd_block, comp_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(heat_equation_control), intent(in) :: heat_ctl
+!!        type(heat_equation_control), intent(in) :: comp_ctl
+!!        integer(kind = kint), intent(inout) :: level
+!!
+!!      subroutine dealloc_thermal_ctl(heat_ctl)
+!!        type(heat_equation_control), intent(inout) :: heat_ctl
 !!
 !!   --------------------------------------------------------------------
 !! example of control block
@@ -87,21 +100,21 @@
 !
 !   5th level for coefs for thermal
 !
-      character(len=kchara) :: hd_n_thermal = 'coef_4_termal_ctl'
-      character(len=kchara) :: hd_n_t_diff =  'coef_4_t_diffuse_ctl'
-      character(len=kchara) :: hd_n_h_src =  'coef_4_heat_source_ctl'
+      character(len=kchara), parameter, private                         &
+     &         :: hd_n_thermal = 'coef_4_termal_ctl'
+      character(len=kchara), parameter, private                         &
+     &         :: hd_n_t_diff =  'coef_4_t_diffuse_ctl'
+      character(len=kchara), parameter, private                         &
+     &         :: hd_n_h_src =  'coef_4_heat_source_ctl'
 !
 !   5th level for coefs for compositional scalar
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &         :: hd_n_dscalar =  'coef_4_composition_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &         :: hd_n_dsc_diff = 'coef_4_c_diffuse_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &         :: hd_n_dsc_src =    'coef_4_light_source_ctl'
-!
-      private :: hd_n_thermal, hd_n_t_diff, hd_n_h_src
-      private :: hd_n_dscalar, hd_n_dsc_diff, hd_n_dsc_src
 !
 !   --------------------------------------------------------------------
 !
@@ -174,21 +187,65 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_thermal_ctl(heat_ctl)
+      subroutine write_thermal_ctl                                      &
+     &         (id_control, hd_block, heat_ctl, level)
 !
-      use calypso_mpi_int
-      use bcast_control_arrays
+      use t_read_control_elements
+      use skip_comment_f
+      use write_control_elements
 !
-      type(heat_equation_control), intent(inout) :: heat_ctl
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(heat_equation_control), intent(in) :: heat_ctl
+!
+      integer(kind = kint), intent(inout) :: level
 !
 !
-      call bcast_ctl_array_cr(heat_ctl%coef_4_adv_flux)
-      call bcast_ctl_array_cr(heat_ctl%coef_4_diffuse)
-      call bcast_ctl_array_cr(heat_ctl%coef_4_source)
+      if(heat_ctl%i_diff_adv .le. 0) return
 !
-      call calypso_mpi_bcast_one_int(heat_ctl%i_diff_adv, 0)
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
-      end subroutine bcast_thermal_ctl
+      call write_control_array_c_r(id_control, level,                   &
+     &      hd_n_thermal, heat_ctl%coef_4_adv_flux)
+      call write_control_array_c_r(id_control, level,                   &
+     &      hd_n_t_diff, heat_ctl%coef_4_diffuse)
+      call write_control_array_c_r(id_control, level,                   &
+     &      hd_n_h_src, heat_ctl%coef_4_source)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_thermal_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_composition_eq_ctl                               &
+     &         (id_control, hd_block, comp_ctl, level)
+!
+      use t_read_control_elements
+      use skip_comment_f
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(heat_equation_control), intent(in) :: comp_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+!
+      if(comp_ctl%i_diff_adv .le. 0) return
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_control_array_c_r(id_control, level,                   &
+     &      hd_n_dscalar, comp_ctl%coef_4_adv_flux)
+      call write_control_array_c_r(id_control, level,                   &
+     &      hd_n_dsc_diff, comp_ctl%coef_4_diffuse)
+      call write_control_array_c_r(id_control, level,                   &
+     &      hd_n_dsc_src, comp_ctl%coef_4_source)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_composition_eq_ctl
 !
 ! -----------------------------------------------------------------------
 !

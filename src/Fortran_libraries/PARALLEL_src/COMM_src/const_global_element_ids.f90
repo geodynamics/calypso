@@ -29,18 +29,16 @@
 !!        integer(kind = kint_gl), intent(in)  :: iele_global(nele)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_int8_buffer), intent(inout) :: SR_il
-!!      subroutine check_element_position(txt, nnod, inod_global,       &
+!!      subroutine check_element_position(txt, inod_global,             &
 !!     &          nele, nnod_4_ele, ie, iele_global, x_ele,             &
-!!     &          inod_dbl, iele_dbl, e_comm, SR_sig, SR_r)
+!!     &          inod_dbl, e_comm, SR_sig, SR_r)
 !!        character(len=kchara), intent(in) :: txt
-!!        integer(kind = kint), intent(in) :: nnod
 !!        integer(kind = kint_gl), intent(in) :: inod_global(nele)
 !!        integer(kind = kint), intent(in) :: nele, nnod_4_ele
 !!        integer(kind = kint), intent(in) :: ie(nele,nnod_4_ele)
 !!        integer(kind = kint_gl), intent(in) :: iele_global(nele)
 !!        real(kind = kreal), intent(in)  :: x_ele(nele,3)
 !!        type(node_ele_double_number), intent(in) :: inod_dbl
-!!        type(element_double_number), intent(in) ::  iele_dbl
 !!        type(communication_table), intent(in) :: e_comm
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
@@ -212,9 +210,9 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine check_element_position(txt, nnod, inod_global,         &
+      subroutine check_element_position(txt, inod_global,               &
      &          nele, nnod_4_ele, ie, iele_global, x_ele,               &
-     &          inod_dbl, iele_dbl, e_comm, SR_sig, SR_r)
+     &          inod_dbl, e_comm, SR_sig, SR_r)
 !
       use t_para_double_numbering
       use t_element_double_number
@@ -222,7 +220,6 @@
       use solver_SR_type
 !
       character(len=kchara), intent(in) :: txt
-      integer(kind = kint), intent(in) :: nnod
       integer(kind = kint_gl), intent(in) :: inod_global(nele)
       integer(kind = kint), intent(in) :: nele, nnod_4_ele
       integer(kind = kint), intent(in) :: ie(nele,nnod_4_ele)
@@ -230,7 +227,6 @@
       real(kind = kreal), intent(in)  :: x_ele(nele,3)
 !
       type(node_ele_double_number), intent(in) :: inod_dbl
-      type(element_double_number), intent(in) ::  iele_dbl
       type(communication_table), intent(in) :: e_comm
 !
       type(send_recv_status), intent(inout) :: SR_sig
@@ -241,9 +237,9 @@
 !      integer(kind = kint), allocatable :: id_test(:,:)
 !      integer(kind = kint), allocatable :: ir_test(:,:)
       integer(kind = kint_gl), allocatable :: l_test(:)
-      integer(kind = kint) :: iele, inum, iflag, iflag_gl, k1
-      integer(kind = kint) :: ip
       integer(kind = kint) :: inod_e(nnod_4_ele)
+      integer(kind = kint) :: iele, inum, iflag, iflag_gl
+!      integer(kind = kint) :: k1
 !
 !
       if(i_debug .gt. 0) write(*,*) 'Number of  ', trim(txt),           &

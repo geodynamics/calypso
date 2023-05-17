@@ -9,7 +9,17 @@
 !!@verbatim
 !!      subroutine read_monitor_data_ctl                                &
 !!     &         (id_control, hd_block, nmtr_ctl, c_buf)
-!!      subroutine bcast_monitor_data_ctl(nmtr_ctl)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(node_monitor_control), intent(inout) :: nmtr_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_monitor_data_ctl                               &
+!!     &         (id_control, hd_block, nmtr_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(node_monitor_control), intent(in) :: nmtr_ctl
+!!        integer(kind = kint), intent(inout) :: level
+!!
 !!      subroutine dealloc_monitor_data_ctl(nmtr_ctl)
 !!        type(node_monitor_control), intent(inout) :: nmtr_ctl
 !!
@@ -109,21 +119,34 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_monitor_data_ctl(nmtr_ctl)
+      subroutine write_monitor_data_ctl                                 &
+     &         (id_control, hd_block, nmtr_ctl, level)
 !
-      use calypso_mpi_int
-      use bcast_control_arrays
+      use t_read_control_elements
+      use skip_comment_f
+      use write_control_elements
 !
-      type(node_monitor_control), intent(inout) :: nmtr_ctl
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(node_monitor_control), intent(in) :: nmtr_ctl
+!
+      integer(kind = kint), intent(inout) :: level
 !
 !
-      call bcast_ctl_array_c1(nmtr_ctl%group_4_monitor_ctl)
-      call bcast_ctl_array_r3(nmtr_ctl%xx_4_monitor_ctl)
-      call bcast_ctl_array_i2(nmtr_ctl%node_4_monitor_ctl)
+      if(nmtr_ctl%i_monitor_data .le. 0) return
 !
-      call calypso_mpi_bcast_one_int(nmtr_ctl%i_monitor_data, 0)
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
-      end subroutine bcast_monitor_data_ctl
+      call write_control_array_c1(id_control, level,                   &
+     &    hd_monitor_grp, nmtr_ctl%group_4_monitor_ctl)
+      call write_control_array_r3(id_control, level,                   &
+     &    hd_monitor_position, nmtr_ctl%xx_4_monitor_ctl)
+      call write_control_array_i2(id_control, level,                   &
+     &    hd_monitor_node, nmtr_ctl%node_4_monitor_ctl)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_monitor_data_ctl
 !
 !   --------------------------------------------------------------------
 !

@@ -10,7 +10,16 @@
 !!@verbatim
 !!      subroutine read_induction_ctl                                   &
 !!     &         (id_control, hd_block, induct_ctl, c_buf)
-!!      subroutine bcast_induction_ctl(induct_ctl)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(induction_equation_control), intent(inout) :: induct_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_induction_ctl                                  &
+!!     &         (id_control, hd_block, induct_ctl, level)
+!!         integer(kind = kint), intent(in) :: id_control
+!!         character(len=kchara), intent(in) :: hd_block
+!!         type(induction_equation_control), intent(in) :: induct_ctl
+!!         integer(kind = kint), intent(inout) :: level
 !!      subroutine dealloc_induction_ctl(induct_ctl)
 !!        type(induction_equation_control), intent(inout) :: induct_ctl
 !!
@@ -120,22 +129,36 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_induction_ctl(induct_ctl)
+      subroutine write_induction_ctl                                    &
+     &         (id_control, hd_block, induct_ctl, level)
 !
-      use calypso_mpi_int
-      use bcast_control_arrays
+      use t_read_control_elements
+      use write_control_elements
+      use skip_comment_f
 !
-      type(induction_equation_control), intent(inout) :: induct_ctl
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(induction_equation_control), intent(in) :: induct_ctl
+!
+      integer(kind = kint), intent(inout) :: level
 !
 !
-      call bcast_ctl_array_cr(induct_ctl%coef_4_magne_evo)
-      call bcast_ctl_array_cr(induct_ctl%coef_4_mag_potential)
-      call bcast_ctl_array_cr(induct_ctl%coef_4_mag_diffuse)
-      call bcast_ctl_array_cr(induct_ctl%coef_4_induction)
+      if(induct_ctl%i_induct_ctl .le. 0) return
 !
-      call calypso_mpi_bcast_one_int(induct_ctl%i_induct_ctl, 0)
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
-      end subroutine bcast_induction_ctl
+      call write_control_array_c_r(id_control, level,                 &
+     &    hd_n_magne, induct_ctl%coef_4_magne_evo)
+      call write_control_array_c_r(id_control, level,                 &
+     &    hd_n_mag_p, induct_ctl%coef_4_mag_potential)
+      call write_control_array_c_r(id_control, level,                 &
+     &    hd_n_m_diff, induct_ctl%coef_4_mag_diffuse)
+      call write_control_array_c_r(id_control, level,                 &
+     &    hd_n_induct, induct_ctl%coef_4_induction)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_induction_ctl
 !
 !   --------------------------------------------------------------------
 !

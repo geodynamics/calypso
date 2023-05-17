@@ -7,13 +7,11 @@
 !>@brief  Dynamo benchmark results
 !!
 !!@verbatim
-!!      subroutine open_dynamobench_monitor_file                        &
-!!     &         (sph_bc_U, sph_bc_B, ipol)
-!!      subroutine output_field_4_dynamobench                           &
-!!     &          (i_step, time, sph_bc_U, sph_bc_B, ipol, bench)
-!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!!        type(phys_address), intent(in) :: ipol
-!!        type(dynamobench_monitor), intent(in) :: bench
+!!      subroutine init_circle_field_name_dbench(fld_ctl,               &
+!!     &                                         d_circle, bench)
+!!        type(ctl_array_c3), intent(in) :: fld_ctl
+!!        type(phys_data), intent(inout) :: d_circle
+!!        type(dynamobench_monitor), intent(inout) :: bench
 !!@endverbatim
 !!
 !!@param i_step   time step
@@ -23,26 +21,27 @@
 !
       use m_precision
       use m_constants
-      use calypso_mpi
+      use t_time_data
       use t_phys_address
+      use t_base_field_labels
       use t_boundary_data_sph_MHD
+      use t_sph_trans_arrays_MHD
 !
       implicit none
 !
-!>      file ID for benchmark output file
-      integer(kind=kint), parameter :: id_dynamobench = 41
-!>      file name for benchmark output file
-      character(len=kchara), parameter                                  &
-     &      :: dynamobench_field_name = 'dynamobench_field.dat'
-!
-!
       type dynamobench_monitor
-!>        temperature address for spherical transform at equator
-        integer(kind = kint) :: ibench_temp =  1
-!>        velocity address for spherical transform at equator
-        integer(kind = kint) :: ibench_velo =  2
-!>        magnetic field address for spherical transform at equator
-        integer(kind = kint) :: ibench_magne = 5
+!>        Integer flag to get dynamo benchmark data
+        integer(kind = kint) :: iflag_dynamobench =  0
+!>        file prefix for benchmark output file
+        character(len=kchara) :: benchmark_file_prefix
+!
+!>        file prefix for detailed benchmark output file
+        character(len=kchara) :: detail_bench_file_prefix
+!
+!>        Address of volume monitor data for outer core
+        integer(kind = kint) :: ipwr_ocore =  0
+!>        Address of volume monitor data for inner core
+        integer(kind = kint) :: ipwr_icore =  0
 !
 !>        average kinetic energy (poloidal, toroidal, total)
         real(kind = kreal) :: KE_bench(3)
@@ -56,6 +55,10 @@
 !>        longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
 !!        at previous monitoring
         real(kind = kreal) :: phi_prev(4) = (/zero,zero,zero,zero/)
+!>        drift phase velocity for @f$v_r = 0 @f$
+        real(kind = kreal) :: phase_vr(4) = (/zero,zero,zero,zero/)
+!>        drift phase velocity for @f$v_r = 0 @f$
+        real(kind = kreal) :: ave_phase_vr = 0.0d0
 !>        mangetic energy in inner core
         real(kind = kreal) :: mene_icore(3)
 !>        rotation rate for inner core
@@ -72,11 +75,11 @@
         real(kind = kreal) :: omega_vm4(2)      = (/zero,zero/)
 !
 !>        local point data
-        real(kind = kreal) :: d_zero(0:4,7)
-      end type dynamobench_monitor
+        real(kind = kreal), allocatable :: d_zero(:,:)
 !
-      private :: id_dynamobench, dynamobench_field_name
-      private :: open_dynamobench_monitor_file
+!>        Address list for circle data
+        type(base_field_address) :: iphys_dbench
+      end type dynamobench_monitor
 !
 ! ----------------------------------------------------------------------
 !
@@ -84,120 +87,108 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine open_dynamobench_monitor_file                          &
-     &         (sph_bc_U, sph_bc_B, ipol)
+      subroutine alloc_dynamobench_monitor(d_circle, bench)
 !
-      type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
-      type(phys_address), intent(in) :: ipol
+      use t_phys_data
 !
+      type(phys_data), intent(inout) :: d_circle
+      type(dynamobench_monitor), intent(inout) :: bench
 !
-      open(id_dynamobench, file=dynamobench_field_name,                 &
-     &    form='formatted', status='old', position='append', err = 99)
-      return
+      allocate(bench%d_zero(0:4,d_circle%ntot_phys))
+      if(d_circle%ntot_phys .le. 0) return
+      bench%d_zero(0:4,1:d_circle%ntot_phys) = 0.0d0
 !
-  99  continue
-      open(id_dynamobench, file=dynamobench_field_name)
-!
-      write(id_dynamobench,'(a)', advance='NO') 't_step    time    '
-      write(id_dynamobench,'(a)', advance='NO')                         &
-     &     'KE_pol    KE_tor    KE_total    '
-!
-      if(ipol%base%i_magne .gt. 0) then
-        write(id_dynamobench,'(a)', advance='NO')                       &
-     &     'ME_pol    ME_tor    ME_total    '
-      end if
-!
-      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
-        write(id_dynamobench,'(a)', advance='NO')                       &
-     &     'ME_pol_icore    ME_tor_icore    ME_total_icore    '
-      end if
-!
-      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        write(id_dynamobench,'(a)', advance='NO') 'omega_ic_z    '
-      end if
-!
-      write(*,*) 'sph_bc_U%iflag_icb', sph_bc_U%iflag_icb
-      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
-     &  .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        write(id_dynamobench,'(a)', advance='NO') 'MAG_torque_ic_z    '
-      end if
-!
-      write(id_dynamobench,'(a)', advance='NO')                         &
-     &     'phi_1    phi_2    phi_3    phi_4    '
-      write(id_dynamobench,'(a)', advance='NO')                         &
-     &     'omega_vp44    omega_vt54    '
-!
-      if(ipol%base%i_magne .gt. 0) then
-        write(id_dynamobench,'(a)', advance='NO') 'B_theta    '
-      end if
-!
-      write(id_dynamobench,'(a)')  'v_phi    temp'
-!
-      end subroutine open_dynamobench_monitor_file
+      end subroutine alloc_dynamobench_monitor
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine output_field_4_dynamobench                             &
-     &          (i_step, time, sph_MHD_bc, ipol, bench)
+      subroutine dealloc_dynamobench_monitor(bench)
 !
-      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-      type(phys_address), intent(in) :: ipol
-      integer(kind = kint), intent(in) :: i_step
-      real(kind = kreal), intent(in) :: time
-      type(dynamobench_monitor), intent(in) :: bench
+      type(dynamobench_monitor), intent(inout) :: bench
 !
+      if(allocated(bench%d_zero) .eqv. .FALSE.) return
+      deallocate(bench%d_zero)
 !
-      if(my_rank .ne. 0) return
-!
-      call open_dynamobench_monitor_file                                &
-     &   (sph_MHD_bc%sph_bc_U, sph_MHD_bc%sph_bc_B, ipol)
-!
-      write(id_dynamobench,'(i15,1pE25.15e3)', advance='NO')            &
-     &     i_step, time
-      write(id_dynamobench,'(1p3E25.15e3)', advance='NO')               &
-     &     bench%KE_bench(1:3)
-!
-      if(ipol%base%i_magne .gt. 0) then
-        write(id_dynamobench,'(1p3E25.15e3)', advance='NO')             &
-     &     bench%ME_bench(1:3)
-      end if
-!
-!
-      if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
-        write(id_dynamobench,'(1p3E25.15e3)', advance='NO')             &
-     &     bench%mene_icore(1:3)
-      end if
-!
-      if(sph_MHD_bc%sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
-     &     bench%rotate_icore(0)
-      end if
-!
-      if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center       &
-     &   .and. sph_MHD_bc%sph_bc_U%iflag_icb .eq. iflag_rotatable_ic)   &
-     & then
-        write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
-     &     bench%m_torque_icore(0)
-      end if
-!
-      write(id_dynamobench,'(1p4E25.15e3)', advance='NO')               &
-     &      bench%phi_zero(1:4)
-      write(id_dynamobench,'(1p2E25.15e3)', advance='NO')               &
-     &      bench%omega_vm4(1:2)
-!
-      if(ipol%base%i_magne .gt. 0) then
-        write(id_dynamobench,'(1p2E25.15e3)', advance='NO')             &
-     &      bench%d_zero(0,bench%ibench_magne+1)
-      end if
-!
-      write(id_dynamobench,'(1p2E25.15e3)')                             &
-     &     bench%d_zero(0,bench%ibench_velo+2),                         &
-     &     bench%d_zero(0,bench%ibench_temp)
-!
-      close(id_dynamobench)
-!
-      end subroutine output_field_4_dynamobench
+      end subroutine dealloc_dynamobench_monitor
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine init_circle_field_name_dbench(ipol, d_circle, bench)
+!
+      use t_phys_data
+      use m_base_field_labels
+      use m_phys_constants
+      use skip_comment_f
+!
+      type(phys_address), intent(in) :: ipol
+!
+      type(phys_data), intent(inout) :: d_circle
+      type(dynamobench_monitor), intent(inout) :: bench
+!
+      integer(kind = kint) :: ifld
+!
+!
+      d_circle%num_phys = 0
+      if(ipol%base%i_velo .gt. 0) then
+        d_circle%num_phys = d_circle%num_phys + 1
+      end if
+      if(ipol%base%i_magne .gt. 0) then
+        d_circle%num_phys = d_circle%num_phys + 1
+      end if
+      if(ipol%base%i_temp .gt. 0) then
+        d_circle%num_phys = d_circle%num_phys + 1
+      end if
+      if(ipol%base%i_light .gt. 0) then
+        d_circle%num_phys = d_circle%num_phys + 1
+      end if
+!
+      call alloc_phys_name(d_circle)
+!
+      ifld = 0
+      if(ipol%base%i_velo .gt. 0) then
+        ifld = ifld + 1
+        bench%iphys_dbench%i_velo                                       &
+     &                    = d_circle%istack_component(ifld-1) + 1
+        d_circle%phys_name(ifld) =     velocity%name
+        d_circle%num_component(ifld) = n_vector
+        d_circle%istack_component(ifld)                                 &
+     &        = d_circle%istack_component(ifld-1) + n_vector
+      end if
+      if(ipol%base%i_magne .gt. 0) then
+        ifld = ifld + 1
+        bench%iphys_dbench%i_magne                                      &
+     &                    = d_circle%istack_component(ifld-1) + 1
+        d_circle%phys_name(ifld) =     magnetic_field%name
+        d_circle%num_component(ifld) = n_vector
+        d_circle%istack_component(ifld)                                 &
+     &        = d_circle%istack_component(ifld-1) + n_vector
+      end if
+      if(ipol%base%i_temp .gt. 0) then
+        ifld = ifld + 1
+        bench%iphys_dbench%i_temp                                       &
+     &                    = d_circle%istack_component(ifld-1) + 1
+        d_circle%phys_name(ifld) =     temperature%name
+        d_circle%num_component(ifld) = n_scalar
+        d_circle%istack_component(ifld)                                 &
+     &        = d_circle%istack_component(ifld-1) + n_scalar
+      end if
+      if(ipol%base%i_light .gt. 0) then
+        ifld = ifld + 1
+        bench%iphys_dbench%i_light                                      &
+     &                    = d_circle%istack_component(ifld-1) + 1
+        d_circle%phys_name(ifld) =     composition%name
+        d_circle%num_component(ifld) = n_scalar
+        d_circle%istack_component(ifld)                                 &
+     &        = d_circle%istack_component(ifld-1) + n_scalar
+      end if
+      d_circle%flag_monitor = .TRUE.
+      d_circle%ntot_phys =     d_circle%istack_component(ifld)
+      d_circle%num_phys_viz =  d_circle%num_phys
+      d_circle%ntot_phys_viz = d_circle%ntot_phys
+!
+      end subroutine init_circle_field_name_dbench
+!
+! -----------------------------------------------------------------------
 !
       end module t_field_4_dynamobench

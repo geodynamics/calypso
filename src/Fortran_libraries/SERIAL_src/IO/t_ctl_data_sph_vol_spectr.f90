@@ -17,8 +17,17 @@
 !!
 !!      subroutine read_each_vol_spectr_ctl                             &
 !!     &         (id_control, hd_block, v_pwr, c_buf)
-!!      subroutine reset_volume_spectr_control(v_pwr)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(volume_spectr_control), intent(inout) :: v_pwr
+!!        type(buffer_for_control), intent(inout) :: c_buf
+!!      subroutine write_each_vol_spectr_ctl                            &
+!!     &         (id_control, hd_block, v_pwr, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(volume_spectr_control), intent(in) :: v_pwr
+!!        integer(kind = kint), intent(inout) :: level
+!!      subroutine reset_volume_spectr_control(v_pwr)
 !!        type(volume_spectr_control), intent(inout) :: v_pwr
 !!
 !! -----------------------------------------------------------------
@@ -163,6 +172,48 @@
       v_pwr%i_vol_spectr_ctl = 1
 !
       end subroutine read_each_vol_spectr_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_each_vol_spectr_ctl                              &
+     &         (id_control, hd_block, v_pwr, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(volume_spectr_control), intent(in) :: v_pwr
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(v_pwr%i_vol_spectr_ctl .le. 0) return
+!
+      maxlen = len_trim(hd_vol_pwr)
+      maxlen = max(maxlen, len_trim(hd_vol_fmt))
+      maxlen = max(maxlen, len_trim(hd_vol_ave))
+      maxlen = max(maxlen, len_trim(hd_inner_r))
+      maxlen = max(maxlen, len_trim(hd_outer_r))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_vol_pwr, v_pwr%volume_spec_file_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_vol_fmt, v_pwr%volume_spec_format_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_vol_ave, v_pwr%volume_ave_file_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_inner_r, v_pwr%inner_radius_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_outer_r, v_pwr%outer_radius_ctl)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_each_vol_spectr_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

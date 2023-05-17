@@ -7,6 +7,8 @@
 !!@n    Connect to vizs  by H. Matsui in July 2006 (ver 2.0)
 !
 !>@brief  Main program to evaluate snapshots from spectr data
+!!         with visualizers
+!!         Input control file: control_snapshot
 !
       program sph_snapshot_w_psf
 !
@@ -17,11 +19,14 @@
 !
       implicit none
 !
+!>      File name for control file
+      character(len=kchara), parameter                                  &
+     &                      :: snap_ctl_name = 'control_snapshot'
+!
 !
       call calypso_MPI_init
 !
-      call initialize_sph_snap_w_psf
-!
+      call initialize_sph_snap_w_psf(snap_ctl_name)
       call evolution_sph_snap_w_psf
 !
       call calypso_MPI_finalize

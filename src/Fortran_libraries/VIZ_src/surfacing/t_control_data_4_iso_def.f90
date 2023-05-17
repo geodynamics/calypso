@@ -15,8 +15,16 @@
 !!
 !!      subroutine read_iso_define_data                                 &
 !!     &         (id_control, hd_block, iso_def_c, c_buf)
-!!      subroutine bcast_iso_define_control(iso_def_c)
-!!        type(iso_define_ctl), intent(inout) :: iso_def_c
+!!         integer(kind = kint), intent(in) :: id_control
+!!         character(len=kchara), intent(in) :: hd_block
+!!         type(iso_define_ctl), intent(inout) :: iso_def_c
+!!         type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_iso_define_data                                &
+!!     &         (id_control, hd_block, iso_def_c, level)
+!!         integer(kind = kint), intent(in) :: id_control
+!!         character(len=kchara), intent(in) :: hd_block
+!!         type(iso_define_ctl), intent(in) :: iso_def_c
+!!         integer(kind = kint), intent(inout) :: level
 !!
 !!      integer(kind = kint) function num_label_iso_define_control()
 !!      subroutine set_label_iso_define_control(names)
@@ -195,25 +203,44 @@
       end subroutine read_iso_define_data
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
 !
-      subroutine bcast_iso_define_control(iso_def_c)
+      subroutine write_iso_define_data                                  &
+     &         (id_control, hd_block, iso_def_c, level)
 !
-      use calypso_mpi
-      use calypso_mpi_int
-      use bcast_control_arrays
+      use write_control_elements
 !
-      type(iso_define_ctl), intent(inout) :: iso_def_c
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(iso_define_ctl), intent(in) :: iso_def_c
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
 !
 !
-      call bcast_ctl_type_c1(iso_def_c%isosurf_comp_ctl)
-      call bcast_ctl_array_c1(iso_def_c%iso_area_ctl)
-      call bcast_ctl_type_r1(iso_def_c%isosurf_value_ctl)
-      call bcast_ctl_type_c1(iso_def_c%isosurf_data_ctl)
+      if(iso_def_c%i_iso_define .le. 0) return
 !
-      call calypso_mpi_bcast_one_int(iso_def_c%i_iso_define, 0)
+      maxlen = len_trim(hd_iso_field)
+      maxlen = max(maxlen, len_trim(hd_iso_comp))
+      maxlen = max(maxlen, len_trim(hd_iso_value))
 !
-      end subroutine bcast_iso_define_control
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_iso_field, iso_def_c%isosurf_data_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_iso_comp, iso_def_c%isosurf_comp_ctl)
+!
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_iso_value, iso_def_c%isosurf_value_ctl)
+!
+      write(id_control,'(a1)') '!'
+      call write_control_array_c1(id_control, level,                    &
+     &    hd_iso_area, iso_def_c%iso_area_ctl)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_iso_define_data
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

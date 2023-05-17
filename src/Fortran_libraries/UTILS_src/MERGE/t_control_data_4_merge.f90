@@ -37,8 +37,13 @@
 !
 !>        Structure for merged program control
       type control_data_4_merge
+!>        File name to read original spherical shell control file
+        character (len = kchara) :: fname_src_psph_ctl
 !>        Structure for file information for original data
         type(platform_data_control) :: source_plt
+!
+!>        File name to read assembled spherical shell control file
+        character (len = kchara) :: fname_asbl_psph_ctl
 !>        Structure for file information for assembled data
         type(platform_data_control) :: assemble_plt
 !
@@ -161,6 +166,9 @@
        subroutine read_merge_control_data                               &
       &         (id_control, hd_block, mgd_ctl, c_buf)
 !
+      use ctl_data_platforms_IO
+      use ctl_file_gen_sph_shell_IO
+!
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
@@ -186,10 +194,10 @@
         call read_newrst_control                                        &
      &     (id_control, hd_newrst_magne, mgd_ctl, c_buf)
 !
-        call read_parallel_shell_in_MHD_ctl                             &
-     &     (id_control, hd_orgsph_shell, mgd_ctl%src_psph_ctl, c_buf)
-        call read_parallel_shell_in_MHD_ctl                             &
-     &     (id_control, hd_newsph_shell, mgd_ctl%asbl_psph_ctl, c_buf)
+        call sel_read_ctl_gen_shell_grids(id_control, hd_orgsph_shell,  &
+     &      mgd_ctl%fname_src_psph_ctl,  mgd_ctl%src_psph_ctl, c_buf)
+        call sel_read_ctl_gen_shell_grids(id_control, hd_newsph_shell,  &
+     &      mgd_ctl%fname_asbl_psph_ctl, mgd_ctl%asbl_psph_ctl, c_buf)
       end do
       mgd_ctl%i_assemble = 1
 !
@@ -256,8 +264,10 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-       subroutine read_merge_step_data                                  &
+      subroutine read_merge_step_data                                   &
      &         (id_control, hd_block, mgd_ctl, c_buf)
+!
+      use ctl_data_4_time_steps_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block

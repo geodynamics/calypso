@@ -7,9 +7,12 @@
 !>@brief Evaluate global data for dynamo benchmark test
 !!
 !!@verbatim
-!!      subroutine copy_energy_4_dynamobench(pwr, KE_bench, ME_bench)
-!!      subroutine copy_icore_energy_4_dbench(pwr, mene_icore)
+!!      subroutine copy_kin_energy_4_dbench(pwr, KE_bench)
+!!      subroutine copy_mag_energy_4_dbench(ipow, pwr, ME_bench)
+!!        integer(kind = kint), intent(in) :: ipow
 !!        type(sph_mean_squares), intent(in) :: pwr
+!!        real(kind = kreal), intent(inout) :: KE_bench(3)
+!!        real(kind = kreal), intent(inout) :: ME_bench(3)
 !!
 !!      subroutine pick_inner_core_rotation(idx_rj_degree_one, nidx_rj, &
 !!     &          nlayer_ICB, ar_1d_rj, is_velo,                        &
@@ -32,14 +35,14 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine copy_energy_4_dynamobench(pwr, KE_bench, ME_bench)
+      subroutine copy_kin_energy_4_dbench(ipow, pwr, KE_bench)
 !
       use m_base_field_labels
       use t_rms_4_sph_spectr
 !
+      integer(kind = kint), intent(in) :: ipow
       type(sph_mean_squares), intent(in) :: pwr
       real(kind = kreal), intent(inout) :: KE_bench(3)
-      real(kind = kreal), intent(inout) :: ME_bench(3)
 !
       integer(kind = kint) :: i_fld, i_comp
 !
@@ -47,34 +50,25 @@
       do i_fld = 1, pwr%num_fld_sq
         if(pwr%pwr_name(i_fld) .eq. velocity%name) then
           i_comp = pwr%istack_comp_sq(i_fld-1) + 1
-          KE_bench(1) = pwr%v_spectr(1)%v_sq(i_comp  )
-          KE_bench(2) = pwr%v_spectr(1)%v_sq(i_comp+1)
-          KE_bench(3) = pwr%v_spectr(1)%v_sq(i_comp+2)
+          KE_bench(1) = pwr%v_spectr(ipow)%v_sq(i_comp  )
+          KE_bench(2) = pwr%v_spectr(ipow)%v_sq(i_comp+1)
+          KE_bench(3) = pwr%v_spectr(ipow)%v_sq(i_comp+2)
           exit
         end if
       end do
 !
-      do i_fld = 1, pwr%num_fld_sq
-        if(pwr%pwr_name(i_fld) .eq. magnetic_field%name) then
-          i_comp = pwr%istack_comp_sq(i_fld-1) + 1
-          ME_bench(1) = pwr%v_spectr(1)%v_sq(i_comp  )
-          ME_bench(2) = pwr%v_spectr(1)%v_sq(i_comp+1)
-          ME_bench(3) = pwr%v_spectr(1)%v_sq(i_comp+2)
-          exit
-        end if
-      end do
-!
-      end subroutine copy_energy_4_dynamobench
+      end subroutine copy_kin_energy_4_dbench
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine copy_icore_energy_4_dbench(pwr, mene_icore)
+      subroutine copy_mag_energy_4_dbench(ipow, pwr, ME_bench)
 !
       use m_base_field_labels
       use t_rms_4_sph_spectr
 !
+      integer(kind = kint), intent(in) :: ipow
       type(sph_mean_squares), intent(in) :: pwr
-      real(kind = kreal), intent(inout) :: mene_icore(3)
+      real(kind = kreal), intent(inout) :: ME_bench(3)
 !
       integer(kind = kint) :: i_fld, i_comp
 !
@@ -82,15 +76,14 @@
       do i_fld = 1, pwr%num_fld_sq
         if(pwr%pwr_name(i_fld) .eq. magnetic_field%name) then
           i_comp = pwr%istack_comp_sq(i_fld-1) + 1
-          mene_icore(1) = pwr%v_spectr(1)%v_sq(i_comp  )
-          mene_icore(2) = pwr%v_spectr(1)%v_sq(i_comp+1)
-          mene_icore(3) = pwr%v_spectr(1)%v_sq(i_comp+2)
-!
+          ME_bench(1) = pwr%v_spectr(ipow)%v_sq(i_comp  )
+          ME_bench(2) = pwr%v_spectr(ipow)%v_sq(i_comp+1)
+          ME_bench(3) = pwr%v_spectr(ipow)%v_sq(i_comp+2)
           exit
         end if
       end do
 !
-      end subroutine copy_icore_energy_4_dbench
+      end subroutine copy_mag_energy_4_dbench
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

@@ -17,6 +17,7 @@
       use t_mesh_data
       use t_phys_data
       use t_phys_address
+      use t_node_monitor_IO
 !
       implicit none
 !
@@ -32,6 +33,9 @@
         type(phys_data) :: field
 !>        Address for nodal fields
         type(phys_address) :: iphys
+
+!>        Addresss for node monitor data
+        type(node_monitor_IO) :: nod_mntr
       end type FEM_mesh_field_data
 !
       end module t_FEM_mesh_field_data

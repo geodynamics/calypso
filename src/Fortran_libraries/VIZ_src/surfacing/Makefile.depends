@@ -1,8 +1,24 @@
 FEM_to_PSF_bridge.o: $(PSF_SECTION_DIR)/FEM_to_PSF_bridge.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_phys_data.o t_comm_table.o t_VIZ_step_parameter.o t_mesh_SR.o parallel_FEM_mesh_init.o const_element_comm_tables.o
 	$(F90) -c $(F90OPTFLAGS) $<
+bcast_ctl_data_surfacings.o: $(PSF_SECTION_DIR)/bcast_ctl_data_surfacings.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_data_surfacings.o calypso_mpi_int.o bcast_control_arrays.o bcast_section_control_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+bcast_section_control_data.o: $(PSF_SECTION_DIR)/bcast_section_control_data.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_control_data_sections.o t_control_data_4_psf.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o t_control_data_isosurfaces.o t_control_data_4_iso.o bcast_control_arrays.o t_control_data_4_fld_on_psf.o t_control_data_4_psf_def.o t_control_data_4_iso_def.o
+	$(F90) -c $(F90OPTFLAGS) $<
+control_data_surfacing_IO.o: $(PSF_SECTION_DIR)/control_data_surfacing_IO.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_data_surfacings.o t_control_data_sections.o t_control_data_isosurfaces.o t_control_array_real.o t_control_array_character.o t_control_array_integer.o t_read_control_elements.o ctl_file_sections_IO.o ctl_file_isosurfaces_IO.o skip_comment_f.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
 convert_components_4_viz.o: $(PSF_SECTION_DIR)/convert_components_4_viz.f90 m_precision.o m_machine_parameter.o set_components_flags.o set_nodal_field_for_psf.o mag_of_field_smp.o copy_field_smp.o cvt_xyz_vector_2_sph_smp.o cvt_xyz_vector_2_cyl_smp.o cvt_xyz_tensor_2_sph_smp.o cvt_xyz_tensor_2_cyl_smp.o
 	$(F90) -c $(F90OPTFLAGS) $<
 copy_psf_data_to_SR.o: $(PSF_SECTION_DIR)/copy_psf_data_to_SR.f90 m_precision.o t_ucd_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_data_isosurface_IO.o: $(PSF_SECTION_DIR)/ctl_data_isosurface_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o t_control_array_character.o t_control_data_4_iso_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o skip_comment_f.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_data_section_IO.o: $(PSF_SECTION_DIR)/ctl_data_section_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_array_character2.o t_control_data_4_psf_def.o t_control_data_4_fld_on_psf.o t_control_data_4_psf.o calypso_mpi.o ctl_data_section_def_IO.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_data_section_def_IO.o: $(PSF_SECTION_DIR)/ctl_data_section_def_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_data_4_psf_def.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_file_isosurfaces_IO.o: $(PSF_SECTION_DIR)/ctl_file_isosurfaces_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_iso.o t_control_data_isosurfaces.o t_read_control_elements.o ctl_data_isosurface_IO.o skip_comment_f.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_file_sections_IO.o: $(PSF_SECTION_DIR)/ctl_file_sections_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_psf.o t_control_data_sections.o t_read_control_elements.o ctl_data_section_IO.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 find_node_and_patch_psf.o: $(PSF_SECTION_DIR)/find_node_and_patch_psf.f90 m_precision.o m_machine_parameter.o t_solver_SR.o t_solver_SR_int8.o t_psf_geometry_list.o t_psf_patch_data.o m_geometry_constants.o calypso_mpi.o calypso_mpi_int.o t_control_params_4_psf.o t_mesh_data.o t_surface_group_connect.o t_psf_case_table.o set_nodes_for_psf.o set_patches_for_psf.o const_element_comm_tables.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -48,10 +64,6 @@ patch_4_psf.o: $(PSF_SECTION_DIR)/patch_4_psf.f90 m_precision.o m_constants.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 psf_global_nod_id.o: $(PSF_SECTION_DIR)/psf_global_nod_id.f90 calypso_mpi.o t_comm_table.o t_solver_SR.o t_solver_SR_int8.o m_machine_parameter.o t_psf_geometry_list.o solver_SR_type.o
 	$(F90) -c $(F90OPTFLAGS) $<
-read_iso_control_data.o: $(PSF_SECTION_DIR)/read_iso_control_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o t_control_array_character.o t_control_data_4_iso_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o skip_comment_f.o
-	$(F90) -c $(F90OPTFLAGS) $<
-read_surfacing_controls.o: $(PSF_SECTION_DIR)/read_surfacing_controls.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_data_surfacings.o t_control_data_sections.o t_control_data_isosurfaces.o t_control_array_real.o t_control_array_character.o t_control_array_integer.o t_read_control_elements.o skip_comment_f.o
-	$(F90) -c $(F90OPTFLAGS) $<
 search_ele_list_for_psf.o: $(PSF_SECTION_DIR)/search_ele_list_for_psf.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_edge_data.o t_group_data.o t_psf_geometry_list.o m_geometry_constants.o t_psf_patch_data.o set_element_list_for_psf.o set_surface_list_for_psf.o set_edge_list_for_psf.o set_node_list_for_psf.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_area_4_viz.o: $(PSF_SECTION_DIR)/set_area_4_viz.f90 m_precision.o
@@ -94,21 +106,21 @@ t_VIZ_only_step_parameter.o: $(PSF_SECTION_DIR)/t_VIZ_only_step_parameter.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 t_VIZ_step_parameter.o: $(PSF_SECTION_DIR)/t_VIZ_step_parameter.f90 m_precision.o m_constants.o t_time_data.o t_IO_step_parameter.o t_ctl_data_4_time_steps.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_4_fld_on_psf.o: $(PSF_SECTION_DIR)/t_control_data_4_fld_on_psf.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_character2.o calypso_mpi.o calypso_mpi_int.o bcast_control_arrays.o t_control_array_character3.o add_nodal_fields_ctl.o
+t_control_data_4_fld_on_psf.o: $(PSF_SECTION_DIR)/t_control_data_4_fld_on_psf.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_character2.o write_control_elements.o t_control_array_character3.o add_nodal_fields_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_4_iso.o: $(PSF_SECTION_DIR)/t_control_data_4_iso.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_character.o t_control_data_4_iso_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o calypso_mpi_int.o bcast_control_arrays.o t_control_array_character3.o add_nodal_fields_ctl.o
+t_control_data_4_iso.o: $(PSF_SECTION_DIR)/t_control_data_4_iso.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_character.o t_control_data_4_iso_def.o t_control_data_4_fld_on_psf.o t_control_array_character3.o add_nodal_fields_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_4_iso_def.o: $(PSF_SECTION_DIR)/t_control_data_4_iso_def.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_data_4_fld_on_psf.o calypso_mpi.o calypso_mpi_int.o bcast_control_arrays.o
+t_control_data_4_iso_def.o: $(PSF_SECTION_DIR)/t_control_data_4_iso_def.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_data_4_fld_on_psf.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_4_psf.o: $(PSF_SECTION_DIR)/t_control_data_4_psf.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_array_character2.o t_control_data_4_psf_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o calypso_mpi_int.o bcast_control_arrays.o t_control_array_character3.o add_nodal_fields_ctl.o
+t_control_data_4_psf.o: $(PSF_SECTION_DIR)/t_control_data_4_psf.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_array_character2.o t_control_data_4_psf_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o t_control_array_character3.o add_nodal_fields_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_4_psf_def.o: $(PSF_SECTION_DIR)/t_control_data_4_psf_def.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o calypso_mpi.o calypso_mpi_int.o bcast_control_arrays.o
+t_control_data_4_psf_def.o: $(PSF_SECTION_DIR)/t_control_data_4_psf_def.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_isosurfaces.o: $(PSF_SECTION_DIR)/t_control_data_isosurfaces.f90 m_precision.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o read_iso_control_data.o skip_comment_f.o calypso_mpi.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o t_control_array_character3.o
+t_control_data_isosurfaces.o: $(PSF_SECTION_DIR)/t_control_data_isosurfaces.f90 m_precision.o m_machine_parameter.o t_control_data_4_iso.o t_control_array_character3.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_sections.o: $(PSF_SECTION_DIR)/t_control_data_sections.f90 m_precision.o m_machine_parameter.o t_control_data_4_psf.o t_read_control_elements.o skip_comment_f.o calypso_mpi.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o t_control_array_character3.o
+t_control_data_sections.o: $(PSF_SECTION_DIR)/t_control_data_sections.f90 m_precision.o m_machine_parameter.o t_control_data_4_psf.o t_control_array_character3.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_surfacings.o: $(PSF_SECTION_DIR)/t_control_data_surfacings.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_data_sections.o t_control_data_isosurfaces.o t_control_array_real.o t_control_array_character.o t_control_array_integer.o calypso_mpi_int.o bcast_control_arrays.o t_ctl_data_4_time_steps.o t_control_array_character3.o
+t_control_data_surfacings.o: $(PSF_SECTION_DIR)/t_control_data_surfacings.f90 m_precision.o m_machine_parameter.o t_control_data_sections.o t_control_data_isosurfaces.o t_control_array_real.o t_control_array_character.o t_control_array_integer.o t_ctl_data_4_time_steps.o t_control_array_character3.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_params_4_iso.o: $(PSF_SECTION_DIR)/t_control_params_4_iso.f90 m_precision.o m_file_format_switch.o set_field_comp_for_viz.o t_group_data.o t_file_IO_parameter.o t_control_data_4_iso.o t_phys_data.o t_psf_patch_data.o skip_comment_f.o t_control_data_4_iso_def.o set_area_4_viz.o t_control_data_4_fld_on_psf.o t_control_array_character.o m_field_file_format.o m_merged_field_fmt_labels.o t_multi_flag_labels.o t_read_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<

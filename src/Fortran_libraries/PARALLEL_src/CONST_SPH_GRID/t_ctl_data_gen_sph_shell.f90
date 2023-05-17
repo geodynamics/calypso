@@ -7,10 +7,23 @@
 !>@brief  control data for resolutions of spherical shell
 !!
 !!@verbatim
-!!      subroutine read_parallel_shell_in_MHD_ctl                       &
+!!      subroutine read_parallel_shell_ctl                              &
 !!     &         (id_control, hd_block, psph_ctl, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        character(len = kchara), intent(inout) :: file_name
+!!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
-!!      subroutine bcast_parallel_shell_ctl(psph_ctl)
+!!      subroutine write_parallel_shell_ctl                             &
+!!     &         (id_control, hd_block, psph_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len = kchara), intent(in) :: file_name
+!!        character(len = kchara), intent(in) :: hd_block
+!!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
+!!        integer(kind = kint), intent(inout) :: level
+!!
+!!      subroutine dealloc_parallel_shell_ctl(psph_ctl)
 !!        type(platform_data_control), intent(inout) :: plt
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!
@@ -18,10 +31,7 @@
 !!    example of control section
 !!
 !!    begin FEM_mesh_ctl
-!!      memory_conservation_ctl        'YES'
-!!      FEM_mesh_output_switch         'NO'
-!!      FEM_surface_output_switch      'NO'
-!!      FEM_viewer_mesh_output_switch  'NO'
+!!      ...
 !!    end FEM_mesh_ctl
 !!
 !!    begin num_domain_ctl
@@ -67,21 +77,13 @@
 !>        Structure of spherical shell domain decomposition
         type(sphere_domain_control) :: sdctl
 !
-!>        File name to read spherical shell control file
-        character (len = kchara)                                        &
-     &         :: control_sph_file = 'control_sph_shell'
 !>        Integer flag to defined spherical shell
         integer (kind=kint) :: iflag_sph_shell = 0
 !>        Integer flag to read spherical shell control file
         integer (kind=kint) :: ifile_sph_shell = 0
       end type parallel_sph_shell_control
 !
-!   Top level
-!
-      character(len=kchara), parameter, private                         &
-     &      :: hd_sph_shell = 'spherical_shell_ctl'
-!
-!   Second level
+!   Labels
 !
       character(len=kchara), parameter, private                         &
      &                     :: hd_FEM_mesh = 'FEM_mesh_ctl'
@@ -94,76 +96,17 @@
       character(len=kchara), parameter, private                         &
      &                      :: hd_shell_def = 'num_grid_sph'
 !
-      private :: read_ctl_file_gen_shell_grids
-      private :: read_parallel_shell_ctl
-!
 !   --------------------------------------------------------------------
 !
       contains
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_ctl_file_gen_shell_grids(id_control, psph_ctl)
-!
-      integer(kind = kint), intent(in) :: id_control
-      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
-!
-      type(buffer_for_control) :: c_buf1
-!
-!
-      write(*,*) 'Spherical shell resolution file: ',                   &
-     &          trim(psph_ctl%control_sph_file)
-      open(id_control, file = psph_ctl%control_sph_file)
-!
-      do
-        call load_one_line_from_control(id_control, c_buf1)
-        if(check_begin_flag(c_buf1, hd_sph_shell)) then
-          call read_parallel_shell_ctl                                  &
-     &       (id_control, hd_sph_shell, psph_ctl, c_buf1)
-        end if
-        if(psph_ctl%iflag_sph_shell .gt. 0) exit
-      end do
-!
-      close(id_control)
-      write(*,*) 'Spherical shell resolution file end'
-!
-      end subroutine read_ctl_file_gen_shell_grids
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine read_parallel_shell_in_MHD_ctl                         &
-     &         (id_control, hd_block, psph_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if((psph_ctl%iflag_sph_shell + psph_ctl%ifile_sph_shell) .gt. 0)  &
-     &      return
-      if(check_file_flag(c_buf, hd_block)) then
-        psph_ctl%control_sph_file = third_word(c_buf)
-        psph_ctl%ifile_sph_shell = 1
-        call read_ctl_file_gen_shell_grids(id_control+2, psph_ctl)
-        return
-      end if
-!
-      if(check_begin_flag(c_buf, hd_block)) then
-        write(*,*) 'resolution data is included'
-        call read_parallel_shell_ctl                                    &
-     &     (id_control, hd_block, psph_ctl, c_buf)
-      end if
-!
-      end subroutine read_parallel_shell_in_MHD_ctl
-!
-!   --------------------------------------------------------------------
-!
       subroutine read_parallel_shell_ctl                                &
      &         (id_control, hd_block, psph_ctl, c_buf)
 !
+      use ctl_data_sphere_model_IO
+!
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
@@ -171,6 +114,7 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(psph_ctl%iflag_sph_shell .gt. 0) return
       do
         call load_one_line_from_control(id_control, c_buf)
@@ -191,40 +135,41 @@
       end subroutine read_parallel_shell_ctl
 !
 !   --------------------------------------------------------------------
+!
+      subroutine write_parallel_shell_ctl                               &
+     &         (id_control, hd_block, psph_ctl, level)
+!
+      use ctl_data_sphere_model_IO
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(parallel_sph_shell_control), intent(in) :: psph_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+!
+      if(psph_ctl%iflag_sph_shell .le. 0) return
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_FEM_mesh_control                                       &
+     &   (id_control, hd_FEM_mesh, psph_ctl%Fmesh_ctl, level)
+      call write_control_shell_define                                   &
+     &   (id_control, hd_sph_def, psph_ctl%spctl, level)
+!
+      call write_control_shell_domain                                   &
+     &   (id_control, hd_domains_sph, psph_ctl%sdctl, level)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_parallel_shell_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_parallel_shell_ctl(psph_ctl)
-!
-      use calypso_mpi
-      use calypso_mpi_int
-      use calypso_mpi_char
-      use transfer_to_long_integers
-      use bcast_4_sphere_ctl
-      use bcast_4_platform_ctl
-!
-      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
-!
-!
-      call calypso_mpi_bcast_one_int(psph_ctl%iflag_sph_shell, 0)
-      call calypso_mpi_bcast_one_int(psph_ctl%ifile_sph_shell, 0)
-      call calypso_mpi_bcast_character                                  &
-     &   (psph_ctl%control_sph_file, cast_long(kchara), 0)
-!
-      if(psph_ctl%iflag_sph_shell .eq. 0) return
-!
-      call bcast_FEM_mesh_control(psph_ctl%Fmesh_ctl)
-      call bcast_ctl_4_shell_define(psph_ctl%spctl)
-      call bcast_ctl_ndomain_4_shell(psph_ctl%sdctl)
-!
-      end subroutine bcast_parallel_shell_ctl
-!
-! -----------------------------------------------------------------------
-!
       subroutine dealloc_parallel_shell_ctl(psph_ctl)
-!
-      use calypso_mpi
-      use bcast_4_sphere_ctl
-      use bcast_4_platform_ctl
 !
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !

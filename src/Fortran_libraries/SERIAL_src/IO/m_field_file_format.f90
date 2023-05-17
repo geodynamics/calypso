@@ -168,7 +168,7 @@
       integer(kind= kint), intent(in) :: i_file_fmt
       character(len=kchara), intent(in) :: file_fmt_ctl
 !
-      character(len = kchara) :: input_flag
+!      character(len = kchara) :: input_flag
 !
       call init_mgd_field_type_flags
 !

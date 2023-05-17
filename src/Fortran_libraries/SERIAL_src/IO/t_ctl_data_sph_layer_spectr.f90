@@ -10,11 +10,18 @@
 !!@verbatim
 !!      subroutine read_layerd_spectr_ctl                               &
 !!     &         (id_control, hd_block, lp_ctl, c_buf)
-!!      subroutine dealloc_num_spec_layer_ctl(lp_ctl)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(layerd_spectr_control), intent(inout) :: lp_ctl
 !!        type(buffer_for_control), intent(inout) :: c_buf
+!!      subroutine write_layerd_spectr_ctl                              &
+!!     &         (id_control, hd_block, lp_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(layerd_spectr_control), intent(in) :: lp_ctl
+!!        integer(kind = kint), intent(inout) :: level
+!!      subroutine dealloc_num_spec_layer_ctl(lp_ctl)
+!!        type(layerd_spectr_control), intent(inout) :: lp_ctl
 !!
 !! -----------------------------------------------------------------
 !!
@@ -139,6 +146,56 @@
       lp_ctl%i_layer_spectr_ctl = 1
 !
       end subroutine read_layerd_spectr_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_layerd_spectr_ctl                                &
+     &         (id_control, hd_block, lp_ctl, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(layerd_spectr_control), intent(in) :: lp_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(lp_ctl%i_layer_spectr_ctl .le. 0) return
+!
+      maxlen = len_trim(hd_spctr_layer)
+      maxlen = max(maxlen, len_trim(hd_layer_rms_head))
+      maxlen = max(maxlen, len_trim(hd_layer_rms_fmt))
+      maxlen = max(maxlen, len_trim(hd_degree_spectr_switch))
+      maxlen = max(maxlen, len_trim(hd_order_spectr_switch))
+      maxlen = max(maxlen, len_trim(hd_diff_lm_spectr_switch))
+      maxlen = max(maxlen, len_trim(hd_axis_spectr_switch))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_control_array_i1(id_control, level,                    &
+     &    hd_spctr_layer, lp_ctl%idx_spec_layer_ctl)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_layer_rms_head, lp_ctl%layered_pwr_spectr_prefix)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_layer_rms_fmt, lp_ctl%layered_pwr_spectr_format)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_degree_spectr_switch, lp_ctl%degree_spectr_switch)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_order_spectr_switch, lp_ctl%order_spectr_switch)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_diff_lm_spectr_switch, lp_ctl%diff_lm_spectr_switch)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_axis_spectr_switch, lp_ctl%axis_spectr_switch)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_layerd_spectr_ctl
 !
 ! -----------------------------------------------------------------------
 !

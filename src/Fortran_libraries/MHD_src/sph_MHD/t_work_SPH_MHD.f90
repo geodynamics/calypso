@@ -19,6 +19,7 @@
       use t_sph_trans_arrays_MHD
       use t_sph_mhd_monitor_data_IO
       use t_sph_radial_interpolate
+      use t_node_monitor_IO
 !
       implicit  none
 !
@@ -45,6 +46,9 @@
 !
 !>        Interpolation tsble in radial direction
         type(sph_radial_interpolate) :: rj_itp
+!
+!>        Addresses of node monitor data
+        type(node_monitor_IO) :: nod_mntr
       end type work_SPH_MHD
 !
       end module t_work_SPH_MHD

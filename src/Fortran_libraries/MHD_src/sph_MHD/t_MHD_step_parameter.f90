@@ -68,6 +68,7 @@
       subroutine s_set_control_4_time_steps(mr_ctl, tctl, MHD_step)
 !
       use t_ctl_data_mhd_evo_scheme
+      use t_ctl_data_mhd_restart
       use m_initial_field_control
       use cal_num_digits
       use skip_comment_f

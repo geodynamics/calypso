@@ -55,7 +55,6 @@
       character(len = kchara), intent(in) :: fname_org
       real(kind = kreal), intent(in) :: start_time, end_time
 !
-      type(read_sph_spectr_data), save :: sph_IN2
       real(kind = kreal) :: true_start, true_end
       integer(kind = kint) :: icou_skip
 !

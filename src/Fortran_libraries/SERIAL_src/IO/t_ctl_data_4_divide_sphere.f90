@@ -236,7 +236,9 @@
       integer(kind = kint) :: maxlen = 0
 !
 !
-      maxlen = max(maxlen, len_trim(hd_inner_decomp))
+      if(sdctl%i_domains_sph .le. 0) return
+!
+      maxlen = len_trim(hd_inner_decomp)
       maxlen = max(maxlen, len_trim(hd_num_radial_domain))
       maxlen = max(maxlen, len_trim(hd_num_horiz_domain))
 !
