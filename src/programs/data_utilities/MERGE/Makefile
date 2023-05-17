@@ -4,7 +4,7 @@
 
 MERGE_SRCDIR =     $$(DATA_UTILS_DIR)/MERGE
 
-TARGET_NEWSPH =       assemble_sph
+TARGET_NEWSPH =       utilities/assemble_sph
 TARGET_CMP_SPH_RST =  tests/compare_sph_restart
 
 SOURCES = $(shell ls *.f90)
