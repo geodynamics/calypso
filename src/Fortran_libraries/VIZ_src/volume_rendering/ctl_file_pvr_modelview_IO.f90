@@ -17,15 +17,16 @@
 !!        character(len = kchara), intent(inout) :: file_name
 !!        integer(kind = kint), intent(inout) :: level
 !!      subroutine read_control_modelview_file(id_control, file_name,   &
-!!     &                                        mat)
+!!     &                                       hd_block, mat)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len = kchara), intent(in) :: file_name
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(modeview_ctl), intent(inout) :: mat
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_control_modelview_file(id_control, file_name,  &
-!!     &                                        mat)
+!!     &                                        hd_block, mat)
 !!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        character(len = kchara), intent(in) :: file_name
 !!        type(modeview_ctl), intent(in) :: mat
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -129,10 +130,6 @@
 !
       implicit  none
 !
-      character(len=kchara), parameter                                  &
-     &                      :: hd_view_transform = 'view_transform_ctl'
-      private :: hd_view_transform
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -155,7 +152,8 @@
         write(*,'(3a)', ADVANCE='NO')                                   &
      &          'Read file for ', trim(hd_block), '... '
         file_name = third_word(c_buf)
-        call read_control_modelview_file(id_control+1, file_name, mat)
+        call read_control_modelview_file(id_control+1, file_name,       &
+     &                                   hd_block, mat)
       else if(check_begin_flag(c_buf, hd_block)) then
         write(*,*)  'Modelview control is included'
         file_name = 'NO_FILE'
@@ -186,7 +184,8 @@
       else
         write(*,'(3a)', ADVANCE='NO')                                   &
      &          'Write file for ', trim(hd_block), '... '
-        call write_control_modelview_file(id_control+1, file_name, mat)
+        call write_control_modelview_file(id_control+1, file_name,      &
+     &                                    hd_block, mat)
         call write_file_name_for_ctl_line(id_control, level,            &
      &                                    hd_block, file_name)
       end if
@@ -197,15 +196,14 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_control_modelview_file(id_control, file_name,     &
-     &                                       mat)
+     &                                       hd_block, mat)
 !
-      use calypso_mpi
-      use m_error_IDs
       use skip_comment_f
       use ctl_data_view_transfer_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: file_name
+      character(len=kchara), intent(in) :: hd_block
       type(modeview_ctl), intent(inout) :: mat
 !
       type(buffer_for_control) :: c_buf1
@@ -216,29 +214,23 @@
 !
       do 
         call load_one_line_from_control(id_control, c_buf1)
-        if(check_begin_flag(c_buf1, hd_view_transform)) then
-          call read_view_transfer_ctl(id_control, hd_view_transform,    &
-     &                                mat, c_buf1)
-        end if
+        call read_view_transfer_ctl(id_control, hd_block, mat, c_buf1)
         if(mat%i_view_transform .gt. 0) exit
       end do
       close(id_control)
-
-      if(mat%i_view_transform .eq. 0) then
-        call calypso_mpi_abort(ierr_PVR, 'Set view matrix file')
-      end if
 !
       end subroutine read_control_modelview_file
 !
 !  ---------------------------------------------------------------------
 !
       subroutine write_control_modelview_file(id_control, file_name,    &
-     &                                        mat)
+     &                                        hd_block, mat)
 !
       use ctl_data_view_transfer_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: file_name
+      character(len=kchara), intent(in) :: hd_block
       type(modeview_ctl), intent(in) :: mat
 !
       integer(kind = kint) :: level
@@ -248,8 +240,7 @@
       open(id_control, file = file_name)
 !
       level = 0
-      call write_view_transfer_ctl(id_control, hd_view_transform,       &
-     &                             mat, level)
+      call write_view_transfer_ctl(id_control, hd_block, mat, level)
       close(id_control)
 !
       end subroutine write_control_modelview_file

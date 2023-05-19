@@ -183,6 +183,7 @@
       subroutine read_pvr_ctl(id_control, hd_block, pvr_ctl, c_buf)
 !
       use ctl_file_pvr_modelview_IO
+      use ctl_file_pvr_light_IO
       use ctl_data_pvr_movie_IO
 !
       integer(kind = kint), intent(in) :: id_control
@@ -205,6 +206,8 @@
         call sel_read_ctl_pvr_colormap_file                             &
      &     (id_control, hd_colormap_file, pvr_ctl%fname_cmap_cbar_c,    &
      &      pvr_ctl%cmap_cbar_c, c_buf)
+        call sel_read_ctl_pvr_light_file(id_control, hd_pvr_lighting,   &
+     &      pvr_ctl%fname_pvr_light_c, pvr_ctl%light, c_buf)
 !
         call read_pvr_sections_ctl(id_control, hd_pvr_sections,         &
      &                             pvr_ctl%pvr_scts_c, c_buf)
@@ -213,8 +216,6 @@
 !
         call read_pvr_render_area_ctl(id_control, hd_plot_area,         &
      &                                pvr_ctl%render_area_c, c_buf)
-        call read_lighting_ctl(id_control, hd_pvr_lighting,             &
-     &                         pvr_ctl%light, c_buf)
         call read_quilt_image_ctl(id_control, hd_quilt_image,           &
      &                            pvr_ctl%quilt_c, c_buf)
         call read_pvr_rotation_ctl(id_control, hd_pvr_movie,            &
@@ -282,6 +283,7 @@
      &         (id_control, hd_block, pvr_ctl, level)
 !
       use ctl_file_pvr_modelview_IO
+      use ctl_file_pvr_light_IO
       use ctl_data_pvr_movie_IO
       use write_control_elements
 !
@@ -347,7 +349,8 @@
       call sel_write_ctl_pvr_colormap_file                              &
      &   (id_control, hd_colormap_file, pvr_ctl%fname_cmap_cbar_c,      &
      &    pvr_ctl%cmap_cbar_c, level)
-      call write_lighting_ctl(id_control, hd_pvr_lighting,              &
+      call sel_write_ctl_pvr_light_file                                 &
+     &   (id_control, hd_pvr_lighting, pvr_ctl%fname_pvr_light_c,       &
      &    pvr_ctl%light, level)
 !
       write(id_control,'(a1)') '!'

@@ -94,7 +94,6 @@
 !
       call calypso_mpi_bcast_one_int(quilt_c%i_quilt_image, 0)
 !
-      call bcast_ctl_type_c1(quilt_c%quilt_mode_ctl)
       call bcast_ctl_type_i2(quilt_c%num_column_row_ctl)
       call bcast_ctl_type_i2(quilt_c%num_row_column_ctl)
 !

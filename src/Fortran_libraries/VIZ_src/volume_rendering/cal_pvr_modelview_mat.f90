@@ -45,7 +45,6 @@
      &           outline, movie_def, stereo_def, view_param,            &
      &           viewpoint_vec, modelview_mat)
 !
-      use calypso_mpi
       use t_surf_grp_4_pvr_domain
       use cal_inverse_small_matrix
       use cal_matrix_vector_smp
@@ -170,21 +169,21 @@
      &                    rotation_mat(1,1), mat_tmp(1,1))
       end if
 !
+!       Shift by viewpoint
+      if(view_param%iflag_viewpt_in_view .eq. 0) then
+        call cal_mat44_vec3_on_node(ione, ione, ione_stack,             &
+     &      modelview_mat, view_param%viewpoint, rev_eye)
+      else
+        rev_eye(1:3) = - view_param%viewpt_in_viewer_pvr(1:3)
+      end if
+      call Kemo_Translate(modelview_mat, rev_eye)
+!
 !   Shift for stereo view
       if(stereo_def%flag_stereo_pvr .or. stereo_def%flag_quilt) then
         streo_eye(1) =  each_eye_from_middle(i_stereo, stereo_def)
         streo_eye(2:3) = zero
         call Kemo_Translate(modelview_mat, streo_eye)
       end if
-!
-!       Shift by viewpoint
-      if(view_param%iflag_viewpt_in_view .eq. 0) then
-        call cal_mat44_vec3_on_node(ione, ione, ione_stack,             &
-     &    modelview_mat, view_param%viewpoint, rev_eye)
-      else
-        rev_eye(1:3) = - view_param%viewpt_in_viewer_pvr(1:3)
-      end if
-      call Kemo_Translate(modelview_mat, rev_eye)
 !
       if (iflag_debug .gt. 0) then
         write(*,*) 'viewpt_in_view',                                    &

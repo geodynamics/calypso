@@ -173,6 +173,7 @@
 !
 !
       icou = 0
+      if(icou .ge. num_pvr_ray) return
       do 
         isrt = index_pvr_start(icou+1)
         ipix =  id_pixel_start(isrt)

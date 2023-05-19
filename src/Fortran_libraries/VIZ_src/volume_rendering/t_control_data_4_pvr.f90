@@ -107,6 +107,9 @@
         character(len=kchara) :: fname_mat_ctl
 !>     Structure for modelview marices
         type(modeview_ctl) :: mat
+!
+!>     file name for lighting parameter
+        character(len=kchara) :: fname_pvr_light_c
 !>     Structure for lighting
         type(pvr_light_ctl) :: light
 !

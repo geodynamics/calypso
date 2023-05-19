@@ -49,6 +49,8 @@
      &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_character(pvr%fname_cmap_cbar_c,           &
      &                                 cast_long(kchara), 0)
+      call calypso_mpi_bcast_character(pvr%fname_pvr_light_c,           &
+     &                                 cast_long(kchara), 0)
 !
 !
       call bcast_view_transfer_ctl(pvr%mat)
@@ -108,6 +110,7 @@
       new_pvr%i_pvr_ctl =         org_pvr%i_pvr_ctl
       new_pvr%fname_mat_ctl =     org_pvr%fname_mat_ctl
       new_pvr%fname_cmap_cbar_c = org_pvr%fname_cmap_cbar_c
+      new_pvr%fname_pvr_light_c = org_pvr%fname_pvr_light_c
 !
       call dup_view_transfer_ctl(org_pvr%mat, new_pvr%mat)
 !

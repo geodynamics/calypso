@@ -29,10 +29,8 @@
 !!      integer(kind = kint) function num_label_quilt_image()
 !!      subroutine set_label_quilt_image(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    Avaiable parameters for quilt_mode_ctl: BITMAP
 !!
 !!  begin quilt_image_ctl
-!!    quilt_mode_ctl           BITMAP
 !!    num_column_row_ctl       9    5
 !!    num_row_column_ctl       9    5
 !!
@@ -45,8 +43,6 @@
 !!    end array view_transform_ctl
 !!  end quilt_image_ctl
 !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    quilt_mode_ctl:   view_matrices, rotation, apature, LIC_kernel
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
 !
@@ -68,9 +64,6 @@
 !
 !>       Structure of quilt image controls
       type quilt_image_ctl
-!>        Structure of quilt mode control
-        type(read_character_item) :: quilt_mode_ctl
-!
 !>        Structure of number of columns and row of image
         type(read_int2_item) :: num_column_row_ctl
 !>        Structure of number of row and columns of image
@@ -84,9 +77,6 @@
       end type quilt_image_ctl
 !
 !     3rd level for rotation
-!
-      character(len=kchara), parameter, private                         &
-     &             :: hd_quilt_mode =  'quilt_mode_ctl'
 !
       character(len=kchara), parameter, private                         &
      &             :: hd_column_row =    'num_column_row_ctl'
@@ -122,8 +112,6 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call read_chara_ctl_type(c_buf, hd_quilt_mode,                  &
-     &      quilt_c%quilt_mode_ctl)
         call read_integer2_ctl_type(c_buf, hd_column_row,               &
      &      quilt_c%num_column_row_ctl)
         call read_integer2_ctl_type(c_buf, hd_row_column,               &
@@ -154,15 +142,12 @@
 !
       if(quilt_c%i_quilt_image .le. 0) return
 !
-      maxlen = len_trim(hd_quilt_mode)
-      maxlen = max(maxlen, len_trim(hd_column_row))
+      maxlen = len_trim(hd_column_row)
       maxlen = max(maxlen, len_trim(hd_row_column))
 !
       write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_quilt_mode, quilt_c%quilt_mode_ctl)
       call write_integer2_ctl_type(id_control, level, maxlen,           &
      &    hd_column_row, quilt_c%num_column_row_ctl)
       call write_integer2_ctl_type(id_control, level, maxlen,           &
@@ -187,8 +172,6 @@
       call dup_mul_view_trans_ctl(org_quilt%mul_qmats_c,                &
      &                            new_quilt%mul_qmats_c)
 !
-      call copy_chara_ctl(org_quilt%quilt_mode_ctl,                     &
-     &                    new_quilt%quilt_mode_ctl)
       call copy_integer2_ctl(org_quilt%num_column_row_ctl,              &
      &                       new_quilt%num_column_row_ctl)
       call copy_integer2_ctl(org_quilt%num_row_column_ctl,              &
@@ -207,7 +190,6 @@
 !
       call dealloc_multi_modeview_ctl(quilt_c%mul_qmats_c)
 !
-      quilt_c%quilt_mode_ctl%iflag =     0
       quilt_c%num_column_row_ctl%iflag = 0
       quilt_c%num_row_column_ctl%iflag = 0
 !
@@ -231,7 +213,6 @@
      &                         :: names(n_label_quilt_ctl)
 !
 !
-      call set_control_labels(hd_quilt_mode, names( 1))
       call set_control_labels(hd_column_row, names( 2))
       call set_control_labels(hd_row_column, names( 3))
       call set_control_labels(hd_qview_transform, names( 4))

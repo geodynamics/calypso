@@ -113,9 +113,9 @@
 !
         if(check_file_flag(c_buf, hd_pvr_ctl)                           &
      &     .or. check_begin_flag(c_buf, hd_pvr_ctl)) then
+          call append_new_pvr_ctl_struct(pvr_ctls)
           write(*,'(3a,i4)', ADVANCE='NO') 'Control for ',              &
      &                 trim(hd_pvr_ctl), ' No. ', pvr_ctls%num_pvr_ctl
-          call append_new_pvr_ctl_struct(pvr_ctls)
           call sel_read_control_pvr(id_control, hd_pvr_ctl,             &
      &        pvr_ctls%fname_pvr_ctl(pvr_ctls%num_pvr_ctl),             &
      &        pvr_ctls%pvr_ctl_type(pvr_ctls%num_pvr_ctl), c_buf)

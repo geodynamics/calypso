@@ -29,7 +29,7 @@
 !!     example of color control for Kemo's volume rendering
 !!
 !!  begin lighting_ctl
-!!    array position_of_lights    4
+!!    array position_of_lights
 !!      position_of_lights    0.0   0.0    0.0   end
 !!      position_of_lights  -10.0   0.0  -10.0   end
 !!      position_of_lights  -10.0   0.0    0.0   end
