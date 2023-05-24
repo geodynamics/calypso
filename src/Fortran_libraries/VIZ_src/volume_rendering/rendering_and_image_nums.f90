@@ -117,7 +117,7 @@
       end do
 !
       flag_error = .FALSE.
-      do i_ctl = 1, PVR_sort%istack_pvr_images(num_pvr)
+      do i = 1, PVR_sort%istack_pvr_images(num_pvr)
         if(check_file_writable(my_rank, pvr_rgb(i)%pvr_prefix)          &
      &                               .eqv. .FALSE.) flag_error = .TRUE.
       end do
