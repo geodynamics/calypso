@@ -23,13 +23,11 @@
 !!  pvr_file_head        pvr_temp
 !!  pvr_output_type      PNG
 !!  monitoring_mode      YES
-!!  image_tranceparency  tranceparent
 !!
 !!  streo_imaging        YES
+!!  anaglyph_switch      NO
 !!  quilt_3d_imaging     YES
 !!!
-!!  max_pe_4_composit     32
-!!
 !!  output_field    temperature
 !!  output_component     scalar
 !!!
@@ -69,9 +67,9 @@
 !!     ...
 !!  end array isosurface_ctl
 !!!
-!!  begin image_rotation_ctl
+!!  begin snapshot_movie_ctl
 !!   ...
-!!  end image_rotation_ctl
+!!  end snapshot_movie_ctl
 !!!
 !!end volume_rendering
 !!
@@ -128,9 +126,9 @@
         type(read_character_item) :: file_head_ctl
         type(read_character_item) :: file_fmt_ctl
         type(read_character_item) :: monitoring_ctl
-        type(read_character_item) :: transparent_ctl
 !
         type(read_character_item) :: streo_ctl
+        type(read_character_item) :: anaglyph_ctl
         type(read_character_item) :: quilt_ctl
 !
 !>      Structure for element group list for PVR
@@ -139,8 +137,6 @@
 !
         type(read_character_item) :: pvr_field_ctl
         type(read_character_item) :: pvr_comp_ctl
-!
-        type(read_integer_item) :: maxpe_composit_ctl
 !
         type(pvr_sections_ctl) :: pvr_scts_c
 !
@@ -177,10 +173,9 @@
       pvr_ctl%updated_ctl%iflag =     0
       pvr_ctl%file_head_ctl%iflag =   0
       pvr_ctl%file_fmt_ctl%iflag =    0
-      pvr_ctl%transparent_ctl%iflag = 0
+      pvr_ctl%anaglyph_ctl%iflag =    0
       pvr_ctl%pvr_field_ctl%iflag =   0
       pvr_ctl%pvr_comp_ctl%iflag =    0
-      pvr_ctl%maxpe_composit_ctl%iflag = 0
 !
       pvr_ctl%i_pvr_ctl = 0
 !

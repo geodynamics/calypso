@@ -11,12 +11,12 @@
 !!        integer(kind = kint), intent(in) :: num_pvr_ctl
 !!        type(pvr_parameter_ctl), intent(inout) :: pvr_ctl(num_pvr_ctl)
 !!      subroutine s_set_pvr_controls(group, nod_fld,                   &
-!!     &          num_pvr, pvr_ctl_type, pvr_param)
+!!     &                              pvr_ctl_type, pvr_param)
 !!        integer(kind = kint), intent(in) :: num_pvr
 !!        type(mesh_groups), intent(in) :: group
 !!        type(phys_data), intent(in) :: nod_fld
-!!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl_type(num_pvr)
-!!        type(PVR_control_params), intent(inout) :: pvr_param(num_pvr)
+!!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl_type
+!!        type(PVR_control_params), intent(inout) :: pvr_param
 !!
 !!      subroutine flush_each_pvr_control(pvr_param)
 !!        type(PVR_control_params), intent(inout) :: pvr_param
@@ -66,7 +66,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine s_set_pvr_controls(group, nod_fld,                     &
-     &          num_pvr, pvr_ctl_type, pvr_param)
+     &                              pvr_ctl_type, pvr_param)
 !
       use t_group_data
       use t_phys_data
@@ -78,46 +78,37 @@
       use set_pvr_modelview_matrix
       use set_control_pvr_movie
 !
-      integer(kind = kint), intent(in) :: num_pvr
       type(mesh_groups), intent(in) :: group
       type(phys_data), intent(in) :: nod_fld
-      type(pvr_parameter_ctl), intent(in) :: pvr_ctl_type(num_pvr)
+      type(pvr_parameter_ctl), intent(in) :: pvr_ctl_type
 !
-      type(PVR_control_params), intent(inout) :: pvr_param(num_pvr)
+      type(PVR_control_params), intent(inout) :: pvr_param
 !
-      integer(kind = kint) :: i_pvr
       integer(kind = kint) :: icheck_ncomp(1)
 !
 !
-      do i_pvr = 1, num_pvr
-        call set_pvr_stereo_control(pvr_ctl_type(i_pvr),                &
-     &                              pvr_param(i_pvr)%stereo_def)
-        call s_set_control_pvr_movie(pvr_ctl_type(i_pvr)%movie,         &
-     &                               pvr_param(i_pvr)%movie_def)
+      call s_set_control_pvr_movie(pvr_ctl_type%movie,                  &
+     &                             pvr_param%movie_def)
 !
-        call check_pvr_field_control(pvr_ctl_type(i_pvr),               &
-     &      nod_fld%num_phys, nod_fld%phys_name)
+      call check_pvr_field_control(pvr_ctl_type,                        &
+     &                             nod_fld%num_phys, nod_fld%phys_name)
 !
-        call set_control_field_4_pvr                                    &
-     &     (pvr_ctl_type(i_pvr)%pvr_field_ctl,                          &
-     &      pvr_ctl_type(i_pvr)%pvr_comp_ctl,                           &
-     &      nod_fld%num_phys, nod_fld%phys_name,                        &
-     &      pvr_param(i_pvr)%field_def, icheck_ncomp)
-        if (icheck_ncomp(1) .gt. 1)                                     &
-     &     call calypso_MPI_abort(ierr_PVR, 'set scalar for rendering')
+      call set_control_field_4_pvr                                      &
+     &   (pvr_ctl_type%pvr_field_ctl, pvr_ctl_type%pvr_comp_ctl,        &
+     &    nod_fld%num_phys, nod_fld%phys_name,                          &
+     &    pvr_param%field_def, icheck_ncomp)
+      if (icheck_ncomp(1) .gt. 1)                                       &
+     &   call calypso_MPI_abort(ierr_PVR, 'set scalar for rendering')
 !
-        if(iflag_debug .gt. 0) write(*,*) 'set_control_pvr'
-        call set_control_pvr                                            &
-     &     (pvr_ctl_type(i_pvr), group%ele_grp, group%surf_grp,         &
-     &      pvr_param(i_pvr)%area_def, pvr_param(i_pvr)%draw_param,     &
-     &      pvr_param(i_pvr)%color, pvr_param(i_pvr)%colorbar)
+      if(iflag_debug .gt. 0) write(*,*) 'set_control_pvr'
+      call set_control_pvr(pvr_ctl_type, group%ele_grp, group%surf_grp, &
+     &    pvr_param%area_def, pvr_param%draw_param,                     &
+     &    pvr_param%color, pvr_param%colorbar)
 !
-!   set transfer matrix
-!
-        call set_pvr_mul_view_params(pvr_ctl_type(i_pvr)%mat,           &
-     &      pvr_ctl_type(i_pvr)%quilt_c, pvr_ctl_type(i_pvr)%movie,     &
-     &      pvr_param(i_pvr))
-      end do
+!   set parameters for stereo views
+      call set_pvr_stereo_control(pvr_ctl_type, pvr_param%stereo_def)
+      call set_pvr_mul_view_params(pvr_ctl_type%mat,                    &
+     &    pvr_ctl_type%quilt_c, pvr_ctl_type%movie, pvr_param)
 !
       end subroutine s_set_pvr_controls
 !
@@ -147,7 +138,6 @@
      &                 ' more than number of quilt image. (Stop)'
           call calypso_mpi_abort(1,e_message)
        else
-         pvr_param%flag_mulview_quilt = .TRUE.
          call init_multi_view_parameters(num_views,                     &
      &       quilt_c%mul_qmats_c, pvr_param)
          end if

@@ -52,8 +52,6 @@
         type(sectioning_module) :: psf
         type(isosurface_module) :: iso
         type(volume_rendering_module) :: pvr
-!
-        type(volume_rendering_module) :: anaglyph_pvr
       end type three_visualize_modules
 !
 !  ---------------------------------------------------------------------
@@ -66,7 +64,6 @@
      &                                VIZ_DAT, viz3_ctls, vizs, m_SR)
 !
       use volume_rendering
-      use anaglyph_volume_rendering
 !
       type(VIZ_step_params), intent(in) :: viz_step
       type(mesh_data), intent(in) :: geofem
@@ -93,9 +90,6 @@
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+3)
       call PVR_initialize(viz_step%PVR_t%increment,                     &
      &    geofem, nod_fld, viz3_ctls%pvr_ctls, vizs%pvr, m_SR)
-      call anaglyph_PVR_initialize(viz_step%PVR_t%increment,            &
-     &    geofem, nod_fld, viz3_ctls%pvr_anaglyph_ctls,                 &
-     &    vizs%anaglyph_pvr, m_SR)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+3)
 !
       call calypso_mpi_barrier
@@ -109,7 +103,6 @@
      &                           nod_fld, VIZ_DAT, vizs, m_SR)
 !
       use volume_rendering
-      use anaglyph_volume_rendering
 !
       type(time_data), intent(in) :: time_d
       type(VIZ_step_params), intent(in) :: viz_step
@@ -135,8 +128,6 @@
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+8)
       call PVR_visualize(viz_step%istep_pvr, time_d%time,               &
      &    geofem, VIZ_DAT%jacobians, nod_fld, vizs%pvr, m_SR)
-      call anaglyph_PVR_visualize(viz_step%istep_pvr, time_d%time,      &
-     &    geofem, VIZ_DAT%jacobians, nod_fld, vizs%anaglyph_pvr, m_SR)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+8)
 !
       call calypso_mpi_barrier

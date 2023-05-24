@@ -41,8 +41,6 @@
       call bcast_files_4_iso_ctl(viz3_ctls%iso_ctls)
       call bcast_files_4_pvr_ctl(viz3_ctls%pvr_ctls)
 !
-      call bcast_files_4_pvr_ctl(viz3_ctls%pvr_anaglyph_ctls)
-!
       call bcast_ctl_type_r1(viz3_ctls%delta_t_psf_v_ctl)
       call bcast_ctl_type_r1(viz3_ctls%delta_t_iso_v_ctl)
       call bcast_ctl_type_r1(viz3_ctls%delta_t_pvr_v_ctl)

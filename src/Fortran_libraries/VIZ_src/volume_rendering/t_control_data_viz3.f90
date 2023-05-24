@@ -31,10 +31,6 @@
 !!      ....
 !!    end array volume_rendering
 !!
-!!    array  anaglyph_volume_rendering
-!!      ....
-!!    end array anaglyph_volume_rendering
-!!
 !!    delta_t_sectioning_ctl   1.0e-3
 !!    i_step_sectioning_ctl    400
 !!    delta_t_isosurface_ctl   1.0e-3
@@ -71,9 +67,6 @@
         type(isosurf_controls) :: iso_ctls
 !>        Structures of volume rendering controls
         type(volume_rendering_controls) :: pvr_ctls
-!
-!>        Structures of volume rendering controls
-        type(volume_rendering_controls) :: pvr_anaglyph_ctls
 !
 !>   Increment for sectioning
         type(read_integer_item) :: i_step_psf_v_ctl
@@ -114,8 +107,6 @@
       call dealloc_psf_ctl_stract(viz_ctls%psf_ctls)
       call dealloc_iso_ctl_stract(viz_ctls%iso_ctls)
       call dealloc_pvr_ctl_struct(viz_ctls%pvr_ctls)
-!
-      call dealloc_pvr_ctl_struct(viz_ctls%pvr_anaglyph_ctls)
 !
       viz_ctls%delta_t_psf_v_ctl%iflag =   0
       viz_ctls%delta_t_iso_v_ctl%iflag =   0
@@ -202,11 +193,6 @@
 !
       if(viz_ctls%pvr_ctls%num_pvr_ctl .gt. 0) then
         call add_fields_4_pvrs_to_fld_ctl(viz_ctls%pvr_ctls, field_ctl)
-      end if
-!
-      if(viz_ctls%pvr_anaglyph_ctls%num_pvr_ctl .gt. 0) then
-        call add_fields_4_pvrs_to_fld_ctl(viz_ctls%pvr_anaglyph_ctls,   &
-     &                                    field_ctl)
       end if
 !
       end subroutine add_fields_viz3_to_fld_ctl

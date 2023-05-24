@@ -7,34 +7,14 @@
 !> @brief Structures for position in the projection coordinate 
 !!
 !!@verbatim
-!!      subroutine rendering_image(istep_pvr, time, mesh, group,        &
-!!     &          sf_grp_4_sf, color_param, cbar_param, field_pvr,      &
-!!     &          draw_param, pvr_screen, pvr_start, pvr_stencil,       &
-!!     &          pvr_rgb, SR_sig, SR_r)
-!!        type(mesh_geometry), intent(in) :: mesh
-!!        type(mesh_groups), intent(in) ::   group
-!!        type(sf_grp_list_each_surf), intent(in) :: sf_grp_4_sf
-!!        type(pvr_field_data), intent(in) :: field_pvr
-!!        type(rendering_parameter), intent(in) :: draw_param
-!!        type(pvr_colormap_parameter), intent(in) :: color_param
-!!        type(pvr_colorbar_parameter), intent(in) :: cbar_param
-!!        type(pvr_view_parameter), intent(in) :: view_param
-!!        type(pvr_projected_position), intent(in) :: pvr_screen
-!!        type(pvr_ray_start_type), intent(inout) :: pvr_start
-!!        type(pvr_stencil_buffer), intent(inout) :: pvr_stencil
-!!        type(pvr_segmented_img), intent(inout) :: pvr_img
-!!        type(pvr_image_type), intent(inout) :: pvr_rgb
-!!        type(send_recv_status), intent(inout) :: SR_sig
-!!        type(send_recv_real_buffer), intent(inout) :: SR_r
-!!
-!!      subroutine sel_write_pvr_image_file(istep_pvr, pvr_rgb)
+!!      subroutine sel_write_pvr_image_file(istep_pvr, i_rot, pvr_rgb)
 !!      subroutine sel_write_pvr_local_img(index, istep_pvr, pvr_rgb)
 !!        type(pvr_image_type), intent(inout) :: pvr_rgb
 !!
-!!      subroutine set_output_rot_sequence_image(istep_pvr,             &
+!!      subroutine set_output_rot_sequence_image(istep_pvr, i_rot,      &
 !!     &          iflag_img_fmt, file_prefix, num_img, n_column_row,    &
 !!     &          rot_rgb)
-!!        integer(kind = kint), intent(in) :: istep_pvr
+!!        integer(kind = kint), intent(in) :: istep_pvr, i_rot
 !!        integer(kind = kint), intent(in) :: num_img
 !!        integer(kind = kint), intent(in) :: n_column_row(2)
 !!        integer(kind = kint), intent(in) :: iflag_img_fmt
@@ -63,96 +43,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine rendering_image(istep_pvr, time, mesh, group,          &
-     &          sf_grp_4_sf, color_param, cbar_param, field_pvr,        &
-     &          draw_param, pvr_screen, pvr_start, pvr_stencil,         &
-     &          pvr_rgb, SR_sig, SR_r)
-!
-      use m_geometry_constants
-      use m_elapsed_labels_4_VIZ
-      use t_mesh_data
-      use t_geometry_data
-      use t_surface_data
-      use t_group_data
-      use t_surf_grp_list_each_surf
-      use t_control_params_4_pvr
-      use t_geometries_in_pvr_screen
-      use t_pvr_image_array
-      use t_pvr_ray_startpoints
-      use t_pvr_stencil_buffer
-      use t_pvr_field_data
-      use t_solver_SR
-!
-      use ray_trace_4_each_image
-      use draw_pvr_colorbar
-      use pvr_axis_label
-!      use composit_by_segmentad_image
-!
-      integer(kind = kint), intent(in) :: istep_pvr
-      real(kind = kreal), intent(in) :: time
-!
-      type(mesh_geometry), intent(in) :: mesh
-      type(mesh_groups), intent(in) ::   group
-      type(sf_grp_list_each_surf), intent(in) :: sf_grp_4_sf
-      type(pvr_field_data), intent(in) :: field_pvr
-      type(rendering_parameter), intent(in) :: draw_param
-      type(pvr_colormap_parameter), intent(in) :: color_param
-      type(pvr_colorbar_parameter), intent(in) :: cbar_param
-      type(pvr_projected_position), intent(in) :: pvr_screen
-!
-      type(pvr_ray_start_type), intent(inout) :: pvr_start
-      type(pvr_stencil_buffer), intent(inout) :: pvr_stencil
-!      type(pvr_segmented_img), intent(inout) :: pvr_img
-      type(pvr_image_type), intent(inout) :: pvr_rgb
-      type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_real_buffer), intent(inout) :: SR_r
-!
-!
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+3)
-      if(iflag_debug .gt. 0) write(*,*) 's_ray_trace_4_each_image'
-      call s_ray_trace_4_each_image(mesh, group, sf_grp_4_sf,           &
-     &    field_pvr, pvr_screen, draw_param, color_param, pvr_start)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+3)
-!
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+4)
-      if(iflag_debug .gt. 0) write(*,*) 'collect_rendering_image'
-      call collect_rendering_image(pvr_start,                           &
-     &    pvr_rgb%num_pixel_actual, pvr_rgb%rgba_real_gl, pvr_stencil,  &
-     &    SR_sig, SR_r)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+4)
-!
-!      call composit_by_segmentad_image                                 &
-!     &   (istep_pvr, iflag_PVR_time, ist_elapsed_PVR,                  &
-!     &    pvr_start, pvr_stencil, pvr_img, pvr_rgb)
-!
-      if(my_rank .eq. pvr_rgb%irank_image_file) then
-        if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+3)
-        if(cbar_param%iflag_pvr_colorbar) then
-          call set_pvr_colorbar                                         &
-     &       (pvr_rgb%num_pixel_xy, pvr_rgb%num_pixels,                 &
-     &        color_param, cbar_param, pvr_rgb%rgba_real_gl)
-        end if
-!
-        if(cbar_param%iflag_draw_time) then
-          call set_pvr_timelabel                                        &
-     &       (time, pvr_rgb%num_pixel_xy, pvr_rgb%num_pixels,           &
-     &        cbar_param, pvr_rgb%rgba_real_gl)
-        end if
-!
-        if(cbar_param%iflag_pvr_axis) then
-          call set_pvr_axislabel                                        &
-     &       (pvr_rgb%num_pixel_xy, pvr_rgb%num_pixels,                 &
-     &        pvr_screen, pvr_rgb%rgba_real_gl)
-        end if
-        if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+3)
-      end if
-!
-      end subroutine rendering_image
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine sel_write_pvr_image_file(istep_pvr, pvr_rgb)
+      subroutine sel_write_pvr_image_file(istep_pvr, i_rot, pvr_rgb)
 !
       use t_pvr_image_array
       use t_control_params_4_pvr
@@ -160,8 +51,10 @@
       use set_parallel_file_name
       use convert_real_rgb_2_bite
 !
-      integer(kind = kint), intent(in) :: istep_pvr
+      integer(kind = kint), intent(in) :: istep_pvr, i_rot
       type(pvr_image_type), intent(inout) :: pvr_rgb
+!
+      character(len=kchara) :: file_prefix_w_index, fname_tmp
 !
 !
       if(my_rank .ne. pvr_rgb%irank_image_file) return
@@ -169,10 +62,17 @@
       call cvt_double_rgba_to_char_rgb(pvr_rgb%num_pixel_xy,            &
      &    pvr_rgb%rgba_real_gl,  pvr_rgb%rgb_chara_gl)
 !
-      write(*,*) trim(pvr_rgb%pvr_prefix), ' is written from process ', &
-     &          my_rank
-      call sel_output_image_file(pvr_rgb%id_pvr_file_type,              &
-     &    add_int_suffix(istep_pvr, pvr_rgb%pvr_prefix),                &
+      fname_tmp = add_int_suffix(istep_pvr, pvr_rgb%pvr_prefix)
+      if(i_rot .ge. 0) then
+        file_prefix_w_index = add_int_suffix(i_rot, fname_tmp)
+      else
+        file_prefix_w_index = fname_tmp
+      end if
+!
+      write(*,*) trim(file_prefix_w_index),                             &
+     &          ' is written from process ', my_rank
+      call sel_output_image_file                                        &
+     &   (pvr_rgb%id_pvr_file_type, file_prefix_w_index,                &
      &    pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
      &    pvr_rgb%rgb_chara_gl)
       if(pvr_rgb%iflag_monitoring .gt. 0) then
@@ -232,7 +132,7 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine set_output_rot_sequence_image(istep_pvr,               &
+      subroutine set_output_rot_sequence_image(istep_pvr, i_rot,        &
      &          iflag_img_fmt, file_prefix, num_img, n_column_row,      &
      &          rot_rgb)
 !
@@ -244,38 +144,47 @@
       use output_image_sel_4_png
       use mpi_write_quilt_BMP_file
 !
-      integer(kind = kint), intent(in) :: istep_pvr
+      integer(kind = kint), intent(in) :: istep_pvr, i_rot
       integer(kind = kint), intent(in) :: num_img
       integer(kind = kint), intent(in) :: n_column_row(2)
       integer(kind = kint), intent(in) :: iflag_img_fmt
       character(len=kchara), intent(in) :: file_prefix
       type(pvr_image_type), intent(in) :: rot_rgb(num_img)
 !
-      integer(kind = kint) :: i_rot, icou
-      character(len=kchara) :: file_tmp
+      integer(kind = kint) :: i_img, icou
+      character(len=kchara) :: file_tmp, file_tmp2
 !
 !
       quilt_d%n_image = num_img
       quilt_d%n_column_row(1:2) = n_column_row(1:2)
 !
       icou = 0
-      do i_rot = 1, num_img
-        if(my_rank .eq. rot_rgb(i_rot)%irank_image_file) icou = icou+1
+      do i_img = 1, num_img
+        if(my_rank .eq. rot_rgb(i_img)%irank_image_file) icou = icou+1
       end do
       quilt_d%num_image_lc = icou
 !
       if(iflag_img_fmt .eq. iflag_QUILT_BMP                             &
      &   .or. iflag_img_fmt .eq. iflag_QUILT_BMP_GZ) then
-        write(file_tmp,'(2a)') trim(file_prefix), '_quilt'
+        write(file_tmp2,'(2a)') trim(file_prefix), '_qs'
+        file_tmp = append_index(quilt_d%n_column_row(1), file_tmp2)
+        write(file_tmp2,'(a,a1)') trim(file_tmp), 'x'
+        file_tmp = append_index(quilt_d%n_column_row(2), file_tmp2)
       else
         file_tmp = file_prefix
       end if
 !
       if(istep_pvr .ge. 0) then
-        quilt_d%image_seq_prefix = add_int_suffix(istep_pvr, file_tmp)
+        file_tmp2 = add_int_suffix(istep_pvr, file_tmp)
       else
-        quilt_d%image_seq_prefix = file_tmp
+        file_tmp2 = file_tmp
       end if
+      if(i_rot .ge. 0) then
+        quilt_d%image_seq_prefix = add_int_suffix(i_rot, file_tmp2)
+      else
+        quilt_d%image_seq_prefix = file_tmp2
+      end if
+!
       quilt_d%image_seq_format = iflag_img_fmt
       quilt_d%npixel_xy(1:2) = rot_rgb(1)%num_pixels(1:2)
       call alloc_quilt_rgb_images(quilt_d)
@@ -288,14 +197,14 @@
 !
 !
       icou = 0
-      do i_rot = 1, num_img
-        if(my_rank .eq. rot_rgb(i_rot)%irank_image_file) then
+      do i_img = 1, num_img
+        if(my_rank .eq. rot_rgb(i_img)%irank_image_file) then
           icou = icou + 1
-          quilt_d%icou_each_pe(icou) = i_rot
+          quilt_d%icou_each_pe(icou) = i_img
           quilt_d%images(icou)%each_prefix                              &
-     &         = add_int_suffix(i_rot, quilt_d%image_seq_prefix)
+     &         = add_int_suffix(i_img, quilt_d%image_seq_prefix)
           call cvt_double_rgba_to_char_rgb                              &
-     &       (rot_rgb(i_rot)%num_pixel_xy, rot_rgb(i_rot)%rgba_real_gl, &
+     &       (rot_rgb(i_img)%num_pixel_xy, rot_rgb(i_img)%rgba_real_gl, &
      &        quilt_d%images(icou)%rgb(1,1,1))
         end if
       end do

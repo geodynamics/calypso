@@ -53,6 +53,7 @@
       use t_pvr_field_data
       use t_geometries_in_pvr_screen
       use t_control_data_pvrs
+      use t_sort_PVRs_by_type
 !
       use each_volume_rendering
 !
@@ -80,17 +81,15 @@
 !>        Domain boundary information
         type(pvr_bounds_surf_ctl), allocatable :: pvr_bound(:)
 !
-!>        Number of rendering for volume rendering
-        integer(kind = kint) :: num_pvr_rendering = 0
-!>        Structure for projection data
-        type(PVR_projection_data), allocatable :: pvr_proj(:)
-!
 !>        Number of image files for volume rendering
         integer(kind = kint) :: num_pvr_images =    0
-!>        Number of image files for volume rendering
-        integer(kind = kint), allocatable :: istack_pvr_images(:)
+!>        Structure for projection data
+        type(PVR_projection_data), allocatable :: pvr_proj(:)
 !>        Structure for PVR images
         type(pvr_image_type), allocatable :: pvr_rgb(:)
+!
+!>        Structure for PVR images
+        type(sort_PVRs_by_type) :: PVR_sort
       end type volume_rendering_module
 !
       character(len=kchara), parameter                                  &
@@ -114,15 +113,27 @@
       type(volume_rendering_controls), intent(inout) :: pvr_ctls
       type(volume_rendering_module), intent(inout) :: pvr
 !
-      integer(kind = kint) :: i_pvr
+      integer(kind = kint) :: i_ctl, i_pvr
 !
-!
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+5)
-      call bcast_pvr_controls(pvr%num_pvr,                              &
-     &    pvr_ctls%pvr_ctl_type, pvr%cflag_update)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+5)
 !
       call alloc_pvr_data(pvr)
+      call s_sort_PVRs_by_type(pvr%num_pvr, pvr_ctls%pvr_ctl_type,      &
+     &                         pvr%PVR_sort)
+!
+      if(iflag_debug .gt. 0) then
+        do i_pvr = 0, 6
+          write(*,*) i_pvr, 'pvr%istack_PVR_modes',                     &
+    &       pvr%PVR_sort%istack_PVR_modes(i_pvr)
+        end do
+        do i_pvr = 1, pvr%num_pvr
+          write(*,*) i_pvr, trim(pvr_ctls%fname_pvr_ctl(i_pvr)), ' ',   &
+    &    yes_flag(pvr_ctls%pvr_ctl_type(i_pvr)%anaglyph_ctl%charavalue),&
+    &    ' ', pvr_ctls%pvr_ctl_type(i_pvr)%movie%movie_mode_ctl%iflag,  &
+    &    yes_flag(pvr_ctls%pvr_ctl_type(i_pvr)%quilt_ctl%charavalue),   &
+    &    ' ', pvr%PVR_sort%ipvr_sorted(i_pvr)
+        end do
+      end if
+!
       do i_pvr = 1, pvr%num_pvr
         call alloc_nod_data_4_pvr                                       &
      &     (geofem%mesh%node%numnod, geofem%mesh%ele%numele,            &
@@ -131,8 +142,20 @@
      &      pvr%pvr_param(i_pvr)%draw_param)
       end do
 !
-      call s_set_pvr_controls(geofem%group, nod_fld, pvr%num_pvr,       &
-     &    pvr_ctls%pvr_ctl_type, pvr%pvr_param)
+      do i_ctl = 1, pvr%num_pvr
+        i_pvr = pvr%PVR_sort%ipvr_sorted(i_ctl)
+        call s_set_pvr_controls(geofem%group, nod_fld,                  &
+     &      pvr_ctls%pvr_ctl_type(i_ctl), pvr%pvr_param(i_pvr))
+      end do
+!
+      call count_num_rendering_and_images(pvr%num_pvr, pvr%pvr_param,   &
+     &    pvr%num_pvr_images, pvr%PVR_sort%istack_pvr_images)
+      call alloc_pvr_images(pvr)
+!
+      call set_rendering_and_image_pes                                  &
+     &   (nprocs, pvr%num_pvr, pvr_ctls%pvr_ctl_type, pvr%PVR_sort,     &
+     &    pvr%num_pvr_images, pvr%pvr_rgb)
+      call dealloc_sort_PVRs_list(pvr%PVR_sort)
 !
       end subroutine set_from_PVR_control
 !
@@ -209,12 +232,11 @@
       type(volume_rendering_module), intent(inout) :: pvr
 !
 !
-      allocate(pvr%istack_pvr_images(0:pvr%num_pvr))
-      pvr%istack_pvr_images = 0
-!
       allocate(pvr%pvr_param(pvr%num_pvr))
       allocate(pvr%field_pvr(pvr%num_pvr))
       allocate(pvr%pvr_bound(pvr%num_pvr))
+!
+      call alloc_sort_PVRs_by_type(pvr%num_pvr, pvr%PVR_sort)
 !
       end subroutine alloc_pvr_data
 !
@@ -225,7 +247,7 @@
       type(volume_rendering_module), intent(inout) :: pvr
 !
 !
-      allocate(pvr%pvr_proj(pvr%num_pvr_rendering))
+      allocate(pvr%pvr_proj(pvr%num_pvr_images))
       allocate(pvr%pvr_rgb(pvr%num_pvr_images))
 !
       end subroutine alloc_pvr_images
@@ -256,6 +278,8 @@
       integer(kind = kint) :: i_pvr
 !
 !
+      call dealloc_sort_PVRs_list(pvr%PVR_sort)
+!
       do i_pvr = 1, pvr%num_pvr
         call dealloc_iflag_pvr_boundaries                               &
      &     (pvr%pvr_param(i_pvr)%draw_param)
@@ -272,15 +296,9 @@
 !
       do i_pvr = 1, pvr%num_pvr_images
         call dealloc_pvr_image_array(pvr%pvr_rgb(i_pvr))
-      end do
-      deallocate(pvr%pvr_rgb)
-!
-!
-      do i_pvr = 1, pvr%num_pvr_rendering
         call flush_rendering_4_fixed_view(pvr%pvr_proj(i_pvr))
       end do
-      deallocate(pvr%pvr_proj)
-      deallocate(pvr%istack_pvr_images)
+      deallocate(pvr%pvr_rgb, pvr%pvr_proj)
 !
       end subroutine dealloc_pvr_and_lic_data
 !

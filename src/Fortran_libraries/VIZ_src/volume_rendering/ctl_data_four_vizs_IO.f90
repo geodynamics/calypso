@@ -35,11 +35,6 @@
 !!    array  fieldline
 !!      ....
 !!    end array fieldline
-!!
-!!
-!!    array  anaglyph_volume_rendering
-!!      ....
-!!    end array anaglyph_volume_rendering
 !!  end  visual_control
 !
 !!    delta_t_sectioning_ctl   1.0e-3
@@ -86,12 +81,6 @@
      &             :: hd_lic_ctl = 'LIC_rendering'
       character(len=kchara), parameter, private                         &
      &             :: hd_fline_ctl =  'fieldline'
-!
-      character(len=kchara), parameter, private                         &
-     &             :: hd_anaglyph_pvr_ctl = 'anaglyph_volume_rendering'
-      character(len=kchara), parameter, private                         &
-     &             :: hd_anaglyph_lic_ctl = 'anaglyph_LIC_rendering'
-!
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_i_step_section =   'i_step_sectioning_ctl'
@@ -158,8 +147,6 @@
 !
         call read_files_4_pvr_ctl(id_control, hd_pvr_ctl,               &
      &      viz_ctls%pvr_ctls, c_buf)
-        call read_files_4_pvr_ctl(id_control, hd_anaglyph_pvr_ctl,      &
-     &      viz_ctls%pvr_anaglyph_ctls, c_buf)
 !
         call read_files_4_fline_ctl(id_control, hd_fline_ctl,           &
      &      viz_ctls%fline_ctls, c_buf)
@@ -254,8 +241,6 @@
      &    hd_i_step_pvr, viz_ctls%i_step_pvr_v_ctl)
       call write_files_4_pvr_ctl(id_control, hd_pvr_ctl,                &
      &                           viz_ctls%pvr_ctls, level)
-      call write_files_4_pvr_ctl(id_control, hd_anaglyph_pvr_ctl,       &
-     &    viz_ctls%pvr_anaglyph_ctls, level)
 !
       write(id_control,'(a1)') '!'
       call write_real_ctl_type(id_control, level, maxlen,               &

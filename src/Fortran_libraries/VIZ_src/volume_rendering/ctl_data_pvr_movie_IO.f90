@@ -26,17 +26,12 @@
 !!      subroutine set_label_pvr_movie(names)
 !!      subroutine set_label_LIC_movie(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    Avaiable parameters for movie_format_ctl:
-!!        BMP, PNG, QUILT
 !!    Avaiable parameters for movie_mode_ctl:
 !!        rotation, zoom, view_matrices, LIC_kernel, looking_glass
 !!
-!!  begin image_rotation_ctl
-!!    movie_format_ctl     QUILT
+!!  begin snapshot_movie_ctl
 !!    movie_mode_ctl       rotation
 !!    num_frames_ctl        120
-!!    num_column_row_ctl       5     9
-!!    num_row_column_ctl       9     5
 !!
 !!    rotation_axis_ctl       z
 !!
@@ -55,7 +50,7 @@
 !!    apature_range           10.0  1.0
 !!
 !!    LIC_kernel_peak_range      -0.8  0.8
-!!  end image_rotation_ctl
+!!  end snapshot_movie_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    movie_mode_ctl:   view_matrices, rotation, apature, LIC_kernel
@@ -86,15 +81,9 @@
 !     3rd level for movie
 !
       character(len=kchara), parameter, private                         &
-     &             :: hd_movie_format =    'movie_format_ctl'
-      character(len=kchara), parameter, private                         &
      &             :: hd_movie_mode =      'movie_mode_ctl'
       character(len=kchara), parameter, private                         &
      &             :: hd_movie_num_frame = 'num_frames_ctl'
-      character(len=kchara), parameter, private                         &
-     &             :: hd_column_row =      'num_column_row_ctl'
-      character(len=kchara), parameter, private                         &
-     &             :: hd_row_column =      'num_row_column_ctl'
 !
       character(len=kchara), parameter, private                         &
      &             :: hd_movie_rot_axis =  'rotation_axis_ctl'
@@ -113,8 +102,8 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_LIC_kernel_peak = 'LIC_kernel_peak_range'
 !
-      integer(kind = kint), parameter :: n_label_pvr_movie =  11
-      integer(kind = kint), parameter :: n_label_LIC_movie =  12
+      integer(kind = kint), parameter :: n_label_pvr_movie =  8
+      integer(kind = kint), parameter :: n_label_LIC_movie =  9
 !
       private :: n_label_pvr_movie, n_label_LIC_movie
 !
@@ -150,15 +139,9 @@
      &      movie%fname_view_end_ctl, movie%view_end_ctl, c_buf)
 !
 !
-        call read_chara_ctl_type(c_buf, hd_movie_format,                &
-     &      movie%movie_format_ctl)
         call read_chara_ctl_type(c_buf, hd_movie_mode,                  &
      &      movie%movie_mode_ctl)
 !
-        call read_integer2_ctl_type(c_buf, hd_column_row,               &
-     &      movie%quilt_column_row_ctl)
-        call read_integer2_ctl_type(c_buf, hd_row_column,               &
-     &      movie%quilt_row_column_ctl)
         call read_integer_ctl_type(c_buf, hd_movie_num_frame,           &
      &      movie%num_frames_ctl)
         call read_chara_ctl_type(c_buf, hd_movie_rot_axis,              &
@@ -197,10 +180,7 @@
 !
       if(movie%i_pvr_rotation .le. 0) return
 !
-      maxlen = len_trim(hd_movie_format)
-      maxlen = max(maxlen, len_trim(hd_movie_mode))
-      maxlen = max(maxlen, len_trim(hd_column_row))
-      maxlen = max(maxlen, len_trim(hd_row_column))
+      maxlen = len_trim(hd_movie_mode)
       maxlen = max(maxlen, len_trim(hd_movie_rot_axis))
       maxlen = max(maxlen, len_trim(hd_angle_range))
       maxlen = max(maxlen, len_trim(hd_apature_range))
@@ -210,15 +190,9 @@
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_movie_format, movie%movie_format_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_movie_mode, movie%movie_mode_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_movie_num_frame, movie%num_frames_ctl)
-      call write_integer2_ctl_type(id_control, level, maxlen,           &
-     &    hd_column_row, movie%quilt_column_row_ctl)
-      call write_integer2_ctl_type(id_control, level, maxlen,           &
-     &    hd_row_column, movie%quilt_row_column_ctl)
 !
       write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
@@ -269,20 +243,17 @@
      &                         :: names(n_label_pvr_movie)
 !
 !
-      call set_control_labels(hd_movie_format,    names( 1))
-      call set_control_labels(hd_movie_mode,      names( 2))
-      call set_control_labels(hd_movie_num_frame, names( 3))
-      call set_control_labels(hd_column_row,      names( 4))
-      call set_control_labels(hd_row_column,      names( 5))
+      call set_control_labels(hd_movie_mode,      names( 1))
+      call set_control_labels(hd_movie_num_frame, names( 2))
 !
-      call set_control_labels(hd_movie_rot_axis,   names( 6))
+      call set_control_labels(hd_movie_rot_axis,   names( 3))
 !
-      call set_control_labels(hd_start_view_control, names( 7))
-      call set_control_labels(hd_end_view_control,   names( 8))
-      call set_control_labels(hd_mview_transform,    names( 9))
+      call set_control_labels(hd_start_view_control, names( 4))
+      call set_control_labels(hd_end_view_control,   names( 5))
+      call set_control_labels(hd_mview_transform,    names( 6))
 !
-      call set_control_labels(hd_angle_range,        names(10))
-      call set_control_labels(hd_apature_range,      names(11))
+      call set_control_labels(hd_angle_range,        names( 7))
+      call set_control_labels(hd_apature_range,      names( 8))
 !
       end subroutine set_label_pvr_movie
 !
@@ -294,22 +265,19 @@
      &                         :: names(n_label_LIC_movie)
 !
 !
-      call set_control_labels(hd_movie_format,    names( 1))
-      call set_control_labels(hd_movie_mode,      names( 2))
-      call set_control_labels(hd_movie_num_frame, names( 3))
-      call set_control_labels(hd_column_row,      names( 4))
-      call set_control_labels(hd_row_column,      names( 5))
+      call set_control_labels(hd_movie_mode,      names( 1))
+      call set_control_labels(hd_movie_num_frame, names( 2))
 !
-      call set_control_labels(hd_movie_rot_axis,   names( 6))
+      call set_control_labels(hd_movie_rot_axis,   names( 3))
 !
-      call set_control_labels(hd_start_view_control, names( 7))
-      call set_control_labels(hd_end_view_control,   names( 8))
-      call set_control_labels(hd_mview_transform,    names( 9))
+      call set_control_labels(hd_start_view_control, names( 4))
+      call set_control_labels(hd_end_view_control,   names( 5))
+      call set_control_labels(hd_mview_transform,    names( 6))
 !
-      call set_control_labels(hd_angle_range,        names(10))
-      call set_control_labels(hd_apature_range,      names(11))
+      call set_control_labels(hd_angle_range,        names( 7))
+      call set_control_labels(hd_apature_range,      names( 8))
 !
-      call set_control_labels(hd_LIC_kernel_peak,   names(12))
+      call set_control_labels(hd_LIC_kernel_peak,   names( 9))
 !
       end subroutine set_label_LIC_movie
 !

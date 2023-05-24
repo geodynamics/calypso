@@ -70,15 +70,13 @@
       call bcast_ctl_type_c1(pvr%file_head_ctl)
       call bcast_ctl_type_c1(pvr%file_fmt_ctl )
       call bcast_ctl_type_c1(pvr%monitoring_ctl)
-      call bcast_ctl_type_c1(pvr%transparent_ctl)
 !
       call bcast_ctl_type_c1(pvr%streo_ctl)
+      call bcast_ctl_type_c1(pvr%anaglyph_ctl)
       call bcast_ctl_type_c1(pvr%quilt_ctl)
 !
       call bcast_ctl_type_c1(pvr%pvr_field_ctl)
       call bcast_ctl_type_c1(pvr%pvr_comp_ctl)
-!
-      call bcast_ctl_type_i1(pvr%maxpe_composit_ctl)
 !
       end subroutine bcast_vr_psf_ctl
 !
@@ -130,17 +128,13 @@
       call copy_chara_ctl(org_pvr%file_fmt_ctl, new_pvr%file_fmt_ctl)
       call copy_chara_ctl(org_pvr%monitoring_ctl,                       &
      &                    new_pvr%monitoring_ctl)
-      call copy_chara_ctl(org_pvr%transparent_ctl,                      &
-     &                    new_pvr%transparent_ctl)
 !
       call copy_chara_ctl(org_pvr%streo_ctl, new_pvr%streo_ctl)
+      call copy_chara_ctl(org_pvr%anaglyph_ctl, new_pvr%anaglyph_ctl)
       call copy_chara_ctl(org_pvr%quilt_ctl, new_pvr%quilt_ctl)
 !
       call copy_chara_ctl(org_pvr%pvr_field_ctl, new_pvr%pvr_field_ctl)
       call copy_chara_ctl(org_pvr%pvr_comp_ctl, new_pvr%pvr_comp_ctl)
-!
-      call copy_integer_ctl(org_pvr%maxpe_composit_ctl,                 &
-     &    new_pvr%maxpe_composit_ctl)
 !
       end subroutine dup_pvr_ctl
 !

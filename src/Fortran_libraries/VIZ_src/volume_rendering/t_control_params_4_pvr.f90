@@ -34,8 +34,8 @@
       real(kind = kreal), parameter :: SMALL_RAY_TRACE = 0.1d0
       real(kind = kreal), parameter :: SMALL_NORM = -0.1d0
 !
-      integer(kind = kint), parameter :: n_flag_pvr_movie_mode =   4
-      integer(kind = kint), parameter :: n_flag_LIC_movie_mode =   5
+      integer(kind = kint), parameter :: n_flag_pvr_movie_mode =   3
+      integer(kind = kint), parameter :: n_flag_LIC_movie_mode =   4
       character(len=kchara), parameter                                  &
      &                      :: FLAG_ROTATE_MOVIE =    'rotation'
       character(len=kchara), parameter :: FLAG_ZOOM = 'zoom'
@@ -43,8 +43,6 @@
      &                      :: FLAG_START_END_VIEW =  'view_matrices'
       character(len=kchara), parameter                                  &
      &                      :: FLAG_LIC_KERNEL = 'LIC_kernel'
-      character(len=kchara), parameter                                  &
-     &                      :: FLAG_LOOKINGLASS =     'looking_glass'
 !
       integer(kind = kint), parameter :: IFLAG_NO_MOVIE =   0
       integer(kind = kint), parameter :: I_ROTATE_MOVIE =   1
@@ -137,8 +135,6 @@
 !
 !>  movie parameters
       type pvr_movie_parameter
-!>    Integer flag for movie file format
-        integer(kind = kint) :: iflag_movie_fmt = iflag_BMP
 !>    Integer flag for movie output
         integer(kind = kint) :: iflag_movie_mode = IFLAG_NO_MOVIE
 !
@@ -332,7 +328,6 @@
       call set_control_labels(FLAG_ROTATE_MOVIE,   names( 1))
       call set_control_labels(FLAG_ZOOM,           names( 2))
       call set_control_labels(FLAG_START_END_VIEW, names( 3))
-      call set_control_labels(FLAG_LOOKINGLASS,    names( 4))
 !
       end subroutine set_flag_pvr_movie_mode
 !
@@ -349,8 +344,7 @@
       call set_control_labels(FLAG_ROTATE_MOVIE,   names( 1))
       call set_control_labels(FLAG_ZOOM,           names( 2))
       call set_control_labels(FLAG_START_END_VIEW, names( 3))
-      call set_control_labels(FLAG_LOOKINGLASS,    names( 4))
-      call set_control_labels(FLAG_LIC_KERNEL,     names( 5))
+      call set_control_labels(FLAG_LIC_KERNEL,     names( 4))
 !
       end subroutine set_flag_LIC_movie_mode
 !

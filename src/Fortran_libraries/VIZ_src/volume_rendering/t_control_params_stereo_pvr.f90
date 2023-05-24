@@ -25,8 +25,8 @@
 !
 !>  Stereo view parameters
       type pvr_stereo_parameter
-!>    Defined flag for stereo view
-        logical :: flag_stereo_pvr = .FALSE.
+!>    Flag to make anaglyph images with fixed view
+        logical :: flag_anaglyph =   .FALSE.
 !>    Flag to make quilt images with fixed view
         logical :: flag_quilt =      .FALSE.
 !
@@ -99,16 +99,17 @@
       type(pvr_stereo_parameter), intent(inout) :: stereo_def
 !
 !
-      stereo_def%num_views = 0
-      stereo_def%flag_stereo_pvr = .FALSE.
       stereo_def%flag_quilt =      .FALSE.
-      if(yes_flag(pvr_ctl%streo_ctl%charavalue)) then
-        stereo_def%flag_stereo_pvr = .TRUE.
-        stereo_def%num_views = 2
-      else if(yes_flag(pvr_ctl%quilt_ctl%charavalue)) then
+      if(yes_flag(pvr_ctl%quilt_ctl%charavalue)) then
         stereo_def%flag_quilt =      .TRUE.
       end if
 !
+      stereo_def%flag_anaglyph =   .FALSE.
+      if(yes_flag(pvr_ctl%anaglyph_ctl%charavalue)) then
+        stereo_def%flag_anaglyph = .TRUE.
+      end if
+!
+      stereo_def%num_views = 0
       call set_pvr_quilt_num_control(pvr_ctl%quilt_c, stereo_def)
 !
       end subroutine set_pvr_stereo_control
@@ -139,8 +140,11 @@
           stereo_def%num_views = stereo_def%n_column_row_view(1)        &
      &                          * stereo_def%n_column_row_view(2)
         end if
+      else if(stereo_def%flag_anaglyph) then
+        stereo_def%n_column_row_view(1) = 2
+        stereo_def%n_column_row_view(2) = 1
+        stereo_def%num_views = 2
       end if
-!
 !
       end subroutine set_pvr_quilt_num_control
 !

@@ -15,17 +15,12 @@
 !!        type(pvr_movie_ctl), intent(inout) :: movie
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    Avaiable parameters for movie_format_ctl:
-!!        BMP, PNG, QUILT
 !!    Avaiable parameters for movie_mode_ctl:
 !!        rotation, zoom, view_matrices, LIC_kernel, looking_glass
 !!
-!!  begin image_rotation_ctl
-!!    movie_format_ctl     QUILT
+!!  begin snapshot_movie_ctl
 !!    movie_mode_ctl       rotation
 !!    num_frames_ctl        120
-!!    num_column_row_ctl       5     9
-!!    num_row_column_ctl       9     5
 !!
 !!    rotation_axis_ctl       z
 !!
@@ -44,7 +39,7 @@
 !!    apature_range           10.0  1.0
 !!
 !!    LIC_kernel_peak_range      -0.8  0.8
-!!  end image_rotation_ctl
+!!  end snapshot_movie_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    movie_mode_ctl:   view_matrices, rotation, apature, LIC_kernel
@@ -70,16 +65,10 @@
 !
 !
       type pvr_movie_ctl
-!>        Structure of movie mode file format
-        type(read_character_item) :: movie_format_ctl
 !>        Structure of movie mode control
         type(read_character_item) :: movie_mode_ctl
 !>        Structure of number of flame control
         type(read_integer_item) ::   num_frames_ctl
-!>        Structure of number of columns and of image
-        type(read_int2_item) :: quilt_column_row_ctl
-!>        Structure of number of row and columns of image
-        type(read_int2_item) :: quilt_row_column_ctl
 !
 !>        Structure of rotation axis control
         type(read_character_item) :: rotation_axis_ctl
@@ -123,16 +112,10 @@
       call dup_mul_view_trans_ctl(org_movie%mul_mmats_c,                &
      &                            new_movie%mul_mmats_c)
 !
-      call copy_chara_ctl(org_movie%movie_format_ctl,                   &
-     &                    new_movie%movie_format_ctl)
       call copy_chara_ctl(org_movie%movie_mode_ctl,                     &
      &                    new_movie%movie_mode_ctl)
       call copy_integer_ctl(org_movie%num_frames_ctl,                   &
      &                      new_movie%num_frames_ctl)
-      call copy_integer2_ctl(org_movie%quilt_column_row_ctl,            &
-     &                       new_movie%quilt_column_row_ctl)
-      call copy_integer2_ctl(org_movie%quilt_row_column_ctl,            &
-     &                       new_movie%quilt_row_column_ctl)
 !
       call copy_chara_ctl(org_movie%rotation_axis_ctl,                  &
      &                    new_movie%rotation_axis_ctl)
@@ -164,11 +147,8 @@
 !
       call dealloc_multi_modeview_ctl(movie%mul_mmats_c)
 !
-      movie%movie_format_ctl%iflag =     0
       movie%movie_mode_ctl%iflag =       0
       movie%num_frames_ctl%iflag =       0
-      movie%quilt_column_row_ctl%iflag = 0
-      movie%quilt_row_column_ctl%iflag = 0
       movie%rotation_axis_ctl%iflag =    0
       movie%angle_range_ctl%iflag =      0
       movie%apature_range_ctl%iflag =    0

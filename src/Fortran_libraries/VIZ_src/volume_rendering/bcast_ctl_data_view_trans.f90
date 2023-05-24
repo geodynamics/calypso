@@ -57,12 +57,9 @@
 !
       call calypso_mpi_bcast_one_int(movie%i_pvr_rotation, 0)
 !
-      call bcast_ctl_type_c1(movie%movie_format_ctl)
       call bcast_ctl_type_c1(movie%movie_mode_ctl)
       call bcast_ctl_type_i1(movie%num_frames_ctl)
       call bcast_ctl_type_c1(movie%rotation_axis_ctl)
-      call bcast_ctl_type_i2(movie%quilt_column_row_ctl)
-      call bcast_ctl_type_i2(movie%quilt_row_column_ctl)
 !
       call bcast_ctl_type_r2(movie%angle_range_ctl)
       call bcast_ctl_type_r2(movie%apature_range_ctl)

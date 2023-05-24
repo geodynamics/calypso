@@ -158,13 +158,7 @@
 !
 !
       if(streo%i_stereo_view .eq. 0) then
-        if(stereo_def%flag_stereo_pvr) then
-          stereo_def%flag_stereo_pvr = .FALSE.
-          if(my_rank.eq.0) then
-            write(*,*) 'Stereo view paramters are missing.'
-            write(*,*) 'Turn off streo view.'
-          end if
-        else if(stereo_def%flag_quilt) then
+        if(stereo_def%flag_quilt) then
           stereo_def%flag_quilt = .FALSE.
           if(my_rank.eq.0) then
             write(*,*) 'Stereo view paramters are missing.'

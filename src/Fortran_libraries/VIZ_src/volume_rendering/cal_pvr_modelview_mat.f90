@@ -133,14 +133,28 @@
       end if
 !
       if(view_param%iflag_scale_fact .eq. 0) then
-        scale(1) = 1.0d0 / outline%rmax_g
-        scale(2) = 1.0d0 / outline%rmax_g
-        scale(3) = 1.0d0 / outline%rmax_g
+        scale(1:3) = one
       else
         scale(1:3) = view_param%scale_factor_pvr(1:3)
       end if
 !
+      if(view_param%iflag_rotation .gt. 0) then
+        call Kemo_Unit(rotation_mat)
+        call Kemo_Rotate(rotation_mat,                                  &
+     &      view_param%rotation_pvr(1), view_param%rotation_pvr(2:4))
+      else
+        mat_tmp(1:4,1:4) = modelview_mat(1:4,1:4)
+        call update_rot_mat_from_viewpts(view_param, rotation_mat)
+      end if
 !
+      if(view_param%iflag_viewpt_in_view .eq. 0) then
+        call cal_mat44_vec3_on_node(ione, ione, ione_stack,             &
+     &      rotation_mat, view_param%viewpoint, rev_eye)
+      else
+        rev_eye(1:3) = - view_param%viewpt_in_viewer_pvr(1:3)
+      end if
+!
+!   Start matrix construction
       call Kemo_Unit(modelview_mat)
       call Kemo_Translate(modelview_mat, rev_lookat)
 !
@@ -159,27 +173,14 @@
       end if
 !
 !   Rotate for viewpoint
-      if(view_param%iflag_rotation .gt. 0) then
-        call Kemo_Rotate(modelview_mat,                                 &
-     &      view_param%rotation_pvr(1), view_param%rotation_pvr(2:4))
-      else
-        mat_tmp(1:4,1:4) = modelview_mat(1:4,1:4)
-        call update_rot_mat_from_viewpts(view_param, rotation_mat)
-        call cal_matmat44(modelview_mat,                                &
-     &                    rotation_mat(1,1), mat_tmp(1,1))
-      end if
+      mat_tmp(1:4,1:4) = modelview_mat(1:4,1:4)
+      call cal_matmat44(modelview_mat, rotation_mat(1,1), mat_tmp(1,1))
 !
 !       Shift by viewpoint
-      if(view_param%iflag_viewpt_in_view .eq. 0) then
-        call cal_mat44_vec3_on_node(ione, ione, ione_stack,             &
-     &      modelview_mat, view_param%viewpoint, rev_eye)
-      else
-        rev_eye(1:3) = - view_param%viewpt_in_viewer_pvr(1:3)
-      end if
       call Kemo_Translate(modelview_mat, rev_eye)
 !
 !   Shift for stereo view
-      if(stereo_def%flag_stereo_pvr .or. stereo_def%flag_quilt) then
+      if(stereo_def%flag_quilt .or. stereo_def%flag_anaglyph) then
         streo_eye(1) =  each_eye_from_middle(i_stereo, stereo_def)
         streo_eye(2:3) = zero
         call Kemo_Translate(modelview_mat, streo_eye)

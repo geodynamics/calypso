@@ -31,8 +31,6 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !!  begin quilt_image_ctl
-!!    num_column_row_ctl       9    5
-!!    num_row_column_ctl       9    5
 !!
 !!    array view_transform_ctl
 !!      file  view_transform_ctl  control_view
@@ -85,7 +83,7 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_qview_transform =   'view_transform_ctl'
 !
-      integer(kind = kint), parameter :: n_label_quilt_ctl =   4
+      integer(kind = kint), parameter :: n_label_quilt_ctl =   3
       private :: n_label_quilt_ctl
 !
 !  ---------------------------------------------------------------------
@@ -213,9 +211,9 @@
      &                         :: names(n_label_quilt_ctl)
 !
 !
-      call set_control_labels(hd_column_row, names( 2))
-      call set_control_labels(hd_row_column, names( 3))
-      call set_control_labels(hd_qview_transform, names( 4))
+      call set_control_labels(hd_column_row, names( 1))
+      call set_control_labels(hd_row_column, names( 2))
+      call set_control_labels(hd_qview_transform, names( 3))
 !
       end subroutine set_label_quilt_image
 !
