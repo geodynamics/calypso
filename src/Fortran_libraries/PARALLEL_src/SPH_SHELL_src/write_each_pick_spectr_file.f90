@@ -179,9 +179,9 @@
 !
       mm = abs(m)
       write(fname_tmp,'(a,a2)') trim(file_prefix), '_l'
-      call add_index_after_name(l, fname_tmp, file_name)
+      file_name = append_index(l, fname_tmp)
       write(fname_tmp,'(a,a2)') trim(file_name), '_m'
-      call add_index_after_name(mm, fname_tmp, file_name)
+      file_name = append_index(mm, fname_tmp)
       if(m .lt. 0) then
         write(fname_tmp,'(a,a1)') trim(file_name), 's'
       else

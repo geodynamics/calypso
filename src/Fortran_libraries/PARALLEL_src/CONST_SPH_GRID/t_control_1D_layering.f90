@@ -89,7 +89,7 @@
       call alloc_layering_group(layer_list_ctl%num, layering)
 !
       do i = 1, layering%nlayer
-        call add_index_after_name(i, name_prefix, layering%name(i))
+        layering%name(i) = append_index(i, name_prefix)
         layering%istart(i) =  layer_list_ctl%int1(i)
         layering%iend(i) =    layer_list_ctl%int2(i)
       end do
@@ -121,7 +121,7 @@
      &   istack_tmp, max_tmp)
 !
       do i = 1, layering%nlayer
-        call add_index_after_name(i, name_prefix, layering%name(i))
+        layering%name(i) = append_index(i, name_prefix)
         layering%istart(i) =  istack_tmp(i-1) + 1
         layering%iend(i) =    istack_tmp(i)
       end do

@@ -57,8 +57,6 @@
       use cmp_trans_sph_tests
       use set_control_platform_item
 !
-      integer(kind = kint) :: ierr = 0
-!
 !
       if (my_rank.eq.0) then
         write(*,*) 'Test for communication ',                           &
