@@ -18,7 +18,7 @@ ctl_file_fieldlines_IO.o: $(FIELDLINE_DIR)/ctl_file_fieldlines_IO.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 extend_field_line.o: $(FIELDLINE_DIR)/extend_field_line.f90 m_precision.o m_constants.o m_geometry_constants.o calypso_mpi.o t_geometry_data.o t_surface_data.o t_local_fline.o cal_field_on_surf_viz.o cal_fline_in_cube.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_each_fline.o: $(FIELDLINE_DIR)/set_control_each_fline.f90 m_precision.o calypso_mpi.o m_constants.o m_error_IDs.o m_machine_parameter.o t_control_params_4_fline.o t_ctl_data_field_line.o t_geometry_data.o t_group_data.o set_area_4_viz.o set_field_comp_for_viz.o set_fields_for_fieldline.o m_field_file_format.o t_source_of_filed_line.o skip_comment_f.o set_components_flags.o
+set_control_each_fline.o: $(FIELDLINE_DIR)/set_control_each_fline.f90 m_precision.o calypso_mpi.o m_constants.o m_error_IDs.o m_machine_parameter.o t_control_params_4_fline.o t_ctl_data_field_line.o t_geometry_data.o t_group_data.o set_area_4_viz.o set_field_comp_for_viz.o set_fields_for_fieldline.o m_field_file_format.o t_source_of_filed_line.o skip_comment_f.o delete_data_files.o set_components_flags.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_fields_for_fieldline.o: $(FIELDLINE_DIR)/set_fields_for_fieldline.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o t_phys_data.o t_geometry_data.o t_surface_data.o t_group_data.o t_control_params_4_fline.o t_source_of_filed_line.o convert_components_4_viz.o t_mesh_data.o start_surface_by_gl_table.o start_surface_by_flux.o start_surface_in_volume.o start_surface_4_fline.o
 	$(F90) -c $(F90OPTFLAGS) $<

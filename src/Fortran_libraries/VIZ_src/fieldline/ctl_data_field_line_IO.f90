@@ -25,12 +25,12 @@
 !!     example of control for Kemo's field line
 !!
 !!  begin fieldline
-!!    fline_file_head    'fline'
-!!    fline_output_type   ucd
+!!    fline_file_prefix    'fline'
+!!    fline_output_format   ucd
 !!
 !!    field_line_field_ctl      magnetic_field   end
 !!    coloring_field_ctl        magnetic_field   end
-!!    coloring_comp_ctl        radial   end
+!!    coloring_comp_ctl          radial   end
 !!
 !!    array chosen_ele_grp_ctl
 !!      chosen_ele_grp_ctl   outer_core   end
@@ -80,9 +80,9 @@
       implicit  none
 !
       character(len=kchara), parameter, private                         &
-     &      :: hd_fline_file_head = 'fline_file_head'
+     &      :: hd_fline_file_prefix =   'fline_file_prefix'
       character(len=kchara), parameter, private                         &
-     &      :: hd_fline_output_type = 'fline_output_type'
+     &      :: hd_fline_output_format = 'fline_output_format'
 !
       character(len=kchara), parameter, private                         &
      &      :: hd_field_line_field =  'field_line_field_ctl'
@@ -110,6 +110,12 @@
      &      :: hd_xx_start_point = 'starting_point_ctl'
       character(len=kchara), parameter, private                         &
      &      :: hd_start_global_surf = 'starting_gl_surface_id'
+!
+!   Deprecated labels
+      character(len=kchara), parameter, private                         &
+     &      :: hd_fline_file_head = 'fline_file_head'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_fline_output_type = 'fline_output_type'
 !
       integer(kind = kint), parameter :: n_label_fline_ctl = 14
 !
@@ -147,9 +153,13 @@
         call read_control_array_i2(id_control,                          &
      &      hd_start_global_surf, fln%seed_surface_ctl, c_buf)
 !
-!
+        call read_chara_ctl_type(c_buf, hd_fline_file_prefix,           &
+     &      fln%fline_file_head_ctl)
         call read_chara_ctl_type(c_buf, hd_fline_file_head,             &
      &      fln%fline_file_head_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_fline_output_format,         &
+     &      fln%fline_output_type_ctl)
         call read_chara_ctl_type(c_buf, hd_fline_output_type,           &
      &      fln%fline_output_type_ctl)
 !
@@ -196,8 +206,8 @@
 !
       if(fln%i_vr_fline_ctl .le. 0) return
 !
-      maxlen = len_trim(hd_fline_file_head)
-      maxlen = max(maxlen, len_trim(hd_fline_output_type))
+      maxlen = len_trim(hd_fline_file_prefix)
+      maxlen = max(maxlen, len_trim(hd_fline_output_format))
       maxlen = max(maxlen, len_trim(hd_field_line_field))
       maxlen = max(maxlen, len_trim(hd_coloring_field))
       maxlen = max(maxlen, len_trim(hd_coloring_comp))
@@ -212,9 +222,9 @@
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_fline_file_head, fln%fline_file_head_ctl)
+     &    hd_fline_file_prefix, fln%fline_file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_fline_output_type, fln%fline_output_type_ctl)
+     &    hd_fline_output_format, fln%fline_output_type_ctl)
 !
       write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
@@ -268,8 +278,8 @@
      &                         :: names(n_label_fline_ctl)
 !
 !
-      call set_control_labels(hd_fline_file_head,   names( 1))
-      call set_control_labels(hd_fline_output_type, names( 2))
+      call set_control_labels(hd_fline_file_prefix,   names( 1))
+      call set_control_labels(hd_fline_output_format, names( 2))
 !
       call set_control_labels(hd_fline_grp,        names( 3))
       call set_control_labels(hd_field_line_field, names( 4))

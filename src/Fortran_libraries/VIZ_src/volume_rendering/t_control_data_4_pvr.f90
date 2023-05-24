@@ -20,8 +20,8 @@
 !!
 !!begin volume_rendering   (BMP or PNG)
 !!  updated_sign         go
-!!  pvr_file_head        pvr_temp
-!!  pvr_output_type      PNG
+!!  pvr_file_prefix      pvr_temp
+!!  pvr_output_format    PNG
 !!  monitoring_mode      YES
 !!
 !!  streo_imaging        YES

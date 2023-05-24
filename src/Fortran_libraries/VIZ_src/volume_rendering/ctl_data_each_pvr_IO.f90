@@ -30,8 +30,8 @@
 !!
 !!begin volume_rendering   (BMP or PNG)
 !!  updated_sign         go
-!!  pvr_file_head        pvr_temp
-!!  pvr_output_type      PNG
+!!  pvr_file_prefix      pvr_temp
+!!  pvr_output_format    PNG
 !!  monitoring_mode      YES
 !!
 !!  streo_imaging        YES
@@ -118,11 +118,11 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_pvr_updated =     'updated_sign'
       character(len=kchara), parameter, private                         &
-     &             :: hd_pvr_file_head =   'pvr_file_head'
+     &             :: hd_pvr_file_prefix = 'pvr_file_prefix'
       character(len=kchara), parameter, private                         &
-     &             :: hd_pvr_out_type =    'pvr_output_type'
+     &             :: hd_pvr_out_format =  'pvr_output_format'
       character(len=kchara), parameter, private                         &
-     &             :: hd_pvr_monitor =   'monitoring_mode'
+     &             :: hd_pvr_monitor =     'monitoring_mode'
 !
       character(len=kchara), parameter, private                         &
      &             :: hd_pvr_streo =    'streo_imaging'
@@ -163,10 +163,14 @@
 !
 !       Deprecated label
       character(len=kchara), parameter, private                         &
-     &             :: hd_pvr_rotation =  'image_rotation_ctl'
+     &             :: hd_pvr_file_head =   'pvr_file_head'
+      character(len=kchara), parameter, private                         &
+     &             :: hd_pvr_out_type =    'pvr_output_type'
+      character(len=kchara), parameter, private                         &
+     &             :: hd_pvr_rotation =    'image_rotation_ctl'
 !
       integer(kind = kint), parameter :: n_label_pvr_ctl =       19
-      integer(kind = kint), parameter :: n_label_pvr_ctl_w_dup = 20
+      integer(kind = kint), parameter :: n_label_pvr_ctl_w_dup = 22
 !
       private :: n_label_pvr_ctl, n_label_pvr_ctl_w_dup
 !
@@ -222,10 +226,17 @@
 !
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_pvr_updated, pvr_ctl%updated_ctl)
+!
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_pvr_file_prefix, pvr_ctl%file_head_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_pvr_file_head, pvr_ctl%file_head_ctl)
+!
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_pvr_out_format, pvr_ctl%file_fmt_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_pvr_out_type, pvr_ctl%file_fmt_ctl)
+!
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_pvr_monitor, pvr_ctl%monitoring_ctl)
 !
@@ -292,8 +303,8 @@
       if(pvr_ctl%i_pvr_ctl .le. 0) return
 !
       maxlen = len_trim(hd_pvr_updated)
-      maxlen = max(maxlen, len_trim(hd_pvr_file_head))
-      maxlen = max(maxlen, len_trim(hd_pvr_out_type))
+      maxlen = max(maxlen, len_trim(hd_pvr_file_prefix))
+      maxlen = max(maxlen, len_trim(hd_pvr_out_format))
       maxlen = max(maxlen, len_trim(hd_pvr_monitor))
       maxlen = max(maxlen, len_trim(hd_anaglyph_switch))
       maxlen = max(maxlen, len_trim(hd_pvr_streo))
@@ -309,9 +320,9 @@
 !
       write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_file_head, pvr_ctl%file_head_ctl)
+     &    hd_pvr_file_prefix, pvr_ctl%file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_out_type, pvr_ctl%file_fmt_ctl)
+     &    hd_pvr_out_format, pvr_ctl%file_fmt_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_pvr_monitor, pvr_ctl%monitoring_ctl)
 !
@@ -384,8 +395,8 @@
 !
       call set_control_labels(hd_pvr_updated,        names( 1))
 !
-      call set_control_labels(hd_pvr_file_head,      names( 2))
-      call set_control_labels(hd_pvr_out_type,       names( 3))
+      call set_control_labels(hd_pvr_file_prefix,    names( 2))
+      call set_control_labels(hd_pvr_out_format,     names( 3))
       call set_control_labels(hd_pvr_monitor,        names( 4))
 !
       call set_control_labels(hd_pvr_streo,          names( 5))
@@ -406,7 +417,10 @@
       call set_control_labels(hd_pvr_isosurf,    names(17))
       call set_control_labels(hd_quilt_image,    names(18))
       call set_control_labels(hd_snapshot_movie, names(19))
-      call set_control_labels(hd_pvr_rotation,   names(20))
+!
+      call set_control_labels(hd_pvr_file_head,  names(20))
+      call set_control_labels(hd_pvr_out_type,   names(21))
+      call set_control_labels(hd_pvr_rotation,   names(22))
 !
       end subroutine set_label_pvr_ctl_w_dup
 !

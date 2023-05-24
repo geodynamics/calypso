@@ -48,6 +48,7 @@
       use t_source_of_filed_line
       use set_area_4_viz
       use skip_comment_f
+      use delete_data_files
 !
       type(element_data), intent(in) :: ele
       type(group_data), intent(in) :: ele_grp
@@ -65,6 +66,13 @@
         fln_prm%fline_prefix =  fln%fline_file_head_ctl%charavalue
       else
         fln_prm%fline_prefix =  'field_line'
+      end if
+!
+      call calypso_mpi_barrier
+      if(check_file_writable(my_rank, fln_prm%fline_prefix)             &
+     &                                             .eqv. .FALSE.) then
+        call calypso_mpi_abort(ierr_VIZ,                                &
+     &                         'Check Directory for Fieldline output')
       end if
 !
       character_256 = fln%fline_output_type_ctl%charavalue

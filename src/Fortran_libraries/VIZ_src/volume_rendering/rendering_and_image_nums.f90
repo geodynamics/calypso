@@ -81,8 +81,10 @@
       subroutine set_rendering_and_image_pes(num_pe, num_pvr, pvr_ctl,  &
      &          PVR_sort, num_pvr_images, pvr_rgb)
 !
+      use m_error_IDs
       use set_composition_pe_range
       use set_parallel_file_name
+      use delete_data_files
 !
       integer, intent(in) :: num_pe
       integer(kind = kint), intent(in) :: num_pvr
@@ -94,6 +96,7 @@
       type(pvr_image_type), intent(inout) :: pvr_rgb(num_pvr_images)
 !
       integer(kind = kint) :: i_pvr, i_ctl, ist, ied, i
+      logical :: flag_error
 !
 !
       call s_set_composition_pe_range                                   &
@@ -112,6 +115,15 @@
           pvr_rgb(i)%pvr_prefix = set_pvr_file_prefix(pvr_ctl(i_ctl))
         end do
       end do
+!
+      flag_error = .FALSE.
+      do i_ctl = 1, PVR_sort%istack_pvr_images(num_pvr)
+        if(check_file_writable(my_rank, pvr_rgb(i)%pvr_prefix)          &
+     &                               .eqv. .FALSE.) flag_error = .TRUE.
+      end do
+      if(flag_error) call calypso_mpi_abort(ierr_VIZ,                   &
+     &                  'Check Directory for PVR output')
+!
 !
       if(iflag_debug .eq. 0) return
 !      if(my_rank .gt. 0) return

@@ -22,8 +22,8 @@
 !!     example of control for Kemo's field line
 !!
 !!  begin fieldline
-!!    fline_file_head    'fline'
-!!    fline_output_type   ucd
+!!    fline_file_prefix    'fline'
+!!    fline_output_format   ucd
 !!
 !!    array chosen_ele_grp_ctl
 !!      chosen_ele_grp_ctl   outer_core   end
