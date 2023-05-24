@@ -53,7 +53,6 @@
       use m_elapsed_labels_SEND_RECV
       use input_control_section_only
 !
-      integer(kind = kint) :: ierr
 !
       call init_elapse_time_by_TOTAL
       call elpsed_label_4_VIZ

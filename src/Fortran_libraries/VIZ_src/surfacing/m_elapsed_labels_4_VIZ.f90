@@ -136,15 +136,15 @@
       elps1%labels(ist_elapsed_PVR+4)                                   &
      &                    = 'V. Rendering subimage composit   '
 !
-      elps1%labels(ist_elapsed_PVR+5)                                  &
+      elps1%labels(ist_elapsed_PVR+5)                                   &
      &                    = 'bcast_pvr_controls  '
-      elps1%labels(ist_elapsed_PVR+6)                                  &
+      elps1%labels(ist_elapsed_PVR+6)                                   &
      &                    = 'set_pvr_controls  '
-      elps1%labels(ist_elapsed_PVR+7)                                  &
+      elps1%labels(ist_elapsed_PVR+7)                                   &
      &                    = 'each_PVR_initialize  '
-      elps1%labels(ist_elapsed_PVR+8)                                  &
+      elps1%labels(ist_elapsed_PVR+8)                                   &
      &                    = 's_const_comm_tbl_img_output  '
-      elps1%labels(ist_elapsed_PVR+9)                                  &
+      elps1%labels(ist_elapsed_PVR+9)                                   &
      &                    = 's_const_comm_tbl_img_composit  '
       elps1%labels(ist_elapsed_PVR+10)                                  &
      &                    = 'calypso_SR_type_int pvr_init  '

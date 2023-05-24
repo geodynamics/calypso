@@ -48,7 +48,7 @@
 !!       character(len=kchara) function add_right_label(file_head)
 !!                put "_right" at the end
 !!
-!!      subroutine add_index_after_name(int_id, chara_head, chara_name)
+!!      character(len=kchara) function append_index(int_id, chara_head)
 !!      subroutine int_to_str(int_val, int_string)
 !!      subroutine lint_to_str(lint_val, int_string)
 !!      subroutine real_to_str(real_val, real_string)
@@ -215,7 +215,7 @@
 !
 !
       write(chara_head,1000) trim(file_head)
-      call add_index_after_name(int_id, chara_head, add_int_suffix)
+      add_int_suffix = append_index(int_id, chara_head)
 !
  1000 format (a,".")
 !
@@ -309,7 +309,7 @@
 !
 !-----------------------------------------------------------------------
 !
-       character(len=kchara) function add_right_label(file_head)
+      character(len=kchara) function add_right_label(file_head)
 !
       character(len=kchara), intent(in) :: file_head
       character(len=kchara) :: file_name
@@ -323,20 +323,19 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine add_index_after_name(int_id, chara_head, chara_name)
-!
+      character(len=kchara) function append_index(int_id, chara_head)
+!,
       integer(kind = kint), intent(in) :: int_id
       character(len=kchara), intent(in) :: chara_head
-      character(len=kchara), intent(inout) :: chara_name
 !
       character(len=kchara) :: charaint
 !
 !
       write(charaint,*) int_id
-      write(chara_name,'(a,a)')                                         &
+      write(append_index,'(a,a)')                                       &
                 trim(chara_head), trim(ADJUSTL(charaint))
 !
-      end subroutine add_index_after_name
+      end function append_index
 !
 !-----------------------------------------------------------------------
 !

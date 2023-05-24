@@ -180,12 +180,10 @@
           write(gauss_head,'(a1)') 'g'
         end if
 !
-        call add_index_after_name                                       &
-     &     (l, gauss_head, gauss%gauss_mode_name_lc(inum))
+        gauss%gauss_mode_name_lc(inum) = append_index(l, gauss_head)
         write(gauss_head,'(a,a1)')                                      &
      &     trim(gauss%gauss_mode_name_lc(inum)), '_'
-        call add_index_after_name                                       &
-     &     (mm, gauss_head, gauss%gauss_mode_name_lc(inum))
+        gauss%gauss_mode_name_lc(inum) = append_index(mm, gauss_head)
       end do
 !
       end subroutine set_gauss_coefs_labels
