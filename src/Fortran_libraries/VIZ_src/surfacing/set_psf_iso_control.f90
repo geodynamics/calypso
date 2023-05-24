@@ -89,12 +89,13 @@
 !
 !
       do i = 1, num_psf
-        call count_control_4_psf(psf_ctls%psf_ctl_struct(i),            &
+        call count_control_4_psf(my_rank, psf_ctls%psf_ctl_struct(i),   &
      &      group%ele_grp, nod_fld%num_phys, nod_fld%phys_name,         &
      &      psf_mesh(i)%field, psf_param(i), psf_file_IO(i), ierr)
+!
+        if(ierr.gt.0) call calypso_MPI_abort(ierr, e_message)
         call mpi_abort_by_no_zlib_in_fld(psf_file_IO(i)%file_prefix,    &
      &                                   psf_file_IO(i)%iflag_format)
-        if(ierr.gt.0) call calypso_MPI_abort(ierr, e_message)
       end do
 !
       do i = 1, num_psf
@@ -144,14 +145,16 @@
       type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
       type(field_IO_params), intent(inout) :: iso_file_IO(num_iso)
 !
-      integer(kind = kint) :: i
+      integer(kind = kint) :: i, ierr
 !
 !
+      ierr = 0
       do i = 1, num_iso
-        call count_control_4_iso(iso_ctls%iso_ctl_struct(i),            &
+        call count_control_4_iso(my_rank, iso_ctls%iso_ctl_struct(i),   &
      &      group%ele_grp, nod_fld%num_phys, nod_fld%phys_name,         &
      &      iso_mesh(i)%field, iso_param(i), iso_def(i),                &
-     &      iso_file_IO(i))
+     &      iso_file_IO(i), ierr)
+        if(ierr.gt.0) call calypso_MPI_abort(ierr, e_message)
         call mpi_abort_by_no_zlib_in_fld(iso_file_IO(i)%file_prefix,    &
      &                                   iso_file_IO(i)%iflag_format)
       end do

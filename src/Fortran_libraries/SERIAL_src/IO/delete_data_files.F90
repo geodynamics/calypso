@@ -134,7 +134,7 @@
   99  continue
 !
       write(*,*) 'File ', trim(file_name),                              &
-     &         ' can not be written. Check directory or permittion'
+     &       ' can not be written. Check directory and its permittion.'
       check_file_writable = .FALSE.
 !
       return

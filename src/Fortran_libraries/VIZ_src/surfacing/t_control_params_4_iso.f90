@@ -7,11 +7,12 @@
 !!
 !!@verbatim
 !!      subroutine count_control_4_iso                                  &
-!!     &         (iso_c, ele_grp, num_nod_phys, phys_nod_name,          &
-!!     &          iso_fld, iso_param, iso_def, iso_file_IO)
+!!     &         (id_rank, iso_c, ele_grp, num_nod_phys, phys_nod_name, &
+!!     &          iso_fld, iso_param, iso_def, iso_file_IO, ierr)
 !!      subroutine set_control_4_iso                                    &
 !!     &         (iso_c, ele_grp, num_nod_phys, phys_nod_name,          &
 !!     &          iso_fld, iso_param, iso_def)
+!!        integer, intent(in) :: id_rank
 !!        type(group_data), intent(in) :: ele_grp
 !!        type(iso_ctl), intent(in) :: iso_c
 !!        type(phys_data), intent(inout) :: iso_fld
@@ -19,6 +20,7 @@
 !!        type(isosurface_define), intent(inout) :: iso_def
 !!        type(field_IO_params), intent(inout) :: iso_file_IO
 !!        integer(kind = kint) function sel_iso_file_format(file_fmt_ctl)
+!!        integer(kind = kint), intent(inout) :: ierr
 !!
 !!      integer(kind = kint) function num_label_iso_type()
 !!      subroutine set_label_iso_type(names)
@@ -63,9 +65,10 @@
 !  ---------------------------------------------------------------------
 !
       subroutine count_control_4_iso                                    &
-     &         (iso_c, ele_grp, num_nod_phys, phys_nod_name,            &
-     &          iso_fld, iso_param, iso_def, iso_file_IO)
+     &         (id_rank, iso_c, ele_grp, num_nod_phys, phys_nod_name,   &
+     &          iso_fld, iso_param, iso_def, iso_file_IO, ierr)
 !
+      use m_error_IDs
       use m_file_format_switch
       use set_field_comp_for_viz
       use t_group_data
@@ -74,10 +77,12 @@
       use t_phys_data
       use t_psf_patch_data
 !
+      use delete_data_files
       use skip_comment_f
 !
       type(group_data), intent(in) :: ele_grp
 !
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: num_nod_phys
       character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
 !
@@ -86,14 +91,23 @@
       type(psf_parameters), intent(inout) :: iso_param
       type(isosurface_define), intent(inout) :: iso_def
       type(field_IO_params), intent(inout) :: iso_file_IO
+      integer(kind = kint), intent(inout) :: ierr
 !
 !
+!
+      ierr = 0
       call set_merged_iso_file_ctl(default_iso_prefix,                  &
      &    iso_c%iso_file_head_ctl, iso_c%iso_output_type_ctl,           &
      &    iso_file_IO)
       if((iso_file_IO%iflag_format/iflag_single) .eq. 0) then
         iso_file_IO%iflag_format = iso_file_IO%iflag_format             &
      &                            + iflag_single
+      end if
+!
+      if(check_file_writable(id_rank, iso_file_IO%file_prefix)          &
+     &                                             .eqv. .FALSE.) then
+        ierr = ierr_VIZ
+        return
       end if
 !
       call count_control_iso_def(iso_c%iso_def_c, ele_grp, iso_param)
