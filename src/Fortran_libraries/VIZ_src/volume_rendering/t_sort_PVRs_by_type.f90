@@ -87,7 +87,7 @@
 !
 !
       if(allocated(PVR_sort%ipvr_sorted) .eqv. .FALSE.) return
-      deallocate(PVR_sort%ipvr_sorted, PVR_sort%istack_pvr_images)
+      deallocate(PVR_sort%ipvr_sorted)
 !
       end subroutine dealloc_sort_PVRs_list
 !
@@ -100,6 +100,7 @@
 !
       if(allocated(PVR_sort%istack_PVR_modes) .eqv. .FALSE.) return
       deallocate(PVR_sort%nPVR_modes, PVR_sort%istack_PVR_modes)
+      deallocate(PVR_sort%istack_pvr_images)
 !
       end subroutine dealloc_sort_PVRs_by_type
 !
