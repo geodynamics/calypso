@@ -9,8 +9,9 @@
 !!      subroutine alloc_coefficients_4_psf(psf_def)
 !!      subroutine dealloc_coefficients_4_psf(psf_def)
 !!      subroutine count_control_4_psf                                  &
-!!     &         (psf_c, ele_grp, num_nod_phys, phys_nod_name,          &
+!!     &         (id_rank, psf_c, ele_grp, num_nod_phys, phys_nod_name, &
 !!     &          psf_fld, psf_param, psf_file_IO, ierr)
+!!        integer, intent(in) :: id_rank
 !!        type(psf_ctl), intent(in) :: psf_c
 !!        type(group_data), intent(in) :: ele_grp
 !!        type(phys_data), intent(inout) :: psf_fld
@@ -91,7 +92,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine count_control_4_psf                                    &
-     &         (psf_c, ele_grp, num_nod_phys, phys_nod_name,            &
+     &         (id_rank, psf_c, ele_grp, num_nod_phys, phys_nod_name,   &
      &          psf_fld, psf_param, psf_file_IO, ierr)
 !
       use m_error_IDs
@@ -103,9 +104,11 @@
       use t_file_IO_parameter
       use set_area_4_viz
       use set_field_comp_for_viz
+      use delete_data_files
 !
       type(group_data), intent(in) :: ele_grp
 !
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: num_nod_phys
       character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
 !
@@ -123,6 +126,12 @@
       if((psf_file_IO%iflag_format/iflag_single) .eq. 0) then
         psf_file_IO%iflag_format = psf_file_IO%iflag_format             &
      &                            + iflag_single
+      end if
+!
+      if(check_file_writable(id_rank, psf_file_IO%file_prefix)          &
+     &                                             .eqv. .FALSE.) then
+        ierr = ierr_VIZ
+        return
       end if
 !
       call count_control_4_field_on_psf                                 &
