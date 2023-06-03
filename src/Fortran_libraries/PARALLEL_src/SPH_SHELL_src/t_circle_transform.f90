@@ -18,9 +18,7 @@
 !!
 !!      subroutine alloc_circle_transform(ltr, leg_circ)
 !!      subroutine alloc_legendre_on_circ_rj(sph_rj, leg_circ)
-!!      subroutine alloc_work_circle_transform                          &
-!!     &         (my_rank, d_circle, leg_circ)
-!!        integer, intent(in) :: my_rank
+!!      subroutine alloc_work_circle_transform(d_circle, leg_circ)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_data), intent(in) :: d_circle
 !!        type(circle_transform_spectr), intent(inout) :: leg_circ
@@ -148,10 +146,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine alloc_work_circle_transform                            &
-     &         (my_rank, d_circle, leg_circ)
+      subroutine alloc_work_circle_transform(d_circle, leg_circ)
 !
-      integer, intent(in) :: my_rank
       type(phys_data), intent(in) :: d_circle
       type(circle_transform_spectr), intent(inout) :: leg_circ
 !

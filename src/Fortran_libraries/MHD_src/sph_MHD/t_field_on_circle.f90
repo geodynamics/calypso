@@ -164,8 +164,7 @@
      &   (sph%sph_rj%nidx_rj(1), sph%sph_rj%radius_1d_rj_r,             &
      &    cdat%leg_circ, cdat%circle)
 !
-      call alloc_work_circle_transform(my_rank, cdat%d_circle,          &
-     &                                 cdat%leg_circ)
+      call alloc_work_circle_transform(cdat%d_circle, cdat%leg_circ)
       call init_legendre_on_circle(sph, comms_sph, trans_p,             &
      &                             cdat%leg_circ, SR_sig, SR_r)
 !
@@ -238,7 +237,7 @@
       do kr = 1, nri - 1
         if(radius_1d_rj_r(kr) .eq. leg_circ%r_circle) then
           circle%kr_gl_rcirc_in =  kr
-          circle%kr_gl_rcirc_out = izero
+          circle%kr_gl_rcirc_out = kr
           circle%coef_gl_rcirc_in =  one
           circle%coef_gl_rcirc_out = zero
           exit
@@ -283,9 +282,12 @@
 !
       if(my_rank .gt. 0) return
 !
-      write(*,*) 'np_smp', np_smp
-      write(*,*) 'istack_circfft_smp', leg_circ%istack_circfft_smp
-      write(*,*) 'mphi_circle', circle%mphi_circle
+      if(i_debug .gt. 0) then
+        write(*,*) 'np_smp', np_smp
+        write(*,*) 'istack_circfft_smp', leg_circ%istack_circfft_smp
+        write(*,*) 'mphi_circle', circle%mphi_circle
+      end if
+!
       call initialize_FFT_select                                        &
      &   (my_rank, iflag_FFT, np_smp, leg_circ%istack_circfft_smp,      &
      &    circle%mphi_circle, WK_circle_fft)

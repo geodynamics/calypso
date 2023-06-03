@@ -148,7 +148,7 @@
       type(buffer_for_control) :: c_buf1
 !
 !
-      write(*,*) 'Section control file: ', trim(file_name)
+      write(*,'(a)') trim(file_name)
       open(id_control, file=file_name, status='old')
 !
       do
@@ -213,7 +213,7 @@
         call write_psf_control_data(id_control, hd_block,               &
      &                              psf_ctl_struct, level)
       else
-        write(*,'(a)', ADVANCE='NO') ' is write file to ... '
+        write(*,'(a)', ADVANCE='NO') ' is write file ... '
         call write_file_name_for_ctl_line(id_control, level,            &
      &                                    hd_block, file_name)
         call write_control_4_psf_file((id_control+2), file_name,        &
@@ -239,7 +239,7 @@
       integer(kind = kint) :: level
 !
 !
-      write(*,*) 'Write section control file: ', trim(file_name)
+      write(*,'(a)') trim(file_name)
       level = 0
       open(id_control, file=file_name)
       call write_psf_control_data(id_control, hd_block,                 &
