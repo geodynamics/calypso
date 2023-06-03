@@ -211,7 +211,7 @@
       if(t_prev .eq. time) then
         drift(1:4)  = 0.0d0
       else
-        drift(1:4) = drift(1:4) / (t_prev - time)
+        drift(1:4) = drift(1:4) / (time - t_prev)
       end if
       phi_prev(1:4) = phi_zero(1:4)
 !
