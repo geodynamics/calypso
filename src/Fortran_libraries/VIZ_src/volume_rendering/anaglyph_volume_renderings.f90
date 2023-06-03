@@ -134,8 +134,8 @@
       ied_pvr = pvr%PVR_sort%istack_PVR_modes(5)
       do i_pvr = ist_pvr, ied_pvr
         ist_img = pvr%PVR_sort%istack_pvr_images(i_pvr-1)
-        call each_PVR_anaglyph                                          &
-     &     (istep_pvr, time, geofem, jacs, nod_fld, pvr%sf_grp_4_sf,    &
+        call each_PVR_anaglyph(istep_pvr, time,                         &
+     &      geofem%mesh, geofem%group, jacs, nod_fld, pvr%sf_grp_4_sf,  &
      &      pvr%field_pvr(i_pvr), pvr%pvr_param(i_pvr),                 &
      &      pvr%pvr_proj(ist_img+1), pvr%pvr_rgb(ist_img+1),            &
      &      m_SR%SR_sig, m_SR%SR_r)
@@ -176,9 +176,9 @@
         ist_img = pvr%PVR_sort%istack_pvr_images(i_pvr-1)
         call anaglyph_rendering_w_rotation(istep_pvr, time,             &
      &      geofem%mesh, geofem%group, nod_fld, jacs, pvr%sf_grp_4_sf,  &
-     &      pvr%pvr_rgb(ist_img+1), pvr%field_pvr(i_pvr),               &
-     &      pvr%pvr_param(i_pvr), pvr%pvr_bound(i_pvr),                 &
-     &      pvr%pvr_proj(ist_img+1), m_SR%SR_sig, m_SR%SR_r, m_SR%SR_i)
+     &      pvr%field_pvr(i_pvr), pvr%pvr_param(i_pvr),                 &
+     &      pvr%pvr_bound(i_pvr), pvr%pvr_proj(ist_img+1),              &
+     &      pvr%pvr_rgb(ist_img+1), m_SR%SR_sig, m_SR%SR_r, m_SR%SR_i)
       end do
 !
       end subroutine PVR_movie_anaglyph_visualize

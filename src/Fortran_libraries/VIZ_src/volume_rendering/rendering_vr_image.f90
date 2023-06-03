@@ -45,6 +45,7 @@
       use t_group_data
       use t_surf_grp_list_each_surf
       use t_control_params_4_pvr
+      use t_pvr_colormap_parameter
       use t_geometries_in_pvr_screen
       use t_pvr_ray_startpoints
       use t_pvr_image_array
@@ -228,19 +229,19 @@
 !
       if(my_rank .eq. pvr_rgb%irank_image_file) then
         if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+3)
-        if(cbar_param%iflag_pvr_colorbar) then
+        if(cbar_param%flag_pvr_colorbar) then
           call set_pvr_colorbar                                         &
      &       (pvr_rgb%num_pixel_xy, pvr_rgb%num_pixels,                 &
      &        color_param, cbar_param, pvr_rgb%rgba_real_gl)
         end if
 !
-        if(cbar_param%iflag_draw_time) then
+        if(cbar_param%flag_draw_time) then
           call set_pvr_timelabel                                        &
      &       (time, pvr_rgb%num_pixel_xy, pvr_rgb%num_pixels,           &
      &        cbar_param, pvr_rgb%rgba_real_gl)
         end if
 !
-        if(cbar_param%iflag_pvr_axis) then
+        if(cbar_param%flag_pvr_axis) then
           call set_pvr_axislabel                                        &
      &       (pvr_rgb%num_pixel_xy, pvr_rgb%num_pixels,                 &
      &        pvr_screen, pvr_rgb%rgba_real_gl)

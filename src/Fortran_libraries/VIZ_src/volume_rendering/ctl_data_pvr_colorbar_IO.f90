@@ -37,6 +37,7 @@
 !!!
 !!    axis_label_switch      ON
 !!    time_label_switch      ON
+!!    map_grid_switch        ON
 !!  end colorbar_ctl
 !!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -77,8 +78,10 @@
      &                  :: hd_axis_switch = 'axis_label_switch'
       character(len=kchara), parameter, private                         &
      &                  :: hd_time_switch = 'time_label_switch'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_mapgrid_switch = 'map_grid_switch'
 !
-      integer(kind = kint), parameter :: n_label_pvr_colorbar = 9
+      integer(kind = kint), parameter :: n_label_pvr_colorbar = 10
 !
 !  ---------------------------------------------------------------------
 !
@@ -121,6 +124,8 @@
      &      cbar_ctl%axis_switch_ctl)
         call read_chara_ctl_type(c_buf, hd_time_switch,                 &
      &      cbar_ctl%time_switch_ctl)
+        call read_chara_ctl_type(c_buf, hd_mapgrid_switch,              &
+     &      cbar_ctl%mapgrid_switch_ctl)
 !
         call read_real2_ctl_type(c_buf,                                 &
      &      hd_cbar_range, cbar_ctl%cbar_range_ctl)
@@ -155,6 +160,7 @@
       maxlen = max(maxlen, len_trim(hd_zeromarker_flag))
       maxlen = max(maxlen, len_trim(hd_axis_switch))
       maxlen = max(maxlen, len_trim(hd_time_switch))
+      maxlen = max(maxlen, len_trim(hd_mapgrid_switch))
       maxlen = max(maxlen, len_trim(hd_cbar_range))
 !
       write(id_control,'(a1)') '!'
@@ -181,6 +187,8 @@
      &    hd_axis_switch, cbar_ctl%axis_switch_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_time_switch, cbar_ctl%time_switch_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_mapgrid_switch, cbar_ctl%mapgrid_switch_ctl)
 !
       level = write_end_flag_for_ctl(id_control, level, hd_block)
 !
@@ -212,6 +220,7 @@
 !
       call set_control_labels(hd_axis_switch,      names( 8))
       call set_control_labels(hd_time_switch,      names( 9))
+      call set_control_labels(hd_mapgrid_switch,   names(10))
 !
       end subroutine set_label_pvr_colorbar
 !

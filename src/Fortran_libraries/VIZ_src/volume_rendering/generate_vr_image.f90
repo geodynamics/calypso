@@ -11,8 +11,6 @@
 !!     &          n_pvr_pixel, pvr_bound, pvr_screen, pvr_start)
 !!        type(node_data), intent(in) :: node
 !!        type(surface_data), intent(in) :: surf
-!!        type(pvr_colormap_parameter), intent(in) :: color_param
-!!        type(pvr_colorbar_parameter), intent(in) :: cbar_param
 !!        type(pvr_view_parameter), intent(inout) :: view_param
 !!        type(pvr_bounds_surf_ctl), intent(inout) :: pvr_bound
 !!        type(pvr_pixel_position_type), intent(inout) :: pixel_xy
@@ -134,7 +132,6 @@
       if(pvr_start%num_pvr_ray .gt. 0) then
         call set_each_pvr_ray_start(node, surf,                         &
      &     pixel_xy%num_pixel_x, pixel_xy%num_pixel_y,                  &
-     &     pixel_xy%pixel_point_x, pixel_xy%pixel_point_y,              &
      &     pvr_bound%num_pvr_surf, pvr_bound%item_pvr_surf,             &
      &     pvr_bound%screen_norm, pvr_screen%viewpoint_vec, ray_vec4,   &
      &     pvr_start%ntot_tmp_pvr_ray, pvr_start%istack_tmp_pvr_ray_st, &
@@ -148,15 +145,15 @@
      &     (pvr_screen%modelview_mat, pvr_screen%projection_mat,        &
      &      pvr_start%num_pvr_ray, pvr_start%xx4_pvr_ray_start)
 !
-        call set_each_ray_projected_start(node, surf,                   &
-     &   pixel_xy%num_pixel_x, pixel_xy%num_pixel_y,                    &
-     &   pixel_xy%pixel_point_x, pixel_xy%pixel_point_y,                &
-     &   pvr_bound%num_pvr_surf, pvr_bound%item_pvr_surf,               &
-     &   pvr_bound%screen_norm, ray_vec4,                               &
-     &   pvr_start%ntot_tmp_pvr_ray, pvr_start%istack_tmp_pvr_ray_st,   &
-     &   pvr_start%ipix_start_tmp, pvr_start%iflag_start_tmp,           &
-     &   pvr_start%istack_pvr_ray_sf, pvr_start%num_pvr_ray,            &
-     &   pvr_start%xi_pvr_start, pvr_start%xx4_pvr_ray_start)
+        call set_each_ray_projected_start(surf,                         &
+     &     pixel_xy%num_pixel_x, pixel_xy%num_pixel_y,                  &
+     &     pixel_xy%pixel_point_x, pixel_xy%pixel_point_y,              &
+     &     pvr_bound%num_pvr_surf, pvr_bound%item_pvr_surf,             &
+     &     pvr_bound%screen_norm, ray_vec4,                             &
+     &     pvr_start%ntot_tmp_pvr_ray, pvr_start%istack_tmp_pvr_ray_st, &
+     &     pvr_start%ipix_start_tmp, pvr_start%iflag_start_tmp,         &
+     &     pvr_start%istack_pvr_ray_sf, pvr_start%num_pvr_ray,          &
+     &     pvr_start%xx4_pvr_ray_start)
 !
 !        if(iflag_debug .gt. 0) then
 !          call check_pvr_ray_startpoint                                &

@@ -34,6 +34,7 @@
       use t_group_data
       use t_surf_grp_list_each_surf
       use t_control_params_4_pvr
+      use t_pvr_colormap_parameter
       use t_pvr_field_data
       use t_geometries_in_pvr_screen
 !

@@ -8,7 +8,9 @@ LIB_VIZ_FILE = libkemo_viz.a
 SUBDIRS = \
 surfacing \
 fieldline \
+map_rendering \
 volume_rendering
+
 
 #
 #  -------------------------------------------------------------------------

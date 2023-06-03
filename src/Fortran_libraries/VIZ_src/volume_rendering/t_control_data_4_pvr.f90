@@ -51,11 +51,11 @@
 !!   ...
 !!  end colorbar_ctl
 !!!
-!!  array section_ctl  2
-!!    file section_ctl     ctl_psf_eq
-!!    begin section_ctl
+!!  array section_ctl
+!!    file surface_define     ctl_psf_eq
+!!    begin surface_define
 !!      ...
-!!    end section_ctl
+!!    end surface_define
 !!  end array section_ctl
 !!!
 !!  array isosurface_ctl  2
@@ -123,7 +123,9 @@
 !
         type(read_character_item) :: updated_ctl
 !
+!>        File prefix of output image file
         type(read_character_item) :: file_head_ctl
+!>        File format of output image file
         type(read_character_item) :: file_fmt_ctl
         type(read_character_item) :: monitoring_ctl
 !
@@ -135,7 +137,9 @@
 !!@n      group_4_monitor_ctl%c_tbl: Name of element group for PVR
         type(pvr_render_area_ctl) :: render_area_c
 !
+!>        Structure of field name for rendering
         type(read_character_item) :: pvr_field_ctl
+!>        Structure of component name for rendering
         type(read_character_item) :: pvr_comp_ctl
 !
         type(pvr_sections_ctl) :: pvr_scts_c

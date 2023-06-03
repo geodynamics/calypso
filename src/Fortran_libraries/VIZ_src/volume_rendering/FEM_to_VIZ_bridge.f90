@@ -105,23 +105,24 @@
 !
 !  -----  Construct Element communication table
       if(viz_step%LIC_t%increment .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+12)
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+14)
         if(iflag_debug.gt.0) write(*,*)' const_ele_comm_table'
         call const_ele_comm_table                                       &
      &     (geofem%mesh%node, geofem%mesh%nod_comm, geofem%mesh%ele,    &
      &      VIZ_DAT%ele_comm, m_SR)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+12)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+14)
       end if
 !
 !  -----  Construct Edge communication table
-      iflag = viz_step%PSF_t%increment + viz_step%ISO_t%increment
+      iflag = viz_step%PSF_t%increment + viz_step%ISO_t%increment       &
+     &       + viz_step%MAP_t%increment
       if(iflag .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+13)
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+15)
         if(iflag_debug .gt. 0) write(*,*) 'const_edge_comm_table'
         call const_edge_comm_table                                      &
      &     (geofem%mesh%node, geofem%mesh%nod_comm, VIZ_DAT%edge_comm,  &
      &      geofem%mesh%edge, m_SR)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+13)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+15)
       end if
       call calypso_mpi_barrier
 !
@@ -161,23 +162,24 @@
 !
 !  -----  Construct Element communication table
       if(viz_step%LIC_t%increment .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+12)
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+14)
         if(iflag_debug.gt.0) write(*,*)' const_ele_comm_table'
         call const_ele_comm_table                                       &
      &     (geofem%mesh%node, geofem%mesh%nod_comm, geofem%mesh%ele,    &
      &      ele_comm, m_SR)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+12)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+14)
       end if
 !
 !  -----  Construct Edge communication table
-      iflag = viz_step%PSF_t%increment + viz_step%ISO_t%increment
+      iflag = viz_step%PSF_t%increment + viz_step%ISO_t%increment       &
+     &       + viz_step%MAP_t%increment
       if(iflag .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+13)
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+15)
         if(iflag_debug .gt. 0) write(*,*) 'const_edge_comm_table'
         call const_edge_comm_table                                      &
      &     (geofem%mesh%node, geofem%mesh%nod_comm, edge_comm,          &
      &      geofem%mesh%edge, m_SR)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+13)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+15)
       end if
 !
       iflag = viz_step%PVR_t%increment + viz_step%LIC_t%increment

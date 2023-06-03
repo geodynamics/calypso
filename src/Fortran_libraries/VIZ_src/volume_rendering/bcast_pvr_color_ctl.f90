@@ -107,6 +107,7 @@
 !
       call bcast_ctl_type_c1(cbar_ctl%axis_switch_ctl)
       call bcast_ctl_type_c1(cbar_ctl%time_switch_ctl)
+      call bcast_ctl_type_c1(cbar_ctl%mapgrid_switch_ctl)
 !
       call bcast_ctl_type_r2(cbar_ctl%cbar_range_ctl)
 !

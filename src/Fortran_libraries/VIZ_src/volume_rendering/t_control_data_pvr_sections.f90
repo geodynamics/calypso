@@ -35,10 +35,10 @@
 !!        type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  array section_ctl
-!!    file section_ctl     ctl_psf_eq
-!!    begin section_ctl
+!!    file surface_define     ctl_psf_eq
+!!    begin surface_define
 !!      ...
-!!    end section_ctl
+!!    end surface_define
 !!
 !!    opacity_ctl       0.9
 !!  end array section_ctl
@@ -130,8 +130,8 @@
         if(check_begin_flag(c_buf, hd_block)) then
           call append_new_pvr_section_ctl(pvr_scts_c)
 !
-          write(*,'(2a,i4)', ADVANCE='NO') trim(hd_block),              &
-     &                           ' No. ', pvr_scts_c%num_pvr_sect_ctl
+          write(*,'(2a,i4,a)', ADVANCE='NO') trim(hd_block),            &
+     &         ' No. ', pvr_scts_c%num_pvr_sect_ctl, ' of '
           call read_pvr_section_ctl(id_control, hd_block,               &
      &        pvr_scts_c%pvr_sect_ctl(pvr_scts_c%num_pvr_sect_ctl),     &
      &        c_buf)

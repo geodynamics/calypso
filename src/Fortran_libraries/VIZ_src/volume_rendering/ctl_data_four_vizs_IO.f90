@@ -28,6 +28,10 @@
 !!      ....
 !!    end array isosurface_ctl
 !!
+!!    array  map_rendering_ctl
+!!      ....
+!!    end array map_rendering_ctl
+!!
 !!    array  volume_rendering
 !!      ....
 !!    end array volume_rendering
@@ -37,16 +41,18 @@
 !!    end array fieldline
 !!  end  visual_control
 !
-!!    delta_t_sectioning_ctl   1.0e-3
-!!    i_step_sectioning_ctl    400
-!!    delta_t_isosurface_ctl   1.0e-3
-!!    i_step_isosurface_ctl    400
-!!    delta_t_pvr_ctl          1.0e-2
-!!    i_step_pvr_ctl           400
-!!    delta_t_fline_ctl        1.0e-1
-!!    i_step_fline_ctl         400
-!!    delta_t_field_ctl        1.0e-3
-!!    i_step_field_ctl         800
+!!    delta_t_sectioning_ctl       1.0e-3
+!!    i_step_sectioning_ctl        400
+!!    delta_t_isosurface_ctl       1.0e-3
+!!    i_step_isosurface_ctl        400
+!!    delta_t_map_projection_ctl   1.0e-3
+!!    i_step_map_projection_ctl    400
+!!    delta_t_pvr_ctl              1.0e-2
+!!    i_step_pvr_ctl               400
+!!    delta_t_fline_ctl            1.0e-1
+!!    i_step_fline_ctl             400
+!!    delta_t_field_ctl            1.0e-3
+!!    i_step_field_ctl             800
 !!    output_field_file_fmt_ctl   'VTK'
 !!  end visual_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -76,6 +82,8 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_isosurf_ctl = 'isosurface_ctl'
       character(len=kchara), parameter, private                         &
+     &             :: hd_map_rendering = 'map_rendering_ctl'
+      character(len=kchara), parameter, private                         &
      &             :: hd_pvr_ctl = 'volume_rendering'
       character(len=kchara), parameter, private                         &
      &             :: hd_lic_ctl = 'LIC_rendering'
@@ -83,29 +91,33 @@
      &             :: hd_fline_ctl =  'fieldline'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_i_step_section =   'i_step_sectioning_ctl'
+     &       :: hd_i_step_section =        'i_step_sectioning_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_i_step_isosurf =   'i_step_isosurface_ctl'
+     &       :: hd_i_step_isosurf =        'i_step_isosurface_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_i_step_pvr =       'i_step_pvr_ctl'
+     &       :: hd_i_step_map_projection = 'i_step_map_projection_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_i_step_lic =       'i_step_LIC_ctl'
+     &       :: hd_i_step_pvr =            'i_step_pvr_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_i_step_fline =     'i_step_fline_ctl'
+     &       :: hd_i_step_lic =            'i_step_LIC_ctl'
+      character(len=kchara), parameter, private                         &
+     &       :: hd_i_step_fline =          'i_step_fline_ctl'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_i_step_ucd =       'i_step_field_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_delta_t_section =   'delta_t_sectioning_ctl'
+     &      :: hd_delta_t_section =        'delta_t_sectioning_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_delta_t_isosurf =   'delta_t_isosurface_ctl'
+     &      :: hd_delta_t_isosurf =        'delta_t_isosurface_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_delta_t_pvr =       'delta_t_pvr_ctl'
+     &      :: hd_delta_t_map_projection = 'delta_t_map_projection_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_delta_t_lic =       'delta_t_LIC_ctl'
+     &       :: hd_delta_t_pvr =           'delta_t_pvr_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_delta_t_fline =     'delta_t_fline_ctl'
+     &       :: hd_delta_t_lic =           'delta_t_LIC_ctl'
+      character(len=kchara), parameter, private                         &
+     &       :: hd_delta_t_fline =         'delta_t_fline_ctl'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_delta_t_ucd =       'delta_t_field_ctl'
@@ -124,6 +136,7 @@
       use t_read_control_elements
       use ctl_file_sections_IO
       use ctl_file_isosurfaces_IO
+      use ctl_file_map_renderings_IO
       use ctl_file_fieldlines_IO
       use skip_comment_f
 !
@@ -144,6 +157,8 @@
      &      viz_ctls%psf_ctls, c_buf)
         call read_files_4_iso_ctl(id_control, hd_isosurf_ctl,           &
      &      viz_ctls%iso_ctls, c_buf)
+        call read_files_4_map_ctl(id_control, hd_map_rendering,         &
+     &                            viz_ctls%map_ctls, c_buf)
 !
         call read_files_4_pvr_ctl(id_control, hd_pvr_ctl,               &
      &      viz_ctls%pvr_ctls, c_buf)
@@ -152,11 +167,12 @@
      &      viz_ctls%fline_ctls, c_buf)
 !
 !
-!
         call read_integer_ctl_type(c_buf, hd_i_step_section,            &
      &      viz_ctls%i_step_psf_v_ctl)
         call read_integer_ctl_type(c_buf, hd_i_step_isosurf,            &
      &      viz_ctls%i_step_iso_v_ctl)
+        call read_integer_ctl_type(c_buf, hd_i_step_map_projection,     &
+     &                             viz_ctls%i_step_map_v_ctl)
         call read_integer_ctl_type(c_buf, hd_i_step_pvr,                &
      &      viz_ctls%i_step_pvr_v_ctl)
         call read_integer_ctl_type(c_buf, hd_i_step_fline,              &
@@ -168,6 +184,8 @@
      &      viz_ctls%delta_t_psf_v_ctl)
         call read_real_ctl_type(c_buf, hd_delta_t_isosurf,              &
      &      viz_ctls%delta_t_iso_v_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_map_projection,       &
+     &                          viz_ctls%delta_t_map_v_ctl)
         call read_real_ctl_type(c_buf, hd_delta_t_pvr,                  &
      &      viz_ctls%delta_t_pvr_v_ctl)
         call read_real_ctl_type(c_buf, hd_delta_t_fline,                &
@@ -190,6 +208,7 @@
       use t_read_control_elements
       use ctl_file_sections_IO
       use ctl_file_isosurfaces_IO
+      use ctl_file_map_renderings_IO
       use ctl_file_fieldlines_IO
       use write_control_elements
       use skip_comment_f
@@ -209,6 +228,8 @@
       maxlen = max(maxlen, len_trim(hd_i_step_section))
       maxlen = max(maxlen, len_trim(hd_delta_t_isosurf))
       maxlen = max(maxlen, len_trim(hd_i_step_isosurf))
+      maxlen = max(maxlen, len_trim(hd_delta_t_map_projection))
+      maxlen = max(maxlen, len_trim(hd_i_step_map_projection))
       maxlen = max(maxlen, len_trim(hd_delta_t_pvr))
       maxlen = max(maxlen, len_trim(hd_i_step_pvr))
       maxlen = max(maxlen, len_trim(hd_delta_t_fline))
@@ -233,6 +254,14 @@
      &    hd_i_step_isosurf, viz_ctls%i_step_iso_v_ctl)
       call write_files_4_iso_ctl(id_control, hd_isosurf_ctl,            &
      &                           viz_ctls%iso_ctls, level)
+!
+      write(id_control,'(a1)') '!'
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_delta_t_map_projection, viz_ctls%delta_t_map_v_ctl)
+      call write_integer_ctl_type(id_control, level, maxlen,            &
+     &    hd_i_step_map_projection, viz_ctls%i_step_map_v_ctl)
+      call write_files_4_map_ctl(id_control, hd_map_rendering,          &
+     &                           viz_ctls%map_ctls, level)
 !
       write(id_control,'(a1)') '!'
       call write_real_ctl_type(id_control, level, maxlen,               &

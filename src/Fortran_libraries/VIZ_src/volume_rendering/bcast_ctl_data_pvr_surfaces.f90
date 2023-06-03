@@ -11,6 +11,8 @@
 !!        type(pvr_section_ctl), intent(inout) :: pvr_scts_c
 !!      subroutine bcast_pvr_isosurfs_ctl(pvr_isos_c)
 !!        type(pvr_isosurfs_ctl), intent(inout) :: pvr_isos_c
+!!      subroutine bcast_pvr_section_ctl(pvr_scts_c)
+!!        type(pvr_section_ctl), intent(inout) :: pvr_scts_c
 !!@endverbatim
 !
       module bcast_ctl_data_pvr_surfaces
@@ -21,7 +23,7 @@
 !
       implicit  none
 !
-      private :: bcast_pvr_section_ctl, bcast_pvr_isosurface_ctl
+      private :: bcast_pvr_isosurface_ctl
 !
 !  ---------------------------------------------------------------------
 !
@@ -117,6 +119,10 @@
       call bcast_section_def_control(pvr_scts_c%psf_def_c)
       call bcast_ctl_type_r1(pvr_scts_c%opacity_ctl)
       call bcast_ctl_type_c1(pvr_scts_c%zeroline_ctl)
+!
+      call bcast_ctl_type_c1(pvr_scts_c%tan_cyl_switch_ctl)
+      call bcast_ctl_type_r1(pvr_scts_c%tangent_cylinder_inner_ctl)
+      call bcast_ctl_type_r1(pvr_scts_c%tangent_cylinder_outer_ctl)
 !
       end subroutine bcast_pvr_section_ctl
 !

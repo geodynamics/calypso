@@ -14,10 +14,10 @@
 !!        type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  array section_ctl
-!!    file section_ctl     ctl_psf_eq
-!!    begin section_ctl
+!!    file surface_define     ctl_psf_eq
+!!    begin surface_define
 !!      ...
-!!    end section_ctl
+!!    end surface_define
 !!
 !!    opacity_ctl           0.9
 !!    zeroline_switch_ctl   On
@@ -41,10 +41,21 @@
       implicit  none
 !
       type pvr_section_ctl
+!>        File name of control file to define surface
         character(len = kchara) :: fname_sect_ctl
+!>        Structure to define surface
         type(psf_define_ctl) :: psf_def_c
+!>        Structure to define opacity of surface
         type(read_real_item) :: opacity_ctl
+!>        Structure of zero line switch
         type(read_character_item) :: zeroline_ctl
+!
+!>        Structure of tangent cylinder line switch
+        type(read_character_item) :: tan_cyl_switch_ctl
+!>        Structure to define outer bounday radius for tangent cylinder
+        type(read_real_item) :: tangent_cylinder_inner_ctl
+!>        Structure to define inner bounday radius for tangent cylinder
+        type(read_real_item) :: tangent_cylinder_outer_ctl
 !
         integer(kind = kint) :: i_pvr_sect_ctl = 0
       end type pvr_section_ctl
@@ -71,6 +82,13 @@
       call copy_chara_ctl(org_pvr_sect_c%zeroline_ctl,                  &
      &                   new_pvr_sect_c%zeroline_ctl)
 !
+      call copy_chara_ctl(org_pvr_sect_c%tan_cyl_switch_ctl,            &
+     &                   new_pvr_sect_c%tan_cyl_switch_ctl)
+      call copy_real_ctl(org_pvr_sect_c%tangent_cylinder_inner_ctl,     &
+     &                   new_pvr_sect_c%tangent_cylinder_inner_ctl)
+      call copy_real_ctl(org_pvr_sect_c%tangent_cylinder_outer_ctl,     &
+     &                   new_pvr_sect_c%tangent_cylinder_outer_ctl)
+!
       end subroutine dup_pvr_section_ctl
 !
 !  ---------------------------------------------------------------------
@@ -83,6 +101,11 @@
       call dealloc_cont_dat_4_psf_def(pvr_sect_ctl%psf_def_c)
       pvr_sect_ctl%opacity_ctl%iflag = 0
       pvr_sect_ctl%zeroline_ctl%iflag = 0
+!
+      pvr_sect_ctl%tan_cyl_switch_ctl%iflag =          0
+      pvr_sect_ctl%tangent_cylinder_inner_ctl%iflag =  0
+      pvr_sect_ctl%tangent_cylinder_outer_ctl%iflag =  0
+!
       pvr_sect_ctl%i_pvr_sect_ctl =    0
 !
       end subroutine dealloc_pvr_section_ctl

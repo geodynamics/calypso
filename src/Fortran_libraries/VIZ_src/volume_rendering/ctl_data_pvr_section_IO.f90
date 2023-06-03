@@ -20,38 +20,22 @@
 !!        type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!
-!!      subroutine sel_read_ctl_pvr_section_def(id_control, hd_block,   &
-!!     &          fname_sect_ctl, psf_def_c, c_buf)
-!!      subroutine read_ctl_file_pvr_section_def                        &
-!!     &         (id_control, fname_sect_ctl, psf_def_c)
-!!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
-!!        character(len = kchara), intent(inout) :: fname_sect_ctl
-!!        type(psf_define_ctl), intent(inout) :: psf_def_c
-!!        type(buffer_for_control), intent(inout)  :: c_buf
-!!
-!!      subroutine sel_write_ctl_pvr_section_def(id_control, hd_block,  &
-!!     &          fname_sect_ctl, psf_def_c, level)
-!!      subroutine write_ctl_file_pvr_section_def                       &
-!!     &         (id_control, fname_sect_ctl, psf_def_c)
-!!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
-!!        character(len = kchara), intent(in) :: fname_sect_ctl
-!!        type(psf_define_ctl), intent(in) :: psf_def_c
-!!        integer(kind = kint), intent(inout) :: level
-!!
 !!      integer(kind = kint) function num_label_pvr_section()
 !!      subroutine set_label_pvr_section(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!  array section_ctl
-!!    file section_ctl     ctl_psf_eq
-!!    begin section_ctl
+!!  begin section_ctl
+!!    file surface_define     ctl_psf_eq
+!!    begin surface_define
 !!      ...
-!!    end section_ctl
+!!    end surface_define
 !!
 !!    opacity_ctl           0.9
 !!    zeroline_switch_ctl   On
-!!  end array section_ctl
+!!
+!!    tangent_cylinder_switch_ctl   On
+!!    inner_radius_ctl              0.53846
+!!    outer_radius_ctl              1.53846
+!!  end section_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -66,7 +50,6 @@
       use t_control_data_4_psf_def
       use t_control_array_real
       use t_control_array_character
-      use t_control_array_chara2real
       use t_ctl_data_pvr_section
       use skip_comment_f
 !
@@ -74,7 +57,7 @@
 !
 !   Labels
       integer(kind = kint), parameter, private                          &
-     &                   :: n_label_pvr_section =   3
+     &                   :: n_label_pvr_section =   6
 !
       character(len=kchara), parameter, private                         &
      &                  :: hd_surface_define =  'surface_define'
@@ -83,10 +66,12 @@
       character(len=kchara), parameter, private                         &
      &                  :: hd_pvr_sec_zeroline = 'zeroline_switch_ctl'
 !
-      private :: sel_read_ctl_pvr_section_def
-      private :: read_ctl_file_pvr_section_def
-      private :: sel_write_ctl_pvr_section_def
-      private :: write_ctl_file_pvr_section_def
+      character(len=kchara), parameter, private                         &
+     &        :: hd_tangent_cylinder = 'tangent_cylinder_switch_ctl'
+      character(len=kchara), parameter, private                         &
+     &        :: hd_tcyl_inner = 'inner_radius_ctl'
+      character(len=kchara), parameter, private                         &
+     &        :: hd_tcyl_outer = 'outer_radius_ctl'
 !
 !  ---------------------------------------------------------------------
 !
@@ -97,7 +82,7 @@
       subroutine read_pvr_section_ctl                                   &
      &         (id_control, hd_block, pvr_sect_ctl, c_buf)
 !
-      use ctl_data_section_def_IO
+      use ctl_file_section_def_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -105,7 +90,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      pvr_sect_ctl%psf_def_c%i_surface_define = 0
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(pvr_sect_ctl%i_pvr_sect_ctl .gt. 0) return
       do
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
@@ -118,6 +104,13 @@
      &     (c_buf, hd_pvr_opacity, pvr_sect_ctl%opacity_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_pvr_sec_zeroline, pvr_sect_ctl%zeroline_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_tangent_cylinder,            &
+     &      pvr_sect_ctl%tan_cyl_switch_ctl)
+        call read_real_ctl_type(c_buf, hd_tcyl_inner,                   &
+     &      pvr_sect_ctl%tangent_cylinder_inner_ctl)
+        call read_real_ctl_type(c_buf, hd_tcyl_outer,                   &
+     &      pvr_sect_ctl%tangent_cylinder_outer_ctl)
       end do
       pvr_sect_ctl%i_pvr_sect_ctl = 1
 !
@@ -128,7 +121,7 @@
       subroutine write_pvr_section_ctl                                  &
      &         (id_control, hd_block, pvr_sect_ctl, level)
 !
-      use ctl_data_section_def_IO
+      use ctl_file_section_def_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
@@ -142,6 +135,9 @@
       if(pvr_sect_ctl%i_pvr_sect_ctl .le. 0) return
       maxlen = len_trim(hd_pvr_opacity)
       maxlen = max(maxlen,len_trim(hd_pvr_sec_zeroline))
+      maxlen = max(maxlen,len_trim(hd_tangent_cylinder))
+      maxlen = max(maxlen,len_trim(hd_tcyl_inner))
+      maxlen = max(maxlen,len_trim(hd_tcyl_outer))
 !
       write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
@@ -154,120 +150,18 @@
      &    hd_pvr_opacity, pvr_sect_ctl%opacity_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_pvr_sec_zeroline, pvr_sect_ctl%zeroline_ctl)
+!
+      write(id_control,'(a1)') '!'
+      call write_chara_ctl_type                                         &
+     &   (id_control, level, maxlen, hd_tangent_cylinder,               &
+     &    pvr_sect_ctl%tan_cyl_switch_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_tcyl_inner, pvr_sect_ctl%tangent_cylinder_inner_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_tcyl_outer, pvr_sect_ctl%tangent_cylinder_outer_ctl)
       level = write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_pvr_section_ctl
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine sel_read_ctl_pvr_section_def(id_control, hd_block,     &
-     &          fname_sect_ctl, psf_def_c, c_buf)
-!
-      use ctl_data_section_def_IO
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      character(len = kchara), intent(inout) :: fname_sect_ctl
-      type(psf_define_ctl), intent(inout) :: psf_def_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_file_flag(c_buf, hd_block)) then
-        write(*,'(a)', ADVANCE='NO') ' is read from file... '
-        fname_sect_ctl = third_word(c_buf)
-        call read_ctl_file_pvr_section_def(id_control+2,                &
-     &      fname_sect_ctl, hd_block, psf_def_c)
-      else if(check_begin_flag(c_buf, hd_block)) then
-        write(*,*) ' is included'
-        fname_sect_ctl = 'NO_FILE'
-        call read_section_def_control(id_control, hd_block,             &
-     &                                psf_def_c, c_buf)
-      end if
-!
-      end subroutine sel_read_ctl_pvr_section_def
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine read_ctl_file_pvr_section_def                          &
-     &         (id_control, fname_sect_ctl, hd_block, psf_def_c)
-!
-      use ctl_data_section_def_IO
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len = kchara), intent(in) :: fname_sect_ctl
-      character(len=kchara), intent(in) :: hd_block
-      type(psf_define_ctl), intent(inout) :: psf_def_c
-!
-      type(buffer_for_control) :: c_buf1
-!
-!
-      write(*,*) trim(fname_sect_ctl), ' for surface definition'
-      open(id_control, file = fname_sect_ctl, status='old')
-!
-      do
-        call load_one_line_from_control(id_control, c_buf1)
-        if(check_end_flag(c_buf1, hd_block)) exit
-        call read_section_def_control(id_control, hd_block,             &
-     &                                psf_def_c, c_buf1)
-      end do
-!
-      close(id_control)
-!
-      end subroutine read_ctl_file_pvr_section_def
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine sel_write_ctl_pvr_section_def(id_control, hd_block,    &
-     &          fname_sect_ctl, psf_def_c, level)
-!
-      use ctl_data_section_def_IO
-      use write_control_elements
-      use skip_comment_f
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      character(len = kchara), intent(in) :: fname_sect_ctl
-      type(psf_define_ctl), intent(in) :: psf_def_c
-      integer(kind = kint), intent(inout) :: level
-!
-!
-      if(cmp_no_case(fname_sect_ctl,'NO_FILE')) then
-        call write_section_def_control(id_control, hd_block,            &
-     &                                 psf_def_c, level)
-      else
-        call write_file_name_for_ctl_line(id_control, level,            &
-     &                                    hd_block, fname_sect_ctl)
-        call write_ctl_file_pvr_section_def                             &
-     &     (id_control+2, fname_sect_ctl, hd_block, psf_def_c)
-      end if
-!
-      end subroutine sel_write_ctl_pvr_section_def
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine write_ctl_file_pvr_section_def                         &
-     &         (id_control, fname_sect_ctl, hd_block, psf_def_c)
-!
-      use ctl_data_section_def_IO
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len = kchara), intent(in) :: fname_sect_ctl
-      character(len=kchara), intent(in) :: hd_block
-      type(psf_define_ctl), intent(in) :: psf_def_c
-!
-      integer(kind = kint) :: level
-!
-!
-      write(*,*) trim(fname_sect_ctl), ' for surface definition'
-      level = 0
-      open(id_control, file = fname_sect_ctl)
-      call write_section_def_control(id_control, hd_block,              &
-     &                               psf_def_c, level)
-      close(id_control)
-!
-      end subroutine write_ctl_file_pvr_section_def
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -288,6 +182,10 @@
       call set_control_labels(hd_surface_define,   names( 1))
       call set_control_labels(hd_pvr_opacity,      names( 2))
       call set_control_labels(hd_pvr_sec_zeroline, names( 3))
+!
+      call set_control_labels(hd_tangent_cylinder, names( 4))
+      call set_control_labels(hd_tcyl_inner,       names( 5))
+      call set_control_labels(hd_tcyl_outer,       names( 6))
 !
       end subroutine set_label_pvr_section
 !

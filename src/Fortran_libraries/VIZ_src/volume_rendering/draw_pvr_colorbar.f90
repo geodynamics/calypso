@@ -21,6 +21,7 @@
       use m_precision
 !
       use m_constants
+      use t_pvr_colormap_parameter
 !
       implicit none
 !
@@ -39,7 +40,6 @@
       subroutine set_pvr_timelabel(time, num_pixel, n_pvr_pixel,        &
      &                             cbar_param, rgba_gl)
 !
-      use t_control_params_4_pvr
       use draw_pvr_colorbar_nums
 !
       integer(kind = kint), intent(in) :: num_pixel
@@ -68,8 +68,6 @@
 !
       subroutine set_pvr_colorbar(num_pixel, n_pvr_pixel,               &
      &         color_param, cbar_param, rgba_gl)
-!
-      use t_control_params_4_pvr
 !
       integer(kind = kint), intent(in) :: num_pixel
       integer(kind = kint), intent(in) :: n_pvr_pixel(2)
@@ -111,7 +109,6 @@
      &         iscale, num_of_scale, c_minmax, npix_img,                &
      &         ntot_pix, color_param, dimage)
 !
-      use t_control_params_4_pvr
       use draw_pvr_colorbar_nums
 !
       integer(kind = kint), intent(in) :: iflag_opacity
@@ -157,7 +154,6 @@
      &         iscale, num_of_scale, c_minmax, npix_img,                &
      &         ntot_pix, color_param, dimage)
 !
-      use t_control_params_4_pvr
       use draw_pvr_colorbar_nums
 !
       integer(kind = kint), intent(in) :: iflag_opacity
@@ -203,7 +199,6 @@
      &         (iscale, c_minmax, npix_img, isleeve_bar,                &
      &          ntot_pix, iflag_opacity, dimage, color_param)
 !
-      use t_control_params_4_pvr
       use set_color_4_pvr
       use set_rgba_4_each_pixel
       use draw_pvr_colorbar_nums
@@ -285,7 +280,6 @@
      &         (iscale, c_minmax, npix_img, isleeve_bar,                &
      &          ntot_pix, iflag_opacity, dimage, color_param)
 !
-      use t_control_params_4_pvr
       use set_color_4_pvr
       use set_rgba_4_each_pixel
       use draw_pvr_colorbar_nums

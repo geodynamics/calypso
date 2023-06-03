@@ -1,0 +1,29 @@
+bcast_maps_control_data.o: $(MAP_RENDERING_DIR)/bcast_maps_control_data.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_control_data_maps.o t_control_data_4_map.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o bcast_control_arrays.o bcast_ctl_data_pvr_surfaces.o bcast_ctl_data_view_trans.o bcast_pvr_color_ctl.o
+	$(F90) -c $(F90OPTFLAGS) $<
+collect_psf_data.o: $(MAP_RENDERING_DIR)/collect_psf_data.f90 calypso_mpi.o m_precision.o t_geometry_data.o t_phys_data.o t_solver_SR.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_map_rendering_data.o m_elapsed_labels_4_VIZ.o t_psf_patch_data.o t_psf_results.o t_pvr_image_array.o collect_psf_mesh_field.o write_PVR_image.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_data_map_rendering_IO.o: $(MAP_RENDERING_DIR)/ctl_data_map_rendering_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_data_4_map.o t_ctl_data_pvr_section.o calypso_mpi.o t_ctl_data_pvr_colormap_bar.o ctl_file_pvr_modelview_IO.o ctl_data_pvr_section_IO.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_file_map_renderings_IO.o: $(MAP_RENDERING_DIR)/ctl_file_map_renderings_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o t_control_data_maps.o t_read_control_elements.o ctl_data_section_IO.o skip_comment_f.o ctl_data_map_rendering_IO.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+draw_aitoff_map.o: $(MAP_RENDERING_DIR)/draw_aitoff_map.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_map_patch_from_1patch.o map_patch_from_1patch.o
+	$(F90) -c $(F90OPTFLAGS) $<
+draw_lines_on_map.o: $(MAP_RENDERING_DIR)/draw_lines_on_map.f90 m_precision.o m_constants.o t_pvr_colormap_parameter.o set_color_4_pvr.o aitoff.o
+	$(F90) -c $(F90OPTFLAGS) $<
+map_patch_from_1patch.o: $(MAP_RENDERING_DIR)/map_patch_from_1patch.f90 m_precision.o m_constants.o m_phys_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+map_projection.o: $(MAP_RENDERING_DIR)/map_projection.f90 m_precision.o calypso_mpi.o t_map_projection.o m_work_time.o m_elapsed_labels_4_VIZ.o m_geometry_constants.o set_map_control.o search_ele_list_for_psf.o set_const_4_sections.o find_node_and_patch_psf.o set_fields_for_psf.o collect_psf_data.o set_ucd_data_to_type.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_map_control.o: $(MAP_RENDERING_DIR)/set_map_control.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_phys_data.o t_control_data_maps.o t_control_data_4_map.o t_control_params_4_psf.o t_psf_patch_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_map_rendering_data.o t_pvr_image_array.o calypso_mpi.o t_read_control_elements.o set_field_comp_for_viz.o mpi_abort_by_missing_zlib.o set_psf_control.o m_error_IDs.o m_file_format_switch.o set_area_4_viz.o set_sections_file_ctl.o delete_data_files.o skip_comment_f.o set_pvr_modelview_matrix.o set_control_pvr_color.o t_control_array_character.o output_image_sel_4_png.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_control_data_4_map.o: $(MAP_RENDERING_DIR)/t_control_data_4_map.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_character.o t_ctl_data_pvr_section.o t_ctl_data_4_view_transfer.o t_ctl_data_pvr_colormap_bar.o t_control_array_character3.o add_nodal_fields_ctl.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_control_data_maps.o: $(MAP_RENDERING_DIR)/t_control_data_maps.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o t_control_array_character3.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_map_patch_from_1patch.o: $(MAP_RENDERING_DIR)/t_map_patch_from_1patch.f90 m_precision.o m_constants.o m_phys_constants.o m_geometry_constants.o coordinate_converter.o aitoff.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_map_projection.o: $(MAP_RENDERING_DIR)/t_map_projection.f90 calypso_mpi.o m_precision.o t_cross_section.o t_psf_results.o t_control_data_maps.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_pvr_image_array.o t_map_rendering_data.o m_field_file_format.o set_map_control.o set_psf_control.o set_fields_for_psf.o find_node_and_patch_psf.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_map_rendering_data.o: $(MAP_RENDERING_DIR)/t_map_rendering_data.f90 calypso_mpi.o m_precision.o t_geometry_data.o t_phys_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_ctl_data_pvr_section.o t_psf_patch_data.o t_pvr_image_array.o t_time_data.o t_file_IO_parameter.o t_map_patch_from_1patch.o set_ucd_data_to_type.o ucd_IO_select.o draw_aitoff_map.o draw_lines_on_map.o draw_pvr_colorbar.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

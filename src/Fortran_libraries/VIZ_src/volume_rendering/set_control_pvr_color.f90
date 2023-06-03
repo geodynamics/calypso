@@ -24,7 +24,7 @@
       use m_error_IDs
       use calypso_mpi
 !
-      use t_control_params_4_pvr
+      use t_pvr_colormap_parameter
       use skip_comment_f
 !
       implicit  none
@@ -254,6 +254,7 @@
       subroutine set_control_pvr_colorbar(cbar_ctl, cbar_param)
 !
       use t_ctl_data_pvr_colorbar
+      use t_pvr_colormap_parameter
 !
       type(pvr_colorbar_ctl), intent(in) :: cbar_ctl
       type(pvr_colorbar_parameter), intent(inout) :: cbar_param
@@ -261,31 +262,38 @@
       character(len = kchara) :: tmpchara
 !
 !    set axis label setting
-      cbar_param%iflag_pvr_axis = .FALSE.
+      cbar_param%flag_pvr_axis = .FALSE.
       if( cbar_ctl%axis_switch_ctl%iflag .gt. 0) then
         tmpchara = cbar_ctl%axis_switch_ctl%charavalue
-        cbar_param%iflag_pvr_axis = cmp_no_case(tmpchara, 'on')
+        cbar_param%flag_pvr_axis = cmp_no_case(tmpchara, 'on')
       end if
 !
 !    set time label setting
-      cbar_param%iflag_draw_time = .FALSE.
+      cbar_param%flag_draw_time = .FALSE.
       if( cbar_ctl%time_switch_ctl%iflag .gt. 0) then
         tmpchara = cbar_ctl%time_switch_ctl%charavalue
-        cbar_param%iflag_draw_time = cmp_no_case(tmpchara, 'on')
+        cbar_param%flag_draw_time = cmp_no_case(tmpchara, 'on')
+      end if
+!
+!    set mapgrid setting
+      cbar_param%flag_draw_mapgrid = .FALSE.
+      if( cbar_ctl%mapgrid_switch_ctl%iflag .gt. 0) then
+        tmpchara = cbar_ctl%mapgrid_switch_ctl%charavalue
+        cbar_param%flag_draw_mapgrid = cmp_no_case(tmpchara, 'on')
       end if
 !
 !    set colorbar setting
 !
-      cbar_param%iflag_pvr_colorbar = .FALSE.
+      cbar_param%flag_pvr_colorbar = .FALSE.
       if( cbar_ctl%colorbar_switch_ctl%iflag .gt. 0) then
         tmpchara = cbar_ctl%colorbar_switch_ctl%charavalue
-        cbar_param%iflag_pvr_colorbar                                   &
+        cbar_param%flag_pvr_colorbar                                    &
      &       = cmp_no_case(tmpchara, 'on')                              &
      &   .or. cmp_no_case(tmpchara, 'data')                             &
      &   .or. cmp_no_case(tmpchara, 'equi_data')
       end if
 !
-      if(cbar_param%iflag_pvr_colorbar) then
+      if(cbar_param%flag_pvr_colorbar) then
         cbar_param%flag_pvr_cbar_bottom = .FALSE.
         if( cbar_ctl%colorbar_position_ctl%iflag .gt. 0) then
           tmpchara = cbar_ctl%colorbar_position_ctl%charavalue

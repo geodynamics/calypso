@@ -8,7 +8,9 @@
 !!
 !!@verbatim
 !!      subroutine alloc_pvr_image_array(n_pvr_pixel, pvr_rgb)
+!!      subroutine alloc_pvr_left_eye_image(pvr_rgb)
 !!      subroutine dealloc_pvr_image_array(pvr_rgb)
+!!      subroutine dealloc_pvr_left_eye_image(pvr_rgb)
 !!        type(pvr_image_type), intent(inout) :: pvr_rgb
 !!
 !!      subroutine store_left_eye_image(pvr_rgb)
@@ -16,6 +18,7 @@
 !!        type(pvr_image_type), intent(inout) :: pvr_rgb
 !!
 !!      subroutine copy_pvr_image_file_param(org_pvr_rgb, rot_pvr_rgb)
+!!      subroutine copy_pvr_image_data(org_pvr_rgb, new_pvr_rgb)
 !!        type(pvr_image_type), intent(in) :: org_pvr_rgb
 !!        type(pvr_image_type), intent(inout) :: rot_pvr_rgb
 !!@endverbatim
@@ -94,16 +97,27 @@
       allocate(pvr_rgb%rgb_chara_gl(3,pvr_rgb%num_pixel_actual))
       allocate(pvr_rgb%rgba_chara_gl(4,pvr_rgb%num_pixel_actual))
 !
-      allocate(pvr_rgb%rgba_left_gl(4,pvr_rgb%num_pixel_actual))
-!
       allocate(pvr_rgb%rgba_real_gl(4,pvr_rgb%num_pixel_actual))
 !
 !$omp parallel workshare
       pvr_rgb%rgba_real_gl(1:4,1:pvr_rgb%num_pixel_actual) =  0.0d0
-      pvr_rgb%rgba_left_gl(1:4,1:pvr_rgb%num_pixel_actual) =  0.0d0
 !$omp end parallel workshare
 !
       end subroutine alloc_pvr_image_array
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_pvr_left_eye_image(pvr_rgb)
+!
+      type(pvr_image_type), intent(inout) :: pvr_rgb
+!
+!
+      allocate(pvr_rgb%rgba_left_gl(4,pvr_rgb%num_pixel_actual))
+!$omp parallel workshare
+      pvr_rgb%rgba_left_gl(1:4,1:pvr_rgb%num_pixel_actual) =  0.0d0
+!$omp end parallel workshare
+!
+      end subroutine alloc_pvr_left_eye_image
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -114,11 +128,21 @@
 !
 !
       deallocate(pvr_rgb%rgb_chara_gl, pvr_rgb%rgba_chara_gl)
-      deallocate(pvr_rgb%rgba_left_gl)
       deallocate(pvr_rgb%rgba_real_gl)
 !
       end subroutine dealloc_pvr_image_array
 !
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_pvr_left_eye_image(pvr_rgb)
+!
+      type(pvr_image_type), intent(inout) :: pvr_rgb
+!
+      deallocate(pvr_rgb%rgba_left_gl)
+!
+      end subroutine dealloc_pvr_left_eye_image
+!
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine store_left_eye_image(pvr_rgb)
@@ -128,10 +152,14 @@
 !
       if(my_rank .ne. pvr_rgb%irank_image_file) return
 !$omp parallel workshare
-      pvr_rgb%rgba_left_gl(1,:) = pvr_rgb%rgba_real_gl(1,:)
-!      pvr_rgb%rgba_left_gl(2,:) = pvr_rgb%rgba_real_gl(2,:)
-!      pvr_rgb%rgba_left_gl(3,:) = pvr_rgb%rgba_real_gl(3,:)
-      pvr_rgb%rgba_left_gl(4,:) = pvr_rgb%rgba_real_gl(4,:)
+      pvr_rgb%rgba_left_gl(1,1:pvr_rgb%num_pixel_actual)               &
+     &            = pvr_rgb%rgba_real_gl(1,1:pvr_rgb%num_pixel_actual)
+!      pvr_rgb%rgba_left_gl(2,1:pvr_rgb%num_pixel_actual)              &
+!     &            = pvr_rgb%rgba_real_gl(2,1:pvr_rgb%num_pixel_actual)
+!      pvr_rgb%rgba_left_gl(3,1:pvr_rgb%num_pixel_actual)              &
+!     &            = pvr_rgb%rgba_real_gl(3,1:pvr_rgb%num_pixel_actual)
+      pvr_rgb%rgba_left_gl(4,1:pvr_rgb%num_pixel_actual)               &
+     &            = pvr_rgb%rgba_real_gl(4,1:pvr_rgb%num_pixel_actual)
 !$omp end parallel workshare
 !
       end subroutine store_left_eye_image
@@ -145,11 +173,15 @@
 !
       if(my_rank .ne. pvr_rgb%irank_image_file) return
 !$omp parallel workshare
-        pvr_rgb%rgba_real_gl(1,:) =  pvr_rgb%rgba_left_gl(1,:)
-!        pvr_rgb%rgba_real_gl(2,:) =  pvr_rgb%rgba_left_gl(2,:)
-!        pvr_rgb%rgba_real_gl(3,:) =  pvr_rgb%rgba_left_gl(3,:)
-        pvr_rgb%rgba_real_gl(4,:) =  pvr_rgb%rgba_real_gl(4,:)          &
-     &                             + pvr_rgb%rgba_left_gl(4,:)
+        pvr_rgb%rgba_real_gl(1,1:pvr_rgb%num_pixel_actual)              &
+     &            = pvr_rgb%rgba_left_gl(1,1:pvr_rgb%num_pixel_actual)
+!        pvr_rgb%rgba_real_gl(2,1:pvr_rgb%num_pixel_actual)             &
+!     &            = pvr_rgb%rgba_left_gl(2,1:pvr_rgb%num_pixel_actual)
+!        pvr_rgb%rgba_real_gl(3,1:pvr_rgb%num_pixel_actual)             &
+!     &            = pvr_rgb%rgba_left_gl(3,1:pvr_rgb%num_pixel_actual)
+        pvr_rgb%rgba_real_gl(4,1:pvr_rgb%num_pixel_actual)              &
+     &            = pvr_rgb%rgba_real_gl(4,1:pvr_rgb%num_pixel_actual)  &
+     &             + pvr_rgb%rgba_left_gl(4,1:pvr_rgb%num_pixel_actual)
 !$omp end parallel workshare
 !
       end subroutine add_left_eye_image
@@ -169,6 +201,22 @@
       rot_pvr_rgb%pvr_prefix =         org_pvr_rgb%pvr_prefix
 !
       end subroutine copy_pvr_image_file_param
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine copy_pvr_image_data(org_pvr_rgb, new_pvr_rgb)
+!
+      type(pvr_image_type), intent(in) :: org_pvr_rgb
+      type(pvr_image_type), intent(inout) :: new_pvr_rgb
+!
+!
+      if(my_rank .ne. org_pvr_rgb%irank_image_file) return
+!$omp parallel workshare
+      new_pvr_rgb%rgba_real_gl(1:4,1:new_pvr_rgb%num_pixel_actual)      &
+     &   = org_pvr_rgb%rgba_real_gl(1:4,1:new_pvr_rgb%num_pixel_actual)
+!$omp end parallel workshare
+!
+      end subroutine copy_pvr_image_data
 !
 !  ---------------------------------------------------------------------
 !

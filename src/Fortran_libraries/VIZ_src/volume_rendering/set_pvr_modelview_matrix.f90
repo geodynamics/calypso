@@ -13,6 +13,13 @@
 !!      subroutine copy_stereo_perspective_matrix(streo, stereo_def)
 !!        type(streo_view_ctl), intent(in) :: streo
 !!        type(pvr_stereo_parameter), intent(inout) :: stereo_def
+!!
+!!     subroutine copy_pvr_perspective_matrix(proj, view_param)
+!!        type(projection_ctl), intent(in) :: proj
+!!        type(pvr_view_parameter), intent(inout) :: view_param
+!!      subroutine copy_pvr_image_size(pixel, view_param)
+!!        type(screen_pixel_ctl), intent(in) :: pixel
+!!        type(pvr_view_parameter), intent(inout) :: view_param
 !!@endverbatim
 !
       module set_pvr_modelview_matrix
@@ -30,7 +37,6 @@
       implicit none
 !
       private :: copy_pvr_modelview_matrix, set_viewpoint_vector_ctl
-      private :: copy_pvr_perspective_matrix, copy_pvr_image_size
       private :: set_view_rotation_vect_ctl, set_view_scale_factor_ctl
       private :: set_viewpnt_in_viewer_ctl
 !

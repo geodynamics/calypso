@@ -155,7 +155,7 @@
         call read_control_modelview_file(id_control+1, file_name,       &
      &                                   hd_block, mat)
       else if(check_begin_flag(c_buf, hd_block)) then
-        write(*,*)  'Modelview control is included'
+        write(*,'(2a)')  trim(hd_block), ' is included'
         file_name = 'NO_FILE'
         call read_view_transfer_ctl(id_control, hd_block, mat, c_buf)
       end if
@@ -209,7 +209,7 @@
       type(buffer_for_control) :: c_buf1
 !
 !
-      write(*,*) 'Modelview control: ', trim(file_name)
+      write(*,*) trim(file_name)
       open(id_control, file = file_name, status='old')
 !
       do 
@@ -236,7 +236,7 @@
       integer(kind = kint) :: level
 !
 !
-      write(*,*) 'Modelview control: ', trim(file_name)
+      write(*,*) trim(file_name)
       open(id_control, file = file_name)
 !
       level = 0

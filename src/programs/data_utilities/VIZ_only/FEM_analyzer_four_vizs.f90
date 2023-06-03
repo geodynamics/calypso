@@ -69,7 +69,7 @@
       type(VIZ_mesh_field), intent(inout) :: pvr
       type(mesh_SR), intent(inout) :: m_SR
 !
-      integer(kind = kint) :: istep_ucd, iflag
+      integer(kind = kint) :: istep_ucd
 !
 !   --------------------------------
 !       setup mesh information

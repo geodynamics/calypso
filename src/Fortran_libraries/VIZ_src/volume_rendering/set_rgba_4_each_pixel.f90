@@ -36,6 +36,7 @@
 !
       use m_precision
       use m_constants
+      use t_pvr_colormap_parameter
 !
       implicit  none
 !
@@ -66,7 +67,6 @@
      &          x4in_model, x4out_model, c_data, grad,                  &
      &          color_param, rgba_pixel)
 !
-      use t_control_params_4_pvr
       use set_color_4_pvr
 !
       real(kind = kreal), intent(in) :: viewpoint_vec(3)
@@ -123,7 +123,6 @@
      &         (viewpoint_vec, x4out_model, c_data, grad,               &
      &          opa_current, color_param, rgba_pixel)
 !
-      use t_control_params_4_pvr
       use set_color_4_pvr
 !
       real(kind = kreal), intent(in) :: viewpoint_vec(3)
@@ -162,7 +161,6 @@
       subroutine black_plane_with_light(viewpoint_vec, x4out_model,     &
      &          grad, opa_current, color_param, rgba_pixel)
 !
-      use t_control_params_4_pvr
       use set_color_4_pvr
 !
       real(kind = kreal), intent(in) :: viewpoint_vec(3)
@@ -185,7 +183,6 @@
       subroutine plane_rendering_with_light(viewpoint_vec, x4_model,    &
      &          surf_normal, opa_current, color_param, rgba_pixel)
 !
-      use t_control_params_4_pvr
       use set_color_4_pvr
 !
       real(kind = kreal), intent(in) :: viewpoint_vec(3)
@@ -209,7 +206,6 @@
      &         (viewpoint_vec, x4_model, surf_normal, color_surf,       &
      &          opa_current, color_param, rgba_pixel)
 !
-      use t_control_params_4_pvr
       use set_color_4_pvr
 !
       real(kind = kreal), intent(in) :: viewpoint_vec(3)

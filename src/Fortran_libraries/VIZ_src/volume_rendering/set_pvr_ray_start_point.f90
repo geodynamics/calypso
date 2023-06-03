@@ -7,22 +7,21 @@
 !> @brief Set start points for ray tracing
 !!
 !!@verbatim
-!!      subroutine set_each_pvr_ray_start(node, surf,                   &
-!!     &          npixel_x, npixel_y, pixel_point_x, pixel_point_y,     &
+!!      subroutine set_each_pvr_ray_start                               &
+!!     &         (node, surf, npixel_x, npixel_y,                       &
 !!     &          num_pvr_surf, item_pvr_surf_domain,                   &
 !!     &          screen_norm_pvr_domain, isurf_xrng_pvr_domain,        &
 !!     &          jsurf_yrng_pvr_domain, viewpoint_vec, ray_vec4,       &
 !!     &          istack_pvr_ray_sf, num_pvr_ray, id_pixel_start,       &
 !!     &          isf_pvr_ray_start, xi_pvr_start,                      &
 !!     &          xx4_pvr_start, xx4_pvr_ray_start)
-!!      subroutine set_each_ray_projected_start(node, surf,             &
+!!      subroutine set_each_ray_projected_start(surf,                   &
 !!     &          npixel_x, npixel_y, pixel_point_x, pixel_point_y,     &
 !!     &          num_pvr_surf, item_pvr_surf_domain,                   &
 !!     &          screen_norm_pvr_domain, ray_vec4,                     &
 !!     &          ntot_tmp_pvr_ray, istack_tmp_pvr_ray_st,              &
 !!     &          ipix_start_tmp, iflag_start_tmp, istack_pvr_ray_sf,   &
-!!     &          num_pvr_ray, xi_pvr_start, xx4_pvr_ray_start)
-!!        type(node_data), intent(in) :: node
+!!     &          num_pvr_ray, xx4_pvr_ray_start)
 !!        type(surface_data), intent(in) :: surf
 !!      subroutine check_pvr_ray_startpoint                             &
 !!     &         (npixel_x, npixel_y, num_pvr_ray, id_pixel_start)
@@ -49,8 +48,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_each_pvr_ray_start(node, surf,                     &
-     &          npixel_x, npixel_y, pixel_point_x, pixel_point_y,       &
+      subroutine set_each_pvr_ray_start                                 &
+     &         (node, surf, npixel_x, npixel_y,                         &
      &          num_pvr_surf, item_pvr_surf_domain,                     &
      &          screen_norm_pvr_domain, viewpoint_vec, ray_vec4,        &
      &          ntot_tmp_pvr_ray, istack_tmp_pvr_ray_st,                &
@@ -65,8 +64,6 @@
       type(surface_data), intent(in) :: surf
 !
       integer(kind = kint), intent(in) :: npixel_x, npixel_y
-      real(kind = kreal), intent(in) :: pixel_point_x(npixel_x)
-      real(kind = kreal), intent(in) :: pixel_point_y(npixel_y)
 !
       integer(kind = kint), intent(in) :: num_pvr_surf
       integer(kind = kint), intent(in)                                  &
@@ -160,17 +157,16 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_each_ray_projected_start(node, surf,               &
+      subroutine set_each_ray_projected_start(surf,                     &
      &          npixel_x, npixel_y, pixel_point_x, pixel_point_y,       &
      &          num_pvr_surf, item_pvr_surf_domain,                     &
      &          screen_norm_pvr_domain, ray_vec4,                       &
      &          ntot_tmp_pvr_ray, istack_tmp_pvr_ray_st,                &
      &          ipix_start_tmp, iflag_start_tmp, istack_pvr_ray_sf,     &
-     &          num_pvr_ray, xi_pvr_start, xx4_pvr_ray_start)
+     &          num_pvr_ray, xx4_pvr_ray_start)
 !
       use cal_field_on_surf_viz
 !
-      type(node_data), intent(in) :: node
       type(surface_data), intent(in) :: surf
 !
       integer(kind = kint), intent(in) :: npixel_x, npixel_y
@@ -196,7 +192,6 @@
      &                    :: istack_pvr_ray_sf(0:num_pvr_surf)
 !
       integer(kind = kint), intent(in) ::  num_pvr_ray
-      real(kind = kreal), intent(in) :: xi_pvr_start(2,num_pvr_ray)
 !
       real(kind = kreal), intent(inout)                                 &
      &                   :: xx4_pvr_ray_start(4,num_pvr_ray)

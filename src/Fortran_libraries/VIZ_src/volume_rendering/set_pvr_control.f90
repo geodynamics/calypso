@@ -190,6 +190,7 @@
 !
       subroutine flush_each_pvr_control(pvr_param)
 !
+      use t_pvr_colormap_parameter
       use t_rendering_vr_image
       use t_geometries_in_pvr_screen
 !

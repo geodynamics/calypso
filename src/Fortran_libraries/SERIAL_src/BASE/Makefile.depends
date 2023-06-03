@@ -1,3 +1,5 @@
+aitoff.o: $(BASEDIR)/aitoff.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
 append_phys_data.o: $(BASEDIR)/append_phys_data.f90 m_precision.o m_machine_parameter.o t_phys_data.o compare_indices.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_add_smp.o: $(BASEDIR)/cal_add_smp.f90 m_precision.o

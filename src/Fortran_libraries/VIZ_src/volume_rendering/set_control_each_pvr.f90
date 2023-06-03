@@ -111,6 +111,7 @@
 !
       use t_group_data
       use t_control_params_4_pvr
+      use t_pvr_colormap_parameter
       use t_geometries_in_pvr_screen
       use set_color_4_pvr
       use set_rgba_4_each_pixel

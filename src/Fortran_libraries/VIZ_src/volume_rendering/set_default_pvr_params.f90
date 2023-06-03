@@ -18,6 +18,7 @@
 !
       use m_constants
       use t_control_params_4_pvr
+      use t_pvr_colormap_parameter
 !
       implicit none
 !

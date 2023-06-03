@@ -52,6 +52,7 @@
       use m_machine_parameter
       use t_control_data_sections
       use t_control_data_isosurfaces
+      use t_control_data_maps
       use t_control_data_pvrs
       use t_control_array_character
       use t_control_array_real
@@ -65,6 +66,8 @@
         type(section_controls) :: psf_ctls
 !>        Structures of isosurface controls
         type(isosurf_controls) :: iso_ctls
+!>        Structures of map projection controls
+        type(map_rendering_controls) :: map_ctls
 !>        Structures of volume rendering controls
         type(volume_rendering_controls) :: pvr_ctls
 !
@@ -72,6 +75,8 @@
         type(read_integer_item) :: i_step_psf_v_ctl
 !>   Increment for isosurface
         type(read_integer_item) :: i_step_iso_v_ctl
+!>   Increment for map projection
+        type(read_integer_item) :: i_step_map_v_ctl
 !>   Increment for volume rendering
         type(read_integer_item) :: i_step_pvr_v_ctl
 !>   Increment for field data output
@@ -81,6 +86,8 @@
         type(read_real_item) :: delta_t_psf_v_ctl
 !>   time interval for isosurface
         type(read_real_item) :: delta_t_iso_v_ctl
+!>   time interval for map projection
+        type(read_real_item) :: delta_t_map_v_ctl
 !>   time interval for volume rendering
         type(read_real_item) :: delta_t_pvr_v_ctl
 !>   time interval for field data output
@@ -106,15 +113,18 @@
 !
       call dealloc_psf_ctl_stract(viz_ctls%psf_ctls)
       call dealloc_iso_ctl_stract(viz_ctls%iso_ctls)
+      call dealloc_map_ctl_stract(viz_ctls%map_ctls)
       call dealloc_pvr_ctl_struct(viz_ctls%pvr_ctls)
 !
       viz_ctls%delta_t_psf_v_ctl%iflag =   0
       viz_ctls%delta_t_iso_v_ctl%iflag =   0
+      viz_ctls%delta_t_map_v_ctl%iflag =   0
       viz_ctls%delta_t_pvr_v_ctl%iflag =   0
       viz_ctls%delta_t_ucd_v_ctl%iflag =   0
 !
       viz_ctls%i_step_psf_v_ctl%iflag =   0
       viz_ctls%i_step_iso_v_ctl%iflag =   0
+      viz_ctls%i_step_map_v_ctl%iflag =   0
       viz_ctls%i_step_pvr_v_ctl%iflag =   0
       viz_ctls%i_step_ucd_v_ctl%iflag =   0
 !
@@ -144,6 +154,10 @@
         call copy_integer_ctl                                           &
      &     (viz3_ctls%i_step_iso_v_ctl, tctl%i_step_iso_ctl)
       end if
+      if(viz3_ctls%i_step_map_v_ctl%iflag .gt. 0) then
+        call copy_integer_ctl                                           &
+     &     (viz3_ctls%i_step_map_v_ctl, tctl%i_step_map_ctl)
+      end if
       if(viz3_ctls%i_step_pvr_v_ctl%iflag .gt. 0) then
         call copy_integer_ctl                                           &
      &     (viz3_ctls%i_step_pvr_v_ctl, tctl%i_step_pvr_ctl)
@@ -161,6 +175,11 @@
         call copy_real_ctl                                              &
      &     (viz3_ctls%delta_t_iso_v_ctl, tctl%delta_t_iso_ctl)
       end if
+      if(viz3_ctls%delta_t_map_v_ctl%iflag .gt. 0) then
+        call copy_real_ctl                                              &
+     &     (viz3_ctls%delta_t_map_v_ctl, tctl%delta_t_map_ctl)
+      end if
+!
       if(viz3_ctls%delta_t_pvr_v_ctl%iflag .gt. 0) then
         call copy_real_ctl                                              &
      &     (viz3_ctls%delta_t_pvr_v_ctl, tctl%delta_t_pvr_ctl)
@@ -188,6 +207,10 @@
 !
       if(viz_ctls%iso_ctls%num_iso_ctl .gt. 0) then
         call add_fields_4_isos_to_fld_ctl(viz_ctls%iso_ctls, field_ctl)
+      end if
+!
+      if(viz_ctls%map_ctls%num_map_ctl .gt. 0) then
+        call add_fields_4_maps_to_fld_ctl(viz_ctls%map_ctls, field_ctl)
       end if
 !
 !

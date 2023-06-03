@@ -46,6 +46,11 @@
         call copy_integer_ctl                                           &
      &     (viz_ctls%i_step_iso_v_ctl, tctl%i_step_iso_ctl)
       end if
+      if(viz_ctls%i_step_map_v_ctl%iflag .gt. 0) then
+        call copy_integer_ctl                                           &
+     &     (viz_ctls%i_step_map_v_ctl, tctl%i_step_map_ctl)
+      end if
+!
       if(viz_ctls%i_step_pvr_v_ctl%iflag .gt. 0) then
         call copy_integer_ctl                                           &
      &     (viz_ctls%i_step_pvr_v_ctl, tctl%i_step_pvr_ctl)
@@ -67,6 +72,11 @@
         call copy_real_ctl                                              &
      &     (viz_ctls%delta_t_iso_v_ctl, tctl%delta_t_iso_ctl)
       end if
+      if(viz_ctls%delta_t_map_v_ctl%iflag .gt. 0) then
+        call copy_real_ctl                                              &
+     &     (viz_ctls%delta_t_map_v_ctl, tctl%delta_t_map_ctl)
+      end if
+!
       if(viz_ctls%delta_t_pvr_v_ctl%iflag .gt. 0) then
         call copy_real_ctl                                              &
      &     (viz_ctls%delta_t_pvr_v_ctl, tctl%delta_t_pvr_ctl)
