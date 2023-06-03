@@ -27,17 +27,18 @@
 !!      start_rst_step_ctl    10
 !!      end_rst_step_ctl      20
 !!
-!!      delta_t_check_ctl        2.0e-5
-!!      delta_t_rst_ctl          1.0e-2
-!!      delta_t_sectioning_ctl   1.0e-3
-!!      delta_t_isosurface_ctl   1.0e-3
-!!      delta_t_pvr_ctl          1.0e-2
-!!      delta_t_fline_ctl        1.0e-1
-!!      delta_t_LIC_ctl          1.0e-1
-!!      delta_t_field_ctl        1.0e-3
-!!      delta_t_monitor_ctl      1.0e-4
-!!      delta_t_sgs_coefs_ctl    2.0e-5
-!!      delta_t_boundary_ctl     1.0e-4
+!!      delta_t_check_ctl            2.0e-5
+!!      delta_t_rst_ctl              1.0e-2
+!!      delta_t_sectioning_ctl       1.0e-3
+!!      delta_t_isosurface_ctl       1.0e-3
+!!      delta_t_map_projection_ctl   1.0e-3
+!!      delta_t_pvr_ctl              1.0e-2
+!!      delta_t_fline_ctl            1.0e-1    
+!!      delta_t_LIC_ctl              1.0e-1
+!!      delta_t_field_ctl            1.0e-3
+!!      delta_t_monitor_ctl          1.0e-4
+!!      delta_t_sgs_coefs_ctl        2.0e-5
+!!      delta_t_boundary_ctl         1.0e-4
 !!    end time_step_ctl
 !!
 !! ------------------------------------------------------------------
@@ -53,18 +54,19 @@
 !!      i_step_finish_ctl     2000
 !!      i_step_number_ctl     2000
 !!
-!!      i_step_check_ctl         40
-!!      i_step_rst_ctl          800
-!!      i_step_sectioning_ctl   400
-!!      i_step_isosurface_ctl   400
-!!      i_step_pvr_ctl          400
-!!      i_step_fline_ctl        400
-!!      i_step_LIC_ctl          400
-!!      i_step_snapshot_ctl     800
-!!      i_step_field_ctl        800
-!!      i_step_monitor_ctl       40
-!!      i_step_sgs_coefs_ctl   2000
-!!      i_step_boundary_ctl      40
+!      i_step_check_ctl             40
+!!      i_step_rst_ctl              800
+!!      i_step_sectioning_ctl       400
+!!      i_step_isosurface_ctl       400
+!!      i_step_map_projection_ctl   400
+!!      i_step_pvr_ctl              400
+!!      i_step_fline_ctl            400
+!!      i_step_LIC_ctl              400
+!!      i_step_snapshot_ctl         800
+!!      i_step_field_ctl            800
+!!      i_step_monitor_ctl           40
+!!      i_step_sgs_coefs_ctl       2000
+!!      i_step_boundary_ctl          40
 !!
 !!      dt_ctl              5.0e-5
 !!      time_init_ctl       0.0e-8
@@ -109,6 +111,7 @@
       call bcast_ctl_type_r1(tctl%delta_t_rst_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_psf_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_iso_ctl)
+      call bcast_ctl_type_r1(tctl%delta_t_map_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_pvr_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_fline_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_lic_ctl)
@@ -127,6 +130,7 @@
 !
       call bcast_ctl_type_i1(tctl%i_step_psf_ctl)
       call bcast_ctl_type_i1(tctl%i_step_iso_ctl)
+      call bcast_ctl_type_i1(tctl%i_step_map_ctl)
       call bcast_ctl_type_i1(tctl%i_step_pvr_ctl)
       call bcast_ctl_type_i1(tctl%i_step_lic_ctl)
       call bcast_ctl_type_i1(tctl%i_step_fline_ctl)

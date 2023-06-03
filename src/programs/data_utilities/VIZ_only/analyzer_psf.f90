@@ -89,7 +89,7 @@
         call FEM_analyze_surface                                        &
      &     (i_step, t_VIZ2%ucd_step, t_VIZ2%time_d, FEM_viz2, m_SR12)
 !
-!  Generate field lines
+!  Generate SEctions
         t_VIZ2%viz_step%istep_psf                                       &
      &     = istep_file_w_fix_dt(i_step, t_VIZ2%viz_step%PSF_t)
         t_VIZ2%viz_step%istep_iso                                       &

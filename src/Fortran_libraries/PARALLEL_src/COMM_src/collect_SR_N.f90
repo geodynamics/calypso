@@ -12,7 +12,7 @@
 !!     &         (dest_rank, NB, NP, X, istack_NP, X_dest, SR_sig)
 !!      integer, intent(in) :: dest_rank
 !!      integer(kind = kint), intent(in) :: NB, NP
-!!      integer(kind = kint), intent(in) :: istack_NP(0:nprocs)
+!!      integer(kind = kint_gl), intent(in) :: istack_NP(0:nprocs)
 !!      real(kind = kreal), intent(in) :: X(NB*NP)
 !!      real(kind = kreal), intent(inout)                               &
 !!     &                   :: X_dest(NB*istack_NP(nprocs))
@@ -49,35 +49,64 @@
       integer, intent(in) :: dest_rank
       integer(kind = kint), intent(in) :: NB, NP
 !
-      integer(kind = kint), intent(in) :: istack_NP(0:nprocs)
+      integer(kind = kint_gl), intent(in) :: istack_NP(0:nprocs)
       real(kind = kreal), intent(in) :: X(NB*NP)
 !
       real(kind = kreal), intent(inout) :: X_dest(NB*istack_NP(nprocs))
       type(send_recv_status), intent(inout) :: SR_sig
 !
-      integer(kind = kint) :: ist, ip
+      integer(kind = kint) :: icou, num_recv
+      integer(kind = kint_gl) :: ist
       integer :: num, id_rank
-      
 !
 !
-      call resize_SR_flag(1, nprocs, SR_sig)
-!
-      num = int(NB * NP)
-      call MPI_ISEND(X, num, CALYPSO_REAL, dest_rank,                   &
-     &               0, CALYPSO_COMM, SR_sig%req1(ione), ierr_MPI)
-!
-      if (my_rank .eq. dest_rank) then
-        do ip = 1, nprocs
-          id_rank = int(ip - 1)
-          ist = NB*istack_NP(ip-1) + 1
-          num = int(NB * (istack_NP(ip) - istack_NP(ip-1)))
-          call MPI_IRECV(X_dest(ist), num, CALYPSO_REAL, id_rank,       &
-     &                   0, CALYPSO_COMM, SR_sig%req2(ip), ierr_MPI)
+      num_recv = 0
+      if(my_rank .eq. dest_rank) then
+        do id_rank = 0, nprocs-1
+          ist = NB*istack_NP(id_rank) + 1
+          num = int(NB * (istack_NP(id_rank+1) - istack_NP(id_rank)))
+          if(id_rank .ne. dest_rank                                     &
+     &         .and. num .gt. 0) num_recv = num_recv + 1
         end do
-        call MPI_WAITALL                                                &
-     &     (nprocs, SR_sig%req2(1), SR_sig%sta2(1,1), ierr_MPI)
       end if
-      call MPI_WAITALL(1, SR_sig%req1(1), SR_sig%sta1(1,1), ierr_MPI)
+!
+      call resize_SR_flag(1, num_recv, SR_sig)
+!
+      num = int(NB * (istack_NP(my_rank+1) - istack_NP(my_rank)))
+      if(num.gt.0 .and. my_rank .ne. dest_rank) then
+        call MPI_ISEND(X, num, CALYPSO_REAL, dest_rank,                 &
+     &                 0, CALYPSO_COMM, SR_sig%req1(ione), ierr_MPI)
+      end if
+!
+      if(my_rank .eq. dest_rank) then
+        icou = 0
+        do id_rank = 0, nprocs-1
+          ist = NB*istack_NP(id_rank)
+          num = int(NB * (istack_NP(id_rank+1) - istack_NP(id_rank)))
+          if(num.gt.0 .and. id_rank.ne.dest_rank) then
+            icou = icou + 1
+            call MPI_IRECV(X_dest(ist+1), num, CALYPSO_REAL, id_rank,   &
+     &                    0, CALYPSO_COMM, SR_sig%req2(icou), ierr_MPI)
+          end if
+        end do
+        if(num_recv .gt. 0) then
+          call MPI_WAITALL                                              &
+     &       (num_recv, SR_sig%req2(1), SR_sig%sta2(1,1), ierr_MPI)
+        end if
+!
+        ist = NB*istack_NP(my_rank)
+        num = int(NB * (istack_NP(my_rank+1) - istack_NP(my_rank)))
+        if(num .gt. 0) then
+!$omp parallel workshare
+          X_dest(ist+1:ist+num) = X(1:num)
+!$omp end parallel workshare
+        end if
+      end if
+!
+      num = int(NB * (istack_NP(my_rank+1) - istack_NP(my_rank)))
+      if(num.gt.0 .and. my_rank .ne. dest_rank) then
+        call MPI_WAITALL(1, SR_sig%req1(1), SR_sig%sta1(1,1), ierr_MPI)
+      end if
 !
       end subroutine collect_send_recv_N
 !

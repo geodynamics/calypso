@@ -119,10 +119,10 @@
       type(ucd_data), intent(in) :: vtk_out
 !
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+11)
+      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+13)
       call sel_write_parallel_ucd_file                                  &
      &   (istep_ucd, vtk_file_IO, time_d, vtk_out)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+11)
+      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+13)
 !
       end subroutine visualize_convert_vtk
 !

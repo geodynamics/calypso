@@ -38,6 +38,10 @@
       integer(kind = kint), save :: ist_elapsed_ISO =   0
       integer(kind = kint), save :: ied_elapsed_ISO =   0
 !
+      logical, save :: iflag_MAP_time = .FALSE.
+      integer(kind = kint), save :: ist_elapsed_MAP =   0
+      integer(kind = kint), save :: ied_elapsed_MAP =   0
+!
       private :: elpsed_label_4_VIZ_outline
       private :: elpsed_label_4_PVR, elpsed_label_4_LIC
       private :: reset_elapse_after_init_VIZ_top
@@ -46,6 +50,7 @@
       private :: reset_elapse_after_init_LIC
       private :: reset_elapse_after_init_PSF
       private :: reset_elapse_after_init_ISO
+      private :: reset_elapse_after_init_MAP
 !
 ! ----------------------------------------------------------------------
 !
@@ -62,6 +67,7 @@
 !
       call elpsed_label_4_PSF
       call elpsed_label_4_ISO
+      call elpsed_label_4_MAP
 !
       end subroutine elpsed_label_4_VIZ
 !
@@ -76,6 +82,7 @@
 !
       call reset_elapse_after_init_PSF
       call reset_elapse_after_init_ISO
+      call reset_elapse_after_init_MAP
 !
       end subroutine reset_elapse_after_init_VIZ
 !
@@ -84,7 +91,7 @@
 !
       subroutine elpsed_label_4_VIZ_outline
 !
-      integer(kind = kint), parameter :: num_append = 13
+      integer(kind = kint), parameter :: num_append = 15
 !
 !
       call append_elapsed_times                                         &
@@ -92,25 +99,32 @@
 !
       elps1%labels(ist_elapsed_VIZ+ 1)                                  &
      &                    = 'Sectioning initialization.    '
-      elps1%labels(ist_elapsed_VIZ+ 2)                                  &
-     &                    = 'Isosurfaceing initialization.    '
-      elps1%labels(ist_elapsed_VIZ+ 3)                                  &
-     &                    = 'Volume rendering initialization.    '
-      elps1%labels(ist_elapsed_VIZ+ 4)                                  &
-     &                    = 'fieldline initialization.    '
-      elps1%labels(ist_elapsed_VIZ+ 5)                                  &
-     &                    = 'LIC rendering initialization.    '
+      elps1%labels(ist_elapsed_VIZ+ 2) = 'Sectioning.    '
 !
-      elps1%labels(ist_elapsed_VIZ+ 6) = 'Sectioning.    '
-      elps1%labels(ist_elapsed_VIZ+ 7) = 'Isosurfaceing.    '
+      elps1%labels(ist_elapsed_VIZ+ 3)                                  &
+     &                    = 'Isosurfaceing initialization.    '
+      elps1%labels(ist_elapsed_VIZ+ 4) = 'Isosurfaceing.    '
+!
+      elps1%labels(ist_elapsed_VIZ+ 5)                                  &
+     &                    = 'Map projection initialization.    '
+      elps1%labels(ist_elapsed_VIZ+ 6) = 'Map projection.    '
+!
+      elps1%labels(ist_elapsed_VIZ+ 7)                                  &
+     &                    = 'Volume rendering initialization.    '
       elps1%labels(ist_elapsed_VIZ+ 8) = 'Volume rendering.    '
-      elps1%labels(ist_elapsed_VIZ+ 9) = 'fieldline.    '
+!
+      elps1%labels(ist_elapsed_VIZ+ 9)                                  &
+     &                    = 'LIC rendering initialization.    '
       elps1%labels(ist_elapsed_VIZ+10) = 'LIC rendering.    '
 !
-      elps1%labels(ist_elapsed_VIZ+11) = 'VTK output in viz module'
-      elps1%labels(ist_elapsed_VIZ+12)                                  &
+      elps1%labels(ist_elapsed_VIZ+11)                                  &
+     &                    = 'fieldline initialization.    '
+      elps1%labels(ist_elapsed_VIZ+12) = 'fieldline.    '
+!
+      elps1%labels(ist_elapsed_VIZ+13) = 'VTK output in viz module'
+      elps1%labels(ist_elapsed_VIZ+14)                                  &
      &                    = 'ele. comm. table for LIC    '
-      elps1%labels(ist_elapsed_VIZ+13)                                  &
+      elps1%labels(ist_elapsed_VIZ+15)                                  &
      &                    = 'edge comm. table for surfacing    '
 !
       iflag_VIZ_time = .TRUE.
@@ -233,13 +247,39 @@
       end subroutine elpsed_label_4_ISO
 !
 !-----------------------------------------------------------------------
+!
+      subroutine elpsed_label_4_MAP
+!
+      integer(kind = kint), parameter :: num_append = 3
+!
+!
+      call append_elapsed_times                                         &
+     &   (num_append, ist_elapsed_MAP, ied_elapsed_MAP)
+!
+      elps1%labels(ist_elapsed_MAP+1)                                   &
+     &                    = 'Collect map data   '
+      elps1%labels(ist_elapsed_MAP+2)                                   &
+     &                    = 'Interpolate data on map   '
+      elps1%labels(ist_elapsed_MAP+3)                                   &
+     &                    = 'Output Map image   '
+!
+      iflag_MAP_time = .TRUE.
+!
+      end subroutine elpsed_label_4_MAP
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine reset_elapse_after_init_VIZ_top
 !
 !
       if(iflag_VIZ_time .eqv. .FALSE.) return
-      call reset_elapsed_times(ist_elapsed_VIZ+6, ied_elapsed_VIZ)
+      call reset_elapsed_times(ist_elapsed_VIZ+ 2, ist_elapsed_VIZ+ 2)
+      call reset_elapsed_times(ist_elapsed_VIZ+ 4, ist_elapsed_VIZ+ 4)
+      call reset_elapsed_times(ist_elapsed_VIZ+ 6, ist_elapsed_VIZ+ 6)
+      call reset_elapsed_times(ist_elapsed_VIZ+ 8, ist_elapsed_VIZ+ 8)
+      call reset_elapsed_times(ist_elapsed_VIZ+10, ist_elapsed_VIZ+10)
+      call reset_elapsed_times(ist_elapsed_VIZ+12, ist_elapsed_VIZ+12)
 !
       end subroutine reset_elapse_after_init_VIZ_top
 !
@@ -282,6 +322,16 @@
       call reset_elapsed_times(ist_elapsed_ISO+2, ist_elapsed_ISO+2)
 !
       end subroutine reset_elapse_after_init_ISO
+!
+!-----------------------------------------------------------------------
+!
+      subroutine reset_elapse_after_init_MAP
+!
+!
+      if(iflag_ISO_time .eqv. .FALSE.) return
+      call reset_elapsed_times(ist_elapsed_MAP+2, ist_elapsed_MAP+2)
+!
+      end subroutine reset_elapse_after_init_MAP
 !
 !-----------------------------------------------------------------------
 !

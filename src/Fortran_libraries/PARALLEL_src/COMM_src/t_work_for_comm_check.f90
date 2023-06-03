@@ -37,7 +37,7 @@
         integer(kind = kint), allocatable :: i_diff(:)
         real(kind = kreal), allocatable :: x_diff(:)
 !
-        integer(kind = kint), allocatable :: istack_diff_pe(:)
+        integer(kind = kint_gl), allocatable :: istack_diff_pe(:)
         integer(kind = kint), allocatable :: i_diff_IO(:)
         real(kind = kreal), allocatable :: x_diff_IO(:)
       end type work_for_comm_check

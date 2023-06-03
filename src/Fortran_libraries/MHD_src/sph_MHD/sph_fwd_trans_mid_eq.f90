@@ -63,8 +63,10 @@
      &    bench%iphys_dbench, cdat%circle, cdat%leg_circ,               &
      &    cdat%d_circle, cdat%WK_circle_fft)
 !
-      call check_mid_eq_trans_dbench(ipol, cdat%circle, cdat%leg_circ,  &
-     &                               cdat%d_circle, bench)
+      if(iflag_debug.gt.0) then
+        call check_mid_eq_trans_dbench(ipol, cdat%circle,               &
+     &      cdat%leg_circ, cdat%d_circle, bench)
+      end if
 !
 !   Evaluate drift frequencty by velocity 
 !

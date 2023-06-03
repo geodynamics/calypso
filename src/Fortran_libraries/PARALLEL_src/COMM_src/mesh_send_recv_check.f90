@@ -296,7 +296,7 @@
 !
       call alloc_ele_comm_test_IO(wk_check)
       call collect_send_recv_int                                        &
-     &   (0, wk_check%num_diff, wk_check%i_diff,                        &
+     &   (0, ione, wk_check%num_diff, wk_check%i_diff,                  &
      &    wk_check%istack_diff_pe, wk_check%i_diff_IO, SR_sig_c)
       call collect_send_recv_N                                          &
      &   (0, isix, wk_check%num_diff, wk_check%x_diff,                  &
