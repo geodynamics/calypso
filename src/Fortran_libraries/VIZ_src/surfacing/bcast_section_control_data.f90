@@ -94,13 +94,17 @@
 !
       use t_control_data_4_psf
       use calypso_mpi_int
+      use calypso_mpi_char
       use bcast_control_arrays
+      use transfer_to_long_integers
 !
       type(psf_ctl), intent(inout) :: psf_c
 !
 !
       call calypso_mpi_bcast_one_int(psf_c%i_psf_ctl, 0)
       call calypso_mpi_bcast_one_int(psf_c%i_output_field, 0)
+      call calypso_mpi_bcast_character(psf_c%fname_section_ctl,         &
+     &                                 cast_long(kchara), 0)
 !
       call bcast_ctl_type_c1(psf_c%psf_file_head_ctl)
       call bcast_ctl_type_c1(psf_c%psf_output_type_ctl)

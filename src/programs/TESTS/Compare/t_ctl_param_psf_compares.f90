@@ -34,7 +34,7 @@
       subroutine set_control_for_psf_compare(psf_cmp_ctls, psf_cmp)
 !
       use t_ctl_data_psf_compare
-      use t_control_params_4_psf
+      use set_sections_file_ctl
 !
       type(psf_compare_control), intent(in) :: psf_cmp_ctls
       type(psf_compare_param), intent(inout):: psf_cmp

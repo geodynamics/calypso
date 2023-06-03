@@ -86,7 +86,7 @@
         type(ucd_data), allocatable :: psf_out(:)
       end type sectioning_module
 !
-      private :: alloc_psf_field_type
+!      private :: alloc_psf_field_type
 !
 !  ---------------------------------------------------------------------
 !
@@ -102,7 +102,7 @@
       use m_geometry_constants
 !
       use calypso_mpi
-      use set_psf_iso_control
+      use set_psf_control
       use search_ele_list_for_psf
       use set_const_4_sections
       use find_node_and_patch_psf
@@ -131,8 +131,8 @@
       if (iflag_debug.eq.1) write(*,*) 'alloc_psf_field_type'
       call alloc_psf_field_type(psf)
 !
-      if (iflag_debug.eq.1) write(*,*) 'set_psf_control'
-      call set_psf_control(psf%num_psf, geofem%group, nod_fld,          &
+      if (iflag_debug.eq.1) write(*,*) 's_set_psf_control'
+      call s_set_psf_control(psf%num_psf, geofem%group, nod_fld,        &
      &    psf_ctls, psf%psf_param, psf%psf_def,                         &
      &    psf%psf_mesh, psf%psf_file_IO)
 !
@@ -211,7 +211,7 @@
 !
       subroutine SECTIONING_finalize(psf)
 !
-      use set_psf_iso_control
+      use set_psf_control
       use set_fields_for_psf
       use find_node_and_patch_psf
 !

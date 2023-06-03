@@ -158,11 +158,11 @@
       call nod_fields_send_recv(geofem%mesh, nod_fld,                   &
      &                          m_SR%v_sol, m_SR%SR_sig, m_SR%SR_r)
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
+      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
       if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize zmean'
       call SECTIONING_visualize                                         &
      &   (viz_step%istep_psf, time_d, geofem, nod_fld, zm_psf)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
+      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
 !
       end subroutine SPH_MHD_zonal_mean_section
 !
@@ -199,11 +199,11 @@
       call nod_fields_send_recv(geofem%mesh, nod_fld,                   &
      &                          m_SR%v_sol, m_SR%SR_sig, m_SR%SR_r)
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
+      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
       if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize RMS'
       call SECTIONING_visualize                                         &
      &   (viz_step%istep_psf, time_d, geofem, nod_fld, zrms_psf)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
+      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
 !
       end subroutine SPH_MHD_zonal_RMS_section
 !

@@ -33,7 +33,7 @@
 !!        integer(kind = kint), intent(inout) :: level
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    array cross_section_ctl  1
+!!    array cross_section_ctl
 !!      file   cross_section_ctl   'ctl_psf_eq'
 !!    end array cross_section_ctl
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

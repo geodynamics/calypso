@@ -93,7 +93,7 @@
 !
       use m_geometry_constants
 !
-      use set_psf_iso_control
+      use set_iso_control
       use search_ele_list_for_psf
 !
       integer(kind = kint), intent(in) :: increment_iso
@@ -114,8 +114,8 @@
 !
       call alloc_iso_field_type(iso)
 !
-      if (iflag_debug.eq.1) write(*,*) 'set_iso_control'
-      call set_iso_control                                              &
+      if (iflag_debug.eq.1) write(*,*) 's_set_iso_control'
+      call s_set_iso_control                                            &
      &   (iso%num_iso, geofem%group, nod_fld, iso_ctls,                 &
      &    iso%iso_param, iso%iso_def, iso%iso_mesh, iso%iso_file_IO)
 !
@@ -199,7 +199,7 @@
 !
       subroutine ISOSURF_finalize(iso)
 !
-      use set_psf_iso_control
+      use set_psf_control
 !
       type(isosurface_module), intent(inout) :: iso
 !

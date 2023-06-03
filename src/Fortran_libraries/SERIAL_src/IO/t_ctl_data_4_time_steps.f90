@@ -29,17 +29,18 @@
 !!      start_rst_step_ctl    10
 !!      end_rst_step_ctl      20
 !!
-!!      delta_t_check_ctl        2.0e-5
-!!      delta_t_rst_ctl          1.0e-2
-!!      delta_t_sectioning_ctl   1.0e-3
-!!      delta_t_isosurface_ctl   1.0e-3
-!!      delta_t_pvr_ctl          1.0e-2
-!!      delta_t_fline_ctl        1.0e-1
-!!      delta_t_LIC_ctl          1.0e-1
-!!      delta_t_field_ctl        1.0e-3
-!!      delta_t_monitor_ctl      1.0e-4
-!!      delta_t_sgs_coefs_ctl    2.0e-5
-!!      delta_t_boundary_ctl     1.0e-4
+!!      delta_t_check_ctl            2.0e-5
+!!      delta_t_rst_ctl              1.0e-2
+!!      delta_t_sectioning_ctl       1.0e-3
+!!      delta_t_isosurface_ctl       1.0e-3
+!!      delta_t_map_projection_ctl   1.0e-3
+!!      delta_t_pvr_ctl              1.0e-2
+!!      delta_t_fline_ctl            1.0e-1    
+!!      delta_t_LIC_ctl              1.0e-1
+!!      delta_t_field_ctl            1.0e-3
+!!      delta_t_monitor_ctl          1.0e-4
+!!      delta_t_sgs_coefs_ctl        2.0e-5
+!!      delta_t_boundary_ctl         1.0e-4
 !!    end time_step_ctl
 !!
 !! ------------------------------------------------------------------
@@ -55,18 +56,19 @@
 !!      i_step_finish_ctl     2000
 !!      i_step_number_ctl     2000
 !!
-!!      i_step_check_ctl         40
-!!      i_step_rst_ctl          800
-!!      i_step_sectioning_ctl   400
-!!      i_step_isosurface_ctl   400
-!!      i_step_pvr_ctl          400
-!!      i_step_fline_ctl        400
-!!      i_step_LIC_ctl          400
-!!      i_step_snapshot_ctl     800
-!!      i_step_field_ctl        800
-!!      i_step_monitor_ctl       40
-!!      i_step_sgs_coefs_ctl   2000
-!!      i_step_boundary_ctl      40
+!!      i_step_check_ctl             40
+!!      i_step_rst_ctl              800
+!!      i_step_sectioning_ctl       400
+!!      i_step_isosurface_ctl       400
+!!      i_step_map_projection_ctl   400
+!!      i_step_pvr_ctl              400
+!!      i_step_fline_ctl            400
+!!      i_step_LIC_ctl              400
+!!      i_step_snapshot_ctl         800
+!!      i_step_field_ctl            800
+!!      i_step_monitor_ctl           40
+!!      i_step_sgs_coefs_ctl       2000
+!!      i_step_boundary_ctl          40
 !!
 !!      dt_ctl              5.0e-5
 !!      time_init_ctl       0.0e-8
@@ -107,6 +109,8 @@
 !>                Increment time for surface rendering data output
 !>@n@param      delta_t_iso_ctl
 !>                Increment time for isosurface rendering data output
+!>@n@param      delta_t_map_ctl
+!>                Increment time for map projection data output
 !>@n@param      delta_t_pvr_ctl
 !>                Increment time for volume rendering data output
 !>@n@param      delta_t_fline_ctl
@@ -134,6 +138,8 @@
 !>                Increment step for restart data output
 !>@n@param      i_step_sectioning_ctl
 !>                Increment step for surface rendering data output
+!>@n@param      i_step_map_projection_ctl
+!>                Increment step for map projection data output
 !>@n@param      i_step_pvr_ctl
 !>                Increment step for volume rendering data output
 !>@n@param      i_step_fline_ctl
@@ -182,6 +188,8 @@
         type(read_integer_item) :: i_step_pvr_ctl
 !>   Increment for sectioning
         type(read_integer_item) :: i_step_psf_ctl
+!>   Increment for map projection
+        type(read_integer_item) :: i_step_map_ctl
 !>   Increment for isosurface
         type(read_integer_item) :: i_step_iso_ctl
 !>   Increment for LIC rendering
@@ -235,6 +243,8 @@
         type(read_real_item) :: delta_t_psf_ctl
 !>   time interval for isosurface
         type(read_real_item) :: delta_t_iso_ctl
+!>   time interval for map projection
+        type(read_real_item) :: delta_t_map_ctl
 !>   time interval for volume rendering
         type(read_real_item) :: delta_t_pvr_ctl
 !>   time interval for field line
@@ -279,6 +289,7 @@
       tctl%delta_t_rst_ctl%iflag = 0
       tctl%delta_t_psf_ctl%iflag = 0
       tctl%delta_t_iso_ctl%iflag = 0
+      tctl%delta_t_map_ctl%iflag = 0
       tctl%delta_t_pvr_ctl%iflag = 0
       tctl%delta_t_fline_ctl%iflag = 0
       tctl%delta_t_lic_ctl%iflag = 0
@@ -297,6 +308,7 @@
 !
       tctl%i_step_psf_ctl%iflag = 0
       tctl%i_step_iso_ctl%iflag = 0
+      tctl%i_step_map_ctl%iflag = 0
       tctl%i_step_pvr_ctl%iflag = 0
       tctl%i_step_lic_ctl%iflag = 0
       tctl%i_step_fline_ctl%iflag = 0
