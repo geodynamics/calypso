@@ -7,17 +7,19 @@
 !>@brief Evaluate dynamo benchmark results
 !!
 !!@verbatim
-!!      subroutine dbench_leg_bwd_trans_rj                              &
-!!     &         (iflag_FFT, sph_rj, rj_fld, ipol, iphys_dbench,        &
-!!     &          circle, leg_circ, d_circle, WK_circle_fft)
-!!        integer(kind = kint), intent(in) :: iflag_FFT
+!!      subroutine const_dynamobench_data                               &
+!!     &         (time_d, sph_params, sph_rj, sph_MHD_bc, trans_p, ipol,&
+!!     &          rj_fld, pwr, cdat, bench)
+!!        type(time_data), intent(in) :: time_d
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
-!!        type(phys_data), intent(in) :: rj_fld
+!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(phys_address), intent(in) :: ipol
-!!        type(base_field_address), intent(in) :: iphys_dbench
-!!        type(circle_transform_spectr), intent(inout) :: leg_circ
-!!        type(phys_data), intent(inout) :: d_circle
-!!        type(working_FFTs), intent(inout) :: WK_circle_fft
+!!        type(phys_data), intent(in) :: rj_fld
+!!        type(sph_mean_squares), intent(in) :: pwr
+!!        type(circle_fld_maker), intent(inout) :: cdat
+!!        type(dynamobench_monitor), intent(inout) :: bench
 !!@endverbatim
 !
       module const_data_4_dynamobench

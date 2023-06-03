@@ -73,7 +73,6 @@
       call cal_drift_by_v44(time, sph_rj, rj_fld, ipol,                 &
      &    cdat%circle, bench%t_prev, bench%phase_vm4,                   &
      &    bench%phase_vm4_prev, bench%omega_vm4)
-      if(my_rank .gt. 0) return
 !
 !   find local point for dynamobench
 !
