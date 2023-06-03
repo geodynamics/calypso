@@ -144,7 +144,7 @@
       type(buffer_for_control) :: c_buf1
 !
 !
-      write(*,*) 'Section control file: ', trim(file_name)
+      write(*,'(a)') trim(file_name)
       open(id_control, file=file_name, status='old')
 !
       do
@@ -233,7 +233,7 @@
       integer(kind = kint) :: level
 !
 !
-      write(*,*) 'Write section control file: ', trim(file_name)
+      write(*,'(a)')  trim(file_name)
       level = 0
       open(id_control, file=file_name)
       call write_map_control_data(id_control, hd_block,                 &

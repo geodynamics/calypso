@@ -133,7 +133,7 @@
       if(ierr_gl .gt. 0) then
         write(e_message,*) ierr_gl,                                     &
      &      ' pickup mode files have wrong header. Check field defs.'
-        call calypso_mpi_barrier()
+        call calypso_mpi_barrier
         call calypso_MPI_abort(ierr_file, e_message)
       end if
 !

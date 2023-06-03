@@ -274,7 +274,6 @@
         end do
       end do
 !
-      call calypso_mpi_barrier
       call calypso_mpi_allreduce_one_int(icou, num_gl, MPI_SUM)
 !
       if(num_gl.gt.0 .and. my_rank .eq. 0) write(*,*)                    &

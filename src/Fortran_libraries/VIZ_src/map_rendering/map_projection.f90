@@ -53,7 +53,7 @@
       use set_const_4_sections
       use find_node_and_patch_psf
       use set_fields_for_psf
-      use collect_psf_data
+      use multi_map_projections
 !
       integer(kind = kint), intent(in) :: increment_psf
       type(mesh_data), intent(in) :: geofem
@@ -72,6 +72,7 @@
       if(increment_psf .le. 0) map%num_map = 0
       if(map%num_map .le. 0) return
 !
+      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+1)
       call init_psf_case_tables(map%psf_case_tbls)
 !
       if (iflag_debug.eq.1) write(*,*) 'alloc_map_rendering_module'
@@ -96,7 +97,6 @@
      &     (geofem%mesh%node, map%map_list(i_psf))
       end do
 !
-      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+1)
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_crossections'
       call set_const_4_crossections                                     &
      &   (map%num_map, map%map_def, geofem%mesh%node, map%map_list)
@@ -108,13 +108,12 @@
      &    map%map_grp_list, map%map_mesh, SR_sig, SR_il)
 !
       call alloc_psf_field_data(map%num_map, map%map_mesh)
-      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+1)
 !
       if (iflag_debug.eq.1) write(*,*) 'output_section_mesh'
-      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
-      call output_map_mesh(map%num_map, map%view_param, map%map_mesh,   &
-     &    map%map_psf_dat1, map%map_data, map%map_rgb, SR_sig)
-      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
+      call init_multi_map_projections                                   &
+     &   (map%num_map, map%view_param, map%map_mesh,                    &
+     &    map%map_psf_dat, map%map_data, map%map_rgb, SR_sig)
+      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+1)
 !
       end subroutine MAP_PROJECTION_initialize
 !
@@ -127,7 +126,7 @@
       use m_elapsed_labels_4_VIZ
       use set_fields_for_psf
       use set_ucd_data_to_type
-      use collect_psf_data
+      use multi_map_projections
 !
       integer(kind = kint), intent(in) :: istep_psf
       type(time_data), intent(in) :: time_d
@@ -148,9 +147,9 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'output_section_data'
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
-      call output_map_file(map%num_map, istep_psf, time_d,              &
+      call s_multi_map_projections(map%num_map, istep_psf, time_d,      &
      &    map%map_mesh, map%color_param, map%cbar_param,                &
-     &    map%map_psf_dat1, map%map_data, map%map_rgb, SR_sig)
+     &    map%map_psf_dat, map%map_data, map%map_rgb, SR_sig)
       if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
 !
       end subroutine MAP_PROJECTION_visualize

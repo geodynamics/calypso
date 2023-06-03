@@ -57,7 +57,7 @@
         type(psf_local_data), allocatable :: map_mesh(:)
 !
 !>        Structure of color bar parameter
-        type(psf_results), allocatable :: map_psf_dat1(:)
+        type(psf_results), allocatable :: map_psf_dat(:)
 !>        Structure of color bar parameter
         type(map_rendering_data), allocatable :: map_data(:)
 !>        Structure of color bar parameter
@@ -90,7 +90,7 @@
       allocate(map%cbar_param(map%num_map))
       allocate(map%map_data(map%num_map))
       allocate(map%map_rgb(map%num_map))
-      allocate(map%map_psf_dat1(map%num_map))
+      allocate(map%map_psf_dat(map%num_map))
 !
       do i_psf = 1, map%num_map
         call alloc_coefficients_4_psf(map%map_def(i_psf))

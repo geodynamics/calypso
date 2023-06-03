@@ -46,15 +46,12 @@
       integer(kind = kint) :: iflag
 !
 !
-      call calypso_mpi_barrier
       iflag = check_read_boundary_files(MHD_prop, MHD_BC)
       if (iflag .eq. id_no_boundary_file) return
 !
       if (iflag_debug.eq.1) write(*,*) 'read_boundary_spectr_file'
       if(my_rank .eq. 0) call read_boundary_spectr_file(bc_IO)
-      call calypso_mpi_barrier
       call bcast_boundary_spectr_file(bc_IO)
-      call calypso_mpi_barrier
 !
       end subroutine sph_boundary_IO_control
 !
