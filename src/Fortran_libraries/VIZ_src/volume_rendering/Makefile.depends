@@ -16,7 +16,7 @@ bcast_ctl_data_viz4.o: $(PVR_DIR)/bcast_ctl_data_viz4.f90 m_precision.o m_machin
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_pvr_color_ctl.o: $(PVR_DIR)/bcast_pvr_color_ctl.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_ctl_data_pvr_colormap.o calypso_mpi_int.o bcast_control_arrays.o t_ctl_data_pvr_light.o t_ctl_data_pvr_colorbar.o t_ctl_data_pvr_area.o
 	$(F90) -c $(F90OPTFLAGS) $<
-cal_pvr_modelview_mat.o: $(PVR_DIR)/cal_pvr_modelview_mat.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_params_4_pvr.o t_geometries_in_pvr_screen.o t_control_params_stereo_pvr.o t_surf_grp_4_pvr_domain.o cal_inverse_small_matrix.o cal_matrix_vector_smp.o transform_mat_operations.o mag_of_field_smp.o cal_products_smp.o
+cal_pvr_modelview_mat.o: $(PVR_DIR)/cal_pvr_modelview_mat.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_params_4_pvr.o t_geometries_in_pvr_screen.o t_control_params_stereo_pvr.o t_surf_grp_4_pvr_domain.o cal_inverse_small_matrix.o small_mat_mat_product.o transform_mat_operations.o mag_of_field_smp.o cal_products_smp.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_pvr_projection_mat.o: $(PVR_DIR)/cal_pvr_projection_mat.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_params_4_pvr.o t_control_params_stereo_pvr.o set_projection_matrix.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -100,7 +100,7 @@ set_control_pvr_movie.o: $(PVR_DIR)/set_control_pvr_movie.f90 m_precision.o m_co
 	$(F90) -c $(F90OPTFLAGS) $<
 set_default_pvr_params.o: $(PVR_DIR)/set_default_pvr_params.f90 m_precision.o m_constants.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_surf_grp_4_pvr_domain.o t_geometries_in_pvr_screen.o set_color_4_pvr.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_position_pvr_screen.o: $(PVR_DIR)/set_position_pvr_screen.f90 m_precision.o m_constants.o m_machine_parameter.o m_geometry_constants.o cal_matrix_vector_smp.o
+set_position_pvr_screen.o: $(PVR_DIR)/set_position_pvr_screen.f90 m_precision.o m_constants.o m_machine_parameter.o m_geometry_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_projection_matrix.o: $(PVR_DIR)/set_projection_matrix.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<

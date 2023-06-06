@@ -29,9 +29,6 @@
 !
       implicit none
 !
-      integer(kind = kint), parameter :: ione_stack(0:1) = (/0,1/)
-      private :: ione_stack
-!
       private :: cal_modelview_mat_by_views
       private :: update_rot_mat_from_viewpts
 !
@@ -47,7 +44,7 @@
 !
       use t_surf_grp_4_pvr_domain
       use cal_inverse_small_matrix
-      use cal_matrix_vector_smp
+      use small_mat_mat_product
 !
       integer(kind = kint), intent(in) :: i_stereo, i_rot
       type(pvr_domain_outline), intent(in) :: outline
@@ -70,8 +67,8 @@
 !
       call cal_inverse_44_matrix(modelview_mat,                         &
      &                           modelview_inv, ierr2)
-      call cal_mat44_vec3_on_node(ione, ione, ione_stack,               &
-     &    modelview_inv, posi_zero(1), vec_tmp(1))
+      call prod_mat44_vec3(modelview_inv, posi_zero(1),                 &
+     &                     vec_tmp(1))
       viewpoint_vec(1:3) = vec_tmp(1:3)
 !
 !      if(my_rank .eq. 0) then
@@ -105,7 +102,7 @@
 !
       use t_surf_grp_4_pvr_domain
       use transform_mat_operations
-      use cal_matrix_vector_smp
+      use small_mat_mat_product
 !
       integer(kind = kint), intent(in) :: i_stereo, i_rot
       type(pvr_domain_outline), intent(in) :: outline
@@ -148,8 +145,8 @@
       end if
 !
       if(view_param%iflag_viewpt_in_view .eq. 0) then
-        call cal_mat44_vec3_on_node(ione, ione, ione_stack,             &
-     &      rotation_mat, view_param%viewpoint, rev_eye)
+        call prod_mat44_vec3(rotation_mat, view_param%viewpoint,        &
+     &                       rev_eye)
       else
         rev_eye(1:3) = - view_param%viewpt_in_viewer_pvr(1:3)
       end if
@@ -206,52 +203,27 @@
       real(kind = kreal), intent(inout) :: rotation_mat(4,4)
 !
       integer(kind = kint) :: i
-      real(kind = kreal) :: viewing_dir(3), u(3), v(3), size(1)
+      real(kind = kreal) :: viewing_dir(3), u(3), v(3)
       real(kind = kreal) :: look_norm(3), view_norm(3), up_norm(3)
+      real(kind = kreal) :: v_tmp(3)
 !
 !
-      viewing_dir(1:3) = view_param%viewpoint(1:3)                      &
+      v_tmp(1:3) = view_param%viewpoint(1:3)                            &
      &                  - view_param%lookat_vec(1:3)
-!$omp parallel
-      call cal_vector_magnitude(ione, ione, ione_stack,                 &
-     &    viewing_dir(1), size(1) )
-!$omp end parallel
-      viewing_dir(1:3) = viewing_dir(1:3) / size(1)
+      call cal_normalized_vector(v_tmp, viewing_dir)
+      call cal_normalized_vector(view_param%lookat_vec, look_norm)
 !
-!$omp parallel
-      call cal_vector_magnitude(ione, ione, ione_stack,                 &
-     &    viewing_dir(1), size(1) )
-!$omp end parallel
-      look_norm(1:3) = view_param%lookat_vec(1:3) / size(1)
-!
-!$omp parallel
-      call cal_vector_magnitude(ione, ione, ione_stack,                 &
-     &    view_param%viewpoint, size(1) )
-!$omp end parallel
-      view_norm(1:3) = view_param%viewpoint(1:3) / size(1)
-!
-!$omp parallel
-      call cal_vector_magnitude(ione, ione, ione_stack,                 &
-     &    view_param%up_direction_vec(1), size(1) )
-!$omp end parallel
-      up_norm(1:3) = view_param%up_direction_vec(1:3) / size(1)
+      v_tmp(1:3) = view_param%viewpoint(1:3)
+      call cal_normalized_vector(v_tmp, view_norm)
+      call cal_normalized_vector(view_param%up_direction_vec, up_norm)
 !
 !    /* find the direction of axis U */
-      call cal_cross_prod_no_coef_smp                                   &
-     &   (ione, up_norm(1), viewing_dir(1), u(1))
-!$omp parallel
-      call cal_vector_magnitude(ione, ione, ione_stack,                 &
-     &    u(1), size(1) )
-!$omp end parallel
-      u(1:3) = u(1:3) / size(1)
+      call one_cross_product(up_norm, viewing_dir, v_tmp)
+      call cal_normalized_vector(v_tmp, u)
 !
 !    /*find the direction of axix V */
-      call cal_cross_prod_no_coef_smp(ione, viewing_dir(1), u(1), v(1))
-!$omp parallel
-      call cal_vector_magnitude(ione, ione, ione_stack,                 &
-     &    v(1), size(1) )
-!$omp end parallel
-      v(1:3) = v(1:3) / size(1)
+      call one_cross_product(viewing_dir, u, v_tmp)
+      call cal_normalized_vector(v_tmp, v)
 !
       do i = 1, 3
         rotation_mat(1,i) = u(i)
@@ -268,5 +240,38 @@
       end subroutine update_rot_mat_from_viewpts
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine cal_normalized_vector(d_fld, d_norm)
+!
+      real(kind=kreal), intent(in)    :: d_fld(3)
+      real(kind=kreal), intent(inout) :: d_norm(3)
+!
+      real(kind = kreal) :: d_mag
+!
+      d_mag = sqrt( d_fld(1)*d_fld(1) + d_fld(2)*d_fld(2)               &
+     &            + d_fld(3)*d_fld(3) )
+      if(d_mag .le. zero) then
+        d_norm(1:3) = zero
+      else
+        d_norm(1:3) = d_fld(1:3) / d_mag
+      end if
+!
+      end subroutine cal_normalized_vector
+!
+! -----------------------------------------------------------------------
+!
+      subroutine one_cross_product(vect1, vect2, prod)
+!
+      real (kind=kreal), intent(in) :: vect1(3), vect2(3)
+      real (kind=kreal), intent(inout) :: prod(3)
+!
+      prod(1) = (vect1(2)*vect2(3) - vect1(3)*vect2(2))
+      prod(2) = (vect1(3)*vect2(1) - vect1(1)*vect2(3))
+      prod(3) = (vect1(1)*vect2(2) - vect1(2)*vect2(1))
+!
+      end subroutine one_cross_product
+!
+! ----------------------------------------------------------------------
 !
       end module cal_pvr_modelview_mat

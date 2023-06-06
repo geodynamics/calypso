@@ -82,6 +82,8 @@ primefac.o: $(BASEDIR)/primefac.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 quicksort.o: $(BASEDIR)/quicksort.f90 m_precision.o m_constants.o isort_with_int.o i8sort_with_int.o dsort_with_int.o
 	$(F90) -c $(F90OPTFLAGS) $<
+small_mat_mat_product.o: $(BASEDIR)/small_mat_mat_product.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
 solver_33_array.o: $(BASEDIR)/solver_33_array.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_group_data.o: $(BASEDIR)/t_group_data.f90 m_precision.o

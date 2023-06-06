@@ -104,7 +104,7 @@
 !>    Defined flag for scale factor
         integer(kind = kint) :: iflag_scale_fact = 0
 !>    Scale factor
-        real(kind = kreal) :: scale_factor_pvr(3) = (/zero,zero,zero/)
+        real(kind = kreal) :: scale_factor_pvr(3) = (/one,one,one/)
 !
 !>    Defined flag for eye point in viewer coordinate
         integer(kind = kint) :: iflag_viewpt_in_view = 0

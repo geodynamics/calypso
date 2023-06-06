@@ -171,8 +171,6 @@
       subroutine project_once_each_element                              &
      &         (model_mat, project_mat, numnod, x4_projected)
 !
-      use cal_matrix_vector_smp
-!
       real(kind = kreal), intent(in) :: model_mat(4,4)
       real(kind = kreal), intent(in) :: project_mat(4,4)
 !
@@ -368,8 +366,6 @@
       subroutine overwte_position_pvr_screen(project_mat, numnod,       &
      &                                       x_nod_screen)
 !
-      use cal_matrix_vector_smp
-!
       real(kind = kreal), intent(in) :: project_mat(4,4)
 !
       integer(kind = kint), intent(in) :: numnod
@@ -411,8 +407,6 @@
 !
       subroutine overwte_pvr_domain_on_screen(model_mat, project_mat,   &
      &          num_pvr_surf, xx_pvr_domain)
-!
-      use cal_matrix_vector_smp
 !
       real(kind = kreal), intent(in) :: model_mat(4,4)
       real(kind = kreal), intent(in) :: project_mat(4,4)

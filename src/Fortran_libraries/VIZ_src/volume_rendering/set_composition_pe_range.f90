@@ -86,6 +86,7 @@
 !
       ist_img = istack_pvr_images(ist_pvr-1)
       num_img = istack_pvr_images(ied_pvr  ) - ist_img
+      if(num_img .le. 0) return
 !
       allocate(maxpe_composit_tmp(num_img))
       allocate(irank_image_tmp(num_img))
