@@ -441,29 +441,25 @@
 !
 !$omp parallel
       if(fe_trns_prod%i_velo_scale .gt. 0) then
-        call cal_len_scale_by_rot_smp                                   &
-     &      (np_smp, sph_rtp%nnod_rtp, sph_rtp%istack_inod_rtp_smp,     &
+        call cal_len_scale_by_rot_smp(sph_rtp%nnod_rtp,                 &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),                 &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_vort),                 &
      &      trns_f_eflux%fld_rtp(1,fe_trns_prod%i_velo_scale))
       end if
       if(fe_trns_prod%i_magne_scale .gt. 0) then
-        call cal_len_scale_by_rot_smp                                   &
-     &     (np_smp, sph_rtp%nnod_rtp, sph_rtp%istack_inod_rtp_smp,      &
+        call cal_len_scale_by_rot_smp(sph_rtp%nnod_rtp,                 &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_magne),                &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_current),              &
      &      trns_f_eflux%fld_rtp(1,fe_trns_prod%i_magne_scale))
       end if
       if(fe_trns_prod%i_temp_scale .gt. 0) then
-        call cal_len_scale_by_diffuse_smp                               &
-     &     (np_smp, sph_rtp%nnod_rtp, sph_rtp%istack_inod_rtp_smp,      &
+        call cal_len_scale_by_diffuse_smp(sph_rtp%nnod_rtp,             &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_temp),                 &
      &      trns_b_eflux%fld_rtp(1,bs_trns_dif%i_t_diffuse),            &
      &      trns_f_eflux%fld_rtp(1,fe_trns_prod%i_temp_scale))
       end if
       if(fe_trns_prod%i_comp_scale .gt. 0) then
-        call cal_len_scale_by_diffuse_smp                               &
-     &     (np_smp, sph_rtp%nnod_rtp, sph_rtp%istack_inod_rtp_smp,      &
+        call cal_len_scale_by_diffuse_smp(sph_rtp%nnod_rtp,             &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_light),                &
      &      trns_b_eflux%fld_rtp(1,bs_trns_dif%i_c_diffuse),            &
      &      trns_f_eflux%fld_rtp(1,fe_trns_prod%i_comp_scale))

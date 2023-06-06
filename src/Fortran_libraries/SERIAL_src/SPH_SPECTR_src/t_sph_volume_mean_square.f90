@@ -60,13 +60,17 @@
         character (len=kchara), pointer :: pwr_name(:)
 !
 !>        Radius for inner boundary
-        real(kind=kreal) :: r_inside
+        real(kind = kreal) :: r_inside
 !>        Radius for outer boundary
-        real(kind=kreal) :: r_outside
+        real(kind = kreal) :: r_outside
 !>        Radial address for inner boundary
-        integer (kind=kint) :: kr_inside
+        integer(kind = kint) :: kr_inside(2)
 !>        Radial address for outer boundary
-        integer (kind=kint) :: kr_outside
+        integer(kind = kint) :: kr_outside(2)
+!>        Radius for inner boundary
+        real(kind = kreal) :: c_inter_in
+!>        Radius for outer boundary
+        real(kind = kreal) :: c_inter_out
 !
 !>        Volume mean square spectrum for degree
         real(kind = kreal), allocatable :: v_l(:,:)

@@ -153,7 +153,7 @@
       sph_OUT%kr_inner = izero
       sph_OUT%kr_outer = izero
       sph_OUT%r_inner =  zero
-      sph_OUT%r_outer =  gauss%radius_gl(1)
+      sph_OUT%r_outer =  gauss%radius_gl(1,1)
 !
       ntot = gauss%istack_picked_spec_lc(nprocs)
       sph_OUT%nfield_sph_spec = ntot

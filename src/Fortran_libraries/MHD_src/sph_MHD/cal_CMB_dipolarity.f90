@@ -130,7 +130,7 @@
         end do
 !
         do knum = 1, pwr%nri_rms
-          if(pwr%kr_4_rms(knum) .eq. sph_params%nlayer_CMB) then
+          if(pwr%kr_4_rms(knum,1) .eq. sph_params%nlayer_CMB) then
             dip%krms_CMB = knum
             dip%rdip_CMB = sph_params%radius_CMB
           end if

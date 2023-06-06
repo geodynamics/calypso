@@ -9,24 +9,30 @@
 !!      Need $omp parallel to use these routines
 !!
 !!@verbatim
-!!      subroutine nodal_lscale_by_rot_smp(np_smp, nnod,                &
-!!     &          inod_smp_stack, ncomp_nod, i_fld, i_rot,              &
-!!     &          d_nod, d_len)
-!!      subroutine nodal_lscale_by_diffuse_smp(np_smp, nnod,            &
-!!     &          inod_smp_stack, ncomp_nod, i_fld, i_diffuse,          &
-!!     &          d_nod, d_len)
+!!      subroutine cal_vector_magnitude(nnod, d_fld, d_mag)
+!!        integer(kind = kint), intent(in) :: nnod
+!!        real(kind=kreal), intent(in)    :: d_fld(nnod,3)
+!!        real(kind=kreal), intent(inout) :: d_mag(nnod)
+!!      subroutine cal_sym_tensor_magnitude(nnod, d_fld, d_mag)
+!!         integer (kind = kint) :: nnod
+!!         real(kind=kreal), intent(in)    :: d_fld(nnod,6)
+!!         real(kind=kreal), intent(inout) :: d_mag(nnod)
+!!      subroutine cal_asym_tensor_magnitude(nnod, d_fld, d_mag)
+!!        integer (kind = kint) :: nnod
+!!        real(kind=kreal), intent(in)    :: d_fld(nnod,3)
+!!        real(kind=kreal), intent(inout) :: d_mag(nnod)
 !!
-!!      subroutine cal_vector_magnitude(np_smp, nnod, inod_smp_stack,   &
-!!     &          d_fld, d_mag)
-!!      subroutine cal_sym_tensor_magnitude(np_smp, nnod,               &
-!!     &          inod_smp_stack, d_fld, d_mag)
-!!      subroutine cal_asym_tensor_magnitude(np_smp, nnod,              &
-!!     &          inod_smp_stack, d_fld, d_mag)
-!!
-!!      subroutine cal_len_scale_by_rot_smp(np_smp, nnod,               &
-!!     &          inod_smp_stack, d_fld, d_rot, d_len)
-!!      subroutine cal_len_scale_by_diffuse_smp(np_smp, nnod,           &
-!!     &          inod_smp_stack, d_fld, d_diffuse, d_len)
+!!      subroutine cal_len_scale_by_rot_smp(nnod, d_fld, d_rot, d_len)
+!!        integer (kind = kint) :: nnod
+!!        real(kind=kreal), intent(in)    :: d_fld(nnod,3)
+!!        real(kind=kreal), intent(in)    :: d_rot(nnod,3)
+!!        real(kind=kreal), intent(inout) :: d_len(nnod)
+!!      subroutine cal_len_scale_by_diffuse_smp(nnod, d_fld, d_diffuse, &
+!!     &                                    d_len)
+!!        integer (kind = kint) :: nnod
+!!        real(kind=kreal), intent(in)    :: d_fld(nnod)
+!!        real(kind=kreal), intent(in)    :: d_diffuse(nnod)
+!!        real(kind=kreal), intent(inout) :: d_len(nnod)
 !!@endverbatim
 !!
 !!@n @param  np_smp   Number of SMP processes
@@ -52,67 +58,20 @@
       contains
 !
 ! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
 !
-      subroutine nodal_lscale_by_rot_smp(np_smp, nnod,                  &
-     &          inod_smp_stack, ncomp_nod, i_fld, i_rot,                &
-     &          d_nod, d_len)
+      subroutine cal_vector_magnitude(nnod, d_fld, d_mag)
 !
-      integer (kind = kint), intent(in) :: np_smp, nnod
-      integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-      integer(kind = kint), intent(in) :: ncomp_nod
-      integer(kind = kint), intent(in) :: i_fld, i_rot
-      real(kind=kreal), intent(in) :: d_nod(nnod,ncomp_nod)
-      real(kind=kreal), intent(inout) :: d_len(nnod)
-!
-      call cal_len_scale_by_rot_smp(np_smp, nnod, inod_smp_stack,       &
-     &    d_nod(1,i_fld), d_nod(1,i_rot), d_len)
-!
-      end subroutine nodal_lscale_by_rot_smp
-!
-!-----------------------------------------------------------------------
-!
-      subroutine nodal_lscale_by_diffuse_smp(np_smp, nnod,              &
-     &          inod_smp_stack, ncomp_nod, i_fld, i_diffuse,            &
-     &          d_nod, d_len)
-!
-      integer (kind = kint), intent(in) :: np_smp, nnod
-      integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-      integer(kind = kint), intent(in) :: ncomp_nod
-      integer(kind = kint), intent(in) :: i_fld, i_diffuse
-      real(kind=kreal), intent(in) :: d_nod(nnod,ncomp_nod)
-      real(kind=kreal), intent(inout) :: d_len(nnod)
-!
-!
-      call cal_len_scale_by_diffuse_smp(np_smp, nnod, inod_smp_stack,   &
-     &    d_nod(1,i_fld), d_nod(1,i_diffuse), d_len)
-!
-      end subroutine nodal_lscale_by_diffuse_smp
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine cal_vector_magnitude(np_smp, nnod, inod_smp_stack,     &
-     &          d_fld, d_mag)
-!
-       integer(kind = kint), intent(in) :: np_smp, nnod
-       integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
+       integer(kind = kint), intent(in) :: nnod
        real(kind=kreal), intent(in)    :: d_fld(nnod,3)
        real(kind=kreal), intent(inout) :: d_mag(nnod)
 !
-       integer (kind = kint) :: inod, ip, ist, ied
+       integer (kind = kint) :: inod
 !
-!$omp do private(ist,ied,inod)
-       do ip = 1, np_smp
-         ist = inod_smp_stack(ip-1) + 1
-         ied = inod_smp_stack(ip)
-         do inod = ist, ied
-!
-           d_mag(inod) = sqrt( d_fld(inod,1)*d_fld(inod,1)              &
-     &                       + d_fld(inod,2)*d_fld(inod,2)              &
-     &                       + d_fld(inod,3)*d_fld(inod,3) )
-!
-        end do
+!$omp do private(inod)
+       do inod = 1, nnod
+         d_mag(inod) = sqrt( d_fld(inod,1)*d_fld(inod,1)                &
+     &                     + d_fld(inod,2)*d_fld(inod,2)                &
+     &                     + d_fld(inod,3)*d_fld(inod,3) )
       end do
 !$omp end do nowait
 !
@@ -120,30 +79,22 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sym_tensor_magnitude(np_smp, nnod,                 &
-     &          inod_smp_stack, d_fld, d_mag)
+      subroutine cal_sym_tensor_magnitude(nnod, d_fld, d_mag)
 !
-       integer (kind = kint) :: np_smp, nnod
-       integer (kind = kint) :: inod_smp_stack(0:np_smp)
+       integer (kind = kint) :: nnod
        real(kind=kreal), intent(in)    :: d_fld(nnod,6)
        real(kind=kreal), intent(inout) :: d_mag(nnod)
 !
-       integer (kind = kint) :: inod, ip, ist, ied
+       integer (kind = kint) :: inod
 !
-!$omp do private(ist,ied,inod)
-       do ip = 1, np_smp
-         ist = inod_smp_stack(ip-1) + 1
-         ied = inod_smp_stack(ip)
-         do inod = ist, ied
-!
-           d_mag(inod) = sqrt(   d_fld(inod,1)*d_fld(inod,1)            &
-     &                     + two*d_fld(inod,2)*d_fld(inod,2)            &
-     &                     + two*d_fld(inod,3)*d_fld(inod,3)            &
-     &                     +     d_fld(inod,4)*d_fld(inod,4)            &
-     &                     + two*d_fld(inod,5)*d_fld(inod,5)            &
-     &                     +     d_fld(inod,6)*d_fld(inod,6) )
-!
-        end do
+!$omp do private(inod)
+      do inod = 1, nnod
+         d_mag(inod) = sqrt(   d_fld(inod,1)*d_fld(inod,1)              &
+     &                   + two*d_fld(inod,2)*d_fld(inod,2)              &
+     &                   + two*d_fld(inod,3)*d_fld(inod,3)              &
+     &                   +     d_fld(inod,4)*d_fld(inod,4)              &
+     &                   + two*d_fld(inod,5)*d_fld(inod,5)              &
+     &                   +     d_fld(inod,6)*d_fld(inod,6) )
       end do
 !$omp end do nowait
 !
@@ -151,27 +102,19 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_asym_tensor_magnitude(np_smp, nnod,                &
-     &          inod_smp_stack, d_fld, d_mag)
+      subroutine cal_asym_tensor_magnitude(nnod, d_fld, d_mag)
 !
-       integer (kind = kint) :: np_smp, nnod
-       integer (kind = kint) :: inod_smp_stack(0:np_smp)
+       integer (kind = kint) :: nnod
        real(kind=kreal), intent(in)    :: d_fld(nnod,3)
        real(kind=kreal), intent(inout) :: d_mag(nnod)
 !
-       integer (kind = kint) :: inod, ip, ist, ied
+       integer (kind = kint) :: inod
 !
-!$omp do private(ist,ied,inod)
-       do ip = 1, np_smp
-         ist = inod_smp_stack(ip-1) + 1
-         ied = inod_smp_stack(ip)
-         do inod = ist, ied
-!
-           d_mag(inod) = two*sqrt( d_fld(inod,1)*d_fld(inod,1)          &
-     &                           + d_fld(inod,2)*d_fld(inod,2)          &
-     &                           + d_fld(inod,3)*d_fld(inod,3) )
-!
-        end do
+!$omp do private(inod)
+      do inod = 1, nnod
+        d_mag(inod) = two*sqrt( d_fld(inod,1)*d_fld(inod,1)             &
+     &                        + d_fld(inod,2)*d_fld(inod,2)             &   
+     &                        + d_fld(inod,3)*d_fld(inod,3) )
       end do
 !$omp end do nowait
 !
@@ -180,35 +123,31 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_len_scale_by_rot_smp(np_smp, nnod,                 &
-     &          inod_smp_stack, d_fld, d_rot, d_len)
+      subroutine cal_len_scale_by_rot_smp(nnod, d_fld, d_rot, d_len)
 !
-      integer (kind = kint) :: np_smp, nnod
-      integer (kind = kint) :: inod_smp_stack(0:np_smp)
+      integer (kind = kint) :: nnod
       real(kind=kreal), intent(in)    :: d_fld(nnod,3)
       real(kind=kreal), intent(in)    :: d_rot(nnod,3)
       real(kind=kreal), intent(inout) :: d_len(nnod)
 !
-       integer (kind = kint) :: inod, ip, ist, ied
+       integer (kind = kint) :: inod
 !
 !
-!$omp do private(ip,ist,ied,inod)
-      do ip = 1, np_smp
-        ist = inod_smp_stack(ip-1) + 1
-        ied = inod_smp_stack(ip)
-        do inod = ist, ied
-           d_len(inod) = d_rot(inod,1)**2 + d_rot(inod,2)**2            &
-     &                 + d_rot(inod,3)**2
-        end do
-        do inod = ist, ied
-          if(d_len(inod) .eq. zero) then
-            d_len(inod) = zero
-          else
-            d_len(inod) =  (d_fld(inod,1)**2 + d_fld(inod,2)**2         &
-     &                    + d_fld(inod,3)**2) / d_len(inod)
-            d_len(inod) = sqrt(d_len(inod))
-          end if
-        end do
+!$omp do private(inod)
+      do inod = 1, nnod
+         d_len(inod) = d_rot(inod,1)**2 + d_rot(inod,2)**2              &
+     &               + d_rot(inod,3)**2
+      end do
+!$omp end do nowait
+!$omp do private(inod)
+      do inod = 1, nnod
+        if(d_len(inod) .eq. zero) then
+          d_len(inod) = zero
+        else
+          d_len(inod) =  (d_fld(inod,1)**2 + d_fld(inod,2)**2           &
+     &                  + d_fld(inod,3)**2) / d_len(inod)
+          d_len(inod) = sqrt(d_len(inod))
+        end if
       end do
 !$omp end do nowait
 !
@@ -216,30 +155,25 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine cal_len_scale_by_diffuse_smp(np_smp, nnod,             &
-     &          inod_smp_stack, d_fld, d_diffuse, d_len)
+      subroutine cal_len_scale_by_diffuse_smp(nnod, d_fld, d_diffuse,   &
+     &                                        d_len)
 !
-      integer (kind = kint) :: np_smp, nnod
-      integer (kind = kint) :: inod_smp_stack(0:np_smp)
+      integer (kind = kint) :: nnod
       real(kind=kreal), intent(in)    :: d_fld(nnod)
       real(kind=kreal), intent(in)    :: d_diffuse(nnod)
       real(kind=kreal), intent(inout) :: d_len(nnod)
 !
-      integer (kind = kint) :: inod, ip, ist, ied
+      integer (kind = kint) :: inod
 !
 !
-!$omp do private(ip,ist,ied,inod)
-      do ip = 1, np_smp
-        ist = inod_smp_stack(ip-1) + 1
-        ied = inod_smp_stack(ip)
-        do inod = ist, ied
-          if(d_fld(inod) .eq. zero) then
-            d_len(inod) = zero
-          else
-            d_len(inod) =  abs(d_fld(inod)  / d_diffuse(inod))
-            d_len(inod) = sqrt(d_len(inod))
-          end if
-        end do
+!$omp do private(inod)
+      do inod = 1, nnod
+        if(d_fld(inod) .eq. zero) then
+          d_len(inod) = zero
+        else
+          d_len(inod) =  abs(d_fld(inod)  / d_diffuse(inod))
+          d_len(inod) = sqrt(d_len(inod))
+        end if
       end do
 !$omp end do nowait
 !

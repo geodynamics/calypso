@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine const_picked_sph_address                             &
-!!     &         (l_truncation, sph_rj, pick_list, picked)
+!!     &         (iflag_center, l_truncation, sph_rj, pick_list, picked)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(pickup_mode_list), intent(inout) :: pick_list
 !!        type(picked_spectrum_data), intent(inout) :: picked

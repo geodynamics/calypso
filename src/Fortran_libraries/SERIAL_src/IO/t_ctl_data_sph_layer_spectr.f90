@@ -42,6 +42,10 @@
 !!      spectr_layer_ctl  62
 !!    end array spectr_layer_ctl
 !!
+!!    array spectr_radius_ctl
+!!      spectr_radius_ctl  1.0538
+!!    end array spectr_radius_ctl
+!!
 !!  end layered_spectrum_ctl
 !!
 !! -----------------------------------------------------------------
@@ -79,6 +83,10 @@
 !!@n        idx_spec_layer_ctl%num:   Number of grid
 !!@n        idx_spec_layer_ctl%ivec: list of radial ID of spectr data
          type(ctl_array_int) :: idx_spec_layer_ctl
+!>        Structure for list of radial grid of spectr energy data output
+!!@n        layer_radius_ctl%num:   Number of grid
+!!@n        layer_radius_ctl%ivec: list of radius of spectr data
+         type(ctl_array_real) :: layer_radius_ctl
 !
         integer (kind = kint) :: i_layer_spectr_ctl = 0
       end type layerd_spectr_control
@@ -92,7 +100,9 @@
      &           :: hd_layer_rms_fmt =  'layered_pwr_spectr_format'
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_spctr_layer = 'spectr_layer_ctl'
+     &           :: hd_spctr_layer =  'spectr_layer_ctl'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_spctr_radius = 'spectr_radius_ctl'
 !
       character(len=kchara), parameter, private                         &
      &           :: hd_degree_spectr_switch = 'degree_spectr_switch'
@@ -128,6 +138,8 @@
 !
         call read_control_array_i1(id_control,                          &
      &      hd_spctr_layer, lp_ctl%idx_spec_layer_ctl, c_buf)
+        call read_control_array_r1(id_control,                          &
+     &      hd_spctr_radius, lp_ctl%layer_radius_ctl, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_layer_rms_head,              &
      &      lp_ctl%layered_pwr_spectr_prefix)
@@ -166,6 +178,7 @@
       if(lp_ctl%i_layer_spectr_ctl .le. 0) return
 !
       maxlen = len_trim(hd_spctr_layer)
+      maxlen = max(maxlen, len_trim(hd_spctr_radius))
       maxlen = max(maxlen, len_trim(hd_layer_rms_head))
       maxlen = max(maxlen, len_trim(hd_layer_rms_fmt))
       maxlen = max(maxlen, len_trim(hd_degree_spectr_switch))
@@ -178,6 +191,8 @@
 !
       call write_control_array_i1(id_control, level,                    &
      &    hd_spctr_layer, lp_ctl%idx_spec_layer_ctl)
+      call write_control_array_r1(id_control, level,                    &
+     &    hd_spctr_radius, lp_ctl%layer_radius_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_layer_rms_head, lp_ctl%layered_pwr_spectr_prefix)
@@ -205,6 +220,7 @@
 !
 !
       call dealloc_control_array_int(lp_ctl%idx_spec_layer_ctl)
+      call dealloc_control_array_real(lp_ctl%layer_radius_ctl)
 !
       lp_ctl%layered_pwr_spectr_prefix%iflag = 0
       lp_ctl%layered_pwr_spectr_format%iflag = 0

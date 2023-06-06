@@ -7,14 +7,14 @@
 !>@brief  Take surface or volume average for mean square data
 !!
 !!@verbatim
-!!      subroutine cal_one_over_volume                                  &
-!!     &         (kg_st, kg_ed, nri, radius_1d_rj_r, avol)
+!!      subroutine cal_one_over_volume(r_inside, r_outside, avol)
+!!        real(kind = kreal), intent(in) :: r_inside, r_outside
+!!        real(kind = kreal), intent(inout) :: avol
 !!
-!!      subroutine surf_ave_4_sph_rms_int(l_truncation, nri,            &
-!!     &          a_r_1d_rj_r, nri_rms, ntot_rms_rj, kr_for_rms,        &
-!!     &          rms_sph_l)
-!!      subroutine surf_ave_4_sph_rms(nri, a_r_1d_rj_r,                 &
-!!     &          nri_rms, ntot_rms_rj, kr_for_rms, rms_sph)
+!!      subroutine surf_ave_4_sph_rms_int(l_truncation, nri_rms,        &
+!!     &          ar_for_rms, ntot_rms_rj, rms_sph_l)
+!!      subroutine surf_ave_4_sph_rms(nri_rms, ar_for_rms,              &
+!!     &                              ntot_rms_rj, rms_sph)
 !!
 !!      subroutine vol_ave_4_rms_sph_int(l_truncation, ntot_rms_rj,     &
 !!     &          avol, sq_sph_vol_l)
@@ -50,20 +50,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_one_over_volume                                    &
-     &         (kg_st, kg_ed, nri, radius_1d_rj_r, avol)
+      subroutine cal_one_over_volume(r_inside, r_outside, avol)
 !
-      integer(kind = kint), intent(in) :: nri
-      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
-      integer(kind = kint), intent(in) :: kg_st, kg_ed
+      real(kind = kreal), intent(in) :: r_inside, r_outside
       real(kind = kreal), intent(inout) :: avol
 !
 !
-      if(kg_st .eq. 0) then
-        avol = three / (radius_1d_rj_r(kg_ed)**3)
+      if(r_inside .eq. 0.0d0) then
+        avol = three / (r_outside**3)
       else
-        avol = three / (radius_1d_rj_r(kg_ed)**3                        &
-     &                - radius_1d_rj_r(kg_st)**3 )
+        avol = three / (r_inside**3 - r_outside**3 )
       end if
 !
       end subroutine cal_one_over_volume
@@ -71,30 +67,27 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine surf_ave_4_sph_rms_int(l_truncation, nri,              &
-     &          a_r_1d_rj_r, nri_rms, ntot_rms_rj, kr_for_rms,          &
-     &          rms_sph_l)
+      subroutine surf_ave_4_sph_rms_int(l_truncation, nri_rms,          &
+     &          ar_for_rms, ntot_rms_rj, rms_sph_l)
 !
-      integer(kind = kint), intent(in) :: nri, l_truncation
+      integer(kind = kint), intent(in) :: l_truncation
       integer(kind = kint), intent(in) :: nri_rms, ntot_rms_rj
-      integer(kind=kint), intent(in) :: kr_for_rms(nri_rms)
-      real(kind = kreal), intent(in) :: a_r_1d_rj_r(nri)
+      real(kind = kreal), intent(in) :: ar_for_rms(nri_rms)
 !
       real(kind = kreal), intent(inout)                                 &
      &           :: rms_sph_l(nri_rms,0:l_truncation,ntot_rms_rj)
 !
-      integer(kind = kint) :: lm, k, kg, icou
+      integer(kind = kint) :: lm, k, icou
 !
 !
       if(nri_rms .le. 0) return
 !
-!$omp parallel do private(k,kg,lm,icou)
+!$omp parallel do private(k,lm,icou)
       do icou = 1, ntot_rms_rj
         do k = 1, nri_rms
-          kg = kr_for_rms(k)
           do lm = 0, l_truncation
             rms_sph_l(k,lm,icou) =  rms_sph_l(k,lm,icou)                &
-     &                              * a_r_1d_rj_r(kg)**2
+     &                              * ar_for_rms(k)**2
           end do
         end do
       end do
@@ -104,27 +97,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine surf_ave_4_sph_rms(nri, a_r_1d_rj_r,                   &
-     &          nri_rms, ntot_rms_rj, kr_for_rms, rms_sph)
+      subroutine surf_ave_4_sph_rms(nri_rms, ar_for_rms,                &
+     &                              ntot_rms_rj, rms_sph)
 !
-      integer(kind = kint), intent(in) :: nri
-      real(kind = kreal), intent(in) :: a_r_1d_rj_r(nri)
       integer(kind = kint), intent(in) :: nri_rms, ntot_rms_rj
-      integer(kind=kint), intent(in) :: kr_for_rms(nri_rms)
+      real(kind = kreal), intent(in) :: ar_for_rms(nri_rms)
 !
       real(kind = kreal), intent(inout)                                 &
      &           :: rms_sph(nri_rms,ntot_rms_rj)
 !
-      integer(kind = kint) :: k, kg, icou
+      integer(kind = kint) :: k, icou
 !
 !
       if(nri_rms .le. 0) return
 !
-!$omp parallel do private(k,kg,icou)
+!$omp parallel do private(k,icou)
       do icou = 1, ntot_rms_rj
         do k = 1, nri_rms
-          kg = kr_for_rms(k)
-          rms_sph(k,icou) =    rms_sph(k,icou) * a_r_1d_rj_r(kg)**2
+          rms_sph(k,icou) = rms_sph(k,icou) * ar_for_rms(k)**2
         end do
       end do
 !$omp end parallel do

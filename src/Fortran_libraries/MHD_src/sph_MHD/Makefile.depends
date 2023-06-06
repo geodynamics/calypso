@@ -322,7 +322,7 @@ t_each_sph_boundary_IO_data.o: $(MHD_SPH_DIR)/t_each_sph_boundary_IO_data.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 t_field_4_dynamobench.o: $(MHD_SPH_DIR)/t_field_4_dynamobench.f90 m_precision.o m_constants.o t_time_data.o t_phys_address.o t_base_field_labels.o t_boundary_data_sph_MHD.o t_sph_trans_arrays_MHD.o t_phys_data.o m_base_field_labels.o m_phys_constants.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_field_on_circle.o: $(MHD_SPH_DIR)/t_field_on_circle.f90 m_precision.o m_constants.o m_machine_parameter.o t_phys_data.o t_phys_address.o t_circle_transform.o t_sph_circle_parameters.o t_FFT_selector.o t_ctl_data_circles.o calypso_mpi.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_work_4_sph_trans.o t_solver_SR.o
+t_field_on_circle.o: $(MHD_SPH_DIR)/t_field_on_circle.f90 m_precision.o m_constants.o m_machine_parameter.o t_phys_data.o t_phys_address.o t_circle_transform.o t_sph_circle_parameters.o t_FFT_selector.o t_ctl_data_circles.o calypso_mpi.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_work_4_sph_trans.o t_solver_SR.o t_spheric_rj_data.o set_radial_interpolation.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_flex_delta_t_data.o: $(MHD_SPH_DIR)/t_flex_delta_t_data.f90 m_precision.o m_constants.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<

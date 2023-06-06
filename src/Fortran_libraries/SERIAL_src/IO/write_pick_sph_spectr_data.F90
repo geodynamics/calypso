@@ -73,10 +73,10 @@
 !
       do knum = 1, picked%num_layer
         write(id_file) picked_each_mode_data_text                       &
-     &               (time_d%i_time_step, time_d%time,                  &
-     &                picked%radius_gl(knum), picked%id_radius(knum),   &
-     &                picked%idx_out(inum,1), picked%idx_out(inum,2),   &
-     &                picked%ntot_comp_rj, d_rj_out(1,knum))
+     &             (time_d%i_time_step, time_d%time,                    &
+     &              picked%radius_gl(knum,1), picked%id_radius(knum,1), &
+     &              picked%idx_out(inum,1), picked%idx_out(inum,2),     &
+     &              picked%ntot_comp_rj, d_rj_out(1,knum))
       end do
 !
       end subroutine sel_gz_write_picked_spec_data
@@ -123,8 +123,8 @@
 !
         line_len = len(picked_each_mode_data_text                       &
      &                           (time_d%i_time_step, time_d%time,      &
-     &                            picked%radius_gl(1),                  &
-     &                            picked%id_radius(1),                  &
+     &                            picked%radius_gl(1,1),                &
+     &                            picked%id_radius(1,1),                &
      &                            picked%idx_out(1,1),                  &
      &                            picked%idx_out(1,2),                  &
      &                            picked%ntot_comp_rj, d_rj_out(1,1)))
@@ -136,35 +136,35 @@
           knum = 1
           call gzip_defleat_char_once(line_len,                         &
      &        picked_each_mode_data_text                                &
-     &                 (time_d%i_time_step, time_d%time,                &
-     &                  picked%radius_gl(knum), picked%id_radius(knum), &
-     &                  picked%idx_out(inum,1), picked%idx_out(inum,2), &
-     &                  picked%ntot_comp_rj, d_rj_out(1,knum)),         &
+     &             (time_d%i_time_step, time_d%time,                    &
+     &              picked%radius_gl(knum,1), picked%id_radius(knum,1), &
+     &              picked%idx_out(inum,1), picked%idx_out(inum,2),     &
+     &              picked%ntot_comp_rj, d_rj_out(1,knum)),             &
      &        int(zbuf%ilen_gz), zbuf, zbuf%gzip_buf(1))
         else
           knum = 1
           call gzip_defleat_char_begin(line_len,                        &
      &        picked_each_mode_data_text                                &
-     &                 (time_d%i_time_step, time_d%time,                &
-     &                  picked%radius_gl(knum), picked%id_radius(knum), &
-     &                  picked%idx_out(inum,1), picked%idx_out(inum,2), &
-     &                  picked%ntot_comp_rj, d_rj_out(1,knum)),         &
+     &             (time_d%i_time_step, time_d%time,                    &
+     &              picked%radius_gl(knum,1), picked%id_radius(knum,1), &
+     &              picked%idx_out(inum,1), picked%idx_out(inum,2),     &
+     &              picked%ntot_comp_rj, d_rj_out(1,knum)),             &
      &        int(zbuf%ilen_gz), zbuf, zbuf%gzip_buf(1))
           do knum = 2, picked%num_layer - 1
             call gzip_defleat_char_cont(line_len,                       &
      &          picked_each_mode_data_text                              &
-     &                 (time_d%i_time_step, time_d%time,                &
-     &                  picked%radius_gl(knum), picked%id_radius(knum), &
-     &                  picked%idx_out(inum,1), picked%idx_out(inum,2), &
-     &                  picked%ntot_comp_rj, d_rj_out(1,knum)),         &
+     &             (time_d%i_time_step, time_d%time,                    &
+     &              picked%radius_gl(knum,1), picked%id_radius(knum,1), &
+     &              picked%idx_out(inum,1), picked%idx_out(inum,2),     &
+     &              picked%ntot_comp_rj, d_rj_out(1,knum)),             &
      &          zbuf)
           end do
           knum = picked%num_layer
           call gzip_defleat_char_last(line_len,                         &
      &        picked_each_mode_data_text                                &
      &                             (time_d%i_time_step, time_d%time,    &
-     &                              picked%radius_gl(knum),             &
-     &                              picked%id_radius(knum),             &
+     &                              picked%radius_gl(knum,1),           &
+     &                              picked%id_radius(knum,1),           &
      &                              picked%idx_out(inum,1),             &
      &                              picked%idx_out(inum,2),             &
      &                              picked%ntot_comp_rj,                &

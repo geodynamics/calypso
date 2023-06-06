@@ -2,7 +2,7 @@ bcast_4_field_ctl.o: $(COMMDIR)/bcast_4_field_ctl.f90 m_precision.o t_ctl_data_4
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_4_platform_ctl.o: $(COMMDIR)/bcast_4_platform_ctl.f90 m_precision.o calypso_mpi.o t_ctl_data_4_platforms.o bcast_control_arrays.o calypso_mpi_int.o t_ctl_data_4_FEM_mesh.o
 	$(F90) -c $(F90OPTFLAGS) $<
-bcast_4_sph_monitor_ctl.o: $(COMMDIR)/bcast_4_sph_monitor_ctl.f90 m_precision.o calypso_mpi.o t_ctl_data_4_sph_monitor.o t_ctl_data_sph_vol_spectr.o t_ctl_data_pick_sph_spectr.o bcast_control_arrays.o calypso_mpi_int.o t_ctl_data_gauss_coefs.o t_ctl_data_sph_layer_spectr.o t_ctl_data_sph_dipolarity.o t_ctl_data_circles.o t_ctl_data_mid_equator.o t_ctl_data_dynamobench.o
+bcast_4_sph_monitor_ctl.o: $(COMMDIR)/bcast_4_sph_monitor_ctl.f90 m_precision.o calypso_mpi.o t_ctl_data_4_sph_monitor.o t_ctl_data_sph_vol_spectr.o t_ctl_data_pick_sph_spectr.o calypso_mpi_int.o bcast_control_arrays.o t_ctl_data_gauss_coefs.o t_ctl_data_sph_layer_spectr.o t_ctl_data_sph_dipolarity.o t_ctl_data_circles.o t_ctl_data_mid_equator.o t_ctl_data_dynamobench.o
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_4_time_step_ctl.o: $(COMMDIR)/bcast_4_time_step_ctl.f90 m_precision.o calypso_mpi.o calypso_mpi_int.o t_ctl_data_4_time_steps.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<

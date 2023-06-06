@@ -7,14 +7,16 @@
 !>@brief  Evaluate radial integration
 !!
 !!@verbatim
-!!      subroutine radial_integration(kg_st, kg_ed, nri, radius,        &
-!!     &         , ntot_comp, f_org, f_int)
+!!      subroutine radial_integration                                   &
+!!     &         (kg_st, kg_ed, c_inter_st, c_inter_ed,                 &
+!!     &          nri, radius, ntot_comp, f_org, f_int)
 !!  Evaluate radial integration f_int =  \int f_org r^{2} dr
 !!
 !!      subroutine radial_int_matrix_by_simpson                         &
 !!     &         (nri, kg_st, kg_ed, radius, a_int, a_ctr)
 !!      subroutine radial_int_by_trapezoid                              &
-!!     &         (nri, kg_st, kg_ed, radius, a_ctr, a_int)
+!!     &         (kg_st, kg_ed, c_inter_st, c_inter_ed,                 &
+!!     &          nri, radius, f_org, f_ctr, f_int)
 !!
 !!      subroutine radial_int_matrix_by_trapezoid                       &
 !!     &         (nri, kg_st, kg_ed, radius, a_int, a_ctr)
@@ -39,10 +41,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine radial_integration(kg_st, kg_ed, nri, radius,          &
-     &          ntot_comp, f_org, f_int)
+      subroutine radial_integration                                     &
+     &         (kg_st, kg_ed, c_inter_st, c_inter_ed,                   &
+     &          nri, radius, ntot_comp, f_org, f_int)
 !
-      integer(kind = kint),  intent(in) :: nri, kg_st, kg_ed
+      integer(kind = kint),  intent(in) :: nri, kg_st(2), kg_ed(2)
+      real(kind = kreal), intent(in) :: c_inter_st, c_inter_ed
       real(kind = kreal), intent(in) :: radius(nri)
       integer(kind = kint),  intent(in) :: ntot_comp
       real(kind = kreal), intent(in) :: f_org(0:nri,ntot_comp)
@@ -55,14 +59,15 @@
 !      if( mod( (kg_ed-kg_st),2) .eq. 0) then
 !!$omp parallel do private(icomp)
 !        do icomp = 1, ntot_comp
-!          call radial_int_by_simpson(nri, kg_st, kg_ed, radius,        &
+!          call radial_int_by_simpson(nri, kg_st(1), kg_ed(1), radius,  &
 !     &          f_org(1,icomp), f_org(0,icomp), f_int(1,icomp) )
 !        end do
 !!$omp end parallel do
 !      else
 !$omp parallel do private(icomp)
         do icomp = 1, ntot_comp
-          call radial_int_by_trapezoid(nri, kg_st, kg_ed, radius,       &
+          call radial_int_by_trapezoid                                  &
+     &       (kg_st, kg_ed, c_inter_st, c_inter_ed, nri, radius,        &
      &        f_org(1,icomp), f_org(0,icomp), f_int(icomp) )
         end do
 !$omp end parallel do
@@ -73,33 +78,68 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine radial_int_by_trapezoid(nri, kg_st, kg_ed, radius,     &
-     &          f_org, f_ctr, f_int)
+      subroutine radial_int_by_trapezoid                                &
+     &         (kg_st, kg_ed, c_inter_st, c_inter_ed,                   &
+     &          nri, radius, f_org, f_ctr, f_int)
 !
-      integer(kind = kint),  intent(in) :: nri, kg_st, kg_ed
+      integer(kind = kint),  intent(in) :: nri, kg_st(2), kg_ed(2)
+      real(kind = kreal), intent(in) :: c_inter_st, c_inter_ed
       real(kind = kreal), intent(in) :: radius(nri)
       real(kind = kreal), intent(in) :: f_org(nri)
       real(kind = kreal), intent(in) :: f_ctr
 !
       real(kind = kreal), intent(inout) :: f_int
 !
-      integer(kind = kint) :: kr, kst
-      real(kind = kreal) :: dr1
+      integer(kind = kint) :: kr
+      real(kind = kreal) :: r_in, r_out, d_in, d_out
 !
 !
-      if(kg_st .eq. 0) then
-        kst = 1
-        dr1 = radius(1)
-        f_int = half * dr1 * (f_ctr + f_org(1))
+      if(kg_st(1) .eq. 0 .and. kg_st(1) .eq. kg_ed(1)) then
+        r_in =  (one - c_inter_st) * radius(1)
+        d_in =         c_inter_st *  f_ctr                              &
+     &        + (one - c_inter_st) * f_org(1)
+        r_out = (one - c_inter_ed)* radius(1)
+        d_out =        c_inter_st *  f_ctr                              &
+     &         + (one - c_inter_ed)* f_org(1)
+        f_int = f_int + half * (r_out-r_in) * (d_out + d_in)
+      else if(kg_st(1) .eq. kg_ed(1)) then
+        r_in =          c_inter_st * radius(kg_st(1))                   &
+     &         + (one - c_inter_st)* radius(kg_st(2))
+        d_in =          c_inter_st * f_org(kg_st(1))                    &
+     &         + (one - c_inter_st)* f_org(kg_st(2))
+        r_out =         c_inter_ed * radius(kg_ed(1))                   &
+     &         + (one - c_inter_ed)* radius(kg_ed(2))
+        d_out =         c_inter_ed * f_org(kg_ed(1))                    &
+     &         + (one - c_inter_ed)* f_org(kg_ed(2))
+        f_int = f_int + half * (r_out-r_in) * (d_out + d_in)
       else
-        kst = kg_st
-        f_int = zero
-      end if
+        if(kg_st(1) .eq. 0) then
+          r_in = (one - c_inter_st) * radius(1)
+          d_in =        c_inter_st *  f_ctr                             &
+     &         + (one - c_inter_st) * f_org(1)
+          f_int = half * (radius(1) - r_in) * (f_org(1) + d_in)
+        else
+          r_in =          c_inter_st * radius(kg_st(1))                 &
+     &           + (one - c_inter_st)* radius(kg_st(1)+1)
+          d_in =          c_inter_st * f_org(kg_st(1))                  &
+     &           + (one - c_inter_st)* f_org(kg_st(1))
+          f_int = half * (radius(kg_st(1)+1) - r_in)                    &
+     &                 * (f_org(kg_st(1)+1) + d_in)
+        end if
 !
-      do kr = kst, kg_ed-1
-        dr1 = radius(kr+1) - radius(kr)
-        f_int = f_int + half * dr1 * (f_org(kr) + f_org(kr+1))
-      end do
+        do kr = kg_st(1)+1, kg_ed(1)-1
+          f_int = f_int + half * (radius(kr+1) - radius(kr))            &
+     &                         * (f_org(kr) + f_org(kr+1))
+        end do
+!
+        if(c_inter_ed .eq. one) return
+        r_out =         c_inter_ed * radius(kg_ed(1))                   &
+     &         + (one - c_inter_ed)* radius(kg_ed(2))
+        d_out =         c_inter_ed * f_org(kg_ed(1))                    &
+     &         + (one - c_inter_ed)* f_org(kg_ed(2))
+        f_int = f_int + half * (r_out - radius(kg_ed(1)))               &
+     &                       * (f_org(kg_ed(1)) + d_out)
+      end if
 !
       end subroutine radial_int_by_trapezoid
 !

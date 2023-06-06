@@ -49,6 +49,7 @@
       type(sph_mean_squares), intent(inout) :: pwr
 !
       character(len = kchara) :: input_flag
+      integer(kind = kint) :: num_layer, i, ist
 !
 !
       if(no_flag(lp_ctl%degree_spectr_switch%charavalue))               &
@@ -77,19 +78,31 @@
       end if
 !
 !   set pickup layer
+      num_layer = 0
       if(pwr%iflag_layer_rms_spec .eq. 0) then
-        call alloc_num_spec_layer(izero, pwr)
+        num_layer = 0
       else if(lp_ctl%idx_spec_layer_ctl%num .eq. 1                      &
         .and. lp_ctl%idx_spec_layer_ctl%ivec(1) .lt. 0) then
         pwr%nri_rms = -1
-      else if(lp_ctl%idx_spec_layer_ctl%num .gt. 0) then
-        call alloc_num_spec_layer(lp_ctl%idx_spec_layer_ctl%num, pwr)
-!
-        pwr%kr_4_rms(1:pwr%nri_rms)                                     &
-     &         = lp_ctl%idx_spec_layer_ctl%ivec(1:pwr%nri_rms)
+        return
       else
-        pwr%nri_rms = -1
+        num_layer = lp_ctl%idx_spec_layer_ctl%num
       end if
+      if(lp_ctl%layer_radius_ctl%num .gt. 0) then
+        num_layer = num_layer + lp_ctl%layer_radius_ctl%num
+      end if
+!
+      call alloc_num_spec_layer(num_layer, pwr)
+!
+      do i = 1, lp_ctl%idx_spec_layer_ctl%num
+        pwr%kr_4_rms(i,1) = lp_ctl%idx_spec_layer_ctl%ivec(i)
+        pwr%r_4_rms(i,1) = -one
+      end do
+      ist = lp_ctl%idx_spec_layer_ctl%num
+      do i = 1, lp_ctl%layer_radius_ctl%num
+        pwr%kr_4_rms(i+ist,1) = 0
+        pwr%r_4_rms(i+ist,1) =  lp_ctl%layer_radius_ctl%vect(i)
+      end do
 !
       end subroutine set_ctl_params_layered_spectr
 !

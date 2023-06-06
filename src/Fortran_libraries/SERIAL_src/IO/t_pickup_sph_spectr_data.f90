@@ -62,9 +62,14 @@
 !>        Number of radial layer for monitoring spectrum
         integer(kind = kint) :: num_layer = 0
 !>        Radial ID for monitoring spectrum
-        integer(kind = kint), allocatable :: id_radius(:)
+        integer(kind = kint), allocatable :: id_radius(:,:)
 !>        Radius for monitoring spectrum
-        real(kind = kreal), allocatable :: radius_gl(:)
+!!                       radius_gl(:,1): radius
+!!                       radius_gl(:,2): 1 / r
+!!        Radius for monitoring spectrum
+        real(kind = kreal), allocatable :: radius_gl(:,:)
+!>        Coefs for radial interpolation
+        real(kind = kreal), allocatable :: coef_radius_gl(:)
 !
 !>        Number of modes of  monitoring spectrum to be evaluated
         integer(kind = kint) :: num_sph_mode =  0
@@ -159,11 +164,13 @@
       type(picked_spectrum_data), intent(inout) :: picked
 !
 !
-      allocate( picked%id_radius(picked%num_layer) )
-      allocate( picked%radius_gl(picked%num_layer) )
+      allocate( picked%id_radius(picked%num_layer,2) )
+      allocate( picked%radius_gl(picked%num_layer,2) )
+      allocate( picked%coef_radius_gl(picked%num_layer) )
       if(picked%num_layer .gt. 0) then
         picked%id_radius = 0
         picked%radius_gl = 0.0d0
+        picked%coef_radius_gl = 0.0d0
       end if
 !
       end subroutine alloc_num_pick_layer
@@ -275,7 +282,8 @@
       type(picked_spectrum_data), intent(inout) :: picked
 !
 !
-      deallocate( picked%id_radius, picked%radius_gl)
+      deallocate(picked%id_radius, picked%radius_gl)
+      deallocate(picked%coef_radius_gl)
 !
       end subroutine dealloc_num_pick_layer
 !
