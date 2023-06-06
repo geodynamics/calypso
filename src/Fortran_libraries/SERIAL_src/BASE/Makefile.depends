@@ -6,8 +6,6 @@ cal_add_smp.o: $(BASEDIR)/cal_add_smp.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_inverse_small_matrix.o: $(BASEDIR)/cal_inverse_small_matrix.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-cal_matrix_vector_smp.o: $(BASEDIR)/cal_matrix_vector_smp.f90 m_precision.o
-	$(F90) -c $(F90OPTFLAGS) $<
 cal_minmax_and_stacks.o: $(BASEDIR)/cal_minmax_and_stacks.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_num_digits.o: $(BASEDIR)/cal_num_digits.f90 m_precision.o m_constants.o

@@ -32,46 +32,32 @@
 !!!
 !!!     if pick_layer_ctl = 0 or negative:
 !!!           output all layer and volume average
-!!    array pick_layer_ctl  1
+!!    array pick_layer_ctl
 !!      pick_layer_ctl  62
 !!    end array pick_layer_ctl
 !!
-!!    array pick_sph_spectr_ctl  2
+!!    array pick_radius_ctl
+!!       pick_radius_ctl   0.5385
+!!       pick_radius_ctl   1.03846
+!!       pick_radius_ctl   1.5384
+!!    end array pick_layer_ctl
+!!
+!!
+!!    array pick_sph_spectr_ctl
 !!      pick_sph_spectr_ctl   2  -2
 !!      pick_sph_spectr_ctl   2   2
 !!    end array pick_sph_spectr_ctl
 !!
-!!    array pick_sph_degree_ctl  2
+!!    array pick_sph_degree_ctl
 !!      pick_sph_degree_ctl   2
 !!      pick_sph_degree_ctl   2
 !!    end array pick_sph_degree_ctl
 !!
-!!    array pick_sph_order_ctl  2
+!!    array pick_sph_order_ctl
 !!      pick_sph_order_ctl  -2
 !!      pick_sph_order_ctl   2
 !!    end array pick_sph_order_ctl
 !!  end pickup_spectr_ctl
-!!
-!!
-!!    begin gauss_coefficient_ctl
-!!      gauss_coefs_prefix           'sph_spectr/gauss_coefs'
-!!      gauss_coefs_radius_ctl    2.82
-!!
-!!      array pick_gauss_coefs_ctl  2
-!!        pick_gauss_coefs_ctl   2  -2
-!!        pick_gauss_coefs_ctl   2   2
-!!      end array pick_gauss_coefs_ctl
-!!
-!!      array pick_gauss_coef_degree_ctl  2
-!!        pick_gauss_coef_degree_ctl   2
-!!        pick_gauss_coef_degree_ctl   2
-!!      end array pick_gauss_coef_degree_ctl
-!!
-!!      array pick_gauss_coef_order_ctl  2
-!!        pick_gauss_coef_order_ctl   -2
-!!        pick_gauss_coef_order_ctl    2
-!!      end array pick_gauss_coef_order_ctl
-!!    end   gauss_coefficient_ctl
 !!
 !! -----------------------------------------------------------------
 !!@endverbatim
@@ -100,7 +86,12 @@
 !>        Structure for list of radial grid of spectr data output
 !!@n        idx_pick_layer_ctl%num:   Number of grid
 !!@n        idx_pick_layer_ctl%ivec: list of radial ID of spectr data
-        type(ctl_array_int) :: idx_pick_layer_ctl
+        type(ctl_array_int) ::  idx_pick_layer_ctl
+!>        Structure for list of radial grid of spectr data output
+!!@n        pick_radius_ctl%num:   Number of grid
+!!@n        pick_radius_ctl%ivec: list of radius of spectr data
+        type(ctl_array_real) :: pick_radius_ctl
+!
 !
 !>        Structure for list of mode of spectr data output
 !!@n        idx_pick_sph_ctl%num:   Number of mode
@@ -129,7 +120,9 @@
      &           :: hd_picked_mode_format = 'picked_sph_format'
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_pick_layer =  'pick_layer_ctl'
+     &           :: hd_pick_layer =   'pick_layer_ctl'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_pick_radius =  'pick_radius_ctl'
 !
       character(len=kchara), parameter, private                         &
      &            :: hd_pick_sph_lm =   'pick_sph_spectr_ctl'
@@ -153,6 +146,7 @@
       call dealloc_control_array_int(pspec_ctl%idx_pick_sph_m_ctl)
       call dealloc_control_array_int(pspec_ctl%idx_pick_sph_l_ctl)
       call dealloc_control_array_int(pspec_ctl%idx_pick_layer_ctl)
+      call dealloc_control_array_real(pspec_ctl%pick_radius_ctl)
 !
       pspec_ctl%picked_mode_head_ctl%iflag = 0
       pspec_ctl%picked_mode_fmt_ctl%iflag =  0
@@ -181,6 +175,8 @@
 !
         call read_control_array_i1(id_control,                          &
      &      hd_pick_layer, pspec_ctl%idx_pick_layer_ctl, c_buf)
+        call read_control_array_r1(id_control,                          &
+     &      hd_pick_radius, pspec_ctl%pick_radius_ctl, c_buf)
 !
         call read_control_array_i2(id_control,                          &
      &      hd_pick_sph_lm, pspec_ctl%idx_pick_sph_ctl, c_buf)
@@ -224,6 +220,8 @@
 !
       call write_control_array_i1(id_control, level,                    &
      &    hd_pick_layer, pspec_ctl%idx_pick_layer_ctl)
+      call write_control_array_r1(id_control, level,                    &
+     &    hd_pick_radius, pspec_ctl%pick_radius_ctl)
 !
       call write_control_array_i2(id_control, level,                    &
      &    hd_pick_sph_lm, pspec_ctl%idx_pick_sph_ctl)

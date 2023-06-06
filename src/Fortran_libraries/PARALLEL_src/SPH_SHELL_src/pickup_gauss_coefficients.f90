@@ -123,7 +123,7 @@
       real(kind = kreal) :: r_4_gauss_coefs, a2r_4_gauss
 !
 !
-      r_4_gauss_coefs = gauss_coef%radius_gl(1)
+      r_4_gauss_coefs = gauss_coef%radius_gl(1,1)
       r_ICB = sph_rj%radius_1d_rj_r(sph_params%nlayer_ICB)
       r_CMB = sph_rj%radius_1d_rj_r(sph_params%nlayer_CMB)
       if(r_4_gauss_coefs .ge. r_CMB) then

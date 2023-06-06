@@ -177,7 +177,7 @@
      &                           rms_sph, spectr_IO(1,1))
       call sel_gz_write_layer_mean_mtr                                  &
      &   (flag_gzip_lc, id_file_rms, time_d%i_time_step, time_d%time,   &
-     &    pwr%nri_rms, pwr%kr_4_rms, pwr%r_4_rms,                       &
+     &    pwr%nri_rms, pwr%kr_4_rms(1,1), pwr%r_4_rms(1,1),             &
      &    pwr%ntot_comp_sq, spectr_IO(1,1), zbuf_m)
       deallocate(spectr_IO)
       call dealloc_sph_espec_data(sph_OUT)
@@ -228,7 +228,7 @@
      &                             rms_sph_x, spectr_IO(1,0,1))
       call sel_gz_write_layer_spectr_mtr                                &
      &   (flag_gzip_lc, id_file_rms, time_d%i_time_step, time_d%time,   &
-     &    pwr%nri_rms, pwr%kr_4_rms, pwr%r_4_rms, ltr,                  &
+     &    pwr%nri_rms, pwr%kr_4_rms(1,1), pwr%r_4_rms(1,1), ltr,        &
      &    pwr%ntot_comp_sq, spectr_IO(1,0,1), zbuf_m)
       deallocate(spectr_IO)
       call dealloc_sph_espec_data(sph_OUT)

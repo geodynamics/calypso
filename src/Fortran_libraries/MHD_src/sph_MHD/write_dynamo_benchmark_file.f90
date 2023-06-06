@@ -236,8 +236,8 @@
       sph_OUT%nri_dat = 1
       sph_OUT%kr_ICB =  sph_params%nlayer_ICB
       sph_OUT%kr_CMB =  sph_params%nlayer_CMB
-      sph_OUT%kr_inner = v_pwr%kr_inside
-      sph_OUT%kr_outer = v_pwr%kr_outside
+      sph_OUT%kr_inner = v_pwr%kr_inside(1)
+      sph_OUT%kr_outer = v_pwr%kr_outside(1)
       sph_OUT%r_inner =  v_pwr%r_inside
       sph_OUT%r_outer =  v_pwr%r_outside
 !
@@ -277,8 +277,8 @@
       sph_OUT%nri_dat = 1
       sph_OUT%kr_ICB =  sph_params%nlayer_ICB
       sph_OUT%kr_CMB =  sph_params%nlayer_CMB
-      sph_OUT%kr_inner = v_pwr%kr_inside
-      sph_OUT%kr_outer = v_pwr%kr_outside
+      sph_OUT%kr_inner = v_pwr%kr_inside(1)
+      sph_OUT%kr_outer = v_pwr%kr_outside(1)
       sph_OUT%r_inner =  v_pwr%r_inside
       sph_OUT%r_outer =  v_pwr%r_outside
 !

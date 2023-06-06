@@ -41,7 +41,7 @@
 !!        pick_gauss_coef_degree_ctl   2
 !!      end array pick_gauss_coef_degree_ctl
 !!
-!!      array pick_gauss_coef_order_ctl  2
+!!      array pick_gauss_coef_order_ctl
 !!        pick_gauss_coef_order_ctl   -2
 !!        pick_gauss_coef_order_ctl    2
 !!      end array pick_gauss_coef_order_ctl

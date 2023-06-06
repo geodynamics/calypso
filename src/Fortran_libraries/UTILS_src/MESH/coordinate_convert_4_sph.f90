@@ -182,8 +182,7 @@
      &        node%rr, node%ss, node%a_r, node%a_s)
       else if(numdir .eq. 3) then
         call overwrite_sph_vect_2_xyz_smp                               &
-     &       (np_smp, node%numnod, node%istack_nod_smp,                 &
-     &        d_nod(1,i_fld), node%theta, node%phi)
+     &       (node%numnod, d_nod(1,i_fld), node%theta, node%phi)
       end if
 !
       end subroutine overwrite_nodal_sph_2_xyz_smp
@@ -210,8 +209,7 @@
      &        node%ss, node%a_s)
       else if(numdir .eq. 3) then
         call overwrite_cyl_vect_2_xyz_smp                               &
-     &       (np_smp, node%numnod, node%istack_nod_smp,                 &
-     &        d_nod(1,i_fld), node%phi)
+     &     (node%numnod, d_nod(1,i_fld), node%phi)
       end if
 !
       end subroutine overwrite_nodal_cyl_2_xyz_smp
@@ -240,8 +238,7 @@
      &        node%rr, node%ss, node%a_r, node%a_s)
       else if(numdir .eq. 3) then
         call overwrite_vector_2_sph_smp                                 &
-     &       (np_smp, node%numnod, node%istack_nod_smp,                 &
-     &        d_nod(1,i_fld), node%xx(1:node%numnod,1),                 &
+     &       (node%numnod, d_nod(1,i_fld), node%xx(1:node%numnod,1),    &
      &        node%xx(1:node%numnod,2), node%xx(1:node%numnod,3),       &
      &        node%rr, node%ss, node%a_r, node%a_s)
       end if
@@ -269,10 +266,9 @@
      &        d_nod(1,i_fld), node%xx(1:node%numnod,1),                 &
      &        node%xx(1:node%numnod,2), node%ss, node%a_s)
       else if(numdir .eq. 3) then
-        call overwrite_vector_2_cyl_smp                                 &
-     &       (np_smp, node%numnod, node%istack_nod_smp,                 &
-     &        d_nod(1,i_fld), node%xx(1:node%numnod,1),                 &
-     &        node%xx(1:node%numnod,2), node%ss, node%a_s)
+        call overwrite_vector_2_cyl_smp(node%numnod, d_nod(1,i_fld),    &
+     &      node%xx(1:node%numnod,1), node%xx(1:node%numnod,2),         &
+     &      node%ss, node%a_s)
       end if
 !
       end subroutine overwrite_nodal_xyz_2_cyl_smp

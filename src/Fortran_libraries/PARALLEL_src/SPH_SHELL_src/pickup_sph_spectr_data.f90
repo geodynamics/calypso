@@ -38,8 +38,6 @@
 !
       implicit  none
 !
-      private :: copy_rj_spectrum_4_monitor
-!
 ! -----------------------------------------------------------------------
 !
       contains
@@ -102,20 +100,37 @@
 ! -----------------------------------------------------------------------
 !
       subroutine pick_center_spectrum_monitor                           &
-     &         (rj_fld, picked, ntot_comp_rj, d_rj_out)
+     &         (rj_fld, picked, ntot_comp_monitor, d_rj_out)
 !
       type(phys_data), intent(in) :: rj_fld
       type(picked_spectrum_data), intent(in) :: picked
-      integer(kind = kint), intent(in) :: ntot_comp_rj
+      integer(kind = kint), intent(in) :: ntot_comp_monitor
 !
-      real(kind=kreal), intent(inout) :: d_rj_out(ntot_comp_rj)
+      real(kind=kreal), intent(inout) :: d_rj_out(ntot_comp_monitor)
+!
+      integer(kind = kint) :: inod, nd, i_fld, j_fld, icou, jcou, ncomp
 !
 !
-      call copy_rj_spectrum_4_monitor(picked%idx_out(0,4),              &
-     &    rj_fld%n_point, rj_fld%num_phys, rj_fld%ntot_phys,            &
-     &    rj_fld%istack_component, rj_fld%d_fld, picked%num_field_rj,   &
-     &    picked%istack_comp_rj, picked%ifield_monitor_rj,              &
-     &    ntot_comp_rj, half, d_rj_out)
+      inod = picked%idx_out(0,4)
+      if(inod .le. 0) return
+!$omp parallel do private(j_fld,i_fld,ncomp,icou,jcou,nd)
+      do j_fld = 1, picked%num_field_rj
+        i_fld = picked%ifield_monitor_rj(j_fld)
+        ncomp = rj_fld%istack_component(i_fld)                          &
+     &         - rj_fld%istack_component(i_fld-1)
+        icou = rj_fld%istack_component(i_fld-1)
+        jcou = picked%istack_comp_rj(j_fld-1)
+        if(ncomp .eq. 3) then
+            d_rj_out(jcou+1) = half * rj_fld%d_fld(inod,icou+1)
+            d_rj_out(jcou+2) = half * rj_fld%d_fld(inod,icou+3)
+            d_rj_out(jcou+3) = half * rj_fld%d_fld(inod,icou+2)
+        else
+          do nd = 1, ncomp
+            d_rj_out(jcou+nd) = rj_fld%d_fld(inod,icou+nd)
+          end do
+        end if
+      end do
+!$omp end parallel do
 !
       end subroutine pick_center_spectrum_monitor
 !
@@ -123,6 +138,8 @@
 !
       subroutine pick_single_sph_spec_4_monitor(inum, knum,             &
      &          sph_rj, rj_fld, picked, ntot_comp_rj, d_rj_out)
+!
+      use single_pt_sph_mean_square
 !
       integer(kind = kint), intent(in) :: inum, knum
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -132,72 +149,54 @@
 !
       real(kind=kreal), intent(inout) :: d_rj_out(ntot_comp_rj)
 !
-      integer(kind = kint) :: inod
-      real(kind = kreal) :: prod_4_zero
+!
+      integer(kind = kint) :: nd, i_fld, j_fld, icou, jcou, ncomp
+      integer(kind = kint) :: j, k_in, k_out, i_in, i_out
+      real(kind = kreal) :: prod_degree_zero
 !
 !
       if(picked%idx_out(inum,1) .eq. 0) then
-        prod_4_zero = 0.5d0
+        prod_degree_zero = 0.5d0
       else
-        prod_4_zero = 1.0d0
+        prod_degree_zero = 1.0d0
       end if
 !
-      inod = picked%idx_out(inum,4)                                     &
-     &      + (picked%id_radius(knum) - 1) * sph_rj%nidx_rj(2)
+      j =     picked%idx_out(inum,4)
+      k_in =  picked%id_radius(knum,1)
+      k_out = picked%id_radius(knum,2)
+      i_in =  1 + (k_in-1) * sph_rj%istep_rj(1)                         &
+     &          + (j-1) *    sph_rj%istep_rj(2)
+      i_out =  1 + (k_out-1) * sph_rj%istep_rj(1)                       &
+     &           + (j-1) *      sph_rj%istep_rj(2)
 !
-      call copy_rj_spectrum_4_monitor                                   &
-     &   (inod, rj_fld%n_point, rj_fld%num_phys, rj_fld%ntot_phys,      &
-     &    rj_fld%istack_component, rj_fld%d_fld, picked%num_field_rj,   &
-     &    picked%istack_comp_rj, picked%ifield_monitor_rj,              &
-     &    ntot_comp_rj, prod_4_zero, d_rj_out)
-!
-      end subroutine pick_single_sph_spec_4_monitor
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine copy_rj_spectrum_4_monitor(inod, n_point,              &
-     &         num_phys_rj, ntot_phys_rj, istack_phys_comp_rj, d_rj,    &
-     &         nfld_monitor, istack_comp_monitor, ifld_monitor,         &
-     &         ntot_comp_monitor, prod_degree_zero, d_rj_out)
-!
-      integer(kind = kint), intent(in) :: inod
-      integer(kind = kint), intent(in) :: n_point
-      integer(kind = kint), intent(in) :: num_phys_rj, ntot_phys_rj
-      integer(kind = kint), intent(in)                                  &
-     &                  :: istack_phys_comp_rj(0:num_phys_rj)
-      real(kind=kreal), intent(in) :: d_rj(n_point,ntot_phys_rj)
-!
-      integer(kind = kint), intent(in) :: nfld_monitor
-      integer(kind = kint), intent(in) :: ntot_comp_monitor
-      integer(kind = kint), intent(in) :: ifld_monitor(nfld_monitor)
-      integer(kind = kint), intent(in)                                  &
-     &                  :: istack_comp_monitor(0:nfld_monitor)
-      real(kind=kreal), intent(in) :: prod_degree_zero
-!
-      real(kind=kreal), intent(inout) :: d_rj_out(ntot_comp_monitor)
-!
-      integer(kind = kint) :: nd, i_fld, j_fld, icou, jcou, ncomp
-!
-!
-      do j_fld = 1, nfld_monitor
-        i_fld = ifld_monitor(j_fld)
-        ncomp = istack_phys_comp_rj(i_fld)                              &
-     &         - istack_phys_comp_rj(i_fld-1)
-        icou = istack_phys_comp_rj(i_fld-1)
-        jcou = istack_comp_monitor(j_fld-1)
+!$omp parallel do private(j_fld,i_fld,ncomp,icou,jcou,nd)
+      do j_fld = 1, picked%num_field_rj
+        i_fld = picked%ifield_monitor_rj(j_fld)
+        ncomp = rj_fld%istack_component(i_fld)                          &
+     &         - rj_fld%istack_component(i_fld-1)
+        icou = rj_fld%istack_component(i_fld-1)
+        jcou = picked%istack_comp_rj(j_fld-1)
         if(ncomp .eq. 3) then
-            d_rj_out(jcou+1) = prod_degree_zero * d_rj(inod,icou+1)
-            d_rj_out(jcou+2) = prod_degree_zero * d_rj(inod,icou+3)
-            d_rj_out(jcou+3) = prod_degree_zero * d_rj(inod,icou+2)
+          call interpolate_rj_vec_spec                                  &
+     &       (rj_fld%d_fld(i_in,icou+1),  rj_fld%d_fld(i_in,icou+2),    &
+     &        rj_fld%d_fld(i_in,icou+3),  rj_fld%d_fld(i_out,icou+1),   &
+     &        rj_fld%d_fld(i_out,icou+2), rj_fld%d_fld(i_out,icou+3),   &
+     &        picked%coef_radius_gl(knum), d_rj_out(jcou+1),            &
+     &        d_rj_out(jcou+3), d_rj_out(jcou+2))
+          d_rj_out(jcou+1:jcou+3)                                       &
+     &            = prod_degree_zero * d_rj_out(jcou+1:jcou+3)
         else
           do nd = 1, ncomp
-            d_rj_out(jcou+nd) = d_rj(inod,icou+nd)
+            d_rj_out(jcou+nd)                                           &
+     &        = interpolate_rj_scalar_spec(rj_fld%d_fld(i_in,icou+nd),  &
+     &                                     rj_fld%d_fld(i_out,icou+nd), &
+     &                                     picked%coef_radius_gl(knum))
           end do
         end if
       end do
+!$omp end parallel do
 !
-      end subroutine copy_rj_spectrum_4_monitor
+      end subroutine pick_single_sph_spec_4_monitor
 !
 ! -----------------------------------------------------------------------
 !

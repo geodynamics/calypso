@@ -47,7 +47,7 @@
       type(pickup_mode_list), intent(inout) :: pick_list
       type(picked_spectrum_data), intent(inout) :: picked_sph
 !
-      integer(kind = kint) :: inum
+      integer(kind = kint) :: inum, ist
       character(len = kchara) :: input_flag
 !
 !   Define spectr pick up
@@ -112,17 +112,32 @@
       end if
 !
 !
-!   set pickup layer
+!   set pickup layers
       picked_sph%num_layer = 0
       if(pspec_ctl%idx_pick_layer_ctl%num .gt. 0) then
         picked_sph%num_layer = pspec_ctl%idx_pick_layer_ctl%num
-        call alloc_num_pick_layer(picked_sph)
-!
-        do inum = 1, picked_sph%num_layer
-          picked_sph%id_radius(inum)                                    &
-     &          = pspec_ctl%idx_pick_layer_ctl%ivec(inum)
-        end do
       end if
+      if(pspec_ctl%pick_radius_ctl%num .gt. 0) then
+        picked_sph%num_layer = picked_sph%num_layer                     &
+     &                        + pspec_ctl%pick_radius_ctl%num
+      end if
+!
+      call alloc_num_pick_layer(picked_sph)
+!
+!   set pickup layer index
+      do inum = 1, pspec_ctl%idx_pick_layer_ctl%num
+        picked_sph%id_radius(inum,1:2)                                  &
+     &          = pspec_ctl%idx_pick_layer_ctl%ivec(inum)
+        picked_sph%radius_gl(inum,1:2) = - one
+      end do
+!
+!   set pickup layer radius
+      ist = pspec_ctl%idx_pick_layer_ctl%num
+      do inum = 1, pspec_ctl%pick_radius_ctl%num
+          picked_sph%id_radius(inum+ist,1:2) = 0
+          picked_sph%radius_gl(inum+ist,1)                              &
+     &          = pspec_ctl%pick_radius_ctl%vect(inum)
+      end do
 !
       end subroutine set_ctl_params_pick_sph
 !
@@ -166,12 +181,13 @@
 !
       gauss_coef%num_layer = 1
       call alloc_num_pick_layer(gauss_coef)
-      gauss_coef%radius_gl(1) = 2.82
+      gauss_coef%radius_gl(1,1) = 2.82
 !
       if(g_pwr%gauss_coefs_radius_ctl%iflag .gt. 0) then
-        gauss_coef%radius_gl(1)                                         &
+        gauss_coef%radius_gl(1,1)                                       &
      &        = g_pwr%gauss_coefs_radius_ctl%realvalue
       end if
+      gauss_coef%radius_gl(1,2) = one / gauss_coef%radius_gl(1,1)
 !
       gauss_list%num_modes = g_pwr%idx_gauss_ctl%num
       call alloc_pick_sph_mode(gauss_list)

@@ -160,9 +160,8 @@
 !
       call initialize_circle_transform(trans_p%iflag_FFT,               &
      &    cdat%circle, cdat%leg_circ, cdat%WK_circle_fft)
-      call set_circle_point_global                                      &
-     &   (sph%sph_rj%nidx_rj(1), sph%sph_rj%radius_1d_rj_r,             &
-     &    cdat%leg_circ, cdat%circle)
+      call set_circle_point_global(sph%sph_rj, cdat%leg_circ,           &
+     &                            cdat%circle)
 !
       call alloc_work_circle_transform(cdat%d_circle, cdat%leg_circ)
       call init_legendre_on_circle(sph, comms_sph, trans_p,             &
@@ -220,39 +219,26 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_circle_point_global                                &
-     &         (nri, radius_1d_rj_r, leg_circ, circle)
+      subroutine set_circle_point_global(sph_rj, leg_circ, circle)
 !
-      integer(kind = kint), intent(in) ::  nri
-      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
+      use t_spheric_rj_data
+      use set_radial_interpolation
+!
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(circle_transform_spectr), intent(in) :: leg_circ
 !
       type(circle_parameters), intent(inout) :: circle
 !
-      integer(kind = kint) :: kr
+      integer(kind = kint) :: kr_st
 !
 !
-      circle%kr_gl_rcirc_in =  izero
-      circle%kr_gl_rcirc_out = izero
-      do kr = 1, nri - 1
-        if(radius_1d_rj_r(kr) .eq. leg_circ%r_circle) then
-          circle%kr_gl_rcirc_in =  kr
-          circle%kr_gl_rcirc_out = kr
-          circle%coef_gl_rcirc_in =  one
-          circle%coef_gl_rcirc_out = zero
-          exit
-        end if
-        if(radius_1d_rj_r(kr) .lt. leg_circ%r_circle                    &
-     &      .and. radius_1d_rj_r(kr+1) .gt. leg_circ%r_circle) then
-          circle%kr_gl_rcirc_in =  kr
-          circle%kr_gl_rcirc_out = kr + 1
-          circle%coef_gl_rcirc_in                                       &
-     &                   = (radius_1d_rj_r(kr+1) - leg_circ%r_circle)   &
-     &                    / (radius_1d_rj_r(kr+1) - radius_1d_rj_r(kr))
-          circle%coef_gl_rcirc_out = one - circle%coef_gl_rcirc_in
-          exit
-        end if
-      end do
+      kr_st = 1
+      call s_set_radial_interpolation                                   &
+     &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                     &
+     &    leg_circ%r_circle, kr_st,                                     &
+     &    circle%kr_gl_rcirc_in, circle%kr_gl_rcirc_out,                &
+     &    circle%coef_gl_rcirc_in)
+      circle%coef_gl_rcirc_out = one - circle%coef_gl_rcirc_in
 !
       end subroutine set_circle_point_global
 !

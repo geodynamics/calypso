@@ -57,7 +57,7 @@
         type(pickup_mode_list) :: gauss_list
 !>        Structure for gauss coeffciients
 !!        Radius to evaluate Gauss coefficients (Default: 6400km/2200km)
-!!        gauss_coef%radius_gl(1) = 2.82
+!!        gauss_coef%radius_gl(1,1) = 2.82
         type(picked_spectrum_data) :: gauss_coef
 !
 !>        Structure for Nusselt number data

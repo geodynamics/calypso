@@ -176,29 +176,25 @@
       else if (ncomp_org .eq. 3) then
 !$omp parallel
         if (i_comp.eq.0) then
-          call cal_vector_magnitude(np_smp, nnod, istack_nod_smp,       &
-     &         d_nod(1,ist_field), c_ref_iso)
+          call cal_vector_magnitude(nnod, d_nod(1,ist_field),           &
+     &                              c_ref_iso)
 !
         else if (i_comp.ge.1 .and. i_comp.le.3) then
           ic = ist_field+i_comp-1
           call copy_nod_scalar_smp(nnod, d_nod(1,ic), c_ref_iso)
 !
         else if (i_comp.eq.11) then
-          call cal_radial_comp_smp(np_smp, nnod, istack_nod_smp,        &
-     &        d_nod(1,ist_field), c_ref_iso, xx(1,1), xx(1,2), xx(1,3), &
-     &        radius, a_r)
+          call cal_radial_comp_smp(nnod, d_nod(1,ist_field), c_ref_iso, &
+     &        xx(1,1), xx(1,2), xx(1,3), radius, a_r)
         else if (i_comp.eq.12) then
-          call cal_theta_comp_smp(np_smp, nnod, istack_nod_smp,         &
-     &        d_nod(1,ist_field), c_ref_iso,                            &
+          call cal_theta_comp_smp(nnod, d_nod(1,ist_field), c_ref_iso,  &
      &        xx(1,1), xx(1,2), xx(1,3), radius, s_radius, a_r, a_s)
         else if (i_comp.eq.13) then
-          call cal_phi_comp_smp(np_smp, nnod, istack_nod_smp,           &
-     &        d_nod(1,ist_field), c_ref_iso,                            &
-     &        xx(1,1), xx(1,2), s_radius, a_s)
+          call cal_phi_comp_smp(nnod, d_nod(1,ist_field), c_ref_iso,    &
+     &                          xx(1,1), xx(1,2), s_radius, a_s)
         else if (i_comp.eq.14) then
-          call cal_cylinder_r_comp_smp(np_smp, nnod, istack_nod_smp,    &
-     &        d_nod(1,ist_field), c_ref_iso,                            &
-     &        xx(1,1), xx(1,2), s_radius, a_s)
+          call cal_cylinder_r_comp_smp(nnod, d_nod(1,ist_field),        &
+     &        c_ref_iso, xx(1,1), xx(1,2), s_radius, a_s)
         end if
 !$omp end parallel
 !
@@ -206,8 +202,8 @@
         if (i_comp.eq.0) then
 !
 !$omp parallel
-          call cal_sym_tensor_magnitude(np_smp, nnod, istack_nod_smp,   &
-     &        d_nod(1,ist_field), c_ref_iso)
+          call cal_sym_tensor_magnitude(nnod, d_nod(1,ist_field),       &
+     &                                  c_ref_iso)
 !$omp end parallel
 !
         else if (i_comp.ge.1 .and. i_comp.le.6) then

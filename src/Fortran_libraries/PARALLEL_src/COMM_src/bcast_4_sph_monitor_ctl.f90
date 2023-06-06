@@ -20,7 +20,6 @@
       use t_ctl_data_4_sph_monitor
       use t_ctl_data_sph_vol_spectr
       use t_ctl_data_pick_sph_spectr
-      use bcast_control_arrays
 !
       implicit  none
 !
@@ -38,6 +37,7 @@
       subroutine bcast_sph_monitoring_ctl(smonitor_ctl)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
 !
       type(sph_monitor_control), intent(inout) :: smonitor_ctl
 !
@@ -87,11 +87,13 @@
       subroutine bcast_pickup_spectr_ctl(pspec_ctl)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
 !
       type(pick_spectr_control), intent(inout) :: pspec_ctl
 !
 !
       call bcast_ctl_array_i1(pspec_ctl%idx_pick_layer_ctl)
+      call bcast_ctl_array_r1(pspec_ctl%pick_radius_ctl)
 !
       call bcast_ctl_array_i2(pspec_ctl%idx_pick_sph_ctl)
       call bcast_ctl_array_i1(pspec_ctl%idx_pick_sph_l_ctl)
@@ -109,6 +111,7 @@
 !
       use t_ctl_data_gauss_coefs
       use calypso_mpi_int
+      use bcast_control_arrays
 !
       type(gauss_spectr_control), intent(inout) :: g_pwr
 !
@@ -130,6 +133,7 @@
       subroutine bcast_each_vol_spectr_ctl(num_vspec_ctl, v_pwr)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
       use t_ctl_data_sph_vol_spectr
 !
       integer(kind = kint), intent(in) :: num_vspec_ctl
@@ -154,12 +158,14 @@
       subroutine bcast_layerd_spectr_ctl(lp_ctl)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
       use t_ctl_data_sph_layer_spectr
 !
       type(layerd_spectr_control), intent(inout) :: lp_ctl
 !
 !
       call bcast_ctl_array_i1(lp_ctl%idx_spec_layer_ctl)
+      call bcast_ctl_array_r1(lp_ctl%layer_radius_ctl)
 !
       call bcast_ctl_type_c1(lp_ctl%layered_pwr_spectr_prefix)
       call bcast_ctl_type_c1(lp_ctl%layered_pwr_spectr_format)
@@ -177,6 +183,7 @@
       subroutine bcast_sph_dipolarity_ctl(fdip_ctl)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
       use t_ctl_data_sph_dipolarity
 !
       type(sph_dipolarity_control), intent(inout) :: fdip_ctl
@@ -195,6 +202,7 @@
       subroutine bcast_data_on_circles_ctl(circ_ctls)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
       use t_ctl_data_circles
 !
       type(data_on_circles_ctl), intent(inout) :: circ_ctls
@@ -215,6 +223,7 @@
       subroutine bcast_mid_eq_monitor_ctl(meq_ctl)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
       use t_ctl_data_mid_equator
 !
       type(mid_equator_control), intent(inout) :: meq_ctl
@@ -239,6 +248,7 @@
       subroutine bcast_ctl_data_dynamobench(dbench_ctl)
 !
       use calypso_mpi_int
+      use bcast_control_arrays
       use t_ctl_data_dynamobench
 !
       type(dynamobench_control), intent(inout) :: dbench_ctl

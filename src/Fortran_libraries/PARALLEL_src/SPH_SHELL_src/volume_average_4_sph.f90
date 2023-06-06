@@ -64,6 +64,7 @@
       do i = 1, pwr%num_vol_spectr
         call radial_integration                                         &
      &       (pwr%v_spectr(i)%kr_inside, pwr%v_spectr(i)%kr_outside,    &
+     &        pwr%v_spectr(i)%c_inter_in, pwr%v_spectr(i)%c_inter_out,  &
      &        sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                 &
      &        pwr%ntot_comp_sq, pwr%shl_ave, pwr%v_spectr(i)%v_ave)
         call averaging_4_sph_ave_int(pwr%ntot_comp_sq,                  &

@@ -142,7 +142,7 @@ begin MHD_control
 !   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
-      array nod_value_ctl   8
+      array nod_value_ctl
         nod_value_ctl  velocity            Viz_On   Monitor_On
         nod_value_ctl  temperature         Viz_On   Monitor_On
         nod_value_ctl  pressure            Viz_On   Monitor_Off
@@ -160,7 +160,7 @@ begin MHD_control
 !                    vector_potential, composition
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin time_evolution_ctl
-      array time_evo_ctl   3
+      array time_evo_ctl
         time_evo_ctl  temperature
         time_evo_ctl  velocity
         time_evo_ctl  vector_potential
@@ -173,7 +173,7 @@ begin MHD_control
 !!!!!  boundary condition for temperature  !!!!!!!!!!!!!!!!!!!!!!!!
 !  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      array bc_temperature   2
+      array bc_temperature
         bc_temperature  file ICB  1.000
         bc_temperature  file CMB  0.000
       end array
@@ -186,7 +186,7 @@ begin MHD_control
 !     free_slip_sph
 !     specitial (you have to define the B.C. in source file)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      array bc_velocity    7
+      array bc_velocity
         bc_velocity  fix_x  ICB   0.000
         bc_velocity  fix_y  ICB   0.000
         bc_velocity  fix_z  ICB   0.000
@@ -198,13 +198,13 @@ begin MHD_control
 !!!!!  boundary condition for pressure  !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      array bc_pressure  1
+      array bc_pressure
         bc_pressure  fixed Press  0.000
       end array bc_pressure
 !!!!!  boundary condition for dummy scalar  !!!!!!!!!!!!!!!!!!!!!!!
 !  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      array bc_composition  1
+      array bc_composition
         bc_composition fixed  Press  0.000
       end array bc_composition
 !!!!!  boundary condition for magnetic field  !!!!!!!!!!!!!!!!!!!!!
@@ -214,7 +214,7 @@ begin MHD_control
 !     insulator (not recommend)
 !     sph
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      array bc_magnetic_field   2
+      array bc_magnetic_field
         bc_magnetic_field  fix_x  equator     0.000
         bc_magnetic_field  fix_y  equator     0.000
 !        bc_magnetic_field  fix_x  infinity     0.000
@@ -224,7 +224,7 @@ begin MHD_control
 !!!!!  boundary condition for magnetic potential  !!!!!!!!!!!!!!!!!
 !  available type:  fixed, file, sph
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      Magnetic_potential   3
+      array Magnetic_potential
         bc_mag_potential fixed   Centre  0.000
         bc_mag_potential fixed  infinity  0.000
         bc_mag_potential fixed  equator   0.000
@@ -235,7 +235,7 @@ begin MHD_control
 !     file_x, file_y, file_z
 !     sph
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      array bc_vector_potential    6
+      array bc_vector_potential
         bc_vector_potential fix_x   infinity  0.000
         bc_vector_potential fix_y   infinity  0.000
         bc_vector_potential fix_z   infinity  0.000
@@ -262,7 +262,7 @@ begin MHD_control
 !     gravity, Coriolis, Lorentz
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin forces_define
-      array force_ctl      4
+      array force_ctl
         force_ctl   gravity
         force_ctl   Coriolis
         force_ctl   Lorentz
@@ -279,7 +279,7 @@ begin MHD_control
 !     Elsasser_number
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
-      array dimless_ctl 6
+      array dimless_ctl
         dimless_ctl  Prandtl_number                   1.0e-0
         dimless_ctl  modified_Rayleigh_number         1.0E+2
         dimless_ctl  Ekman_number                     1.0e-3
@@ -314,50 +314,50 @@ begin MHD_control
 !
     begin coefficients_ctl
       begin thermal
-        array coef_4_termal_ctl     1
+        array coef_4_termal_ctl
           coef_4_termal_ctl            One                        1.0
         end array coef_4_termal_ctl
 !
-        array coef_4_t_diffuse_ctl  1
+        array coef_4_t_diffuse_ctl
           coef_4_t_diffuse_ctl         Prandtl_number            -1.0
         end array coef_4_t_diffuse_ctl
 !
-        array coef_4_heat_source_ctl  1
+        array coef_4_heat_source_ctl
           coef_4_heat_source_ctl       One                        1.0
         end array coef_4_heat_source_ctl
       end  thermal
 !
 !
       begin momentum
-        array coef_4_velocity_ctl            1
+        array coef_4_velocity_ctl
           coef_4_velocity_ctl          One                        1.0
         end array coef_4_velocity_ctl
 !
-        array coef_4_press_ctl               1
+        array coef_4_press_ctl
           coef_4_press_ctl             Ekman_number              -1.0
         end array coef_4_press_ctl
 !
-        array coef_4_v_diffuse_ctl           1
+        array coef_4_v_diffuse_ctl
           coef_4_v_diffuse_ctl         One                        1.0
         end array coef_4_v_diffuse_ctl
 !
-        array coef_4_buoyancy_ctl            3
+        array coef_4_buoyancy_ctl
           coef_4_buoyancy_ctl          Radial_parameter           1.0
           coef_4_buoyancy_ctl          modified_Rayleigh_number   1.0
           coef_4_buoyancy_ctl          Ekman_number              -1.0
         end array coef_4_buoyancy_ctl
 !
-        array coef_4_Coriolis_ctl            2
+        array coef_4_Coriolis_ctl
           coef_4_Coriolis_ctl          Two                        1.0
           coef_4_Coriolis_ctl          Ekman_number              -1.0
         end array coef_4_Coriolis_ctl
 !
-        array coef_4_Lorentz_ctl             2
+        array coef_4_Lorentz_ctl
           coef_4_Lorentz_ctl           magnetic_Prandtl_number   -1.0
           coef_4_Lorentz_ctl           Ekman_number              -1.0
         end array coef_4_Lorentz_ctl
 !
-        array coef_4_composit_buoyancy_ctl   3
+        array coef_4_composit_buoyancy_ctl
           coef_4_composit_buoyancy_ctl  Radial_parameter           1.0
           coef_4_composit_buoyancy_ctl  Composite_Rayleigh_number  1.0
           coef_4_composit_buoyancy_ctl  Ekman_number              -1.0
@@ -365,29 +365,29 @@ begin MHD_control
       end  momentum
 !
       begin induction
-        array coef_4_magnetic_ctl   1
+        array coef_4_magnetic_ctl
           coef_4_magnetic_ctl          One                        1.0
         end array coef_4_magnetic_ctl
 !
-        array coef_4_m_diffuse_ctl  1
+        array coef_4_m_diffuse_ctl
           coef_4_m_diffuse_ctl         magnetic_Prandtl_number   -1.0
         end array coef_4_m_diffuse_ctl
 !
-        array coef_4_induction_ctl  1
+        array coef_4_induction_ctl
           coef_4_induction_ctl         One                       -1.0
         end array coef_4_induction_ctl
       end  induction
 !
       begin composition
-        array coef_4_composition_ctl     1
+        array coef_4_composition_ctl
           coef_4_composition_ctl       One                        1.0
         end array coef_4_composition_ctl
 !
-        array coef_4_c_diffuse_ctl  1
+        array coef_4_c_diffuse_ctl
           coef_4_c_diffuse_ctl         Composite_Prandtl_number  -1.0
         end array coef_4_c_diffuse_ctl
 !
-        array coef_4_light_source_ctl  1
+        array coef_4_light_source_ctl
           coef_4_light_source_ctl     One                         1.0
         end array coef_4_light_source_ctl
       end  composition
@@ -403,7 +403,7 @@ begin MHD_control
       gravity_type_ctl     radial
 !
 !!!!! direction of gravity (opposite direction to that of buoyancy)
-      array gravity_vec  3
+      array gravity_vec
         gravity_vec  x     0.000
         gravity_vec  y     0.000
         gravity_vec  z     -1.000
@@ -412,7 +412,7 @@ begin MHD_control
 !
 !!!!! direction of rotation vector for Coriolis force !!!!!!!!!!!!!
     begin Coriolis_define
-      array rotation_vec   3
+      array rotation_vec
         rotation_vec  x   0.000
         rotation_vec  y   0.000
         rotation_vec  z   1.000
@@ -453,7 +453,7 @@ begin MHD_control
 !    array ext_magne_vec:   0...off  more than 1...On
 !     ext_magne_vec: external field (constant)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      array ext_magne_vec   3
+      array ext_magne_vec
         ext_magne_vec  x     0.000   end
         ext_magne_vec  y     1.000   end
         ext_magne_vec  z     0.000   end
@@ -476,7 +476,7 @@ begin MHD_control
         commute_coef_rst_format  'merged_gz'
       end filter_files_def
 !
-      array sph_filter_ctl  1
+      array sph_filter_ctl
         begin sph_filter_ctl
           number_of_moments        3
           radial_filter_width     1.0
@@ -502,7 +502,7 @@ begin MHD_control
 !        end   sph_filter_ctl
       end array sph_filter_ctl
 !
-      array SGS_terms_ctl      5
+      array SGS_terms_ctl
         SGS_terms_ctl    heat              end
         SGS_terms_ctl    inertia           end
         SGS_terms_ctl    Lorentz           end
@@ -599,7 +599,7 @@ begin MHD_control
 !
 !!!!!   control for monitor nodal data
   begin monitor_data_ctl
-    array monitor_grp_ctl   1
+    array monitor_grp_ctl
       monitor_grp_ctl     mid_equator   end
     end array monitor_grp_ctl
   end monitor_data_ctl
@@ -615,15 +615,14 @@ begin MHD_control
   end shell_define_ctl
 !
   begin visual_control
-    array cross_section_ctl  4
+    array cross_section_ctl
       file  cross_section_ctl   ctl_psf_cmb
       file  cross_section_ctl   ctl_psf_z0 
       file  cross_section_ctl   ctl_psf_z0.3
       file  cross_section_ctl   ctl_psf_z1.0
     end array cross_section_ctl
-    array isosurface_ctl     0
 !
-    array  LIC_rendering  1
+    array  LIC_rendering
       file  LIC_rendering  'ctl_pvr_temp'
     end array LIC_rendering
 !
@@ -646,7 +645,7 @@ begin MHD_control
       diff_lm_spectr_switch        'On'
       axisymmetric_spectr_switch   'On'
 !
-      array spectr_layer_ctl  1
+      array spectr_layer_ctl
         spectr_layer_ctl  62
       end array spectr_layer_ctl
     end layered_spectrum_ctl
@@ -657,22 +656,22 @@ begin MHD_control
     begin pickup_spectr_ctl
       picked_sph_prefix            'sph_spectr/picked_mode'
 !
-      array pick_layer_ctl  1
+      array pick_layer_ctl
         pick_layer_ctl  62
       end array pick_layer_ctl
 !
 !
-      array pick_sph_spectr_ctl  2
+      array pick_sph_spectr_ctl
         pick_sph_spectr_ctl   2  -2
         pick_sph_spectr_ctl   2   2
       end array pick_sph_spectr_ctl
 !
-      array pick_sph_degree_ctl  2
+      array pick_sph_degree_ctl
         pick_sph_degree_ctl   2
         pick_sph_degree_ctl   2
       end array pick_sph_degree_ctl
 !
-      array pick_sph_order_ctl  2
+      array pick_sph_order_ctl
         pick_sph_order_ctl  -2
         pick_sph_order_ctl   2
       end array pick_sph_order_ctl
@@ -682,17 +681,17 @@ begin MHD_control
       gauss_coefs_prefix           'sph_spectr/gauss_coefs'
       gauss_coefs_radius_ctl    2.82
 !
-      array pick_gauss_coefs_ctl  2
+      array pick_gauss_coefs_ctl
         pick_gauss_coefs_ctl   2  -2
         pick_gauss_coefs_ctl   2   2
       end array pick_gauss_coefs_ctl
 !
-      array pick_gauss_coef_degree_ctl  2
+      array pick_gauss_coef_degree_ctl
         pick_gauss_coef_degree_ctl   1
         pick_gauss_coef_degree_ctl   2
       end array pick_gauss_coef_degree_ctl
 !
-      array pick_gauss_coef_order_ctl  2
+      array pick_gauss_coef_order_ctl
         pick_gauss_coef_order_ctl   -2
         pick_gauss_coef_order_ctl    2
       end array pick_gauss_coef_order_ctl
