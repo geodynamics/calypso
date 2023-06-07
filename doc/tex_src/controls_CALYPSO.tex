@@ -939,7 +939,27 @@ File format for Nusselt number data \verb|[nusselt_number_prefix].dat|. If \verb
 \label{href_t:volume_spectrum_ctl}
 Volume average of power spectrum and mean square data between any radius range are defined in this block.
 
-\paragraph{\tt inner\_radius\_ctl}
+\paragraph{\tt degree\_spectra\_switch}
+\label{href_t:degree_spectra_switch}
+\verb|[ON/OFF]| \\
+Switch to output the power spectrum data as a function of spherical harmonic degree $l$. Default value is {\tt ON}.
+
+\paragraph{\tt order\_spectra\_switch}
+\label{href_t:order_spectra_switch}
+\verb|[ON/OFF]| \\
+Switch to output the power spectrum data as a function of spherical harmonic order $m$. Default value is {\tt ON}.
+
+\paragraph{\tt diff\_lm\_spectra\_switch}
+\label{href_t:diff_lm_spectra_switch}
+\verb|[ON/OFF]| \\
+Switch to output the power spectrum data as a function of difference of spherical harmonic order from degree $l-m$. Default value is {\tt ON}.
+
+\paragraph{\tt axisymmetric\_power\_switch}
+\label{href_t:axisymmetric_power_switch}
+\verb|[ON/OFF]| \\
+Switch to output the mean square data for the axisymmetric component. Default value is {\tt ON}.
+
+\paragraph{\tt Inner\_radius\_ctl}
 \label{href_t:inner_radius_ctl}
 \verb|[radius]| \\
 Inner boundary of the volume average \verb|[radius]| is defined. The closest radial grid point is chosen as a inner boundary of averaging.
@@ -966,11 +986,14 @@ Spectrum as a function of degree {l} is written in \verb|[layer_pwr_prefix]_l.da
 \verb|[file_format]| \\
 File format for mean square spectrum data averaged over the fluid shell. If \verb|[file_format]| is \verb|gzip|, the mean square and spectrum data are compressed by zlib. Otherwise, data file is written by text format. If the mean square data file exist, this setting is ignored and append data in the existing file.
 
-
+\paragraph{\tt array spectr\_radius\_ctl}
+\label{href_t:spectr_radius_ctl}
+\verb|[Radius]|
+List of radii \verb|[Radius]| to output power spectrum data by real value.
 \paragraph{\tt array spectr\_layer\_ctl}
 \label{href_t:spectr_layer_ctl}
 \verb|[Layer #]|
-List of radial grid point number \verb|[Layer #]| to output power spectrum data by integer. If this array is not defined, layered mean square data are written for all radial grid points.
+List of radial grid point number \verb|[Layer #]| to output power spectrum data by integer. If this array nor array {\tt spectr\_radius\_ctl} is not defined, layered mean square data are written for all radial grid points.
 
 %
 \subsubsection{\tt gauss\_coefficient\_ctl}
@@ -1022,10 +1045,14 @@ File prefix for picked spectrum data files \verb|[picked_sph_prefix]| is defined
 \verb|[file_format]| \\
 File format for picked spectrum data files. If \verb|[file_format]| is \verb|gzip|, picked spectrum data files are compressed by zlib. Otherwise, data files are written by text format. If the picked spectrum data files exist, this setting is ignored and  data is appended in the existing file.
 
+\paragraph{\tt array pick\_radius\_ctl}
+\label{href_t:pick_radius_ctl}
+\verb|[Layer #]|
+List of radii \verb|[Radius]| to output picked spectrum data by integer.
 \paragraph{\tt array pick\_layer\_ctl}
 \label{href_t:pick_layer_ctl}
 \verb|[Layer #]|
-List of radial grid point number \verb|[Layer #]| to output picked spectrum data by integer. If this array is not defined, picked spectrum data are written for all radial grid points.
+List of radial grid point number \verb|[Layer #]| to output picked spectrum data by integer. If this array nor array {\tt array pick\_radius\_ctl} is not defined, picked spectrum data are written for all radial grid points.
 
 \paragraph{\tt array pick\_sph\_spectr\_ctl}
 \label{href_t:pick_sph_spectr_ctl}

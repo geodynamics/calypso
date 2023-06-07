@@ -105,15 +105,16 @@ Block \verb|MHD_control|  (Top block of the control file)
 			{\tt field\_file\_fmt\_ctl    [fld\_format]}
 	\end{itemize}
 %
-\item (File or Block \hyperref[href_i:spherical_shell_ctl]
-			{\tt spherical\_shell\_ctl        [resolution\_control]})
+\item File or Block \hyperref[href_i:spherical_shell_ctl]
+			{\tt spherical\_shell\_ctl        [resolution\_control]}  \\
+			 (See Section \ref{section:resolution_block})
 	\begin{itemize}
-	\item (Block \hyperref[href_i:FEM_mesh_ctl]
-        {\tt FEM\_mesh\_ctl} See Section \ref{section:resolution_block})
-	\item (Block \hyperref[href_i:num_domain_ctl]
-		{\tt num\_domain\_ctl} See Section \ref{section:resolution_block})
-	\item (Block \hyperref[href_i:num_grid_sph]
-		{\tt num\_grid\_sph} See Section \ref{section:resolution_block})
+	\item Block \hyperref[href_i:FEM_mesh_ctl]
+        {\tt FEM\_mesh\_ctl} (See Section \ref{section:resolution_block})
+	\item Block \hyperref[href_i:num_domain_ctl]
+		{\tt num\_domain\_ctl} (See Section \ref{section:resolution_block})
+	\item Block \hyperref[href_i:num_grid_sph]
+		{\tt num\_grid\_sph} (See Section \ref{section:resolution_block})
 	\end{itemize}
 %
 \item Block \verb|model|
@@ -304,6 +305,15 @@ Block \verb|MHD_control|  (Top block of the control file)
         	\item \hyperref[href_t:volume_pwr_spectr_format]
 		    	{\tt volume\_pwr\_spectr\_format    [file\_format]}
 %
+			\item \hyperref[href_t:degree_spectra_switch]
+				{\tt degree\_spectra\_switch           [ON/OFF]}
+			\item \hyperref[href_t:order_spectra_switch]
+				{\tt order\_spectra\_switch           [ON/OFF]}
+			\item \hyperref[href_t:diff_lm_spectra_switch]
+				{\tt diff\_lm\_spectra\_switch           [ON/OFF]}
+			\item \hyperref[href_t:axisymmetric_power_switch]
+				{\tt axisymmetric\_power\_switch           [ON/OFF]}
+%
 			\item \hyperref[href_t:inner_radius_ctl]
 				{\tt inner\_radius\_ctl           [radius]}
 			\item \hyperref[href_t:outer_radius_ctl]
@@ -315,8 +325,20 @@ Block \verb|MHD_control|  (Top block of the control file)
 		\begin{itemize}
 		\item \hyperref[href_t:layered_pwr_spectr_prefix]
 				{\tt layered\_pwr\_spectr\_prefix         [layer\_pwr\_prefix]}
-       	\item \hyperref[href_t:layered_pwr_spectr_format]
+	       	\item \hyperref[href_t:layered_pwr_spectr_format]
 		    	{\tt volume\_pwr\_spectr\_format    [file\_format]}
+%
+		\item \hyperref[href_t:degree_spectra_switch]
+			{\tt degree\_spectra\_switch           [ON/OFF]}
+		\item \hyperref[href_t:order_spectra_switch]
+			{\tt order\_spectra\_switch           [ON/OFF]}
+		\item \hyperref[href_t:diff_lm_spectra_switch]
+			{\tt diff\_lm\_spectra\_switch           [ON/OFF]}
+		\item \hyperref[href_t:axisymmetric_power_switch]
+			{\tt axisymmetric\_power\_switch           [ON/OFF]}
+%
+		\item Array \hyperref[href_t:spectr_radius_ctl]
+				{\tt spectr\_radius\_ctl [Radius] }
 		\item Array \hyperref[href_t:spectr_layer_ctl]
 				{\tt spectr\_layer\_ctl [Layer \#] }
 		\end{itemize}
@@ -343,6 +365,8 @@ Block \verb|MHD_control|  (Top block of the control file)
 			{\tt picked\_sph\_prefix                    [picked\_sph\_prefix]|}
        	\item \hyperref[href_t:picked_sph_format]
 		    	{\tt picked\_sph\_format     [file\_format]}
+		\item Array \hyperref[href_t:pick_radius_ctl]
+					{\tt pick\_radius\_ctl             [Radius]}
 		\item Array \hyperref[href_t:pick_layer_ctl]
 					{\tt pick\_layer\_ctl               [Layer \#]}
 		\item Array \hyperref[href_t:pick_sph_spectr_ctl]
