@@ -72,10 +72,7 @@
 !
 !
       if(fs_trns_eflux%i_buo_gen .gt. 0) then
-        if    (ref_param_T%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp        &
-     &    .or. ref_param_T%iflag_reference .eq. id_numerical_solution   &
-     &   ) then
+        if(ref_param_T%flag_ref_field) then
           call sel_buoyancy_flux_rtp(sph_rtp, fl_prop%coef_buo,         &
      &        trns_b_scl%fld_rtp(1,bs_trns_scalar%i_per_temp),          &
      &        trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),               &
@@ -89,10 +86,7 @@
       end if
 !
       if(fs_trns_eflux%i_c_buo_gen .gt. 0) then
-        if    (ref_param_C%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp        &
-     &    .or. ref_param_C%iflag_reference .eq. id_numerical_solution   &
-     &   ) then
+        if(ref_param_C%flag_ref_field) then
           call sel_buoyancy_flux_rtp(sph_rtp, fl_prop%coef_comp_buo,    &
      &        trns_b_scl%fld_rtp(1,bs_trns_scalar%i_per_light),         &
      &        trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),               &
@@ -129,10 +123,7 @@
 !
 !$omp parallel
       if(fs_trns_eflux%i_buo_gen .gt. 0) then
-        if    (ref_param_T%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp        &
-     &    .or. ref_param_T%iflag_reference .eq. id_numerical_solution   &
-     &   ) then
+        if(ref_param_T%flag_ref_field) then
           call pole_sph_buoyancy_flux                                   &
      &       (sph_rtp%nnod_pole, sph_rtp%nidx_rtp(1),                   &
      &        sph_rtp%radius_1d_rtp_r, fl_prop%coef_buo,                &
@@ -150,10 +141,7 @@
       end if
 !
       if(fs_trns_eflux%i_c_buo_gen .gt. 0) then
-        if    (ref_param_C%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp        &
-     &    .or. ref_param_C%iflag_reference .eq. id_numerical_solution   &
-     &   ) then
+        if(ref_param_C%flag_ref_field) then
           call pole_sph_buoyancy_flux                                   &
      &       (sph_rtp%nnod_pole, sph_rtp%nidx_rtp(1),                   &
      &        sph_rtp%radius_1d_rtp_r, fl_prop%coef_comp_buo,           &

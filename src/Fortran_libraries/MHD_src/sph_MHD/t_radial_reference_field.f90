@@ -245,12 +245,6 @@
      &      ione, .TRUE., .FALSE., izero, ref_field)
       end if
 !
-      if(ipol_base%i_ref_density .gt. 0) then
-        iref_base%i_ref_density = ref_field%ntot_phys + 1
-        call append_field_name_list(reference_density%name,             &
-     &      ione, .TRUE., .FALSE., izero, ref_field)
-      end if
-!
       if(ipol_base%i_temp .gt. 0) then
         iref_base%i_temp = ref_field%ntot_phys + 1
         call append_field_name_list(temperature%name,                   &
@@ -309,9 +303,9 @@
      &    iref_base%i_light_source, ipol_base%i_light_source,           &
      &    ref_field, rj_fld)
 !
-      call overwrite_each_field_by_ref(sph_rj,                          &
-     &    iref_base%i_ref_density, ipol_base%i_ref_density,             &
-     &    ref_field, rj_fld)
+!      call overwrite_dipole_by_ref(sph_rj,                             &
+!     &    iref_base%i_back_B, ipol_base%i_back_B,                      &
+!     &    ref_field, rj_fld)
 !
       end subroutine overwrite_sources_by_reference
 !

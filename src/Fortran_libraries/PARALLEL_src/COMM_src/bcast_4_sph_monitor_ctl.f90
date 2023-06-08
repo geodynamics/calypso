@@ -47,7 +47,12 @@
       call bcast_ctl_type_c1(smonitor_ctl%volume_average_prefix)
       call bcast_ctl_type_c1(smonitor_ctl%volume_pwr_spectr_prefix)
       call bcast_ctl_type_c1(smonitor_ctl%volume_pwr_spectr_format)
-
+!
+      call bcast_ctl_type_c1(smonitor_ctl%degree_v_spectra_switch)
+      call bcast_ctl_type_c1(smonitor_ctl%order_v_spectra_switch)
+      call bcast_ctl_type_c1(smonitor_ctl%diff_v_lm_spectra_switch)
+      call bcast_ctl_type_c1(smonitor_ctl%axis_v_power_switch)
+!
       call bcast_ctl_type_c1(smonitor_ctl%heat_Nusselt_file_prefix)
       call bcast_ctl_type_c1(smonitor_ctl%heat_Nusselt_file_format)
       call bcast_ctl_type_c1(smonitor_ctl%comp_Nusselt_file_prefix)
@@ -146,6 +151,12 @@
         call bcast_ctl_type_c1(v_pwr(i)%volume_spec_file_ctl)
         call bcast_ctl_type_c1(v_pwr(i)%volume_ave_file_ctl)
         call bcast_ctl_type_c1(v_pwr(i)%volume_spec_format_ctl)
+!
+        call bcast_ctl_type_c1(v_pwr(i)%degree_v_spectra_switch)
+        call bcast_ctl_type_c1(v_pwr(i)%order_v_spectra_switch)
+        call bcast_ctl_type_c1(v_pwr(i)%diff_v_lm_spectra_switch)
+        call bcast_ctl_type_c1(v_pwr(i)%axis_v_power_switch)
+!
         call bcast_ctl_type_r1(v_pwr(i)%inner_radius_ctl)
         call bcast_ctl_type_r1(v_pwr(i)%outer_radius_ctl)
         call calypso_mpi_bcast_one_int(v_pwr(i)%i_vol_spectr_ctl, 0)
@@ -170,10 +181,10 @@
       call bcast_ctl_type_c1(lp_ctl%layered_pwr_spectr_prefix)
       call bcast_ctl_type_c1(lp_ctl%layered_pwr_spectr_format)
 !
-      call bcast_ctl_type_c1(lp_ctl%degree_spectr_switch)
-      call bcast_ctl_type_c1(lp_ctl%order_spectr_switch)
-      call bcast_ctl_type_c1(lp_ctl%diff_lm_spectr_switch)
-      call bcast_ctl_type_c1(lp_ctl%axis_spectr_switch)
+      call bcast_ctl_type_c1(lp_ctl%degree_spectra_switch)
+      call bcast_ctl_type_c1(lp_ctl%order_spectra_switch)
+      call bcast_ctl_type_c1(lp_ctl%diff_lm_spectra_switch)
+      call bcast_ctl_type_c1(lp_ctl%axis_power_switch)
       call calypso_mpi_bcast_one_int(lp_ctl%i_layer_spectr_ctl, 0)
 !
       end subroutine bcast_layerd_spectr_ctl

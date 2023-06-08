@@ -97,23 +97,30 @@
       if(pwr%ntot_comp_sq .eq. 0)  return
 !
       if(id_rank .eq. pwr%irank_m) then
+        if(pwr%flag_skip_spectr_m) then
 !        write(*,*) 'write_sph_layer_spec_file m', id_rank
-        write(fname_rms, '(a,a6)') trim(pwr%fhead_rms_layer), '_m.dat'
-        write(mode_label,'(a)') 'order'
-        call write_sph_layer_spec_file(fname_rms, mode_label,           &
-     &      ene_labels, time_d, sph_params%l_truncation,                &
-     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
-     &      pwr, pwr%shl_m)
+          write(fname_rms, '(a,a6)')                                    &
+     &                   trim(pwr%fhead_rms_layer), '_m.dat'
+          write(mode_label,'(a)') 'order'
+          call write_sph_layer_spec_file(fname_rms, mode_label,         &
+     &        ene_labels, time_d, sph_params%l_truncation,              &
+     &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
+     &        pwr, pwr%shl_m)
+        end if
 !
-        write(fname_rms,'(a,a7)') trim(pwr%fhead_rms_layer), '_m0.dat'
-        write(mode_label,'(a)') 'EMPTY'
-        call write_sph_layer_pwr_file(fname_rms, mode_label,            &
-     &      ene_labels, time_d, sph_params%l_truncation,                &
-     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
-     &      pwr, pwr%shl_m0)
+        if(pwr%flag_skip_spectr_m0) then
+          write(fname_rms,'(a,a7)')                                     &
+     &                   trim(pwr%fhead_rms_layer), '_m0.dat'
+          write(mode_label,'(a)') 'EMPTY'
+          call write_sph_layer_pwr_file(fname_rms, mode_label,          &
+     &        ene_labels, time_d, sph_params%l_truncation,              &
+     &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
+     &        pwr, pwr%shl_m0)
+        end if
       end if
 !
-      if(id_rank .eq. pwr%irank_l) then
+      if((id_rank .eq. pwr%irank_l)                                     &
+     &            .and. pwr%flag_skip_spectr_l) then
 !        write(*,*) 'write_sph_layer_spec_file l', id_rank
         write(fname_rms, '(a,a6)') trim(pwr%fhead_rms_layer), '_l.dat'
         write(mode_label,'(a)') 'degree'
@@ -123,7 +130,8 @@
      &      pwr, pwr%shl_l)
       end if
 !
-      if(id_rank .eq. pwr%irank_lm) then
+      if((id_rank .eq. pwr%irank_lm)                                    &
+     &            .and. pwr%flag_skip_spectr_lm) then
 !        write(*,*) 'write_sph_layer_spec_file lm', id_rank
         write(fname_rms,'(a,a7)') trim(pwr%fhead_rms_layer), '_lm.dat'
         write(mode_label,'(a)') 'diff_deg_order'

@@ -21,27 +21,19 @@
 !!  grad_temp                   [i_grad_temp]:  gradient of temperature
 !!  grad_pert_temp              [i_grad_per_t]:
 !!                     gradient of perturbation of temperature
-!!  grad_reference_temp         [i_grad_ref_t]:
-!!                     gradient of reference temperature
 !!
 !!  grad_composition            [i_grad_composit]:
 !!                     gradient of composition
 !!  grad_pert_composition       [i_grad_per_c]:
 !!                     gradient of perturbation of composition
-!!  grad_reference_composition  [i_grad_ref_c]:
-!!                     gradient of reference composition
 !!
 !!  grad_density            [i_grad_density]:  gradient of density
 !!  grad_pert_density       [i_grad_per_density]:
 !!                     gradient of perturbation of density
-!!  grad_reference_density  [i_grad_ref_density]:
-!!                     gradient of reference density
 !!
 !!  grad_entropy            [i_grad_entropy]:  gradient of entropy
 !!  grad_pert_entropy       [i_grad_per_entropy]:
 !!                     gradient of perturbation of entropy
-!!  grad_reference_entropy  [i_grad_ref_entropy]:
-!!                     gradient of reference entropy
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -72,9 +64,6 @@
 !>        Field address for gradient of @f$ \Theta @f$
 !!         @f$  \partial_{i} \Theta / dz@f$
         integer (kind=kint) :: i_grad_per_t =      izero
-!>        Field address for gradient of reference temperature
-!!         @f$  \partial_{i} T_{0} / dz@f$
-        integer (kind=kint) :: i_grad_ref_t =      izero
 !
 !>        Field address for gradient of @f$ C @f$
 !!         @f$  \partial_{i} C / dz@f$
@@ -82,9 +71,6 @@
 !>        Field address for gradient of perturbation of composition
 !!         @f$  \partial_{i} \Theta_{C} / dz@f$
         integer (kind=kint) :: i_grad_per_c =       izero
-!>        Field address for gradient of reference composition
-!!         @f$  \partial_{i} C_{0} / dz@f$
-        integer (kind=kint) :: i_grad_ref_c =       izero
 !
 !>        Field address for gradient of @f$ \rho @f$
 !!         @f$  \partial_{i} \rho / dz@f$
@@ -92,9 +78,6 @@
 !>        Field address for gradient of perturbation of density
 !!         @f$  \partial_{i} \Theta_{\rho} / dz@f$
         integer (kind=kint) :: i_grad_per_density =    izero
-!>        Field address for gradient of reference density
-!!         @f$  \partial_{i} \rho_{0} / dz@f$
-        integer (kind=kint) :: i_grad_ref_density =    izero
 !
 !>        Field address for gradient of @f$ S @f$
 !!         @f$  \partial_{i} S / dz@f$
@@ -102,9 +85,6 @@
 !>        Field address for gradient of perturbation of entropy
 !!         @f$  \partial_{i} \Theta_{S} / dz@f$
         integer (kind=kint) :: i_grad_per_entropy = izero
-!>        Field address for gradient of reference density
-!!         @f$  \partial_{i} S_{0} / dz@f$
-        integer (kind=kint) :: i_grad_ref_entropy = izero
       end type gradient_field_address
 !
 ! ----------------------------------------------------------------------
@@ -139,29 +119,21 @@
           grad_fld%i_grad_temp =  i_phys
         else if(field_name .eq. grad_pert_temp%name) then
           grad_fld%i_grad_per_t = i_phys
-        else if(field_name .eq. grad_reference_temp%name) then
-          grad_fld%i_grad_ref_t = i_phys
 !
         else if(field_name .eq. grad_composition%name) then
           grad_fld%i_grad_composit = i_phys
         else if (field_name .eq. grad_pert_composition%name) then
           grad_fld%i_grad_per_c =    i_phys
-        else if (field_name .eq. grad_reference_composition%name) then
-          grad_fld%i_grad_ref_c =    i_phys
 !
         else if (field_name .eq. grad_density%name) then
           grad_fld%i_grad_density =     i_phys
         else if (field_name .eq. grad_pert_density%name) then
           grad_fld%i_grad_per_density = i_phys
-        else if (field_name .eq. grad_reference_density%name) then
-          grad_fld%i_grad_ref_density = i_phys
 !
         else if (field_name .eq. grad_entropy%name) then
           grad_fld%i_grad_entropy =     i_phys
         else if (field_name .eq. grad_pert_entropy%name) then
           grad_fld%i_grad_per_entropy = i_phys
-        else if (field_name .eq. grad_reference_entropy%name) then
-          grad_fld%i_grad_ref_entropy = i_phys
         end if
       end if
 !

@@ -7,15 +7,15 @@
 !>@brief  Dynamo benchmark results
 !!
 !!@verbatim
-!!      subroutine write_fields_on_circle_file                          &
-!!     &         (my_rank, file_prefix, gzip_flag,                      &
-!!     &          sph_params, time_d, cdat)
-!!        integer, intent(in) :: my_rank
-!!        character(len=kchara), intent(in) :: file_prefix
-!!        logical, intent(in) :: gzip_flag
+!!      subroutine dup_field_on_circ_header_to_IO                       &
+!!     &         (sph_params, leg_circ, circle, d_circle, sph_OUT)
+!!      subroutine dup_spectr_on_circ_header_to_IO                      &
+!!     &         (sph_params, leg_circ, circle, d_circle, sph_OUT)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
-!!        type(time_data), intent(in) :: time_d
-!!        type(circle_fld_maker), intent(in) :: cdat
+!!        type(circle_transform_spectr) :: leg_circ
+!!        type(circle_parameters), intent(in) :: circle
+!!        type(phys_data), intent(in) :: d_circle
+!!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !!@endverbatim
 !!
 !!@param i_step   time step

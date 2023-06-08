@@ -294,30 +294,24 @@
      &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_sq)
           call vol_ave_4_rms_sph                                        &
      &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_m0)
+          call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
+     &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_m)
+        end if
 !
-        else if(my_rank .eq. v_pwr(i)%irank_l) then
+        if(my_rank .eq. v_pwr(i)%irank_l) then
           call sum_sph_vol_rms_all_modes(sph_params%l_truncation,       &
      &        ntot_rms_rj, v_pwr(i)%v_l, v_pwr(i)%v_sq)
           call vol_ave_4_rms_sph                                        &
      &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_sq)
+          call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
+     &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_l)
+        end if
 !
-        else if(my_rank .eq. v_pwr(i)%irank_lm) then
+        if(my_rank .eq. v_pwr(i)%irank_lm) then
           call sum_sph_vol_rms_all_modes(sph_params%l_truncation,       &
      &        ntot_rms_rj, v_pwr(i)%v_lm, v_pwr(i)%v_sq)
           call vol_ave_4_rms_sph                                        &
      &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_sq)
-        end if
-!
-!
-        if(my_rank .eq. v_pwr(i)%irank_m) then
-          call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
-     &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_m)
-        end if
-        if(my_rank .eq. v_pwr(i)%irank_l) then
-          call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
-     &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_l)
-        end if
-        if(my_rank .eq. v_pwr(i)%irank_lm) then
           call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
      &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_lm)
         end if

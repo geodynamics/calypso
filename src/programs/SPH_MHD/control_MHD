@@ -640,10 +640,10 @@ begin MHD_control
       layered_pwr_spectr_prefix    'sph_pwr_layer'
       layered_pwr_spectr_format    'gzip'
 !
-      degree_spectr_switch         'On'
-      order_spectr_switch          'On'
-      diff_lm_spectr_switch        'On'
-      axisymmetric_spectr_switch   'On'
+      degree_spectra_switch         'On'
+      order_spectra_switch          'On'
+      diff_lm_spectra_switch        'On'
+      axisymmetric_power_switch     'On'
 !
       array spectr_layer_ctl
         spectr_layer_ctl  62

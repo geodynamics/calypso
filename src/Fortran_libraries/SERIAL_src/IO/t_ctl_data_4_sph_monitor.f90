@@ -25,6 +25,11 @@
 !!    volume_pwr_spectr_prefix     'sph_pwr_volume'
 !!    volume_pwr_spectr_format     'gzip'
 !!
+!!    degree_spectra_switch         'On'
+!!    order_spectra_switch          'On'
+!!    diff_lm_spectra_switch        'On'
+!!    axisymmetric_power_switch     'On'
+!!
 !!    nusselt_number_prefix        'Nusselt'
 !!    nusselt_number_format        'gzip'
 !!
@@ -107,9 +112,17 @@
 !
 !>        Structure for volume spectrum file prefix
         type(read_character_item) :: volume_pwr_spectr_prefix
-!
 !>        Structure for volume spectrum file format
         type(read_character_item) :: volume_pwr_spectr_format
+!
+!>        Structure for degree spectrum switch
+        type(read_character_item) :: degree_v_spectra_switch
+!>        Structure for order spectrum switch
+        type(read_character_item) :: order_v_spectra_switch
+!>        Structure for l-m spectrum switch
+        type(read_character_item) :: diff_v_lm_spectra_switch
+!>        Structure for axissymmetric data output switch
+        type(read_character_item) :: axis_v_power_switch
 !
 !>        Structure for Nusselt number file prefix
         type(read_character_item) :: heat_Nusselt_file_prefix
@@ -155,6 +168,12 @@
       smonitor_ctl%volume_average_prefix%iflag =     0
       smonitor_ctl%volume_pwr_spectr_prefix%iflag =  0
       smonitor_ctl%volume_pwr_spectr_format%iflag =  0
+!
+      smonitor_ctl%degree_v_spectra_switch%iflag =   0
+      smonitor_ctl%order_v_spectra_switch%iflag =    0
+      smonitor_ctl%diff_v_lm_spectra_switch%iflag =  0
+      smonitor_ctl%axis_v_power_switch%iflag =       0
+!
       smonitor_ctl%heat_Nusselt_file_prefix%iflag =  0
       smonitor_ctl%heat_Nusselt_file_format%iflag =  0
       smonitor_ctl%comp_Nusselt_file_prefix%iflag =  0

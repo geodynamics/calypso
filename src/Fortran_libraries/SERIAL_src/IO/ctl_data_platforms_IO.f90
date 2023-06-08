@@ -29,7 +29,7 @@
 !!
 !!      coriolis_int_file_name      'sph_shell/rot_int.dat'
 !!      boundary_data_file_name     'bc_spec.dat'
-!!      radial_data_file_name       'radial_data.dat'
+!!      radial_field_file_name      'radial_data.dat'
 !!
 !!      interpolate_sph_to_fem_ctl  'sph_shell/sph_to_fem'
 !!      interpolate_fem_to_sph_ctl  'sph_shell/fem_to_sph'
@@ -95,7 +95,7 @@
       character(len=kchara), parameter, private                         &
      &       :: hd_bc_data_file_name =     'boundary_data_file_name'
       character(len=kchara), parameter, private                         &
-     &       :: hd_radial_data_file_name = 'radial_data_file_name'
+     &       :: hd_radial_data_file_name = 'radial_field_file_name'
       character(len=kchara), parameter, private                         &
      &       :: hd_itp_sph_to_fem =        'interpolate_sph_to_fem_ctl'
       character(len=kchara), parameter, private                         &

@@ -100,8 +100,8 @@
       call alloc_mark_ele_psf(psf_search)
 !
       if(psf_def%id_section_method .gt. 0) then
-        call set_psf_type_id(ele, node%numnod,                          &
-     &      psf_search%elem_list, psf_search%mark_e, psf_list%ref_fld)
+        call set_psf_type_id(ele, node%numnod, psf_search%elem_list,    &
+     &                       psf_search%mark_e, psf_list%section_fld)
 !
         call count_num_patch_4_psf                                      &
      &     (edge, psf_list, psf_search%elem_list, psf_search%mark_e,    &
@@ -141,8 +141,8 @@
         iso_patch%istack_ele_smp(0) = 0
         call alloc_mark_ele_psf(iso_search)
 !
-        call set_psf_type_id(ele, node%numnod,                          &
-     &      iso_search%elem_list, iso_search%mark_e, iso_list%ref_fld)
+        call set_psf_type_id(ele, node%numnod, iso_search%elem_list,    &
+     &                       iso_search%mark_e, iso_list%section_fld)
 !
         call count_num_patch_4_psf(edge, iso_list,                      &
      &      iso_search%elem_list, iso_search%mark_e,                    &

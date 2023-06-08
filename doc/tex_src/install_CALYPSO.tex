@@ -145,10 +145,10 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-fftw3          Use fftw3 library 
  Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-fftw3            Use fftw3 library
   --with-hdf5=yes/no/PATH full path of h5pcc for parallel HDF5 configuration
   --with-blas=<lib>       use BLAS library <lib>
   --with-zlib=DIR root directory path of zlib installation defaults to
@@ -172,6 +172,9 @@ Some influential environment variables:
   FFTW3_CFLAGS
               C compiler flags for FFTW3, overriding pkg-config
   FFTW3_LIBS  linker flags for FFTW3, overriding pkg-config
+  ZLIB_CFLAGS
+              C compiler flags for ZLIB, overriding pkg-config
+  ZLIB_LIBS       linker flags for ZLIB, overriding pkg-config
 
 \end{verbatim}
 }
@@ -207,41 +210,78 @@ Use zlib at ...       yes
 
 
 \subsubsection{Compile}
-Compile is performed using the {\tt make} command. The Makefile in the top directory is used to generate another Makefile in the {\tt work} directory, which is automatically used to complete the compilation. The object file and libraries are compiled in the {\tt work} directory. Finally, the executive files are assembled in {\tt bin} directory. You should find the following programs in the {\tt bin} directory.
+Compile is performed using the {\tt make} command. The Makefile in the top directory is used to generate another Makefile in the {\tt work} directory, which is automatically used to complete the compilation. The object file and libraries are compiled in the {\tt work} directory. Finally, the executive files are assembled in {\tt bin} directory. You should find the following programs in the {\tt bin} directory as
+%
+\begin{verbatim}
+$ pwd
+/home/matsui/git/calypso/bin
+$ ls -F
+sph_add_initial_field*  sph_mhd*       tests/
+sph_initial_field*      sph_snapshot*  utilities/
+$ ls -F utilities/
+assemble_sph*   make_f90depends*  t_ave_monitor_data*
+field_to_VTK*   sectioning*       three_vizualizations*
+gen_sph_grids*  section_to_vtk*
+\end{verbatim}
+%
 %
 \begin{description}
-\item{\tt gen\_sph\_grids:    }\\
- Preprocessing program for data transfer for spherical harmonics transform
-\item{\tt check\_sph\_grids:    }\\
- Check program for data communication for spherical harmonics transform
 \item{\tt sph\_mhd:          }\\
  Simulation program
+\item{\tt sph\_snapshot:     }\\
+ Data transfer from spectrum data to field data
 \item{\tt sph\_initial\_field: }\\
  Example program to generate initial field
 \item{\tt sph\_add\_initial\_field: }\\
- Example program to add initial field in existing spectum data
-\item{\tt sph\_snapshot:     }\\
- Data transfer from spectrum data to field data
-\item{\tt sph\_dynamobench:  }\\
- Data processing for dynamo benchmark test by Christensen {\it et. al.} (2002)
+ Example program to add initial field in existing initial field data
+\end{description}
+%
+ Utility and data analysis programs under {\tt bin/utilities} folder are the following:
+%
+\begin{description}
 \item{\tt assemble\_sph:     }\\
  Data transfer program to change number of subdomains.
-\item{\tt sectioning:     }\\
- Generate cross section and isosurface from field data and FEM mesh data.
+\item{\tt gen\_sph\_grids:    }\\
+ Preprocessing program for data transfer for spherical harmonics transform
+\item{\tt t\_ave\_monitor\_data:     }\\
+ Time averaging program for monitor data files
 \item{\tt field\_to\_VTK:   }\\
  Data transfer program from field and FEM mesh data to VTK format.
 \item{\tt section\_to\_vtk:     }\\
  Data transfer program from section and isosurface data to VTK format.
-\item{\tt t\_ave\_monitor\_data:     }\\
- Time averaging program for the mean square data.
-\item{\tt t\_ave\_picked\_sph\_coefs:     }\\
- Time averaging program for the picked spectrum data.
-\item{\tt t\_ave\_nusselt:     }\\
-Time averaging program for the Nusselt number data.
-\item{\tt check\_sph\_grids:   }\\
-                   Check program for tests.
+\item{\tt sectioning:     }\\
+ Generate cross section and isosurface from field data and FEM mesh data.
 \item{\tt make\_f90depends:  }\\
  Program to generate dependency of the source code ({\tt make} command uses to generate {\tt work/Makefile})
+\end{description}
+%
+Test programs for the subroutines in  {\tt bin/test} folder are the following:
+%
+\begin{description}
+\item{\tt compare\_fft\_test:    }\\
+	 Check program for Fourier transform with exsisting Fourier transform data. This program is used for the test procedure.
+\item{\tt compare\_gauss\_points:    }\\
+	 Check program for Gauss-Legendre integration points with exsisting Gauss-Legendre point data. This program is used for the test procedure.
+\item{\tt compare\_psf:    }\\
+	 Check program for sectioning data output with exsisting Gauss-Legendre point data. This program is used for the test procedure.
+\item{\tt compare\_sph\_restart:    }\\
+	 Check program for restart data output with exsisting Gauss-Legendre point data. This program is used for the test procedure.
+\item{\tt sph\_ene\_check:    }\\
+	 Check program for monitor data output with exsisting Gauss-Legendre point data. This program is used for the test procedure.
+\item{\tt check\_sph\_grids:    }\\
+	 Check program for data communication for spherical harmonics transform
+\item{\tt check\_sph\_comms:   }\\
+	  Check program for data communications.
+\item{\tt gauss\_points:   }\\
+	Check program for Gauss-Legendre integration points and its colatitude
+\item{\tt test\_schmidt\_Legendre:   }\\
+	 Test program for Schmidt quasi-normalized Legendre polynomials
+\item{\tt test\_FFTPACK:   }\\
+	Test program for Fourier transform by FFTPACK
+\item{\tt test\_FFTW3\_f:   }\\
+         Test program for Fourier transform by FFTW3 from fortran programs
+\item{\tt test\_single\_FFTW3:   }\\
+         Test program for Fourier transform by FFTW3 from fortran programs
 \end{description}
 %
 The following library files are also made in {\tt work} directory.
@@ -270,6 +310,17 @@ To revert the files and directory to the original package, use make distclean as
  The executive files are copied to the install directory \verb|$(INSTDIR)/bin|. The install directory \verb|$(INSTDIR)| is defined in Makefile, and can also set by  \verb|${--prefix}| option for \verb|configure| command. Alternatively, you can use the programs in \verb|${SRCDIR}/bin| directory without running \verb|make install|. If directory \verb|${PREFIX}| does not exist, \verb|make install | creates  \verb|${PREFIX}|,  \verb|${PREFIX}/lib|,  \verb|${PREFIX}/bin|, and  \verb|${PREFIX}/include| directories. No files are installed in \verb|${PREFIX}/lib| and \verb|${PREFIX}/include|.
 
 \subsubsection{Construct dependecies (only for developper)}
+The build process of Calypso consists of three steps:
+%
+\begin{enumerate}
+\item Construct dependency of source files {\tt Makefile.depends} in each directory by  {\tt make depends} command.
+\item Construct {\tt Makefile} in {\tt [WORKDIR]} directory by {\tt make makemake} command.
+\item Move into  {\tt [WORKDIR]}  and run {\tt make} command in {\tt [WORKDIR]} directory ({\tt cd [WORKDIR]; make})
+\end{enumerate}
+%
+gmake supports parallel build by using {\tt -j [\# of process]} option, but the step 1 and 2 do not work correctly under the parallel build, but the step 3 (build under {\tt [WORKDIR} support the parallel build. Consequently, build time can be significantly reduced by run the step 3 sepalately with {\tt -j} option. 
+{\color{red} (Caution) Many large computer system does not recommend to use parallel build on the login nodes. Please check the computer center's documentations}
+
 Fortran90 routines need to be build after modules which are used in the routines. C source files also need dependency among include files. Consequently, list of dependency of source files are saved in the file \verb|Makefile.depends| in each directory. When you modify the source files with changing the module usage,  \verb|Makefile.depends| files need to be updated. To update the  \verb|Makefile.depends|files, use the  \verb|make| command at the \verb|[CALYPSO_HOME]| directory as \\
 %
 \begin{verbatim}
@@ -313,109 +364,3 @@ In Makefile, the following variables should be defined.
 
 \end{description}
 %
-
-\subsection{Install using cmake}
-CMake is a cross-platform, open-source build system. CMake can be downloaded from \url{http://www.cmake.org}. The following procedure is required to install.
-%
-\begin{enumerate}
-\item Create working directory (you can also use \verb|[CALYPSO_HOME]/work|).
-\item Generate Makefile and working directories by {\tt cmake} command.
-\item Compile programs by {\tt make} command.
-\end{enumerate}
-%
-In this section, \verb|[CALYPSO\_HOME]/work| is used as the working directory.
-Options for CMake can be checked by \verb|cmake -i [CALYPSO_HOME]| command at \verb|[CALYPSO_HOME]| \\
-\verb|/work|. There are a number of options can be found, but the following valuables are important settings for installation:
-%
-\begin{itemize}
-\item Install directory
-\begin{description}
-\item{\verb|CMAKE_INSTALL_PREFIX|}  \\
-Install directory
-\end{description}
-
-\item Compiler settings
-\begin{description}
-\item{\verb|CMAKE_Fortran_COMPILER|} \\
-Fortran90 compiler.
-\item{\verb|CMAKE_c_COMPILER|} C compiler.
-
-\item{\verb|CMAKE_Fortran_FLAGS|} \\
-Optimization flags for Fortran90 compiler.
-\item{\verb|CMAKE_c_FLAGS|} \\
-Optimization flags for C compiler.
-\end{description}
-
-\item Option settings
-\begin{description}
-\item{\verb|CMAKE_DISABLE_FIND_PACKAGE_OpenMP_Fortran|} \\
-OpenMP is not used if 'yes' is set in this valuable.
-\item{\verb|CMAKE_DISABLE_FIND_PACKAGE_BLAS|}  \\
-BLAS library is not linked if 'yes' is set in this valuable.
-\item{\verb|CMAKE_DISABLE_FIND_PACKAGE_FFTW|}  \\
-FFTW3 library is not linked if 'yes' is set in this valuable.
-\item{\verb|CMAKE_DISABLE_FIND_PACKAGE_ZLIB|}  \\
-Zlib library is not linked if 'yes' is set in this valuable.
-\item{\verb|CMAKE_DISABLE_FIND_PACKAGE_HDF5|}  \\
-HDF5 library is not linked if 'yes' is set in this valuable.
-\end{description}
-
-\item Manual settings for optional features
-\begin{description}
-\item{\verb|CMAKE_LIBRARY_PATH|}   \\
-CMake library  search paths. This directory is used to search FFTW3 library.
-\item{\verb|CMAKE_INCLUDE_PATH|}   \\
-CMake include search paths. This directory is used to search include file for FFTW3.
-\item{\verb|HDF5_INCLUDE_DIRS|}  \\
-Include file directories to compile with HDF5. This setting can be found by using hfd5 command \verb|h5pfc -show|.
-\item{\verb|HDF5_LIBRARY_DIRS|}    \\
-Location of HDF5 library. This setting can be found by using hfd5 command \verb|h5pfc -show|.
-\item{\verb|HDF5_LIBRARIES|}   \\
-Library lists for HDF5. This setting can be found by using hfd5 command \verb|h5pfc -show|.
-\end{description}
-%
-\end{itemize}
-%
-The easiest example of using CMake on Mac OS X with gcc9 is the following:
- \begin{verbatim}
-% cd build
-% cmake ~/CALYPSO/ -DCMAKE_Fortran_COMPILER=/opt/local/bin/gfortran-mp-9 \
-? -DCMAKE_c_COMPILER=/opt/local/bin/gcc-mp-9 \
-? -DCMAKE_Fortran_FLAGS="-O3 -g" -DCMAKE_c_FLAGS="-O3"
-\end{verbatim}
-%
-After configuration, compile and install are started by
- \begin{verbatim}
-% make
-...
-% make install
-\end{verbatim}
-%
-
-After running \verb|make| command, execute files are built in \verb|[CALYPSO_HOME]/work/bin| directory. Calypso consists of the following programs:
-%
-\begin{itemize}
-\item Preprocessing programs
-	\begin{itemize}
-	\item {\tt sph\_initial\_field} (See Section \ref{sec:sph_initial_field}),
-	\item {\tt sph\_add\_initial\_field} (See Section \ref{sec:add_initial_field}),
-	\item {\tt gen\_sph\_grid} (See Section \ref{section:gen_sph_grid}) {\color{red} (Deprecated)},
- 	\end{itemize}
-\item Simulation program {\tt sph\_mhd} (See Section \ref{section:sph_mhd}), 
-\item Data analysis programs,
-	\begin{itemize}
-	\item {\tt sph\_snapshot} (See Section \ref{section:sph_snapshot}),
-	\item {\tt sph\_dynamobench} (See Section \ref{section:check_bench}),
-	\item {\tt sectioning} (See Section \ref{sec:sectioning}),
- 	\item {\tt field\_to\_VTK} (See Section \ref{sec:field_to_VTK}),
- 	\item {\tt section\_to\_VTK} (See Section \ref{section:section_to_VTK}),
- 	\item {\tt assemble\_sph} (See Section \ref{section:assemble_sph}),
- 	\item {\tt t\_ave\_monitor\_data} (See Section \ref{sec:ave_mean_square}),
-	\end{itemize}
-\item Utility program to bulid.
-	\begin{itemize}
-	\item {\tt make\_f90depends} (See Section \ref{sec:make_f90depends}),
-	\end{itemize}
-\end{itemize}
-%
-

@@ -31,10 +31,10 @@
 !!    layered_pwr_spectr_prefix    'sph_pwr_layer'
 !!    layered_pwr_spectr_format    'gzip'
 !!
-!!    degree_spectr_switch         'On'
-!!    order_spectr_switch          'On'
-!!    diff_lm_spectr_switch        'On'
-!!    axisymmetric_spectr_switch   'On'
+!!    degree_spectra_switch         'On'
+!!    order_spectra_switch          'On'
+!!    diff_lm_spectra_switch        'On'
+!!    axisymmetric_power_switch     'On'
 !!
 !!   if number of spectr_layer_ctl = 0 or negative: No output
 !!   if first item of spectr_layer_ctl[1] = -1: Output all layers
@@ -71,13 +71,13 @@
         type(read_character_item) :: layered_pwr_spectr_format
 !
 !>        Structure for degree spectrum switch
-        type(read_character_item) :: degree_spectr_switch
+        type(read_character_item) :: degree_spectra_switch
 !>        Structure for order spectrum switch
-        type(read_character_item) :: order_spectr_switch
+        type(read_character_item) :: order_spectra_switch
 !>        Structure for l-m spectrum switch
-        type(read_character_item) :: diff_lm_spectr_switch
+        type(read_character_item) :: diff_lm_spectra_switch
 !>        Structure for l-m spectrum switch
-        type(read_character_item) :: axis_spectr_switch
+        type(read_character_item) :: axis_power_switch
 !
 !>        Structure for list of radial grid of spectr energy data output
 !!@n        idx_spec_layer_ctl%num:   Number of grid
@@ -105,14 +105,13 @@
      &           :: hd_spctr_radius = 'spectr_radius_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_degree_spectr_switch = 'degree_spectr_switch'
+     &           :: hd_degree_spectr_switch = 'degree_spectra_switch'
       character(len=kchara), parameter, private                         &
-     &           :: hd_order_spectr_switch = 'order_spectr_switch'
+     &           :: hd_order_spectr_switch = 'order_spectra_switch'
       character(len=kchara), parameter, private                         &
-     &           :: hd_diff_lm_spectr_switch                            &
-     &                              = 'axisymmetric_spectr_switch'
+     &           :: hd_diff_lm_spectr_switch = 'diff_lm_spectra_switch'
       character(len=kchara), parameter, private                         &
-     &           :: hd_axis_spectr_switch = 'diff_lm_spectr_switch'
+     &           :: hd_axis_spectr_switch = 'axisymmetric_power_switch'
 !
 ! -----------------------------------------------------------------------
 !
@@ -147,13 +146,13 @@
      &      lp_ctl%layered_pwr_spectr_format)
 !
         call read_chara_ctl_type(c_buf, hd_degree_spectr_switch,        &
-     &      lp_ctl%degree_spectr_switch)
+     &      lp_ctl%degree_spectra_switch)
         call read_chara_ctl_type(c_buf, hd_order_spectr_switch,         &
-     &      lp_ctl%order_spectr_switch)
+     &      lp_ctl%order_spectra_switch)
         call read_chara_ctl_type(c_buf, hd_diff_lm_spectr_switch,       &
-     &      lp_ctl%diff_lm_spectr_switch)
+     &      lp_ctl%diff_lm_spectra_switch)
         call read_chara_ctl_type(c_buf, hd_axis_spectr_switch,          &
-     &      lp_ctl%axis_spectr_switch)
+     &      lp_ctl%axis_power_switch)
       end do
       lp_ctl%i_layer_spectr_ctl = 1
 !
@@ -200,13 +199,13 @@
      &    hd_layer_rms_fmt, lp_ctl%layered_pwr_spectr_format)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_degree_spectr_switch, lp_ctl%degree_spectr_switch)
+     &    hd_degree_spectr_switch, lp_ctl%degree_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_order_spectr_switch, lp_ctl%order_spectr_switch)
+     &    hd_order_spectr_switch, lp_ctl%order_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_diff_lm_spectr_switch, lp_ctl%diff_lm_spectr_switch)
+     &    hd_diff_lm_spectr_switch, lp_ctl%diff_lm_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_axis_spectr_switch, lp_ctl%axis_spectr_switch)
+     &    hd_axis_spectr_switch, lp_ctl%axis_power_switch)
 !
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
@@ -224,10 +223,10 @@
 !
       lp_ctl%layered_pwr_spectr_prefix%iflag = 0
       lp_ctl%layered_pwr_spectr_format%iflag = 0
-      lp_ctl%degree_spectr_switch%iflag =  0
-      lp_ctl%order_spectr_switch%iflag =   0
-      lp_ctl%diff_lm_spectr_switch%iflag = 0
-      lp_ctl%axis_spectr_switch%iflag =    0
+      lp_ctl%degree_spectra_switch%iflag =  0
+      lp_ctl%order_spectra_switch%iflag =   0
+      lp_ctl%diff_lm_spectra_switch%iflag = 0
+      lp_ctl%axis_power_switch%iflag =    0
       lp_ctl%i_layer_spectr_ctl = 0
 !
       end subroutine dealloc_num_spec_layer_ctl
