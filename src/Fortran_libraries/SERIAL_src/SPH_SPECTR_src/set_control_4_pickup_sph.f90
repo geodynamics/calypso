@@ -114,7 +114,15 @@
 !
 !   set pickup layers
       picked_sph%num_layer = 0
-      if(pspec_ctl%idx_pick_layer_ctl%num .gt. 0) then
+      if(pspec_ctl%idx_pick_layer_ctl%num .eq. 0                        &
+             .and. pspec_ctl%pick_radius_ctl%num .eq. 0) then
+          picked_sph%num_layer = -1
+        return
+      else if(pspec_ctl%idx_pick_layer_ctl%num .eq. 1                   &
+     &      .and. pspec_ctl%idx_pick_layer_ctl%ivec(1) .lt. 0) then
+        picked_sph%num_layer = -1
+        return
+      else if(pspec_ctl%idx_pick_layer_ctl%num .gt. 0) then
         picked_sph%num_layer = pspec_ctl%idx_pick_layer_ctl%num
       end if
       if(pspec_ctl%pick_radius_ctl%num .gt. 0) then

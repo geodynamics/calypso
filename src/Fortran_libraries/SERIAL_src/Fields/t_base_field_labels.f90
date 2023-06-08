@@ -39,11 +39,6 @@
 !!   density [i_density]:      density     \rho
 !!   entropy [i_entropy]:      Entropy               S
 !!
-!!   reference_temperature [i_ref_t]:   T_0
-!!   reference_composition [i_ref_c]:   C_0
-!!   reference_density [i_ref_density]:       \rho_0
-!!   reference_entropy [i_ref_entropy]:       S_0
-!!
 !!   perturbation_temp [i_per_temp]:         \Theta = T - T_0
 !!   perturbation_composition [i_per_light]:  C - C_0
 !!   perturbation_density [i_per_density]:      \rho - \rho_0
@@ -111,9 +106,6 @@
 !>        start address for perturbation of temperature
 !!         @f$ \Theta = T - T_{0} @f$
         integer (kind=kint) :: i_per_temp =        izero
-!>        start address for reference temperature
-!!         @f$  T_{0} @f$
-        integer (kind=kint) :: i_ref_t =           izero
 !
 !>        start address for compostiion variation
 !!         @f$ C @f$
@@ -121,9 +113,6 @@
 !>        start address for perturbation of composition
 !!         @f$  C - C_{0} @f$
         integer (kind=kint) :: i_per_light =       izero
-!>        start address for reference temperature
-!!         @f$  C_{0} @f$
-        integer (kind=kint) :: i_ref_c =           izero
 !
 !>        start address for density
 !!         @f$ \rho @f$
@@ -131,9 +120,6 @@
 !>        start address for perturbation of density
 !!         @f$  \rho - \rho_{0} @f$
         integer (kind=kint) :: i_per_density =     izero
-!>        start address for reference density
-!!         @f$  \rho_{0} @f$
-        integer (kind=kint) :: i_ref_density =     izero
 !
 !>        start address for entropy
 !!         @f$ S @f$
@@ -141,9 +127,6 @@
 !>        start address for perturbation of entropy
 !!         @f$  S - S_{0} @f$
         integer (kind=kint) :: i_per_entropy =     izero
-!>        start address for reference entropy
-!!         @f$  S_{0} @f$
-        integer (kind=kint) :: i_ref_entropy =     izero
 !
 !>        start address for heat source
 !!         @f$ q_{T} @f$
@@ -242,29 +225,21 @@
           base_fld%i_temp =            i_phys
         else if (field_name .eq. perturbation_temp%name) then
           base_fld%i_per_temp =        i_phys
-        else if (field_name .eq. reference_temperature%name) then
-          base_fld%i_ref_t =           i_phys
 !
         else if (field_name .eq. composition%name) then
           base_fld%i_light =          i_phys
         else if (field_name .eq. perturbation_composition%name) then
           base_fld%i_per_light =      i_phys
-        else if (field_name .eq. reference_composition%name) then
-          base_fld%i_ref_c =          i_phys
 !
         else if (field_name .eq. density%name) then
           base_fld%i_density =        i_phys
         else if (field_name .eq. perturbation_density%name) then
           base_fld%i_per_density =    i_phys
-        else if (field_name .eq. reference_density%name) then
-          base_fld%i_ref_density =    i_phys
 !
         else if (field_name .eq. entropy%name) then
           base_fld%i_entropy =        i_phys
         else if (field_name .eq. perturbation_entropy%name) then
           base_fld%i_per_entropy =    i_phys
-        else if (field_name .eq. reference_entropy%name) then
-          base_fld%i_ref_entropy =    i_phys
 !
         else if (field_name .eq. heat_source%name) then
           base_fld%i_heat_source =    i_phys

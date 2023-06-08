@@ -19,22 +19,22 @@
 !!      control block for pickup spherical harmonics
 !!
 !!  begin monitor_data_list_ctl
-!!    array vol_integrate_prefix
-!!      vol_integrate_prefix     'sph_ave_volume'
-!!      vol_integrate_prefix     'sph_pwr_volume_s'
-!!      vol_integrate_prefix     'sph_pwr_volume_m0'
-!!    end array vol_integrate_prefix
+!!    array volume_integrate_prefix
+!!      volume_integrate_prefix     'sph_ave_volume'
+!!      volume_integrate_prefix     'sph_pwr_volume_s'
+!!      volume_integrate_prefix     'sph_pwr_volume_m0'
+!!    end array volume_integrate_prefix
 !!
-!!    array vol_spectr_prefix
-!!      vol_spectr_prefix     'sph_pwr_volume_l'
-!!      vol_spectr_prefix     'sph_pwr_volume_m'
-!!      vol_spectr_prefix     'sph_pwr_volume_lm'
-!!    end array vol_spectr_prefix
+!!    array volume_sph_spectr_prefix
+!!      volume_sph_spectr_prefix     'sph_pwr_volume_l'
+!!      volume_sph_spectr_prefix     'sph_pwr_volume_m'
+!!      volume_sph_spectr_prefix     'sph_pwr_volume_lm'
+!!    end array volume_sph_spectr_prefix
 !!
-!!    array sph_integrate_prefix
-!!      sph_integrate_prefix     'sph_pwr_layer_s'
-!!      sph_integrate_prefix     'sph_pwr_layer_m0'
-!!    end array sph_integrate_prefix
+!!    array sphere_integrate_prefix
+!!      sphere_integrate_prefix     'sph_pwr_layer_s'
+!!      sphere_integrate_prefix     'sph_pwr_layer_m0'
+!!    end array sphere_integrate_prefix
 !!
 !!    array layer_sph_spectr_prefix
 !!      layer_sph_spectr_prefix     'sph_pwr_layer_l'
@@ -46,11 +46,6 @@
 !!      picked_sph_prefix        'monitor/picked_mode'
 !!      picked_sph_prefix        'monitor/picked_mode_l2_m0c'
 !!    end array picked_sph_prefix
-!!
-!!    gauss_coefs_prefix           'sph_spectr/gauss_coefs'
-!!    picked_sph_prefix            'sph_spectr/picked_mode'
-!!    nusselt_number_prefix        'Nusselt'
-!!    dipolarity_file_prefix       'dipolarity'
 !!  end monitor_data_list_ctl
 !!
 !! -----------------------------------------------------------------
@@ -97,12 +92,12 @@
 !    label for entry
 !
       character(len=kchara), parameter, private                         &
-     &            :: hd_vol_time_series = 'vol_integrate_prefix'
+     &            :: hd_vol_time_series = 'volume_integrate_prefix'
       character(len=kchara), parameter, private                         &
-     &            :: hd_vol_spec_series = 'vol_spectr_prefix'
+     &            :: hd_vol_spec_series = 'volume_sph_spectr_prefix'
 !
       character(len=kchara), parameter, private                         &
-     &          :: hd_layer_time_series = 'sph_integrate_prefix'
+     &          :: hd_layer_time_series = 'sphere_integrate_prefix'
       character(len=kchara), parameter, private                         &
      &          :: hd_layer_spec_series = 'layer_sph_spectr_prefix'
 !

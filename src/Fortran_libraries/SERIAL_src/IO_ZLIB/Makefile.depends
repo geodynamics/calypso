@@ -100,7 +100,7 @@ gz_vtk_data_IO.o: $(ZLIB_IO_DIR)/gz_vtk_data_IO.f90 m_precision.o m_constants.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_vtk_file_IO.o: $(ZLIB_IO_DIR)/gz_vtk_file_IO.f90 m_precision.o m_constants.o m_machine_parameter.o m_field_file_format.o t_ucd_data.o t_buffer_4_gzip.o gz_udt_to_VTK_data_IO.o set_parallel_file_name.o set_ucd_file_names.o set_ucd_extensions.o skip_gz_comment.o gzip_file_access.o
 	$(F90) -c $(F90OPTFLAGS) $<
-init_reference_scalar.o: $(ZLIB_IO_DIR)/init_reference_scalar.f90 m_precision.o m_constants.o m_spheric_constants.o m_machine_parameter.o t_spheric_parameter.o t_fdm_coefs.o t_boundary_params_sph_MHD.o t_boundary_sph_spectr.o t_reference_scalar_param.o t_sph_matrix.o set_reference_sph_mhd.o set_reference_temp_sph.o const_r_mat_4_scalar_sph.o const_radial_references.o set_parallel_file_name.o
+init_reference_scalar.o: $(ZLIB_IO_DIR)/init_reference_scalar.f90 m_precision.o m_constants.o m_spheric_constants.o m_machine_parameter.o t_spheric_parameter.o t_fdm_coefs.o t_boundary_params_sph_MHD.o t_boundary_sph_spectr.o t_reference_scalar_param.o t_sph_matrix.o set_reference_sph_mhd.o set_reference_temp_sph.o const_r_mat_4_scalar_sph.o const_radial_references.o const_diffusive_profile.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $<
 input_old_file_sel_4_zlib.o: $(ZLIB_IO_DIR)/input_old_file_sel_4_zlib.F90 m_precision.o m_file_format_switch.o t_file_IO_parameter.o t_time_data.o t_field_data_IO.o gz_rst_data_IO_by_fld.o gz_field_file_IO.o field_file_IO.o set_field_file_names.o rst_data_IO_by_fld.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<

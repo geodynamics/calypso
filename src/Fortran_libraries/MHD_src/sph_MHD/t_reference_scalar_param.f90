@@ -47,6 +47,8 @@
 !>      flag to use referece temperature as a function of @f$ r @f$
       integer (kind=kint), parameter :: id_sphere_ref_temp = 100
 !>      flag to obtain diffusive profile numerically
+      integer (kind=kint), parameter :: id_read_file = 10
+!>      flag to obtain diffusive profile numerically
       integer (kind=kint), parameter :: id_numerical_solution = 999
 !>      flag to use linearly decrease referece temperature
 !!      as a function of @f$ r @f$
@@ -67,10 +69,13 @@
 !
       character(len = kchara), parameter                                &
      &               :: label_get_numerical = 'numrical_solution'
+      character(len = kchara), parameter :: label_load_file = 'file'
 !
       type reference_scalar_param
-!>      temperature setting
-        integer (kind=kint) :: iflag_reference
+!>        switch to use perturbation of scalar
+        logical :: flag_ref_field = .FALSE.
+!>        temperature setting
+        integer (kind=kint) :: iflag_reference = id_no_ref_temp
 !
 !>        reference lowest temperature (at upper boundary)
         real (kind = kreal) :: low_value
@@ -162,8 +167,18 @@
           ref_param%iflag_reference = id_z_ref_temp
         else if (cmp_no_case(tmpchara, label_get_numerical)) then
           ref_param%iflag_reference = id_numerical_solution
+        else if (cmp_no_case(tmpchara, label_load_file)) then
+          ref_param%iflag_reference = id_read_file
         end if
       end if
+!
+      ref_param%flag_ref_field = .FALSE.
+      if     (ref_param%iflag_reference .eq. id_sphere_ref_temp         &
+     &   .or. ref_param%iflag_reference .eq. id_takepiro_temp           &
+     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
+     &   .or. ref_param%iflag_reference .eq. id_read_file               &
+     &   ) ref_param%flag_ref_field = .TRUE.
+
 !
       iflag = low_temp_ctl%depth%iflag*low_temp_ctl%value%iflag
       if (iflag .eq. 0) then

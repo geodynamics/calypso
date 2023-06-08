@@ -39,33 +39,27 @@
 !
 !
       if(check_field_list_ctl(perturbation_temp, field_ctl)) then
-        call add_phys_name_ctl(reference_temperature, field_ctl)
+        call add_phys_name_ctl(temperature, field_ctl)
       end if
       if(check_field_list_ctl(perturbation_composition,                 &
      &                        field_ctl)) then
-        call add_phys_name_ctl(reference_composition, field_ctl)
-      end if
-      if(   check_field_list_ctl(perturbation_entropy, field_ctl)) then
-        call add_phys_name_ctl(reference_entropy, field_ctl)
-      end if
-      if(   check_field_list_ctl(perturbation_density, field_ctl)) then
-        call add_phys_name_ctl(reference_density, field_ctl)
-      end if
-!
-      if(   check_field_list_ctl(reference_temperature, field_ctl)      &
-     & .or. check_field_list_ctl(heat_source, field_ctl)) then
-        call add_phys_name_ctl(temperature, field_ctl)
-      end if
-      if(   check_field_list_ctl(reference_composition, field_ctl)      &
-     & .or. check_field_list_ctl(composition_source, field_ctl)) then
         call add_phys_name_ctl(composition, field_ctl)
       end if
-      if(   check_field_list_ctl(reference_entropy, field_ctl)          &
-     & .or. check_field_list_ctl(entropy_source, field_ctl)) then
+      if(   check_field_list_ctl(perturbation_entropy, field_ctl)) then
         call add_phys_name_ctl(entropy, field_ctl)
       end if
-      if(check_field_list_ctl(reference_density, field_ctl)) then 
+      if(   check_field_list_ctl(perturbation_density, field_ctl)) then
         call add_phys_name_ctl(density, field_ctl)
+      end if
+!
+      if(check_field_list_ctl(heat_source, field_ctl)) then
+        call add_phys_name_ctl(temperature, field_ctl)
+      end if
+      if(   check_field_list_ctl(composition_source, field_ctl)) then
+        call add_phys_name_ctl(composition, field_ctl)
+      end if
+      if(   check_field_list_ctl(entropy_source, field_ctl)) then
+        call add_phys_name_ctl(entropy, field_ctl)
       end if
 !
       if( check_field_list_ctl(vector_potential, field_ctl)) then
@@ -120,29 +114,21 @@
      &   call add_phys_name_ctl(temperature, field_ctl)
       if(check_field_list_ctl(grad_pert_temp, field_ctl))               &
      &   call add_phys_name_ctl(perturbation_temp, field_ctl)
-      if(check_field_list_ctl(grad_reference_temp, field_ctl))          &
-     &   call add_phys_name_ctl(reference_temperature, field_ctl)
 !
       if(check_field_list_ctl(grad_composition, field_ctl))             &
      &   call add_phys_name_ctl(composition, field_ctl)
       if(check_field_list_ctl(grad_pert_composition, field_ctl))        &
      &   call add_phys_name_ctl(perturbation_composition, field_ctl)
-      if(check_field_list_ctl(grad_reference_composition, field_ctl))   &
-     &   call add_phys_name_ctl(reference_composition, field_ctl)
 !
       if(check_field_list_ctl(grad_density, field_ctl))                 &
      &   call add_phys_name_ctl(density, field_ctl)
       if(check_field_list_ctl(grad_pert_density, field_ctl))            &
      &   call add_phys_name_ctl(perturbation_density, field_ctl)
-      if(check_field_list_ctl(grad_reference_density, field_ctl))       &
-     &   call add_phys_name_ctl(reference_density, field_ctl)
 !
       if(check_field_list_ctl(grad_entropy, field_ctl))                 &
      &   call add_phys_name_ctl(entropy, field_ctl)
       if(check_field_list_ctl(grad_pert_entropy, field_ctl))            &
      &   call add_phys_name_ctl(perturbation_entropy, field_ctl)
-      if(check_field_list_ctl(grad_reference_entropy, field_ctl))       &
-     &   call add_phys_name_ctl(reference_entropy, field_ctl)
 !
       end subroutine add_field_ctl_4_grad_field
 !

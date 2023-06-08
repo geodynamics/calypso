@@ -31,6 +31,11 @@
 !!    volume_pwr_spectr_prefix     'sph_pwr_volume'
 !!    volume_pwr_spectr_format     'gzip'
 !!
+!!    degree_spectra_switch         'On'
+!!    order_spectra_switch          'On'
+!!    diff_lm_spectra_switch        'On'
+!!    axisymmetric_power_switch     'On'
+!!
 !!    nusselt_number_prefix        'Nusselt'
 !!    nusselt_number_format        'gzip'
 !!
@@ -116,6 +121,16 @@
      &           :: hd_voume_rms_head = 'volume_pwr_spectr_prefix'
       character(len=kchara), parameter, private                         &
      &           :: hd_voume_rms_format = 'volume_pwr_spectr_format'
+!
+      character(len=kchara), parameter, private                         &
+     &           :: hd_degree_spectr_switch = 'degree_spectra_switch'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_order_spectr_switch = 'order_spectra_switch'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_diff_lm_spectr_switch = 'diff_lm_spectra_switch'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_axis_spectr_switch = 'axisymmetric_power_switch'
+!
       character(len=kchara), parameter, private                         &
      &           :: hd_Nusselt_file_head = 'nusselt_number_prefix'
       character(len=kchara), parameter, private                         &
@@ -205,6 +220,15 @@
      &      smonitor_ctl%volume_pwr_spectr_prefix)
         call read_chara_ctl_type(c_buf, hd_voume_rms_format,            &
      &      smonitor_ctl%volume_pwr_spectr_format)
+!
+        call read_chara_ctl_type(c_buf, hd_degree_spectr_switch,        &
+     &      smonitor_ctl%degree_v_spectra_switch)
+        call read_chara_ctl_type(c_buf, hd_order_spectr_switch,         &
+     &      smonitor_ctl%order_v_spectra_switch)
+        call read_chara_ctl_type(c_buf, hd_diff_lm_spectr_switch,       &
+     &      smonitor_ctl%diff_v_lm_spectra_switch)
+        call read_chara_ctl_type(c_buf, hd_axis_spectr_switch,          &
+     &      smonitor_ctl%axis_v_power_switch)
       end do
       smonitor_ctl%i_sph_monitor = 1
 !
@@ -272,7 +296,10 @@
       maxlen = max(maxlen, len_trim(hd_typ_scale_file_format))
       maxlen = max(maxlen, len_trim(hd_voume_ave_head))
       maxlen = max(maxlen, len_trim(hd_voume_rms_head))
-      maxlen = max(maxlen, len_trim(hd_voume_rms_format))
+      maxlen = max(maxlen, len_trim(hd_degree_spectr_switch))
+      maxlen = max(maxlen, len_trim(hd_order_spectr_switch))
+      maxlen = max(maxlen, len_trim(hd_diff_lm_spectr_switch))
+      maxlen = max(maxlen, len_trim(hd_axis_spectr_switch))
 !
       write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
@@ -282,8 +309,19 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_voume_rms_head, smonitor_ctl%volume_pwr_spectr_prefix)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_voume_rms_format, smonitor_ctl%volume_pwr_spectr_format)
+     &    hd_diff_lm_spectr_switch,                                     &
+     &    smonitor_ctl%volume_pwr_spectr_format)
+!
       write(id_control,'(a1)') '!'
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &   hd_degree_spectr_switch, smonitor_ctl%degree_v_spectra_switch)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &   hd_order_spectr_switch, smonitor_ctl%order_v_spectra_switch)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_diff_lm_spectr_switch,                                     &
+     &    smonitor_ctl%diff_v_lm_spectra_switch)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_axis_spectr_switch, smonitor_ctl%axis_v_power_switch)
 !
       call write_volume_spectr_ctl(id_control, hd_vol_spec_block,       &
      &                             smonitor_ctl, level)

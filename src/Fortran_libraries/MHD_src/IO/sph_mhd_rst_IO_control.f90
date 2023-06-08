@@ -33,7 +33,7 @@
 !!      subroutine output_spectr_4_snap(i_step, time_d,                 &
 !!     &          sph_file_IO, rj_fld, ucd_step)
 !!        type(time_data), intent(in) :: time_d
-!!        type(phys_data), intent(in) :: ref_fld
+!!        type(phys_data), intent(in) :: rj_fld
 !!        type(field_IO_params), intent(in) :: sph_file_IO
 !!      subroutine read_alloc_sph_spectr                                &
 !!     &         (i_step, ucd_step, rj_file_param, sph_file_IO,         &

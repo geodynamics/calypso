@@ -31,7 +31,12 @@ File prefix of FEM mesh file \verb|[mesh_prefix]| is defined by text. Process ID
 \paragraph{\tt boundary\_data\_file\_name}
 \label{href_t:boundary_data_file_name}
 \verb|[boundary_data_name]| \\
-File name of boundary condition data file \verb|[boundary_data_name]| is defined by text. 
+File name of boundary condition data file \verb|[File_Name]| is defined by text. 
+
+\paragraph{\tt radial\_field\_file\_name}
+\label{href_t:radial_field_file_name}
+\verb|[radial_field_file_name]| \\
+File name of radial field data file \verb|[File_Name]| is defined by text. 
 
 \paragraph{\tt restart\_file\_prefix}
 \label{href_t:restart_file_prefix}
@@ -730,6 +735,7 @@ Type of reference temperature is defined by text. The following options are avai
           r_{l}T_{l} - r_{h}T_{h} + \frac{r_{l} r_{h}}{r} \left(T_{h}-T_{l}\right) \right].
 \nonumber
 \end{eqnarray}
+\item{\tt file} Reference temperature data is read from file defeind at {\tt [radial\_field\_file\_name]}. The reference temperature is interpolated into the radial grid in the simulation.
 \end{description}
 %
 
@@ -1088,17 +1094,62 @@ File format for dipolarity data files. If \verb|[file_format]| is \verb|gzip|, d
 \label{href_t:dipolarity_truncation_ctl}
 \verb|[Degree]| \\
 Truncation degrees $l$ to evaluate dipolarity is defined in \verb|[Degree]| by integer. More than 1 truncations can be defined in this array. The dipolarity with the truncation degree of the simulation $L_{max}$ is automatically added in the dta output.
+%
 
+\subsubsection{\tt dynamo\_benchmark\_data\_ctl}
+\label{href_t:dynamo_benchmark_data_ctl}
+Parameters to generate dynamo benchmark data.
 
-\subsubsection{\tt mid\_equator\_monitor\_ctl}
-\label{href_t:mid_equator_monitor_ctl}
-Parameters to generate data at mid-depth of euqtorial plane are defined in this block.
+\paragraph{\tt dynamo\_benchmark\_file\_prefix}
+\label{href_t:dynamo_benchmark_file_prefix}
+\verb|[File\_Prefix]| \\
+File prefix for dynamo benchmark data output.
+
+\paragraph{\tt dynamo\_benchmark\_file\_format}
+\label{href_t:dynamo_benchmark_file_format}
+\verb|[ASCII or gzip]| \\
+File format of the data files. {\tt ASCII} or {\tt gzip} are available.
 
 \paragraph{\tt nphi\_mid\_eq\_ctl}
 \label{href_t:nphi_mid_eq_ctl}
 \verb|[Nphi_mid_equator]| \\
 Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to evaluate mid-depth of the shell in the equatorial plane for dynamo benchmark is defined as integer. If \verb|[Nphi_mid_equator]| is not defined or less than zero, \verb|[Nphi_mid_equator]| is set set number grid as the input spherical transform data. 
 %
+
+\subsubsection{\tt fields\_on\_circle\_ctl}
+\label{href_t:fields_on_circle_ctl}
+Parameters to generate data at along with circle
+
+\paragraph{\tt field\_on\_circle\_prefix}
+\label{href_t:field_on_circle_prefix}
+\verb|[File\_Prefix]| \\
+File prefix for field data on the circle as a function of the longitude.
+
+\paragraph{\tt spectr\_on\_circle\_prefix}
+\label{href_t:spectr_on_circle_prefix}
+\verb|[File\_Prefix]| \\
+File prefix for field data on the circle as a function of the longitude.
+
+\paragraph{\tt field\_on\_circle\_format}
+\label{href_t:field_on_circle_format}
+\verb|[ASCII or gzip]| \\
+File format of the data files. {\tt ASCII} or {\tt gzip} are available.
+
+\paragraph{\tt pick\_circle\_coord\_ctl}
+\label{href_t:pick_circle_coord_ctl}
+\verb|[Coordinate]| \\
+Coordinate system for veator fields are defeined by {\tt spherical} or {\tt cylindrical}.
+
+\paragraph{\tt pick\_cylindrical\_radius\_ctl}
+\label{href_t:pick_cylindrical_radius_ctl}
+\verb|[S]| \\
+cylinderical radius of the circle {\tt [S]} is defined as a real value.
+
+\paragraph{\tt pick\_vertical\_position\_ctl}
+\label{href_t:pick_vertical_position_ctl}
+\verb|[Z]| \\
+Vertical position of the circle {\tt [Z]} is defined as a real value.
+
 %
 
 \subsection{\tt visual\_control}
@@ -1438,3 +1489,45 @@ Parameters to modify magnetic field are defined in this block. \\
 \label{href_t:magnetic_field_ratio_ctl} 
 \verb|[ratio]| \\
 Ratio of new magnetic field data to original magnetic field \verb|[ratio]| is defined by real.
+
+
+\subsection{\tt time\_averaging\_sph\_monitor}
+\label{href_t:time_averaging_sph_monitor}
+Parameters for time averaging of monitor data files.
+
+\paragraph{\tt start\_time\_ctl}
+\label{href_t:tave_start_time_ctl} 
+\verb|[TIME]| \\
+Start  time \verb|[TIME]| for the restart file is defined by real.
+
+\paragraph{\tt end\_time\_ctl}
+\label{href_t:tave_end_time_ctl} 
+\verb|[TIME]| \\
+End  time \verb|[TIME]| for the restart file is defined by real.
+
+\paragraph{\tt volume\_integrate\_prefix}
+\label{href_t:volume_integrate_prefix} 
+\verb|[File\_Prefix]| \\
+File prefix  \verb|[File\_Prefix]|  for  volume integrated data is defined by text.
+
+\paragraph{\tt volume\_sph\_spectr\_prefix}
+\label{href_t:volume_sph_spectr_prefix} 
+\verb|[File\_Prefix]| \\
+File prefix  \verb|[File\_Prefix]|  for  volume integrated spectrum data is defined by text.
+
+\paragraph{\tt sphere\_integrate\_prefix}
+\label{href_t:sphere_integrate_prefix} 
+\verb|[File\_Prefix]| \\
+File prefix  \verb|[File\_Prefix]|  for sphere integrated data is defined by text.
+
+\paragraph{\tt layer\_sph\_spectr\_prefix}
+\label{href_t:layer_sph_spectr_prefix} 
+\verb|[File\_Prefix]| \\
+File prefix  \verb|[File\_Prefix]|  for  layered spectrum data is defined by text.
+
+\paragraph{\tt picked\_sph\_prefix}
+\label{href_t:picked_sph_prefix} 
+\verb|[File\_Prefix]| \\
+File prefix  \verb|[File\_Prefix]|  for  picked up spectrum data is defined by text.
+
+

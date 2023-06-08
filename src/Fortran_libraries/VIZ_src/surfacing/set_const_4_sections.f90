@@ -52,7 +52,7 @@
         if(psf_def(i_psf)%id_section_method .gt. 0) then
           call set_constant_4_psf                                       &
      &       (node%numnod, node%istack_nod_smp, node%xx,                &
-     &        psf_def(i_psf)%const_psf, psf_list(i_psf)%ref_fld)
+     &        psf_def(i_psf)%const_psf, psf_list(i_psf)%section_fld)
         end if
       end do
 !
@@ -83,7 +83,7 @@
      &     (iso_def(i_iso), node%numnod, node%istack_nod_smp, node%xx,  &
      &      node%rr, node%a_r, node%ss, node%a_s, nod_fld%num_phys,     &
      &      nod_fld%ntot_phys,  nod_fld%istack_component,               &
-     &      nod_fld%d_fld, iso_list(i_iso)%ref_fld)
+     &      nod_fld%d_fld, iso_list(i_iso)%section_fld)
       end do
 !
       end subroutine set_const_4_isosurfaces

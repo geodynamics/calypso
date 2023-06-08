@@ -28,7 +28,7 @@
 !!
 !!      coriolis_int_file_name      'sph_shell/rot_int.dat'
 !!      boundary_data_file_name     'bc_spec.dat'
-!!      radial_data_file_name       'radial_data.dat'
+!!      radial_field_file_name      'radial_data.dat'
 !!
 !!      interpolate_sph_to_fem_ctl  'sph_shell/sph_to_fem'
 !!      interpolate_fem_to_sph_ctl  'sph_shell/fem_to_sph'
@@ -73,7 +73,7 @@
 !>                File name for hermonic integration for Coriolis term
 !>@n@param      boundary_data_file_name
 !>                File name for boundary conditions
-!>@n@param      radial_data_file_name
+!>@n@param      radial_field_file_name
 !>                File name for reference radial data
 !>@n@param      interpolate_sph_to_fem_ctl 
 !>               File header for interpolation table

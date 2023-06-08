@@ -25,27 +25,19 @@
 !!  grad_temp                   [i_grad_temp]:  gradient of temperature
 !!  grad_pert_temp              [i_grad_per_t]:
 !!                     gradient of perturbation of temperature
-!!  grad_reference_temp         [i_grad_ref_t]:
-!!                     gradient of reference temperature
 !!
 !!  grad_composition            [i_grad_composit]:
 !!                     gradient of composition
 !!  grad_pert_composition       [i_grad_per_c]:
 !!                     gradient of perturbation of composition
-!!  grad_reference_composition  [i_grad_ref_c]:
-!!                     gradient of reference composition
 !!
 !!  grad_density            [i_grad_density]:  gradient of density
 !!  grad_pert_density       [i_grad_per_density]:
 !!                     gradient of perturbation of density
-!!  grad_reference_density  [i_grad_ref_density]:
-!!                     gradient of reference density
 !!
 !!  grad_entropy            [i_grad_entropy]:  gradient of entropy
 !!  grad_pert_entropy       [i_grad_per_entropy]:
 !!                     gradient of perturbation of entropy
-!!  grad_reference_entropy  [i_grad_ref_entropy]:
-!!                     gradient of reference entropy
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -59,7 +51,7 @@
       implicit none
 !
       integer(kind = kint), parameter, private :: ndiv_vector =   3
-      integer(kind = kint), parameter, private :: ngrad_scalar = 12
+      integer(kind = kint), parameter, private :: ngrad_scalar =  8
 !
 !>        Divergence of velocity
 !!         @f$ \partial_{i} u_{i} @f$
@@ -92,12 +84,6 @@
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'grad_pert_temp',                          &
      &                math = '$ \partial_{i} \Theta $')
-!>        Field label for gradient of reference temperature
-!!         @f$  \partial_{i} T_{0} / dz@f$
-      type(field_def), parameter :: grad_reference_temp                 &
-     &    = field_def(n_comp = n_vector,                                &
-     &                name = 'grad_reference_temp',                     &
-     &                math = '$ \partial_{i} T_{0} $')
 !
 !>        Field label for gradient of @f$ C @f$
 !!         @f$  \partial_{i} C / dz@f$
@@ -111,12 +97,6 @@
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'grad_pert_composition',                   &
      &                math = '$ \partial_{i} \Theta_{C} $')
-!>        Field label for gradient of reference composition
-!!         @f$  \partial_{i} C_{0} / dz@f$
-      type(field_def), parameter :: grad_reference_composition          &
-     &    = field_def(n_comp = n_vector,                                &
-     &                name = 'grad_reference_composition',              &
-     &                math = '$ \partial_{i} C_{0} $')
 !
 !>        Field label for gradient of density
 !!         @f$  \partial_{i} \rho / dz@f$
@@ -130,12 +110,6 @@
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'grad_pert_density',                       &
      &                math = '$ \partial_{i} \Theta_{\rho} $')
-!>        Field label for gradient of reference density
-!!         @f$  \partial_{i} \rho_{0} / dz@f$
-      type(field_def), parameter :: grad_reference_density              &
-     &    = field_def(n_comp = n_vector,                                &
-     &                name = 'grad_reference_density',                  &
-     &                math = '$ \partial_{i} \rho_{0} $')
 !
 !>        Field label for gradient of entropy
 !!         @f$  \partial_{i} S / dz@f$
@@ -149,12 +123,6 @@
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'grad_pert_entropy',                       &
      &                math = '$ \partial_{i} \Theta_{S} $')
-!>        Field label for gradient of reference density
-!!         @f$  \partial_{i} S_{0} / dz@f$
-      type(field_def), parameter :: grad_reference_entropy              &
-     &    = field_def(n_comp = n_vector,                                &
-     &                name = 'grad_reference_entropy',                  &
-     &                math = '$ \partial_{i} S_{0} $')
 !
 ! ----------------------------------------------------------------------
 !
@@ -184,19 +152,15 @@
       check_gradient_field                                              &
      &   =    (field_name .eq. grad_temp%name)                          &
      &   .or. (field_name .eq. grad_pert_temp%name)                     &
-     &   .or. (field_name .eq. grad_reference_temp%name)                &
 !
      &   .or. (field_name .eq. grad_composition%name)                   &
      &   .or. (field_name .eq. grad_pert_composition%name)              &
-     &   .or. (field_name .eq. grad_reference_composition%name)         &
 !
      &   .or. (field_name .eq. grad_density%name)                       &
      &   .or. (field_name .eq. grad_pert_density%name)                  &
-     &   .or. (field_name .eq. grad_reference_density%name)             &
 !
      &   .or. (field_name .eq. grad_entropy%name)                       &
-     &   .or. (field_name .eq. grad_pert_entropy%name)                  &
-     &   .or. (field_name .eq. grad_reference_entropy%name)
+     &   .or. (field_name .eq. grad_pert_entropy%name)
 !
       end function check_gradient_field
 !
@@ -246,29 +210,21 @@
      &    n_comps( 1), names( 1), maths( 1))
       call set_field_labels(grad_pert_temp,                             &
      &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(grad_reference_temp,                        &
-     &    n_comps( 3), names( 3), maths( 3))
 !
       call set_field_labels(grad_composition,                           &
-     &    n_comps( 4), names( 4), maths( 4))
+     &    n_comps( 3), names( 3), maths( 3))
       call set_field_labels(grad_pert_composition,                      &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(grad_reference_composition,                 &
-     &    n_comps( 6), names( 6), maths( 6))
+     &    n_comps( 4), names( 4), maths( 4))
 !
       call set_field_labels(grad_density,                               &
-     &    n_comps( 7), names( 7), maths( 7))
+     &    n_comps( 5), names( 5), maths( 5))
       call set_field_labels(grad_pert_density,                          &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(grad_reference_density,                     &
-     &    n_comps( 9), names( 9), maths( 9))
+     &    n_comps( 6), names( 6), maths( 6))
 !
       call set_field_labels(grad_entropy,                               &
-     &    n_comps(10), names(10), maths(10))
+     &    n_comps( 7), names( 7), maths( 7))
       call set_field_labels(grad_pert_entropy,                          &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(grad_reference_entropy,                     &
-     &    n_comps(12), names(12), maths(12))
+     &    n_comps( 8), names( 8), maths( 8))
 !
       end subroutine set_gradient_field_labels
 !

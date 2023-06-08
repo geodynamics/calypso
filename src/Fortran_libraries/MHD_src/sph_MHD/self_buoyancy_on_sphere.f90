@@ -67,10 +67,7 @@
 !
 !
       if(iflag_4_gravity) then
-        if    (ref_param_T%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp        &
-     &    .or. ref_param_T%iflag_reference .eq. id_numerical_solution   &
-     &   ) then
+        if(ref_param_T%flag_ref_field) then
           ipol_temp =  ipol_base%i_per_temp
         else
           ipol_temp =  ipol_base%i_temp
@@ -78,10 +75,7 @@
       end if
 !
       if(iflag_4_composit_buo) then
-        if    (ref_param_C%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp        &
-     &    .or. ref_param_C%iflag_reference .eq. id_numerical_solution   &
-     &   ) then
+        if(ref_param_C%flag_ref_field) then
           ipol_comp =  ipol_base%i_per_light
         else
           ipol_comp =  ipol_base%i_light

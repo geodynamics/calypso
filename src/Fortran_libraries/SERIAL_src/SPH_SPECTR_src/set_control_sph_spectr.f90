@@ -52,14 +52,18 @@
       integer(kind = kint) :: num_layer, i, ist
 !
 !
-      if(no_flag(lp_ctl%degree_spectr_switch%charavalue))               &
-     &                                      pwr%iflag_spectr_l = 0
-      if(no_flag(lp_ctl%order_spectr_switch%charavalue))                &
-     &                                      pwr%iflag_spectr_m = 0
-      if(no_flag(lp_ctl%diff_lm_spectr_switch%charavalue))              &
-     &                                      pwr%iflag_spectr_lm = 0
-      if(no_flag(lp_ctl%axis_spectr_switch%charavalue))                 &
-     &                                      pwr%iflag_spectr_m0 = 0
+      pwr%flag_skip_spectr_l =  .FALSE.
+      if(no_flag(lp_ctl%degree_spectra_switch%charavalue))              &
+     &                                 pwr%flag_skip_spectr_l = .TRUE.
+      pwr%flag_skip_spectr_m =  .FALSE.
+      if(no_flag(lp_ctl%order_spectra_switch%charavalue))               &
+     &                                 pwr%flag_skip_spectr_m = .TRUE.
+      pwr%flag_skip_spectr_lm = .FALSE.
+      if(no_flag(lp_ctl%diff_lm_spectra_switch%charavalue))             &
+     &                                 pwr%flag_skip_spectr_lm = .TRUE.
+       pwr%flag_skip_spectr_m0 = .FALSE.
+      if(no_flag(lp_ctl%axis_power_switch%charavalue))                  &
+     &                                 pwr%flag_skip_spectr_m0 = .TRUE.
 !
 !
       pwr%iflag_layer_rms_spec = lp_ctl%layered_pwr_spectr_prefix%iflag
@@ -79,12 +83,16 @@
 !
 !   set pickup layer
       num_layer = 0
-      if(pwr%iflag_layer_rms_spec .eq. 0) then
-        num_layer = 0
+      if(pwr%iflag_layer_rms_spec .eq. 0                                &
+     &     .and. lp_ctl%layer_radius_ctl%num .eq. 0) then
+        pwr%nri_rms = -1
+        return
       else if(lp_ctl%idx_spec_layer_ctl%num .eq. 1                      &
         .and. lp_ctl%idx_spec_layer_ctl%ivec(1) .lt. 0) then
         pwr%nri_rms = -1
         return
+      else if(pwr%iflag_layer_rms_spec .eq. 0) then
+        num_layer = 0
       else
         num_layer = lp_ctl%idx_spec_layer_ctl%num
       end if
@@ -178,6 +186,20 @@
      &                     v_spectr%gzip_flag_vol_spec = .TRUE.
       end if
 !
+!
+      v_spectr%flag_skip_v_spec_l =  .FALSE.
+      if(no_flag(smonitor_ctl%degree_v_spectra_switch%charavalue))      &
+     &                           v_spectr%flag_skip_v_spec_l = .TRUE.
+      v_spectr%flag_skip_v_spec_m =  .FALSE.
+      if(no_flag(smonitor_ctl%order_v_spectra_switch%charavalue))       &
+     &                           v_spectr%flag_skip_v_spec_m = .TRUE.
+      v_spectr%flag_skip_v_spec_lm = .FALSE.
+      if(no_flag(smonitor_ctl%diff_v_lm_spectra_switch%charavalue))     &
+     &                           v_spectr%flag_skip_v_spec_lm = .TRUE.
+       v_spectr%flag_skip_v_spec_m0 = .FALSE.
+      if(no_flag(smonitor_ctl%axis_v_power_switch%charavalue))          &
+     &                           v_spectr%flag_skip_v_spec_m0 = .TRUE.
+!
       v_spectr%r_inside =  -1.0
       v_spectr%r_outside = -1.0
 !
@@ -220,6 +242,18 @@
      &                   v_spectr%gzip_flag_vol_spec = .TRUE.
       end if
 !
+      v_spectr%flag_skip_v_spec_l =  .FALSE.
+      if(no_flag(v_pwr_ctl%degree_v_spectra_switch%charavalue))         &
+     &                           v_spectr%flag_skip_v_spec_l = .TRUE.
+      v_spectr%flag_skip_v_spec_m =  .FALSE.
+      if(no_flag(v_pwr_ctl%order_v_spectra_switch%charavalue))          &
+     &                           v_spectr%flag_skip_v_spec_m = .TRUE.
+      v_spectr%flag_skip_v_spec_lm = .FALSE.
+      if(no_flag(v_pwr_ctl%diff_v_lm_spectra_switch%charavalue))        &
+     &                           v_spectr%flag_skip_v_spec_lm = .TRUE.
+       v_spectr%flag_skip_v_spec_m0 = .FALSE.
+      if(no_flag(v_pwr_ctl%axis_v_power_switch%charavalue))             &
+     &                           v_spectr%flag_skip_v_spec_m0 = .TRUE.
 !
       if(v_pwr_ctl%inner_radius_ctl%iflag .gt. 0) then
         v_spectr%r_inside = v_pwr_ctl%inner_radius_ctl%realvalue
@@ -232,6 +266,7 @@
       else
         v_spectr%r_outside = -1.0
       end if
+!
 !
       end subroutine set_ctl_params_vol_sph_spectr
 !
