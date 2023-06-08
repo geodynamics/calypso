@@ -21,7 +21,7 @@
 !!      subroutine composit_rendering_image                             &
 !!     &         (img_stack, npixel_recved, rgba_subdomain,             &
 !!     &          npixel_stacked, rgba_composit)
-!!      subroutine check_rendering_image(id_file, iref,                 &
+!!      subroutine check_rendering_image(id_file, i_ref,                &
 !!     &          img_stack, npixel_recved, rgba_subdomain,             &
 !!     &          npixel_stacked, rgba_composit)
 !!        type(pvr_image_stack_table), intent(in) :: img_stack
@@ -193,13 +193,13 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine check_rendering_image(id_file, iref,                   &
+      subroutine check_rendering_image(id_file, i_ref,                  &
      &          img_stack, npixel_recved, rgba_subdomain,               &
      &          npixel_stacked, rgba_composit)
 !
       use set_rgba_4_each_pixel
 !
-      integer(kind = kint), intent(in) :: id_file, iref
+      integer(kind = kint), intent(in) :: id_file, i_ref
       type(pvr_image_stack_table), intent(in) :: img_stack
       integer(kind = kint), intent(in) :: npixel_recved, npixel_stacked
       real(kind = kreal), intent(in) :: rgba_subdomain(4,npixel_recved)
@@ -216,8 +216,8 @@
         ist = img_stack%istack_composition(ipix-1)
         ied = img_stack%istack_composition(ipix)
         do inum = ist+1, ied
-          if(img_stack%ipixel_4_composit(ipix) .eq. iref) then
-            write(id_file,*) 'rgba_subdomain', iref, inum,              &
+          if(img_stack%ipixel_4_composit(ipix) .eq. i_ref) then
+            write(id_file,*) 'rgba_subdomain', i_ref, inum,             &
      &              rgba_subdomain(1:4,inum),                           &
      &              img_stack%depth_pixel_composit(inum)
 !
@@ -228,9 +228,10 @@
       end do
 !
       do i = 1, npixel_stacked
-        if(img_stack%ipixel_4_composit(i) .eq. iref) then
-          write(id_file,*) 'rgb_test', iref, i, rgb_test(1:4)
-          write(id_file,*) 'rgba_composit', iref, i, rgba_composit(1:4,i)
+        if(img_stack%ipixel_4_composit(i) .eq. i_ref) then
+          write(id_file,*) 'rgb_test', i_ref, i, rgb_test(1:4)
+          write(id_file,*)                                              &
+     &          'rgba_composit', i_ref, i, rgba_composit(1:4,i)
         end if
       end do
 !

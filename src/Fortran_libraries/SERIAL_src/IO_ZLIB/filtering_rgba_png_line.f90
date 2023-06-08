@@ -203,7 +203,7 @@
       integer(kind = 4), intent(inout) :: i_rgba_line(4,0:npix_x,0:4)
       integer(kind = 4), intent(inout) :: iflag_sel
 !
-      integer(kind = 4) :: i, k, ic, iref
+      integer(kind = 4) :: i, k, ic, i_ref
       integer(kind = 4) :: line_ave(0:4), line_sigma(0:4)
 !
 !
@@ -247,11 +247,11 @@
 !
 !
       iflag_sel = 0
-      iref = line_sigma(0)
+      i_ref = line_sigma(0)
       do k = 1, 4
-        if(line_sigma(k) .lt. iref) then
+        if(line_sigma(k) .lt. i_ref) then
           iflag_sel = k
-          iref = line_sigma(k)
+          i_ref = line_sigma(k)
         end if
       end do
 !      write(*,*) 'iflag_sel', j, iflag_sel, line_sigma(0:4)
