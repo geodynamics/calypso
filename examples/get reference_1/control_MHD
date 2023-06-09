@@ -1,0 +1,235 @@
+begin MHD_control
+!!!!! Define for files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!  num_subdomain_ctl: number of subdomains
+!  num_smp_ctl:       number of smp processes
+!
+!  mesh_file_head_ctl:  header of mesh file (Default: in.domain#)
+!
+!  sph_file_prefix:     prefix of spherical transfoem grid
+!  restart_file_prefix: prefix of restart file
+!                            (Default: restart/rst.step#.domain#)
+!  field_file_prefix:   prefix of snapshot field data
+!                            (Default: out.step#.domain#.udt)
+!
+!  field_file_fmt_ctl:  data format for field files
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  begin data_files_def
+    debug_flag_ctl            'Off'
+!
+    num_subdomain_ctl            2
+    num_smp_ctl                  2
+!
+    radial_field_file_name      'radial_field.dat'
+!
+    restart_file_prefix         'rst_6/rst'
+    restart_file_fmt_ctl       'merged_bin'
+  end data_files_def
+!
+!!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
+!
+!  To Define by external file...
+!    file spherical_shell_ctl  'file name'
+!
+!  num_domain_ctl:   Parallelization information
+!    num_radial_domain_ctl:        Number of radial decompositoin
+!    num_horizontal_domain_ctl:    Number of horizontal decompositoin
+!
+!   truncation_level_ctl: Truncation of spherical harmonics (Lmax)
+!   ngrid_meridonal_ctl:  Number of meridional grid points ( = 1.5 x (Lmax+1))
+!   num_horizontal_domain_ctl: Number of zonal grid points ( = 3 x (Lmax+1))
+!
+!   radial_grid_type_ctl:  Definition for radial grid   
+!         explicit:        Set each radial grid explicitly
+!         Chebyshev:       Set Chebyshev collocation points
+!         equi_distance:   Set equi-diatance grid
+!
+!   num_fluid_grid_ctl:    Number of radial grids
+!   fluid_core_size_ctl    Size of fluid shell
+!   ICB_to_CMB_ratio_ctl   Aspect ratio (r_o / r_i)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  file spherical_shell_ctl  'control_resolution'
+!
+  begin model
+!!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! available valuables 
+!   velocity, temperature, pressure, vorticity
+!   vector_potential, magnetic_field, current_density, magnetic_potential
+!   composition, perturbation_temp
+!
+!   buoyancy_flux, Lorentz_work
+!   magnetic_ene_generation
+!   temp_generation, part_temp_gen
+!   vis_ene_diffuse, mag_ene_diffuse
+!
+!   thermal_diffusion, viscous_diffusion, magnetic_diffusion
+!   Coriolis_force, buoyancy
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin phys_values_ctl
+      array nod_value_ctl
+        nod_value_ctl  velocity                Viz_On   Monitor_On
+        nod_value_ctl  pressure                Viz_On   Monitor_On
+        nod_value_ctl  temperature             Viz_On   Monitor_On
+        nod_value_ctl  heat_source             Viz_On   Monitor_On
+        nod_value_ctl  composition             Viz_On   Monitor_On
+        nod_value_ctl  composition_source      Viz_On   Monitor_On
+      end array nod_value_ctl
+    end phys_values_ctl
+!
+!!!!!  physical values for time evolution !!!!!!!!!!!!!!!!!!
+! aviable valuables: velocity, temperature, magnetic_field
+!                    vector_potential, composition
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin time_evolution_ctl
+      array time_evo_ctl
+        time_evo_ctl  temperature
+        time_evo_ctl  composition
+      end array time_evo_ctl
+    end time_evolution_ctl
+!
+!!!!!  setting for boundary condition
+!
+    begin boundary_condition
+      array bc_temperature
+        bc_temperature  fixed ICB  1.000
+        bc_temperature  fixed CMB  0.000
+      end array bc_temperature
+      array bc_composition
+        bc_composition fixed       ICB  1.000  end
+        bc_composition fixed_flux  CMB -0.35   end
+      end array bc_composition
+    end boundary_condition
+!
+!!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  available forces
+!     gravity, Coriolis, Lorentz
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    begin forces_define
+!    end forces_define
+!
+!!!!!  dimensionless numbers !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  available numbers
+!     Prandtl_number, magnetic_Prandtl_number
+!     Rayleigh_number, modified_Rayleigh_number
+!     Reynords_number
+!     Taylor_number, Ekman_number
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin dimensionless_ctl
+      array dimless_ctl
+        dimless_ctl  Prandtl_number                   1.0e-0
+      end array dimless_ctl
+    end dimensionless_ctl
+!
+!!!!! Normalization settings  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!    define
+!     coef_4_termal_ctl:      time integration and advection of temp
+!     coef_4_velocity_ctl:    time integration and advection of temperature
+!     coef_4_magnetic_ctl:    time integration and advection of magnetic f.
+!     coef_4_t_diffuse_ctl:   coefficients for thermal diffusion
+!     coef_4_v_diffuse_ctl:   coefficients for viscous diffusion
+!     coef_4_m_diffuse_ctl:   coefficients for magnetic diffusion
+!     coef_4_buoyancy_ctl:    coefficients for buoyancy
+!     coef_4_Coriolis_ctl:    coefficients for Coriolis force
+!     coef_4_Lorentz_ctl:     coefficients for Lorantz force
+!     coef_4_composit_buoyancy_ctl: 
+!                             coefficients for compositional buoyancy
+!     coef_4_induction_ctl:   coefficients for magnetic induction
+!
+!     One:  1, Zero (Ignore), Two:  2,   Radial_parameter: (1-ri/ro)
+!     Radial_35: (1-0.35)
+!
+!     Real number.... Power of each numbers
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+    begin coefficients_ctl
+      begin thermal
+        array coef_4_termal_ctl
+          coef_4_termal_ctl            Zero    1.0
+        end array coef_4_termal_ctl
+        array coef_4_t_diffuse_ctl
+          coef_4_t_diffuse_ctl         One     1.0
+        end array coef_4_t_diffuse_ctl
+        array coef_4_heat_source_ctl
+          coef_4_heat_source_ctl       One     1.0
+        end array coef_4_heat_source_ctl
+      end thermal
+!
+      begin composition
+        array coef_4_composition_ctl
+          coef_4_composition_ctl       Zero    1.0
+        end array coef_4_composition_ctl
+        array coef_4_c_diffuse_ctl  1
+          coef_4_c_diffuse_ctl         One     1.0
+        end array coef_4_c_diffuse_ctl
+        array coef_4_light_source_ctl
+          coef_4_light_source_ctl      One     1.0
+        end array coef_4_light_source_ctl
+      end composition
+!
+!
+      begin momentum
+        array coef_4_velocity_ctl
+          coef_4_velocity_ctl          One                        1.0
+        end array coef_4_velocity_ctl
+!
+        array coef_4_press_ctl
+          coef_4_press_ctl             One                       -1.0
+        end array coef_4_press_ctl
+!
+        array coef_4_v_diffuse_ctl
+          coef_4_v_diffuse_ctl         One                        1.0
+        end array coef_4_v_diffuse_ctl
+      end momentum
+    end coefficients_ctl
+!
+!!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!    ref_temperature_ctl: none           (No reference of temperature)
+!                         spherical_shell (for spherical shell model)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin temperature_define
+!      ref_temp_ctl     none
+      ref_temp_ctl      numerical_solution
+    end temperature_define
+    begin composition_define
+      ref_comp_ctl      numerical_solution
+    end composition_define
+  end model
+!
+!
+!
+  begin control
+!!!!!  information for sime integration
+   begin time_step_ctl
+       i_step_init_ctl          0
+!      i_step_init_ctl          1
+      i_step_finish_ctl         1
+!
+      i_step_check_ctl             100
+      i_step_rst_ctl             20000
+!
+      dt_ctl              5.0e-5
+      time_init_ctl       0.0e-8
+    end time_step_ctl
+!
+!!!!!  control for restart data
+    begin restart_file_ctl
+      rst_ctl                dynamo_benchmark_1
+    end restart_file_ctl
+!
+!!!!!!   method for time evolution
+!
+    begin time_loop_ctl
+      scheme_ctl              Crank_Nicolson
+    end time_loop_ctl
+  end control
+!
+end MHD_control
