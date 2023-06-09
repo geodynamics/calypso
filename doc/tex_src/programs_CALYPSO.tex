@@ -219,7 +219,9 @@ Block \verb|MHD_control|  (Top block of the control file)
 	\item Block \hyperref[href_t:temperature_define]{\tt temperature\_define}
 		\begin{itemize} \label{href_i:temperature_define}
 		\item \verb||
-				\hyperref[href_t:ref_temp_ctl]{\tt ref\_temp\_ctl        [REFERENCE\_TEMP]}
+				\hyperref[href_t:ref_temp_ctl]{\tt ref\_temp\_ctl        [REFERENCE\_TYPE]}
+		\item \verb||
+				\hyperref[href_t:ref_field_file_name]{\tt ref\_field\_file\_name [File\_Name]}
 		\item Block \hyperref[href_t:low_temp_ctl]{\tt low\_temp\_ctl}
 			\begin{itemize}
 			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
@@ -230,6 +232,25 @@ Block \verb|MHD_control|  (Top block of the control file)
 			\begin{itemize}
 			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
 			\item \hyperref[href_t:temperature]{\tt temperature  [TEMPERATURE]}
+			\end{itemize}
+		\end{itemize}
+%
+	\item Block \hyperref[href_t:composition_define]{\tt tcomposition\_define}
+		\begin{itemize} \label{href_i:composition_define}
+		\item \verb||
+				\hyperref[href_t:ref_comp_ctl]{\tt ref\_comp\_ctl        [REFERENCE\_TYPE]}
+		\item \verb||
+				\hyperref[href_t:ref_field_file_name]{\tt ref\_field\_file\_name [File\_Name]}
+		\item Block \hyperref[href_t:low_comp_ctl]{\tt low\_comp\_ctl}
+			\begin{itemize}
+			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:composition]{\tt composition  [COMPOSITION]}
+			\end{itemize}
+%
+		\item Block \hyperref[href_t:high_comp_ctl]{\tt high\_comp\_ctl}
+			\begin{itemize}
+			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:composition]{\tt composition  [COMPOSITION]}
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
@@ -610,11 +631,11 @@ An example of the boundary condition file is shown in Figure \ref{fig:boundary_f
 \item  After finishing the list of spectrum data return to Step 2 for the next boundary condition
 \end{enumerate}
 %
-If harmonics coefficients of the boundary conditions are not listed in item 5, 0.0 is automatically applied for the harmonics coefficients of the boundary conditions. So, only non-zero components need to be listed in the boundary condition file.
-
+If harmonics coefficients of the boundary conditions are not listed in item 5, 0.0 is automatically applied for the harmonics coefficients of the boundary conditions. So, only non-zero components need to be listed in the boundary condition file. Lines starting from "\#" or "!" are ignored as comment lines.
 %
 \begin{figure}[htbp]
 \begin{center}
+{\small
 \begin{verbatim}
 #
 #  number of boundary conditions
@@ -651,12 +672,73 @@ CMB
   0   0   1.0E+00
   2  -2   5.0E-01
 \end{verbatim}
+}
 \end{center}
 \caption{An example of boundary condition file.}
 \label{fig:boundary_file}
 \end{figure}
 %
+%
+\subsubsection{Radial stationary field file}\label{sec:radial_field_file}
+Horizontally homogeneous heat and light element source/sink can be defined by the text file defined by  \hyperref[href_t:radial_field_file_name]{\tt [radial\_field\_file\_name]}. If the radial field data file is read, the heat and composition source term in the restart data are overwritten. The data in the file consist of the radius and fields data. The read data are interpolated into the each grids points in the program. If there are more than  one field data, the radial grids in the data file has to be shared for the data. An example of the radial data file is shown in Figure \ref{fig:radial_field_file}. Lines starting from "\#" or "!" are ignored as comment lines. Calypso ignore the field in data file if this field is not used. 
+%
+\begin{figure}[htbp]
+\begin{center}
+{\small
+\begin{verbatim}
+#  domain ID
+               0
+#  time step number
+               0
+#  time, Delta t
+   0.000000000000000E+000   0.000000000000000E+000
+#  Number of grids, fields, and component
+    7    3
+    1    1    1
+radius
+   0.000000000000000E+000
+   5.384615384615384E-001
+   5.440461253489739E-001
+   5.440461253489742E-001
+   1.488945972412747E+000
+   1.488945972412750E+000
+   1.538461538461538E+000
+heat_source
+   0.000000000000000E+000
+   0.000000000000000E+000
+   0.000000000000000E+000
+   0.000000000000000E+000
+  -1.000000000000000E+001
+  -1.000000000000000E+001
+composition_source
+   1.000000000000000E+000
+   1.000000000000000E+000
+   1.000000000000000E+000
+   0.000000000000000E+001
+   0.000000000000000E+001
+   0.000000000000000E+000
+   0.000000000000000E+000
+\end{verbatim}
+}
+\end{center}
+\caption{An example of boundary condition file.}
+\label{fig:radial_field_file}
+\end{figure}
+%
+\subsubsection{Reference fields output file}\label{sec:ref_field_output}
+Calypso can solve the heat and composition equation using the reference and perturbation of the temperature and composition when the scalar satisfies the conservation.
+When reference field for is used, reference temperature, radial temperature gradient, heat source, composition, radial gradient of composition, and composition source is written in the ifle {\tt reference\_fields.dat}. This file has the same format as the input radial stationary field file  \hyperref[href_t:radial_field_file_name]{\tt [radial\_field\_file\_name]}. This file is useful to figure out the diffusive temperature and composition profile when \hyperref[href_t:ref_temp_ctl]{\tt [ref\_temp\_ctl]} or \hyperref[href_t:ref_comp_ctl]{\tt [ref\_comp\_ctl]} is set to {\tt numerical\_solution}. 
+%
+\begin{eqnarray}
+ 0 = \nabla^{2} T_{0} + q_{0},
+\nonumber
+\end{eqnarray}
+%
+where $q_{0}$ is the heat source/sink as a function of radius. Simple examples to evaluate the reference field is in {\tt examples/get\_reference\_1} and {\tt examples/get\_reference\_2} directory.
 
+({\color{red} Caution}) When fixed boundary condition is not set for the inner nor outer boundary, it is almost impossible to solve the diffusive profile numerically. Consequently, the diffusive profile is evaluated with applying the fixed boundary condition $T = 0$ at the outer boundary. 
+%
+%
 \subsection{Spectrum data for restarting}
 Spectrum data is used for restarting data and generating field data by Data transform program \verb|sph_snapshot|, \verb|sph_zm_snapshot|, or \verb|sph_dynamobench|. This file is saved for each subdomain (MPI processes), then \verb|[step #]| and \verb|[domain #]| are added in the file name. The \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_RESTART]|. Data format is defined by \verb|[restart_file_fmt_ctl]| as shown in Table \ref{table:restart_format}.
 %

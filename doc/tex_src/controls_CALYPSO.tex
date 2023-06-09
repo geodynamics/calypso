@@ -719,12 +719,23 @@ Reference of temperature $T_{0}$ is defined in this block. If reference of tempe
 
 \paragraph{\tt ref\_temp\_ctl}
 \label{href_t:ref_temp_ctl}
-\verb|[REFERENCE_TEMP]| \\
-Type of reference temperature is defined by text. The following options are available for \verb|[REFERENCE_TEMP]|.
+\verb|[REFERENCE_TYPE]| \\
+Type of reference temperature is defined by text. The following options are available for \verb|[REFERENCE_TYPE]|.
 %
 \begin{description}
-\item{\tt none}   Reference of temperature is not defined. Temperature $T$ is used to time evolution and thermal buoyancy.
-\item{\tt spherical\_shell} Reference of temperature is set by
+\item{\tt none: }   \\
+Reference of temperature is not defined. Temperature $T$ is used to time evolution and thermal buoyancy.
+\item{\tt file: }      \\
+Read reference temperature from data file defined by \hyperref[href_t:ref_field_file_name]{\tt [ref\_field\_file\_name]}
+\item{\tt numerical\_solution: } \\
+Reference temperature obtained from the given boundary condition and radial heat source by
+\begin{eqnarray}
+ 0 = \nabla^{2} T_{0} + q_{0}
+ \nonumber
+\end{eqnarray}
+%
+
+\item{\tt spherical\_shell:} Reference of temperature is set by
 \begin{eqnarray}
  T_{0} = \frac{1}{\left(r_{h}-r_{l} \right)} \left[
           r_{l}T_{l} - r_{h}T_{h} + \frac{r_{l} r_{h}}{r} \left(T_{h}-T_{l}\right) \right].
@@ -732,6 +743,9 @@ Type of reference temperature is defined by text. The following options are avai
 \end{eqnarray}
 \end{description}
 %
+\paragraph{\tt ref\_field\_file\_name [File\_Name]}
+\label{href_t:ref_field_file_name}
+ [File\_Name] for the reference temperature is defined as text. 
 
 \paragraph{\tt low\_temp\_ctl}
 \label{href_t:low_temp_ctl}
@@ -750,6 +764,29 @@ Radius for reference temperature is defined by real.
 \label{href_t:temperature}
 \verb|[TEMPERATURE]| \\
 Temperature for reference temperature is defined by real.
+
+\subsection{\tt composition\_define}
+\label{href_t:composition_define}
+Reference of light element $C_{0}$ is defined in this block. If reference of light element amount is defined, perturbation of temperature $\Theta_{C} = C - C_{0}$ is used for time evolution and buoyancy. \\
+\hyperref[href_i:composition_define]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt ref\_comp\_ctl}
+\label{href_t:ref_comp_ctl}
+\verb|[REFERENCE_TYPE]| \\
+Type of reference temperature is defined by text. See  \hyperref[href_t:ref_temp_ctl]{\tt [ref\_temp\_ctl]} for the available options for \verb|[REFERENCE_TYPE]| .
+%
+\\paragraph{\tt low\_comp\_ctl}
+\label{href_t:low_comp_ctl}
+Amplitude of low reference composition $C_{l}$ and its radius $r_{l}$ (Generally $r_{l} = r_{o}$) are defined in this block.
+
+\paragraph{\tt high\_comp\_ctl}
+\label{href_t:high_comp_ctl}
+Amplitude of high reference composition $C_{h}$ and its radius $r_{h}$ (Generally $r_{h} = r_{i}$) are defined in this block.
+
+\paragraph{\tt composition}
+\label{href_t:composition}
+\verb|[COMPOSITION]| \\
+Composition for the reference composition is defined by real.
 
 
 \subsection{\tt time\_step\_ctl}
