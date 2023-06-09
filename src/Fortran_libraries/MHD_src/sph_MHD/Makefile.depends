@@ -18,7 +18,7 @@ address_sph_trans_MHD.o: $(MHD_SPH_DIR)/address_sph_trans_MHD.f90 m_precision.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 address_sph_trans_snap.o: $(MHD_SPH_DIR)/address_sph_trans_snap.f90 m_precision.o m_machine_parameter.o t_phys_data.o t_phys_address.o t_addresses_sph_transform.o add_base_field_4_sph_trns.o add_base_force_4_sph_trns.o add_prod_field_4_sph_trns.o add_diffusion_4_sph_trns.o add_diff_vect_to_sph_trans.o add_field_to_sph_trans_list.o add_energy_flux_4_sph_trns.o
 	$(F90) -c $(F90OPTFLAGS) $<
-adjust_reference_fields.o: $(MHD_SPH_DIR)/adjust_reference_fields.f90 m_precision.o m_machine_parameter.o t_spheric_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_reference_scalar_param.o t_control_parameter.o t_radial_reference_field.o set_reference_sph_mhd.o copy_nodal_fields.o
+adjust_reference_fields.o: $(MHD_SPH_DIR)/adjust_reference_fields.f90 m_precision.o m_machine_parameter.o t_spheric_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_reference_scalar_param.o t_control_parameter.o t_radial_reference_field.o set_reference_sph_mhd.o swap_full_perturbation_sph.o copy_nodal_fields.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_CMB_dipolarity.o: $(MHD_SPH_DIR)/cal_CMB_dipolarity.f90 m_precision.o m_constants.o t_phys_data.o t_CMB_dipolarity.o t_rms_4_sph_spectr.o t_spheric_parameter.o t_control_array_character.o t_control_array_integer.o t_multi_flag_labels.o m_file_format_labels.o m_base_field_labels.o set_parallel_file_name.o t_spheric_rj_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -158,7 +158,7 @@ init_FFT_4_MHD.o: $(MHD_SPH_DIR)/init_FFT_4_MHD.F90 m_precision.o calypso_mpi.o 
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 init_external_magne_sph.o: $(MHD_SPH_DIR)/init_external_magne_sph.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_base_field_labels.o t_field_component_labels.o t_phys_data.o t_physical_property.o
 	$(F90) -c $(F90OPTFLAGS) $<
-init_radial_infos_sph_mhd.o: $(MHD_SPH_DIR)/init_radial_infos_sph_mhd.f90 m_precision.o calypso_mpi.o m_constants.o m_spheric_constants.o m_machine_parameter.o t_control_parameter.o t_spheric_parameter.o t_spheric_group.o t_poloidal_rotation.o t_radial_reference_field.o t_fdm_coefs.o t_sph_boundary_input_data.o t_bc_data_list.o t_boundary_data_sph_MHD.o t_phys_address.o t_phys_data.o t_work_4_sph_trans.o t_physical_property.o second_fdm_node_coefs.o material_property.o set_bc_sph_mhd.o set_radius_func_noequi.o sph_mhd_rst_IO_control.o reference_sources_from_d_rj.o init_reference_scalar.o init_external_magne_sph.o
+init_radial_infos_sph_mhd.o: $(MHD_SPH_DIR)/init_radial_infos_sph_mhd.f90 m_precision.o calypso_mpi.o m_constants.o m_spheric_constants.o m_machine_parameter.o t_control_parameter.o t_spheric_parameter.o t_spheric_group.o t_poloidal_rotation.o t_radial_reference_field.o t_fdm_coefs.o t_sph_boundary_input_data.o t_bc_data_list.o t_boundary_data_sph_MHD.o t_phys_address.o t_phys_data.o t_work_4_sph_trans.o t_physical_property.o second_fdm_node_coefs.o material_property.o set_bc_sph_mhd.o set_radius_func_noequi.o sph_mhd_rst_IO_control.o reference_sources_from_d_rj.o init_reference_scalar.o init_external_magne_sph.o radial_reference_field_IO.o m_base_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 init_sphrical_transform_MHD.o: $(MHD_SPH_DIR)/init_sphrical_transform_MHD.f90 m_precision.o m_constants.o m_machine_parameter.o m_work_time.o calypso_mpi.o t_SPH_MHD_model_data.o t_SPH_mesh_field_data.o t_sph_trans_comm_tbl.o t_poloidal_rotation.o t_sph_trans_arrays_MHD.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_trans_select.o t_sph_FFT_selector.o t_const_wz_coriolis_rtp.o t_coriolis_terms_rlm.o t_gaunt_coriolis_rlm.o t_boundary_data_sph_MHD.o t_solver_SR.o set_address_sph_trans_MHD.o set_address_sph_trans_snap.o check_sph_mhd_openmp_size.o init_sph_trans.o init_FFT_4_MHD.o pole_sph_transform.o skip_comment_f.o m_legendre_transform_list.o test_legendre_transforms.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -183,6 +183,8 @@ m_initial_field_control.o: $(MHD_SPH_DIR)/m_initial_field_control.f90 m_precisio
 material_property.o: $(MHD_SPH_DIR)/material_property.f90 m_precision.o m_constants.o t_phys_address.o t_control_parameter.o t_physical_property.o t_coef_parameters_list.o calypso_mpi.o construct_MHD_coefficient.o
 	$(F90) -c $(F90OPTFLAGS) $<
 poynting_flux_smp.o: $(MHD_SPH_DIR)/poynting_flux_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+radial_reference_field_IO.o: $(MHD_SPH_DIR)/radial_reference_field_IO.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_phys_data.o t_phys_address.o t_radial_reference_field.o calypso_mpi.o t_time_data.o field_file_IO.o copy_rj_phys_data_4_IO.o set_sph_extensions.o calypso_mpi_int.o calypso_mpi_real.o t_file_IO_parameter.o interpolate_reference_data.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
 reference_sources_from_d_rj.o: $(MHD_SPH_DIR)/reference_sources_from_d_rj.f90 m_precision.o calypso_mpi.o t_spheric_parameter.o t_phys_address.o t_phys_data.o t_radial_reference_field.o calypso_mpi_real.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -288,6 +290,8 @@ sum_rot_coriolis_terms_rlm.o: $(MHD_SPH_DIR)/sum_rot_coriolis_terms_rlm.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 sum_rotation_of_forces.o: $(MHD_SPH_DIR)/sum_rotation_of_forces.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_physical_property.o t_phys_address.o t_base_force_labels.o t_explicit_term_labels.o t_phys_data.o copy_nodal_fields.o cal_vorticity_terms_adams.o m_phys_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
+swap_full_perturbation_sph.o: $(MHD_SPH_DIR)/swap_full_perturbation_sph.f90 m_precision.o m_constants.o t_spheric_rj_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
 t_CMB_dipolarity.o: $(MHD_SPH_DIR)/t_CMB_dipolarity.f90 m_precision.o m_constants.o t_field_labels.o t_read_sph_spectra.o t_buffer_4_gzip.o sph_monitor_data_text.o select_gz_stream_file_IO.o gz_open_sph_vol_mntr_file.o m_time_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_FEM_mesh_field_data.o: $(MHD_SPH_DIR)/t_FEM_mesh_field_data.f90 m_precision.o t_mesh_data.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_grad_field_labels.o t_node_monitor_IO.o
@@ -342,9 +346,9 @@ t_poloidal_rotation.o: $(MHD_SPH_DIR)/t_poloidal_rotation.f90 m_precision.o m_co
 	$(F90) -c $(F90OPTFLAGS) $<
 t_radial_matrices_sph_MHD.o: $(MHD_SPH_DIR)/t_radial_matrices_sph_MHD.f90 m_precision.o t_spheric_rj_data.o t_sph_matrices.o t_sph_matrix.o check_sph_radial_mat.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_radial_reference_field.o: $(MHD_SPH_DIR)/t_radial_reference_field.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_grad_field_labels.o t_field_component_labels.o t_file_IO_parameter.o t_sph_radial_interpolate.o t_field_data_IO.o calypso_mpi.o t_time_data.o field_file_IO.o copy_rj_phys_data_4_IO.o set_sph_extensions.o calypso_mpi_int.o calypso_mpi_real.o interpolate_reference_data.o m_base_field_labels.o m_grad_field_labels.o m_field_component_labels.o append_phys_data.o init_external_magne_sph.o
+t_radial_reference_field.o: $(MHD_SPH_DIR)/t_radial_reference_field.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_grad_field_labels.o t_field_component_labels.o t_file_IO_parameter.o t_sph_radial_interpolate.o t_field_data_IO.o m_base_field_labels.o m_grad_field_labels.o m_field_component_labels.o append_phys_data.o interpolate_reference_data.o init_external_magne_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_reference_scalar_param.o: $(MHD_SPH_DIR)/t_reference_scalar_param.f90 m_precision.o m_error_IDs.o m_machine_parameter.o t_ctl_data_temp_model.o calypso_mpi.o t_control_array_character.o t_ctl_data_stratified_model.o
+t_reference_scalar_param.o: $(MHD_SPH_DIR)/t_reference_scalar_param.f90 m_precision.o m_error_IDs.o m_machine_parameter.o t_ctl_data_temp_model.o t_file_IO_parameter.o calypso_mpi.o t_control_array_character.o m_file_format_switch.o delete_data_files.o t_ctl_data_stratified_model.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_MHD_w_psf.o: $(MHD_SPH_DIR)/t_sph_MHD_w_psf.f90 m_precision.o t_FEM_mesh_field_data.o t_SPH_MHD_zonal_mean_viz.o t_viz_sections.o t_comm_table.o
 	$(F90) -c $(F90OPTFLAGS) $<

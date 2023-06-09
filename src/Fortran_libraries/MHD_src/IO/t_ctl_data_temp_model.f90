@@ -16,7 +16,7 @@
 !!    ref_temp_ctl: none           (No reference of temperature)
 !!                  spherical_shell ( for spherical shell model)
 !!                  takepiro        ( takepiro model )
-!!                  numrical_solution ( Get numerical solution)
+!!                  numerical_solution ( Get numerical solution)
 !!                  linear_x        ( propotional to x-direction )
 !!                  linear_y        ( propotional to x-direction )
 !!                  linear_z        ( propotional to x-direction )
@@ -34,6 +34,7 @@
 !!      ICB_diffusivity_reduction_ctl     0.1
 !!
 !!      ref_temp_ctl              spherical_shell
+!!      ref_field_file_name      'reference_temp.dat'
 !!      begin low_temp_ctl
 !!           depth         1.5384615384615384
 !!           temperature   0.0d0
@@ -55,6 +56,7 @@
 !!      filtered_advection_ctl    Off
 !!
 !!      ref_comp_ctl              spherical_shell
+!!      ref_field_file_name      'reference_comp.dat'
 !!      begin low_comp_ctl
 !!           depth         1.5384615384615384
 !!           composition   0.0d0
@@ -99,6 +101,7 @@
         type(read_character_item) :: filterd_advect_ctl
         type(read_character_item) :: reference_ctl
         type(read_character_item) :: stratified_ctl
+        type(read_character_item) :: ref_file_ctl
 !
         type(read_real_item) :: ICB_diffuse_reduction_ctl
 !
@@ -129,6 +132,7 @@
       refs_ctl%filterd_advect_ctl%iflag =   0
       refs_ctl%reference_ctl%iflag =        0
       refs_ctl%stratified_ctl%iflag =       0
+      refs_ctl%ref_file_ctl%iflag =         0
 !
       refs_ctl%i_temp_def = 0
 !

@@ -92,13 +92,15 @@
      &    refs%iref_base%i_temp, refs%iref_grad%i_grad_temp,            &
      &    refs%ref_field, MHD_prop%ref_param_T,                         &
      &    ipol%base%i_temp, ipol%grad_fld%i_grad_temp,                  &
-     &    ipol%base%i_per_temp, ipol%grad_fld%i_grad_per_t, rj_fld)
+     &    ipol%base%i_per_temp, ipol%grad_fld%i_grad_per_t,             &
+     &    ipol%base%i_heat_source, rj_fld)
 !
       call sync_scalar_by_pert_sph(sph%sph_rj,                          &
      &    refs%iref_base%i_light, refs%iref_grad%i_grad_composit,       &
      &    refs%ref_field, MHD_prop%ref_param_C,                         &
      &    ipol%base%i_light, ipol%grad_fld%i_grad_composit,             &
-     &    ipol%base%i_per_light, ipol%grad_fld%i_grad_per_c, rj_fld)
+     &    ipol%base%i_per_light, ipol%grad_fld%i_grad_per_c,            &
+     &    ipol%base%i_light_source, rj_fld)
 !
       end subroutine sync_temp_by_per_temp_sph
 !
@@ -117,17 +119,19 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call trans_pert_to_scalar_sph(sph%sph_rj,                         &
-     &    refs%iref_base%i_temp, refs%iref_grad%i_grad_temp,            &
-     &    refs%ref_field, MHD_prop%ref_param_T,                         &
-     &    ipol%base%i_temp, ipol%grad_fld%i_grad_temp,                  &
-     &    ipol%base%i_per_temp, ipol%grad_fld%i_grad_per_t, rj_fld)
+      call trans_pert_to_scalar_sph(sph%sph_rj, refs%iref_base%i_temp,  &
+     &   refs%iref_base%i_heat_source, refs%iref_grad%i_grad_temp,      &
+     &   refs%ref_field, MHD_prop%ref_param_T,                          &
+     &   ipol%base%i_temp, ipol%grad_fld%i_grad_temp,                   &
+     &   ipol%base%i_per_temp, ipol%grad_fld%i_grad_per_t,              &
+     &   ipol%base%i_heat_source, rj_fld)
 !
-      call trans_pert_to_scalar_sph(sph%sph_rj,                         &
-     &    refs%iref_base%i_light, refs%iref_grad%i_grad_composit,       &
-     &    refs%ref_field, MHD_prop%ref_param_C,                         &
-     &    ipol%base%i_light, ipol%grad_fld%i_grad_composit,             &
-     &    ipol%base%i_per_light, ipol%grad_fld%i_grad_per_c, rj_fld)
+      call trans_pert_to_scalar_sph(sph%sph_rj, refs%iref_base%i_light, &
+     &   refs%iref_base%i_light_source, refs%iref_grad%i_grad_composit, &
+     &   refs%ref_field, MHD_prop%ref_param_C,                          &
+     &   ipol%base%i_light, ipol%grad_fld%i_grad_composit,              &
+     &   ipol%base%i_per_light, ipol%grad_fld%i_grad_per_c,             &
+     &   ipol%base%i_light_source, rj_fld)
 !
       end subroutine trans_per_temp_to_temp_sph
 !
@@ -137,15 +141,16 @@
       subroutine sync_scalar_by_pert_sph                                &
      &         (sph_rj, iref_scalar, iref_grad, ref_field, ref_param,   &
      &          is_temp, is_grad_t, is_par_temp, is_grad_part_t,        &
-     &          rj_fld)
+     &          is_source, rj_fld)
 !
-      use set_reference_sph_mhd
+      use swap_full_perturbation_sph
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
       integer(kind = kint), intent(in) :: iref_scalar, iref_grad
       integer(kind = kint), intent(in) :: is_temp, is_par_temp
       integer(kind = kint), intent(in) :: is_grad_t, is_grad_part_t
+      integer(kind = kint), intent(in) :: is_source
 !
       type(reference_scalar_param), intent(in) :: ref_param
       type(phys_data), intent(in) :: ref_field
@@ -156,43 +161,50 @@
 !
       if(ref_param%flag_ref_field .eqv. .FALSE.) return
 !
-      call chenge_temp_to_per_temp_sph                                  &
-     &   (sph_rj%idx_rj_degree_zero, sph_rj%inod_rj_center,             &
-     &    sph_rj%nnod_rj, sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,        &
+      call chenge_temp_to_per_temp_sph(sph_rj,                          &
      &    ref_field%d_fld(1,iref_scalar), ref_field%d_fld(1,iref_grad), &
      &    rj_fld%d_fld(1,is_temp), rj_fld%d_fld(1,is_grad_t),           &
      &    rj_fld%d_fld(1,is_par_temp), rj_fld%d_fld(1,is_grad_part_t))
+!
+      if(is_source .le. 0) then
+        call remove_ref_source_sph(sph_rj, rj_fld%d_fld(1,is_source))
+      end if
 !
       end subroutine sync_scalar_by_pert_sph
 !
 ! -----------------------------------------------------------------------
 !
       subroutine trans_pert_to_scalar_sph                               &
-     &         (sph_rj, iref_scalar, iref_grad, ref_field, ref_param,   &
-     &          is_temp, is_grad_t, is_par_temp, is_grad_part_t,        &
-     &          rj_fld)
+     &         (sph_rj, iref_scalar, iref_source, iref_grad,            &
+     &          ref_field, ref_param, is_temp, is_grad_t,               &
+     &          is_par_temp, is_grad_part_t, is_source, rj_fld)
 !
-      use set_reference_sph_mhd
+      use swap_full_perturbation_sph
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(reference_scalar_param), intent(in) :: ref_param
       type(phys_data), intent(in) :: ref_field
 !
       integer(kind = kint), intent(in) :: iref_scalar, iref_grad
+      integer(kind = kint), intent(in) :: iref_source
       integer(kind = kint), intent(in) :: is_temp, is_par_temp
       integer(kind = kint), intent(in) :: is_grad_t, is_grad_part_t
+      integer(kind = kint), intent(in) :: is_source
 !
       type(phys_data), intent(inout) :: rj_fld
 !
 !
       if(ref_param%flag_ref_field .eqv. .FALSE.) return
 !
-      call transfer_per_temp_to_temp_sph                                &
-     &   (sph_rj%idx_rj_degree_zero, sph_rj%inod_rj_center,             &
-     &    sph_rj%nnod_rj, sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,        &
+      call back_per_temp_to_temp_sph(sph_rj,                            &
      &    ref_field%d_fld(1,iref_scalar), ref_field%d_fld(1,iref_grad), &
      &    rj_fld%d_fld(1,is_temp), rj_fld%d_fld(1,is_grad_t),           &
      &    rj_fld%d_fld(1,is_par_temp), rj_fld%d_fld(1,is_grad_part_t))
+!
+      if(is_source .le. 0) then
+        call back_ref_source_sph(sph_rj,                                &
+     &      ref_field%d_fld(1,iref_source), rj_fld%d_fld(1,is_source))
+      end if
 !
       end subroutine trans_pert_to_scalar_sph
 !

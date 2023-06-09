@@ -27,7 +27,7 @@
 !!    ref_temp_ctl: none           (No reference of temperature)
 !!                  spherical_shell ( for spherical shell model)
 !!                  takepiro        ( takepiro model )
-!!                  numrical_solution ( Get numerical solution)
+!!                  numerical_solution ( Get numerical solution)
 !!                  linear_x        ( propotional to x-direction )
 !!                  linear_y        ( propotional to x-direction )
 !!                  linear_z        ( propotional to x-direction )
@@ -42,6 +42,7 @@
 !!      filtered_advection_ctl    Off
 !!
 !!      ref_comp_ctl              spherical_shell
+!!      ref_field_file_name      'reference_temp.dat'
 !!      begin low_comp_ctl
 !!           depth         1.5384615384615384
 !!           composition   0.0d0
@@ -82,14 +83,16 @@
      &    :: hd_diffusivity_reduction = 'ICB_diffusivity_reduction_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_ref_comp =    'ref_comp_ctl'
+     &       :: hd_ref_comp =       'ref_comp_ctl'
+      character(len=kchara), parameter, private                         &
+     &       :: hd_ref_field_file = 'ref_field_file_name'
       character(len=kchara), parameter, private                         &
      &       :: hd_low_comp =    'low_comp_ctl'
       character(len=kchara), parameter, private                         &
      &       :: hd_high_comp =   'high_comp_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_strat_ctl =   'stratified_ctl'
+     &       :: hd_start_ctl =   'stratified_ctl'
       character(len=kchara), parameter, private                         &
      &       :: hd_takepiro_ctl = 'takepiro_model_ctl'
 !
@@ -136,7 +139,9 @@
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_ref_comp, refc_ctl%reference_ctl)
         call read_chara_ctl_type                                        &
-     &     (c_buf, hd_strat_ctl, refc_ctl%stratified_ctl)
+     &     (c_buf, hd_start_ctl, refc_ctl%stratified_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_ref_field_file, refc_ctl%ref_file_ctl)
 !
         call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
      &                          refc_ctl%ICB_diffuse_reduction_ctl)
@@ -166,7 +171,8 @@
       maxlen = len_trim(hd_filterd_advection)
       maxlen = max(maxlen, len_trim(hd_diffusivity_reduction))
       maxlen = max(maxlen, len_trim(hd_ref_comp))
-      maxlen = max(maxlen, len_trim(hd_strat_ctl))
+      maxlen = max(maxlen, len_trim(hd_start_ctl))
+      maxlen = max(maxlen, len_trim(hd_ref_field_file))
 !
       write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
@@ -187,7 +193,9 @@
 !
       write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_strat_ctl, refc_ctl%stratified_ctl)
+     &    hd_start_ctl, refc_ctl%stratified_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_ref_field_file, refc_ctl%ref_file_ctl)
       call write_takepiro_ctl(id_control, hd_takepiro_ctl,              &
      &    refc_ctl%takepiro_ctl, level)
 !

@@ -129,7 +129,6 @@
       type(sph_mean_squares), intent(inout) :: pwr
 !
       integer(kind = kint) :: num_vspec, inum
-      character(len = kchara) :: input_flag
 !
 !
       num_vspec = 1

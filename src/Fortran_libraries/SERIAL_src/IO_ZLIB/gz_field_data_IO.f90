@@ -133,7 +133,8 @@
 !
 !
       write(zbuf%fixbuf(1),'(a,2a1)'   )                                &
-     &          '! number of field and component', char(10), char(0)
+     &         '! Number of grids, fields, and component',              &
+     &         char(10), char(0)
       call gz_write_textbuf_no_lf(FPz_f, zbuf)
       write(zbuf%fixbuf(1),'(2i16,2a1)')                                &
      &           nnod64, num_field, char(10), char(0)
