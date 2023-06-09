@@ -20,7 +20,6 @@ begin MHD_control
     num_subdomain_ctl            2
     num_smp_ctl                  2
 !
-    sph_file_prefix             'sph_lm4r64c_2/in'
     boundary_data_file_name     'bc_spectr.btx'
 !
     restart_file_prefix         'rst_2/rst'
@@ -72,7 +71,7 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
-      array nod_value_ctl     4
+      array nod_value_ctl
         nod_value_ctl  velocity                Viz_Off  Monitor_Off
         nod_value_ctl  pressure                Viz_Off  Monitor_Off
         nod_value_ctl  temperature             Viz_On   Monitor_On
@@ -85,7 +84,7 @@ begin MHD_control
 !                    vector_potential, composition
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin time_evolution_ctl
-      array time_evo_ctl   2
+      array time_evo_ctl
         time_evo_ctl  temperature
         time_evo_ctl  composition
       end array time_evo_ctl
@@ -94,28 +93,24 @@ begin MHD_control
 !!!!!  setting for boundary condition
 !
     begin boundary_condition
-      array bc_temperature  2
+      array bc_temperature
         bc_temperature  fixed_flux_file  CMB  0.000
         bc_temperature  fixed_file       ICB  1.000
       end array bc_temperature
 !
-      array bc_velocity    0
+      array bc_velocity
 !
-      array bc_composition      2
+      array bc_composition
         bc_composition  fixed_flux_file        ICB 0.000
         bc_composition  fixed_file            CMB  1.000
       end array bc_composition
-!
-      array bc_magnetic_field   0
     end boundary_condition
 !
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available forces
 !     gravity, Coriolis, Lorentz
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    begin forces_define
-      array force_ctl      0
-    end forces_define
+!    begin forces_define
 !
 !!!!!  dimensionless numbers !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available numbers
@@ -125,7 +120,7 @@ begin MHD_control
 !     Taylor_number, Ekman_number
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
-      array dimless_ctl 2
+      array dimless_ctl
         dimless_ctl  Prandtl_number                   1.0e+0
         dimless_ctl  Composite_Prandtl_number         2.0E+0
       end array dimless_ctl
@@ -156,30 +151,30 @@ begin MHD_control
 !
     begin coefficients_ctl
       begin thermal
-        array coef_4_termal_ctl     1
+        array coef_4_termal_ctl
           coef_4_termal_ctl            One                        1.0
         end array coef_4_termal_ctl
 !
-        array coef_4_t_diffuse_ctl  1
+        array coef_4_t_diffuse_ctl
           coef_4_t_diffuse_ctl         Prandtl_number            -1.0
         end array coef_4_t_diffuse_ctl
 !
-        array coef_4_heat_source_ctl  1
+        array coef_4_heat_source_ctl
           coef_4_heat_source_ctl       One                        1.0
         end array coef_4_heat_source_ctl
       end  thermal
 !
 !
       begin composition
-        array coef_4_composition_ctl     1
+        array coef_4_composition_ctl
           coef_4_composition_ctl       One                        1.0
         end array coef_4_composition_ctl
 !
-        array coef_4_c_diffuse_ctl  1
+        array coef_4_c_diffuse_ctl
           coef_4_c_diffuse_ctl         Composite_Prandtl_number  -1.0
         end array coef_4_c_diffuse_ctl
 !
-        array coef_4_light_source_ctl  1
+        array coef_4_light_source_ctl
           coef_4_light_source_ctl     Two                         1.0
         end array coef_4_light_source_ctl
       end  composition
@@ -226,16 +221,16 @@ begin MHD_control
     begin pickup_spectr_ctl
       picked_sph_prefix     'monitor/picked_mode'
 !
-      array pick_layer_ctl  1
+      array pick_layer_ctl
         pick_layer_ctl   -1
       end array pick_layer_ctl
 !
-      array pick_sph_degree_ctl  2
+      array pick_sph_degree_ctl
         pick_sph_degree_ctl   0
         pick_sph_degree_ctl   1
       end array pick_sph_degree_ctl
 !
-      array pick_sph_spectr_ctl  2
+      array pick_sph_spectr_ctl
         pick_sph_spectr_ctl   2  -2
         pick_sph_spectr_ctl   2   2
       end array pick_sph_spectr_ctl
