@@ -8,19 +8,30 @@
 !!
 !!
 !!@verbatim
-!!      subroutine init_reft_rj_data(sph_rj, ipol, refs)
 !!      subroutine dealloc_reference_field(refs)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(phys_address), intent(in) :: ipol
 !!        type(radial_reference_field), intent(inout) :: refs
 !!      subroutine set_default_reference_file_name(refs)
-!!      subroutine output_reference_field(refs)
 !!        type(radial_reference_field), intent(in) :: refs
-!!      subroutine load_sph_reference_data(sph_rj, ipol, rj_fld, refs)
+!!      subroutine append_reference_field_names                         &
+!!     &         (radius_name, ipol_base, iref_radius,                  &
+!!     &          iref_base, iref_grad, iref_cmp, ref_field)
+!!        character(len = kchara), intent(in) :: radius_name
+!!        type(base_field_address), intent(in) :: ipol_base
+!!        integer(kind = kint), intent(inout) :: iref_radius
+!!        type(base_field_address), intent(inout) :: iref_base
+!!        type(gradient_field_address), intent(inout) :: iref_grad
+!!        type(field_component_address), intent(inout) :: iref_cmp
+!!        type(phys_data), intent(inout) :: ref_field
+!!
+!!      subroutine overwrite_sources_by_reference                       &
+!!     &         (sph_rj, iref_base, ipol_base, ref_field, rj_fld)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
-!!        type(phys_address), intent(in) :: ipol
+!!        type(base_field_address), intent(in) :: iref_base
+!!        type(base_field_address), intent(in) :: ipol_base
+!!        type(phys_data), intent(inout) :: ref_field
 !!        type(phys_data), intent(inout) :: rj_fld
-!!        type(radial_reference_field), intent(inout) :: refs
 !!@endverbatim
 !
       module t_radial_reference_field
@@ -38,9 +49,6 @@
       use t_field_data_IO
 !
       implicit  none
-!
-      character(len = kchara), parameter, private                       &
-     &             :: radius_name = 'radius'
 !
       character(len = kchara), parameter, private                       &
      &     :: default_input_reference_file = 'input_reference.dat'
@@ -71,39 +79,9 @@
         type(sph_radial_interpolate) :: r_itp
       end type radial_reference_field
 !
-      private :: append_reference_field_names
-      private :: overwrite_sources_by_reference
-!
 ! -----------------------------------------------------------------------
 !
       contains
-!
-! -----------------------------------------------------------------------
-!
-      subroutine init_reft_rj_data(sph_rj, ipol, refs)
-!
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(phys_address), intent(in) :: ipol
-!
-      type(radial_reference_field), intent(inout) :: refs
-!
-!
-      refs%ref_field%num_phys =   0
-      refs%ref_field%ntot_phys =  0
-      call alloc_phys_name(refs%ref_field)
-
-      call append_reference_field_names                                 &
-     &   (ipol%base, refs%iref_radius, refs%iref_base, refs%iref_grad,  &
-     &    refs%iref_cmp, refs%ref_field)
-      call alloc_phys_data((sph_rj%nidx_rj(1)+1), refs%ref_field)
-!
-      refs%ref_field%d_fld(1,refs%iref_radius) = 0.0d0
-!$omp parallel workshare
-      refs%ref_field%d_fld(2:sph_rj%nidx_rj(1)+1,refs%iref_radius)      &
-     &                    = sph_rj%radius_1d_rj_r(1:sph_rj%nidx_rj(1))
-!$omp end parallel workshare
-!
-      end subroutine init_reft_rj_data
 !
 ! -----------------------------------------------------------------------
 !
@@ -128,92 +106,10 @@
       end subroutine set_default_reference_file_name
 !
 !  --------------------------------------------------------------------
-!
-      subroutine output_reference_field(refs)
-!
-      use calypso_mpi
-      use t_time_data
-      use field_file_IO
-!
-      use copy_rj_phys_data_4_IO
-      use set_sph_extensions
-!
-      type(radial_reference_field), intent(inout) :: refs
-!
-      type(time_data) :: time_IO
-!
-!
-      if(my_rank .ne. 0) return
-!
-      time_IO%i_time_step = izero
-      time_IO%time = zero
-      time_IO%dt = zero
-!
-!
-      call copy_rj_phys_name_to_IO                                      &
-     &   (refs%ref_field%num_phys_viz, refs%ref_field, refs%ref_fld_IO)
-      call alloc_phys_data_IO(refs%ref_fld_IO)
-      call copy_rj_phys_data_to_IO                                      &
-     &   (refs%ref_field%num_phys_viz, refs%ref_field, refs%ref_fld_IO)
-!
-      call write_step_field_file(refs%ref_output_IO%file_prefix,        &
-     &                           my_rank, time_IO, refs%ref_fld_IO)
-!
-      call dealloc_phys_data_IO(refs%ref_fld_IO)
-      call dealloc_phys_name_IO(refs%ref_fld_IO)
-!
-      end subroutine output_reference_field
-!
 ! -----------------------------------------------------------------------
 !
-      subroutine load_sph_reference_data(sph_rj, ipol, rj_fld, refs)
-!
-      use calypso_mpi
-      use calypso_mpi_int
-      use calypso_mpi_real
-      use t_time_data
-      use t_file_IO_parameter
-      use field_file_IO
-      use interpolate_reference_data
-!
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(phys_address), intent(in) :: ipol
-!
-      type(phys_data), intent(inout) :: rj_fld
-      type(radial_reference_field), intent(inout) :: refs
-!
-      type(time_data) :: time_IO
-      integer(kind = kint_gl) :: num64
-!
-!
-      refs%ref_field%iflag_update(1:refs%ref_field%ntot_phys) = 0
-      if(refs%ref_input_IO%iflag_IO .eq. 0) return
-      if(my_rank .eq. 0) then
-        call read_and_alloc_step_field(refs%ref_input_IO%file_prefix,   &
-     &      my_rank, time_IO, refs%ref_fld_IO)
-!
-        call interpolate_reference_data_IO(radius_name,                 &
-     &      refs%iref_radius, refs%ref_fld_IO,                          &
-     &      refs%ref_field, refs%r_itp)
-!
-        call dealloc_phys_data_IO(refs%ref_fld_IO)
-        call dealloc_phys_name_IO(refs%ref_fld_IO)
-      end if
-!
-      num64 = refs%ref_field%ntot_phys
-      call calypso_mpi_bcast_int(refs%ref_field%iflag_update, num64, 0)
-      num64 = refs%ref_field%n_point * refs%ref_field%ntot_phys
-      call calypso_mpi_bcast_real(refs%ref_field%d_fld, num64, 0)
-!
-      call overwrite_sources_by_reference                               &
-     &   (sph_rj, refs%iref_base, ipol%base, refs%ref_field, rj_fld)
-!
-      end subroutine load_sph_reference_data
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine append_reference_field_names(ipol_base, iref_radius,   &
+      subroutine append_reference_field_names                           &
+     &         (radius_name, ipol_base, iref_radius,                    &
      &          iref_base, iref_grad, iref_cmp, ref_field)
 !
       use m_base_field_labels
@@ -221,6 +117,7 @@
       use m_field_component_labels
       use append_phys_data
 !
+      character(len = kchara), intent(in) :: radius_name
       type(base_field_address), intent(in) :: ipol_base
 !
       integer(kind = kint), intent(inout) :: iref_radius

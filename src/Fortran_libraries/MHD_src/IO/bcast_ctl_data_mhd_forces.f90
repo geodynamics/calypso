@@ -139,6 +139,7 @@
 !
       call bcast_ctl_type_c1(refs_ctl%filterd_advect_ctl)
       call bcast_ctl_type_c1(refs_ctl%reference_ctl)
+      call bcast_ctl_type_c1(refs_ctl%ref_file_ctl)
       call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
       call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_ctl)
       call calypso_mpi_bcast_one_int(refs_ctl%i_temp_def, 0)

@@ -179,6 +179,7 @@
       use initial_magne_dynamobench
       use initial_magne_dbench_qvc
       use set_initial_sph_scalars
+      use calypso_mpi
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -189,10 +190,14 @@
       integer(kind = kint) :: isig
 !
 !
+        call calypso_mpi_barrier
+        if(iflag_debug .gt. 0) write(*,*) 'set_initial_velo_sph'
         isig = 400
         call set_initial_velo_sph(ipol%base%i_velo,                     &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         if(ipol%base%i_temp .gt. 0) then
+          call calypso_mpi_barrier
+          if(iflag_debug.gt.0) write(*,*) 'initilal for temperature'
           call set_ini_ref_temp_benchmark                               &
      &       (sph_rj, sph_params%nlayer_ICB, sph_params%nlayer_CMB,     &
      &        rj_fld%d_fld(1,ipol%base%i_temp))
@@ -202,9 +207,12 @@
      &        rj_fld%d_fld(1,ipol%base%i_temp))
         end if
         if(ipol%base%i_light .gt. 0) then
+          call calypso_mpi_barrier
+          if(iflag_debug.gt.0) write(*,*) 'initilal for composition'
           call set_ini_ref_temp_benchmark                               &
      &       (sph_rj, sph_params%nlayer_ICB, sph_params%nlayer_CMB,     &
      &        rj_fld%d_fld(1,ipol%base%i_light))
+!
           call set_initial_temp_sph(isig, sph_rj,                       &
      &        sph_params%radius_ICB, sph_params%radius_CMB,             &
      &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
@@ -213,6 +221,8 @@
 !
         if(iflag_restart .eq. i_rst_dbench1) then
           if(ipol%base%i_magne .gt. 0) then
+            call calypso_mpi_barrier
+            if(iflag_debug.gt.0) write(*,*) 'initilal for magnetic'
             call initial_b_dynamobench_1(sph_rj, ipol,                  &
      &          sph_params%radius_ICB, sph_params%radius_CMB,           &
      &          sph_params%nlayer_ICB, sph_params%nlayer_CMB,           &
@@ -220,6 +230,8 @@
           end if
         else if(iflag_restart .eq. i_rst_dbench2) then
           if(ipol%base%i_magne .gt. 0) then
+            call calypso_mpi_barrier
+            if(iflag_debug.gt.0) write(*,*) 'initilal for magnetic'
             call initial_b_dynamobench_2(sph_rj, ipol,                  &
      &          sph_params%nlayer_CMB, sph_params%radius_CMB,           &
      &          rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
