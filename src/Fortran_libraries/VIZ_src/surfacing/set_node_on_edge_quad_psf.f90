@@ -41,12 +41,12 @@
 !
 !
       call set_node_on_edge_4_quad_psf(numnod, numedge,                 &
-     &    nnod_4_edge, ie_edge, xx, const_psf, psf_list%ref_fld,        &
+     &    nnod_4_edge, ie_edge, xx, const_psf, psf_list%section_fld,    &
      &    psf_list%internod_on_edge, psf_list%istack_inter_n_on_e_smp,  &
      &    psf_list%iedge_int_nod, psf_list%coef_int_edge)
 !
       call set_node_on_edge_4_quad_psf(numnod, numedge,                 &
-     &    nnod_4_edge, ie_edge, xx, const_psf, psf_list%ref_fld,        &
+     &    nnod_4_edge, ie_edge, xx, const_psf, psf_list%section_fld,    &
      &    psf_list%externod_on_edge, psf_list%istack_exter_n_on_e_smp,  &
      &    psf_list%iedge_ext_nod, psf_list%coef_ext_edge)
 !
@@ -68,12 +68,12 @@
 !
 !
       call set_node_on_edge_4_linear_psf(numnod, numedge, nnod_4_edge,  &
-     &    ie_edge, psf_list%ref_fld, psf_list%internod_on_edge,         &
+     &    ie_edge, psf_list%section_fld, psf_list%internod_on_edge,     &
      &    psf_list%istack_inter_n_on_e_smp, psf_list%iedge_int_nod,     &
      &    psf_list%coef_int_edge)
 !
       call set_node_on_edge_4_linear_psf(numnod, numedge, nnod_4_edge,  &
-     &    ie_edge, psf_list%ref_fld, psf_list%externod_on_edge,         &
+     &    ie_edge, psf_list%section_fld, psf_list%externod_on_edge,     &
      &    psf_list%istack_exter_n_on_e_smp, psf_list%iedge_ext_nod,     &
      &    psf_list%coef_ext_edge)
 !
@@ -83,7 +83,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_node_on_edge_4_linear_psf                          &
-     &         (numnod, numedge, nnod_4_edge, ie_edge, ref_fld,         &
+     &         (numnod, numedge, nnod_4_edge, ie_edge, section_fld,     &
      &          nnod_on_edge, istack_n_on_e_smp, iedge_4_nod,           &
      &          coef_on_edge)
 !
@@ -92,7 +92,7 @@
 !
       integer(kind = kint), intent(in) :: numnod, numedge, nnod_4_edge
       integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
-      real(kind= kreal), intent(in) :: ref_fld(numnod)
+      real(kind= kreal), intent(in) :: section_fld(numnod)
       integer(kind = kint), intent(in) :: nnod_on_edge
       integer(kind = kint), intent(in) :: istack_n_on_e_smp(0:np_smp)
       integer(kind = kint), intent(in) :: iedge_4_nod(nnod_on_edge)
@@ -112,9 +112,9 @@
           iedge = iedge_4_nod(icou)
           inod1 = abs( ie_edge(iedge,1) )
           inod2 = abs( ie_edge(iedge,2) )
-          diff = ref_fld(inod2) - ref_fld(inod1)
-          coef_on_edge(icou,1) =  ref_fld(inod2) / diff
-          coef_on_edge(icou,2) = -ref_fld(inod1) / diff
+          diff = section_fld(inod2) - section_fld(inod1)
+          coef_on_edge(icou,1) =  section_fld(inod2) / diff
+          coef_on_edge(icou,2) = -section_fld(inod1) / diff
         end do
       end do
 !$omp end parallel do
@@ -124,13 +124,13 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_node_on_edge_4_quad_psf(numnod, numedge,           &
-     &          nnod_4_edge, ie_edge, xx, const_psf, ref_fld,           &
+     &          nnod_4_edge, ie_edge, xx, const_psf, section_fld,       &
      &          nnod_on_edge, istack_n_on_e_smp, iedge_4_nod,           &
      &          coef_on_edge)
 !
       integer(kind = kint), intent(in) :: numnod, numedge, nnod_4_edge
       integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
-      real(kind= kreal), intent(in) :: ref_fld(numnod)
+      real(kind= kreal), intent(in) :: section_fld(numnod)
       real(kind = kreal), intent(in) :: xx(numnod,3)
 !
       integer(kind = kint), intent(in) :: nnod_on_edge
@@ -193,9 +193,9 @@
      &         + const_psf( 9) * z_mid                                  &
      &         + const_psf(10)
 !
-          if(ref_fld(inod1) .eq. zero) then
+          if(section_fld(inod1) .eq. zero) then
             xi = -one
-          else if(ref_fld(inod2) .eq. zero) then
+          else if(section_fld(inod2) .eq. zero) then
             xi =  one
           else if(c_xi2 .ne. zero) then
             diag = c_xi1*c_xi1 - four*c_xi2*c_xi0

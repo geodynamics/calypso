@@ -35,6 +35,15 @@
 !>        File format flag
         logical :: gzip_flag_vol_spec = .FALSE.
 !
+!>        Output flag for spectrum with respect to degree
+        logical :: flag_skip_v_spec_l =  .FALSE.
+!>        Output flag for spectrum with respect to order
+        logical :: flag_skip_v_spec_m =  .FALSE.
+!>        Output flag for spectrum with respect to l-m
+        logical :: flag_skip_v_spec_lm = .FALSE.
+!>        Output flag for spectrum for axis-symmetric component
+        logical :: flag_skip_v_spec_m0 = .FALSE.
+!
 !>        MPI rank for l-spectr data output
         integer :: irank_l
 !>        MPI rank for m-spectr data output

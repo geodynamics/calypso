@@ -162,6 +162,8 @@
       use reference_sources_from_d_rj
       use init_reference_scalar
       use init_external_magne_sph
+      use radial_reference_field_IO
+      use m_base_field_labels
 !
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
@@ -176,42 +178,47 @@
      &            :: tmat_name = 'reference_Temperature'
       character(len=kchara), parameter                                  &
      &            :: cmat_name = 'reference_Composition'
-      logical :: flag_ref
+      logical :: flag_write_ref
 !
 !
-      flag_ref = .FALSE.
+      flag_write_ref = .FALSE.
       call init_reft_rj_data(sph%sph_rj, ipol, refs)
       call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
-      call load_sph_reference_data(sph%sph_rj, ipol, rj_fld, refs)
+      call load_sph_reference_fields(refs)
+      call overwrite_sources_by_reference(sph%sph_rj, refs%iref_base,   &
+     &    ipol%base, refs%ref_field, rj_fld)
+!
 !
       call s_init_reference_scalar                                      &
      &   (MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%ht_prop, sph_MHD_bc%sph_bc_T,                 &
      &    sph_MHD_bc%fdm2_center, tmat_name, MHD_prop%ref_param_T,      &
+     &    refs%iref_radius, temperature%name,                           &
      &    refs%iref_base%i_temp, refs%iref_grad%i_grad_temp,            &
-     &    refs%iref_base%i_heat_source, refs%ref_field,                 &
-     &    sph_MHD_bc%bcs_T, flag_ref)
+     &    refs%iref_base%i_heat_source, refs%r_itp, refs%ref_fld_IO,    &
+     &    refs%ref_field, sph_MHD_bc%bcs_T, flag_write_ref)
 !
       call s_init_reference_scalar                                      &
      &   (MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%cp_prop, sph_MHD_bc%sph_bc_C,                 &
      &    sph_MHD_bc%fdm2_center, cmat_name, MHD_prop%ref_param_C,      &
+     &    refs%iref_radius, composition%name,                           &
      &    refs%iref_base%i_light, refs%iref_grad%i_grad_composit,       &
-     &    refs%iref_base%i_light_source, refs%ref_field,                &
-     &    sph_MHD_bc%bcs_C, flag_ref)
+     &    refs%iref_base%i_light_source, refs%r_itp, refs%ref_fld_IO,   &
+     &    refs%ref_field, sph_MHD_bc%bcs_C, flag_write_ref)
 !
       call init_sph_contant_ext_magne(MHD_prop%cd_prop, sph%sph_rj,     &
-     &    refs%iref_cmp, ipol%base, refs%ref_field, rj_fld, flag_ref)
+     &    refs%iref_cmp, ipol%base, refs%ref_field, rj_fld,             &
+     &    flag_write_ref)
 !
       call calypso_mpi_barrier
 !
-      if(flag_ref .eqv. .FALSE.) return
+      if(flag_write_ref .eqv. .FALSE.) return
       call set_default_reference_file_name(refs)
       call output_reference_field(refs)
 !
       end subroutine init_reference_fields
 !
-!  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
 !
       end module init_radial_infos_sph_mhd

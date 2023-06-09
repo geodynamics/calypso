@@ -31,6 +31,10 @@
 !!
 !!  array fields_on_circle_ctl
 !!    begin fields_on_circle_ctl
+!!      field_on_circle_prefix         'monitor/dbench_field'
+!!      spectr_on_circle_prefix        'monitor/dbench_spectr'
+!!      field_on_circle_format         'gzip'
+!!
 !!      pick_circle_coord_ctl         spherical
 !!      nphi_mid_eq_ctl               500
 !!      pick_cylindrical_radius_ctl   0.75

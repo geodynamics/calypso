@@ -10,25 +10,26 @@
 !!        by finite difference method
 !!
 !!@verbatim
-!!      subroutine s_init_reference_scalar(takepiro, sph_params, sph_rj,&
-!!     &          r_2nd, sc_prop, sph_bc_S, fdm2_center, mat_name,      &
-!!     &          ref_param, iref_scalar, iref_grad,                    &
-!!     &          iref_source, ref_field, bcs_S, flag_ref)
-!!        character(len=kchara), intent(in) :: mat_name
+!!      subroutine s_init_reference_scalar                              &
+!!     &         (takepiro, sph_params, sph_rj, r_2nd, sc_prop,         &
+!!     &          sph_bc_S, fdm2_center, mat_name, ref_param,           &
+!!     &          iref_radius, phys_name, iref_scalar, iref_grad,       &
+!!     &          iref_source, ref_field, bcs_S, flag_write_ref)
+!!        character(len=kchara), intent(in) :: mat_name, phys_name
 !!        integer(kind = kint), intent(in) :: iref_scalar, iref_grad
-!!        integer(kind = kint), intent(in) :: iref_source
+!!        integer(kind = kint), intent(in) :: iref_source, iref_radius
 !!        type(takepiro_model_param), intent(in) :: takepiro
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
-!!!         type(phys_data), intent(in) :: rj_fld
+!!        type(phys_data), intent(in) :: rj_fld
 !!        type(scalar_property), intent(in) :: sc_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(reference_scalar_param), intent(inout) :: ref_param
 !!        type(phys_data), intent(inout) :: ref_field
 !!        type(sph_scalar_boundary_data), intent(inout) :: bcs_S
-!!        logical, intent(inout) :: flag_ref
+!!        logical, intent(inout) :: flag_write_ref
 !!@endverbatim
 !!
       module init_reference_scalar
@@ -37,6 +38,7 @@
       use m_constants
       use m_spheric_constants
       use m_machine_parameter
+      use m_phys_constants
 !
       use t_spheric_parameter
       use t_fdm_coefs
@@ -53,20 +55,24 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine s_init_reference_scalar(takepiro, sph_params, sph_rj,  &
-     &          r_2nd, sc_prop, sph_bc_S, fdm2_center, mat_name,        &
-     &          ref_param, iref_scalar, iref_grad,                      &
-     &          iref_source, ref_field, bcs_S, flag_ref)
+      subroutine s_init_reference_scalar                                &
+     &         (takepiro, sph_params, sph_rj, r_2nd, sc_prop,           &
+     &          sph_bc_S, fdm2_center, mat_name, ref_param,             &
+     &          iref_radius, phys_name, iref_scalar, iref_grad,         &
+     &          iref_source, r_itp, ref_fld_IO, ref_field,              &
+     &          bcs_S, flag_write_ref)
 !
       use set_reference_sph_mhd
       use set_reference_temp_sph
       use const_r_mat_4_scalar_sph
       use const_radial_references
+      use const_diffusive_profile
       use set_parallel_file_name
+      use radial_reference_field_IO
 !
-      character(len=kchara), intent(in) :: mat_name
+      character(len=kchara), intent(in) :: mat_name, phys_name
       integer(kind = kint), intent(in) :: iref_scalar, iref_grad
-      integer(kind = kint), intent(in) :: iref_source
+      integer(kind = kint), intent(in) :: iref_source, iref_radius
 !
       type(takepiro_model_param), intent(in) :: takepiro
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -78,9 +84,11 @@
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       type(reference_scalar_param), intent(inout) :: ref_param
+      type(sph_radial_interpolate), intent(inout) :: r_itp
+      type(field_IO), intent(inout) :: ref_fld_IO
       type(phys_data), intent(inout) :: ref_field
       type(sph_scalar_boundary_data), intent(inout) :: bcs_S
-      logical, intent(inout) :: flag_ref
+      logical, intent(inout) :: flag_write_ref
 !
       character(len=kchara) :: file_name
       type(band_matrix_type) :: band_s00_poisson
@@ -90,7 +98,7 @@
      & .and. ref_param%iflag_reference .ne. id_takepiro_temp            &
      & .and. ref_param%iflag_reference .ne. id_numerical_solution       &
      &    ) return
-      flag_ref = .TRUE.
+      flag_write_ref = .TRUE.
 !
 !      Set reference temperature and adjust boundary conditions
       if (ref_param%iflag_reference .eq. id_sphere_ref_temp) then
@@ -118,6 +126,14 @@
      &      fdm2_center, r_2nd, band_s00_poisson,                       &
      &      iref_scalar, iref_grad, iref_source, ref_field)
         call dealloc_band_matrix(band_s00_poisson)
+      else if(ref_param%iflag_reference .eq. id_read_file) then
+        call load_sph_reference_one_field                               &
+     &     (iref_radius, phys_name, iref_scalar, n_scalar,              &
+     &      ref_param%ref_file_IO, ref_fld_IO, r_itp, ref_field)
+        call gradient_of_radial_reference                               &
+     &     (sph_rj, r_2nd, sph_bc_S, bcs_S, fdm2_center,                &
+     &      ref_field%d_fld(1,iref_scalar),                             &
+     &      ref_field%d_fld(1,iref_grad))
       else
         call no_ref_temp_sph_mhd(sph_rj%nidx_rj(1),                     &
      &      sph_params%radius_ICB, sph_params%radius_CMB,               &

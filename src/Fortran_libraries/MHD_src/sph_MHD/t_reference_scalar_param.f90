@@ -33,6 +33,7 @@
       use m_machine_parameter
 !
       use t_ctl_data_temp_model
+      use t_file_IO_parameter
 !
       implicit  none
 !
@@ -46,6 +47,8 @@
       integer (kind=kint), parameter :: id_z_ref_temp = 0
 !>      flag to use referece temperature as a function of @f$ r @f$
       integer (kind=kint), parameter :: id_sphere_ref_temp = 100
+!>      flag to obtain diffusive profile numerically
+      integer (kind=kint), parameter :: id_read_file = 10
 !>      flag to obtain diffusive profile numerically
       integer (kind=kint), parameter :: id_numerical_solution = 999
 !>      flag to use linearly decrease referece temperature
@@ -66,11 +69,16 @@
       character(len = kchara), parameter :: label_linear_z = 'linear_z'
 !
       character(len = kchara), parameter                                &
-     &               :: label_get_numerical = 'numrical_solution'
+     &               :: label_get_numerical = 'numerical_solution'
+      character(len = kchara), parameter :: label_load_file = 'file'
 !
       type reference_scalar_param
-!>      temperature setting
-        integer (kind=kint) :: iflag_reference
+!>        switch to use perturbation of scalar
+        logical :: flag_ref_field = .FALSE.
+!>        temperature setting
+        integer (kind=kint) :: iflag_reference = id_no_ref_temp
+!>        Structure of file name
+        type(field_IO_params) :: ref_file_IO
 !
 !>        reference lowest temperature (at upper boundary)
         real (kind = kreal) :: low_value
@@ -116,8 +124,8 @@
       if(iflag_debug .ge. iflag_routine_msg) write(*,*) trim(charaflag)
 !z
       call set_linear_ref_scalar_ctl                                    &
-     &   (ref_ctl%reference_ctl, ref_ctl%low_ctl, ref_ctl%high_ctl,     &
-     &    ref_param)
+     &   (ref_ctl%reference_ctl, ref_ctl%ref_file_ctl,                  &
+     &    ref_ctl%low_ctl, ref_ctl%high_ctl, ref_param)
       call set_takepiro_scalar_ctl                                      &
      &   (ref_ctl%stratified_ctl, ref_ctl%takepiro_ctl,                 &
      &    ref_param%iflag_reference, takepiro)
@@ -127,13 +135,17 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_linear_ref_scalar_ctl                              &
-     &         (ref_temp_ctl, low_temp_ctl, high_temp_ctl, ref_param)
+      subroutine set_linear_ref_scalar_ctl(ref_temp_ctl, ref_file_ctl,  &
+     &          low_temp_ctl, high_temp_ctl, ref_param)
 !
       use calypso_mpi
       use t_control_array_character
+      use m_file_format_switch
+      use m_error_IDs
+      use delete_data_files
 !
       type(read_character_item), intent(in) :: ref_temp_ctl
+      type(read_character_item), intent(in) :: ref_file_ctl
       type(reference_point_control), intent(in) :: low_temp_ctl
       type(reference_point_control), intent(in) :: high_temp_ctl
 !
@@ -162,6 +174,32 @@
           ref_param%iflag_reference = id_z_ref_temp
         else if (cmp_no_case(tmpchara, label_get_numerical)) then
           ref_param%iflag_reference = id_numerical_solution
+        else if (cmp_no_case(tmpchara, label_load_file)) then
+          ref_param%iflag_reference = id_read_file
+        end if
+      end if
+!
+      ref_param%flag_ref_field = .FALSE.
+      if     (ref_param%iflag_reference .eq. id_sphere_ref_temp         &
+     &   .or. ref_param%iflag_reference .eq. id_takepiro_temp           &
+     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
+     &   .or. ref_param%iflag_reference .eq. id_read_file               &
+     &   ) ref_param%flag_ref_field = .TRUE.
+!
+      if(ref_param%iflag_reference .eq. id_read_file) then
+        ref_param%ref_file_IO%iflag_IO = 0
+        ref_param%ref_file_IO%iflag_format = id_ascii_file_fmt
+        if(ref_file_ctl%iflag .le. 0) then
+          call calypso_mpi_abort(ierr_file, 'Set reference field file')
+        else
+          ref_param%ref_file_IO%file_prefix = ref_file_ctl%charavalue
+!
+          if(check_file_exist(ref_param%ref_file_IO%file_prefix)        &
+     &                                            .eqv. .FALSE.) then
+            write(e_message,*) 'File ',                                 &
+     &               ref_param%ref_file_IO%file_prefix, ' is missing.'
+            call calypso_mpi_abort(ierr_file, e_message)
+          end if
         end if
       end if
 !

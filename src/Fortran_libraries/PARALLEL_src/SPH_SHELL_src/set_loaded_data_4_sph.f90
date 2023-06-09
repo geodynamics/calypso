@@ -202,13 +202,13 @@
 !
       integer(kind = kint), intent(inout) :: istep(numdir)
 !
-      integer(kind = kint) :: nd, inod, iref
+      integer(kind = kint) :: nd, inod, i_ref
 !
 !
       do nd = 1, numdir
-        iref = idx_global(1,nd)
+        i_ref = idx_global(1,nd)
         do inod = 2, nnod
-          if(idx_global(inod,nd) .ne. iref) then
+          if(idx_global(inod,nd) .ne. i_ref) then
             istep(nd) = inod - 1
             exit
           end if

@@ -153,17 +153,6 @@
       type(reference_scalar_param), intent(in) :: ref_param_C
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
-!
-      if (ref_param_T%iflag_reference .ne. id_no_ref_temp) then
-        call add_phys_name_ctl(reference_temperature, field_ctl)
-        call add_phys_name_ctl(grad_reference_temp, field_ctl)
-      end if
-!
-      if (ref_param_C%iflag_reference .ne. id_no_ref_temp) then
-        call add_phys_name_ctl(reference_composition, field_ctl)
-        call add_phys_name_ctl(grad_reference_composition, field_ctl)
-      end if
-!
       end subroutine add_ctl_4_ref_temp
 !
 ! -----------------------------------------------------------------------

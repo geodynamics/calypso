@@ -36,11 +36,6 @@
 !!   density [i_density]:      density     \rho
 !!   entropy [i_entropy]:      Entropy               S
 !!
-!!   reference_temperature [i_ref_t]:   T_0
-!!   reference_composition [i_ref_c]:   C_0
-!!   reference_density [i_ref_density]:       \rho_0
-!!   reference_entropy [i_ref_entropy]:       S_0
-!!
 !!   perturbation_temp [i_per_temp]:         \Theta = T - T_0
 !!   perturbation_composition [i_per_light]:  C - C_0
 !!   perturbation_density [i_per_density]:      \rho - \rho_0
@@ -62,7 +57,7 @@
       implicit  none
 ! 
 !
-      integer(kind = kint), parameter, private :: nfld_base = 25
+      integer(kind = kint), parameter, private :: nfld_base = 21
 !
 !>        Field label for velocity
 !!         @f$ u_{i} @f$
@@ -139,12 +134,6 @@
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'perturbation_density',                    &
      &                math = '$ \Theta_{\rho} = \rho - \rho_{0} $')
-!>        Field label for reference density
-!!         @f$  \rho_{0} @f$
-      type(field_def), parameter :: reference_density                   &
-     &    = field_def(n_comp = n_scalar,                                &
-     &                name = 'reference_density',                       &
-     &                math = '$ \rho_{0} $')
 !
 !>        Field label for temperature
 !!         @f$ T @f$
@@ -158,12 +147,6 @@
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'perturbation_temp',                       &
      &                math = '$ \Theta = T - T_{0} $')
-!>        Field label for reference temperature
-!!         @f$  T_{0} @f$
-      type(field_def), parameter :: reference_temperature               &
-     &    = field_def(n_comp = n_scalar,                                &
-     &                name = 'reference_temperature',                   &
-     &                math = '$ T_{0} $')
 !
 !>        Field label for compostiion variation
 !!         @f$ C @f$
@@ -177,12 +160,6 @@
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'perturbation_composition',                &
      &                math = '$ \Theta_{C} = C - C_{0} $')
-!>        Field label for reference composition
-!!         @f$  C_{0} @f$
-      type(field_def), parameter :: reference_composition               &
-     &    = field_def(n_comp = n_scalar,                                &
-     &                name = 'reference_composition',                   &
-     &                math = '$ C_{0} $')
 !
 !>        Field label for entropy
 !!         @f$ S @f$
@@ -196,12 +173,6 @@
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'perturbation_entropy',                    &
      &                math = '$ \Theta_{S} = S - S_{0} $')
-!>        Field label for reference entropy
-!!         @f$  S_{0} @f$
-      type(field_def), parameter :: reference_entropy                   &
-     &    = field_def(n_comp = n_scalar,                                &
-     &                name = 'reference_entropy',                       &
-     &                math = '$ S_{0} $')
 !
 !>        Field label for heat source
 !!         @f$ q_{T} @f$
@@ -258,19 +229,15 @@
 !
      &   .or. (field_name .eq. density%name)                            &
      &   .or. (field_name .eq. perturbation_density%name)               &
-     &   .or. (field_name .eq. reference_density%name)                  &
 !
      &   .or. (field_name .eq. temperature%name)                        &
      &   .or. (field_name .eq. perturbation_temp%name)                  &
-     &   .or. (field_name .eq. reference_temperature%name)              &
 !
      &   .or. (field_name .eq. composition%name)                        &
      &   .or. (field_name .eq. perturbation_composition%name)           &
-     &   .or. (field_name .eq. reference_composition%name)              &
 !
      &   .or. (field_name .eq. entropy%name)                            &
      &   .or. (field_name .eq. perturbation_entropy%name)               &
-     &   .or. (field_name .eq. reference_entropy%name)                  &
 !
      &   .or. (field_name .eq. heat_source%name)                        &
      &   .or. (field_name .eq. composition_source%name)                 &
@@ -321,35 +288,27 @@
      &    n_comps(11), names(11), maths(11))
       call set_field_labels(perturbation_temp,                          &
      &    n_comps(12), names(12), maths(12))
-      call set_field_labels(reference_temperature,                      &
-     &    n_comps(13), names(13), maths(13))
       call set_field_labels(heat_source,                                &
-     &    n_comps(14), names(14), maths(14))
+     &    n_comps(13), names(13), maths(13))
 !
       call set_field_labels(composition,                                &
-     &    n_comps(15), names(15), maths(15))
+     &    n_comps(14), names(14), maths(14))
       call set_field_labels(perturbation_composition,                   &
-     &    n_comps(16), names(16), maths(16))
-      call set_field_labels(reference_composition,                      &
-     &    n_comps(17), names(17), maths(17))
+     &    n_comps(15), names(15), maths(15))
       call set_field_labels(composition_source,                         &
-     &    n_comps(18), names(18), maths(18))
+     &    n_comps(16), names(16), maths(16))
 !
       call set_field_labels(entropy,                                    &
-     &    n_comps(19), names(19), maths(19))
+     &    n_comps(17), names(17), maths(17))
       call set_field_labels(perturbation_entropy,                       &
-     &    n_comps(20), names(20), maths(20))
-      call set_field_labels(reference_entropy,                          &
-     &    n_comps(21), names(21), maths(21))
+     &    n_comps(18), names(18), maths(18))
       call set_field_labels(entropy_source,                             &
-     &    n_comps(22), names(22), maths(22))
+     &    n_comps(19), names(19), maths(19))
 !
       call set_field_labels(density,                                    &
-     &    n_comps(23), names(23), maths(23))
+     &    n_comps(20), names(20), maths(20))
       call set_field_labels(perturbation_density,                       &
-     &    n_comps(24), names(24), maths(24))
-      call set_field_labels(reference_density,                          &
-     &    n_comps(25), names(25), maths(25))
+     &    n_comps(21), names(21), maths(21))
 !
       end subroutine set_base_field_names
 !

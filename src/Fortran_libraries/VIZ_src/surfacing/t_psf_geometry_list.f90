@@ -68,7 +68,7 @@
       type sectioning_list
 !
 !>        reference field for sectioning
-        real(kind = kreal), allocatable :: ref_fld(:)
+        real(kind = kreal), allocatable :: section_fld(:)
 !
 !>        Number of interior nodes for sections on edge
         integer(kind = kint) :: internod_on_edge
@@ -201,8 +201,8 @@
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
-      allocate(psf_list%ref_fld(node%numnod) )
-      if(node%numnod .gt. 0) psf_list%ref_fld = 0.0d0
+      allocate(psf_list%section_fld(node%numnod) )
+      if(node%numnod .gt. 0) psf_list%section_fld = 0.0d0
 !
       end subroutine alloc_ref_field_4_psf
 !
@@ -292,7 +292,7 @@
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
-      deallocate(psf_list%ref_fld)
+      deallocate(psf_list%section_fld)
 !
       end subroutine dealloc_ref_field_4_psf
 !

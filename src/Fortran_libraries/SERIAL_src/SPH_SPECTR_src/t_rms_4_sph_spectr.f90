@@ -58,14 +58,13 @@
         logical :: gzip_flag_rms_layer = .FALSE.
 !
 !>        Output flag for spectrum with respect to degree
-        integer(kind = kint) :: iflag_spectr_l =  1
+        logical :: flag_skip_spectr_l =  .FALSE.
 !>        Output flag for spectrum with respect to order
-        integer(kind = kint) :: iflag_spectr_m =  1
+        logical :: flag_skip_spectr_m =  .FALSE.
 !>        Output flag for spectrum with respect to l-m
-        integer(kind = kint) :: iflag_spectr_lm = 1
-!
+        logical :: flag_skip_spectr_lm = .FALSE.
 !>        Output flag for spectrum for axis-symmetric component
-        integer(kind = kint) :: iflag_spectr_m0 = 1
+        logical :: flag_skip_spectr_m0 = .FALSE.
 !
 !>        MPI rank for l-spectr data output
         integer :: irank_l

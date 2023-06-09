@@ -60,7 +60,8 @@
           iedge = edge_search%id_search(inum)
           inod1 = ie_edge(iedge,1)
           inod2 = ie_edge(iedge,2)
-          c0 = psf_list%ref_fld(inod1) * psf_list%ref_fld(inod2)
+          c0 = psf_list%section_fld(inod1)                              &
+     &        * psf_list%section_fld(inod2)
           if(c0 .le. zero) then
             num_item(ip) = num_item(ip) + 1
             if(interior_edge(iedge) .gt. 0) then
@@ -126,7 +127,8 @@
           iedge = edge_search%id_search(inum)
           inod1 = abs( ie_edge(iedge,1) )
           inod2 = abs( ie_edge(iedge,2) )
-          c0 = psf_list%ref_fld(inod1) * psf_list%ref_fld(inod2)
+          c0 = psf_list%section_fld(inod1)                              &
+     &        * psf_list%section_fld(inod2)
           if(c0 .le. zero) then
             if(interior_edge(iedge) .gt. 0) then
               icou = icou + 1
