@@ -1,0 +1,35 @@
+begin assemble_control
+  begin data_files_def
+    num_subdomain_ctl           4
+    restart_file_prefix         '4domains/rst'
+    restart_file_fmt_ctl         'merged_gz'
+  end data_files_def
+  spherical_shell_ctl       'sph_lm47r63c_4/control_resolution'
+!
+  begin new_data_files_def
+    num_new_domain_ctl           6
+    new_restart_prefix         '6domains/rst'
+    restart_file_fmt_ctl       'merged'
+    delete_original_data_flag       'NO'
+  end new_data_files_def
+  new_spherical_shell_ctl    'sph_lm63r71c_6/control_resolution'
+!
+  begin control
+!!!!!  information for time integration
+    begin time_step_ctl
+      i_step_init_ctl       1
+      i_step_finish_ctl     1
+      i_step_rst_ctl        1
+    end time_step_ctl
+!
+    begin new_time_step_ctl
+      i_step_init_ctl       1000
+      i_step_rst_ctl     50
+      time_init_ctl        5.0e0
+    end new_time_step_ctl
+  end control
+!
+  begin newrst_magne_ctl
+    magnetic_field_ratio_ctl     1.0d0
+  end newrst_magne_ctl
+end assemble_control
