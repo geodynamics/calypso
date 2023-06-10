@@ -166,7 +166,7 @@
      &    rj_fld%d_fld(1,is_temp), rj_fld%d_fld(1,is_grad_t),           &
      &    rj_fld%d_fld(1,is_par_temp), rj_fld%d_fld(1,is_grad_part_t))
 !
-      if(is_source .le. 0) then
+      if(is_source .gt. 0) then
         call remove_ref_source_sph(sph_rj, rj_fld%d_fld(1,is_source))
       end if
 !
@@ -201,7 +201,7 @@
      &    rj_fld%d_fld(1,is_temp), rj_fld%d_fld(1,is_grad_t),           &
      &    rj_fld%d_fld(1,is_par_temp), rj_fld%d_fld(1,is_grad_part_t))
 !
-      if(is_source .le. 0) then
+      if(is_source .gt. 0) then
         call back_ref_source_sph(sph_rj,                                &
      &      ref_field%d_fld(1,iref_source), rj_fld%d_fld(1,is_source))
       end if

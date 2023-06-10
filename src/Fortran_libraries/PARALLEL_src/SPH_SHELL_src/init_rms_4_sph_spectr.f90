@@ -47,6 +47,7 @@
 !
       use calypso_mpi
       use init_sph_spec_radial_param
+      use cal_ave_4_rms_vector_sph
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -71,7 +72,9 @@
 !
       do i = 1, pwr%num_vol_spectr
         call init_sph_vol_spectr_r_param(sph_params, sph_rj,            &
-&                                        pwr%v_spectr(i))
+     &                                   pwr%v_spectr(i))
+        call cal_one_over_volume( pwr%v_spectr(i)%r_inside,             &
+     &      pwr%v_spectr(i)%r_outside, pwr%v_spectr(i)%avol)
       end do
 !
       if(iflag_debug .gt. 0) then

@@ -43,9 +43,9 @@
       implicit none
 !
       character(len=25), parameter                                      &
-     &          :: FLD_HD0 = '! List of Number of nodes'
-      character(len=40), parameter                                      &
-     &          :: FLD_HD1 = '! Number of grids, fields, and component'
+     &            :: FLD_HD0 = '! List of Number of nodes'
+      character(len=31), parameter                                      &
+     &            :: FLD_HD1 = '! Num. of grid, field and comps'
 !
       private :: FLD_HD1
 !
@@ -91,7 +91,7 @@
       function field_num_buffer(num_field)
 !
       integer(kind = kint), intent(in) ::    num_field
-      character(len=40+1+16+1) :: field_num_buffer
+      character(len=31+1+16+1) :: field_num_buffer
 !
       character(len=16) :: buf_nfld
 !

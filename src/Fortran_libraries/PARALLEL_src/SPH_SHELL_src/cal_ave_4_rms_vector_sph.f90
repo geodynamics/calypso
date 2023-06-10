@@ -59,7 +59,7 @@
       if(r_inside .eq. 0.0d0) then
         avol = three / (r_outside**3)
       else
-        avol = three / (r_inside**3 - r_outside**3 )
+        avol = three / (r_outside**3 - r_inside**3)
       end if
 !
       end subroutine cal_one_over_volume
