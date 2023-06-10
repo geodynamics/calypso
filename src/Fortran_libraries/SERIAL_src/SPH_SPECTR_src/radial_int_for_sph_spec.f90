@@ -68,7 +68,7 @@
         do icomp = 1, ntot_comp
           call radial_int_by_trapezoid                                  &
      &       (kg_st, kg_ed, c_inter_st, c_inter_ed, nri, radius,        &
-     &        f_org(1,icomp), f_org(0,icomp), f_int(icomp) )
+     &        f_org(1,icomp), f_org(0,icomp), f_int(icomp))
         end do
 !$omp end parallel do
 !      end if
@@ -94,6 +94,7 @@
       real(kind = kreal) :: r_in, r_out, d_in, d_out
 !
 !
+      f_int = 0.0d0
       if(kg_st(1) .eq. 0 .and. kg_st(1) .eq. kg_ed(1)) then
         r_in =  (one - c_inter_st) * radius(1)
         d_in =         c_inter_st *  f_ctr                              &
@@ -132,7 +133,6 @@
      &                         * (f_org(kr) + f_org(kr+1))
         end do
 !
-        if(c_inter_ed .eq. one) return
         r_out =         c_inter_ed * radius(kg_ed(1))                   &
      &         + (one - c_inter_ed)* radius(kg_ed(2))
         d_out =         c_inter_ed * f_org(kg_ed(1))                    &

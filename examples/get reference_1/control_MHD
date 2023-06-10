@@ -17,15 +17,15 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
   begin data_files_def
+    debug_flag_ctl            'Off'
+!
     num_subdomain_ctl            2
     num_smp_ctl                  2
 !
-    boundary_data_file_name     'bc_spectr.btx'
+    radial_field_file_name      'radial_field.dat'
 !
-    restart_file_prefix         'rst_2/rst'
-    field_file_prefix           'field/out'
-!
-    field_file_fmt_ctl          'VTK'
+    restart_file_prefix         'rst_6/rst'
+    restart_file_fmt_ctl       'merged_bin'
   end data_files_def
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
@@ -72,10 +72,12 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
       array nod_value_ctl
-        nod_value_ctl  velocity                Viz_Off  Monitor_Off
-        nod_value_ctl  pressure                Viz_Off  Monitor_Off
+        nod_value_ctl  velocity                Viz_On   Monitor_On
+        nod_value_ctl  pressure                Viz_On   Monitor_On
         nod_value_ctl  temperature             Viz_On   Monitor_On
+        nod_value_ctl  heat_source             Viz_On   Monitor_On
         nod_value_ctl  composition             Viz_On   Monitor_On
+        nod_value_ctl  composition_source      Viz_On   Monitor_On
       end array nod_value_ctl
     end phys_values_ctl
 !
@@ -94,15 +96,12 @@ begin MHD_control
 !
     begin boundary_condition
       array bc_temperature
-        bc_temperature  fixed_flux_file  CMB  0.000
-        bc_temperature  fixed_file       ICB  1.000
+        bc_temperature  fixed ICB  1.000
+        bc_temperature  fixed CMB  0.000
       end array bc_temperature
-!
-      array bc_velocity
-!
       array bc_composition
-        bc_composition  fixed_flux_file        ICB 0.000
-        bc_composition  fixed_file            CMB  1.000
+        bc_composition fixed       ICB  1.000  end
+        bc_composition fixed_flux  CMB -0.35   end
       end array bc_composition
     end boundary_condition
 !
@@ -111,6 +110,7 @@ begin MHD_control
 !     gravity, Coriolis, Lorentz
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !    begin forces_define
+!    end forces_define
 !
 !!!!!  dimensionless numbers !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available numbers
@@ -121,8 +121,7 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
       array dimless_ctl
-        dimless_ctl  Prandtl_number                   1.0e+0
-        dimless_ctl  Composite_Prandtl_number         2.0E+0
+        dimless_ctl  Prandtl_number                   1.0e-0
       end array dimless_ctl
     end dimensionless_ctl
 !
@@ -152,33 +151,57 @@ begin MHD_control
     begin coefficients_ctl
       begin thermal
         array coef_4_termal_ctl
-          coef_4_termal_ctl            One                        1.0
+          coef_4_termal_ctl            Zero    1.0
         end array coef_4_termal_ctl
-!
         array coef_4_t_diffuse_ctl
-          coef_4_t_diffuse_ctl         Prandtl_number            -1.0
+          coef_4_t_diffuse_ctl         One     1.0
         end array coef_4_t_diffuse_ctl
-!
         array coef_4_heat_source_ctl
-          coef_4_heat_source_ctl       One                        1.0
+          coef_4_heat_source_ctl       One     1.0
         end array coef_4_heat_source_ctl
-      end  thermal
-!
+      end thermal
 !
       begin composition
         array coef_4_composition_ctl
-          coef_4_composition_ctl       One                        1.0
+          coef_4_composition_ctl       Zero    1.0
         end array coef_4_composition_ctl
-!
-        array coef_4_c_diffuse_ctl
-          coef_4_c_diffuse_ctl         Composite_Prandtl_number  -1.0
+        array coef_4_c_diffuse_ctl  1
+          coef_4_c_diffuse_ctl         One     1.0
         end array coef_4_c_diffuse_ctl
-!
         array coef_4_light_source_ctl
-          coef_4_light_source_ctl     Two                         1.0
+          coef_4_light_source_ctl      One     1.0
         end array coef_4_light_source_ctl
-      end  composition
+      end composition
+!
+!
+      begin momentum
+        array coef_4_velocity_ctl
+          coef_4_velocity_ctl          One                        1.0
+        end array coef_4_velocity_ctl
+!
+        array coef_4_press_ctl
+          coef_4_press_ctl             One                       -1.0
+        end array coef_4_press_ctl
+!
+        array coef_4_v_diffuse_ctl
+          coef_4_v_diffuse_ctl         One                        1.0
+        end array coef_4_v_diffuse_ctl
+      end momentum
     end coefficients_ctl
+!
+!!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!    ref_temperature_ctl: none           (No reference of temperature)
+!                         spherical_shell (for spherical shell model)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin temperature_define
+!      ref_temp_ctl     none
+      ref_temp_ctl      numerical_solution
+    end temperature_define
+    begin composition_define
+      ref_comp_ctl      numerical_solution
+    end composition_define
   end model
 !
 !
@@ -186,55 +209,27 @@ begin MHD_control
   begin control
 !!!!!  information for sime integration
    begin time_step_ctl
-      elapsed_time_ctl      80000.
-      i_step_init_ctl           0
-      i_step_finish_ctl     10000
+       i_step_init_ctl          0
+!      i_step_init_ctl          1
+      i_step_finish_ctl         1
 !
-      i_step_check_ctl       500
-      i_step_rst_ctl        10000
-      i_step_field_ctl          0
+      i_step_check_ctl             100
+      i_step_rst_ctl             20000
 !
-      dt_ctl              1.0e-4
+      dt_ctl              5.0e-5
       time_init_ctl       0.0e-8
     end time_step_ctl
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-      rst_ctl                no_data
+      rst_ctl                dynamo_benchmark_1
     end restart_file_ctl
 !
 !!!!!!   method for time evolution
 !
     begin time_loop_ctl
       scheme_ctl              Crank_Nicolson
-      coef_imp_v_ctl          6.0e-1
-      coef_imp_t_ctl          6.0e-1
-      coef_imp_b_ctl          6.0e-1
-      coef_imp_d_ctl          6.0e-1
     end time_loop_ctl
   end control
 !
-  begin sph_monitor_ctl
-    volume_average_prefix        'monitor/sph_ave_volume'
-    volume_pwr_spectr_prefix     'monitor/sph_pwr_volume'
-!
-    begin pickup_spectr_ctl
-      picked_sph_prefix     'monitor/picked_mode'
-!
-      array pick_layer_ctl
-        pick_layer_ctl   -1
-      end array pick_layer_ctl
-!
-      array pick_sph_degree_ctl
-        pick_sph_degree_ctl   0
-        pick_sph_degree_ctl   1
-      end array pick_sph_degree_ctl
-!
-      array pick_sph_spectr_ctl
-        pick_sph_spectr_ctl   2  -2
-        pick_sph_spectr_ctl   2   2
-      end array pick_sph_spectr_ctl
-    end pickup_spectr_ctl
-!
-  end sph_monitor_ctl
 end MHD_control

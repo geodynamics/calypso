@@ -20,13 +20,10 @@ begin MHD_control
     debug_flag_ctl            'Off'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  1
+    num_smp_ctl                  2
 !
-    sph_file_prefix             'sph_lm31r48c_ic_4/in'
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
-!
-    sph_file_fmt_ctl           'merged_gz'
     restart_file_fmt_ctl       'merged_gz'
     field_file_fmt_ctl         'merged_VTK_gz'
   end data_files_def
@@ -81,6 +78,18 @@ begin MHD_control
         nod_value_ctl  vorticity               Viz_On   Monitor_On
         nod_value_ctl  magnetic_field          Viz_On   Monitor_On
         nod_value_ctl  current_density         Viz_On   Monitor_On
+!
+        nod_value_ctl  Lorentz_work             Viz_On   Monitor_On
+        nod_value_ctl  buoyancy_flux            Viz_On   Monitor_On
+!
+        nod_value_ctl  Coriolis_force           Viz_On   Monitor_On
+        nod_value_ctl  Lorentz_force            Viz_On   Monitor_On
+        nod_value_ctl  inertia                  Viz_On   Monitor_On
+!
+        nod_value_ctl  rot_Coriolis_force       Viz_On   Monitor_Off
+        nod_value_ctl  rot_Lorentz_force        Viz_On   Monitor_Off
+        nod_value_ctl  rot_inertia              Viz_On   Monitor_Off
+        nod_value_ctl  rot_buoyancy             Viz_On   Monitor_Off
       end array nod_value_ctl
     end phys_values_ctl
 !
@@ -264,7 +273,7 @@ begin MHD_control
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-      rst_ctl                dynamo_benchmark_1
+      rst_ctl                dynamo_benchmark_2
 !      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
@@ -282,24 +291,32 @@ begin MHD_control
   begin sph_monitor_ctl
     volume_average_prefix        'monitor/sph_ave_volume'
     volume_pwr_spectr_prefix     'monitor/sph_pwr_volume'
+    volume_pwr_spectr_format     'gzip'
+!
+    nusselt_number_prefix        'Nusselt'
+    nusselt_number_format        'gzip'
 !
     begin layered_spectrum_ctl
       layered_pwr_spectr_prefix    'monitor/sph_pwr_layer'
+      layered_pwr_spectr_format    'gzip'
 !
-      array spectr_layer_ctl
-        spectr_layer_ctl   25
-        spectr_layer_ctl   49
-        spectr_layer_ctl   73
-      end array spectr_layer_ctl
+      array spectr_radius_ctl
+        spectr_radius_ctl    0.538461538461538
+        spectr_radius_ctl    0.838461538461538
+        spectr_radius_ctl    1.238461538461538
+        spectr_radius_ctl    1.538461538461538
+      end array spectr_radius_ctl
     end layered_spectrum_ctl
 !
     begin pickup_spectr_ctl
       picked_sph_prefix     'monitor/picked_mode'
+      picked_sph_format     'gzip'
 !
-      array pick_layer_ctl
-        pick_layer_ctl    8
-        pick_layer_ctl   16
-      end array pick_layer_ctl
+      array pick_radius_ctl
+        pick_radius_ctl     0.538461538461538
+        pick_radius_ctl     1.038461538461538
+        pick_radius_ctl     1.538461538461538
+      end array pick_radius_ctl
 !
       array pick_sph_spectr_ctl
         pick_sph_spectr_ctl   1   0
@@ -309,12 +326,19 @@ begin MHD_control
 !
     begin gauss_coefficient_ctl
       gauss_coefs_prefix    'monitor/gauss_coefs'
+      gauss_coefs_format    'gzip'
       gauss_coefs_radius_ctl    2.91
 !
       array pick_gauss_coef_degree_ctl
         pick_gauss_coef_degree_ctl   1
       end array pick_gauss_coef_degree_ctl
     end gauss_coefficient_ctl
+!
+    begin dynamo_benchmark_data_ctl
+      dynamo_benchmark_file_prefix     'monitor/dynamobench'
+      dynamo_benchmark_file_format     'gzip'
+      nphi_mid_eq_ctl                   512
+    end dynamo_benchmark_data_ctl
   end sph_monitor_ctl
 !
   begin visual_control
@@ -325,5 +349,13 @@ begin MHD_control
       file  cross_section_ctl   control_psf_z0.3
       file  cross_section_ctl   control_psf_s0.55
     end array cross_section_ctl
+!
+    array isosurface_ctl
+      file  isosurface_ctl      control_iso_temp
+    end array isosurface_ctl
   end  visual_control
+!
+  begin dynamo vizs control
+    file zonal mean section ctl  control_psf_zm
+  end dynamo vizs control
 end MHD_control

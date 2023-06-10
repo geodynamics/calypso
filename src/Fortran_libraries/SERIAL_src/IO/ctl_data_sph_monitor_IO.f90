@@ -46,7 +46,7 @@
 !!
 !!    typical_scale_prefix         'typical_scale'
 !!    typical_scale_format         'gzip'
-!!!
+!!
 !!    array volume_spectrum_ctl
 !!      ...
 !!    end array volume_spectrum_ctl

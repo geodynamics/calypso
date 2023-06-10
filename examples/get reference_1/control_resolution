@@ -25,17 +25,17 @@
 begin spherical_shell_ctl
   begin num_domain_ctl
     num_radial_domain_ctl         2
-    num_horizontal_domain_ctl     2
+    num_horizontal_domain_ctl     1
   end num_domain_ctl
 !
   begin num_grid_sph
-    truncation_level_ctl      47
+    truncation_level_ctl      4
 !
-    ngrid_meridonal_ctl       72
-    ngrid_zonal_ctl          144
+    ngrid_meridonal_ctl       6
+    ngrid_zonal_ctl           8
 !
     radial_grid_type_ctl   Chebyshev
-    num_fluid_grid_ctl     63
+    num_fluid_grid_ctl     511
     fluid_core_size_ctl   1.0
     ICB_to_CMB_ratio_ctl  0.35
   end num_grid_sph

@@ -1,23 +1,26 @@
-begin spherical_shell_ctl
+begin MHD_control
   begin data_files_def
     num_subdomain_ctl    1
     sph_file_prefix             'sph_lm24r24e_1/in'
+    sph_file_fmt_ctl            'merged_gzip'
   end data_files_def
 !
-  begin num_domain_ctl
-    num_radial_domain_ctl         1
-    num_horizontal_domain_ctl     1
-  end num_domain_ctl
+  begin spherical_shell_ctl
+    begin num_domain_ctl
+      num_radial_domain_ctl         1
+      num_horizontal_domain_ctl     1
+    end num_domain_ctl
 !
-  begin num_grid_sph
-    truncation_level_ctl      24
+    begin num_grid_sph
+      truncation_level_ctl      24
 !
-    ngrid_meridonal_ctl      48
-    ngrid_zonal_ctl          96
+      ngrid_meridonal_ctl      48
+      ngrid_zonal_ctl          96
 !
-    radial_grid_type_ctl   Chebyshev
-    num_fluid_grid_ctl     48
-    fluid_core_size_ctl   1.0
-    ICB_to_CMB_ratio_ctl  0.35
-  end num_grid_sph
-end spherical_shell_ctl
+      radial_grid_type_ctl   equi-distance
+      num_fluid_grid_ctl     48
+      fluid_core_size_ctl   1.0
+      ICB_to_CMB_ratio_ctl  0.35
+    end num_grid_sph
+  end spherical_shell_ctl
+end MHD_control

@@ -1,17 +1,21 @@
 begin assemble_control
-!
   begin data_files_def
     num_subdomain_ctl           4
 
     sph_file_prefix             'sph_lm31r48c_4/in'
     restart_file_prefix         '4domains/rst'
+    mesh_file_fmt_ctl           'merged_gz'
+    restart_file_fmt_ctl        'merged_gz'
   end data_files_def
+  spherical_shell_ctl       'sph_lm47r63c_4/control_resolution'
 !
   begin new_data_files_def
     num_new_domain_ctl           6
 !
     new_sph_mode_prefix        'sph_lm41r60c_6/in'
     new_restart_prefix         '6domains/rst'
+    mesh_file_fmt_ctl           'gzip'
+    restart_file_fmt_ctl        'gzip'
 !
     delete_original_data_flag       'NO'
   end new_data_files_def
