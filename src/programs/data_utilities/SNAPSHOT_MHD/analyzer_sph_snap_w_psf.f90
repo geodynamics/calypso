@@ -44,6 +44,7 @@
       use t_ctl_data_MHD
       use t_ctl_data_sph_MHD_w_psf
       use t_viz_sections
+      use t_SPH_MHD_zmean_sections
       use init_sph_MHD_elapsed_label
       use input_control_sph_MHD
       use SPH_analyzer_snap_w_vizs
@@ -111,6 +112,7 @@
       subroutine evolution_sph_snap_w_psf
 !
       use t_viz_sections
+      use t_SPH_MHD_zmean_sections
       use SPH_analyzer_snap_w_vizs
       use FEM_analyzer_sph_MHD
       use output_viz_file_control
