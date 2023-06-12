@@ -90,6 +90,7 @@
       integer(kind = kint) :: iflag
 !
 !
+      iflag = 1
       do i_fld = 1, rj_fld%num_phys
         if (rj_fld%num_component(i_fld) .eq. n_vector) then
           iflag = compare_each_sph_vector_with_IO(rj_fld, fld_IO,       &
@@ -105,6 +106,7 @@
           return
         end if
       end do
+      compare_rj_phys_data_with_IO = iflag
       return
 !
       end function compare_rj_phys_data_with_IO

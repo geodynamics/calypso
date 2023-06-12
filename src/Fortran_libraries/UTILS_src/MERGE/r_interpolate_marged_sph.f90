@@ -162,9 +162,6 @@
       real(kind = kreal), intent(in) :: r_new(nri_org)
       type(sph_radial_interpolate), intent(inout) :: r_itp
 !
-      integer(kind = kint) :: k, kr_org
-      real(kind = kreal) :: r_in, r_out
-!
 !
       r_itp%flag_same_rgrid                                             &
      &    = check_sph_same_radial_grid(nri_org, r_org, nri_new, r_new)
