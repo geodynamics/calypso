@@ -56,12 +56,11 @@
 !
 !
       num_vspec = 1
-      call cnt_ctl_params_v_spec_w_dbench                               &
-     &   (smonitor_ctl%num_vspec_ctl, smonitor_ctl%dbench_ctl, MHD_BC,  &
-     &    num_vspec, circle, bench)
       if(smonitor_ctl%num_vspec_ctl .gt. 0) then
         num_vspec = smonitor_ctl%num_vspec_ctl + num_vspec
       end if
+      call cnt_ctl_params_v_spec_w_dbench                               &
+     &   (smonitor_ctl%dbench_ctl, MHD_BC, num_vspec, circle, bench)
 
       call alloc_volume_spectr_data(num_vspec, pwr)
       call set_ctl_params_base_vol_spectr(smonitor_ctl,                 &
@@ -79,8 +78,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cnt_ctl_params_v_spec_w_dbench                         &
-     &         (num_vspec_ctl, dbench_ctl, MHD_BC, num_vspec,           &
-     &          circle, bench)
+     &         (dbench_ctl, MHD_BC, num_vspec, circle, bench)
 !
       use t_sph_volume_mean_square
       use t_multi_flag_labels
@@ -89,7 +87,6 @@
 !
       type(dynamobench_control), intent(in) :: dbench_ctl
       type(MHD_BC_lists), intent(in) :: MHD_BC
-      integer(kind = kint), intent(in) :: num_vspec_ctl
 !
       integer(kind = kint), intent(inout) :: num_vspec
       type(circle_parameters), intent(inout) :: circle
@@ -105,8 +102,8 @@
       if(bench%iflag_dynamobench .le. 0) return
       bench%benchmark_file_prefix                                       &
      &                 = dbench_ctl%dynamobench_file_ctl%charavalue
-      bench%ipwr_ocore = num_vspec_ctl + 2
       num_vspec = num_vspec + 1
+      bench%ipwr_ocore = num_vspec
 !
       bench%detail_bench_file_prefix = 'NO_FILE'
       if(dbench_ctl%detailed_dbench_file_ctl%iflag .gt. 0) then
@@ -136,12 +133,12 @@
       if(find_conductive_inner_core_bc(MHD_BC%magne_BC%nod_BC,          &
      &                                 MHD_BC%magne_BC%surf_BC)         &
      &    .eqv. .FALSE.) return 
-      if(find_conductive_inner_core_bc(MHD_BC%velo_BC%nod_BC,           &
+      if(find_rotatable_inner_core_bc(MHD_BC%velo_BC%nod_BC,            &
      &                                 MHD_BC%velo_BC%surf_BC)          &
      &    .eqv. .FALSE.) return 
 !
-      bench%ipwr_icore = num_vspec_ctl + 3
       num_vspec = num_vspec + 1
+      bench%ipwr_icore = num_vspec
 !
       end subroutine cnt_ctl_params_v_spec_w_dbench
 !
@@ -170,14 +167,16 @@
       v_spectr(bench%ipwr_ocore)%iflag_volume_ave_sph = 0
       v_spectr(bench%ipwr_ocore)%fhead_ave = 'NO_FILE'
 !
+      v_spectr(bench%ipwr_ocore)%kr_inside =  -1
+      v_spectr(bench%ipwr_ocore)%kr_outside = -1
       v_spectr(bench%ipwr_ocore)%r_inside =   7.0d0 / 13.0d0
       v_spectr(bench%ipwr_ocore)%r_outside = 20.0d0 / 13.0d0
 !
       if(find_conductive_inner_core_bc(MHD_BC%magne_BC%nod_BC,          &
      &                                 MHD_BC%magne_BC%surf_BC)         &
      &    .eqv. .FALSE.) return 
-      if(find_conductive_inner_core_bc(MHD_BC%velo_BC%nod_BC,           &
-     &                                 MHD_BC%velo_BC%surf_BC)          &
+      if(find_rotatable_inner_core_bc(MHD_BC%velo_BC%nod_BC,            &
+     &                                MHD_BC%velo_BC%surf_BC)           &
      &    .eqv. .FALSE.) return 
 !
       v_spectr(bench%ipwr_icore)%iflag_volume_rms_spec = 1
@@ -187,6 +186,8 @@
       v_spectr(bench%ipwr_icore)%iflag_volume_ave_sph = 0
       v_spectr(bench%ipwr_icore)%fhead_ave = 'NO_FILE'
 !
+      v_spectr(bench%ipwr_icore)%kr_inside =  -1
+      v_spectr(bench%ipwr_icore)%kr_outside = -1
       v_spectr(bench%ipwr_icore)%r_inside =  0.0d0
       v_spectr(bench%ipwr_icore)%r_outside = 7.0d0 / 13.0d0
 !
