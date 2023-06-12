@@ -71,13 +71,6 @@
 !>    Number of pixels for image
         integer(kind = kint) :: n_pvr_pixel(2) = (/0,0/)
 !
-!>    Defined flag for orthogonal view
-        integer(kind = kint) :: iflag_ortho_mat = 0
-!>    Orthogonal projection parameter
-        real(kind = kreal) :: ortho_mat(3) = (/zero,zero,zero/)
-!>    Orthogonal projection matrix
-        real(kind = kreal) :: ortho_pvr(2) = (/zero,zero/)
-!
 !>    Defined flag for perspective view
         integer(kind = kint) :: iflag_perspective = 0
 !>    Apature of perspective view

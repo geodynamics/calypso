@@ -105,7 +105,7 @@
      &    MVIZs%FEM_DAT%geofem, MVIZs%FEM_DAT%field, MVIZs%VIZ_DAT,     &
      &    add_VMHD_ctl1%viz3_ctls, MVIZs%VIZ3s, MHDMs%m_SR)
 !
-      call init_zonal_mean_sections                                     &
+      call init_zonal_mean_vizs                                         &
      &   (MHDMs%MHD_step%viz_step, MVIZs%FEM_DAT%geofem,                &
      &    MVIZs%VIZ_DAT%edge_comm, MVIZs%FEM_DAT%field,                 &
      &    add_VMHD_ctl1%zm_ctls, MVIZs%zmeans, MHDMs%m_SR)
@@ -191,7 +191,7 @@
 !*  ----------- Zonal means --------------
 !*
           if(MHDMs%MHD_step%viz_step%istep_psf .ge. 0) then
-            call SPH_MHD_zmean_sections                                 &
+            call SPH_MHD_zmean_vizs                                     &
      &         (MHDMs%MHD_step%viz_step, MHDMs%MHD_step%time_d,         &
      &          MHDMs%SPH_MHD%sph, MVIZs%FEM_DAT%geofem,                &
      &          MHDMs%SPH_WK%trns_WK, MVIZs%FEM_DAT%field,              &

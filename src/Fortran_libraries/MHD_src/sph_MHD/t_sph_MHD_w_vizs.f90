@@ -25,7 +25,7 @@
 !>        Structure of sectioning and isosurfaceing modules
         type(three_visualize_modules) :: VIZ3s
 !>        Structures of zonal mean controls
-        type(sph_zonal_mean_sectioning) :: zmeans
+        type(sph_zonal_mean_viz) :: zmeans
       end type sph_MHD_w_vizs
 !
       end module t_sph_MHD_w_vizs

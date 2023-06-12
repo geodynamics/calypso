@@ -58,6 +58,9 @@
         real(kind = kreal) :: pvr_lighting_real(3) = (/zero,zero,zero/)
 !>    Position of lights
         real(kind = kreal), allocatable :: xyz_pvr_lights(:,:)
+!
+!>        Background color
+        real(kind = kreal) :: bg_rgba_real(4) = (/0.0,0.0,0.0,0.0/)
       end type pvr_colormap_parameter
 !
 !>  Structure for PVR colorbar parameters

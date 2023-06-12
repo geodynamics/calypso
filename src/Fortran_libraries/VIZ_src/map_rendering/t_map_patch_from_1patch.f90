@@ -7,9 +7,8 @@
 !>@brief Divided triangle patch for map projection
 !!
 !!@verbatim
-!!      subroutine alloc_map_patch_from_1patch(ntot_comp, map_e)
+!!      subroutine alloc_map_patch_from_1patch(map_e)
 !!      subroutine dealloc_map_patch_from_1patch(map_e)
-!!        integer(kind = kint), intent(in) :: ntot_comp
 !!        type(map_patches_for_1patch), intent(inout) :: map_e
 !!
 !!      subroutine set_sph_position_4_map_patch(x_map_patch,            &
@@ -46,7 +45,7 @@
         integer(kind = kint) :: n_map_patch
 !
         real(kind=kreal), allocatable :: xy_map(:,:,:)
-        real(kind=kreal), allocatable :: d_map_patch(:,:,:)
+        real(kind=kreal), allocatable :: d_map_patch(:,:)
 !
         real(kind=kreal), allocatable :: x_map_patch(:,:,:)
         real(kind=kreal), allocatable :: rtp_map_patch(:,:,:)
@@ -60,18 +59,17 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine alloc_map_patch_from_1patch(ntot_comp, map_e)
+      subroutine alloc_map_patch_from_1patch(map_e)
 !
-      integer(kind = kint), intent(in) :: ntot_comp
       type(map_patches_for_1patch), intent(inout) :: map_e
 !
       allocate(map_e%xy_map(2,num_triangle,nmax_map_p))
-      allocate(map_e%d_map_patch(num_triangle,ntot_comp,nmax_map_p))
+      allocate(map_e%d_map_patch(num_triangle,nmax_map_p))
       allocate(map_e%x_map_patch(num_triangle,n_vector,nmax_map_p))
       allocate(map_e%rtp_map_patch(num_triangle,n_vector,nmax_map_p))
 !
       map_e%xy_map(1:2,1:num_triangle,1:nmax_map_p) =  zero
-      map_e%d_map_patch(1:num_triangle,1:ntot_comp,1:nmax_map_p) = zero
+      map_e%d_map_patch(1:num_triangle,1:nmax_map_p) = zero
       map_e%x_map_patch(1:num_triangle,1:n_vector,1:nmax_map_p) =  zero
       map_e%rtp_map_patch(1:num_triangle,1:n_vector,1:nmax_map_p)= zero
 !

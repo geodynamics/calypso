@@ -217,7 +217,9 @@
      &                              cbar_param)
       cbar_param%iflag_opacity = 0
 !
-      call set_ctl_map_rendering_param(map_c%map_define_ctl, map_data)
+      call set_ctl_map_rendering_param                                  &
+     &   (map_c%mat%projection_type_ctl, map_c%mat%proj,                &
+     &    map_c%map_define_ctl, map_data)
 !
       end subroutine set_control_4_map
 !

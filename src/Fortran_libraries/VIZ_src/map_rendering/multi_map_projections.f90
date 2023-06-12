@@ -107,6 +107,7 @@
       use t_pvr_image_array
 !
       use collect_psf_mesh_field
+      use xyz_plane_rendering
       use write_PVR_image
 !
       integer(kind= kint), intent(in) :: num_map
@@ -135,10 +136,18 @@
 !
       if(iflag_MAP_time) call start_elapsed_time(ist_elapsed_MAP+2)
       do i_map = 1, num_map
-        call cal_map_rendering_data                                     &
-     &     (time_d, psf_dat(i_map)%psf_nod, psf_dat(i_map)%psf_ele,     &
-     &      psf_dat(i_map)%psf_phys, color_param(i_map),                &
-     &      cbar_param(i_map), map_data(i_map), map_rgb(i_map))
+        if(map_data(i_map)%iflag_2d_projection_mode                     &
+     &                              .eq. iflag_aitoff) then
+          call aitoff_projection_rendering                              &
+     &       (time_d, psf_dat(i_map)%psf_nod, psf_dat(i_map)%psf_ele,   &
+     &        psf_dat(i_map)%psf_phys, color_param(i_map),              &
+     &        cbar_param(i_map), map_data(i_map), map_rgb(i_map))
+        else
+          call s_xyz_plane_rendering                                    &
+     &       (time_d, psf_dat(i_map)%psf_nod, psf_dat(i_map)%psf_ele,   &
+     &        psf_dat(i_map)%psf_phys, color_param(i_map),              &
+     &        cbar_param(i_map), map_data(i_map), map_rgb(i_map))
+        end if
       end do
       if(iflag_MAP_time) call end_elapsed_time(ist_elapsed_MAP+2)
 !

@@ -152,6 +152,7 @@
 !
       call bcast_ctl_type_r1(mat%view_rotation_deg_ctl)
       call bcast_ctl_type_r1(mat%scale_factor_ctl)
+      call bcast_ctl_type_c1(mat%projection_type_ctl)
 !
 !
       call bcast_projection_mat_ctl(mat%proj)
@@ -196,6 +197,9 @@
       call bcast_ctl_type_r1(proj%perspective_xy_ratio_ctl)
       call bcast_ctl_type_r1(proj%perspective_near_ctl)
       call bcast_ctl_type_r1(proj%perspective_far_ctl)
+!
+      call bcast_ctl_type_r2(proj%horizontal_range_ctl)
+      call bcast_ctl_type_r2(proj%vertical_range_ctl)
 !
       end subroutine bcast_projection_mat_ctl
 !

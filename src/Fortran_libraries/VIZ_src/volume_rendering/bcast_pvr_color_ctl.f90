@@ -60,6 +60,7 @@
       call bcast_ctl_type_r1(color%range_min_ctl)
       call bcast_ctl_type_r1(color%range_max_ctl)
       call bcast_ctl_type_r1(color%fix_opacity_ctl)
+      call bcast_ctl_type_r3(color%background_color_ctl)
 !
       end subroutine bcast_pvr_colordef_ctl
 !

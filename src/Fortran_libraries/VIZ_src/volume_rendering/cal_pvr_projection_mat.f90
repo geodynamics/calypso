@@ -7,8 +7,6 @@
 !> @brief Evaluate projection matirx
 !!
 !!@verbatim
-!!      subroutine set_pvr_orthogonal_params(view_param)
-!!
 !!      subroutine set_pvr_projection_matrix(view_param, projection_mat)
 !!      subroutine set_pvr_step_projection_mat                          &
 !!     &         (i_img, view_param, stereo_def, projection_step)
@@ -36,33 +34,6 @@
       contains
 !
 ! -----------------------------------------------------------------------
-!
-      subroutine set_pvr_orthogonal_params(view_param)
-!
-      type(pvr_view_parameter), intent(inout) :: view_param
-!
-!
-      if(view_param%iflag_perspective .eq. 0) then
-        view_param%ortho_pvr(1)                                         &
-     &      = max(view_param%ortho_pvr(1), view_param%ortho_pvr(2))
-        view_param%ortho_pvr(2) = view_param%ortho_pvr(1)
-      end if
-!
-      if (iflag_debug .gt. 0) then
-        write(*,*) 'Orthogonal parameter for PVR '
-        write(*,*) 'perspective_angle',                                 &
-     &            view_param%perspective_angle
-        write(*,*) 'perspective_xy_ratio',                              &
-     &             view_param%perspective_xy_ratio
-        write(*,*) 'perspective_near',  view_param%perspective_near
-        write(*,*) 'perspective_far',  view_param%perspective_far
-        write(*,*) 'ortho_pvr',  view_param%ortho_pvr(1:2)
-      end if
-!
-      end subroutine set_pvr_orthogonal_params
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
 !
       subroutine set_pvr_projection_matrix(view_param, projection_mat)
 !

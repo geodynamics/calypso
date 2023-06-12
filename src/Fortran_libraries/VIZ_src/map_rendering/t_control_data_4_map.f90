@@ -51,6 +51,10 @@
 !!      end surface_define
 !!
 !!      zeroline_switch_ctl           On
+!!      isoline_switch_ctl            On
+!!      isoline_color_mode      color, white, or black
+!!      isoline_number_ctl            20
+!!
 !!      tangent_cylinder_switch_ctl   On
 !!      inner_radius_ctl              0.53846
 !!      outer_radius_ctl              1.53846
@@ -62,13 +66,17 @@
 !!        y_pixel_ctl  480
 !!      end image_size_ctl
 !!
+!!      projection_type_ctl      Aitoff, xy_plane, xz_plane, yz_plane
 !!      begin projection_matrix_ctl
 !!        perspective_xy_ratio_ctl   1.0
+!!        horizontal_range_ctl       -2.4   2.4
+!!        vertical_range_ctl         -1.2   1.2
 !!      end projection_matrix_ctl
 !!    end map_projection_ctl
 !!
 !!    begin colormap_ctl
 !!      colormap_mode_ctl       rainbow
+!!      background_color_ctl    0.0   0.0   0.0
 !!
 !!      data_mapping_ctl   Colormap_list
 !!      array color_table_ctl
@@ -85,7 +93,7 @@
 !!      iflag_zeromarker       ON
 !!      colorbar_range     0.0   1.0
 !!      font_size_ctl         3
-!!      num_grid_ctl     4
+!!      num_grid_ctl          4
 !!!
 !!      axis_label_switch      ON
 !!    end colorbar_ctl

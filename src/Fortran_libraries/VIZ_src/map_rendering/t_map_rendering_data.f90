@@ -13,8 +13,10 @@
 !!        integer(kind = kint), intent(in) :: num_pixel
 !!        type(map_rendering_data), intent(inout) :: map_data
 !!
-!!      subroutine set_ctl_map_rendering_param(map_define_ctl,          &
-!!     &                                       map_data)
+!!      subroutine set_ctl_map_rendering_param                          &
+!!     &         (proj_type_c, proj_c, map_define_ctl, map_data)
+!!        type(read_character_item), intent(in) :: proj_type_c
+!!        type(projection_ctl), intent(in) :: proj_c
 !!        type(pvr_section_ctl), intent(in) :: map_define_ctl
 !!        type(map_rendering_data), intent(inout) :: map_data
 !!      subroutine init_map_rendering_data                              &
@@ -38,6 +40,7 @@
 !
       use calypso_mpi
       use m_precision
+      use m_machine_parameter
 !
       use t_geometry_data
       use t_phys_data
@@ -49,8 +52,29 @@
       real(kind= kreal), parameter, private :: xframe = 2.4
       real(kind= kreal), parameter, private :: yframe = 1.8
 !
+      character(len = kchara), parameter :: label_xy_plane = 'xy_plane'
+      character(len = kchara), parameter :: label_xz_plane = 'xz_plane'
+      character(len = kchara), parameter :: label_yz_plane = 'yz_plane'
+      character(len = kchara), parameter :: label_aitoff = 'aitoff'
+      integer(kind = kint), parameter :: iflag_xy_plane = 1
+      integer(kind = kint), parameter :: iflag_xz_plane = 2
+      integer(kind = kint), parameter :: iflag_yz_plane = 3
+      integer(kind = kint), parameter :: iflag_aitoff = 101
+!
+      character(len = kchara), parameter :: label_colored = 'color'
+      character(len = kchara), parameter :: label_black =   'black'
+      character(len = kchara), parameter :: label_white =   'white'
+      integer(kind = kint), parameter :: iflag_colored = 1
+      integer(kind = kint), parameter :: iflag_black =   2
+      integer(kind = kint), parameter :: iflag_white =   3
+!
       type map_rendering_data
+        logical :: fill_flag = .TRUE.
         logical :: flag_zeroline = .FALSE.
+        integer(kind = kint) :: num_line = 0
+!
+        integer(kind = kint) :: iflag_2d_projection_mode = 0
+        integer(kind = kint) :: iflag_isoline_color = 0
 !
         real(kind= kreal) :: xmin_frame = -xframe
         real(kind= kreal) :: xmax_frame =  xframe
@@ -101,19 +125,91 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine set_ctl_map_rendering_param(map_define_ctl,            &
-     &                                       map_data)
+      subroutine set_ctl_map_rendering_param                            &
+     &         (proj_type_c, proj_c, map_define_ctl, map_data)
 !
+      use t_control_array_character
       use t_ctl_data_pvr_section
+      use t_ctl_data_4_projection
+      use skip_comment_f
 !
+      type(read_character_item), intent(in) :: proj_type_c
+      type(projection_ctl), intent(in) :: proj_c
       type(pvr_section_ctl), intent(in) :: map_define_ctl
       type(map_rendering_data), intent(inout) :: map_data
 !
+      character(len = kchara) :: tmpchara
       real(kind = kreal) :: pi
 !
-      if(map_define_ctl%zeroline_ctl%iflag .gt. 0) then
+!
+      if(proj_type_c%iflag .gt. 0) then
+        tmpchara = proj_type_c%charavalue
+        if(cmp_no_case(tmpchara, label_xy_plane)) then
+          map_data%iflag_2d_projection_mode = iflag_xy_plane
+        else if(cmp_no_case(tmpchara, label_xz_plane)) then
+          map_data%iflag_2d_projection_mode = iflag_xz_plane
+        else if(cmp_no_case(tmpchara, label_yz_plane)) then
+          map_data%iflag_2d_projection_mode = iflag_yz_plane
+        else if(cmp_no_case(tmpchara, label_aitoff)) then
+          map_data%iflag_2d_projection_mode = iflag_aitoff
+        end if
+      end if
+!
+      map_data%xmin_frame = -xframe
+      map_data%xmax_frame =  xframe
+      if(proj_c%horizontal_range_ctl%iflag .gt. 0) then
+        map_data%xmin_frame = proj_c%horizontal_range_ctl%realvalue(1)
+        map_data%xmax_frame = proj_c%horizontal_range_ctl%realvalue(2)
+      end if
+!
+      map_data%ymin_frame = -yframe
+      map_data%ymax_frame =  yframe
+      if(proj_c%vertical_range_ctl%iflag .gt. 0) then
+        map_data%ymin_frame = proj_c%vertical_range_ctl%realvalue(1)
+        map_data%ymax_frame = proj_c%vertical_range_ctl%realvalue(2)
+      end if
+!
+!
+      map_data%fill_flag = .TRUE.
+      if(map_define_ctl%opacity_ctl%iflag .gt. 0                        &
+     &  .and. map_define_ctl%opacity_ctl%realvalue .eq. 0.0d0) then
+        map_data%fill_flag = .FALSE.
+      end if
+!
+      map_data%flag_zeroline = .FALSE.
+      if(map_define_ctl%zeroline_switch_ctl%iflag .gt. 0) then
         map_data%flag_zeroline                                          &
-     &   = yes_flag(map_define_ctl%zeroline_ctl%charavalue)
+     &   = yes_flag(map_define_ctl%zeroline_switch_ctl%charavalue)
+      end if
+!
+      map_data%num_line = 0
+      if(map_define_ctl%isoline_switch_ctl%iflag .gt. 0) then
+        if(yes_flag(map_define_ctl%isoline_switch_ctl%charavalue)) then
+          if(map_define_ctl%isoline_number_ctl%iflag .gt. 0) then
+            map_data%num_line                                           &
+     &          = map_define_ctl%isoline_number_ctl%intvalue
+          end if
+        end if
+      end if
+!
+      map_data%iflag_isoline_color = iflag_black
+      if(map_data%num_line .gt. 0) then
+        if(map_define_ctl%isoline_color_mode%iflag .gt. 0) then
+          tmpchara = map_define_ctl%isoline_color_mode%charavalue
+          if(cmp_no_case(tmpchara, label_colored)) then
+            map_data%iflag_isoline_color = iflag_colored
+          else if(cmp_no_case(tmpchara, label_white)) then
+            map_data%iflag_isoline_color = iflag_white
+          else if(cmp_no_case(tmpchara, label_black)) then
+            map_data%iflag_isoline_color = iflag_black
+          end if
+        end if
+      end if
+!
+!
+      if(map_define_ctl%zeroline_switch_ctl%iflag .gt. 0) then
+        map_data%flag_zeroline                                          &
+     &   = yes_flag(map_define_ctl%zeroline_switch_ctl%charavalue)
       end if
 !
       if(map_define_ctl%tan_cyl_switch_ctl%iflag.gt.0) then
@@ -151,7 +247,7 @@
 !
       type(map_rendering_data), intent(inout) :: map_data
 !
-      real(kind = kreal) :: xtmp, ytmp
+      real(kind = kreal) :: x_tmp, y_tmp, width(2)
       real(kind = kreal) :: aspect
 !
 !
@@ -160,18 +256,34 @@
 !
       aspect =  view_param%perspective_xy_ratio
 !
-      ytmp = xframe / aspect
-      xtmp = yframe * aspect
-      if(ytmp .le. 1.0) then
-        map_data%xmin_frame = -xtmp
-        map_data%xmax_frame =  xtmp
-        map_data%ymin_frame = -yframe
-        map_data%ymax_frame =  yframe
-      else
-        map_data%xmin_frame = -xframe
-        map_data%xmax_frame =  xframe
-        map_data%ymin_frame = -ytmp
-        map_data%ymax_frame =  ytmp
+      map_data%xmin_frame = -xframe
+      map_data%xmax_frame =  xframe
+      map_data%ymin_frame = -yframe
+      map_data%ymax_frame =  yframe
+!
+      width(1) = map_data%xmax_frame - map_data%xmin_frame
+      width(2) = map_data%ymax_frame - map_data%ymin_frame
+!
+      y_tmp = width(1) * dble(view_param%n_pvr_pixel(2))                &
+     &                 / dble(view_param%n_pvr_pixel(1))
+      x_tmp = width(2) * dble(view_param%n_pvr_pixel(1))                &
+     &                 / dble(view_param%n_pvr_pixel(2))
+!
+      if(x_tmp .gt. width(1)) then
+        map_data%xmin_frame = map_data%xmin_frame * x_tmp / width(1)
+        map_data%xmax_frame = map_data%xmax_frame * x_tmp / width(1)
+      end if
+      if(y_tmp .gt. width(2)) then
+        map_data%ymin_frame = map_data%ymin_frame * y_tmp / width(2)
+        map_data%ymax_frame = map_data%ymax_frame * y_tmp / width(2)
+      end if
+!
+      if (iflag_debug .gt. 0) then
+        write(*,*) 'Orthogonal parameter for rendering '
+        write(*,*) 'horizontal range:',                                 &
+     &             map_data%xmin_frame, map_data%xmax_frame
+        write(*,*) 'vertical range:',                                   &
+     &             map_data%ymin_frame, map_data%ymax_frame
       end if
 !
       end subroutine init_map_rendering_data
@@ -193,6 +305,8 @@
       use draw_aitoff_map
       use draw_lines_on_map
       use draw_pvr_colorbar
+      use draw_pixels_on_map
+      use set_map_values_for_grids
 !
       type(time_data), intent(in) :: time_d
       type(pvr_colormap_parameter), intent(in) :: color_param
@@ -209,7 +323,7 @@
 !
       if(my_rank .ne. pvr_rgb%irank_image_file) return
 !
-      call alloc_map_patch_from_1patch(ione, map_e1)
+      call alloc_map_patch_from_1patch(map_e1)
       call set_scalar_on_map_image(psf_nod, psf_ele, psf_phys,          &
      &    map_data%xmin_frame, map_data%xmax_frame,                     &
      &    map_data%ymin_frame, map_data%ymax_frame,                     &
@@ -218,40 +332,51 @@
      &    map_e1)
       call dealloc_map_patch_from_1patch(map_e1)
 !
-      call map_value_to_rgb                                             &
-     &   (color_param, pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),    &
-     &    pvr_rgb%num_pixel_xy, map_data%d_map, pvr_rgb%rgba_real_gl)
+      if(map_data%fill_flag) then
+        call map_value_to_rgb                                           &
+     &     (color_param, pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),  &
+     &      map_data%d_map, pvr_rgb%rgba_real_gl)
+      end if
 !
       if(map_data%flag_zeroline) then
-        call draw_aitoff_map_zeroline                                   &
+        call draw_zeroline                                              &
      &     (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      pvr_rgb%num_pixel_xy, map_data%d_map, pvr_rgb%rgba_real_gl)
+     &      map_data%d_map, pvr_rgb%rgba_real_gl)
       end if
 !
+      if(map_data%num_line .gt. 0) then
+        call draw_isolines                                              &
+     &     (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), color_param,  &
+     &      map_data%num_line, map_data%d_map, pvr_rgb%rgba_real_gl)
+      end if
+!
+      call map_value_to_colatitude                                      &
+     &   (map_data%xmin_frame, map_data%xmax_frame,                     &
+     &    map_data%ymin_frame, map_data%ymax_frame,                     &
+     &    pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map)
+      call draw_latitude_grid                                           &
+     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map, &
+     &    pvr_rgb%rgba_real_gl)
       if(map_data%flag_tangent_cylinder) then
-        call draw_aitoff_lat_line                                       &
-     &     (map_data%xmin_frame, map_data%xmax_frame,                   &
-     &      map_data%ymin_frame, map_data%ymax_frame,                   &
-     &      map_data%tangent_cylinder_theta(1),                         &
-     &      map_data%tangent_cylinder_rgba,                             &
-     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      pvr_rgb%num_pixel_xy, pvr_rgb%rgba_real_gl)
-        call draw_aitoff_lat_line                                       &
-     &     (map_data%xmin_frame, map_data%xmax_frame,                   &
-     &      map_data%ymin_frame, map_data%ymax_frame,                   &
-     &      map_data%tangent_cylinder_theta(2),                         &
-     &      map_data%tangent_cylinder_rgba,                             &
-     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      pvr_rgb%num_pixel_xy, pvr_rgb%rgba_real_gl)
+        call draw_map_tangent_cyl_grid                                  &
+     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
+     &    map_data%tangent_cylinder_theta, map_data%d_map,              &
+     &    pvr_rgb%rgba_real_gl)
       end if
 !
-      if(cbar_param%flag_draw_mapgrid) then
-        call draw_aitoff_map_frame                                      &
-     &     (map_data%xmin_frame, map_data%xmax_frame,                   &
-     &      map_data%ymin_frame, map_data%ymax_frame,                   &
-     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      pvr_rgb%num_pixel_xy, pvr_rgb%rgba_real_gl)
-      end if
+      call map_value_to_longitude                                       &
+     &   (map_data%xmin_frame, map_data%xmax_frame,                     &
+     &    map_data%ymin_frame, map_data%ymax_frame,                     &
+     &    pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map)
+      call draw_longitude_grid                                          &
+     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map, &
+     &    pvr_rgb%rgba_real_gl)
+      call draw_mapflame(pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),  &
+     &                   map_data%d_map, pvr_rgb%rgba_real_gl)
+!
+      call fill_background                                              &
+     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
+     &    color_param%bg_rgba_real, pvr_rgb%rgba_real_gl)
 !
       if(cbar_param%flag_pvr_colorbar) then
         call set_pvr_colorbar(pvr_rgb%num_pixel_xy, pvr_rgb%num_pixels, &

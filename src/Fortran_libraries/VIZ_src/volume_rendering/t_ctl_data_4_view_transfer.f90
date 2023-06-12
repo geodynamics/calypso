@@ -85,11 +85,15 @@
 !!
 !!    Orthogonal view....( perspective_near_ctl = perspective_far_ctl)
 !!
+!!    projection_type_ctl      Aitoff, xy_plane, xz_plane, yz_plane
 !!    begin projection_matrix_ctl
 !!      perspective_angle_ctl     10.0
 !!      perspective_xy_ratio_ctl   1.0
 !!      perspective_near_ctl       0.5
 !!      perspective_far_ctl     1000.0
+!!
+!!      horizontal_range_ctl       -2.4   2.4
+!!      vertical_range_ctl         -1.2   1.2
 !!    end projection_matrix_ctl
 !!
 !!    begin stereo_view_parameter_ctl
@@ -111,6 +115,7 @@
       use m_machine_parameter
       use t_read_control_elements
       use t_control_array_real
+      use t_control_array_character
       use t_control_array_charareal
       use t_control_array_chara2real
       use t_ctl_data_4_screen_pixel
@@ -174,6 +179,9 @@
 !!@n      viewpt_in_viewer_ctl%vect:    Position of viewpoint in viewer
         type(ctl_array_cr) :: viewpt_in_viewer_ctl
 !
+!>      Structure for projection type for 2D plot
+        type(read_character_item) :: projection_type_ctl
+!
 !>         entry label for this block
         integer (kind=kint) :: i_view_transform = 0
       end type modeview_ctl
@@ -222,6 +230,8 @@
       mat%view_rotation_deg_ctl%iflag = 0
       mat%scale_factor_ctl%iflag = 0
 !
+      mat%projection_type_ctl%iflag = 0
+!
       call reset_image_size_ctl(mat%pixel)
       call reset_projection_view_ctl(mat%proj)
       call reset_stereo_view_ctl(mat%streo)
@@ -259,6 +269,9 @@
      &                   new_mat%view_rotation_deg_ctl)
       call copy_real_ctl(org_mat%scale_factor_ctl,                      &
      &                   new_mat%scale_factor_ctl)
+!
+      call copy_chara_ctl(org_mat%projection_type_ctl,                  &
+     &                   new_mat%projection_type_ctl)
 !
       call copy_projection_mat_ctl(org_mat%proj, new_mat%proj)
       call copy_image_size_ctl(org_mat%pixel, new_mat%pixel)

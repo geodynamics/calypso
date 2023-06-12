@@ -29,6 +29,7 @@
 !!
 !!  begin colormap_ctl
 !!    colormap_mode_ctl       rainbow
+!!    background_color_ctl    0.0   0.0   0.0
 !!!
 !!    LIC_color_field             magnetic_field
 !!    LIC_color_componenet        magnitude
@@ -92,7 +93,9 @@
 !     3rd level for colormap
 !
       character(len=kchara), parameter, private                         &
-     &        :: hd_colormap_mode =  'colormap_mode_ctl'
+     &        :: hd_colormap_mode =     'colormap_mode_ctl'
+      character(len=kchara), parameter, private                         &
+     &        :: hd_background_color =  'background_color_ctl'
 !
       character(len=kchara), parameter, private                         &
      &        :: hd_lic_color_fld =  'LIC_color_field'
@@ -120,8 +123,8 @@
       character(len=kchara), parameter, private                         &
      &        :: hd_opacity_def =    'step_opacity_ctl'
 !
-      integer(kind = kint), parameter :: n_label_pvr_colormap =  9
-      integer(kind = kint), parameter :: n_label_lic_colormap = 13
+      integer(kind = kint), parameter :: n_label_pvr_colormap = 10
+      integer(kind = kint), parameter :: n_label_lic_colormap = 14
 !
       private :: n_label_pvr_colormap, n_label_lic_colormap
 !
@@ -178,6 +181,8 @@
      &      color%range_max_ctl)
         call read_real_ctl_type(c_buf, hd_constant_opacity,             &
      &      color%fix_opacity_ctl)
+        call read_real3_ctl_type                                        &
+     &     (c_buf, hd_background_color, color%background_color_ctl)
       end do
       color%i_pvr_colordef = 1
 !
@@ -210,9 +215,17 @@
       maxlen = max(maxlen, len_trim(hd_constant_opacity))
       maxlen = max(maxlen, len_trim(hd_pvr_range_min))
       maxlen = max(maxlen, len_trim(hd_pvr_range_max))
+      maxlen = max(maxlen, len_trim(hd_colormap_mode))
+      maxlen = max(maxlen, len_trim(hd_background_color))
 !
       write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      write(id_control,'(a1)') '!'
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_colormap_mode, color%colormap_mode_ctl)
+      call write_real3_ctl_type(id_control, level, maxlen,              &
+     &    hd_background_color, color%background_color_ctl)
 !
       write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
@@ -283,6 +296,8 @@
       call set_control_labels(hd_linear_opacity,   names( 8))
       call set_control_labels(hd_opacity_def,      names( 9))
 !
+      call set_control_labels(hd_background_color,    names(10))
+!
       end subroutine set_label_pvr_colormap
 !
 ! ----------------------------------------------------------------------
@@ -310,6 +325,8 @@
       call set_control_labels(hd_constant_opacity, names(11))
       call set_control_labels(hd_linear_opacity,   names(12))
       call set_control_labels(hd_opacity_def,      names(13))
+!
+      call set_control_labels(hd_background_color,    names(14))
 !
       end subroutine set_label_LIC_colormap
 !

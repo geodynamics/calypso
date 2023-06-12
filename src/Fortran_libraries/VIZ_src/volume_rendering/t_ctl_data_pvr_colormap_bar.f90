@@ -47,6 +47,7 @@
 !!  begin pvr_color_ctl   (BMP or PNG)
 !!    begin colormap_ctl
 !!      colormap_mode_ctl       rainbow
+!!      background_color_ctl    0.0   0.0   0.0
 !!!
 !!      LIC_color_field             magnetic_field
 !!      LIC_color_componenet        magnitude

@@ -95,6 +95,7 @@
 !!
 !!    Orthogonal view....( perspective_near_ctl = perspective_far_ctl)
 !!
+!!    projection_type_ctl      Aitoff, xy_plane, xz_plane, yz_plane
 !!    begin projection_matrix_ctl
 !!      ...
 !!    end projection_matrix_ctl
@@ -156,6 +157,8 @@
 !
       character(len=kchara), parameter, private                         &
      &             :: hd_stereo_view = 'stereo_view_parameter_ctl'
+      character(len=kchara), parameter, private                         &
+     &             :: hd_projection_type = 'projection_type_ctl'
 !
 !      Old definision
       character(len=kchara), parameter, private                         &
@@ -163,7 +166,7 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_viewpt_in_view = 'viewpoint_in_viewer_ctl'
 !
-      integer(kind = kint), parameter :: n_label_pvr_modelview =  12
+      integer(kind = kint), parameter :: n_label_pvr_modelview =  13
       private :: n_label_pvr_modelview
 !
 !  ---------------------------------------------------------------------
@@ -220,9 +223,11 @@
      &      hd_model_mat, mat%modelview_mat_ctl, c_buf)
 !
         call read_real_ctl_type(c_buf, hd_view_rot_deg,                 &
-     &        mat%view_rotation_deg_ctl)
+     &      mat%view_rotation_deg_ctl)
         call read_real_ctl_type(c_buf, hd_scale_factor,                 &
-     &        mat%scale_factor_ctl)
+     &      mat%scale_factor_ctl)
+        call read_chara_ctl_type(c_buf, hd_projection_type,             &
+     &      mat%projection_type_ctl)
       end do
       mat%i_view_transform = 1
 !
@@ -248,10 +253,13 @@
 !
       maxlen = len_trim(hd_view_rot_deg)
       maxlen = max(maxlen, len_trim(hd_scale_factor))
+      maxlen = max(maxlen, len_trim(hd_projection_type))
 !
       write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_projection_type, mat%projection_type_ctl)
       call write_projection_mat_ctl                                     &
      &   (id_control, hd_project_mat, mat%proj, level)
       call write_image_size_ctl                                         &
@@ -320,6 +328,7 @@
       call set_control_labels(hd_model_mat,   names(11))
 !
       call set_control_labels(hd_stereo_view, names(12))
+      call set_control_labels(hd_projection_type, names(13))
 !
       end subroutine set_label_pvr_modelview
 !

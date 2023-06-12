@@ -20,7 +20,15 @@
 !!    end surface_define
 !!
 !!    opacity_ctl           0.9
-!!    zeroline_switch_ctl   On
+!!
+!!    zeroline_switch_ctl           On
+!!    isoline_switch_ctl            On
+!!    isoline_color_mode      color, white, or black
+!!    isoline_number_ctl            20
+!!
+!!    tangent_cylinder_switch_ctl   On
+!!    inner_radius_ctl              0.53846
+!!    outer_radius_ctl              1.53846
 !!  end array section_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -34,6 +42,7 @@
       use t_read_control_elements
       use t_control_data_4_psf_def
       use t_control_array_real
+      use t_control_array_integer
       use t_control_array_character
       use t_control_array_chara2real
       use skip_comment_f
@@ -47,8 +56,15 @@
         type(psf_define_ctl) :: psf_def_c
 !>        Structure to define opacity of surface
         type(read_real_item) :: opacity_ctl
+!
 !>        Structure of zero line switch
-        type(read_character_item) :: zeroline_ctl
+        type(read_character_item) :: zeroline_switch_ctl
+!>        Structure of isoline switch
+        type(read_character_item) :: isoline_switch_ctl
+!>        Structure of isoline color mode
+        type(read_character_item) :: isoline_color_mode
+!>        Structure of number of isoline
+        type(read_integer_item) :: isoline_number_ctl
 !
 !>        Structure of tangent cylinder line switch
         type(read_character_item) :: tan_cyl_switch_ctl
@@ -79,8 +95,15 @@
 !
       call copy_real_ctl(org_pvr_sect_c%opacity_ctl,                    &
      &                   new_pvr_sect_c%opacity_ctl)
-      call copy_chara_ctl(org_pvr_sect_c%zeroline_ctl,                  &
-     &                   new_pvr_sect_c%zeroline_ctl)
+!
+      call copy_chara_ctl(org_pvr_sect_c%zeroline_switch_ctl,           &
+     &                   new_pvr_sect_c%zeroline_switch_ctl)
+      call copy_chara_ctl(org_pvr_sect_c%isoline_switch_ctl,            &
+     &                   new_pvr_sect_c%isoline_switch_ctl)
+      call copy_chara_ctl(org_pvr_sect_c%isoline_color_mode,            &
+     &                   new_pvr_sect_c%isoline_color_mode)
+      call copy_integer_ctl(org_pvr_sect_c%isoline_number_ctl,          &
+     &                      new_pvr_sect_c%isoline_number_ctl)
 !
       call copy_chara_ctl(org_pvr_sect_c%tan_cyl_switch_ctl,            &
      &                   new_pvr_sect_c%tan_cyl_switch_ctl)
@@ -100,7 +123,11 @@
 !
       call dealloc_cont_dat_4_psf_def(pvr_sect_ctl%psf_def_c)
       pvr_sect_ctl%opacity_ctl%iflag = 0
-      pvr_sect_ctl%zeroline_ctl%iflag = 0
+!
+      pvr_sect_ctl%zeroline_switch_ctl%iflag = 0
+      pvr_sect_ctl%isoline_switch_ctl%iflag = 0
+      pvr_sect_ctl%isoline_color_mode%iflag = 0
+      pvr_sect_ctl%isoline_number_ctl%iflag = 0
 !
       pvr_sect_ctl%tan_cyl_switch_ctl%iflag =          0
       pvr_sect_ctl%tangent_cylinder_inner_ctl%iflag =  0

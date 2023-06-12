@@ -18,6 +18,7 @@
 !!
 !!  begin colormap_ctl
 !!    colormap_mode_ctl       rainbow
+!!    background_color_ctl    0.0   0.0   0.0
 !!!
 !!    LIC_color_field             magnetic_field
 !!    LIC_color_componenet        magnitude
@@ -106,6 +107,9 @@
 !!@n        step_opacity_ctl%vec3:  Opacity for each level
         type(ctl_array_r3) :: step_opacity_ctl
 !
+!>        Structure for background color (R,G,B)
+        type(read_real3_item) :: background_color_ctl
+!
 !     Top level
 !     2nd level for color definition
         integer (kind=kint) :: i_pvr_colordef =        0
@@ -133,6 +137,7 @@
       color%range_max_ctl%iflag =       0
       color%opacity_style_ctl%iflag =   0
       color%fix_opacity_ctl%iflag =     0
+      color%background_color_ctl%iflag = 0
 !
       color%i_pvr_colordef = 0
 !
@@ -200,7 +205,8 @@
      &                   new_color%range_max_ctl)
       call copy_real_ctl(org_color%fix_opacity_ctl,                     &
      &                   new_color%fix_opacity_ctl)
-!
+      call copy_real3_ctl(org_color%background_color_ctl,               &
+     &                    new_color%background_color_ctl)!
       end subroutine dup_pvr_colordef_ctl
 !
 !  ---------------------------------------------------------------------

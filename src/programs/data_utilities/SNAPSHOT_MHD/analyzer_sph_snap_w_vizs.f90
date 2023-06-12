@@ -91,7 +91,7 @@
       call init_three_visualize(SNAPs%MHD_step%viz_step,                &
      &    MVIZs%FEM_DAT%geofem, MVIZs%FEM_DAT%field, MVIZs%VIZ_DAT,     &
      &    add_VMHD_ctl1%viz3_ctls, MVIZs%VIZ3s, SNAPs%m_SR)
-      call init_zonal_mean_sections(SNAPs%MHD_step%viz_step,            &
+      call init_zonal_mean_vizs(SNAPs%MHD_step%viz_step,                &
      &    MVIZs%FEM_DAT%geofem, MVIZs%VIZ_DAT%edge_comm,                &
      &    MVIZs%FEM_DAT%field, add_VMHD_ctl1%zm_ctls,                   &
      &    MVIZs%zmeans, SNAPs%m_SR)
@@ -167,7 +167,7 @@
 !*  ----------- Zonal means --------------
 !*
           if(SNAPs%MHD_step%viz_step%istep_psf .ge. 0) then
-            call SPH_MHD_zmean_sections                                 &
+            call SPH_MHD_zmean_vizs                                     &
      &         (SNAPs%MHD_step%viz_step, SNAPs%MHD_step%time_d,         &
      &          SNAPs%SPH_MHD%sph, MVIZs%FEM_DAT%geofem,                &
      &          SNAPs%SPH_WK%trns_WK, MVIZs%FEM_DAT%field,              &

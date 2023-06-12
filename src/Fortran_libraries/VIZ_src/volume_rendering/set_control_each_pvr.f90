@@ -232,9 +232,10 @@
           end if
 !
           draw_param%iflag_psf_zeoline(i) = 0
-          if(pvr_scts_c%pvr_sect_ctl(i)%zeroline_ctl%iflag .gt. 0) then
+          if(pvr_scts_c%pvr_sect_ctl(i)%zeroline_switch_ctl%iflag       &
+     &                                                     .gt. 0) then
             tmpchara                                                    &
-     &         = pvr_scts_c%pvr_sect_ctl(i)%zeroline_ctl%charavalue
+     &      = pvr_scts_c%pvr_sect_ctl(i)%zeroline_switch_ctl%charavalue
             if(yes_flag(tmpchara)) draw_param%iflag_psf_zeoline(i) = 1
           end if
         end do

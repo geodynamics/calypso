@@ -14,6 +14,8 @@ bcast_ctl_data_mhd_time_rst.o: $(MHD_IO_DIR)/bcast_ctl_data_mhd_time_rst.f90 m_p
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_dynamo_sect_control.o: $(MHD_IO_DIR)/bcast_dynamo_sect_control.f90 m_precision.o calypso_mpi.o m_machine_parameter.o t_control_data_dynamo_sects.o calypso_mpi_int.o bcast_control_arrays.o bcast_section_control_data.o bcast_control_sph_MHD.o
 	$(F90) -c $(F90OPTFLAGS) $<
+bcast_dynamo_viz_control.o: $(MHD_IO_DIR)/bcast_dynamo_viz_control.f90 m_precision.o calypso_mpi.o m_machine_parameter.o t_control_data_dynamo_vizs.o bcast_section_control_data.o bcast_maps_control_data.o bcast_control_sph_MHD.o
+	$(F90) -c $(F90OPTFLAGS) $<
 bcast_monitor_data_ctl.o: $(MHD_IO_DIR)/bcast_monitor_data_ctl.f90 m_precision.o m_machine_parameter.o t_ctl_data_node_monitor.o calypso_mpi.o calypso_mpi_int.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
 check_read_bc_file.o: $(MHD_IO_DIR)/check_read_bc_file.f90 m_precision.o t_bc_data_list.o t_control_parameter.o calypso_mpi.o t_physical_property.o
@@ -65,6 +67,8 @@ t_MHD_IO_data.o: $(MHD_IO_DIR)/t_MHD_IO_data.f90 m_precision.o t_MHD_file_parame
 t_bc_data_list.o: $(MHD_IO_DIR)/t_bc_data_list.f90 m_precision.o t_control_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_data_dynamo_sects.o: $(MHD_IO_DIR)/t_control_data_dynamo_sects.f90 m_precision.o m_machine_parameter.o t_control_data_sections.o t_ctl_data_crust_filter.o t_read_control_elements.o skip_comment_f.o write_control_elements.o ctl_data_section_IO.o ctl_file_sections_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_control_data_dynamo_vizs.o: $(MHD_IO_DIR)/t_control_data_dynamo_vizs.f90 m_precision.o m_machine_parameter.o t_control_data_sections.o t_ctl_data_crust_filter.o t_control_data_maps.o t_read_control_elements.o skip_comment_f.o ctl_file_map_renderings_IO.o write_control_elements.o ctl_data_section_IO.o ctl_file_sections_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_MHD.o: $(MHD_IO_DIR)/t_ctl_data_MHD.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_MHD_model.o t_ctl_data_SPH_MHD_control.o t_ctl_data_4_sph_monitor.o t_ctl_data_node_monitor.o t_ctl_data_gen_sph_shell.o delete_data_files.o ctl_data_platforms_IO.o ctl_data_sph_monitor_IO.o ctl_data_MHD_model_IO.o ctl_file_gen_sph_shell_IO.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -129,6 +129,14 @@
         end if
       end if
 !
+      color_param%bg_rgba_real(1:4) = 0.0d0
+      if(color%background_color_ctl%iflag .gt. 0) then
+        color_param%bg_rgba_real(1:3)                                   &
+     &        = color%background_color_ctl%realvalue(1:3)
+        color_param%bg_rgba_real(4) = 1.0d0
+      end if
+!
+!
       color_param%id_pvr_color(2) = iflag_automatic
       color_param%num_pvr_datamap_pnt = 2
       if( color%data_mapping_ctl%iflag .gt. 0) then

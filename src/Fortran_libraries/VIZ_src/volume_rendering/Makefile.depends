@@ -136,13 +136,13 @@ t_control_params_4_pvr.o: $(PVR_DIR)/t_control_params_4_pvr.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_params_stereo_pvr.o: $(PVR_DIR)/t_control_params_stereo_pvr.f90 m_precision.o m_constants.o t_control_data_4_pvr.o set_area_4_viz.o skip_comment_f.o t_ctl_data_quilt_image.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_4_projection.o: $(PVR_DIR)/t_ctl_data_4_projection.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_array_real.o skip_comment_f.o write_control_elements.o
+t_ctl_data_4_projection.o: $(PVR_DIR)/t_ctl_data_4_projection.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_array_real.o t_control_array_real2.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_4_screen_pixel.o: $(PVR_DIR)/t_ctl_data_4_screen_pixel.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_array_integer.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_4_streo_view.o: $(PVR_DIR)/t_ctl_data_4_streo_view.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_array_character.o t_control_array_real.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_4_view_transfer.o: $(PVR_DIR)/t_ctl_data_4_view_transfer.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_array_real.o t_control_array_charareal.o t_control_array_chara2real.o t_ctl_data_4_screen_pixel.o t_ctl_data_4_projection.o t_ctl_data_4_streo_view.o skip_comment_f.o
+t_ctl_data_4_view_transfer.o: $(PVR_DIR)/t_ctl_data_4_view_transfer.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_array_chara2real.o t_ctl_data_4_screen_pixel.o t_ctl_data_4_projection.o t_ctl_data_4_streo_view.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_pvr_area.o: $(PVR_DIR)/t_ctl_data_pvr_area.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_array_character.o t_control_array_chara2real.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -158,7 +158,7 @@ t_ctl_data_pvr_light.o: $(PVR_DIR)/t_ctl_data_pvr_light.f90 m_precision.o m_mach
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_pvr_movie.o: $(PVR_DIR)/t_ctl_data_pvr_movie.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_data_4_psf.o t_control_array_character.o t_control_array_integer.o t_control_array_real2.o t_control_array_integer2.o t_ctl_data_4_view_transfer.o t_ctl_data_view_transfers.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_pvr_section.o: $(PVR_DIR)/t_ctl_data_pvr_section.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_data_4_psf_def.o t_control_array_real.o t_control_array_character.o t_control_array_chara2real.o skip_comment_f.o
+t_ctl_data_pvr_section.o: $(PVR_DIR)/t_ctl_data_pvr_section.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_data_4_psf_def.o t_control_array_real.o t_control_array_integer.o t_control_array_character.o t_control_array_chara2real.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_quilt_image.o: $(PVR_DIR)/t_ctl_data_quilt_image.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_array_character.o t_control_array_integer.o t_control_array_integer2.o t_control_array_real2.o t_ctl_data_view_transfers.o skip_comment_f.o ctl_file_pvr_modelview_IO.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
