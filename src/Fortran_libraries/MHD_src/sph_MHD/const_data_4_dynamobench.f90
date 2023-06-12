@@ -106,7 +106,7 @@
 !
       if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         if(bench%ipwr_icore .gt. 0) then
-          irank_copy = pwr%v_spectr(bench%ipwr_ocore)%irank_m
+          irank_copy = pwr%v_spectr(bench%ipwr_icore)%irank_m
           if(my_rank .eq. irank_copy)  then
             call copy_mag_energy_4_dbench(bench%ipwr_icore, pwr,        &
      &                                    bench%mene_icore)

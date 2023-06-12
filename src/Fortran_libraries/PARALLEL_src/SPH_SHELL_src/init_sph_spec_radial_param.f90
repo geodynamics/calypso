@@ -51,12 +51,14 @@
       integer(kind = kint) :: kr_st
 !
 !
-        if(v_pwr%r_inside .le. zero) then
+        if(v_pwr%r_inside .le. zero                                     &
+     &                         .and. v_pwr%kr_inside(1) .eq. 0) then
           v_pwr%kr_inside(1:2) = sph_params%nlayer_ICB
           v_pwr%r_inside = sph_params%radius_ICB
           v_pwr%c_inter_in = one
-        else if(v_pwr%r_inside .eq. zero) then
+        else if(v_pwr%r_inside .le. zero) then
           v_pwr%kr_inside(1:2) = 0
+          v_pwr%r_inside = zero
           v_pwr%c_inter_in = one
         else if(v_pwr%r_inside .le. sph_rj%radius_1d_rj_r(1)) then
           v_pwr%kr_inside(1) = 0
