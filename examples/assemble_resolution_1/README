@@ -16,9 +16,9 @@ The simulation procedure is the following
 
 1: Run index generation program in both directory for index tables
 [assemble_sph]% cd sph_lm31r48c_4
-[sph_lm31r48c_4]% [CALYPSO_DIR]/bin/gen_sph_grids
+[sph_lm31r48c_4]% [CALYPSO_DIR]/bin/utilities/utilities/assemble_sph
 [sph_lm31r48c_4]% cd ../sph_lm31r48c_2
-[sph_lm41r60c_6]% [CALYPSO_DIR]/bin/gen_sph_grids
+[sph_lm41r60c_6]% [CALYPSO_DIR]/bin/utilities/gen_sph_grids
 [sph_lm41r60c_6]% cd ../
 
 2. Copy spectr data from benchmark example

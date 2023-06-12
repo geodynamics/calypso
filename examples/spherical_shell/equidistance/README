@@ -11,4 +11,4 @@ control_sph_shell:   control file for data transform
 sph_lm24r24e_1:     Directory for spherical harmonics index table
 
 Run index generation program in both directory for index tables
-[equidistance]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[equidistance]$ [CALYPSO_DIR]/bin/utilities/gen_sph_grids

@@ -20,10 +20,6 @@
 !!     &         (d_rj, i_pol, irtp, i_trns, each_trns)
 !!        type(phys_data), intent(in) :: d_rj
 !!        type(spherical_transform_data), intent(inout) :: each_trns
-!!      subroutine add_scalar_4_sph_trns_snap                           &
-!!     &         (d_rj, i_pol, irtp, i_trns, each_trns)
-!!        type(phys_data), intent(in) :: d_rj
-!!        type(spherical_transform_data), intent(inout) :: each_trns
 !!
 !!      subroutine add_field_name_4_sph_trns                            &
 !!     &         (iflag_add, field_name, num_component,                 &
@@ -79,10 +75,10 @@
       integer(kind = kint)  :: iflag_snap, i, num_comp
 !
 !
-      iflag_snap = i_pol * irtp
+      iflag_snap = i_pol
       i = field_id_by_address(d_rj, i_pol)
       num_comp = d_rj%istack_component(i) - d_rj%istack_component(i-1)
-      call add_field_name_4_sph_trns(iflag_snap, d_rj%phys_name(i),     &
+      call add_field_name_4_sph_trns(i_pol, d_rj%phys_name(i),          &
      &    num_comp, i_pol, irtp, i_trns, each_trns)
 !
       end subroutine add_field_name_4_sph_trns_snap
@@ -107,27 +103,6 @@
      &    n_scalar, i_pol, irtp, i_trns, each_trns)
 !
       end subroutine add_scalar_4_sph_trns_by_pol
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_scalar_4_sph_trns_snap                             &
-     &         (d_rj, i_pol, irtp, i_trns, each_trns)
-!
-      integer(kind = kint), intent(in) :: i_pol, irtp
-      type(phys_data), intent(in) :: d_rj
-!
-      integer(kind = kint), intent(inout) :: i_trns
-      type(spherical_transform_data), intent(inout) :: each_trns
-!
-      integer(kind = kint)  :: iflag_snap, i
-!
-!
-      iflag_snap = i_pol * irtp
-      i = field_id_by_address(d_rj, i_pol)
-      call add_field_name_4_sph_trns(iflag_snap, d_rj%phys_name(i),     &
-     &    n_scalar, i_pol, irtp, i_trns, each_trns)
-!
-      end subroutine add_scalar_4_sph_trns_snap
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

@@ -16,7 +16,7 @@ field:              Directory for field data files
 The simulation procedure is the following
 
 1: Run index generation program as
-[dynamobench_case_1]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[dynamobench_case_1]$ [CALYPSO_DIR]/bin/utilities/gen_sph_grids
 
 2. Generate initial field
 [dynamobench_case_1]$ [CALYPSO_DIR]/bin/sph_initial_field
