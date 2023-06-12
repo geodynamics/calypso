@@ -103,7 +103,7 @@
       real(kind = kreal), intent(inout) :: true_start, true_end
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint) :: i_step, ierr, i
+      integer(kind = kint) :: i_step, i
       real(kind = kreal) :: time
 !
 !
@@ -157,7 +157,7 @@
       integer(kind = kint), intent(inout) :: icou_skip
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint) :: i_step, ierr, i
+      integer(kind = kint) :: i_step, i
       real(kind = kreal) :: time
 !
 !

@@ -208,7 +208,6 @@
       subroutine write_sph_mhd_ctl_noviz                                &
      &         (id_control, hd_block, MHD_ctl, level)
 !
-      use t_control_data_dynamo_vizs
       use ctl_data_platforms_IO
       use ctl_data_sph_monitor_IO
       use ctl_data_MHD_model_IO

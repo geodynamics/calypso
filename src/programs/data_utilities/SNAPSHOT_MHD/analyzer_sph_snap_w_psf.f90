@@ -97,8 +97,8 @@
      &    add_SMHD_ctl1%surfacing_ctls, MPSFs%PSFs, SNAPs%m_SR)
       call init_zonal_mean_sections                                     &
      &   (SNAPs%MHD_step%viz_step, MPSFs%FEM_DAT%geofem,                &
-     &    MPSFs%edge_comm, MPSFs%FEM_DAT%field, add_SMHD_ctl1%zm_ctls,  &
-     &    MPSFs%zmeans, SNAPs%m_SR)
+     &    MPSFs%edge_comm, MPSFs%FEM_DAT%field, add_SMHD_ctl1%zm_sects, &
+     &    MPSFs%zsectios, SNAPs%m_SR)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
       call calypso_MPI_barrier
@@ -175,7 +175,7 @@
      &         (SNAPs%MHD_step%viz_step, SNAPs%MHD_step%time_d,         &
      &          SNAPs%SPH_MHD%sph, MPSFs%FEM_DAT%geofem,                &
      &          SNAPs%SPH_WK%trns_WK, MPSFs%FEM_DAT%field,              &
-     &          MPSFs%zmeans, SNAPs%m_SR)
+     &          MPSFs%zsectios, SNAPs%m_SR)
           end if
           if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+4)
         end if

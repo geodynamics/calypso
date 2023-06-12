@@ -50,7 +50,7 @@
       use t_ctl_data_gen_sph_shell
 !
       use t_control_data_surfacings
-      use t_control_data_dynamo_vizs
+      use t_control_data_dynamo_sects
 !
       implicit none
 !
@@ -62,7 +62,7 @@
 !>        Structures of visualization controls
         type(surfacing_controls) :: surfacing_ctls
 !>        Structures of zonal mean controls
-        type(sph_dynamo_viz_controls) :: zm_ctls
+        type(sph_dynamo_section_controls) :: zm_sects
       end type add_psf_sph_mhd_ctl
 !
 !   2nd level for MHD
@@ -109,7 +109,6 @@
      &                                        add_SMHD_ctl)
 !
       use t_control_data_surfacings
-      use t_control_data_dynamo_vizs
 !
       character(len=kchara), intent(in) :: file_name
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
@@ -141,7 +140,6 @@
      &                                         add_SMHD_ctl)
 !
       use t_control_data_surfacings
-      use t_control_data_dynamo_vizs
       use delete_data_files
 !
       character(len=kchara), intent(in) :: file_name
@@ -213,10 +211,10 @@
         call s_read_surfacing_controls                                  &
      &     (id_control, hd_viz_ctl, add_SMHD_ctl%surfacing_ctls, c_buf)
 !
-        call read_dynamo_viz_control                                    &
-     &     (id_control, hd_dynamo_viz_ctl, add_SMHD_ctl%zm_ctls, c_buf)
-        call read_dynamo_viz_control                                    &
-     &     (id_control, hd_zm_viz_ctl, add_SMHD_ctl%zm_ctls, c_buf)
+        call read_dynamo_sects_control                                  &
+     &    (id_control, hd_dynamo_viz_ctl, add_SMHD_ctl%zm_sects, c_buf)
+        call read_dynamo_sects_control                                  &
+     &    (id_control, hd_zm_viz_ctl, add_SMHD_ctl%zm_sects, c_buf)
       end do
       MHD_ctl%i_mhd_ctl = 1
 !
@@ -269,8 +267,8 @@
       call write_surfacing_controls                                     &
      &   (id_control, hd_viz_ctl, add_SMHD_ctl%surfacing_ctls, level)
 !
-      call write_dynamo_viz_control                                     &
-     &   (id_control, hd_dynamo_viz_ctl, add_SMHD_ctl%zm_ctls, level)
+      call write_dynamo_sects_control                                   &
+     &   (id_control, hd_dynamo_viz_ctl, add_SMHD_ctl%zm_sects, level)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_sph_mhd_ctl_w_psf
@@ -284,7 +282,7 @@
 !
 !
       call dealloc_surfacing_controls(add_SMHD_ctl%surfacing_ctls)
-      call dealloc_dynamo_viz_control(add_SMHD_ctl%zm_ctls)
+      call dealloc_dynamo_sects_control(add_SMHD_ctl%zm_sects)
 !
       end subroutine dealloc_sph_mhd_ctl_w_psf
 !

@@ -10,7 +10,7 @@
       use m_precision
 !
       use t_FEM_mesh_field_data
-      use t_SPH_MHD_zonal_mean_viz
+      use t_SPH_MHD_zmean_sections
       use t_viz_sections
       use t_comm_table
 !
@@ -25,7 +25,7 @@
 !>        Structure of sectioning and isosurfaceing modules
         type(surfacing_modules) :: PSFs
 !>        Structures of zonal mean controls
-        type(sph_zonal_mean_sectioning) :: zmeans
+        type(sph_zonal_mean_sectioning) :: zsectios
       end type sph_MHD_w_psf
 !
       end module t_sph_MHD_w_psf
