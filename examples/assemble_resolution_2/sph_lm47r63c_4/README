@@ -6,4 +6,4 @@
 
  To generate spherical harmonics table data, run the following command:
  
- [sph_lm31r48c_4]$ [CALYPSO_DIR]/bin/gen_sph_grids
+ [sph_lm31r48c_4]$ [CALYPSO_DIR]/bin/utilities/gen_sph_grids

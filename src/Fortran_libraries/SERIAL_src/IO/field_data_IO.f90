@@ -45,9 +45,11 @@
       character(len=25), parameter                                      &
      &            :: FLD_HD0 = '! List of Number of nodes'
       character(len=31), parameter                                      &
-     &            :: FLD_HD1 = '! Num. of grid, field and comps'
+     &            :: FLD_HD1 = '! Number of fields, components '
+      character(len=31), parameter                                      &
+     &            :: FLD_HD2 = '! Num. of grid, field and comps'
 !
-      private :: FLD_HD1
+      private :: FLD_HD1, FLD_HD2
 !
 ! -------------------------------------------------------------------
 !
@@ -296,7 +298,7 @@
       character(len=kchara) :: fmt_txt
 !
 !
-      write(id_file,'(a)'   ) FLD_HD1
+      write(id_file,'(a)'   ) FLD_HD2
       write(id_file,'(2i16)') nnod64, num_field
       write(id_file,'(10i5)') ncomp_field(1:num_field)
 !

@@ -25,8 +25,8 @@ all: test
 
 test: 
 	rm -f *.dat restart/rst.*
-	$(MPIRUN) -np 3 $(BUILDDIR)/gen_sph_grids
-	$(MPIRUN) -np 3 $(BUILDDIR)/assemble_sph
+	$(MPIRUN) -np 3 $(BUILDDIR)/utilities/gen_sph_grids
+	$(MPIRUN) -np 3 $(BUILDDIR)/utilities/assemble_sph
 	$(MPIRUN) -np 3 $(BUILDDIR)/tests/compare_sph_restart
 
 clean:

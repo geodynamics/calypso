@@ -11,4 +11,4 @@ control_sph_shell:   control file for data transform
 sph_lm31r48c_4:     Directory for spherical harmonics index table
 
 Run index generation program in both directory for index tables
-[Chebyshev_points]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[Chebyshev_points]$ [CALYPSO_DIR]/bin/utilities/gen_sph_grids

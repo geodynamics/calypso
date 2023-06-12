@@ -25,7 +25,7 @@ all: test
 
 test: 
 	rm -f *.dat
-	$(MPIRUN) -np 4 $(BUILDDIR)/gen_sph_grids
+	$(MPIRUN) -np 4 $(BUILDDIR)/utilities/gen_sph_grids
 	$(MPIRUN) -np 4 $(BUILDDIR)/sph_mhd
 	echo 'Compare with reference mean square data'
 	$(BUILDDIR)/tests/sph_ene_check

@@ -20,10 +20,10 @@ The simulation procedure is the following
 
 2: Run index generation program for new domein decomposition
 [sph_lm31r48c_4]$ sph_lm31r48c_2
-[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/utilities/gen_sph_grids
 [sph_lm31r48c_2]$ cd ../
 
 3. Run data transform program
-[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/assemble_sph
+[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/utilities/assemble_sph
 
 4. Converted data is saved in '2doamins' directory.
