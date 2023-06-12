@@ -60,16 +60,20 @@ In Version 1.2, the following features are implemented:
 \subsection{Updates for Ver 2.0}
 In Version 2.0, there are a number of changes as;
 \begin{itemize}
-\item Start using Fortran structures to reduce global instances.
+\item Performance is improved. Ver. 2.0 is approximately 30\% faster than the Ver. 1.2.
+\item Drop the build process using {\bf Cmake}. Please use {\tt Configure} command for the configuration to build.
+\item Number of array information is not required to define "array" block in control files.
+\item Block layout of the control file is changed for spatial resolution and spherical harmonic data IO. See Section \ref{section:resolution_block}
+
 \item Using MPI-IO for data IO to generate a single date file from MPI processes
 \item Include interface to zlib library (\url{https://www.zlib.net}) for data IO with data compression. zlib is pre-installed in MacOS and most of Linux distributions.
-\item Calypso now support various format of data IO (ascii, binary, gzipped ascii, and gzipped binary) through MPI-IO.
+\item For easier data handling, Calypso now support various format of data IO (ascii, binary, gzipped ascii, and gzipped binary) through MPI-IO.
 \item Include spherical harmonics index generator into simulation program. Consequently, we can start program without preprocessing.
 \item Modules to generate longitudinal average data is included into the simulation program.
 \item Due to the performance drops on massively parallel environment, spectrum data \\
 {\tt [picked\_sph\_prefix].dat} is splitted into the data files for each spherical harmonics mode {\tt [picked\_sph\_prefix]\_l[degree]\_m[order][c/s].dat}. Consequently, the file prefix [picked\_sph\_prefix] is recommends to includer subdirectory and that files are saved undere a subdirectory. (See Section \ref{sec:pickup_spectr_ctl} and tests under \verb|tests/Dynamobench_case2|.)
-\item Number of array information is not required to define "array" block in control files.
-\item Block layout of the control file is changed for spatial resolution and spherical harmonic data IO.
+\item The monitor data files can also be compressed by zlib libraly. These compressed data files can be decompressed by {\tt gunzip} command.
+\item In internally, Fortran structures to reduce global instances.
 \end{itemize}
 
 
