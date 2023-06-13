@@ -52,18 +52,18 @@
       integer(kind = kint) :: num_layer, i, ist
 !
 !
-      pwr%flag_skip_spectr_l =  .FALSE.
+      pwr%flag_skip_spectr_l =  .TRUE.
       if(no_flag(lp_ctl%degree_spectra_switch%charavalue))              &
-     &                                 pwr%flag_skip_spectr_l = .TRUE.
-      pwr%flag_skip_spectr_m =  .FALSE.
+     &                              pwr%flag_skip_spectr_l = .FALSE.
+      pwr%flag_skip_spectr_m =  .TRUE.
       if(no_flag(lp_ctl%order_spectra_switch%charavalue))               &
-     &                                 pwr%flag_skip_spectr_m = .TRUE.
-      pwr%flag_skip_spectr_lm = .FALSE.
+     &                              pwr%flag_skip_spectr_m = .FALSE.
+      pwr%flag_skip_spectr_lm = .TRUE.
       if(no_flag(lp_ctl%diff_lm_spectra_switch%charavalue))             &
-     &                                 pwr%flag_skip_spectr_lm = .TRUE.
-       pwr%flag_skip_spectr_m0 = .FALSE.
+     &                              pwr%flag_skip_spectr_lm = .FALSE.
+      pwr%flag_skip_spectr_m0 = .TRUE.
       if(no_flag(lp_ctl%axis_power_switch%charavalue))                  &
-     &                                 pwr%flag_skip_spectr_m0 = .TRUE.
+     &                              pwr%flag_skip_spectr_m0 = .FALSE.
 !
 !
       pwr%iflag_layer_rms_spec = lp_ctl%layered_pwr_spectr_prefix%iflag
