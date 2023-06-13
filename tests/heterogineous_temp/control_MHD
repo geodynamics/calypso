@@ -20,13 +20,11 @@ begin MHD_control
     num_subdomain_ctl            2
     num_smp_ctl                  2
 !
-    sph_file_prefix             'sph_lm4r64c_2/in'
     boundary_data_file_name     'bc_spectr.btx'
 !
     restart_file_prefix         'rst_2/rst'
     field_file_prefix           'field/out'
 !
-    sph_file_fmt_ctl           'merged_bin'
     restart_file_fmt_ctl       'merged_bin'
     field_file_fmt_ctl         'merged_VTK_gz'
   end data_files_def

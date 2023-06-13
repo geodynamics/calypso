@@ -1,0 +1,14 @@
+radial_layers, truncation
+              96              31
+ICB_id, CMB_id
+              25              73
+Not_used, Not_used
+               0   0.000000000000000E+000
+Not_used, Reference_radius
+               0   2.920000000000000E+000
+Number_of_gauss_coefs, Number_of_gauss_coefs
+               3               3
+    1    1    1
+t_step    time    g1_0    g1_1    h1_1    
+              50   2.500000000000000E-003   1.236877382077717E-001   0.000000000000000E+000   0.000000000000000E+000
+             100   4.999999999999998E-003   1.235432358922918E-001   0.000000000000000E+000   0.000000000000000E+000

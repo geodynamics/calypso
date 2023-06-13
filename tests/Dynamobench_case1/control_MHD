@@ -22,12 +22,9 @@ begin MHD_control
     num_subdomain_ctl            4
     num_smp_ctl                  2
 !
-    sph_file_prefix             'sph_lm31r48c_4/in'
-!
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-    sph_file_fmt_ctl           'merged'
     restart_file_fmt_ctl       'merged'
     field_file_fmt_ctl         'merged_VTK'
   end data_files_def
