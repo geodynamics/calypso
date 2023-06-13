@@ -35,7 +35,9 @@ count_monitor_time_series.o \
 cal_tave_sph_ene_spectr.o
 
 MOD_SPH_ENE_CHECK = \
-compare_sph_mean_square.o
+compare_sph_mean_square.o \
+old_sph_spectr_data_IO.o \
+gz_spl_sph_spectr_data_IO.o
 
 
 #

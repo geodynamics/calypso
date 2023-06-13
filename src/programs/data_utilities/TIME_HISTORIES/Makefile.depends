@@ -1,6 +1,6 @@
 cal_tave_sph_ene_spectr.o: $(SPH_UTILS_DIR)/cal_tave_sph_ene_spectr.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-compare_sph_mean_square.o: $(SPH_UTILS_DIR)/compare_sph_mean_square.f90 m_precision.o skip_comment_f.o
+compare_sph_mean_square.o: $(SPH_UTILS_DIR)/compare_sph_mean_square.f90 m_precision.o skip_comment_f.o t_buffer_4_gzip.o t_read_sph_spectra.o t_sph_spectr_head_labels.o compare_sph_monitor_header.o sel_gz_input_sph_mtr_head.o select_gz_stream_file_IO.o gz_spl_sph_spectr_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 count_monitor_time_series.o: $(SPH_UTILS_DIR)/count_monitor_time_series.f90 m_precision.o m_constants.o t_buffer_4_gzip.o select_gz_stream_file_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
