@@ -76,7 +76,7 @@ begin MHD_control
         nod_value_ctl  velocity                Viz_On   Monitor_On
         nod_value_ctl  temperature             Viz_On   Monitor_On
         nod_value_ctl  pressure                Viz_Off  Monitor_Off
-        nod_value_ctl  vorticity               Viz_Off  Monitor_Off
+        nod_value_ctl  vorticity               Viz_On   Monitor_Off
         nod_value_ctl  magnetic_field          Viz_On   Monitor_On
         nod_value_ctl  current_density         Viz_Off  Monitor_Off
       end array nod_value_ctl
