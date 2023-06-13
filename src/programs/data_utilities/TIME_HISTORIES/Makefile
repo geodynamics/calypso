@@ -4,8 +4,8 @@
 
 SPH_UTILS_DIR = $$(DATA_UTILS_DIR)/TIME_HISTORIES
 
-TARGET_TAVE_SPH_ENE_SPEC =   utilities/t_ave_monitor_data
-TARGET_SPH_ENE_CHECK =       tests/sph_ene_check
+TARGET_TAVE_SPH_ENE_SPEC =  utilities/t_ave_monitor_data
+TARGET_SPH_ENE_CHECK =      tests/sph_ene_check
 
 SOURCES = $(shell ls *.f90 *.F90)
 
@@ -38,7 +38,6 @@ MOD_SPH_ENE_CHECK = \
 compare_sph_mean_square.o \
 old_sph_spectr_data_IO.o \
 gz_spl_sph_spectr_data_IO.o
-
 
 #
 #  ------------------------------------------------------------------
@@ -77,7 +76,6 @@ target_task:
 	'-L. $$(LIBS_SPH_MHD)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
-
 
 lib_name:
 

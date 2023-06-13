@@ -267,7 +267,6 @@ begin MHD_control
 !!!!!  control for restart data
     begin restart_file_ctl
       rst_ctl                dynamo_benchmark_1
-!      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
 !!!!!!   method for time evolution

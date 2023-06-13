@@ -23,11 +23,13 @@
       use sel_gz_input_sph_mtr_head
       use select_gz_stream_file_IO
       use gz_spl_sph_spectr_data_IO
+      use set_parallel_file_name
+      use skip_comment_f
 !
       implicit none
 !
-      character(len = kchara) :: fname_rms_vol
-      character(len = kchara) :: fname_rms_ref
+      character(len = kchara) :: fhead_rms_vol, fname_rms_vol
+      character(len = kchara) :: fhead_rms_ref, fname_rms_ref
 !
 !
       integer(kind = kint), parameter :: id_file1 = 34, id_file2 = 36
@@ -48,14 +50,14 @@
 !
 !
       if(iargc_kemo() .le. 1) then
-        write(*,*)                                                      &
-     &     'kemo_module_dep REFERENCE_FILE_NAME COMPARED_FILE_NAME'
+        write(*,*) 'sph_ene_check ',                                    &
+     &             'REFERENCE_FILE_PREFIX COMPARED_FILE_PREFIX'
         stop
       end if
-      call getarg_k(1, fname_rms_ref)
-      call getarg_k(2, fname_rms_vol)
-      write(*,*) 'reference file name: ', trim(fname_rms_ref)
-      write(*,*) 'comparerd file name: ', trim(fname_rms_vol)
+      call getarg_k(1, fhead_rms_ref)
+      call getarg_k(2, fhead_rms_vol)
+      fname_rms_ref = add_dat_extension(fhead_rms_ref)
+      fname_rms_vol = add_dat_extension(fhead_rms_vol)
 !
 !
       call sel_open_check_gz_stream_file(FPz_f1, id_file1,              &
@@ -150,4 +152,5 @@
       end function iargc_kemo
 !
 !   --------------------------------------------------------------------
+!
       end program compare_sph_mean_square
