@@ -132,7 +132,7 @@
       call write_sph_layer_spectr_snapshot(.FALSE., trms_file_name,     &
      &    comment_1, sph_IN1, WK_tave1%rms_spec_l(1,0,1))
 !  Output Standard deviation
-      call write_sph_layer_spectr_snapshot(.FALSE., trms_file_name,     &
+      call write_sph_layer_spectr_snapshot(.FALSE., sdev_file_name,     &
      &    comment_1, sph_IN1, WK_tave1%sigma_spec_l(1,0,1))
 !
       write(*,'(a,1p2e25.15e3)') 'Start and end time:     ',            &

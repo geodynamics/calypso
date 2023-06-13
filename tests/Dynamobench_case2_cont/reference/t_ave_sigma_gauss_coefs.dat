@@ -1,0 +1,21 @@
+#
+# Start and End time:     1.500299999997170E+001   1.500799999997169E+001
+# 1st data: Time average
+# 2nd data: R.M.S. over time
+# 3rd data: Standard Deviation
+#
+radial_layers, truncation
+              96              31
+ICB_id, CMB_id
+              25              73
+Not_used, Not_used
+               0   0.000000000000000E+000
+Not_used, Reference_radius
+               0   2.910000000000000E+000
+Number_of_gauss_coefs, Number_of_gauss_coefs
+               3               3
+    1    1    1
+t_step    time    g1_0    g1_1    h1_1    
+          300160   1.500799999997169E+001   1.120021687135653E-001   0.000000000000000E+000   0.000000000000000E+000
+          300160   1.500799999997169E+001   1.120021687135653E-001   0.000000000000000E+000   0.000000000000000E+000
+          300160   1.500799999997169E+001   2.634953026057116E-016   0.000000000000000E+000   0.000000000000000E+000

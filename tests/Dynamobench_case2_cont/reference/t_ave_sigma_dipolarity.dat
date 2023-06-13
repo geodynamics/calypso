@@ -1,0 +1,21 @@
+#
+# Start and End time:     1.500299999997170E+001   1.500799999997169E+001
+# 1st data: Time average
+# 2nd data: R.M.S. over time
+# 3rd data: Standard Deviation
+#
+radial_layers, truncation
+              96              31
+ICB_id, CMB_id
+              25              73
+Not_used, Not_used
+               0   0.000000000000000E+000
+Upper_boundary_ID, Upper_boundary_radius
+               4   1.538461538461538E+000
+Number_of_field, Number_of_components
+               2               2
+    1    1
+t_step    time    truncation_31    truncation_13    
+          300160   1.500799999997169E+001   6.753528464783534E-001   6.819545219606736E-001
+          300160   1.500799999997169E+001   6.753528464783533E-001   6.819545219606736E-001
+          300160   1.500799999997169E+001   1.577337420896946E-015   1.503932221442311E-015

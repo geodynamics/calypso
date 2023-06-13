@@ -188,7 +188,7 @@
       write(fname_tmp, '(a6,a)') 't_ave_', trim(fname_no_dir)
       tave_file_name = append_directory(directory, fname_tmp)
       write(fname_tmp, '(a6,a)') 't_rms_', trim(fname_no_dir)
-      tave_file_name = append_directory(directory, fname_tmp)
+      trms_file_name = append_directory(directory, fname_tmp)
       write(fname_tmp, '(a7,a)') 't_sdev_', trim(fname_no_dir)
       sdev_file_name = append_directory(directory, fname_tmp)
 !

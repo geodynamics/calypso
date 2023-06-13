@@ -1,0 +1,40 @@
+begin time_averaging_sph_monitor
+  start_time_ctl     1.50025E+001
+  end_time_ctl       1.50075E+001
+!!
+  begin monitor_data_list_ctl
+    array volume_integrate_prefix
+      volume_integrate_prefix     'monitor/sph_ave_volume'
+      volume_integrate_prefix     'monitor/sph_pwr_volume_s'
+      volume_integrate_prefix     'monitor/sph_pwr_volume_m0'
+      volume_integrate_prefix     'monitor/sph_pwr_convective_s'
+      volume_integrate_prefix     'monitor/sph_pwr_convective_m0'
+      volume_integrate_prefix     'monitor/dipolarity'
+      volume_integrate_prefix     'monitor/dynamobench'
+      volume_integrate_prefix     'monitor/gauss_coefs'
+      volume_integrate_prefix     'monitor/Nusselt'
+    end array volume_integrate_prefix
+!!
+    array volume_sph_spectr_prefix
+      volume_sph_spectr_prefix     'monitor/sph_pwr_volume_l'
+      volume_sph_spectr_prefix     'monitor/sph_pwr_volume_m'
+      volume_sph_spectr_prefix     'monitor/sph_pwr_volume_lm'
+      volume_sph_spectr_prefix     'monitor/sph_pwr_convective_l'
+    end array volume_sph_spectr_prefix
+!!
+    array sphere_integrate_prefix
+      sphere_integrate_prefix     'monitor/sph_pwr_layer_s'
+    end array sphere_integrate_prefix
+!!
+    array layer_sph_spectr_prefix
+      layer_sph_spectr_prefix     'monitor/sph_pwr_layer_l'
+      layer_sph_spectr_prefix     'monitor/sph_pwr_layer_m'
+    end array layer_sph_spectr_prefix
+!!
+    array picked_sph_prefix
+      picked_sph_prefix        'monitor/picked_mode_l1_m0c'
+      picked_sph_prefix        'monitor/picked_mode_l2_m0c'
+    end array picked_sph_prefix
+  end monitor_data_list_ctl
+end time_averaging_sph_monitor
+

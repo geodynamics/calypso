@@ -32,6 +32,7 @@ restart_assemble \
 \
 Dynamobench_case1 \
 Dynamobench_case2 \
+Dynamobench_case2_cont \
 snapshot_test \
 heterogineous_temp
 

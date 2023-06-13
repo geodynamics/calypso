@@ -1,0 +1,14 @@
+Radial_layers, Truncation
+              65               4
+ICB_id, CMB_id
+               1              65
+Lower_boundary_ID, Lower_boundary_radius
+               1   5.384615384615384E-001
+Upper_boundary_ID, Upper_boundary_radius
+              65   1.538461538461538E+000
+Number_of_fields, Number_of_components
+               2               2
+    1    1
+t_step    time    temperature    composition    
+              50   5.000000000000000E-003   1.207417427263205E-002   6.738793715421028E-002
+             100   9.999999999999995E-003   1.765561779481518E-002   9.552463180996783E-002

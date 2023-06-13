@@ -46,6 +46,8 @@
         integer(kind = kint) :: num_layer = 0
 !>        Number of modes of  monitoring spectrum to be evaluated
         integer(kind = kint) :: num_mode =  0
+!>        Number of fields
+        integer(kind = kint) :: num_field = 0
 !>        Number of components
         integer(kind = kint) :: ntot_comp = 0
 !>        Number of data for each step
@@ -58,7 +60,11 @@
 !>        snapshot of monitoring spectrum
         real(kind = kreal), allocatable :: d_pk(:)
 !>        Name of  monitoring spectrum
+        character(len=kchara) :: time_labels(6)
+!>        Name of  monitoring spectrum
         character(len=kchara), allocatable :: spectr_name(:)
+!>        Number of component
+        integer(kind=kint), allocatable :: num_comp(:)
 !
 !>        Number of time series
         integer(kind = kint) :: n_step = 0
@@ -89,7 +95,8 @@
       allocate( picked_IO%radius(ntot_pick_spectr) )
       allocate( picked_IO%d_pk(picked_IO%ntot_data) )
 
-      allocate( picked_IO%spectr_name(picked_IO%ntot_comp) )
+      allocate(picked_IO%num_comp(picked_IO%num_field))
+      allocate(picked_IO%spectr_name(picked_IO%ntot_comp))
 !
       if(ntot_pick_spectr .gt. 0) then
         picked_IO%idx_sph = -1
@@ -144,7 +151,7 @@
       deallocate( picked_IO%radius)
       deallocate( picked_IO%d_pk)
 
-      deallocate( picked_IO%spectr_name)
+      deallocate(picked_IO%spectr_name,  picked_IO%num_comp)
 !
       end subroutine dealloc_pick_sph_monitor_IO
 !

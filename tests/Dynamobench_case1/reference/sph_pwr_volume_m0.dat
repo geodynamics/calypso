@@ -1,0 +1,14 @@
+Radial_layers, Truncation
+              49              31
+ICB_id, CMB_id
+               1              49
+Lower_boundary_ID, Lower_boundary_radius
+               1   5.384615384615384E-001
+Upper_boundary_ID, Upper_boundary_radius
+              49   1.538461538461538E+000
+Number_of_fields, Number_of_components
+               3               7
+    3    1    3
+t_step    time    K_ene_pol    K_ene_tor    K_ene    temperature    M_ene_pol    M_ene_tor    M_ene    
+              50   2.500000000000000E-003   1.026854250136521E+001   5.775403658780499E+000   1.604394616014571E+001   8.314799474463130E-002   2.875452839800523E+000   3.053037001530052E+000   5.928489841330574E+000
+             100   4.999999999999998E-003   1.588214425995744E+000   1.446061562358149E+001   1.604883004957723E+001   8.304366079600618E-002   2.873291627024039E+000   2.986382486174314E+000   5.859674113198355E+000

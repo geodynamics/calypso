@@ -22,12 +22,9 @@ begin MHD_control
     num_subdomain_ctl            4
     num_smp_ctl                  2
 !
-    sph_file_prefix             'sph_lm31r48c_4/in'
-!
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-    sph_file_fmt_ctl           'merged'
     restart_file_fmt_ctl       'merged'
     field_file_fmt_ctl         'merged_VTK'
   end data_files_def
@@ -267,7 +264,6 @@ begin MHD_control
 !!!!!  control for restart data
     begin restart_file_ctl
       rst_ctl                dynamo_benchmark_1
-!      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
 !!!!!!   method for time evolution

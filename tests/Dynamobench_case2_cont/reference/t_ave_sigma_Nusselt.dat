@@ -1,0 +1,21 @@
+#
+# Start and End time:     1.500299999997170E+001   1.500799999997169E+001
+# 1st data: Time average
+# 2nd data: R.M.S. over time
+# 3rd data: Standard Deviation
+#
+Radial_layers, Truncation
+              96              31
+ICB_id, CMB_id
+              25              73
+Lower_boundary_ID, Lower_boundary_radius
+              25   5.384615384615384E-001
+Upper_boundary_ID, Upper_boundary_radius
+              73   1.538461538461538E+000
+Number_of_fields, Number_of_components
+               2               2
+    1    1
+t_step    time    Nu_ICB    Nu_CMB    
+          300160   1.500799999997169E+001   1.420452373521129E+000   1.416319568517556E+000
+          300160   1.500799999997169E+001   1.420452373521129E+000   1.416319568517556E+000
+          300160   1.500799999997169E+001   0.000000000000000E+000   0.000000000000000E+000
