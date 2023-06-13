@@ -61,11 +61,12 @@
       subroutine check_picked_sph_spectr(file_name, picked_IO)
 !
       use select_gz_stream_file_IO
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: file_name
       type(picked_spectrum_data_IO), intent(inout) :: picked_IO
 !
-      integer(kind = kint) :: i, j
+      integer(kind = kint) :: i, j, k
       integer(kind = kint) :: i_start, i_end
       real(kind = kreal) :: start_time, end_time
 !
@@ -83,16 +84,29 @@
       call read_pick_series_comp_name                                   &
      &   (FPz_f1, id_pick_mode, flag_gzip1, picked_IO, zbuf1)
 !
-      call sel_skip_comment_gz_stream                                   &
-     &   (FPz_f1, id_pick_mode, flag_gzip1, zbuf1)
-      read(zbuf1%fixbuf(1),*) i_start, start_time
+      do j = 1, picked_IO%num_mode
+        do i = 1, picked_IO%num_layer
+          k = i + (j-1) * picked_IO%num_layer
+          call sel_skip_comment_gz_stream                               &
+     &       (FPz_f1, id_pick_mode, flag_gzip1, zbuf1)
+          read(zbuf1%fixbuf(1),*) i_start, start_time,                  &
+     &        picked_IO%idx_sph(k,1), picked_IO%radius(k),              &
+     &        picked_IO%idx_sph(k,3:4)
+          picked_IO%idx_sph(k,2)                                        &
+     &       = picked_IO%idx_sph(k,3) * (picked_IO%idx_sph(k,3)+1)      &
+     &        + picked_IO%idx_sph(k,4)
+        end do
+      end do
 !
       do
         call sel_skip_comment_gz_stream                                 &
      &     (FPz_f1, id_pick_mode, flag_gzip1, zbuf1)
-        if(zbuf1%len_used .lt. 0) exit
+        if(zbuf1%len_used .le. 0) exit
+        if(check_gzfile_eof(FPz_f1) .gt. 0) exit
         read(zbuf1%fixbuf(1),*) i_end, end_time
       end do
+      call sel_close_read_gz_stream_file                                &
+     &   (FPz_f1, id_pick_mode, flag_gzip1, zbuf1)
 
       write(*,*) 'Start step and time: ', i_start, start_time
       write(*,*) 'End step and time: ', i_end, end_time
@@ -138,7 +152,7 @@
       integer(kind = kint) :: ierr, num_count, icou_skip, num
 !
 !
-      write(*,*) 'Open file: ', trim(file_name)
+      write(*,*) 'Open file again: ', trim(file_name)
       call sel_open_read_gz_stream_file                                 &
      &   (FPz_f1, id_pick_mode, file_name, flag_gzip1, zbuf1)
       call read_pick_series_head(FPz_f1, id_pick_mode, flag_gzip1,      &
@@ -221,7 +235,7 @@
       subroutine read_pick_series_head(FPz_f, id_stream, flag_gzip,     &
      &                                 picked_IO, zbuf)
 !
-      use select_gz_stream_file_IO
+      use sel_gz_read_sph_mtr_header
 !
       character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: id_stream
@@ -230,14 +244,20 @@
       type(picked_spectrum_data_IO), intent(inout) :: picked_IO
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
+      type(sph_spectr_head_labels) :: sph_lbl_IN
+      type(read_sph_spectr_data) :: sph_IN
 !
-      call sel_skip_comment_gz_stream(FPz_f, id_stream,                 &
-     &                                flag_gzip, zbuf)
-      read(zbuf%fixbuf(1),*) picked_IO%num_layer, picked_IO%num_mode
 !
-      call sel_skip_comment_gz_stream(FPz_f, id_stream,                 &
-     &                                flag_gzip, zbuf)
-      read(zbuf%fixbuf(1),*) picked_IO%ntot_comp
+      call gz_read_sph_pwr_layer_head                                   &
+     &   (FPz_f, id_stream, flag_gzip, sph_lbl_IN, sph_IN, zbuf)
+      picked_IO%num_layer = sph_IN%nri_sph
+      picked_IO%num_mode =  sph_IN%ltr_sph
+      picked_IO%num_field = sph_IN%nfield_sph_spec
+      picked_IO%ntot_comp = sph_IN%ntot_sph_spec
+      write(*,*) 'picked_IO%num_layer', picked_IO%num_layer
+      write(*,*) 'picked_IO%num_mode', picked_IO%num_mode
+      write(*,*) 'picked_IO%num_field', picked_IO%num_field
+      write(*,*) 'picked_IO%ntot_comp', picked_IO%ntot_comp
 !
       end subroutine read_pick_series_head
 !
@@ -246,7 +266,7 @@
       subroutine read_pick_series_comp_name                             &
      &         (FPz_f, id_stream, flag_gzip, picked_IO, zbuf)
 !
-      use select_gz_stream_file_IO
+      use sel_gz_read_sph_mtr_header
 !
       character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: id_stream
@@ -255,14 +275,19 @@
       type(picked_spectrum_data_IO), intent(inout) :: picked_IO
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint) :: i
-      character(len=kchara) :: tmpchara
+      type(read_sph_spectr_data) :: sph_IN
 !
 !
-      call sel_skip_comment_gz_stream(FPz_f, id_stream,                 &
-     &                                flag_gzip, zbuf)
-      read(zbuf%fixbuf(1),*) (tmpchara,i=1,6),                          &
-     &                 picked_IO%spectr_name(1:picked_IO%ntot_comp)
+      sph_IN%num_time_labels = 6
+      sph_IN%nfield_sph_spec = picked_IO%num_field
+      sph_IN%ntot_sph_spec = picked_IO%ntot_comp
+      call alloc_sph_espec_name(sph_IN)
+      call sel_read_sph_spectr_name(FPz_f, id_stream, flag_gzip,        &
+     &   sph_IN%nfield_sph_spec, sph_IN%num_labels,                     &
+     &   sph_IN%ncomp_sph_spec, sph_IN%ene_sph_spec_name, zbuf)
+!
+      picked_IO%spectr_name(1:picked_IO%ntot_comp) &
+     &   = sph_IN%ene_sph_spec_name(7:picked_IO%ntot_comp+6)
 !
       end subroutine read_pick_series_comp_name
 !

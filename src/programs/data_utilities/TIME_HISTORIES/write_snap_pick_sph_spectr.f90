@@ -63,22 +63,22 @@
 !
       if(picked_IO%num_mode .eq. izero) return
 !
-      open(id_pick_mode, file = file_name, form='formatted',            &
-     &     position='append')
+      open(id_pick_mode, file = file_name, form='formatted')
 !
-      write(*,'(a,3i16)') hd_pick_sph_head(), picked_IO%num_layer,      &
-     &        picked_IO%num_mode
-      write(*,'(a,i16)') hd_pick_sph_num(), picked_IO%ntot_comp
+!      write(*,'(a,3i16)') hd_pick_sph_head(), picked_IO%num_layer,     &
+!     &        picked_IO%num_mode
+!      write(*,'(a,i16)') hd_pick_sph_num(), picked_IO%ntot_comp
 !
-      write(*,'(a)')  '#   Start and end time'
-      write(*,'(1p2e25.12)')  true_Start, end_time
+!      write(*,'(a)')  '#   Start and end time'
+!      write(*,'(1p2e25.12)')  true_Start, end_time
 !
-      write(id_pick_mode,'(a)')    '#'
-      write(id_pick_mode,'(a)')    '# num_layers, num_spectr'
+      write(id_pick_mode,'(a)')    '!'
+      write(id_pick_mode,'(a)')    'Num_Radial_layers, Num_spectr'
       write(id_pick_mode,'(2i16)') picked_IO%num_layer,                 &
      &                            picked_IO%num_mode
-      write(id_pick_mode,'(a)')    '# number of component'
-      write(id_pick_mode,'(i16)') picked_IO%ntot_comp
+      write(id_pick_mode,'(a)') 'Number_of_field, Number_of_components'
+      write(id_pick_mode,'(2i16)')                                      &
+     &                  picked_IO%num_field, picked_IO%ntot_comp
 !
       write(id_pick_mode,'(a)',advance='NO')  't_step    time    '
       write(id_pick_mode,'(a)',advance='NO')  'radius_ID    radius    '
