@@ -39,6 +39,7 @@ jobs:
         make
         make test
 
+  Run-on-Mac:
     name: test-compile on Mac
     runs-on: [macos-latest]
     steps:
