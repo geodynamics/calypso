@@ -27,11 +27,11 @@ test:
 	rm -f *.dat
 	$(MPIRUN) -np 2 $(BUILDDIR)/sph_mhd
 	echo 'Compare with reference mean square data'
-	$(BUILDDIR)/tests/sph_ene_check  reference/sph_ave_volume    sph_ave_volume
-	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_s  sph_pwr_volume_s
-	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_m0 sph_pwr_volume_m0
+	$(BUILDDIR)/tests/sph_ene_check  reference/sph_ave_volume    sph_ave_volume    >> log.txt
+	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_s  sph_pwr_volume_s  >> log.txt
+	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_m0 sph_pwr_volume_m0 >> log.txt
 
 clean:
-	rm -f *.dat rst_2/rst.*  sph_lm4r64c_2/in.*
+	rm -f *.dat *.txt rst_2/rst.*  sph_lm4r64c_2/in.*
 
 distclean: clean

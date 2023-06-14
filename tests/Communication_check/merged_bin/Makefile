@@ -25,11 +25,11 @@ all: test
 
 test: 
 	rm -f *.dat
-	$(MPIRUN) -np 6 $(BUILDDIR)/utilities/gen_sph_grids
-	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_grids
-	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms
+	$(MPIRUN) -np 6 $(BUILDDIR)/utilities/gen_sph_grids > log.txt
+	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_grids >> log.txt
+	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms >> log.txt
 
 clean:
-	rm -f *.dat in.*
+	rm -f *.dat *.txt in.*
 
 distclean: clean

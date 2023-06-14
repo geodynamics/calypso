@@ -1,3 +1,0 @@
-'section/psf_eq'
-sdt
-1 1 1

@@ -222,9 +222,9 @@
       if (my_rank .eq. 0) then
         if(     cd_prop%iflag_Bevo_scheme .gt. id_no_evolution          &
      &     .or. cd_prop%iflag_Aevo_scheme .gt. id_no_evolution) then
-          write(*,*) 'Ratio of magnetic energy to kinetic energy:',     &
-     &              cd_prop%me_to_ke_ratio
-          write(*,*) ''
+!          write(*,*) 'Ratio of magnetic energy to kinetic energy:',    &
+!     &              cd_prop%me_to_ke_ratio
+!          write(*,*) ''
 !
           write(*,*) 'coefficient for magnetic field:      ',           &
      &              cd_prop%coef_magne

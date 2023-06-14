@@ -1,3 +1,0 @@
-'isosurface/iso_w10n'
-sfm.gz
-1 1 1

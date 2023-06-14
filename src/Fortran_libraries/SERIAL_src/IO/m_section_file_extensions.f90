@@ -11,7 +11,9 @@
 !!      integer(kind = kint) function                                   &
 !!     &                    section_format_id_from_input()
 !!      integer(kind = kint) function                                   &
-!!     &                    psf_to_vtk_format_id_from_input()
+!!     &                    psf_to_vtk_format_id_from_input(file_ext)
+!!        character(len = kchara), intent(in) :: file_ext
+!!      function psf_to_vtk_format_list()
 !!
 !!      function psf_extension_list()
 !!        character(len= 6*(3+6+5)) :: psf_extension_list
@@ -43,7 +45,6 @@
       end type psf_extensions
 !
       private :: set_psf_extensions, section_format_id_from_ext
-      private :: psf_to_vtk_format_list
 !
 ! -----------------------------------------------------------------------
 !
@@ -71,15 +72,11 @@
 ! -----------------------------------------------------------------------
 !
       integer(kind = kint) function                                     &
-     &                    psf_to_vtk_format_id_from_input()
+     &                    psf_to_vtk_format_id_from_input(file_ext)
 !
-      character(len = kchara) :: file_ext
+      character(len = kchara), intent(in) :: file_ext
       type(psf_extensions) :: psf_exts
 !
-!
-      write(*,*) 'Input file extension from following:'
-      write(*,*) psf_to_vtk_format_list()
-      read(*,*) file_ext
 !
       call set_psf_extensions(psf_exts)
       psf_to_vtk_format_id_from_input                                   &
