@@ -25,10 +25,10 @@ all: test
 
 test: 
 	rm -f *.dat restart/rst.*
-	$(MPIRUN) -np 6 $(BUILDDIR)/utilities/assemble_sph
-	$(MPIRUN) -np 6 $(BUILDDIR)/tests/compare_sph_restart
+	$(MPIRUN) -np 6 $(BUILDDIR)/utilities/assemble_sph > log.txt
+	$(MPIRUN) -np 6 $(BUILDDIR)/tests/compare_sph_restart >> log.txt
 
 clean:
-	rm -f *.dat restart/rst.*
+	rm -f *.dat *.txt restart/rst.*
 
 distclean: clean

@@ -25,7 +25,7 @@ all: test
 
 test: 
 	rm -f *.dat
-	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms >& log.txt
+	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms > log.txt
 
 clean:
 	rm -f *.dat *.txt

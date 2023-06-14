@@ -25,11 +25,11 @@ all: test
 
 test: 
 	rm -f *.dat restart/rst.*
-	$(MPIRUN) -np 3 $(BUILDDIR)/utilities/gen_sph_grids
-	$(MPIRUN) -np 3 $(BUILDDIR)/utilities/assemble_sph
-	$(MPIRUN) -np 3 $(BUILDDIR)/tests/compare_sph_restart
+	$(MPIRUN) -np 3 $(BUILDDIR)/utilities/gen_sph_grids > log.txt
+	$(MPIRUN) -np 3 $(BUILDDIR)/utilities/assemble_sph >> log.txt
+	$(MPIRUN) -np 3 $(BUILDDIR)/tests/compare_sph_restart >> log.txt
 
 clean:
-	rm -f *.dat restart/rst.* sph_lm7t12r14c_ic_3/in.* 
+	rm -f *.dat *.txt restart/rst.* sph_lm7t12r14c_ic_3/in.* 
 
 distclean: clean
