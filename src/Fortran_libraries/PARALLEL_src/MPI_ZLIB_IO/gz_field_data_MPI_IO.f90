@@ -200,12 +200,14 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
       character(len=num_pe*16+1) :: textbuf_p
+      integer :: len_textbuf_p
 !
       integer(kind = kint_gl) :: istack_buf(0:num_pe)
 !
 !
+      len_textbuf_p = len(textbuf_p)
       call gz_read_fld_charhead_mpi                                     &
-     &   (id_fld, ioff_gl, len(textbuf_p), textbuf_p)
+     &   (id_fld, ioff_gl, len_textbuf_p, textbuf_p)
 
       if(my_rank .eq. 0) call read_buffer_istack_nod_buffer             &
      &                      (textbuf_p, num_pe, istack_buf)
@@ -241,12 +243,14 @@
       integer, intent(in) :: num_pe
 !
       character(len=num_pe*16+1) :: textbuf_p
+      integer :: len_textbuf_p
 !
       integer(kind = kint_gl) :: istack_buf(0:num_pe)
 !
 !
+      len_textbuf_p = len(textbuf_p)
       call gz_read_fld_charhead_mpi                                     &
-     &   (id_fld, ioff_gl, len(textbuf_p), textbuf_p)
+     &   (id_fld, ioff_gl, len_textbuf_p, textbuf_p)
 !
       if(my_rank .eq. 0) call read_buffer_istack_nod_buffer             &
      &                      (textbuf_p, num_pe, istack_buf)
