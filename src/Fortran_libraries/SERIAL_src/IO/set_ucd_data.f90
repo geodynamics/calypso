@@ -58,8 +58,8 @@
      &          iele_gl, ie, ucd)
 !
       integer(kind = kint), intent(in) :: numele, nnod_4_ele
-      integer(kind = kint_gl), target, intent(in) :: iele_gl(numele)
-      integer(kind = kint), target, intent(in) :: ie(numele,nnod_4_ele)
+      integer(kind = kint_gl), intent(in) :: iele_gl(numele)
+      integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
       type(ucd_data), intent(inout) :: ucd
 !
 !
@@ -72,6 +72,8 @@
 !
 !$omp parallel workshare
       ucd%ie(1:numele,1:nnod_4_ele) = ie(1:numele,1:nnod_4_ele)
+!$omp end parallel workshare
+!$omp parallel workshare
       ucd%iele_global(1:numele) =     iele_gl(1:numele)
 !$omp end parallel workshare
 !
