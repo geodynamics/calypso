@@ -31,7 +31,6 @@
 !
       call calypso_MPI_finalize
 !
-      write(*,*) '***** program finished *****'
-      stop
+      stop '***** program finished *****'
 !
       end program sph_snapshot_w_psf
