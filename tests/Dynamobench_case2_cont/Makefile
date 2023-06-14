@@ -34,7 +34,7 @@ test:
 	$(BUILDDIR)/tests/sph_ene_check  reference/gauss_coefs       monitor/gauss_coefs
 	$(BUILDDIR)/tests/sph_ene_check  reference/dipolarity        monitor/dipolarity
 	$(BUILDDIR)/tests/sph_ene_check  reference/dynamobench       monitor/dynamobench
-	$(BUILDDIR)/tests/sph_ene_check  reference/Nusselt.dat       monitor/Nusselt.dat
+	$(BUILDDIR)/tests/sph_ene_check  reference/Nusselt           monitor/Nusselt
 	$(BUILDDIR)/tests/sph_ene_check  reference/sph_ave_convective    monitor/sph_ave_convective
 	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_convective_s    monitor/sph_pwr_convective_s
 
