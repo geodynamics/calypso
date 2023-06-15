@@ -44,7 +44,7 @@ merged_bin_gz
 all: test
 
 test: 
-	for dir in $(SUBDIRS) ; do \
+	@for dir in $(SUBDIRS) ; do \
 	echo "# Test spherical harmonics indexining in $${dir} directory..."; \
 		( cd $${dir}; \
 		$(GMAKE) \
@@ -56,10 +56,10 @@ test:
 		test)\
 	done; \
 	echo "# Test Communication without indexing file"; \
-	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms
+	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms > log.txt
 	
-	rm -f *.dat
-	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
+	@rm -f *.dat *.txt
+	@rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
 clean:
 	for dir in $(SUBDIRS) ; do \

@@ -235,6 +235,7 @@
 !
       call read_one_line_from_stream(id_file, len(zbuf%fixbuf(1)),      &
      &    zbuf%num_word, zbuf%len_used, zbuf%fixbuf(1))
+      if(zbuf%len_used .le. 0) return
       zbuf%fixbuf(1)(zbuf%len_used:zbuf%len_used) = char(32)
 !
       end subroutine sel_read_line_gz_stream
@@ -246,6 +247,7 @@
 !
       use skip_comment_f
       use skip_gz_comment
+      use gzip_file_access
 !
       character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: id_file
@@ -257,12 +259,14 @@
 !#ifdef ZLIB_IO
       if(flag_gzip) then
         call skip_gz_comment_get_nword(FPz_f, zbuf)
+        if(check_gzfile_eof(FPz_f) .ne. 0) zbuf%len_used = -1
         return
       end if
 !#endif
 !
       call skip_comment_from_stream(id_file, len(zbuf%fixbuf(1)),       &
      &    zbuf%num_word, zbuf%len_used, zbuf%fixbuf(1))
+      if(zbuf%len_used .le. 0) return
       zbuf%fixbuf(1)(zbuf%len_used:zbuf%len_used) = char(32)
 !
       end subroutine sel_skip_comment_gz_stream

@@ -27,7 +27,7 @@ test:
 	rm -f *.dat
 	$(MPIRUN) -np 4 $(BUILDDIR)/sph_mhd
 #	echo 'Compare with reference mean square data'
-#	$(BUILDDIR)/tests/sph_ene_check
+#	$(BUILDDIR)/tests/sph_ene_check sph_pwr_volume_s reference/sph_pwr_volume_s >> log.txt
 
 clean:
 	rm -f *.dat *.txt fort.*

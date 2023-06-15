@@ -44,7 +44,7 @@ heterogineous_temp
 all: test
 
 test: 
-	for dir in $(SUBDIRS) ; do \
+	@for dir in $(SUBDIRS) ; do \
 	echo "# Test in $${dir} directory..."; \
 		( cd $${dir}; \
 		$(GMAKE) \
