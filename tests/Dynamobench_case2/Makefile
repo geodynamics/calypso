@@ -27,10 +27,10 @@ test:
 	rm -f *.dat
 	$(MPIRUN) -np 4 $(BUILDDIR)/sph_mhd
 	echo 'Compare with reference mean square data'
-	$(BUILDDIR)/tests/sph_ene_check  reference/sph_ave_volume    sph_ave_volume    >>& log.txt
-	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_s  sph_pwr_volume_s  >>& log.txt
-	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_m0 sph_pwr_volume_m0 >>& log.txt
-	$(BUILDDIR)/tests/sph_ene_check  reference/gauss_coefs_Re    gauss_coefs_Re    >>& log.txt
+	$(BUILDDIR)/tests/sph_ene_check  reference/sph_ave_volume    sph_ave_volume    > log.txt
+	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_s  sph_pwr_volume_s  > log.txt
+	$(BUILDDIR)/tests/sph_ene_check  reference/sph_pwr_volume_m0 sph_pwr_volume_m0 > log.txt
+	$(BUILDDIR)/tests/sph_ene_check  reference/gauss_coefs_Re    gauss_coefs_Re    > log.txt
 
 clean:
 	rm -f *.dat *.txt

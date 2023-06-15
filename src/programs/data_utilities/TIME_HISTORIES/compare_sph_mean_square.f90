@@ -74,7 +74,7 @@
      &            (sph_lbl_IN1, sph_IN1, sph_lbl_IN2, sph_IN2)
       if(error) then
         write(*,*) 'time sequence data header does not match'
-        stop 1
+        stop 'Check failed'
       end if
 !
       allocate(spectr_IN1(sph_IN1%ntot_sph_spec))
@@ -114,10 +114,10 @@
 !
       if(error) then
         write(*,*) 'time sequence data does not match'
-        stop 1
+        stop 'Check failed'
       end if
 !
-      stop 0
+      stop 'Check finished'
 !
 !   --------------------------------------------------------------------
 !
