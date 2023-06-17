@@ -1,0 +1,68 @@
+!
+!
+!     example of control for Kemo's volume rendering
+!
+begin volume_rendering   (BMP or PNG)
+  updated_sign          end
+!
+  pvr_file_head        'pvr/pvr_temp'
+  pvr_output_type      PNG
+!  image_tranceparency  transparent
+!
+  output_field    temperature    end
+  output_component scalar
+!
+  begin plot_area_ctl
+    array chosen_ele_grp_ctl
+      chosen_ele_grp_ctl   all
+    end array chosen_ele_grp_ctl
+!
+    array surface_enhanse_ctl
+      surface_enhanse_ctl   ICB   reverse_surface   0.7
+      surface_enhanse_ctl   CMB   reverse_surface   0.1
+    end array surface_enhanse_ctl
+  end  plot_area_ctl
+!
+  begin pvr_color_ctl
+    colormap_mode_ctl       rainbow
+!
+    data_mapping_ctl   Colormap_list
+    array color_table_ctl
+      color_table_ctl    0.0    0.0
+      color_table_ctl    0.25   0.5
+      color_table_ctl    0.5    1.0
+    end array color_table_ctl
+!
+    opacity_style_ctl              point_linear
+    array  linear_opacity_ctl
+      linear_opacity_ctl   0.0     0.01
+      linear_opacity_ctl   0.01    0.02
+      linear_opacity_ctl   0.28    0.03
+      linear_opacity_ctl   0.30    0.6
+      linear_opacity_ctl   0.32    0.05
+      linear_opacity_ctl   0.38    0.05
+      linear_opacity_ctl   0.40    0.6
+      linear_opacity_ctl   0.42    0.05
+      linear_opacity_ctl   0.45    0.03
+      linear_opacity_ctl   0.5     0.1
+    end array linear_opacity_ctl
+    constant_opacity_ctl           0.003
+!
+    range_min_ctl   0.0
+    range_max_ctl   0.5
+  end   pvr_color_ctl
+!
+  begin colorbar_ctl
+    colorbar_switch_ctl    On
+    colorbar_scale_ctl     ON
+    iflag_zeromarker       OFF
+    colorbar_range     0.0   0.5
+    font_size_ctl         1
+    num_grid_ctl     4
+!
+    axis_label_switch      ON
+  end colorbar_ctl
+!
+  file lighting_ctl        'PVR_defs/control_lights'
+  file view_transform_ctl  'view_defines/control_view'
+end volume_rendering

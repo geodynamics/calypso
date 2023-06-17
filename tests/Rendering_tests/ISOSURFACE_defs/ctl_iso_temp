@@ -1,0 +1,26 @@
+!
+begin isosurface_ctl
+  isosurface_file_prefix    'isosurfaces/iso_temp'
+  iso_output_type           'VTK_gz'
+!
+  begin isosurf_define
+    isosurf_field           temperature
+    isosurf_component      scalar
+    isosurf_value            0.3
+!
+    array isosurf_area_ctl
+      isosurf_area_ctl   outer_core   end
+    end array isosurf_area_ctl
+  end isosurf_define
+!
+  begin field_on_isosurf
+!    result_type      constant
+!    result_value     0.7
+    array output_field 
+      output_field    velocity         vector   end
+      output_field    magnetic_field   radial   end
+    end array output_field
+  end field_on_isosurf
+!
+end isosurface_ctl
+

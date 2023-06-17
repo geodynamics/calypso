@@ -1,0 +1,22 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin surface_rendering
+  psf_file_head    'sections/zm_y0'
+  psf_output_type  PSF_gzip
+!
+  file surface_define  'SURFACE_defs/ctl_section_zm'
+!
+  begin output_field_define
+    array output_field
+      output_field  temperature           scalar           
+      output_field  velocity              spherical_vector 
+      output_field  vorticity             spherical_vector 
+      output_field  magnetic_field        spherical_vector 
+!
+      output_field  stream_pol_velocity      phi
+      output_field  stream_pol_magne         phi
+    end array output_field
+  end output_field_define
+end surface_rendering

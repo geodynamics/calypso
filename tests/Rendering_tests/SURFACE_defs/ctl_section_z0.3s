@@ -1,0 +1,11 @@
+!
+!     example of control for Kemo's surface rendering
+!
+  begin surface_define
+    section_method    equation
+!
+    array coefs_ctl
+      coefs_ctl  z      1.0
+      coefs_ctl  const  0.3
+    end array coefs_ctl
+  end surface_define

@@ -1,0 +1,34 @@
+  begin view_transform_ctl
+!
+    begin image_size_ctl
+      x_pixel_ctl     800
+      y_pixel_ctl     600
+    end image_size_ctl
+!
+    array viewpoint_in_viewer_ctl  3
+      viewpoint_in_viewer_ctl   x   0.000000000000e+00 
+      viewpoint_in_viewer_ctl   y   0.000000000000e+00 
+      viewpoint_in_viewer_ctl   z   1.000000000000e+01 
+    end array viewpoint_in_viewer_ctl
+!
+    scale_factor_ctl      3.752906696377e-01
+!
+    array look_at_point_ctl  3
+      look_at_point_ctl         x   0.000000000000e+00 
+      look_at_point_ctl         y   0.000000000000e+00 
+      look_at_point_ctl         z   0.000000000000e+00 
+    end array look_at_point_ctl
+!
+    array view_rotation_vec_ctl  3
+      view_rotation_vec_ctl     x   -3.690266841943e-01 
+      view_rotation_vec_ctl     y   -4.439897059620e-01 
+      view_rotation_vec_ctl     z   -8.164053523597e-01 
+    end array view_rotation_vec_ctl
+    view_rotation_deg_ctl   1.144756353644e+02 
+!
+    begin projection_matrix_ctl
+      perspective_angle_ctl      8.000000000000e+00 
+    end projection_matrix_ctl
+!
+  end view_transform_ctl
+!

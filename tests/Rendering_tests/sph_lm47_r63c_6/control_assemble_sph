@@ -1,0 +1,34 @@
+begin assemble_control
+!
+  begin data_files_def
+    num_subdomain_ctl           64
+    sph_file_prefix      '../sph_lm127t192r224c_64/in'
+    restart_file_prefix  '../sph_lm127t192r224c_64/rst'
+!
+    sph_file_fmt_ctl           'merged_gz'
+    restart_file_fmt_ctl       'merged_gz'
+  end data_files_def
+!
+  begin new_data_files_def
+    num_subdomain_ctl              6
+    restart_file_prefix         'rst'
+    restart_file_fmt_ctl        'merged_bin_gz'
+  end new_data_files_def
+!
+  file new_spherical_shell_ctl  'control_resolution'
+!
+  begin control
+!!!!!  information for time integration
+    begin time_step_ctl
+      i_step_init_ctl         200
+      i_step_number_ctl       200
+      i_step_rst_ctl          1
+      i_step_ucd_ctl          1
+    end time_step_ctl
+!    begin new_time_step_ctl
+!      i_step_init_ctl    0
+!      time_init_ctl     0.0
+!    end new_time_step_ctl
+  end control
+end assemble_control
+

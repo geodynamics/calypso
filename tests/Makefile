@@ -34,7 +34,8 @@ Dynamobench_case1 \
 Dynamobench_case2 \
 Dynamobench_case2_cont \
 snapshot_test \
-heterogineous_temp
+heterogineous_temp \
+Rendering_tests
 
 #
 #  -------------------------------------------------------------------------

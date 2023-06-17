@@ -1,0 +1,16 @@
+!!
+!
+!     example of control for lighting parameter for PVR
+!
+  begin lighting_ctl
+    array position_of_lights
+      position_of_lights    -10.0  -10.0   10.0   end
+      position_of_lights    -10.0    10.0  -10.0   end
+      position_of_lights    -10.0    0.0   -10.0   end
+    end array position_of_lights
+!
+    ambient_coef_ctl              0.5
+    diffuse_coef_ctl              0.7
+    specular_coef_ctl             0.9
+  end lighting_ctl
+

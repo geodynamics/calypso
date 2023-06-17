@@ -1,0 +1,33 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin surface_rendering
+  psf_file_head    'sections/equator'
+  psf_output_type  UDT_gzip
+!
+  begin surface_define
+    section_method    equation
+!
+    array coefs_ctl  10
+      coefs_ctl  x2     0.0
+      coefs_ctl  y2     0.0
+      coefs_ctl  z2     0.0
+      coefs_ctl  xy     0.0
+      coefs_ctl  yz     0.0
+      coefs_ctl  zx     0.0
+      coefs_ctl  x      0.0
+      coefs_ctl  y      0.0
+      coefs_ctl  z      1.0
+      coefs_ctl  const  0.0
+    end array coefs_ctl
+!
+    begin plot_area_ctl
+      array chosen_ele_grp_ctl 1
+        chosen_ele_grp_ctl   all   end
+      end array chosen_ele_grp_ctl
+    end plot_area_ctl
+  end surface_define
+!
+  file output_field_define    'SECTION_defs/ctl_fields_z_sections'
+end surface_rendering

@@ -1,0 +1,29 @@
+!
+  begin  view_transform_ctl
+    begin  image_size_ctl
+      x_pixel_ctl   720
+      y_pixel_ctl   600
+    end  image_size_ctl
+!
+    array eye_position_ctl
+      eye_position_ctl         x   15.5250
+      eye_position_ctl         y    2.44416
+      eye_position_ctl         z   19.1197
+    end array eye_position_ctl
+!
+    array look_at_point_ctl
+      look_at_point_ctl     x     0.0
+      look_at_point_ctl     y     0.0
+      look_at_point_ctl     z     0.0
+    end array look_at_point_ctl
+!
+    array up_direction_ctl
+      up_direction_ctl     x   -0.751889
+      up_direction_ctl     y   -0.181709
+      up_direction_ctl     z    0.633754
+    end array up_direction_ctl
+!
+    begin projection_matrix_ctl
+      perspective_angle_ctl      10.0
+    end projection_matrix_ctl
+  end  view_transform_ctl

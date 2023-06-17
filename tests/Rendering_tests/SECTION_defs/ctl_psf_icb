@@ -1,0 +1,18 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin surface_rendering
+  psf_file_head    'sections/icb'
+  psf_output_type  UDT_gzip
+!
+  file surface_define  'SURFACE_defs/ctl_section_ICB'
+!
+  begin output_field_define
+    array output_field
+      output_field  magnetic_field        spherical_vector
+      output_field  temperature           scalar
+      output_field  grad_temp             spherical_vector
+    end array output_field
+  end output_field_define
+end surface_rendering

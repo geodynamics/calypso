@@ -1,0 +1,53 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin map_rendering_ctl
+  map_image_prefix    'maps/map_cmb_Br_line'
+  map_image_format     PNG
+!
+!  output_field        magnetic_field
+!  output_component    r
+!
+  isoline_field        magnetic_field
+  isoline_component    r
+!
+  begin colormap_ctl
+    colormap_ctl       rainbow
+!
+    data_mapping_ctl   Colormap_list
+    array color_table_ctl
+      color_table_ctl   -4.0   0.0
+      color_table_ctl    0.0   0.5
+      color_table_ctl    4.0   1.0
+    end array color_table_ctl
+  end colormap_ctl
+!
+  begin colorbar_ctl
+    colorbar_switch_ctl    On
+    colorbar_position_ctl  'bottom'
+    colorbar_scale_ctl     ON
+    iflag_zeromarker       ON
+    colorbar_range        -4.0   4.0
+    font_size_ctl           2
+    num_grid_ctl            0
+!
+    time_label_switch       On
+    map_grid_switch         On
+  end colorbar_ctl
+!
+  begin section_ctl
+    file  surface_define  'SURFACE_defs/ctl_section_CMB'
+!
+    isoline_color_mode            color
+    isoline_number_ctl            11
+    zeroline_switch_ctl           On
+    isoline_width_ctl             1.5
+    grid_width_ctl                1.0
+    tangent_cylinder_switch_ctl   On
+    inner_radius_ctl              0.53846
+    outer_radius_ctl              1.53846
+  end section_ctl
+!
+  file map_projection_ctl  'view_defines/control_map_view'
+end map_rendering_ctl

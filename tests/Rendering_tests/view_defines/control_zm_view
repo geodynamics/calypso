@@ -1,0 +1,16 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+  begin map_projection_ctl
+    projection_type_ctl      xz_plane
+    begin image_size_ctl
+      x_pixel_ctl     480
+      y_pixel_ctl     640
+    end image_size_ctl
+!
+    begin projection_matrix_ctl
+      horizontal_range_ctl       0.0   1.8
+      vertical_range_ctl        -1.8   1.8
+    end projection_matrix_ctl
+  end map_projection_ctl
