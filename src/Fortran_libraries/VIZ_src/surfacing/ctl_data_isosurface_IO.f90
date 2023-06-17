@@ -121,6 +121,7 @@
      &         (id_control, hd_block, iso_c, c_buf)
 !
       use skip_comment_f
+      use ctl_file_field_on_psf_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -134,9 +135,11 @@
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
 !
-        call read_fld_on_psf_control(id_control, hd_field_on_iso,       &
+        call sel_read_ctl_field_on_psf_file                             &
+     &     (id_control, hd_field_on_iso, iso_c%fname_fld_on_iso,        &
      &      iso_c%fld_on_iso_c, c_buf)
-        call read_fld_on_psf_control(id_control, hd_iso_result,         &
+        call sel_read_ctl_field_on_psf_file                             &
+     &     (id_control, hd_iso_result, iso_c%fname_fld_on_iso,          &
      &      iso_c%fld_on_iso_c, c_buf)
 !
         call read_iso_define_data                                       &
@@ -159,6 +162,7 @@
      &         (id_control, hd_block, iso_c, level)
 !
       use write_control_elements
+      use ctl_file_field_on_psf_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -183,8 +187,8 @@
 !
       call write_iso_define_data(id_control, hd_iso_define,             &
      &                           iso_c%iso_def_c, level)
-      call write_fld_on_psf_control(id_control, hd_field_on_iso,        &
-     &                              iso_c%fld_on_iso_c, level)
+      call sel_write_ctl_field_on_psf_file(id_control, hd_field_on_iso, &
+     &    iso_c%fname_fld_on_iso, iso_c%fld_on_iso_c, level)
 !
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !

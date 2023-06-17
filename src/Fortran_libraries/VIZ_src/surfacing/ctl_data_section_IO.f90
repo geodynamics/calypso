@@ -169,6 +169,7 @@
      &         (id_control, hd_block, psf_c, c_buf)
 !
       use ctl_file_section_def_IO
+      use ctl_file_field_on_psf_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -187,8 +188,9 @@
      &     (id_control, hd_surface_define, psf_c%fname_section_ctl,     &
      &      psf_c%psf_def_c, c_buf)
 !
-        call read_fld_on_psf_control(id_control, hd_output_field,       &
-     &                               psf_c%fld_on_psf_c, c_buf)
+        call sel_read_ctl_field_on_psf_file                             &
+     &     (id_control, hd_output_field, psf_c%fname_fld_on_psf,        &
+     &      psf_c%fld_on_psf_c, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_psf_file_prefix,             &
      &      psf_c%psf_file_head_ctl)
@@ -207,6 +209,7 @@
      &         (id_control, hd_block, psf_c, level)
 !
       use ctl_file_section_def_IO
+      use ctl_file_field_on_psf_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
@@ -231,8 +234,8 @@
 !
       call sel_write_ctl_pvr_section_def(id_control, hd_surface_define, &
      &    psf_c%fname_section_ctl, psf_c%psf_def_c, level)
-      call write_fld_on_psf_control(id_control, hd_output_field,        &
-     &                              psf_c%fld_on_psf_c, level)
+      call sel_write_ctl_field_on_psf_file(id_control, hd_output_field, &
+     &    psf_c%fname_fld_on_psf, psf_c%fld_on_psf_c, level)
 !
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
