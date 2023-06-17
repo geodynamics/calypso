@@ -166,7 +166,8 @@
 !*
 !*  ----------- Zonal means --------------
 !*
-          if(SNAPs%MHD_step%viz_step%istep_psf .ge. 0) then
+          if(SNAPs%MHD_step%viz_step%istep_psf .ge. 0                   &
+     &        .or. SNAPs%MHD_step%viz_step%istep_map .ge. 0) then
             call SPH_MHD_zmean_vizs                                     &
      &         (SNAPs%MHD_step%viz_step, SNAPs%MHD_step%time_d,         &
      &          SNAPs%SPH_MHD%sph, MVIZs%FEM_DAT%geofem,                &

@@ -190,7 +190,8 @@
 !*
 !*  ----------- Zonal means --------------
 !*
-          if(MHDMs%MHD_step%viz_step%istep_psf .ge. 0) then
+          if(MHDMs%MHD_step%viz_step%istep_psf .ge. 0                   &
+     &        .or. MHDMs%MHD_step%viz_step%istep_map .ge. 0) then
             call SPH_MHD_zmean_vizs                                     &
      &         (MHDMs%MHD_step%viz_step, MHDMs%MHD_step%time_d,         &
      &          MHDMs%SPH_MHD%sph, MVIZs%FEM_DAT%geofem,                &

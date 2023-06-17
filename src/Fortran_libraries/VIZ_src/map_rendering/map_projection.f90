@@ -137,7 +137,7 @@
       type(send_recv_status), intent(inout) :: SR_sig
 !
 !
-      if (map%num_map.le.0 .or. istep_psf.le.0) return
+      if(map%num_map.le.0 .or. istep_psf.le.0) return
 !
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+2)
       call set_field_4_psf(map%num_map, geofem%mesh%edge, nod_fld,      &
