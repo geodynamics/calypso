@@ -101,7 +101,7 @@
       type(buffer_for_control) :: c_buf1
 !
 !
-      write(*,*) trim(fname_sect_ctl), ' for surface definition'
+      write(*,*) trim(fname_sect_ctl)
       open(id_control, file = fname_sect_ctl, status='old')
 !
       do
@@ -160,7 +160,7 @@
       integer(kind = kint) :: level
 !
 !
-      write(*,*) trim(fname_sect_ctl), ' for surface definition'
+      write(*,*) trim(fname_sect_ctl)
       level = 0
       open(id_control, file = fname_sect_ctl)
       call write_section_def_control(id_control, hd_block,              &

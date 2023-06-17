@@ -85,6 +85,8 @@
       type iso_ctl
 !>        Structure of isosurface define control
         type(iso_define_ctl) :: iso_def_c
+!>        file name for fields on isosurface control
+        character(len=kchara) :: fname_fld_on_iso
 !>        Structure of fields on isosurface control
         type(field_on_psf_ctl) :: fld_on_iso_c
 !
@@ -143,7 +145,8 @@
       call copy_chara_ctl(org_iso_c%iso_output_type_ctl,                &
      &                    new_iso_c%iso_output_type_ctl)
 !
-      new_iso_c%i_iso_ctl =       org_iso_c%i_iso_ctl
+      new_iso_c%i_iso_ctl =        org_iso_c%i_iso_ctl
+      new_iso_c%fname_fld_on_iso = org_iso_c%fname_fld_on_iso
 !
       call dup_iso_define_control                                       &
      &   (org_iso_c%iso_def_c, new_iso_c%iso_def_c)

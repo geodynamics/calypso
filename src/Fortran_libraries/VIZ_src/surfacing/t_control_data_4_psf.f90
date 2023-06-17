@@ -137,6 +137,8 @@
         character(len=kchara) :: fname_section_ctl
 !>        Structure of cross section definition
         type(psf_define_ctl) :: psf_def_c
+!>        file name for fields on isosurface control
+        character(len=kchara) :: fname_fld_on_psf
 !>        Structure of fields on isosurface control
         type(field_on_psf_ctl) :: fld_on_psf_c
 !
@@ -203,6 +205,7 @@
      &                    new_psf_c%psf_output_type_ctl)
 !
       new_psf_c%fname_section_ctl = org_psf_c%fname_section_ctl
+      new_psf_c%fname_fld_on_psf =  org_psf_c%fname_fld_on_psf
       new_psf_c%i_psf_ctl =         org_psf_c%i_psf_ctl
       new_psf_c%i_output_field =    org_psf_c%i_output_field
 !

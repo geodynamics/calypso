@@ -12,11 +12,13 @@ convert_components_4_viz.o: $(PSF_SECTION_DIR)/convert_components_4_viz.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 copy_psf_data_to_SR.o: $(PSF_SECTION_DIR)/copy_psf_data_to_SR.f90 m_precision.o t_ucd_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ctl_data_isosurface_IO.o: $(PSF_SECTION_DIR)/ctl_data_isosurface_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o t_control_array_character.o t_control_data_4_iso_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o skip_comment_f.o write_control_elements.o
+ctl_data_isosurface_IO.o: $(PSF_SECTION_DIR)/ctl_data_isosurface_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o t_control_array_character.o t_control_data_4_iso_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o skip_comment_f.o ctl_file_field_on_psf_IO.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ctl_data_section_IO.o: $(PSF_SECTION_DIR)/ctl_data_section_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_array_character2.o t_control_data_4_psf_def.o t_control_data_4_fld_on_psf.o t_control_data_4_psf.o calypso_mpi.o ctl_file_section_def_IO.o write_control_elements.o
+ctl_data_section_IO.o: $(PSF_SECTION_DIR)/ctl_data_section_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_array_character2.o t_control_data_4_psf_def.o t_control_data_4_fld_on_psf.o t_control_data_4_psf.o calypso_mpi.o ctl_file_section_def_IO.o ctl_file_field_on_psf_IO.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_data_section_def_IO.o: $(PSF_SECTION_DIR)/ctl_data_section_def_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_data_4_psf_def.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_file_field_on_psf_IO.o: $(PSF_SECTION_DIR)/ctl_file_field_on_psf_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_fld_on_psf.o t_control_data_sections.o t_read_control_elements.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_file_isosurfaces_IO.o: $(PSF_SECTION_DIR)/ctl_file_isosurfaces_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_iso.o t_control_data_isosurfaces.o t_read_control_elements.o ctl_data_isosurface_IO.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
