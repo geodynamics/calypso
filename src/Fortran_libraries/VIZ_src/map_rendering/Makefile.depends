@@ -4,11 +4,15 @@ ctl_data_map_rendering_IO.o: $(MAP_RENDERING_DIR)/ctl_data_map_rendering_IO.f90 
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_file_map_renderings_IO.o: $(MAP_RENDERING_DIR)/ctl_file_map_renderings_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o t_control_data_maps.o t_read_control_elements.o ctl_data_section_IO.o skip_comment_f.o ctl_data_map_rendering_IO.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-draw_aitoff_map.o: $(MAP_RENDERING_DIR)/draw_aitoff_map.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_map_patch_from_1patch.o map_patch_from_1patch.o draw_pixels_on_map.o
+draw_aitoff_map.o: $(MAP_RENDERING_DIR)/draw_aitoff_map.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_pvr_image_array.o t_map_rendering_data.o t_map_patch_from_1patch.o map_patch_from_1patch.o draw_pixels_on_map.o set_color_4_pvr.o draw_isoline_in_triangle.o
 	$(F90) -c $(F90OPTFLAGS) $<
-draw_lines_on_map.o: $(MAP_RENDERING_DIR)/draw_lines_on_map.f90 m_precision.o m_constants.o t_pvr_colormap_parameter.o set_color_4_pvr.o draw_pixels_on_map.o
+draw_isoline_in_triangle.o: $(MAP_RENDERING_DIR)/draw_isoline_in_triangle.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-draw_pixels_on_map.o: $(MAP_RENDERING_DIR)/draw_pixels_on_map.f90 m_precision.o m_constants.o t_pvr_colormap_parameter.o set_color_4_pvr.o
+draw_lines_on_map.o: $(MAP_RENDERING_DIR)/draw_lines_on_map.f90 m_precision.o m_constants.o t_geometry_data.o t_map_patch_from_1patch.o t_map_rendering_data.o t_pvr_image_array.o draw_xyz_plane_isolines.o draw_aitoff_map.o
+	$(F90) -c $(F90OPTFLAGS) $<
+draw_pixels_on_map.o: $(MAP_RENDERING_DIR)/draw_pixels_on_map.f90 m_precision.o m_constants.o m_geometry_constants.o t_pvr_colormap_parameter.o set_color_4_pvr.o
+	$(F90) -c $(F90OPTFLAGS) $<
+draw_xyz_plane_isolines.o: $(MAP_RENDERING_DIR)/draw_xyz_plane_isolines.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_map_rendering_data.o t_map_patch_from_1patch.o t_pvr_colormap_parameter.o t_pvr_image_array.o set_color_4_pvr.o draw_pixels_on_map.o set_xyz_plot_from_1patch.o draw_isoline_in_triangle.o
 	$(F90) -c $(F90OPTFLAGS) $<
 map_patch_from_1patch.o: $(MAP_RENDERING_DIR)/map_patch_from_1patch.f90 m_precision.o m_constants.o m_phys_constants.o m_geometry_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -18,11 +22,9 @@ multi_map_projections.o: $(MAP_RENDERING_DIR)/multi_map_projections.f90 calypso_
 	$(F90) -c $(F90OPTFLAGS) $<
 set_map_control.o: $(MAP_RENDERING_DIR)/set_map_control.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_phys_data.o t_control_data_maps.o t_control_data_4_map.o t_control_params_4_psf.o t_psf_patch_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_map_rendering_data.o t_pvr_image_array.o calypso_mpi.o t_read_control_elements.o set_field_comp_for_viz.o mpi_abort_by_missing_zlib.o set_psf_control.o m_error_IDs.o m_file_format_switch.o set_area_4_viz.o set_sections_file_ctl.o delete_data_files.o skip_comment_f.o set_pvr_modelview_matrix.o set_control_pvr_color.o t_control_array_character.o output_image_sel_4_png.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_map_values_for_grids.o: $(MAP_RENDERING_DIR)/set_map_values_for_grids.f90 m_precision.o m_constants.o aitoff.o
+set_scalar_on_xyz_plane.o: $(MAP_RENDERING_DIR)/set_scalar_on_xyz_plane.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_map_rendering_data.o t_map_patch_from_1patch.o t_pvr_colormap_parameter.o t_pvr_image_array.o draw_pixels_on_map.o set_xyz_plot_from_1patch.o map_patch_from_1patch.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_scalar_on_xyz_plane.o: $(MAP_RENDERING_DIR)/set_scalar_on_xyz_plane.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_map_patch_from_1patch.o set_xyz_plot_from_1patch.o map_patch_from_1patch.o draw_pixels_on_map.o
-	$(F90) -c $(F90OPTFLAGS) $<
-set_xyz_plot_from_1patch.o: $(MAP_RENDERING_DIR)/set_xyz_plot_from_1patch.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o
+set_xyz_plot_from_1patch.o: $(MAP_RENDERING_DIR)/set_xyz_plot_from_1patch.f90 m_precision.o m_constants.o t_geometry_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_data_4_map.o: $(MAP_RENDERING_DIR)/t_control_data_4_map.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_character.o t_ctl_data_pvr_section.o t_ctl_data_4_view_transfer.o t_ctl_data_pvr_colormap_bar.o t_control_array_character3.o add_nodal_fields_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -32,8 +34,8 @@ t_map_patch_from_1patch.o: $(MAP_RENDERING_DIR)/t_map_patch_from_1patch.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 t_map_projection.o: $(MAP_RENDERING_DIR)/t_map_projection.f90 calypso_mpi.o m_precision.o t_cross_section.o t_psf_results.o t_control_data_maps.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_pvr_image_array.o t_map_rendering_data.o m_field_file_format.o set_map_control.o set_psf_control.o set_fields_for_psf.o find_node_and_patch_psf.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_map_rendering_data.o: $(MAP_RENDERING_DIR)/t_map_rendering_data.f90 calypso_mpi.o m_precision.o m_machine_parameter.o t_geometry_data.o t_phys_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_control_array_character.o t_ctl_data_pvr_section.o t_ctl_data_4_projection.o skip_comment_f.o t_psf_patch_data.o t_pvr_image_array.o t_time_data.o t_file_IO_parameter.o t_map_patch_from_1patch.o set_ucd_data_to_type.o ucd_IO_select.o draw_aitoff_map.o draw_lines_on_map.o draw_pvr_colorbar.o draw_pixels_on_map.o set_map_values_for_grids.o
+t_map_rendering_data.o: $(MAP_RENDERING_DIR)/t_map_rendering_data.f90 calypso_mpi.o m_precision.o m_machine_parameter.o t_geometry_data.o t_phys_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_control_array_character.o t_ctl_data_pvr_section.o t_ctl_data_4_projection.o skip_comment_f.o t_psf_patch_data.o t_pvr_image_array.o
 	$(F90) -c $(F90OPTFLAGS) $<
-xyz_plane_rendering.o: $(MAP_RENDERING_DIR)/xyz_plane_rendering.f90 m_precision.o m_constants.o t_psf_patch_data.o t_time_data.o t_file_IO_parameter.o t_map_patch_from_1patch.o t_pvr_image_array.o t_map_rendering_data.o set_ucd_data_to_type.o ucd_IO_select.o draw_aitoff_map.o draw_lines_on_map.o draw_pvr_colorbar.o draw_pixels_on_map.o set_map_values_for_grids.o set_scalar_on_xyz_plane.o
+xyz_plane_rendering.o: $(MAP_RENDERING_DIR)/xyz_plane_rendering.f90 m_precision.o m_constants.o t_psf_patch_data.o t_time_data.o t_file_IO_parameter.o t_map_patch_from_1patch.o t_pvr_image_array.o t_map_rendering_data.o set_ucd_data_to_type.o ucd_IO_select.o draw_aitoff_map.o draw_lines_on_map.o draw_pvr_colorbar.o draw_pixels_on_map.o set_scalar_on_xyz_plane.o draw_xyz_plane_isolines.o cal_mesh_position.o
 	$(F90) -c $(F90OPTFLAGS) $<
 

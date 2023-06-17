@@ -80,8 +80,6 @@
      &                             map_rgb(i_map))
         call init_map_rendering_data(view_param(i_map),                 &
      &                               map_rgb(i_map), map_data(i_map))
-        call alloc_scalar_on_map(map_rgb(i_map)%num_pixel_xy,           &
-     &                           map_data(i_map))
       end do
 !
       if(iflag_MAP_time) call start_elapsed_time(ist_elapsed_MAP+1)
@@ -131,6 +129,9 @@
         call collect_psf_scalar(map_rgb(i_map)%irank_image_file, ione,  &
      &      psf_mesh(i_map)%node, psf_mesh(i_map)%field,                &
      &      psf_dat(i_map)%psf_phys%d_fld(1,1), SR_sig)
+        call collect_psf_scalar(map_rgb(i_map)%irank_image_file, itwo,  &
+     &      psf_mesh(i_map)%node, psf_mesh(i_map)%field,                &
+     &      psf_dat(i_map)%psf_phys%d_fld(1,2), SR_sig)
       end do
       if(iflag_MAP_time) call end_elapsed_time(ist_elapsed_MAP+1)
 !

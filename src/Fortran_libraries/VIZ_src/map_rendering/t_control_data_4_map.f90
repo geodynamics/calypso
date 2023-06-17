@@ -27,6 +27,9 @@
 !!    output_field       magnetic_field
 !!    output_component   r
 !!
+!!    isoline_field       magnetic_field
+!!    isoline_component   r
+!!
 !!    begin section_ctl
 !!      file surface_define     ctl_psf_eq
 !!      begin surface_define
@@ -51,9 +54,11 @@
 !!      end surface_define
 !!
 !!      zeroline_switch_ctl           On
-!!      isoline_switch_ctl            On
 !!      isoline_color_mode      color, white, or black
 !!      isoline_number_ctl            20
+!!      isoline_range_ctl          -0.5   0.5
+!!      isoline_width_ctl             1.5
+!!      grid_width_ctl                1.0
 !!
 !!      tangent_cylinder_switch_ctl   On
 !!      inner_radius_ctl              0.53846
@@ -183,6 +188,11 @@
 !>        Structure of component name for rendering
         type(read_character_item) :: map_comp_ctl
 !
+!>        Structure of isoline field name for rendering
+        type(read_character_item) :: isoline_field_ctl
+!>        Structure of isoline component name for rendering
+        type(read_character_item) :: isoline_comp_ctl
+!
 !>     file name for modelview matrix
         character(len=kchara) :: fname_mat_ctl
 !>     Structure for modelview marices
@@ -228,6 +238,8 @@
       map_c%map_image_fmt_ctl%iflag =    0
       map_c%map_field_ctl%iflag =        0
       map_c%map_comp_ctl%iflag =         0
+      map_c%isoline_field_ctl%iflag =    0
+      map_c%isoline_comp_ctl%iflag =     0
 !
       map_c%i_map_ctl =        0
       map_c%i_output_field =   0
@@ -256,6 +268,10 @@
      &                    new_map_c%map_field_ctl)
       call copy_chara_ctl(org_map_c%map_comp_ctl,                       &
      &                    new_map_c%map_comp_ctl)
+      call copy_chara_ctl(org_map_c%isoline_field_ctl,                  &
+     &                    new_map_c%isoline_field_ctl)
+      call copy_chara_ctl(org_map_c%isoline_comp_ctl,                   &
+     &                    new_map_c%isoline_comp_ctl)
 !
       new_map_c%i_map_ctl =        org_map_c%i_map_ctl
       new_map_c%i_output_field =   org_map_c%i_output_field
@@ -276,6 +292,10 @@
 !
       if(map_c%map_field_ctl%iflag .gt. 0) then
         call add_viz_name_ctl(map_c%map_field_ctl%charavalue,           &
+     &                        field_ctl)
+      end if
+      if(map_c%isoline_field_ctl%iflag .gt. 0) then
+        call add_viz_name_ctl(map_c%isoline_field_ctl%charavalue,       &
      &                        field_ctl)
       end if
 !

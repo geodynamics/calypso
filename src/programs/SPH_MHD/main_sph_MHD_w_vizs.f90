@@ -29,5 +29,6 @@
 !
       call calypso_MPI_finalize
 !
-      stop
+      stop '***** program finished *****'
+!
       end program kemorin_sph_MHD

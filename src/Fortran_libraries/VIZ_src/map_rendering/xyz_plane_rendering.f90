@@ -50,7 +50,7 @@
       use draw_lines_on_map
       use draw_pvr_colorbar
       use draw_pixels_on_map
-      use set_map_values_for_grids
+      use draw_lines_on_map
 !
       type(time_data), intent(in) :: time_d
       type(pvr_colormap_parameter), intent(in) :: color_param
@@ -63,60 +63,76 @@
       type(pvr_image_type), intent(inout) :: pvr_rgb
 !
       type(map_patches_for_1patch) :: map_e1
+      real(kind = kreal), parameter                                     &
+     &                   :: black(4) = (/zero,zero,zero,one/)
+      real(kind = kreal), parameter                                     &
+     &                   :: white(4) = (/one,one,one,one/)
+      real(kind = kreal) :: color_ref(4)
+!
+      real(kind = kreal), allocatable :: phi_shift(:)
+      real(kind = kreal) :: pi
+      integer(kind = kint) :: i
 !
 !
       if(my_rank .ne. pvr_rgb%irank_image_file) return
+!$omp parallel workshare
+      pvr_rgb%rgba_real_gl(1:4,1:pvr_rgb%num_pixel_actual) = 0.0d0
+!$omp end parallel workshare
 !
+      pi = four*atan(one)
       call alloc_map_patch_from_1patch(map_e1)
-      call set_scalar_on_map_image(psf_nod, psf_ele, psf_phys,          &
-     &    map_data%xmin_frame, map_data%xmax_frame,                     &
-     &    map_data%ymin_frame, map_data%ymax_frame,                     &
-     &    pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
-     &    pvr_rgb%num_pixel_xy, map_data%d_map, pvr_rgb%rgba_real_gl,   &
-     &    map_e1)
-      call dealloc_map_patch_from_1patch(map_e1)
-!
       if(map_data%fill_flag) then
-        call map_value_to_rgb                                           &
-     &     (color_param, pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),  &
-     &      map_data%d_map, pvr_rgb%rgba_real_gl)
-      end if
-!
-      if(map_data%flag_zeroline) then
-        call draw_zeroline                                              &
-     &     (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      map_data%d_map, pvr_rgb%rgba_real_gl)
+        call set_scalar_on_map_image(color_param, psf_nod, psf_ele,     &
+     &      psf_phys%d_fld(1,1), map_data, pvr_rgb, map_e1)
+        if(map_data%flag_zeroline .and. (map_data%num_line.le.0)) then
+          call draw_aitoff_map_zeroline                                 &
+     &       (psf_nod, psf_ele, psf_phys%d_fld(1,1), map_data,          &
+     &        black, pvr_rgb, map_e1)
+        end if
+      else
+        call fill_map_one_color                                         &
+     &      (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),              &
+     &       color_param%bg_rgba_real, pvr_rgb%rgba_real_gl)
       end if
 !
       if(map_data%num_line .gt. 0) then
-        call draw_isolines                                              &
-     &     (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), color_param,  &
-     &      map_data%num_line, map_data%d_map, pvr_rgb%rgba_real_gl)
+        call draw_aitoff_map_isolines                                   &
+     &     (psf_nod, psf_ele, psf_phys%d_fld(1,2), map_data,            &
+     &      color_param, pvr_rgb, map_e1)
+!
+        if(map_data%flag_zeroline                                       &
+     &        .and. (map_data%fill_flag.eqv. .FALSE.)) then
+          call set_flame_color                                          &
+     &       (map_data%fill_flag, color_param%bg_rgba_real, color_ref)
+          call draw_aitoff_map_zeroline                                 &
+     &       (psf_nod, psf_ele, psf_phys%d_fld(1,2), map_data,          &
+     &        white, pvr_rgb, map_e1)
+        end if
       end if
 !
-      call map_value_to_colatitude                                      &
-     &   (map_data%xmin_frame, map_data%xmax_frame,                     &
-     &    map_data%ymin_frame, map_data%ymax_frame,                     &
-     &    pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map)
-      call draw_latitude_grid                                           &
-     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map, &
-     &    pvr_rgb%rgba_real_gl)
+      call draw_latitude_grid(psf_nod, psf_ele, map_data,               &
+     &    color_param%bg_rgba_real, pvr_rgb, map_e1)
       if(map_data%flag_tangent_cylinder) then
-        call draw_map_tangent_cyl_grid                                  &
-     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
-     &    map_data%tangent_cylinder_theta, map_data%d_map,              &
-     &    pvr_rgb%rgba_real_gl)
+        call draw_map_tangent_cyl_grid(psf_nod, psf_ele, map_data,      &
+     &      color_param%bg_rgba_real, map_data%tangent_cylinder_theta,  &
+     &      pvr_rgb, map_e1)
       end if
 !
-      call map_value_to_longitude                                       &
-     &   (map_data%xmin_frame, map_data%xmax_frame,                     &
-     &    map_data%ymin_frame, map_data%ymax_frame,                     &
-     &    pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map)
-      call draw_longitude_grid                                          &
-     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map, &
-     &    pvr_rgb%rgba_real_gl)
-      call draw_mapflame(pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),  &
-     &                   map_data%d_map, pvr_rgb%rgba_real_gl)
+      allocate(phi_shift(psf_nod%numnod))
+      do i = 1, psf_nod%numnod
+        if(psf_nod%xx(i,2) .ge. 0) then
+          phi_shift(i) = psf_nod%phi(i)
+        else
+          phi_shift(i) = two*pi - psf_nod%phi(i)
+        end if
+      end do
+!
+      call draw_longitude_grid(psf_nod, psf_ele, phi_shift, map_data,   &
+     &    color_param%bg_rgba_real, pvr_rgb, map_e1)
+      call draw_mapflame(psf_nod, psf_ele, phi_shift, map_data,         &
+     &    color_param%bg_rgba_real, pvr_rgb, map_e1)
+      deallocate(phi_shift)
+      call dealloc_map_patch_from_1patch(map_e1)
 !
       call fill_background                                              &
      &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
@@ -142,10 +158,11 @@
      &          psf_phys, color_param, cbar_param, map_data, pvr_rgb)
 !
       use set_scalar_on_xyz_plane
-      use set_map_values_for_grids
+      use draw_xyz_plane_isolines
+      use draw_pvr_colorbar
       use draw_pixels_on_map
       use draw_lines_on_map
-      use draw_pvr_colorbar
+      use cal_mesh_position
 !
       type(time_data), intent(in) :: time_d
       type(pvr_colormap_parameter), intent(in) :: color_param
@@ -158,84 +175,66 @@
       type(pvr_image_type), intent(inout) :: pvr_rgb
 !
       type(map_patches_for_1patch) :: map_e1
+      real(kind = kreal), parameter                                     &
+     &                   :: black(4) = (/zero,zero,zero,one/)
+      real(kind = kreal), parameter                                     &
+     &                   :: white(4) = (/one,one,one,one/)
+      real(kind = kreal) :: color_ref(4)
 !
 !
       if(my_rank .ne. pvr_rgb%irank_image_file) return
+!$omp parallel workshare
+      pvr_rgb%rgba_real_gl(1:4,1:pvr_rgb%num_pixel_actual) = 0.0d0
+!$omp end parallel workshare
 !
       call alloc_map_patch_from_1patch(map_e1)
-      if(map_data%iflag_2d_projection_mode .eq. iflag_xy_plane)  then
-        call set_scalar_on_xy_plane(psf_nod, psf_ele, psf_phys,         &
-     &      map_data%xmin_frame, map_data%xmax_frame,                   &
-     &      map_data%ymin_frame, map_data%ymax_frame,                   &
-     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      pvr_rgb%num_pixel_xy, map_data%d_map, pvr_rgb%rgba_real_gl, &
-     &      map_e1)
-      else if(map_data%iflag_2d_projection_mode .eq. iflag_xz_plane)    &
-     &                                                            then
-        call set_scalar_on_xz_plane(psf_nod, psf_ele, psf_phys,         &
-     &      map_data%xmin_frame, map_data%xmax_frame,                   &
-     &      map_data%ymin_frame, map_data%ymax_frame,                   &
-     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      pvr_rgb%num_pixel_xy, map_data%d_map, pvr_rgb%rgba_real_gl, &
-     &      map_e1)
-      else if(map_data%iflag_2d_projection_mode .eq. iflag_yz_plane)    &
-     &                                                            then
-        call set_scalar_on_yz_plane(psf_nod, psf_ele, psf_phys,         &
-     &      map_data%xmin_frame, map_data%xmax_frame,                   &
-     &      map_data%ymin_frame, map_data%ymax_frame,                   &
-     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      pvr_rgb%num_pixel_xy, map_data%d_map, pvr_rgb%rgba_real_gl, &
-     &      map_e1)
-      end if
-      call dealloc_map_patch_from_1patch(map_e1)
-!
       if(map_data%fill_flag) then
-        call map_value_to_rgb                                           &
-     &     (color_param, pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),  &
-     &      map_data%d_map, pvr_rgb%rgba_real_gl)
-      end if
+        call sel_scalar_on_xyz_plane                                    &
+     &     (color_param, psf_nod, psf_ele, psf_phys%d_fld(1,1),         &
+     &      map_data, pvr_rgb, map_e1)
 !
-      if(map_data%flag_zeroline) then
-        call draw_zeroline                                              &
-     &     (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
-     &      map_data%d_map, pvr_rgb%rgba_real_gl)
+        if(map_data%flag_zeroline .and. (map_data%num_line.le.0)) then
+          call draw_xyz_plane_zeroline                                  &
+     &       (psf_nod, psf_ele, psf_phys%d_fld(1,1), map_data,          &
+     &        black, pvr_rgb, map_e1)
+        end if
+      else
+        call fill_map_one_color                                         &
+     &      (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),              &
+     &       color_param%bg_rgba_real, pvr_rgb%rgba_real_gl)
       end if
 !
       if(map_data%num_line .gt. 0) then
-        call draw_isolines                                              &
-     &     (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), color_param,  &
-     &      map_data%num_line, map_data%d_map, pvr_rgb%rgba_real_gl)
+        call s_draw_xyz_plane_isolines                                  &
+     &     (psf_nod, psf_ele, psf_phys%d_fld(1,2), map_data,            &
+     &      color_param, pvr_rgb, map_e1)
+        if(map_data%flag_zeroline                                       &
+     &        .and. (map_data%fill_flag.eqv. .FALSE.)) then
+          call set_flame_color                                          &
+     &       (map_data%fill_flag, color_param%bg_rgba_real, color_ref)
+          call draw_xyz_plane_zeroline                                  &
+     &       (psf_nod, psf_ele, psf_phys%d_fld(1,2), map_data,          &
+     &        white, pvr_rgb, map_e1)
+        end if
       end if
 !
       if(map_data%iflag_2d_projection_mode .eq. iflag_xz_plane          &
      &   .or. map_data%iflag_2d_projection_mode .eq. iflag_xz_plane     &
      &  ) then
         if(map_data%flag_tangent_cylinder) then
-          call map_value_to_projected_x                                 &
-     &       (map_data%xmin_frame, map_data%xmax_frame,                 &
-     &        map_data%ymin_frame, map_data%ymax_frame,                 &
-     &        pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),             &
-     &        map_data%d_map)
           call draw_med_tangent_cyl_grid                                &
-     &       (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),             &
-     &        map_data%tangent_cylinder_radius(1), map_data%d_map,      &
-     &        pvr_rgb%rgba_real_gl)
+     &       (psf_nod, psf_ele, map_data, color_param%bg_rgba_real,     &
+     &        map_data%tangent_cylinder_radius(2), pvr_rgb, map_e1)
         end if
       end if
 !
-      call map_value_to_projected_r                                     &
-     &   (map_data%xmin_frame, map_data%xmax_frame,                     &
-     &    map_data%ymin_frame, map_data%ymax_frame,                     &
-     &    pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2), map_data%d_map)
-!
-      call draw_radius_grid                                             &
-     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
-     &    map_data%tangent_cylinder_radius(1), map_data%d_map,          &
-     &    pvr_rgb%rgba_real_gl)
-      call draw_radius_grid                                             &
-     &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &
-     &    map_data%tangent_cylinder_radius(2), map_data%d_map,          &
-     &    pvr_rgb%rgba_real_gl)
+      call draw_radius_grid(psf_nod, psf_ele, map_data,                 &
+     &   color_param%bg_rgba_real, map_data%tangent_cylinder_radius(2), &
+     &   pvr_rgb, map_e1)
+      call draw_radius_grid(psf_nod, psf_ele, map_data,                 &
+     &   color_param%bg_rgba_real, map_data%tangent_cylinder_radius(1), &
+     &   pvr_rgb, map_e1)
+      call dealloc_map_patch_from_1patch(map_e1)
 !
       call fill_background                                              &
      &   (pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),                 &

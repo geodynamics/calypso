@@ -6,26 +6,14 @@
 !
 !>@brief Subroutines for plane projection
 !!@verbatim
-!!      subroutine set_scalar_on_xy_plane(psf_nod, psf_ele, psf_phys,   &
-!!     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,       &
-!!     &          nxpixel, nypixel, npix, d_map, rgba, map_e)
-!!      subroutine set_scalar_on_xz_plane(psf_nod, psf_ele, psf_phys,   &
-!!     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,       &
-!!     &          nxpixel, nypixel, npix, d_map, rgba, map_e)
-!!      subroutine set_scalar_on_yz_plane(psf_nod, psf_ele, psf_phys,   &
-!!     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,       &
-!!     &          nxpixel, nypixel, npix, d_map, rgba, map_e)
+!!      subroutine sel_scalar_on_xyz_plane(psf_nod, psf_ele, d_scalar,  &
+!!     &                                   map_data, pvr_rgb, map_e)
 !!        type(node_data), intent(in) :: psf_nod
 !!        type(element_data), intent(in) :: psf_ele
-!!        type(phys_data), intent(in) :: psf_phys
-!!        real(kind= kreal), intent(in) :: xmin_frame, xmax_frame
-!!        real(kind= kreal), intent(in) :: ymin_frame, ymax_frame
-!!        integer(kind = kint), intent(in) :: nxpixel, nypixel, npix
-!!        real(kind = kreal), intent(inout) :: d_map(npix)
-!!        real(kind = kreal), intent(inout) :: rgba(4,npix)
+!!        real(kind= kreal), intent(in) :: d_scalar(psf_nod%numnod)
+!!        type(map_rendering_data), intent(inout) :: map_data
+!!        type(pvr_image_type), intent(inout) :: pvr_rgb
 !!        type(map_patches_for_1patch), intent(inout) :: map_e
-!!        integer(kind = kint) :: iele
-!!        integer(kind = kint) :: k_ymin, k_ymid, k_ymax
 !!@endverbatim
       module set_scalar_on_xyz_plane
 !
@@ -34,8 +22,15 @@
 !
       use t_geometry_data
       use t_phys_data
+      use t_map_rendering_data
+      use t_map_patch_from_1patch
+      use t_pvr_colormap_parameter
+      use t_pvr_image_array
 !
       implicit  none
+!
+      private :: set_scalar_on_xy_plane, set_scalar_on_xz_plane
+      private :: set_scalar_on_yz_plane
 !
 !  ---------------------------------------------------------------------
 !
@@ -43,120 +38,140 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_scalar_on_xy_plane(psf_nod, psf_ele, psf_phys,     &
-     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,         &
-     &          nxpixel, nypixel, npix, d_map, rgba, map_e)
+      subroutine sel_scalar_on_xyz_plane(color_param,                   &
+     &          psf_nod, psf_ele, d_scalar, map_data, pvr_rgb, map_e)
 !
-      use t_map_patch_from_1patch
+      use draw_pixels_on_map
+!
+      type(pvr_colormap_parameter), intent(in) :: color_param
+      type(node_data), intent(in) :: psf_nod
+      type(element_data), intent(in) :: psf_ele
+      real(kind= kreal), intent(in) :: d_scalar(psf_nod%numnod)
+!
+      type(map_rendering_data), intent(inout) :: map_data
+      type(pvr_image_type), intent(inout) :: pvr_rgb
+      type(map_patches_for_1patch), intent(inout) :: map_e
+!
+!
+      if(map_data%iflag_2d_projection_mode .eq. iflag_xy_plane)  then
+        call set_scalar_on_xy_plane(color_param, psf_nod, psf_ele,      &
+     &     d_scalar, map_data, pvr_rgb, map_e)
+      else if(map_data%iflag_2d_projection_mode .eq. iflag_xz_plane)    &
+     &                                                            then
+        call set_scalar_on_xz_plane(color_param, psf_nod, psf_ele,      &
+     &     d_scalar, map_data, pvr_rgb, map_e)
+      else if(map_data%iflag_2d_projection_mode .eq. iflag_yz_plane)    &
+     &                                                            then
+        call set_scalar_on_yz_plane(color_param, psf_nod, psf_ele,      &
+     &     d_scalar, map_data, pvr_rgb, map_e)
+      end if
+!
+      end subroutine sel_scalar_on_xyz_plane
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine set_scalar_on_xy_plane(color_param, psf_nod, psf_ele,  &
+     &          d_scalar, map_data, pvr_rgb, map_e)
+!
       use set_xyz_plot_from_1patch
       use map_patch_from_1patch
       use draw_pixels_on_map
 !
+      type(pvr_colormap_parameter), intent(in) :: color_param
       type(node_data), intent(in) :: psf_nod
       type(element_data), intent(in) :: psf_ele
-      type(phys_data), intent(in) :: psf_phys
+      type(map_rendering_data), intent(in) :: map_data
 !
-      real(kind= kreal), intent(in) :: xmin_frame, xmax_frame
-      real(kind= kreal), intent(in) :: ymin_frame, ymax_frame
-      integer(kind = kint), intent(in) :: nxpixel, nypixel, npix
+      real(kind= kreal), intent(in) :: d_scalar(psf_nod%numnod)
 !
-      real(kind = kreal), intent(inout) :: d_map(npix)
-      real(kind = kreal), intent(inout) :: rgba(4,npix)
+      type(pvr_image_type), intent(inout) :: pvr_rgb
       type(map_patches_for_1patch), intent(inout) :: map_e
 !
-      integer(kind = kint) :: iele, k_ymin, k_ymid, k_ymax
+      integer(kind = kint) :: iele
 !
 !
       do iele = 1, psf_ele%numele
-        call set_xy_plot_from_1patch(psf_nod, psf_ele, psf_phys, iele,  &
+        call set_xy_plot_from_1patch(psf_nod, psf_ele, d_scalar, iele,  &
      &      map_e%xy_map(1,1,1), map_e%d_map_patch(1,1))
-        call find_map_path_orientation(map_e%xy_map(1,1,1),             &
-     &                                   k_ymin, k_ymid, k_ymax)
-        call fill_triangle_data_on_image                                &
-     &       (xmin_frame, xmax_frame, ymin_frame, ymax_frame,           &
-     &        nxpixel, nypixel, k_ymin, k_ymid, k_ymax,                 &
-     &        map_e%xy_map(1,1,1), map_e%d_map_patch(1,1),              &
-     &        d_map, rgba)
+        call fill_triangle_data_on_image(color_param,                   &
+     &      map_data%xmin_frame, map_data%xmax_frame,                   &
+     &      map_data%ymin_frame, map_data%ymax_frame,                   &
+     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
+     &      map_e%xy_map(1,1,1), map_e%d_map_patch(1,1),                &
+     &      pvr_rgb%rgba_real_gl)
       end do
 !
       end subroutine set_scalar_on_xy_plane
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_scalar_on_xz_plane(psf_nod, psf_ele, psf_phys,     &
-     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,         &
-     &          nxpixel, nypixel, npix, d_map, rgba, map_e)
+      subroutine set_scalar_on_xz_plane(color_param, psf_nod, psf_ele,  &
+     &          d_scalar, map_data, pvr_rgb, map_e)
 !
       use t_map_patch_from_1patch
       use set_xyz_plot_from_1patch
       use map_patch_from_1patch
       use draw_pixels_on_map
 !
+      type(pvr_colormap_parameter), intent(in) :: color_param
       type(node_data), intent(in) :: psf_nod
       type(element_data), intent(in) :: psf_ele
-      type(phys_data), intent(in) :: psf_phys
+      type(map_rendering_data), intent(in) :: map_data
 !
-      real(kind= kreal), intent(in) :: xmin_frame, xmax_frame
-      real(kind= kreal), intent(in) :: ymin_frame, ymax_frame
-      integer(kind = kint), intent(in) :: nxpixel, nypixel, npix
+      real(kind= kreal), intent(in) :: d_scalar(psf_nod%numnod)
 !
-      real(kind = kreal), intent(inout) :: d_map(npix)
-      real(kind = kreal), intent(inout) :: rgba(4,npix)
+      type(pvr_image_type), intent(inout) :: pvr_rgb
       type(map_patches_for_1patch), intent(inout) :: map_e
 !
-      integer(kind = kint) :: iele, k_ymin, k_ymid, k_ymax
+      integer(kind = kint) :: iele
 !
 !
       do iele = 1, psf_ele%numele
-        call set_xz_plot_from_1patch(psf_nod, psf_ele, psf_phys, iele,  &
+        call set_xz_plot_from_1patch(psf_nod, psf_ele, d_scalar, iele,  &
      &      map_e%xy_map(1,1,1), map_e%d_map_patch(1,1))
-        call find_map_path_orientation(map_e%xy_map(1,1,1),             &
-     &                                   k_ymin, k_ymid, k_ymax)
-        call fill_triangle_data_on_image                                &
-     &       (xmin_frame, xmax_frame, ymin_frame, ymax_frame,           &
-     &        nxpixel, nypixel, k_ymin, k_ymid, k_ymax,                 &
-     &        map_e%xy_map(1,1,1), map_e%d_map_patch(1,1),              &
-     &        d_map, rgba)
+        call fill_triangle_data_on_image(color_param,                   &
+     &      map_data%xmin_frame, map_data%xmax_frame,                   &
+     &      map_data%ymin_frame, map_data%ymax_frame,                   &
+     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
+     &      map_e%xy_map(1,1,1), map_e%d_map_patch(1,1),                &
+     &      pvr_rgb%rgba_real_gl)
       end do
 !
       end subroutine set_scalar_on_xz_plane
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_scalar_on_yz_plane(psf_nod, psf_ele, psf_phys,     &
-     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,         &
-     &          nxpixel, nypixel, npix, d_map, rgba, map_e)
+      subroutine set_scalar_on_yz_plane(color_param, psf_nod, psf_ele,  &
+     &          d_scalar, map_data, pvr_rgb, map_e)
 !
       use t_map_patch_from_1patch
       use set_xyz_plot_from_1patch
       use map_patch_from_1patch
       use draw_pixels_on_map
 !
+      type(pvr_colormap_parameter), intent(in) :: color_param
       type(node_data), intent(in) :: psf_nod
       type(element_data), intent(in) :: psf_ele
-      type(phys_data), intent(in) :: psf_phys
+      type(map_rendering_data), intent(in) :: map_data
 !
-      real(kind= kreal), intent(in) :: xmin_frame, xmax_frame
-      real(kind= kreal), intent(in) :: ymin_frame, ymax_frame
-      integer(kind = kint), intent(in) :: nxpixel, nypixel, npix
+      real(kind= kreal), intent(in) :: d_scalar(psf_nod%numnod)
 !
-      real(kind = kreal), intent(inout) :: d_map(npix)
-      real(kind = kreal), intent(inout) :: rgba(4,npix)
+      type(pvr_image_type), intent(inout) :: pvr_rgb
       type(map_patches_for_1patch), intent(inout) :: map_e
 !
-      integer(kind = kint) :: iele, k_ymin, k_ymid, k_ymax
+      integer(kind = kint) :: iele
 !
 !
       do iele = 1, psf_ele%numele
-        call set_yz_plot_from_1patch(psf_nod, psf_ele, psf_phys, iele,  &
+        call set_yz_plot_from_1patch(psf_nod, psf_ele, d_scalar, iele,  &
      &      map_e%xy_map(1,1,1), map_e%d_map_patch(1,1))
-        call find_map_path_orientation(map_e%xy_map(1,1,1),             &
-     &                                   k_ymin, k_ymid, k_ymax)
-        call fill_triangle_data_on_image                                &
-     &       (xmin_frame, xmax_frame, ymin_frame, ymax_frame,           &
-     &        nxpixel, nypixel, k_ymin, k_ymid, k_ymax,                 &
-     &        map_e%xy_map(1,1,1), map_e%d_map_patch(1,1),              &
-     &        d_map, rgba)
+        call fill_triangle_data_on_image(color_param,                   &
+     &      map_data%xmin_frame, map_data%xmax_frame,                   &
+     &      map_data%ymin_frame, map_data%ymax_frame,                   &
+     &      pvr_rgb%num_pixels(1), pvr_rgb%num_pixels(2),               &
+     &      map_e%xy_map(1,1,1), map_e%d_map_patch(1,1),                &
+     &      pvr_rgb%rgba_real_gl)
       end do
 !
       end subroutine set_scalar_on_yz_plane

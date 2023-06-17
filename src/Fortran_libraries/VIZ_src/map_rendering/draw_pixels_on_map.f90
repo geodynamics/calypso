@@ -7,44 +7,33 @@
 !>@brief Fraw pixels on projected image
 !!
 !!@verbatim
-!!      subroutine fill_triangle_data_on_image                          &
-!!     &         (xmin_frame, xmax_frame, ymin_frame, ymax_frame,       &
+!!      subroutine fill_triangle_data_on_image(color_param,             &
+!!     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,       &
 !!     &          nxpixel, nypixel, k_ymin, k_ymid, k_ymax,             &
-!!     &          xy_patch, d_patch, d_map, rgba)
+!!     &          xy_patch, d_patch, rgba)
+!!        type(pvr_colormap_parameter), intent(in) :: color_param
 !!        real(kind= kreal), intent(in) :: xmin_frame, xmax_frame
 !!        real(kind= kreal), intent(in) :: ymin_frame, ymax_frame
 !!        integer(kind = kint), intent(in) :: nxpixel, nypixel
 !!        integer(kind = kint), intent(in) :: k_ymin, k_ymid, k_ymax
 !!        real(kind = kreal), intent(in) :: xy_patch(2,3)
 !!        real(kind = kreal), intent(in) :: d_patch(3)
-!!        real(kind = kreal), intent(inout) :: d_map(nxpixel*nypixel)
 !!        real(kind = kreal), intent(inout) :: rgba(4,nxpixel*nypixel)
-!!      subroutine map_value_to_rgb(color_param, nxpixel, nypixel,      &
-!!     &                            d_map, rgba)
-!!        type(pvr_colormap_parameter), intent(in) :: color_param
-!!        integer(kind = kint), intent(in) :: nxpixel, nypixel
-!!        real(kind = kreal), intent(in) :: d_map(npix)
-!!        real(kind = kreal), intent(inout) :: rgba(4,npix)
+!!      subroutine fill_map_one_color(nxpixel, nypixel, bg_rgba, rgba)
 !!      subroutine fill_background(nxpixel, nypixel, bg_rgba, rgba)
 !!        integer(kind = kint), intent(in) :: nxpixel, nypixel
 !!        real(kind = kreal), intent(in) :: bg_rgba(4)
-!!        real(kind = kreal), intent(inout) :: rgba(4,nxpixel*nypixel)
-!!
-!!      subroutine draw_isoline_on_pixel(nxpixel, nypixel, nwidth,      &
-!!     &          idots, d_ref, color_ref, d_map, rgba)
-!!        integer(kind = kint), intent(in) :: nxpixel, nypixel
-!!        integer(kind = kint), intent(in) :: nwidth, idots
-!!        real(kind = kreal), intent(in) :: d_map(nxpixel*nypixel)
-!!        real(kind = kreal), intent(in) :: color_ref(4)
-!!        real(kind = kreal), intent(in) :: d_ref
 !!        real(kind = kreal), intent(inout) :: rgba(4,nxpixel*nypixel)
 !!@endverbatim
       module draw_pixels_on_map
 !
       use m_precision
       use m_constants
+      use m_geometry_constants
 !
       implicit  none
+!
+      private :: find_map_path_orientation
 !
 !  ---------------------------------------------------------------------
 !
@@ -52,28 +41,32 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine fill_triangle_data_on_image                            &
-     &         (xmin_frame, xmax_frame, ymin_frame, ymax_frame,         &
-     &          nxpixel, nypixel, k_ymin, k_ymid, k_ymax,               &
-     &          xy_patch, d_patch, d_map, rgba)
+      subroutine fill_triangle_data_on_image(color_param,               &
+     &          xmin_frame, xmax_frame, ymin_frame, ymax_frame,         &
+     &          nxpixel, nypixel, xy_patch, d_patch, rgba)
 !
+      use t_pvr_colormap_parameter
+      use set_color_4_pvr
+!
+      type(pvr_colormap_parameter), intent(in) :: color_param
       real(kind= kreal), intent(in) :: xmin_frame, xmax_frame
       real(kind= kreal), intent(in) :: ymin_frame, ymax_frame
       integer(kind = kint), intent(in) :: nxpixel, nypixel
-      integer(kind = kint), intent(in) :: k_ymin, k_ymid, k_ymax
       real(kind = kreal), intent(in) :: xy_patch(2,3)
       real(kind = kreal), intent(in) :: d_patch(3)
 !
-      real(kind = kreal), intent(inout) :: d_map(nxpixel*nypixel)
       real(kind = kreal), intent(inout) :: rgba(4,nxpixel*nypixel)
 !
+      integer(kind = kint) :: k_ymin, k_ymid, k_ymax
       integer(kind = kint) :: ix, iy, i_img
       integer(kind = kint) :: ix_min, ix_max
       integer(kind = kint) :: iy_min, iy_mid, iy_max
       integer(kind = kint) :: kmin, kmax
-      real(kind = kreal) :: x(2), d(2)
+      real(kind = kreal) :: x(2), d(2), d_map
       real(kind = kreal) :: ratio_ymid, ratio_ymax, ratio_x
 !
+!
+      call find_map_path_orientation(xy_patch, k_ymin, k_ymid, k_ymax)
 !
       iy_min = int(1 + dble(nypixel-1)                                  &
      &                * (xy_patch(2,k_ymin) - ymin_frame)               &
@@ -84,6 +77,10 @@
       iy_max = int(1 + dble(nypixel-1)                                  &
      &                * (xy_patch(2,k_ymax) - ymin_frame)               &
      &                  / (ymax_frame - ymin_frame))
+!
+      iy_min = max(iy_min,1)
+      iy_mid = max(iy_mid,0)
+      iy_max = max(iy_max,0)
       do iy = iy_min, iy_mid
         if(iy_max.eq.iy_min .or. iy_mid.eq.iy_min) then
           x(1) = xy_patch(1,k_ymin)
@@ -113,15 +110,28 @@
      &                  / (xmax_frame - xmin_frame))
         ix_max = int(1 + dble(nxpixel-1)*(x(kmax) - xmin_frame)         &
      &                  / (xmax_frame - xmin_frame))
+        ix_min = max(ix_min,1)
+        ix_max = max(ix_max,0)
 !
-        i_img = ix_min + (iy-1) * nxpixel
-        d_map(i_img) =  d(kmin)
-        rgba(4,i_img) = one
+        if(ix_max .gt. 0) then
+          i_img = ix_min + (iy-1) * nxpixel
+          call value_to_rgb(color_param%id_pvr_color(2),                &
+     &                      color_param%id_pvr_color(1),                &
+     &                      color_param%num_pvr_datamap_pnt,            &
+     &                      color_param%pvr_datamap_param,              &
+     &                      d(kmin), rgba(1,i_img))
+          rgba(4,i_img) = one
+        end if
 !
         do ix = ix_min+1, ix_max
           i_img = ix + (iy-1) * nxpixel
           ratio_x = dble(ix-ix_min) / dble(ix_max-ix_min)
-          d_map(i_img) = (one - ratio_x) * d(kmin) + ratio_x *  d(kmax)
+          d_map = (one - ratio_x) * d(kmin) + ratio_x * d(kmax)
+          call value_to_rgb(color_param%id_pvr_color(2),                &
+     &                      color_param%id_pvr_color(1),                &
+     &                      color_param%num_pvr_datamap_pnt,            &
+     &                      color_param%pvr_datamap_param,              &
+     &                      d_map, rgba(1,i_img))
           rgba(4,i_img) = one
         end do
       end do
@@ -155,15 +165,28 @@
      &                  / (xmax_frame - xmin_frame))
         ix_max = int(1 + dble(nxpixel-1)*(x(kmax) - xmin_frame)         &
      &                  / (xmax_frame - xmin_frame))
+        ix_min = max(ix_min,1)
+        ix_max = max(ix_max,0)
 !
-        i_img = ix_min + (iy-1) * nxpixel
-        d_map(i_img) =  d(kmin)
-        rgba(4,i_img) = one
+        if(ix_max .gt. 0) then
+          i_img = ix_min + (iy-1) * nxpixel
+          call value_to_rgb(color_param%id_pvr_color(2),                &
+     &                      color_param%id_pvr_color(1),                &
+     &                      color_param%num_pvr_datamap_pnt,            &
+     &                      color_param%pvr_datamap_param,              &
+     &                      d(kmin), rgba(1,i_img))
+          rgba(4,i_img) = one
+        end if
 !
         do ix = ix_min+1, ix_max
           i_img = ix + (iy-1) * nxpixel
           ratio_x = dble(ix-ix_min) / dble(ix_max-ix_min)
-          d_map(i_img) = (one - ratio_x) * d(kmin) + ratio_x *  d(kmax)
+          d_map = (one - ratio_x) * d(kmin) + ratio_x * d(kmax)
+          call value_to_rgb(color_param%id_pvr_color(2),                &
+     &                      color_param%id_pvr_color(1),                &
+     &                      color_param%num_pvr_datamap_pnt,            &
+     &                      color_param%pvr_datamap_param,              &
+     &                      d_map, rgba(1,i_img))
           rgba(4,i_img) = one
         end do
       end do
@@ -173,15 +196,13 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine map_value_to_rgb(color_param, nxpixel, nypixel,        &
-     &                            d_map, rgba)
+      subroutine fill_map_one_color(nxpixel, nypixel, bg_rgba, rgba)
 !
       use t_pvr_colormap_parameter
       use set_color_4_pvr
 !
-      type(pvr_colormap_parameter), intent(in) :: color_param
       integer(kind = kint), intent(in) :: nxpixel, nypixel
-      real(kind = kreal), intent(in) :: d_map(nxpixel*nypixel)
+      real(kind = kreal), intent(in) :: bg_rgba(4)
 !
       real(kind = kreal), intent(inout) :: rgba(4,nxpixel*nypixel)
 !
@@ -192,18 +213,12 @@
       do j = 1, nypixel
         do i = 1, nxpixel
           i_img = i + (j-1) * nxpixel
-          if(rgba(4,i_img) .eq. zero) cycle
-!
-          call value_to_rgb(color_param%id_pvr_color(2),                &
-     &                      color_param%id_pvr_color(1),                &
-     &                      color_param%num_pvr_datamap_pnt,            &
-     &                      color_param%pvr_datamap_param,              &
-     &                      d_map(i_img), rgba(1,i_img))
+          if(rgba(4,i_img) .gt. zero) rgba(1:4,i_img) = bg_rgba(1:4)
         end do
       end do
 !$omp end parallel do
 !
-      end subroutine map_value_to_rgb
+      end subroutine fill_map_one_color
 !
 !  ---------------------------------------------------------------------
 !
@@ -234,71 +249,46 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine draw_isoline_on_pixel(nxpixel, nypixel, nwidth,        &
-     &          idots, d_ref, color_ref, d_map, rgba)
+      subroutine find_map_path_orientation                              &
+     &         (xy_map, k_ymin, k_ymid, k_ymax)
 !
-      integer(kind = kint), intent(in) :: nxpixel, nypixel
-      integer(kind = kint), intent(in) :: nwidth, idots
-      real(kind = kreal), intent(in) :: d_map(nxpixel*nypixel)
-      real(kind = kreal), intent(in) :: color_ref(4)
-      real(kind = kreal), intent(in) :: d_ref
+      real(kind = kreal), intent(in) :: xy_map(2,num_triangle)
+      integer(kind = kint), intent(inout) :: k_ymin, k_ymid, k_ymax
 !
-      real(kind = kreal), intent(inout) :: rgba(4,nxpixel*nypixel)
 !
-      integer(kind = kint) :: i_img, i, j, icou, isq, i1, i2, i3, i4
-      integer(kind = kint) :: nwidth_xn, nwidth_xp
-      integer(kind = kint) :: nwidth_yt, nwidth_yn, nwidth_yp
+      if(      xy_map(2,1) .le. xy_map(2,2)                             &
+     &   .and. xy_map(2,1) .le. xy_map(2,3)) then
+        k_ymin = 1
+        if(xy_map(2,2) .le. xy_map(2,3)) then
+          k_ymid = 2
+          k_ymax = 3
+        else
+          k_ymid = 3
+          k_ymax = 2
+        end if
+      else if( xy_map(2,2) .le. xy_map(2,3)                             &
+     &   .and. xy_map(2,2) .le. xy_map(2,1)) then
+        k_ymin = 2
+        if(xy_map(2,3) .le. xy_map(2,1)) then
+          k_ymid = 3
+          k_ymax = 1
+        else
+          k_ymid = 1
+          k_ymax = 3
+        end if
+      else
+        k_ymin = 3
+        if(xy_map(2,1) .le. xy_map(2,2)) then
+          k_ymid = 1
+          k_ymax = 2
+        else
+          k_ymid = 2
+          k_ymax = 1
+        end if
+      end if
 !
-      isq = 2*idots
-      nwidth_xn = -(nwidth-1) / 4
-      nwidth_xp =  (nwidth+2) / 4
-      nwidth_yt = -(nwidth-1) / 2
-      nwidth_yn =  (nwidth_yt-1) / 2 + 1
-      nwidth_yp =  nwidth / 4
+      end subroutine find_map_path_orientation
 !
-!$omp parallel do private(i,j,i_img,icou,i1,i2,i3,i4)
-      do j = 1, nypixel
-        do i = 1, nxpixel
-          i_img = i + (j-1) * nxpixel
-          if(rgba(4,i_img) .eq. zero) cycle
-          if(isq .gt. 0) then
-            if(mod(j,isq).ge.idots .and. mod(i,isq).lt.idots) cycle
-            if(mod(j,isq).lt.idots .and. mod(i,isq).ge.idots) cycle
-          end if
-!
-          do icou = nwidth_xn, nwidth_xp
-            i1 = max(i+icou,  1) +       (j-1) * nxpixel
-            i2 = min(i+icou+1,nxpixel) + (j-1) * nxpixel
-            i3 = i + max(j+icou-1,1) *     nxpixel
-            i4 = i + min(j+icou,nypixel) * nxpixel
-            if((rgba(4,i1)*rgba(4,i2)*rgba(4,i3)*rgba(4,i4))            &
-     &                                                 .eq. zero) cycle
-            if(   ((d_map(i1)-d_ref)*(d_map(i2)-d_ref)) .le. zero       &
-     &       .or. ((d_map(i1)-d_ref)*(d_map(i3)-d_ref)) .le. zero       &
-     &       .or. ((d_map(i1)-d_ref)*(d_map(i4)-d_ref)) .le. zero) then
-              rgba(1:4,i_img) = color_ref(1:4)
-            end if
-          end do
-!
-          do icou = nwidth_yn, nwidth_yp
-            i1 = i + max(j+icou-1,1) *     nxpixel
-            i2 = i + min(j+icou,nypixel) * nxpixel
-            i3 = i + max(j+icou-1,1) *     nxpixel
-            i4 = i + min(j+icou,nypixel) * nxpixel
-            if((rgba(4,i1)*rgba(4,i2)*rgba(4,i3)*rgba(4,i4))            &
-     &                                                 .eq. zero) cycle
-            if(   ((d_map(i1)-d_ref)*(d_map(i2)-d_ref)) .le. zero       &
-     &       .or. ((d_map(i1)-d_ref)*(d_map(i3)-d_ref)) .le. zero       &
-     &       .or. ((d_map(i1)-d_ref)*(d_map(i4)-d_ref)) .le. zero) then
-              rgba(1:4,i_img) = color_ref(1:4)
-            end if
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine draw_isoline_on_pixel
-!
-!  ---------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       end module draw_pixels_on_map

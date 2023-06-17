@@ -87,6 +87,8 @@
       call bcast_ctl_type_c1(map_c%map_image_fmt_ctl)
       call bcast_ctl_type_c1(map_c%map_field_ctl)
       call bcast_ctl_type_c1(map_c%map_comp_ctl)
+      call bcast_ctl_type_c1(map_c%isoline_field_ctl)
+      call bcast_ctl_type_c1(map_c%isoline_comp_ctl)
 !
       end subroutine bcast_map_control_data
 !

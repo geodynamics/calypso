@@ -97,7 +97,7 @@
       end do
 !
       do i = 1, num_map
-        psf_mesh(i)%field%num_phys = 1
+        psf_mesh(i)%field%num_phys = 2
         call alloc_phys_name(psf_mesh(i)%field)
         call set_control_4_map                                          &
      &     (map_ctls%map_ctl_struct(i), group%ele_grp, group%surf_grp,  &
@@ -198,15 +198,52 @@
       if(ierr .gt. 0) call calypso_MPI_abort(ierr_VIZ,                  &
      &                                      'Check surface parameter')
 !
-      call alloc_output_comps_psf(ione, psf_param)
-!
-      call set_one_component_4_viz(num_nod_phys, phys_nod_name,         &
-     &   map_c%map_field_ctl%charavalue, map_c%map_comp_ctl%charavalue, &
-     &   psf_param%id_output(1), psf_param%icomp_output(1),             &
-     &   psf_fld%num_component(1), psf_param%ncomp_org(1),              &
-     &   psf_fld%phys_name(1))
-      if(psf_fld%num_component(1) .gt. 1)                               &
+      call alloc_output_comps_psf(itwo, psf_param)
+      map_data%fill_flag = .FALSE.
+      if((map_c%map_field_ctl%iflag*map_c%map_comp_ctl%iflag)           &
+     &                                                   .gt. 0) then
+        map_data%fill_flag = .TRUE.
+        call set_one_component_4_viz(num_nod_phys, phys_nod_name,       &
+     &     map_c%map_field_ctl%charavalue,                              &
+     &     map_c%map_comp_ctl%charavalue,                               &
+     &     psf_param%id_output(1), psf_param%icomp_output(1),           &
+     &     psf_fld%num_component(1), psf_param%ncomp_org(1),            &
+     &     psf_fld%phys_name(1))
+        if(psf_fld%num_component(1) .gt. 1)                             &
      &     call calypso_MPI_abort(ierr_VIZ, 'set scalar for rendering')
+      end if
+!
+      if((map_c%isoline_field_ctl%iflag*map_c%isoline_comp_ctl%iflag)   &
+     &                                                     .gt. 0) then
+        call set_one_component_4_viz(num_nod_phys, phys_nod_name,       &
+     &     map_c%isoline_field_ctl%charavalue,                          &
+     &     map_c%isoline_comp_ctl%charavalue,                           &
+     &     psf_param%id_output(2), psf_param%icomp_output(2),           &
+     &     psf_fld%num_component(2), psf_param%ncomp_org(2),            &
+     &     psf_fld%phys_name(2))
+        if(psf_fld%num_component(2) .gt. 1)                             &
+     &     call calypso_MPI_abort(ierr_VIZ, 'set scalar for isolines')
+      end if
+!
+      if(psf_param%id_output(1) .le. 0                                  &
+     &          .and. psf_param%id_output(2) .le. 0) then
+        call calypso_MPI_abort(ierr_VIZ,                                &
+     &      'set either field for rendering or isolines')
+      else if(psf_param%id_output(1) .gt. 0                             &
+     &          .and. psf_param%id_output(2) .le. 0) then
+        psf_param%id_output(2) =     psf_param%id_output(1)
+        psf_param%icomp_output(2) =  psf_param%icomp_output(1)
+        psf_param%ncomp_org(2) =     psf_param%ncomp_org(1)
+        psf_fld%num_component(2) =   psf_fld%num_component(1)
+        psf_fld%phys_name(2) =       psf_fld%phys_name(1)
+      else if(psf_param%id_output(2) .gt. 0                             &
+     &          .and. psf_param%id_output(1) .le. 0) then
+        psf_param%id_output(1) =     psf_param%id_output(2)
+        psf_param%icomp_output(1) =  psf_param%icomp_output(2)
+        psf_param%ncomp_org(1) =     psf_param%ncomp_org(2)
+        psf_fld%num_component(1) =   psf_fld%num_component(2)
+        psf_fld%phys_name(1) =       psf_fld%phys_name(2)
+      end if
 !
       call copy_pvr_image_size(map_c%mat%pixel, view_param)
       call copy_pvr_perspective_matrix(map_c%mat%proj, view_param)

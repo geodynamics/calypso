@@ -34,6 +34,9 @@
 !!    output_field       magnetic_field
 !!    output_component   r
 !!
+!!    isoline_field       magnetic_field
+!!    isoline_component   r
+!!
 !!    begin section_ctl
 !!      file surface_define     ctl_psf_eq
 !!      begin surface_define
@@ -41,9 +44,11 @@
 !!      end surface_define
 !!
 !!      zeroline_switch_ctl           On
-!!      isoline_switch_ctl            On
 !!      isoline_color_mode      color, white, or black
 !!      isoline_number_ctl            20
+!!      isoline_range_ctl          -0.5   0.5
+!!    isoline_width_ctl             1.5
+!!    grid_width_ctl                1.0
 !!
 !!      tangent_cylinder_switch_ctl   On
 !!      inner_radius_ctl              0.53846
@@ -179,13 +184,17 @@
      &                  :: hd_map_output_field = 'output_field'
       character(len=kchara), parameter, private                         &
      &                  :: hd_map_output_comp =  'output_component'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_map_isoline_field = 'isoline_field'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_map_isoline_comp =  'isoline_component'
 !
       character(len=kchara), parameter, private                         &
      &                  :: hd_map_projection = 'map_projection_ctl'
       character(len=kchara), parameter, private                         &
      &                  :: hd_map_colormap_file =  'map_color_ctl'
 !
-      integer(kind = kint), parameter :: n_label_map_ctl = 7
+      integer(kind = kint), parameter :: n_label_map_ctl = 9
       private :: n_label_map_ctl
 !
 !  ---------------------------------------------------------------------
@@ -232,6 +241,11 @@
      &      map_c%map_field_ctl)
         call read_chara_ctl_type(c_buf, hd_map_output_comp,             &
      &      map_c%map_comp_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_map_isoline_field,           &
+     &      map_c%isoline_field_ctl)
+        call read_chara_ctl_type(c_buf, hd_map_isoline_comp,            &
+     &      map_c%isoline_comp_ctl)
       end do
       map_c%i_map_ctl = 1
 !
@@ -262,6 +276,8 @@
       maxlen = max(maxlen, len_trim(hd_map_image_format))
       maxlen = max(maxlen, len_trim(hd_map_output_field))
       maxlen = max(maxlen, len_trim(hd_map_output_comp))
+      maxlen = max(maxlen, len_trim(hd_map_isoline_field))
+      maxlen = max(maxlen, len_trim(hd_map_isoline_comp))
 !
       write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
@@ -274,6 +290,10 @@
      &    hd_map_output_field, map_c%map_field_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_map_output_comp, map_c%map_comp_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_map_isoline_field, map_c%isoline_field_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_map_isoline_comp, map_c%isoline_comp_ctl)
 !
       call write_pvr_section_ctl(id_control, hd_section_ctl,            &
      &                           map_c%map_define_ctl, level)
@@ -310,9 +330,11 @@
 !
       call set_control_labels(hd_map_output_field,   names( 4))
       call set_control_labels(hd_map_output_comp,    names( 5))
+      call set_control_labels(hd_map_isoline_field,  names( 6))
+      call set_control_labels(hd_map_isoline_comp,   names( 7))
 !
-      call set_control_labels(hd_map_projection,    names( 6))
-      call set_control_labels(hd_map_colormap_file, names( 7))
+      call set_control_labels(hd_map_projection,    names( 8))
+      call set_control_labels(hd_map_colormap_file, names( 9))
 !
       end subroutine set_label_map_ctl
 !

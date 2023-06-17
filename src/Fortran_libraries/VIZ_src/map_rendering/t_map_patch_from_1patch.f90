@@ -21,11 +21,6 @@
 !!        real(kind = kreal), intent(in)                                &
 !!     &          :: rtp_map_patch(num_triangle,n_vector)
 !!        real(kind = kreal), intent(inout) :: xy_map(2,num_triangle)
-!!
-!!      subroutine find_map_path_orientation                            &
-!!     &         (xy_map, k_ymin, k_ymid, k_ymax)
-!!        real(kind = kreal), intent(in) :: xy_map(2,num_triangle)
-!!        integer(kind = kint), intent(inout) :: k_ymin, k_ymid, k_ymax
 !!@endverbatim
       module t_map_patch_from_1patch
 !
@@ -164,48 +159,6 @@
       end do
 !
       end subroutine patch_to_aitoff
-!
-!-----------------------------------------------------------------------
-!
-      subroutine find_map_path_orientation                              &
-     &         (xy_map, k_ymin, k_ymid, k_ymax)
-!
-      real(kind = kreal), intent(in) :: xy_map(2,num_triangle)
-      integer(kind = kint), intent(inout) :: k_ymin, k_ymid, k_ymax
-!
-!
-      if(      xy_map(2,1) .le. xy_map(2,2)                             &
-     &   .and. xy_map(2,1) .le. xy_map(2,3)) then
-        k_ymin = 1
-        if(xy_map(2,2) .le. xy_map(2,3)) then
-          k_ymid = 2
-          k_ymax = 3
-        else
-          k_ymid = 3
-          k_ymax = 2
-        end if
-      else if( xy_map(2,2) .le. xy_map(2,3)                             &
-     &   .and. xy_map(2,2) .le. xy_map(2,1)) then
-        k_ymin = 2
-        if(xy_map(2,3) .le. xy_map(2,1)) then
-          k_ymid = 3
-          k_ymax = 1
-        else
-          k_ymid = 1
-          k_ymax = 3
-        end if
-      else
-        k_ymin = 3
-        if(xy_map(2,1) .le. xy_map(2,2)) then
-          k_ymid = 1
-          k_ymax = 2
-        else
-          k_ymid = 2
-          k_ymax = 1
-        end if
-      end if
-!
-      end subroutine find_map_path_orientation
 !
 !-----------------------------------------------------------------------
 !

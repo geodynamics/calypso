@@ -121,7 +121,6 @@
         call dealloc_inod_grp_psf(map%map_grp_list(i_psf))
         call dealloc_coefficients_4_psf(map%map_def(i_psf))
         call dealloc_pvr_image_array(map%map_rgb(i_psf))
-        call dealloc_scalar_on_map(map%map_data(i_psf))
       end do
 !
       call dealloc_psf_node_and_patch                                   &

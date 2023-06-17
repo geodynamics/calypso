@@ -32,9 +32,11 @@
 !!    opacity_ctl           0.9
 !!
 !!    zeroline_switch_ctl           On
-!!    isoline_switch_ctl            On
 !!    isoline_color_mode      color, white, or black
 !!    isoline_number_ctl            20
+!!    isoline_range_ctl          -0.5   0.5
+!!    isoline_width_ctl             1.5
+!!    grid_width_ctl                1.0
 !!
 !!    tangent_cylinder_switch_ctl   On
 !!    inner_radius_ctl              0.53846
@@ -53,6 +55,7 @@
       use t_read_control_elements
       use t_control_data_4_psf_def
       use t_control_array_real
+      use t_control_array_real2
       use t_control_array_character
       use t_ctl_data_pvr_section
       use skip_comment_f
@@ -61,7 +64,7 @@
 !
 !   Labels
       integer(kind = kint), parameter, private                          &
-     &                   :: n_label_pvr_section =   9
+     &                   :: n_label_pvr_section =  11
 !
       character(len=kchara), parameter, private                         &
      &                  :: hd_surface_define =  'surface_define'
@@ -71,11 +74,15 @@
       character(len=kchara), parameter, private                         &
      &                  :: hd_pvr_sec_zeroline = 'zeroline_switch_ctl'
       character(len=kchara), parameter, private                         &
-     &                  :: hd_pvr_sec_isoline =  'isoline_switch_ctl'
-      character(len=kchara), parameter, private                         &
      &                  :: hd_pvr_isoline_color = 'isoline_color_mode'
       character(len=kchara), parameter, private                         &
      &                  :: hd_isoline_number =    'isoline_number_ctl'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_isoline_range =     'isoline_range_ctl'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_isoline_width =     'isoline_width_ctl'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_grid_width =        'grid_width_ctl'
 !
       character(len=kchara), parameter, private                         &
      &        :: hd_tangent_cylinder = 'tangent_cylinder_switch_ctl'
@@ -115,12 +122,16 @@
      &     (c_buf, hd_pvr_opacity, pvr_sect_ctl%opacity_ctl)
         call read_chara_ctl_type(c_buf, hd_pvr_sec_zeroline,            &
      &      pvr_sect_ctl%zeroline_switch_ctl)
-        call read_chara_ctl_type(c_buf, hd_pvr_sec_isoline,             &
-     &      pvr_sect_ctl%isoline_switch_ctl)
         call read_chara_ctl_type(c_buf, hd_pvr_isoline_color,           &
      &      pvr_sect_ctl%isoline_color_mode)
         call read_integer_ctl_type(c_buf, hd_isoline_number,            &
      &      pvr_sect_ctl%isoline_number_ctl)
+        call read_real2_ctl_type(c_buf, hd_isoline_range,               &
+     &      pvr_sect_ctl%isoline_range_ctl)
+        call read_real_ctl_type(c_buf, hd_isoline_width,                &
+     &      pvr_sect_ctl%isoline_width_ctl)
+        call read_real_ctl_type(c_buf, hd_grid_width,                   &
+     &      pvr_sect_ctl%grid_width_ctl)
 !
         call read_chara_ctl_type(c_buf, hd_tangent_cylinder,            &
      &      pvr_sect_ctl%tan_cyl_switch_ctl)
@@ -152,9 +163,11 @@
       if(pvr_sect_ctl%i_pvr_sect_ctl .le. 0) return
       maxlen = len_trim(hd_pvr_opacity)
       maxlen = max(maxlen,len_trim(hd_pvr_sec_zeroline))
-      maxlen = max(maxlen,len_trim(hd_pvr_sec_isoline))
       maxlen = max(maxlen,len_trim(hd_pvr_isoline_color))
       maxlen = max(maxlen,len_trim(hd_isoline_number))
+      maxlen = max(maxlen,len_trim(hd_isoline_range))
+      maxlen = max(maxlen,len_trim(hd_isoline_width))
+      maxlen = max(maxlen,len_trim(hd_grid_width))
       maxlen = max(maxlen,len_trim(hd_tangent_cylinder))
       maxlen = max(maxlen,len_trim(hd_tcyl_inner))
       maxlen = max(maxlen,len_trim(hd_tcyl_outer))
@@ -171,11 +184,15 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_pvr_sec_zeroline, pvr_sect_ctl%zeroline_switch_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_sec_isoline, pvr_sect_ctl%isoline_switch_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_pvr_isoline_color, pvr_sect_ctl%isoline_color_mode)
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_isoline_number, pvr_sect_ctl%isoline_number_ctl)
+      call write_real2_ctl_type(id_control, level, maxlen,              &
+     &    hd_isoline_range, pvr_sect_ctl%isoline_range_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_isoline_width, pvr_sect_ctl%isoline_width_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_grid_width, pvr_sect_ctl%grid_width_ctl)
 !
       write(id_control,'(a1)') '!'
       call write_chara_ctl_type                                         &
@@ -209,13 +226,15 @@
       call set_control_labels(hd_pvr_opacity,      names( 2))
 !
       call set_control_labels(hd_pvr_sec_zeroline,  names( 3))
-      call set_control_labels(hd_pvr_sec_isoline,   names( 4))
-      call set_control_labels(hd_pvr_isoline_color, names( 5))
-      call set_control_labels(hd_isoline_number,    names( 6))
+      call set_control_labels(hd_pvr_isoline_color, names( 4))
+      call set_control_labels(hd_isoline_number,    names( 5))
+      call set_control_labels(hd_isoline_range,    names( 6))
+      call set_control_labels(hd_isoline_width,    names( 7))
+      call set_control_labels(hd_grid_width,       names( 8))
 !
-      call set_control_labels(hd_tangent_cylinder, names( 7))
-      call set_control_labels(hd_tcyl_inner,       names( 8))
-      call set_control_labels(hd_tcyl_outer,       names( 9))
+      call set_control_labels(hd_tangent_cylinder, names( 9))
+      call set_control_labels(hd_tcyl_inner,       names(10))
+      call set_control_labels(hd_tcyl_outer,       names(11))
 !
       end subroutine set_label_pvr_section
 !

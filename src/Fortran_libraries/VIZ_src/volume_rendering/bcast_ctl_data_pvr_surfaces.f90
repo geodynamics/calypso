@@ -120,9 +120,11 @@
       call bcast_ctl_type_r1(pvr_scts_c%opacity_ctl)
 !
       call bcast_ctl_type_c1(pvr_scts_c%zeroline_switch_ctl)
-      call bcast_ctl_type_c1(pvr_scts_c%isoline_switch_ctl)
       call bcast_ctl_type_c1(pvr_scts_c%isoline_color_mode)
       call bcast_ctl_type_i1(pvr_scts_c%isoline_number_ctl)
+      call bcast_ctl_type_r2(pvr_scts_c%isoline_range_ctl)
+      call bcast_ctl_type_r1(pvr_scts_c%isoline_width_ctl)
+      call bcast_ctl_type_r1(pvr_scts_c%grid_width_ctl)
 !
       call bcast_ctl_type_c1(pvr_scts_c%tan_cyl_switch_ctl)
       call bcast_ctl_type_r1(pvr_scts_c%tangent_cylinder_inner_ctl)
