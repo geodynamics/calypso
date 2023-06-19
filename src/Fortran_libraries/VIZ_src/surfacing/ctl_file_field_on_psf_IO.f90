@@ -78,9 +78,7 @@
         call write_one_ctl_file_message                                 &
      &     (hd_block, c_buf%level, file_name)
         call read_ctl_field_on_psf_file((id_control+2), file_name,      &
-     &                               hd_block, fld_on_psf_c)
-        if(fld_on_psf_c%i_iso_result .ne. 1)                            &
-     &                         c_buf%iend = fld_on_psf_c%i_iso_result
+     &                               hd_block, fld_on_psf_c, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
         file_name = 'NO_FILE'
 !
@@ -94,7 +92,7 @@
 !   --------------------------------------------------------------------
 !
       subroutine read_ctl_field_on_psf_file(id_control, file_name,      &
-     &                                      hd_block, fld_on_psf_c)
+     &          hd_block, fld_on_psf_c, c_buf)
 !
       use t_read_control_elements
 !
@@ -103,24 +101,24 @@
       character(len = kchara), intent(in) :: file_name
       character(len=kchara), intent(in) :: hd_block
       type(field_on_psf_ctl), intent(inout) :: fld_on_psf_c
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
-      c_buf1%level = 0
+      c_buf%level = c_buf%level + 1
       write(*,'(a)') trim(file_name)
       open(id_control, file=file_name, status='old')
 !
       do
-        call load_one_line_from_control(id_control, hd_block, c_buf1)
-        if(c_buf1%iend .gt. 0) exit
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
 !
         call read_fld_on_psf_control(id_control, hd_block,              &
-     &      fld_on_psf_c, c_buf1)
+     &      fld_on_psf_c, c_buf)
         if(fld_on_psf_c%i_iso_result .gt. 0) exit
       end do
       close(id_control)
-      if(c_buf1%iend .gt. 0) fld_on_psf_c%i_iso_result = c_buf1%iend
+!
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_ctl_field_on_psf_file
 !

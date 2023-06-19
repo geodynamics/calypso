@@ -44,6 +44,7 @@
 !
       use t_ctl_params_gen_sph_shell
       use t_sph_grid_maker_in_sim
+      use t_read_control_elements
       use m_error_IDs
 !
       character(len=kchara), intent(in) :: file_name
@@ -52,15 +53,16 @@
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !
       integer(kind = kint) :: ierr = 0
+      type(buffer_for_control) :: c_buf1
 !
 !
-!       load control file
+      c_buf1%level = 0
       if(my_rank .eq. 0) then
-        call read_control_4_const_shell(file_name, gen_SPH_ctl)
+        call read_control_4_const_shell(file_name, gen_SPH_ctl, c_buf1)
       end if
       call bcast_sph_shell_construct_ctl(gen_SPH_ctl)
 !
-      if(gen_SPH_ctl%i_sph_mesh_ctl .ne. 1) then
+      if(c_buf1%iend .gt. 0) then
         call calypso_MPI_abort(gen_SPH_ctl%i_sph_mesh_ctl,              &
      &                         trim(file_name))
       end if

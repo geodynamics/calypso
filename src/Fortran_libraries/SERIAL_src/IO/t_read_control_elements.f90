@@ -145,10 +145,7 @@
 !
       check_begin_flag = .FALSE.
       if(cmp_no_case(first_word(c_buf), hd_begin)) then
-        if(cmp_no_case(second_word(c_buf), label)) then
-          check_begin_flag = .TRUE.
-          c_buf%level = c_buf%level + 1
-        end if
+        check_begin_flag = cmp_no_case(second_word(c_buf), label)
       end if
 !
       end function check_begin_flag
@@ -182,10 +179,7 @@
 !
       check_end_flag = .FALSE.
       if(cmp_no_case(first_word(c_buf), hd_end)) then
-        if(cmp_no_case(second_word(c_buf), label)) then
-          check_end_flag = .TRUE.
-          c_buf%level = c_buf%level - 1
-        end if
+        check_end_flag = cmp_no_case(second_word(c_buf), label)
       end if
 !
       end function check_end_flag
@@ -210,10 +204,7 @@
       if(ntmp .eq. 0) return
 !
   99  continue
-      if(cmp_no_case(second_word(c_buf), label)) then
-        check_array_flag = .TRUE.
-        c_buf%level = c_buf%level + 1
-      end if
+      check_array_flag = cmp_no_case(second_word(c_buf), label)
 !
       end function check_array_flag
 !
@@ -230,10 +221,7 @@
       check_end_array_flag = .FALSE.
       if(cmp_no_case(first_word(c_buf), hd_end)) then
         if(cmp_no_case(second_word(c_buf), hd_array)) then
-          if(cmp_no_case(third_word(c_buf), label)) then
-            check_end_array_flag = .TRUE.
-            c_buf%level = c_buf%level - 1
-          end if
+          check_end_array_flag = cmp_no_case(third_word(c_buf), label)
         end if
       end if
 !

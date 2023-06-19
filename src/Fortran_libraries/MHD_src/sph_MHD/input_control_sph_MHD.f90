@@ -71,6 +71,7 @@
 !
       use t_ctl_data_MHD
       use t_ctl_data_sph_MHD_w_psf
+      use t_read_control_elements
       use bcast_control_sph_MHD
       use bcast_ctl_data_surfacings
       use bcast_dynamo_sect_control
@@ -79,19 +80,22 @@
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
       type(add_psf_sph_mhd_ctl), intent(inout) :: add_SMHD_ctl
 !
+      type(buffer_for_control) :: c_buf1
 !
+!
+      c_buf1%level = 0
       if(my_rank .eq. 0) then
         call read_control_4_sph_MHD_w_psf(file_name, MHD_ctl,          &
-     &                                    add_SMHD_ctl)
+     &      add_SMHD_ctl, c_buf1)
+      end if
+!
+      if(c_buf1%iend .gt. 0) then
+        call calypso_MPI_abort(MHD_ctl%i_mhd_ctl, trim(file_name))
       end if
 !
       call bcast_sph_mhd_control_data(MHD_ctl)
       call bcast_surfacing_controls(add_SMHD_ctl%surfacing_ctls)
       call s_bcast_dynamo_section_control(add_SMHD_ctl%zm_sects)
-!
-      if(MHD_ctl%i_mhd_ctl .ne. 1) then
-        call calypso_MPI_abort(MHD_ctl%i_mhd_ctl, trim(file_name))
-      end if
 !
       end subroutine load_control_4_sph_MHD_w_psf
 !
@@ -105,14 +109,17 @@
       character(len=kchara), intent(in) :: file_name
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
 !
+      type(buffer_for_control) :: c_buf1
 !
+!
+      c_buf1%level = 0
       if(my_rank .eq. 0) then
-        call read_control_4_sph_MHD_noviz(file_name, MHD_ctl)
+        call read_control_4_sph_MHD_noviz(file_name, MHD_ctl, c_buf1)
       end if
 !
       call bcast_sph_mhd_control_data(MHD_ctl)
 !
-      if(MHD_ctl%i_mhd_ctl .le. 0) then
+      if(c_buf1%level .gt. 0) then
         call calypso_MPI_abort(MHD_ctl%i_mhd_ctl, trim(file_name))
       end if
 !

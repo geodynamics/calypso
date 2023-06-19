@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine read_control_file_section_only(file_name,            &
-!!     &                                          sec_viz_ctl)
+!!     &                                          sec_viz_ctl, c_buf)
 !!      subroutine write_control_file_section_only(file_name,           &
 !!     &                                           sec_viz_ctl)
 !!        character(len=kchara), intent(in) :: file_name
@@ -91,30 +91,31 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_control_file_section_only(file_name,              &
-     &                                          sec_viz_ctl)
+     &                                          sec_viz_ctl, c_buf)
 !
       use skip_comment_f
       use t_control_data_surfacings
 !
       character(len=kchara), intent(in) :: file_name
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
-      type(buffer_for_control) :: c_buf1
+      type(buffer_for_control), intent(inout) :: c_buf
 !
 !
-      c_buf1%level = 0
+      c_buf%level = c_buf%level + 1
       open (viz_ctl_file_code, file=file_name, status='old' )
       do
         call load_one_line_from_control                                 &
-     &     (viz_ctl_file_code, hd_viz_only_file, c_buf1)
-        if(c_buf1%iend .gt. 0) exit
+     &     (viz_ctl_file_code, hd_viz_only_file, c_buf)
+        if(c_buf%iend .gt. 0) exit
 !
         call read_section_control_data                                  &
-     &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf1)
+     &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf)
         if(sec_viz_ctl%i_viz_only_file .gt. 0) exit
       end do
       close(viz_ctl_file_code)
 !
-      if(c_buf1%iend .gt. 0) sec_viz_ctl%i_viz_only_file = c_buf1%iend
+      c_buf%level = c_buf%level - 1
+      if(c_buf%iend .gt. 0) return
 !
       call section_step_ctls_to_time_ctl                                &
      &   (sec_viz_ctl%surfacing_ctls, sec_viz_ctl%t_sect_ctl)

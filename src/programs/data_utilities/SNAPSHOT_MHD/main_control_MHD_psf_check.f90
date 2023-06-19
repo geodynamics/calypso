@@ -14,6 +14,7 @@
 !
       use t_ctl_data_MHD
       use t_ctl_data_sph_MHD_w_psf
+      use t_read_control_elements
       use write_control_elements
 !
       implicit none
@@ -25,7 +26,7 @@
 !
       type(mhd_simulation_control) :: MHD_ctl1
       type(add_psf_sph_mhd_ctl) :: add_SMHD_ctl1
-      integer(kind = kint) :: level1 = 0
+      type(buffer_for_control) :: c_buf1
 !
 !
       if(iargc_kemo() .le. 0) then
@@ -34,16 +35,17 @@
       end if
       call getarg_k(1, MHD_ctl_name)
 !
+      c_buf1%level = 0
       call read_control_4_sph_MHD_w_psf(MHD_ctl_name,                   &
-     &                                  MHD_ctl1, add_SMHD_ctl1)
-      if(MHD_ctl1%i_mhd_ctl .ne. 1) stop 'Error in control file'
+     &    MHD_ctl1, add_SMHD_ctl1, c_buf1)
+      if(c_buf1%iend .gt. 0) stop 'Error in control file'
 !
 !
       write(id_monitor,'(a)') '!  '
       write(id_monitor,'(a)') '!  Checked control data'
       write(id_monitor,'(a)') '!  '
       call write_sph_mhd_ctl_w_psf(id_monitor, hd_mhd_ctl,              &
-     &                             MHD_ctl1, add_SMHD_ctl1, level1)
+     &    MHD_ctl1, add_SMHD_ctl1, c_buf1%level)
 !
       stop '***** program finished *****'
 !

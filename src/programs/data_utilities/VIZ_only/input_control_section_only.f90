@@ -58,20 +58,25 @@
       subroutine s_input_control_section_only                           &
      &         (ctl_file_name, sec_viz_ctl, FEM_viz, t_viz_param)
 !
+      use t_read_control_elements
+!
       character(len = kchara), intent(in) :: ctl_file_name
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
       type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
       type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !
       integer(kind = kint) :: ierr
+      type(buffer_for_control) :: c_buf1
 !
-!       load control file
+!
+      c_buf1%level = 0
       if(my_rank .eq. 0) then
-        call read_control_file_section_only(ctl_file_name, sec_viz_ctl)
+        call read_control_file_section_only(ctl_file_name,              &
+     &                                      sec_viz_ctl, c_buf1)
       end if
       call bcast_section_control_data(sec_viz_ctl)
 !
-      if(sec_viz_ctl%i_viz_only_file .ne. 1) then
+      if(c_buf1%iend .gt. 0) then
         call calypso_MPI_abort(sec_viz_ctl%i_viz_only_file,             &
      &                             'control file is broken')
       end if

@@ -109,32 +109,29 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_control_4_sph_MHD_noviz(file_name, MHD_ctl)
+      subroutine read_control_4_sph_MHD_noviz                           &
+     &         (file_name, MHD_ctl, c_buf)
 !
       character(len=kchara), intent(in) :: file_name
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
-      c_buf1%level = 0
+      c_buf%level = c_buf%level + 1
       open(id_control_file, file = file_name, status='old' )
 !
       do
         call load_one_line_from_control(id_control_file, hd_mhd_ctl,    &
-     &                                  c_buf1)
-        if(c_buf1%iend .gt. 0) exit
+     &                                  c_buf)
+        if(c_buf%iend .gt. 0) exit
 !
         call read_sph_mhd_ctl_noviz                                     &
-     &     (id_control_file, hd_mhd_ctl, MHD_ctl, c_buf1)
+     &     (id_control_file, hd_mhd_ctl, MHD_ctl, c_buf)
         if(MHD_ctl%i_mhd_ctl .gt. 0) exit
       end do
       close(id_control_file)
 !
-      if(c_buf1%iend .gt. 0) then
-        MHD_ctl%i_mhd_ctl = c_buf1%iend
-        return
-      end if
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_control_4_sph_MHD_noviz
 !

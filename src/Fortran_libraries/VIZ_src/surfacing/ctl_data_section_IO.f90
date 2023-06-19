@@ -187,7 +187,7 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
         if(check_file_flag(c_buf, hd_surface_define)                    &
-     &        .or. check_begin_flag(c_buf, hd_block)) then
+     &        .or. check_begin_flag(c_buf, hd_surface_define)) then
           call write_multi_ctl_file_message                             &
      &       (hd_surface_define, izero, c_buf%level)
           call sel_read_ctl_pvr_section_def(id_control,                 &

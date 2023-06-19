@@ -2,7 +2,7 @@ SPH_analyzer_snap_w_vizs.o: $(SPH_SNAP_MAINDIR)/SPH_analyzer_snap_w_vizs.f90 m_p
 	$(F90) -c $(F90OPTFLAGS) $<
 analyzer_sph_snap_w_psf.o: $(SPH_SNAP_MAINDIR)/analyzer_sph_snap_w_psf.f90 m_precision.o calypso_mpi.o m_work_time.o m_elapsed_labels_4_MHD.o m_elapsed_labels_SEND_RECV.o m_machine_parameter.o t_spherical_MHD.o t_sph_MHD_w_psf.o t_ctl_data_MHD.o t_ctl_data_sph_MHD_w_psf.o t_viz_sections.o t_SPH_MHD_zmean_sections.o init_sph_MHD_elapsed_label.o input_control_sph_MHD.o SPH_analyzer_snap_w_vizs.o FEM_analyzer_sph_MHD.o FEM_to_PSF_bridge.o output_viz_file_control.o set_time_step_params.o
 	$(F90) -c $(F90OPTFLAGS) $<
-main_control_MHD_psf_check.o: $(SPH_SNAP_MAINDIR)/main_control_MHD_psf_check.f90 m_precision.o t_ctl_data_MHD.o t_ctl_data_sph_MHD_w_psf.o write_control_elements.o
+main_control_MHD_psf_check.o: $(SPH_SNAP_MAINDIR)/main_control_MHD_psf_check.f90 m_precision.o t_ctl_data_MHD.o t_ctl_data_sph_MHD_w_psf.o t_read_control_elements.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 main_sph_snapshot_w_psf.o: $(SPH_SNAP_MAINDIR)/main_sph_snapshot_w_psf.f90 m_precision.o calypso_mpi.o analyzer_sph_snap_w_psf.o
 	$(F90) -c $(F90OPTFLAGS) $<

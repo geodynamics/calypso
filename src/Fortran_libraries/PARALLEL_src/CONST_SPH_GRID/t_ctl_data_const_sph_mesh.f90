@@ -11,7 +11,8 @@
 !!@n        Modified by H. Matsui on Oct., 2012
 !!
 !!@verbatim
-!!      subroutine read_control_4_const_shell(file_name, gen_SPH_ctl)
+!!      subroutine read_control_4_const_shell(file_name,                &
+!!     &                                      gen_SPH_ctl, c_buf)
 !!        character(len=kchara), intent(in) :: file_name
 !!        type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
 !!      subroutine write_control_4_const_shell(file_name, gen_SPH_ctl)
@@ -69,33 +70,30 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_control_4_const_shell(file_name, gen_SPH_ctl)
+      subroutine read_control_4_const_shell(file_name,                  &
+     &                                      gen_SPH_ctl, c_buf)
 !
       character(len=kchara), intent(in) :: file_name
       type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
-      c_buf1%level = 0
+      c_buf%level = c_buf%level + 1
       open(control_file_code, file = file_name, status='old')
 !
       do
         call load_one_line_from_control(control_file_code, hd_mhd_ctl,  &
-     &                                  c_buf1)
-        if(c_buf1%iend .gt. 0) exit
+     &                                  c_buf)
+        if(c_buf%iend .gt. 0) exit
 !
         call read_sph_shell_define_ctl                                  &
-     &     (control_file_code, hd_mhd_ctl, gen_SPH_ctl, c_buf1)
+     &     (control_file_code, hd_mhd_ctl, gen_SPH_ctl, c_buf)
         if(gen_SPH_ctl%i_sph_mesh_ctl .gt. 0) exit
       end do
 !
       close(control_file_code)
 !
-      if(c_buf1%iend .gt. 0) then
-        gen_SPH_ctl%i_sph_mesh_ctl = c_buf1%iend
-        return
-      end if
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_control_4_const_shell
 !

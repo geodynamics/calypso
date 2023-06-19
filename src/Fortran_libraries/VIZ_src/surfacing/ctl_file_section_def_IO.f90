@@ -9,8 +9,6 @@
 !!@verbatim
 !!      subroutine sel_read_ctl_pvr_section_def(id_control, hd_block,   &
 !!     &          fname_sect_ctl, psf_def_c, c_buf)
-!!      subroutine read_ctl_file_pvr_section_def                        &
-!!     &         (id_control, fname_sect_ctl, psf_def_c)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        character(len = kchara), intent(inout) :: fname_sect_ctl
@@ -76,9 +74,7 @@
 !
         write(*,'(2a)') ' is read from ... ', trim(fname_sect_ctl)
         call read_ctl_file_pvr_section_def(id_control+2,                &
-     &      fname_sect_ctl, hd_block, psf_def_c)
-        if(psf_def_c%i_surface_define .ne. 1)                           &
-     &                         c_buf%iend = psf_def_c%i_surface_define
+     &      fname_sect_ctl, hd_block, psf_def_c, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
         fname_sect_ctl = 'NO_FILE'
 !
@@ -92,7 +88,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_ctl_file_pvr_section_def                          &
-     &         (id_control, fname_sect_ctl, hd_block, psf_def_c)
+     &         (id_control, fname_sect_ctl, hd_block, psf_def_c, c_buf)
 !
       use ctl_data_section_def_IO
 !
@@ -100,25 +96,25 @@
       character(len = kchara), intent(in) :: fname_sect_ctl
       character(len=kchara), intent(in) :: hd_block
       type(psf_define_ctl), intent(inout) :: psf_def_c
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
-      c_buf1%level = 0
+      c_buf%level = c_buf%level + 1
       open(id_control, file = fname_sect_ctl, status='old')
 !
       do
-        call load_one_line_from_control(id_control, hd_block, c_buf1)
-        if(c_buf1%iend .gt. 0) exit
-        if(check_end_flag(c_buf1, hd_block)) exit
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
+        if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_section_def_control(id_control, hd_block,             &
-     &                                psf_def_c, c_buf1)
+     &                                psf_def_c, c_buf)
         if(psf_def_c%i_surface_define .gt. 0) exit
       end do
 !
       close(id_control)
-      if(c_buf1%iend .gt. 0) psf_def_c%i_surface_define = c_buf1%iend
+!
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_ctl_file_pvr_section_def
 !
