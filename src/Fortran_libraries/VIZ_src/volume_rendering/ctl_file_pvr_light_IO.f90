@@ -16,13 +16,6 @@
 !!        type(pvr_light_ctl), intent(in) :: light
 !!        character(len = kchara), intent(inout) :: file_name
 !!        integer(kind = kint), intent(inout) :: level
-!!      subroutine read_control_pvr_light_file(id_control, file_name,   &
-!!     &                                       hd_block, light)
-!!        integer(kind = kint), intent(in) :: id_control
-!!        character(len = kchara), intent(in) :: file_name
-!!        character(len=kchara), intent(in) :: hd_block
-!!        type(pvr_light_ctl), intent(inout) :: light
-!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_control_pvr_light_file(id_control, file_name,  &
 !!     &                                        hd_block, light)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -60,6 +53,8 @@
 !
       implicit  none
 !
+      private :: read_control_pvr_light_file
+!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -69,6 +64,7 @@
       subroutine sel_read_ctl_pvr_light_file                            &
      &         (id_control, hd_block, file_name, light, c_buf)
 !
+      use write_control_elements
       use ctl_data_view_transfer_IO
 !
       integer(kind = kint), intent(in) :: id_control
@@ -79,14 +75,16 @@
 !
 !
       if(check_file_flag(c_buf, hd_block)) then
-        write(*,'(3a)', ADVANCE='NO')                                   &
-     &          'Read file for ', trim(hd_block), '... '
         file_name = third_word(c_buf)
+!
+        call write_one_ctl_file_message                                 &
+     &     (hd_block, c_buf%level, file_name)
         call read_control_pvr_light_file(id_control+1, file_name,       &
-     &                                   hd_block, light)
+     &                                   hd_block, light, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
-        write(*,*)  'Lighting control is included'
         file_name = 'NO_FILE'
+!
+        call write_included_message(hd_block, c_buf%level)
         call read_lighting_ctl(id_control, hd_block, light, c_buf)
       end if
 !
@@ -108,11 +106,14 @@
 !
 !
       if(cmp_no_case(file_name, 'NO_FILE')) then
-        write(*,*)  'Lighting control is included'
+        call write_lighting_ctl(id_control, hd_block, light, level)
+      else if(id_control .eq. id_monitor) then
+        write(*,'(4a)') '!  ', trim(hd_block),                          &
+     &        ' should be written to file ... ', trim(file_name)
         call write_lighting_ctl(id_control, hd_block, light, level)
       else
-        write(*,'(3a)', ADVANCE='NO')                                   &
-     &          'Write file for ', trim(hd_block), '... '
+        write(*,'(4a)') 'Write file for ', trim(hd_block),              &
+     &                  ' ... ', trim(file_name)
         call write_control_pvr_light_file(id_control+1, file_name,      &
      &                                    hd_block, light)
         call write_file_name_for_ctl_line(id_control, level,            &
@@ -125,7 +126,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_control_pvr_light_file(id_control, file_name,     &
-     &                                       hd_block, light)
+     &                                       hd_block, light, c_buf)
 !
       use skip_comment_f
 !
@@ -133,19 +134,21 @@
       character(len = kchara), intent(in) :: file_name
       character(len=kchara), intent(in) :: hd_block
       type(pvr_light_ctl), intent(inout) :: light
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
-      write(*,*) 'Lighting control: ', trim(file_name)
+      c_buf%level = c_buf%level + 1
       open(id_control, file = file_name, status='old')
-!
       do 
-        call load_one_line_from_control(id_control, c_buf1)
-        call read_lighting_ctl(id_control, hd_block, light, c_buf1)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
+!
+        call read_lighting_ctl(id_control, hd_block, light, c_buf)
         if(light%i_pvr_lighting .gt. 0) exit
       end do
       close(id_control)
+!
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_control_pvr_light_file
 !
@@ -162,7 +165,6 @@
       integer(kind = kint) :: level
 !
 !
-      write(*,*) 'Lighting control: ', trim(file_name)
       open(id_control, file = file_name)
 !
       level = 0

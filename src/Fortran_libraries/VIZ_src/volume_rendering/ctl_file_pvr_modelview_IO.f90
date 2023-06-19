@@ -16,13 +16,6 @@
 !!        type(modeview_ctl), intent(in) :: mat
 !!        character(len = kchara), intent(inout) :: file_name
 !!        integer(kind = kint), intent(inout) :: level
-!!      subroutine read_control_modelview_file(id_control, file_name,   &
-!!     &                                       hd_block, mat)
-!!        integer(kind = kint), intent(in) :: id_control
-!!        character(len = kchara), intent(in) :: file_name
-!!        character(len=kchara), intent(in) :: hd_block
-!!        type(modeview_ctl), intent(inout) :: mat
-!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_control_modelview_file(id_control, file_name,  &
 !!     &                                        hd_block, mat)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -130,6 +123,8 @@
 !
       implicit  none
 !
+      private :: read_control_modelview_file
+!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -149,14 +144,15 @@
 !
 !
       if(check_file_flag(c_buf, hd_block)) then
-        write(*,'(3a)', ADVANCE='NO')                                   &
-     &          'Read file for ', trim(hd_block), '... '
         file_name = third_word(c_buf)
+!
+        write(*,'(2a)') ' is read from ... ', trim(file_name)
         call read_control_modelview_file(id_control+1, file_name,       &
-     &                                   hd_block, mat)
+     &                                   hd_block, mat, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
-        write(*,'(2a)')  trim(hd_block), ' is included'
         file_name = 'NO_FILE'
+!
+        write(*,'(a)') ' is included'
         call read_view_transfer_ctl(id_control, hd_block, mat, c_buf)
       end if
 !
@@ -179,11 +175,15 @@
 !
 !
       if(cmp_no_case(file_name, 'NO_FILE')) then
-        write(*,*)  'Modelview control is included'
+        write(*,*)  ' is included'
+        call write_view_transfer_ctl(id_control, hd_block, mat, level)
+      else if(id_control .eq. id_monitor) then
+        write(*,'(4a)') '!  ', trim(hd_block),                          &
+     &        ' should be written to file ... ', trim(file_name)
         call write_view_transfer_ctl(id_control, hd_block, mat, level)
       else
-        write(*,'(3a)', ADVANCE='NO')                                   &
-     &          'Write file for ', trim(hd_block), '... '
+        write(*,'(4a)') 'Write file for ', trim(hd_block),              &
+     &                  '... ', trim(file_name)
         call write_control_modelview_file(id_control+1, file_name,      &
      &                                    hd_block, mat)
         call write_file_name_for_ctl_line(id_control, level,            &
@@ -196,7 +196,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_control_modelview_file(id_control, file_name,     &
-     &                                       hd_block, mat)
+     &                                       hd_block, mat, c_buf)
 !
       use skip_comment_f
       use ctl_data_view_transfer_IO
@@ -205,19 +205,22 @@
       character(len = kchara), intent(in) :: file_name
       character(len=kchara), intent(in) :: hd_block
       type(modeview_ctl), intent(inout) :: mat
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
-      write(*,*) trim(file_name)
+      c_buf%level = c_buf%level + 1
       open(id_control, file = file_name, status='old')
 !
       do 
-        call load_one_line_from_control(id_control, c_buf1)
-        call read_view_transfer_ctl(id_control, hd_block, mat, c_buf1)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
+!
+        call read_view_transfer_ctl(id_control, hd_block, mat, c_buf)
         if(mat%i_view_transform .gt. 0) exit
       end do
       close(id_control)
+!
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_control_modelview_file
 !

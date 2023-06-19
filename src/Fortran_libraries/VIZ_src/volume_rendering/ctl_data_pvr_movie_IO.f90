@@ -117,6 +117,7 @@
      &         (id_control, hd_block, movie, c_buf)
 !
       use ctl_file_pvr_modelview_IO
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -127,16 +128,28 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if (movie%i_pvr_rotation.gt.0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call sel_read_ctl_modelview_file                                &
-     &     (id_control, hd_start_view_control,                          &
-     &      movie%fname_view_start_ctl, movie%view_start_ctl, c_buf)
-        call sel_read_ctl_modelview_file                                &
-     &     (id_control, hd_end_view_control,                            &
-     &      movie%fname_view_end_ctl, movie%view_end_ctl, c_buf)
+        if(check_file_flag(c_buf, hd_start_view_control)                &
+     &        .or. check_begin_flag(c_buf, hd_start_view_control)) then
+          call write_multi_ctl_file_message                             &
+     &       (hd_start_view_control, izero, c_buf%level)
+          call sel_read_ctl_modelview_file                              &
+     &       (id_control, hd_start_view_control,                        &
+     &        movie%fname_view_start_ctl, movie%view_start_ctl, c_buf)
+        end if
+!
+        if(check_file_flag(c_buf, hd_end_view_control)                  &
+     &        .or. check_begin_flag(c_buf, hd_end_view_control)) then
+          call write_multi_ctl_file_message                             &
+     &       (hd_end_view_control, izero, c_buf%level)
+         call sel_read_ctl_modelview_file                               &
+     &       (id_control, hd_end_view_control,                          &
+     &        movie%fname_view_end_ctl, movie%view_end_ctl, c_buf)
+        end if
 !
 !
         call read_chara_ctl_type(c_buf, hd_movie_mode,                  &
@@ -186,21 +199,20 @@
       maxlen = max(maxlen, len_trim(hd_apature_range))
       maxlen = max(maxlen, len_trim(hd_LIC_kernel_peak))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_movie_mode, movie%movie_mode_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_movie_num_frame, movie%num_frames_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_movie_rot_axis, movie%rotation_axis_ctl)
 !
+      write(*,'(2a)', ADVANCE='NO') '!  ', trim(hd_start_view_control)
       call sel_write_ctl_modelview_file                                 &
      &   (id_control, hd_start_view_control,                            &
      &    movie%fname_view_start_ctl, movie%view_start_ctl, level)
+      write(*,'(2a)', ADVANCE='NO') '!  ', trim(hd_end_view_control)
       call sel_write_ctl_modelview_file                                 &
      &   (id_control, hd_end_view_control,                              &
      &    movie%fname_view_end_ctl, movie%view_end_ctl, level)
@@ -208,14 +220,12 @@
       call write_mul_view_transfer_ctl                                  &
      &   (id_control, hd_mview_transform, movie%mul_mmats_c, level)
 !
-      write(id_control,'(a1)') '!'
       call write_real2_ctl_type(id_control, level, maxlen,              &
      &    hd_angle_range, movie%angle_range_ctl)
       call write_real2_ctl_type(id_control, level, maxlen,              &
      &    hd_apature_range, movie%apature_range_ctl)
       call write_real2_ctl_type(id_control, level, maxlen,              &
      &    hd_LIC_kernel_peak, movie%LIC_kernel_peak_range_ctl)
-!
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_pvr_rotation_ctl

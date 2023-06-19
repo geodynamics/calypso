@@ -121,7 +121,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(zm_ctls%i_viz_ctl .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_crustal_filtering_ctl                                 &
@@ -160,9 +161,7 @@
 !
       if(zm_ctls%i_viz_ctl .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_crustal_filtering_ctl(id_control,                      &
      &    hd_crustal_filtering, zm_ctls%crust_filter_ctl, level)
 !
@@ -205,6 +204,7 @@
       use ctl_data_section_IO
       use ctl_file_sections_IO
       use skip_comment_f
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: hd_section
@@ -219,6 +219,8 @@
         psf_ctls%num_psf_ctl = 1
         call alloc_psf_ctl_stract(psf_ctls)
 !
+        call write_multi_ctl_file_message                               &
+     &     (hd_section, psf_ctls%num_psf_ctl, c_buf%level)
         call sel_read_control_4_psf_file(id_control, hd_section,        &
      &      psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl),               &
      &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl), c_buf)

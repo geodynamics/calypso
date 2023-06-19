@@ -141,7 +141,8 @@
 !
       if (fln%i_vr_fline_ctl.gt.0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
@@ -218,15 +219,12 @@
       maxlen = max(maxlen, len_trim(hd_num_fieldline))
       maxlen = max(maxlen, len_trim(hd_selection_type))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_fline_file_prefix, fln%fline_file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_fline_output_format, fln%fline_output_type_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_field_line_field, fln%fline_field_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
@@ -234,11 +232,9 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_coloring_comp, fln%fline_color_comp_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_control_array_c1(id_control, level,                    &
      &    hd_fline_grp, fln%fline_area_grp_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_line_direction, fln%line_direction_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
@@ -252,7 +248,6 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_selection_type, fln%selection_type_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_control_array_r3(id_control, level,                    &
      &    hd_xx_start_point, fln%seed_point_ctl)
       call write_control_array_i2 (id_control, level,                   &

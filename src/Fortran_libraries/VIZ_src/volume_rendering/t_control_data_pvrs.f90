@@ -93,6 +93,7 @@
 !
       use t_read_control_elements
       use skip_comment_f
+      use write_control_elements
       use ctl_file_each_pvr_IO
 !
       integer(kind = kint), intent(in) :: id_control
@@ -108,14 +109,16 @@
       call alloc_pvr_ctl_struct(pvr_ctls)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_pvr_ctl, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, hd_pvr_ctl)) exit
 !
         if(check_file_flag(c_buf, hd_pvr_ctl)                           &
      &     .or. check_begin_flag(c_buf, hd_pvr_ctl)) then
           call append_new_pvr_ctl_struct(pvr_ctls)
-          write(*,'(3a,i4)', ADVANCE='NO') 'Control for ',              &
-     &                 trim(hd_pvr_ctl), ' No. ', pvr_ctls%num_pvr_ctl
+!
+          call write_multi_ctl_file_message                             &
+     &       (hd_pvr_ctl, pvr_ctls%num_pvr_ctl, c_buf%level)
           call sel_read_control_pvr(id_control, hd_pvr_ctl,             &
      &        pvr_ctls%fname_pvr_ctl(pvr_ctls%num_pvr_ctl),             &
      &        pvr_ctls%pvr_ctl_type(pvr_ctls%num_pvr_ctl), c_buf)
@@ -144,11 +147,10 @@
 !
       if(pvr_ctls%num_pvr_ctl .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_array_flag_for_ctl(id_control, level, hd_pvr_ctl)
       do i = 1, pvr_ctls%num_pvr_ctl
-        write(*,'(3a,i4)', ADVANCE='NO')                                &
-     &          'Control for ', trim(hd_pvr_ctl), ' No. ', i
+        write(*,'(3a,i4,a)', ADVANCE='NO') '!  ', trim(hd_pvr_ctl),     &
+     &                                     ' No. ', i
         call sel_write_control_pvr(id_control, hd_pvr_ctl,              &
      &      pvr_ctls%fname_pvr_ctl(i), pvr_ctls%pvr_ctl_type(i), level)
       end do

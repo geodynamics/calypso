@@ -6,6 +6,8 @@ analyzer_sph_snap_w_vizs.o: $(SPH_SNAP_MAINDIR)/analyzer_sph_snap_w_vizs.f90 m_p
 	$(F90) -c $(F90OPTFLAGS) $<
 main_control_MHD_psf_check.o: $(SPH_SNAP_MAINDIR)/main_control_MHD_psf_check.f90 m_precision.o t_ctl_data_MHD.o t_ctl_data_sph_MHD_w_psf.o t_read_control_elements.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
+main_control_MHD_viz_check.o: $(SPH_SNAP_MAINDIR)/main_control_MHD_viz_check.f90 m_precision.o t_ctl_data_MHD.o t_ctl_data_sph_MHD_w_vizs.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
 main_sph_snapshot_w_psf.o: $(SPH_SNAP_MAINDIR)/main_sph_snapshot_w_psf.f90 m_precision.o calypso_mpi.o analyzer_sph_snap_w_psf.o
 	$(F90) -c $(F90OPTFLAGS) $<
 main_sph_snapshot_w_vizs.o: $(SPH_SNAP_MAINDIR)/main_sph_snapshot_w_vizs.f90 m_precision.o calypso_mpi.o analyzer_sph_snap_w_vizs.o

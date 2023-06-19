@@ -8,8 +8,8 @@
 !!
 !!@verbatim
 !!      subroutine s_input_control_three_vizs                           &
-!!     &         (ctl_file_name, viz3_c, FEM_viz, t_viz_param)
-!!        character(len = kchara), intent(in) :: ctl_file_name
+!!     &         (file_name, viz3_c, FEM_viz, t_viz_param)
+!!        character(len = kchara), intent(in) :: file_name
 !!        type(control_data_three_vizs), intent(inout) :: viz3_c
 !!        type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
 !!        type(time_step_param_w_viz), intent(inout) :: t_viz_param
@@ -49,20 +49,30 @@
 !  ---------------------------------------------------------------------
 !
       subroutine s_input_control_three_vizs                             &
-     &         (ctl_file_name, viz3_c, FEM_viz, t_viz_param)
+     &         (file_name, viz3_c, FEM_viz, t_viz_param)
 !
-      character(len = kchara), intent(in) :: ctl_file_name
+      use t_read_control_elements
+!
+      character(len = kchara), intent(in) :: file_name
       type(control_data_three_vizs), intent(inout) :: viz3_c
       type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
       type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !
       integer(kind = kint) :: ierr
+      type(buffer_for_control) :: c_buf1
+!
+!
+      c_buf1%level = 0
 !
 !       load control file
       if(my_rank .eq. 0) then
-        call read_control_file_three_vizs(ctl_file_name, viz3_c)
+        call read_control_file_three_vizs(file_name, viz3_c, c_buf1)
       end if
       call bcast_three_vizs_control_data(viz3_c)
+!
+      if(c_buf1%iend .gt. 0) then
+        call calypso_MPI_abort(c_buf1%iend, 'control file is broken')
+      end if
 !
 !       set control data
       call set_ctl_params_three_vizs(viz3_c, FEM_viz,                   &

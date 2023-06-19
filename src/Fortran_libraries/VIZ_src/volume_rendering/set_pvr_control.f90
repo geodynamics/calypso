@@ -134,7 +134,7 @@
       if(quilt_c%mul_qmats_c%num_modelviews_c .gt. 0) then
         num_views = quilt_c%mul_qmats_c%num_modelviews_c
         if(num_views .lt.  pvr_param%stereo_def%num_views) then
-          write(e_message,*) 'The number of view paramter shold be',    &
+          write(e_message,*) 'The number of view paramter should be',   &
      &                 ' more than number of quilt image. (Stop)'
           call calypso_mpi_abort(1,e_message)
        else
@@ -144,7 +144,7 @@
        else if(movie_ctl%mul_mmats_c%num_modelviews_c .gt. 0) then
          num_views = movie_ctl%mul_mmats_c%num_modelviews_c
          if(num_views .lt. pvr_param%movie_def%num_frame) then
-          write(e_message,*) 'The number of view paramter shold be',    &
+          write(e_message,*) 'The number of view paramter should be',   &
      &                     ' more than number of movie image. (Stop)'
           call calypso_mpi_abort(1,e_message)
         else

@@ -83,7 +83,8 @@
       call alloc_pvr_isosurfs_ctl(pvr_isos_c)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, hd_block)) exit
 !
         if(check_begin_flag(c_buf, hd_block)) then
@@ -113,7 +114,6 @@
 !
       if(pvr_isos_c%num_pvr_iso_ctl .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_array_flag_for_ctl(id_control, level, hd_block)
       do i = 1, pvr_isos_c%num_pvr_iso_ctl
         call write_pvr_isosurface_ctl(id_control, hd_block,             &

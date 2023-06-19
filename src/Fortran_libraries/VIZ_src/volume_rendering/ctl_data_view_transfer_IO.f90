@@ -185,9 +185,11 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if (mat%i_view_transform .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(mat%i_view_transform .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_projection_mat_ctl                                    &
@@ -255,9 +257,7 @@
       maxlen = max(maxlen, len_trim(hd_scale_factor))
       maxlen = max(maxlen, len_trim(hd_projection_type))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_projection_type, mat%projection_type_ctl)
       call write_projection_mat_ctl                                     &
@@ -267,7 +267,6 @@
       call write_stereo_view_ctl                                        &
      &   (id_control, hd_stereo_view, mat%streo, level)
 !
-      write(id_control,'(a1)') '!'
       call write_control_array_c_r(id_control, level,                   &
      &    hd_look_point, mat%lookpoint_ctl)
       call write_control_array_c_r(id_control, level,                   &
@@ -275,7 +274,6 @@
       call write_control_array_c_r(id_control, level,                   &
      &    hd_up_dir, mat%up_dir_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_control_array_c_r(id_control, level,                   &
      &    hd_view_rot_dir, mat%view_rot_vec_ctl)
       call write_control_array_c_r(id_control, level,                   &
@@ -286,12 +284,10 @@
       call write_control_array_c2_r(id_control, level,                  &
      &    hd_model_mat, mat%modelview_mat_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_view_rot_deg, mat%view_rotation_deg_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_scale_factor, mat%scale_factor_ctl)
-!
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_view_transfer_ctl

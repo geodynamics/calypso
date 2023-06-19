@@ -102,7 +102,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(light%i_pvr_lighting .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_array_r3(id_control,                          &
@@ -141,9 +142,7 @@
       maxlen = max(maxlen, len_trim(hd_diffuse))
       maxlen = max(maxlen, len_trim(hd_specular))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_control_array_r3(id_control, level,                    &
      &    hd_light_param, light%light_position_ctl)
 !
@@ -153,7 +152,6 @@
      &    hd_diffuse, light%diffuse_coef_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_specular, light%specular_coef_ctl)
-!
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_lighting_ctl

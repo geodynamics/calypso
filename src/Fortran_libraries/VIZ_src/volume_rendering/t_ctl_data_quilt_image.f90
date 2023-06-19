@@ -106,7 +106,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if (quilt_c%i_quilt_image.gt.0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
@@ -143,9 +144,7 @@
       maxlen = len_trim(hd_column_row)
       maxlen = max(maxlen, len_trim(hd_row_column))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_integer2_ctl_type(id_control, level, maxlen,           &
      &    hd_column_row, quilt_c%num_column_row_ctl)
       call write_integer2_ctl_type(id_control, level, maxlen,           &
@@ -153,7 +152,6 @@
 !
       call write_mul_view_transfer_ctl                                  &
      &   (id_control, hd_qview_transform, quilt_c%mul_qmats_c, level)
-!
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_quilt_image_ctl

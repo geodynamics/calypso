@@ -102,7 +102,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(cbar_ctl%i_pvr_colorbar .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_integer_ctl_type                                      &
@@ -163,7 +164,6 @@
       maxlen = max(maxlen, len_trim(hd_mapgrid_switch))
       maxlen = max(maxlen, len_trim(hd_cbar_range))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
@@ -182,7 +182,6 @@
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_pvr_numgrid_cbar, cbar_ctl%ngrid_cbar_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_axis_switch, cbar_ctl%axis_switch_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &

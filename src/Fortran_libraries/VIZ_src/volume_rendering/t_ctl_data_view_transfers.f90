@@ -106,6 +106,7 @@
 !
       use ctl_file_pvr_modelview_IO
       use ctl_data_view_transfer_IO
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -119,15 +120,16 @@
       call alloc_multi_modeview_ctl(mul_mats_c)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, hd_block)) exit
 !
         if(check_file_flag(c_buf, hd_block)                             &
      &        .or. check_begin_flag(c_buf, hd_block)) then
           call append_mul_view_trans_ctl(mul_mats_c)
-          write(*,'(2a,i4)', ADVANCE='NO') trim(hd_block),              &
-     &                           ' No. ', mul_mats_c%num_modelviews_c
 !
+          call write_multi_ctl_file_message                             &
+     &       (hd_block, mul_mats_c%num_modelviews_c, c_buf%level)
           call sel_read_ctl_modelview_file(id_control, hd_block,        &
      &        mul_mats_c%fname_mat_ctl(mul_mats_c%num_modelviews_c),    &
      &        mul_mats_c%matrices(mul_mats_c%num_modelviews_c), c_buf)
@@ -152,12 +154,11 @@
 !
       integer(kind = kint) :: i
 !
-      write(id_control,'(a1)') '!'
       level = write_array_flag_for_ctl(id_control, level, hd_block)
       do i = 1, mul_mats_c%num_modelviews_c
-        write(*,'(2a,i4)', ADVANCE='NO') trim(hd_block), ' No. ', i
+        write(*,'(3a,i4)', ADVANCE='NO') '!  ', trim(hd_block),         &
+     &                                   ' No. ', i
 !
-        write(id_control,'(a1)') '!'
         call sel_write_ctl_modelview_file(id_control, hd_block,         &
      &      mul_mats_c%fname_mat_ctl(i), mul_mats_c%matrices(i), level)
       end do

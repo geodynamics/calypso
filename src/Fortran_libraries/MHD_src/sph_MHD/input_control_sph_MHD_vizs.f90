@@ -58,6 +58,7 @@
 !
       use t_ctl_data_MHD
       use t_ctl_data_sph_MHD_w_vizs
+      use t_read_control_elements
       use bcast_control_sph_MHD
       use bcast_ctl_data_viz3
       use bcast_dynamo_viz_control
@@ -67,10 +68,17 @@
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
       type(add_vizs_sph_mhd_ctl), intent(inout) :: add_VMHD_ctl
 !
+      type(buffer_for_control) :: c_buf1
 !
+!
+      c_buf1%level = 0
       if(my_rank .eq. 0) then
         call read_control_4_sph_MHD_w_vizs(file_name, MHD_ctl,          &
-     &                                     add_VMHD_ctl)
+     &                                     add_VMHD_ctl, c_buf1)
+      end if
+!
+      if(c_buf1%iend .gt. 0) then
+        call calypso_MPI_abort(MHD_ctl%i_mhd_ctl, trim(file_name))
       end if
 !
       call bcast_sph_mhd_control_data(MHD_ctl)
