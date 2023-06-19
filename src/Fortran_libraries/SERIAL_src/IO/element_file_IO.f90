@@ -70,7 +70,7 @@
       call read_comm_table(input_file_code, id_rank,                    &
      &                     ele_mesh_IO%comm, ierr)
 !      call read_element_geometry(input_file_code,                      &
-!     &    ele_mesh_IO%node, ele_mesh_IO%sfed)
+!     &    ele_mesh_IO%node, ele_mesh_IO%sfed, ierr)
       close(input_file_code)
 !
       end subroutine input_element_file
@@ -96,7 +96,7 @@
      &  (input_file_code, id_rank, surf_mesh_IO%comm,                   &
      &   surf_mesh_IO%ele, surf_mesh_IO%sfed, ierr)
 !      call read_surface_geometry(input_file_code,                      &
-!     &    surf_mesh_IO%node, surf_mesh_IO%sfed)
+!     &    surf_mesh_IO%node, surf_mesh_IO%sfed, ierr)
       close (input_file_code)
 !
       end subroutine input_surface_file
@@ -122,7 +122,7 @@
      &   (input_file_code, id_rank, edge_mesh_IO%comm,                  &
      &    edge_mesh_IO%ele, edge_mesh_IO%sfed, ierr)
 !      call read_edge_geometry(input_file_code,                         &
-!     &    edge_mesh_IO%node, edge_mesh_IO%sfed)
+!     &    edge_mesh_IO%node, edge_mesh_IO%sfed, ierr)
       close (input_file_code)
 !
       end subroutine input_edge_file

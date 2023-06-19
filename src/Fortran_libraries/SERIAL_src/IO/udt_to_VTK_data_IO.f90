@@ -12,7 +12,7 @@
 !!        type(ucd_data), intent(in) :: ucd
 !!
 !!      subroutine read_udt_field_from_VTK(id_vtk, ucd)
-!!      subroutine read_alloc_udt_field_from_VTK(id_vtk, ucd)
+!!      subroutine read_alloc_udt_field_from_VTK(id_vtk, ucd, iend)
 !!      subroutine read_ucd_mesh_from_VTK(id_vtk, ucd)
 !!      subroutine read_alloc_ucd_mesh_from_VTK(id_vtk, ucd)
 !!        type(ucd_data), intent(inout) :: ucd
@@ -77,13 +77,14 @@
       integer(kind = kint), intent(in) ::  id_vtk
       type(ucd_data), intent(inout) :: ucd
 !
-      integer(kind = kint) :: i_field, iflag_end, ncomp_field
+      integer(kind = kint) :: i_field, iflag_end, ncomp_field, iend
       character(len=kchara)  :: field_name
       real(kind = kreal), allocatable :: d_tmp(:,:)
       integer(kind=kint_gl) :: nnod
 !
 !
-      call read_vtk_fields_head(id_vtk, nnod)
+      call read_vtk_fields_head(id_vtk, nnod, iend)
+      if(iend .gt. 0) write(*,*) 'Error in file'
       if(nnod .ne. ucd%nnod) write(*,*) 'Error in number of node'
 !
       i_field = 0
@@ -118,10 +119,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_alloc_udt_field_from_VTK(id_vtk, ucd)
+      subroutine read_alloc_udt_field_from_VTK(id_vtk, ucd, iend)
 !
       integer(kind = kint), intent(in) ::  id_vtk
       type(ucd_data), intent(inout) :: ucd
+      integer(kind = kint), intent(inout) ::  iend
 !
       type(ucd_data) :: tmp
 !
@@ -130,7 +132,8 @@
       real(kind = kreal), allocatable :: d_tmp(:,:)
 !
 !
-      call read_vtk_fields_head(id_vtk, ucd%nnod)
+      call read_vtk_fields_head(id_vtk, ucd%nnod, iend)
+      if(iend .gt. 0) write(*,*) 'Error in file'
 !
       tmp%nnod =      ucd%nnod
       ucd%num_field = 0

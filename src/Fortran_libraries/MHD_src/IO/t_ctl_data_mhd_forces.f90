@@ -83,7 +83,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(frc_ctl%i_forces_ctl .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_array_c1(id_control, hd_num_forces,           &
@@ -106,14 +107,11 @@
 !
       integer(kind = kint), intent(inout) :: level
 !
-      integer(kind = kint) :: maxlen = 0
 !
       if(frc_ctl%i_forces_ctl .le. 0) return
-      maxlen = len_trim(hd_num_forces)
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-      call write_control_array_c1(id_control, maxlen,                   &
+      call write_control_array_c1(id_control, level,                    &
      &                            hd_num_forces, frc_ctl%force_names)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !

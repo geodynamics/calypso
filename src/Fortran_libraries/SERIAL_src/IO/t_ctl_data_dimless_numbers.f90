@@ -94,7 +94,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(dless_ctl%i_dimless_ctl .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_array_c_r(id_control,                         &
@@ -120,9 +121,7 @@
 !
       if(dless_ctl%i_dimless_ctl .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_control_array_c_r(id_control, level,                   &
      &    hd_dimless, dless_ctl%dimless)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)

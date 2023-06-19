@@ -88,7 +88,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(Fmesh_ctl%i_FEM_mesh .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_chara_ctl_type(c_buf, hd_mem_conserve,                &
@@ -129,9 +130,7 @@
       maxlen = max(maxlen, len_trim(hd_FEM_surf_output))
       maxlen = max(maxlen, len_trim(hd_FEM_viewer_output))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_mem_conserve, Fmesh_ctl%memory_conservation_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &

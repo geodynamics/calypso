@@ -34,7 +34,7 @@
 !!      subroutine write_integer3_ctl_item                              &
 !!     &         (id_file, level, maxlen, label, int1, int2, int3)
 !!      subroutine write_chara_real_ctl_item                            &
-!!     &          (id_file, level, maxlen, label, chara_data, real_data)
+!!     &          (id_file, level, maxlen, label, chara1, real_data)
 !!       subroutine write_chara_real2_ctl_item(id_file, level, maxlen,  &
 !!     &           label, chara_data, real1, real2)
 !!      subroutine write_chara2_real_ctl_item(id_file, level, maxlen,   &
@@ -63,6 +63,12 @@
 !!        character(len=kchara), intent(in) :: label
 !!        character(len=kchara), intent(in) :: fname(num)
 !!        integer(kind = kint), intent(inout) :: level
+!!
+!!      subroutine write_multi_ctl_file_message(label, num, level)
+!!      subroutine write_one_ctl_file_message(label, level, file_name)
+!!      subroutine write_included_message(label, level)
+!!        integer (kind=kint), intent(in) :: num, level
+!!        character(len=kchara), intent(in) :: label, file_name
 !!@endverbatim
 !!
 !!@n @param  ctl_name   label for control block
@@ -95,6 +101,9 @@
       use m_machine_parameter
 !
       implicit none
+!
+!>   file ID to output on screen
+       integer(kind = kint), parameter :: id_monitor = 6
 !
 !>   Label to start a control block
        character(len=kchara), parameter  :: hd_begin = 'begin'
@@ -383,25 +392,26 @@
 !   --------------------------------------------------------------------
 !
        subroutine write_chara_real_ctl_item                             &
-     &          (id_file, level, maxlen, label, chara_data, real_data)
+     &          (id_file, level, maxlen, label, chara1, real_data)
 !
       use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
-      integer(kind = kint), intent(in) :: maxlen
+      integer(kind = kint), intent(in) :: maxlen(0:1)
       character(len=kchara), intent(in) :: label
-      character(len=kchara), intent(in) :: chara_data
+      character(len=kchara), intent(in) :: chara1
       real(kind = kreal), intent(in) :: real_data
 !
-      integer(kind = kint) :: nspace0
+      integer(kind = kint) :: nspace0, nspace1
 !
-      nspace0 = maxlen - len_trim(label) + 4
-!
+      nspace0 = maxlen(0) - len_trim(label)
+      nspace1 = maxlen(1) - len_trim(chara1) - 2 * iflag_divide(chara1)
 !
       call write_space_4_parse(id_file, level)
       call write_ctl_chara_cont(id_file, label)
       call write_spaces(id_file, nspace0)
-      call write_ctl_chara_cont(id_file, chara_data)
+      call write_ctl_chara_cont(id_file, chara1)
+      call write_spaces(id_file, nspace1)
       write(id_file,'(a2,1pE25.15e3)')  '  ', real_data
 !
       end subroutine write_chara_real_ctl_item
@@ -676,6 +686,52 @@
 !
       end subroutine write_file_names_from_ctl_line
 !
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine write_multi_ctl_file_message(label, num, level)
+      use write_control_items
+      integer (kind=kint), intent(in) :: num, level
+      character(len=kchara), intent(in) :: label
+!
+      write(id_monitor,'(a)',ADVANCE='NO') '! '
+      call write_space_4_parse(id_monitor, level)
+      write(id_monitor,'(2a)',ADVANCE='NO') 'Control for ', trim(label)
+      if(num .le. 0) return
+!
+      write(id_monitor,'(a,i4)', ADVANCE='NO') ' No. ',  num
+!
+      end subroutine write_multi_ctl_file_message
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_one_ctl_file_message(label, level, file_name)
+      use write_control_items
+      integer (kind=kint), intent(in) :: level
+      character(len=kchara), intent(in) :: label, file_name
+!
+        write(id_monitor,'(a)',ADVANCE='NO') '! '
+        call write_space_4_parse(id_monitor, level)
+        write(id_monitor,'(4a)') 'Control for ', trim(label),           &
+     &                   ' is read from file... ', trim(file_name)
+!
+      end subroutine write_one_ctl_file_message
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_included_message(label, level)
+      use write_control_items
+      integer (kind=kint), intent(in) :: level
+      character(len=kchara), intent(in) :: label
+!
+        write(id_monitor,'(a)',ADVANCE='NO') '! '
+        call write_space_4_parse(id_monitor, level)
+        write(id_monitor,'(3a)') 'Control for ', trim(label),           &
+     &                           ' is included.'
+!
+      end subroutine write_included_message
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       end module write_control_elements

@@ -8,7 +8,10 @@
 !> @brief subroutines to find comment lines in data
 !!
 !!@verbatim
-!!      subroutine skip_comment(character_4_read,id_file)
+!!      subroutine skip_comment(id_file, character_4_read, iend)
+!!        integer (kind=kint), intent(in) :: id_file
+!!        character(len=255), intent(inout) :: character_4_read
+!!        integer (kind=kint), intent(inout) :: iend
 !!
 !!      subroutine read_one_line_from_stream(id_file,                   &
 !!     &          lenghbuf, num_word, nchara_read, tbuf)
@@ -22,7 +25,10 @@
 !!      subroutine count_field_by_comma(id_file, charabuf,              &
 !!     &          ncomp, field_name)
 !!      subroutine read_stack_array(character_4_read, id_file, num,     &
-!!     &          istack_array)
+!!     &                            istack_array, iend)
+!!        integer (kind=kint), intent(in) :: id_file, num
+!!        integer (kind=kint), intent(inout) :: istack_array(0:num)
+!!        integer (kind=kint), intent(inout) :: iend
 !!
 !!      subroutine change_2_upper_case(string)
 !!      subroutine change_2_lower_case(string)
@@ -52,18 +58,26 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine skip_comment(character_4_read,id_file)
+      subroutine skip_comment(id_file, character_4_read, iend)
 !
-       integer (kind=kint), intent(in) :: id_file
-       character(len=255), intent(inout) :: character_4_read
-       character(len=1) :: detect_comment
+      integer (kind=kint), intent(in) :: id_file
+      character(len=255), intent(inout) :: character_4_read
+      integer (kind=kint), intent(inout) :: iend
+      character(len=1) :: detect_comment
 !
-   10 continue
-       read(id_file,'(a)') character_4_read
-       read(character_4_read,*,end=10)  detect_comment
-      if ( detect_comment.eq.'!' .or. detect_comment.eq.'#') go to 10
+      iend = 0
+  10  continue
+        read(id_file,'(a)',end=99) character_4_read
+        read(character_4_read,*,end=10)  detect_comment
+      if(detect_comment.eq.'!' .or. detect_comment.eq.'#') go to 10
 !
       return
+!
+  99  continue
+      write(*,*) 'File is probably incorrect.'
+      iend = 99
+      return
+!
       end subroutine skip_comment
 !
 !-----------------------------------------------------------------------
@@ -169,41 +183,43 @@
 !-----------------------------------------------------------------------
 !
       subroutine read_stack_array(character_4_read, id_file, num,       &
-     &          istack_array)
+     &                            istack_array, iend)
 !
-       integer (kind=kint), intent(in) :: id_file, num
+      integer (kind=kint), intent(in) :: id_file, num
+      integer (kind=kint), intent(inout) :: istack_array(0:num)
+      integer (kind=kint), intent(inout) :: iend
 !
-       integer (kind=kint), intent(inout) :: istack_array(0:num)
-       character(len=255) :: character_4_read
+      character(len=255) :: character_4_read
 !
-       integer (kind=kint) :: i, ii
+      integer (kind=kint) :: i, ii
 !
 !
-        istack_array(0:num) = -1
+      istack_array(0:num) = -1
 !
-        call skip_comment(character_4_read,id_file)
-        read(character_4_read,*,end=51) istack_array
-   51   continue
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
+      read(character_4_read,*,end=51) istack_array
+   51 continue
 !
 !    Check number of read data
 !
-        ii = num + 1
-        do i = num, 1, -1 
-          if ( istack_array(i-1) .eq. -1 ) ii = i
-        end do
+      ii = num + 1
+      do i = num, 1, -1
+        if ( istack_array(i-1) .eq. -1 ) ii = i
+      end do
 !
 !   shift stack array
 !
-        do i = ii-1, 1,-1
-          istack_array(i) = istack_array(i-1)
-        end do
-        istack_array(0) = 0
+      do i = ii-1, 1,-1
+        istack_array(i) = istack_array(i-1)
+      end do
+      istack_array(0) = 0
 !
 !    read reast of array
 !
-        if ( ii .le. num ) then
-         read(id_file,*)  (istack_array(i),i=ii, num)
-        end if
+      if ( ii .le. num ) then
+       read(id_file,*)  (istack_array(i),i=ii, num)
+      end if
 !
       end subroutine read_stack_array
 !

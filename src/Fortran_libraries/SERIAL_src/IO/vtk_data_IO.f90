@@ -17,11 +17,12 @@
 !!      subroutine write_vtk_connect_data                               &
 !!     &         (id_vtk, ntot_ele, nnod_ele, nele, ie)
 !!
-!!      subroutine read_vtk_fields_head(id_vtk, nnod)
+!!      subroutine read_vtk_fields_head(id_vtk, nnod, iend)
 !!      subroutine read_vtk_each_field_head                             &
 !!     &         (id_vtk, iflag_end, ncomp_field, field_name)
 !!      subroutine read_vtk_each_field                                  &
 !!     &         (id_vtk, ntot_nod, ncomp_field, nnod, d_nod)
+!!        integer(kind = kint), intent(inout) :: iend
 !!
 !!      subroutine read_vtk_node_head(id_vtk, nnod)
 !!      subroutine read_vtk_connect_head(id_vtk, nele, nnod_ele)
@@ -205,17 +206,19 @@
 ! -----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine read_vtk_fields_head(id_vtk, nnod)
+      subroutine read_vtk_fields_head(id_vtk, nnod, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_vtk
       integer(kind=kint_gl), intent(inout) :: nnod
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=kchara)  :: tmpchara, label
 !
 !
-      call skip_comment(tmpchara, id_vtk)
+      call skip_comment(id_vtk, tmpchara, iend)
+      if(iend .gt. 0) return
       read(tmpchara,*) label, nnod
 ! 
       end subroutine read_vtk_fields_head

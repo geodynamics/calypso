@@ -74,24 +74,32 @@
       if(ierr .ne. 0) return
 !
 !      write(*,*) '! truncation level for spherical harmonics'
-      call read_gl_resolution_sph(id_file, sph_IO)
+      call read_gl_resolution_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !      write(*,*) '! segment ID for each direction'
-      call read_rank_4_sph(id_file, sph_IO)
+      call read_rank_4_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! global ID for each direction'
-      call read_rtp_gl_1d_table(id_file, sph_IO)
+      call read_rtp_gl_1d_table(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! global radial ID and grid ID'
-      call read_gl_nodes_sph(id_file, sph_IO)
+      call read_gl_nodes_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! communication table between spectr data'
-      call read_import_data(id_file, comm_IO)
+      call read_import_data(id_file, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! Group data'
-      call read_group_data(id_file, sph_grps_IO%bc_rtp_grp)
-      call read_group_data(id_file, sph_grps_IO%radial_rtp_grp)
-      call read_group_data(id_file, sph_grps_IO%theta_rtp_grp)
-      call read_group_data(id_file, sph_grps_IO%zonal_rtp_grp)
+      call read_group_data(id_file, sph_grps_IO%bc_rtp_grp, ierr)
+      if(ierr .ne. 0) return
+      call read_group_data(id_file, sph_grps_IO%radial_rtp_grp, ierr)
+      if(ierr .ne. 0) return
+      call read_group_data(id_file, sph_grps_IO%theta_rtp_grp, ierr)
+      if(ierr .ne. 0) return
+      call read_group_data(id_file, sph_grps_IO%zonal_rtp_grp, ierr)
 !
       end subroutine read_geom_rtp_data
 !
@@ -118,22 +126,27 @@
       if(ierr .ne. 0) return
 !
 !      write(*,*) '! truncation level for spherical harmonics'
-      call read_gl_resolution_sph(id_file, sph_IO)
+      call read_gl_resolution_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !      write(*,*) '! segment ID for each direction'
-      call read_rank_4_sph(id_file, sph_IO)
+      call read_rank_4_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! global ID for each direction'
-      call read_rj_gl_1d_table(id_file, sph_IO)
+      call read_rj_gl_1d_table(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! global radial ID and spectr ID'
-      call read_gl_nodes_sph(id_file, sph_IO)
+      call read_gl_nodes_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! communication table between spectr data'
-      call read_import_data(id_file, comm_IO)
+      call read_import_data(id_file, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(*,*) '! Group data'
-      call read_group_data(id_file, sph_grps_IO%radial_rj_grp)
-      call read_group_data(id_file, sph_grps_IO%sphere_rj_grp)
+      call read_group_data(id_file, sph_grps_IO%radial_rj_grp, ierr)
+      call read_group_data(id_file, sph_grps_IO%sphere_rj_grp, ierr)
 !
       end subroutine read_spectr_modes_rj_data
 !
@@ -155,12 +168,17 @@
       call read_domain_info(id_file, id_rank, comm_IO, ierr)
       if(ierr .ne. 0) return
 !
-      call read_gl_resolution_sph(id_file, sph_IO)
-      call read_rank_4_sph(id_file, sph_IO)
-      call read_rtp_gl_1d_table(id_file, sph_IO)
-      call read_gl_nodes_sph(id_file, sph_IO)
+      call read_gl_resolution_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_rank_4_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_rtp_gl_1d_table(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_gl_nodes_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
-      call read_import_data(id_file, comm_IO)
+      call read_import_data(id_file, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
       end subroutine read_geom_rtm_data
 !
@@ -182,12 +200,17 @@
       call read_domain_info(id_file, id_rank, comm_IO, ierr)
       if(ierr .ne. 0) return
 !
-      call read_gl_resolution_sph(id_file, sph_IO)
-      call read_rank_4_sph(id_file, sph_IO)
-      call read_rj_gl_1d_table(id_file, sph_IO)
-      call read_gl_nodes_sph(id_file, sph_IO)
+      call read_gl_resolution_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_rank_4_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_rj_gl_1d_table(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_gl_nodes_sph(id_file, sph_IO, ierr)
+      if(ierr .ne. 0) return
 !
-      call read_import_data(id_file, comm_IO)
+      call read_import_data(id_file, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
       end subroutine read_spectr_modes_rlm_data
 !

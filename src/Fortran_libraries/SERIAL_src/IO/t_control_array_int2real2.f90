@@ -195,7 +195,8 @@
       call alloc_control_array_i2_r2(array_i2r2)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, label, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, label)) exit
 !
         if(c_buf%header_chara.eq.label) then
@@ -224,7 +225,6 @@
 !
 !
       if(array_i2r2%num .le. 0) return
-      write(id_control,'(a1)') '!'
 !
       level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_i2r2%num

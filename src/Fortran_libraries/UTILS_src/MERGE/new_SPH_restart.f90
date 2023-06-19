@@ -168,6 +168,7 @@
 !>      Field data IO structure for original data
       type(field_IO) :: org_fst_IO
       integer(kind = kint) :: n_point
+      integer(kind = kint) :: ierr_IO = 0
       integer :: irank_new, iloop, ip
 !
 !
@@ -176,7 +177,9 @@
         ip = irank_new + 1
 !
         call sel_read_alloc_field_file                                  &
-     &     (irank_new, istep, org_fst_param, org_fst_IO)
+     &     (irank_new, istep, org_fst_param, org_fst_IO, ierr_IO)
+        if(ierr_IO .gt. 0) call calypso_MPI_abort(ierr_IO,              &
+     &                 'Read file error in sel_read_alloc_field_file')
 !
         if(irank_new .lt. org_sph_array%num_pe) then
           n_point = org_sph_array%sph(ip)%sph_rj%nnod_rj

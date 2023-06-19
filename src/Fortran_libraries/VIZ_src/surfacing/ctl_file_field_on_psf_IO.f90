@@ -61,6 +61,8 @@
      &          file_name, fld_on_psf_c, c_buf)
 !
       use t_read_control_elements
+!
+      use write_control_elements
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
@@ -73,14 +75,14 @@
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
-        write(*,'(2a)', ADVANCE='NO') trim(hd_block),                   &
-     &                             ' is read file from ... '
+        call write_one_ctl_file_message                                 &
+     &     (hd_block, c_buf%level, file_name)
         call read_ctl_field_on_psf_file((id_control+2), file_name,      &
-     &                               hd_block, fld_on_psf_c)
+     &                               hd_block, fld_on_psf_c, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
         file_name = 'NO_FILE'
 !
-        write(*,*) trim(hd_block), ' is included'
+        call write_included_message(hd_block, c_buf%level)
         call read_fld_on_psf_control(id_control, hd_block,              &
      &                               fld_on_psf_c, c_buf)
       end if
@@ -90,7 +92,7 @@
 !   --------------------------------------------------------------------
 !
       subroutine read_ctl_field_on_psf_file(id_control, file_name,      &
-     &                                      hd_block, fld_on_psf_c)
+     &          hd_block, fld_on_psf_c, c_buf)
 !
       use t_read_control_elements
 !
@@ -99,20 +101,24 @@
       character(len = kchara), intent(in) :: file_name
       character(len=kchara), intent(in) :: hd_block
       type(field_on_psf_ctl), intent(inout) :: fld_on_psf_c
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
+      c_buf%level = c_buf%level + 1
       write(*,'(a)') trim(file_name)
       open(id_control, file=file_name, status='old')
 !
       do
-        call load_one_line_from_control(id_control, c_buf1)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
+!
         call read_fld_on_psf_control(id_control, hd_block,              &
-     &      fld_on_psf_c, c_buf1)
+     &      fld_on_psf_c, c_buf)
         if(fld_on_psf_c%i_iso_result .gt. 0) exit
       end do
       close(id_control)
+!
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_ctl_field_on_psf_file
 !
@@ -136,9 +142,14 @@
       if(cmp_no_case(file_name, 'NO_FILE')) then
         call write_fld_on_psf_control(id_control, hd_block,             &
      &                              fld_on_psf_c, level)
+      else if(id_control .eq. id_monitor) then
+        write(*,'(4a)') '!  ', trim(hd_block),                          &
+     &              ' should be written to file ... ', trim(file_name)
+        call write_fld_on_psf_control(id_control, hd_block,             &
+     &                              fld_on_psf_c, level)
       else
-        write(*,'(2a)', ADVANCE='NO') trim(hd_block),                   &
-     &                             ' is write file ... '
+        write(*,'(3a)', ADVANCE='NO') trim(hd_block),                   &
+     &              ' is written to file ... ', trim(file_name)
         call write_file_name_for_ctl_line(id_control, level,            &
      &                                    hd_block, file_name)
         call write_ctl_field_on_psf_file((id_control+2), file_name,     &
@@ -163,7 +174,6 @@
       integer(kind = kint) :: level
 !
 !
-      write(*,'(a)') trim(file_name)
       level = 0
       open(id_control, file=file_name)
       call write_fld_on_psf_control(id_control, hd_block,               &

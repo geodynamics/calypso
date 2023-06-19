@@ -18,7 +18,7 @@
 !!        type(element_data), intent(in) :: ele_IO
 !!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
-!!      subroutine read_surface_geometry(id_file, nod_IO, sfed_IO)
+!!      subroutine read_surface_geometry(id_file, nod_IO, sfed_IO, ierr)
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!      subroutine write_surface_geometry(id_file, nod_IO, sfed_IO)
@@ -26,6 +26,7 @@
 !!      subroutine write_surface_geometry_cyl(id_file, nod_IO, sfed_IO)
 !!        type(node_data), intent(in) :: nod_IO
 !!        type(surf_edge_IO_data), intent(in) :: sfed_IO
+!!        integer(kind = kint), intent(inout) :: iend
 !!@endverbatim
 !
       module surface_data_IO
@@ -75,7 +76,8 @@
 !      write(id_file,'(a)') '!      (type and connection) '
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_element(id_file, ele_IO)
+      call read_number_of_element(id_file, ele_IO, ierr)
+      if(ierr .ne. 0) return
       call read_element_info(id_file, ele_IO)
 !
 !      write(id_file,'(a)') '!'
@@ -93,13 +95,14 @@
 !      write(id_file,'(a)') '! 3.1 surface ID for import '
 !      write(id_file,'(a)') '!'
 !
-      call read_import_data(id_file, comm_IO)
+      call read_import_data(id_file, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 3.2 surface ID for export '
 !      write(id_file,'(a)') '!'
 !
-      call read_export_data(id_file, comm_IO)
+      call read_export_data(id_file, comm_IO, ierr)
 !
       end subroutine read_surface_connection
 !
@@ -142,34 +145,36 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_surface_geometry(id_file, nod_IO, sfed_IO)
+      subroutine read_surface_geometry(id_file, nod_IO, sfed_IO, iend)
 !
       use node_geometry_IO
 !
       integer (kind = kint), intent(in) :: id_file
       type(node_data), intent(inout) :: nod_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
+      integer(kind = kint), intent(inout) :: iend
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 4.  geometry of surface'
 !      write(id_file,'(a)') '! 4.1 center of surface'
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_node(id_file, nod_IO)
+      call read_number_of_node(id_file, nod_IO, iend)
+      if(iend .ne. 0) return
       call read_geometry_info(id_file, nod_IO)
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '!  4.2 normal vector of surface'
 !      write(id_file,'(a)') '!'
 !
-      call read_vector_in_element(id_file, nod_IO, sfed_IO)
+      call read_vector_in_element(id_file, nod_IO, sfed_IO, iend)
+      if(iend .ne. 0) return
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 4.3 area of surface'
 !      write(id_file,'(a)') '!'
 !
-      call read_scalar_in_element(id_file, nod_IO, sfed_IO)
+      call read_scalar_in_element(id_file, nod_IO, sfed_IO, iend)
 !
       end subroutine read_surface_geometry
 !

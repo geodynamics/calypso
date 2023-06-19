@@ -108,7 +108,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(surfacing_ctls%i_surfacing_control .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
@@ -167,9 +168,7 @@
       maxlen = max(maxlen, len_trim(hd_delta_t_ucd))
       maxlen = max(maxlen, len_trim(hd_i_step_ucd))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_section, surfacing_ctls%delta_t_psf_s_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
@@ -177,7 +176,6 @@
       call write_files_4_psf_ctl(id_control,                            &
      &    hd_section_ctl, surfacing_ctls%psf_s_ctls, level)
 !
-      write(id_control,'(a1)') '!'
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_isosurf, surfacing_ctls%delta_t_iso_s_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
@@ -185,7 +183,6 @@
       call write_files_4_iso_ctl(id_control,                            &
      &    hd_isosurf_ctl, surfacing_ctls%iso_s_ctls, level)
 !
-      write(id_control,'(a1)') '!'
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_ucd, surfacing_ctls%delta_t_ucd_s_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &

@@ -2,7 +2,7 @@ compare_psf_files.o: $(COMPARISON_DIR)/compare_psf_files.f90 m_precision.o t_ctl
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_psf_compare.o: $(COMPARISON_DIR)/t_ctl_data_psf_compare.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_array_character.o t_control_array_integer.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_psf_compares.o: $(COMPARISON_DIR)/t_ctl_data_psf_compares.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_psf_compare.o skip_comment_f.o
+t_ctl_data_psf_compares.o: $(COMPARISON_DIR)/t_ctl_data_psf_compares.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_psf_compare.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_param_psf_compares.o: $(COMPARISON_DIR)/t_ctl_param_psf_compares.f90 m_precision.o m_machine_parameter.o t_file_IO_parameter.o t_ctl_data_psf_compare.o set_sections_file_ctl.o t_ucd_data.o t_psf_results.o append_phys_data.o compare_mesh_structures.o
 	$(F90) -c $(F90OPTFLAGS) $<

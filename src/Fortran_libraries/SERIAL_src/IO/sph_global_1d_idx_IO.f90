@@ -7,9 +7,11 @@
 !> @brief Base routines for spectr indexing data IO
 !!
 !!@verbatim
-!!      subroutine read_rtp_gl_1d_table(id_file, sph_IO)
-!!      subroutine read_rj_gl_1d_table(id_file, sph_IO)
+!!      subroutine read_rtp_gl_1d_table(id_file, sph_IO, iend)
+!!      subroutine read_rj_gl_1d_table(id_file, sph_IO, iend)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        integer(kind = kint), intent(inout) :: iend
 !!
 !!      subroutine write_rtp_gl_1d_table(id_file, sph_IO)
 !!      subroutine write_rj_gl_1d_table(id_file, sph_IO)
@@ -32,12 +34,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_rtp_gl_1d_table(id_file, sph_IO)
+      subroutine read_rtp_gl_1d_table(id_file, sph_IO, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_file
       type(sph_IO_data), intent(inout) :: sph_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       integer(kind = kint) :: i
 !
@@ -48,7 +51,8 @@
 !
       call alloc_num_idx_sph_IO(sph_IO)
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%nidx_sph(1),                      &
      &                         sph_IO%ist_sph(1), sph_IO%ied_sph(1)
       call alloc_idx_sph_1d1_IO(sph_IO)
@@ -57,7 +61,8 @@
         read(id_file,*) sph_IO%idx_gl_1(i), sph_IO%r_gl_1(i)
       end do
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%nidx_sph(2),                      &
      &                         sph_IO%ist_sph(2), sph_IO%ied_sph(2)
       call alloc_idx_sph_1d2_IO(sph_IO)
@@ -66,7 +71,8 @@
         read(id_file,*) sph_IO%idx_gl_2(i,1:sph_IO%ncomp_table_1d(2))
       end do
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%nidx_sph(3),                      &
      &                         sph_IO%ist_sph(3), sph_IO%ied_sph(3)
       call alloc_idx_sph_1d3_IO(sph_IO)
@@ -79,12 +85,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_rj_gl_1d_table(id_file, sph_IO)
+      subroutine read_rj_gl_1d_table(id_file, sph_IO, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_file
       type(sph_IO_data), intent(inout) :: sph_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       integer(kind = kint) :: i
 !
@@ -95,7 +102,8 @@
 !
       call alloc_num_idx_sph_IO(sph_IO)
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%nidx_sph(1),                      &
      &                         sph_IO%ist_sph(1), sph_IO%ied_sph(1)
       call alloc_idx_sph_1d1_IO(sph_IO)
@@ -104,7 +112,8 @@
         read(id_file,*) sph_IO%idx_gl_1(i), sph_IO%r_gl_1(i)
       end do
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%nidx_sph(2),                      &
      &                         sph_IO%ist_sph(2), sph_IO%ied_sph(2)
       call alloc_idx_sph_1d2_IO(sph_IO)

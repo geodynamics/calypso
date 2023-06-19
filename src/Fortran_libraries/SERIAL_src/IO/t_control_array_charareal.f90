@@ -11,7 +11,7 @@
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!        type(read_chara_real_item), intent(inout) :: cr_item
 !!      subroutine write_charareal_ctl_type                             &
-!!     &         (id_file, level, maxlen, label, cr_item)
+!!     &         (id_file, level, label, cr_item)
 !!        type(read_chara_real_item), intent(in) :: cr_item
 !!      subroutine copy_charareal_ctl(org_cr, new_cr)
 !!        type(read_chara_real_item), intent(in) :: org_cr
@@ -101,17 +101,21 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_charareal_ctl_type                               &
-     &         (id_file, level, maxlen, label, cr_item)
+     &         (id_file, level, label, cr_item)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
-      integer(kind = kint), intent(in) :: maxlen
       character(len=kchara), intent(in) :: label
       type(read_chara_real_item), intent(in) :: cr_item
 !
+      integer(kind = kint) :: maxlen(0:1)
+!
 !
       if(cr_item%iflag .eq. 0) return
+!
+      maxlen(0) = len_trim(label)
+      maxlen(1) = len_trim(cr_item%charavalue)
 !
       call write_chara_real_ctl_item(id_file, level, maxlen, label,     &
      &    cr_item%charavalue, cr_item%realvalue)
@@ -185,7 +189,8 @@
       call alloc_control_array_c_r(array_cr)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, label, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, label)) exit
 !
         if(c_buf%header_chara.eq.label) then
@@ -203,6 +208,7 @@
 !
       use skip_comment_f
       use write_control_elements
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: label
@@ -211,16 +217,18 @@
       integer(kind = kint), intent(inout) :: level
 !
       integer(kind = kint) :: i
+      integer(kind = kint) :: maxlen(0:1)
 !
 !
       if(array_cr%num .le. 0) return
-      write(id_control,'(a1)') '!'
+!
+      maxlen(0) = len_trim(label)
+      maxlen(1) = max_len_of_charaarray(array_cr%num, array_cr%c_tbl)
 !
       level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_cr%num
-        call write_chara_real_ctl_item                                  &
-     &     (id_control, level, len_trim(label), label,                  &
-     &      array_cr%c_tbl(i), array_cr%vect(i))
+        call write_chara_real_ctl_item(id_control, level, maxlen,       &
+     &      label, array_cr%c_tbl(i), array_cr%vect(i))
       end do
       level = write_end_array_flag_for_ctl(id_control, level, label)
 !

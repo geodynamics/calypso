@@ -11,8 +11,9 @@
 !!      subroutine read_step_data_buffer(textbuf, id_rank, t_IO)
 !!
 !!      subroutine write_step_data(id_file, id_rank, t_IO)
-!!      subroutine read_step_data(id_file, t_IO)
+!!      subroutine read_step_data(id_file, t_IO, iend)
 !!        type(time_data), intent(inout) :: t_IO
+!!        integer(kind = kint), intent(inout) :: iend
 !!@endverbatim
 !!
 !!@n @param  id_rank   Process ID
@@ -112,22 +113,26 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine read_step_data(id_file, t_IO)
+      subroutine read_step_data(id_file, t_IO, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_file
       type(time_data), intent(inout) :: t_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=255) :: character_4_read
       integer(kind = kint) :: itmp
 !
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) itmp
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) t_IO%i_time_step
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*,err=99, end=99)                           &
      &                        t_IO%time, t_IO%dt
 !

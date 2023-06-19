@@ -42,7 +42,6 @@
 !
 !
       call calypso_mpi_bcast_one_int(psph_ctl%iflag_sph_shell, 0)
-      call calypso_mpi_bcast_one_int(psph_ctl%ifile_sph_shell, 0)
 !
       if(psph_ctl%iflag_sph_shell .eq. 0) return
 !

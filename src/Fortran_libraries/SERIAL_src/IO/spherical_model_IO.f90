@@ -7,10 +7,12 @@
 !> @brief  Data IO routines for spectrum data
 !!
 !!@verbatim
-!!      subroutine read_rank_4_sph(id_file, sph_IO)
-!!      subroutine read_gl_resolution_sph(id_file, sph_IO)
-!!      subroutine read_gl_nodes_sph(id_file, sph_IO)
+!!      subroutine read_rank_4_sph(id_file, sph_IO, iend)
+!!      subroutine read_gl_resolution_sph(id_file, sph_IO, iend)
+!!      subroutine read_gl_nodes_sph(id_file, sph_IO, iend)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        integer(kind = kint), intent(inout) :: iend
 !!
 !!      subroutine write_rank_4_sph(id_file, sph_IO)
 !!      subroutine write_gl_resolution_sph(id_file, sph_IO)
@@ -35,54 +37,62 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_rank_4_sph(id_file, sph_IO)
+      subroutine read_rank_4_sph(id_file, sph_IO, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_file
       type(sph_IO_data), intent(inout) :: sph_IO
+      integer(kind = kint), intent(inout) :: iend
 !
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%sph_rank(1:sph_IO%numdir_sph)
 !
       end subroutine read_rank_4_sph
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gl_resolution_sph(id_file, sph_IO)
+      subroutine read_gl_resolution_sph(id_file, sph_IO, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_file
       type(sph_IO_data), intent(inout) :: sph_IO
+      integer(kind = kint), intent(inout) :: iend
 !
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%nidx_gl_sph(1:sph_IO%numdir_sph)
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%ltr_gl
 !
       end subroutine read_gl_resolution_sph
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gl_nodes_sph(id_file, sph_IO)
+      subroutine read_gl_nodes_sph(id_file, sph_IO, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_file
       type(sph_IO_data), intent(inout) :: sph_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       integer(kind = kint) :: i
 !
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%numnod_sph
 !
       call alloc_nod_id_sph_IO(sph_IO)
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) sph_IO%inod_gl_sph(1),                   &
      &                         sph_IO%idx_gl_sph(1,1:sph_IO%numdir_sph)
       do i = 2, sph_IO%numnod_sph

@@ -88,12 +88,13 @@
       call alloc_data_on_circles_ctl(circ_ctls)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, hd_block)) exit
 !
         if(check_begin_flag(c_buf, hd_block)) then
           call append_data_on_circles_ctl(circ_ctls)
-          write(*,'(3a,i4,a)') 'Control for ', trim(hd_block), ' No. ',  &
+          write(*,'(3a,i4,a)') 'Control for ', trim(hd_block), ' No. ', &
      &        circ_ctls%num_circ_ctl, ' is included'
           call read_mid_eq_monitor_ctl(id_control, hd_block,            &
      &        circ_ctls%meq_ctl(circ_ctls%num_circ_ctl), c_buf)
@@ -116,7 +117,6 @@
 !
       integer(kind = kint) :: i
 !
-      write(id_control,'(a1)') '!'
       level = write_array_flag_for_ctl(id_control, level, hd_block)
       do i = 1, circ_ctls%num_circ_ctl
         write(*,'(2a,i4)', ADVANCE='NO') trim(hd_block), ' No. ', i

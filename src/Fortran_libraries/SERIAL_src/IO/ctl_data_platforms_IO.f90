@@ -144,7 +144,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(plt%i_platform .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
@@ -249,19 +250,15 @@
       maxlen = max(maxlen, len_trim(hd_coriolis_file_fmt))
       maxlen = max(maxlen, len_trim(hd_del_org_data))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_debug_flag_ctl, plt%debug_flag_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_num_subdomain, plt%ndomain_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_num_smp, plt%num_smp_ctl)
 !
-      write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_mesh_header, plt%mesh_file_prefix)
 !
@@ -285,20 +282,17 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_spect_field_fmt, plt%spectr_field_fmt_ctl)
 !
-      write(id_control,'(a)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_bc_data_file_name, plt%bc_data_file_name_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_radial_data_file_name, plt%radial_data_file_name_ctl)
 !
-      write(id_control,'(a)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_rayleigh_spectr_dir, plt%rayleigh_spectr_dir)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_rayleigh_field_dir, plt%rayleigh_field_dir)
 !
 !
-      write(id_control,'(a)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_coriolis_tri_int_name, plt%coriolis_int_file_name)
       call write_chara_ctl_type(id_control, level, maxlen,              &

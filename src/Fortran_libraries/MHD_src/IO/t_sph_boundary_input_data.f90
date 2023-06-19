@@ -11,8 +11,9 @@
 !!      subroutine bcast_boundary_spectr_file(bc_IO)
 !!        type(boundary_spectra), intent(inout) :: bc_IO
 !!
-!!      subroutine read_boundary_spectr_file(bc_IO)
+!!      subroutine read_boundary_spectr_file(bc_IO, iend)
 !!        type(boundary_spectra), intent(inout) :: bc_IO
+!!        integer(kind = kint), intent(inout) :: iend
 !!      subroutine write_boundary_spectr_file(bc_IO)
 !!        type(boundary_spectra), intent(in) :: bc_IO
 !!
@@ -123,12 +124,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_boundary_spectr_file(bc_IO)
+      subroutine read_boundary_spectr_file(bc_IO, iend)
 !
       use m_machine_parameter
       use skip_comment_f
 !
       type(boundary_spectra), intent(inout) :: bc_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       integer(kind = kint) :: igrp
       character(len=255) :: tmpchara
@@ -138,14 +140,16 @@
      &                      trim(bc_IO%file_name)
       open(id_boundary_file, file=bc_IO%file_name)
 !
-      call skip_comment(tmpchara,id_boundary_file)
+      call skip_comment(id_boundary_file, tmpchara, iend)
+      if(iend .gt. 0) return
       read(tmpchara,*) bc_IO%num_bc_fld
 !
       call alloc_sph_bc_item_ctl(bc_IO)
 !
       do igrp = 1, bc_IO%num_bc_fld
         call read_each_boundary_spectr                                  &
-     &     (id_boundary_file, bc_IO%ctls(igrp))
+     &     (id_boundary_file, bc_IO%ctls(igrp), iend)
+        if(iend .gt. 0) return
       end do
       close(id_boundary_file)
 !
