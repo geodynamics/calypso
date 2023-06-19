@@ -97,7 +97,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(cor_ctl%i_coriolis_ctl .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_chara_ctl_type(c_buf, hd_FEM_Coriolis_model,          &
@@ -133,9 +134,7 @@
       maxlen = len_trim(hd_FEM_Coriolis_model)
       maxlen = max(maxlen, len_trim(hd_FEM_Coriolis_imp))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_FEM_Coriolis_model, cor_ctl%FEM_coriolis_model)
       call write_chara_ctl_type(id_control, level, maxlen,              &

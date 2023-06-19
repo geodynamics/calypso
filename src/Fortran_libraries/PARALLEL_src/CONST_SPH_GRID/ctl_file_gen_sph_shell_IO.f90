@@ -83,6 +83,8 @@
       subroutine sel_read_ctl_gen_shell_grids                           &
      &         (id_control, hd_block, file_name, psph_ctl, c_buf)
 !
+      use write_control_elements
+!
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
@@ -91,16 +93,19 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if((psph_ctl%iflag_sph_shell + psph_ctl%ifile_sph_shell)          &
-     &                                                  .gt. 0) return
+      if(psph_ctl%iflag_sph_shell .gt. 0) return
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
-        psph_ctl%ifile_sph_shell = 1
+!
+        call write_one_ctl_file_message                                 &
+     &     (hd_block, c_buf%level, file_name)
         call read_ctl_file_gen_shell_grids(id_control+2, file_name,     &
      &                                     hd_block, psph_ctl)
+        c_buf%iend = psph_ctl%iflag_sph_shell
       else if(check_begin_flag(c_buf, hd_block)) then
         file_name = 'NO_FILE'
-        write(*,*) 'resolution data is included'
+!
+        call write_included_message(hd_block, c_buf%level)
         call read_parallel_shell_ctl                                    &
      &     (id_control, hd_block, psph_ctl, c_buf)
       end if
@@ -120,23 +125,28 @@
       type(buffer_for_control) :: c_buf1
 !
 !
-      write(*,*) 'Spherical shell resolution file: ',                   &
-     &          trim(file_name)
+      c_buf1%level = 0
       open(id_control, file = file_name)
 !
       do
         if(psph_ctl%iflag_sph_shell .gt. 0) exit
-        call load_one_line_from_control(id_control, c_buf1)
+        call load_one_line_from_control(id_control, hd_block, c_buf1)
+        if(c_buf1%iend .gt. 0) exit
         if(check_end_flag(c_buf1, hd_block)) exit
 !
         call read_parallel_shell_ctl(id_control, hd_block,              &
      &                               psph_ctl, c_buf1)
         call read_parallel_shell_ctl(id_control, hd_sph_shell,          &
      &                               psph_ctl, c_buf1)
+        if(psph_ctl%iflag_sph_shell .gt. 0) exit
       end do
 !
       close(id_control)
-      write(*,*) 'Spherical shell resolution file end'
+!
+      if(c_buf1%iend .gt. 0) then
+        psph_ctl%iflag_sph_shell = c_buf1%iend
+        return
+      end if
 !
       end subroutine read_ctl_file_gen_shell_grids
 !
@@ -159,8 +169,14 @@
       if(cmp_no_case(file_name, 'NO_FILE')) then
         call write_parallel_shell_ctl(id_control, hd_block,             &
      &                                psph_ctl, level)
+      else if(id_control .eq. id_monitor) then
+        write(*,'(4a)') '!  ', trim(hd_block),                          &
+     &           ' should be written to file ... ', trim(file_name)
+        call write_parallel_shell_ctl(id_control, hd_block,             &
+     &                                psph_ctl, level)
       else
-        write(*,'(a)', ADVANCE='NO') ' is write file to ... '
+        write(*,'(3a)') trim(hd_block),                                 &
+     &           ' is written to file ... ', trim(file_name)
         call write_file_name_for_ctl_line(id_control, level,            &
      &                                    hd_block, file_name)
         call write_ctl_file_gen_shell_grids((id_control+2), file_name,  &
@@ -189,7 +205,6 @@
         read(*,*)
       end if
 !
-      write(*,*) 'Spherical shell resolution file: ', trim(file_name)
       level = 0
       open(id_control, file = file_name)
       call write_parallel_shell_ctl(id_control, hd_block,               &

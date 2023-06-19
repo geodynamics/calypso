@@ -71,7 +71,9 @@
       open(input_file_code, file = file_name, form = 'formatted')
 !
       call read_geometry_data(input_file_code, id_rank, mesh_IO, ierr)
-      call read_mesh_groups(input_file_code, group_IO)
+      if(ierr .gt. 0) return
+      call read_mesh_groups(input_file_code, group_IO, ierr)
+      if(ierr .gt. 0) return
       close(input_file_code)
 !
       end subroutine read_mesh_file

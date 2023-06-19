@@ -218,7 +218,7 @@ set_bc_sph_mhd.o: $(MHD_SPH_DIR)/set_bc_sph_mhd.f90 m_precision.o m_machine_para
 	$(F90) -c $(F90OPTFLAGS) $<
 set_bc_sph_scalars.o: $(MHD_SPH_DIR)/set_bc_sph_scalars.f90 m_precision.o calypso_mpi.o m_constants.o m_error_IDs.o m_machine_parameter.o m_boundary_condition_IDs.o t_spheric_rj_data.o t_group_data.o t_boundary_params_sph_MHD.o t_boundary_sph_spectr.o t_sph_boundary_input_data.o t_bc_data_list.o t_field_labels.o m_base_field_labels.o m_base_force_labels.o set_sph_bc_data_by_file.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_4_SPH_to_FEM.o: $(MHD_SPH_DIR)/set_control_4_SPH_to_FEM.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_parameter.o t_spheric_parameter.o t_phys_data.o t_sph_boundary_input_data.o t_bc_data_list.o check_read_bc_file.o
+set_control_4_SPH_to_FEM.o: $(MHD_SPH_DIR)/set_control_4_SPH_to_FEM.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_parameter.o t_spheric_parameter.o t_phys_data.o t_sph_boundary_input_data.o t_bc_data_list.o calypso_mpi_int.o check_read_bc_file.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_control_sph_data_MHD.o: $(MHD_SPH_DIR)/set_control_sph_data_MHD.f90 m_precision.o calypso_mpi.o m_error_IDs.o m_machine_parameter.o t_control_parameter.o t_control_array_character3.o t_phys_data.o add_nodal_fields_4_MHD.o add_sph_MHD_fields_2_ctl.o set_control_field_data.o m_file_format_switch.o m_FFT_selector.o m_legendre_transform_list.o t_ctl_data_4_platforms.o t_ctl_data_mhd_evo_scheme.o t_field_data_IO.o t_legendre_trans_select.o t_sph_boundary_input_data.o t_work_4_sph_trans.o skip_comment_f.o sph_mhd_rst_IO_control.o sel_spherical_SRs.o
 	$(F90) -c $(F90OPTFLAGS) $<

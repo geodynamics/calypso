@@ -101,14 +101,20 @@
       type(buffer_for_control) :: c_buf1
 !
 !
+      c_buf1%level = 0
       open (viz_ctl_file_code, file=file_name, status='old' )
       do
-        call load_one_line_from_control(viz_ctl_file_code, c_buf1)
+        call load_one_line_from_control                                 &
+     &     (viz_ctl_file_code, hd_viz_only_file, c_buf1)
+        if(c_buf1%iend .gt. 0) exit
+!
         call read_section_control_data                                  &
      &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf1)
         if(sec_viz_ctl%i_viz_only_file .gt. 0) exit
       end do
       close(viz_ctl_file_code)
+!
+      if(c_buf1%iend .gt. 0) sec_viz_ctl%i_viz_only_file = c_buf1%iend
 !
       call section_step_ctls_to_time_ctl                                &
      &   (sec_viz_ctl%surfacing_ctls, sec_viz_ctl%t_sect_ctl)
@@ -167,7 +173,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(sec_viz_ctl%i_viz_only_file .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_platforms                                     &
@@ -202,9 +209,7 @@
 !
       if(sec_viz_ctl%i_viz_only_file .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_control_platforms                                      &
      &   (id_control, hd_platform, sec_viz_ctl%sect_plt, level)
       call write_control_time_step_data                                 &

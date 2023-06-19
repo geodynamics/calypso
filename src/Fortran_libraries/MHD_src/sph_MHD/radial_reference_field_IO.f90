@@ -124,6 +124,7 @@
       type(radial_reference_field), intent(inout) :: refs
 !
       type(time_data) :: time_IO
+      integer(kind = kint) :: iend
       integer(kind = kint_gl) :: num64
 !
 !
@@ -131,7 +132,9 @@
       if(refs%ref_input_IO%iflag_IO .eq. 0) return
       if(my_rank .eq. 0) then
         call read_and_alloc_step_field(refs%ref_input_IO%file_prefix,   &
-     &      my_rank, time_IO, refs%ref_fld_IO)
+     &      my_rank, time_IO, refs%ref_fld_IO, iend)
+        if(iend .gt. 0) call calypso_mpi_abort(iend,                    &
+     &                                         'Read file failed')
 !
         call interpolate_ref_fields_IO(radius_name,                     &
      &      refs%iref_radius, refs%ref_fld_IO,                          &
@@ -172,6 +175,7 @@
       type(phys_data), intent(inout) :: ref_field
 !
       type(time_data) :: time_IO
+      integer(kind = kint) :: iend
       integer(kind = kint_gl) :: num64
 !
 !
@@ -179,7 +183,9 @@
       if(ref_file_IO%iflag_IO .eq. 0) return
       if(my_rank .eq. 0) then
         call read_and_alloc_step_field(ref_file_IO%file_prefix,         &
-     &      my_rank, time_IO, ref_fld_IO)
+     &      my_rank, time_IO, ref_fld_IO, iend)
+        if(iend .gt. 0) call calypso_mpi_abort(iend,                    &
+     &                                         'Read file failed')
 !
         call interpolate_one_ref_field_IO(radius_name,                  &
      &      iref_radius, phys_name, iref_in, ncomp, ref_fld_IO,         &

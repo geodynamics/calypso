@@ -7,13 +7,13 @@
 !>@brief  Routines for communcation table IO
 !!
 !!@verbatim
-!!      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr)
+!!      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr, iend)
 !!      subroutine read_send_recv_work(id_file, ntot_sr, nwork,         &
-!!     &          inod_sr, idx_work)
+!!     &                               inod_sr, idx_work, iend)
 !!      subroutine write_send_recv_data(id_file, num_sr, ntot_sr,       &
-!!     &          istack_sr, inod_sr)
+!!     &                                istack_sr, inod_sr)
 !!      subroutine write_send_recv_work(id_file, num_sr, ntot_sr, nwork,&
-!!     &          istack_sr, inod_sr, idx_work)
+!!     &                                istack_sr, inod_sr, idx_work)
 !!@endverbatim
 !
       module comm_table_data_IO
@@ -31,17 +31,19 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr)
+      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr, iend)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_file
       integer(kind = kint), intent(in) :: ntot_sr
       integer(kind = kint), intent(inout) :: inod_sr(ntot_sr)
+      integer (kind=kint), intent(inout) :: iend
 !
       integer(kind = kint) :: i
 !
-      call skip_comment(character_4_read, id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) inod_sr(1)
       do i = 2, ntot_sr
         read(id_file,*) inod_sr(i)
@@ -52,7 +54,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_send_recv_work(id_file, ntot_sr, nwork,           &
-     &          inod_sr, idx_work)
+     &                               inod_sr, idx_work, iend)
 !
       use skip_comment_f
 !
@@ -60,11 +62,13 @@
       integer(kind = kint), intent(in) :: ntot_sr, nwork
       integer(kind = kint), intent(inout) :: inod_sr(ntot_sr)
       integer(kind = kint), intent(inout) :: idx_work(ntot_sr,nwork)
+      integer (kind=kint), intent(inout) :: iend
 !
       integer(kind = kint) :: i
 !
 !
-      call skip_comment(character_4_read, id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) inod_sr(1), idx_work(1,1:nwork)
       do i = 2, ntot_sr
         read(id_file,*) inod_sr(i), idx_work(i,1:nwork)
@@ -76,7 +80,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine write_send_recv_data(id_file, num_sr, ntot_sr,         &
-     &          istack_sr, inod_sr)
+     &                                istack_sr, inod_sr)
 !
       integer(kind = kint), intent(in) :: id_file
       integer(kind = kint), intent(in) :: num_sr, ntot_sr
@@ -103,7 +107,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine write_send_recv_work(id_file, num_sr, ntot_sr, nwork,  &
-     &          istack_sr, inod_sr, idx_work)
+     &                                istack_sr, inod_sr, idx_work)
 !
       integer(kind = kint), intent(in) :: id_file
       integer(kind = kint), intent(in) :: num_sr, ntot_sr, nwork

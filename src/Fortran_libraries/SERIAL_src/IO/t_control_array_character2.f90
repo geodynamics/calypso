@@ -183,7 +183,8 @@
       call alloc_control_array_c2(array_c2)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, label, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, label)) exit
 !
         if(c_buf%header_chara.eq.label) then
@@ -213,7 +214,6 @@
 !
 !
       if(array_c2%num .le. 0) return
-      write(id_control,'(a1)') '!'
 !
       maxlen(0) = len_trim(label)
       maxlen(1) = max_len_of_charaarray(array_c2%num, array_c2%c1_tbl)

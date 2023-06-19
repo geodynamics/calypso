@@ -71,6 +71,11 @@
       end if
       call bcast_section_control_data(sec_viz_ctl)
 !
+      if(sec_viz_ctl%i_viz_only_file .ne. 1) then
+        call calypso_MPI_abort(sec_viz_ctl%i_viz_only_file,             &
+     &                             'control file is broken')
+      end if
+!
 !       set control data
       call set_control_params_4_sections(sec_viz_ctl,                   &
      &                                   FEM_viz, t_viz_param, ierr)

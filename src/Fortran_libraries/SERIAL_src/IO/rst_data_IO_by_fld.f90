@@ -7,10 +7,12 @@
 !> @brief read restart file
 !!
 !!@verbatim
-!!      subroutine read_rst_file(id_rank, file_name, t_IO, fld_IO)
-!!      subroutine read_rst_data_comps(id_rank, file_name, t_IO, fld_IO)
+!!      subroutine read_rst_file(id_rank, file_name, t_IO, fld_IO, iend)
+!!      subroutine read_rst_data_comps                                  &
+!!     &         (id_rank, file_name, t_IO, fld_IO, iend)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(field_IO), intent(inout) :: fld_IO
+!!        integer(kind = kint), intent(inout) :: iend
 !!@endverbatim
 !
       module rst_data_IO_by_fld
@@ -32,7 +34,7 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_rst_file(id_rank, file_name, t_IO, fld_IO)
+      subroutine read_rst_file(id_rank, file_name, t_IO, fld_IO, iend)
 !
       use set_parallel_file_name
       use field_data_IO
@@ -44,6 +46,7 @@
 !
       type(time_data), intent(inout) :: t_IO
       type(field_IO), intent(inout) :: fld_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=kchara) :: character_4_read
 !
@@ -52,21 +55,25 @@
      &    'Read ascii restart file: ', trim(file_name)
       open (id_phys_file, file = file_name, form='formatted')
 !
-      call read_step_data(id_phys_file, t_IO)
+      call read_step_data(id_phys_file, t_IO, iend)
+      if(iend .gt. 0) return
 !
-      call skip_comment(character_4_read,id_phys_file)
+      call skip_comment(id_phys_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) fld_IO%num_field_IO
 !
       call read_field_data(id_phys_file, cast_long(fld_IO%nnod_IO),     &
      &    fld_IO%num_field_IO, fld_IO%ntot_comp_IO,                     &
-     &    fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
+     &    fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO, iend)
+      if(iend .gt. 0) return
       close (id_phys_file)
 !
       end subroutine read_rst_file
 !
 !------------------------------------------------------------------
 !
-      subroutine read_rst_data_comps(id_rank, file_name, t_IO, fld_IO)
+      subroutine read_rst_data_comps                                    &
+     &         (id_rank, file_name, t_IO, fld_IO, iend)
 !
       use set_parallel_file_name
       use field_data_IO
@@ -77,6 +84,7 @@
 !
       type(time_data), intent(inout) :: t_IO
       type(field_IO), intent(inout) :: fld_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=kchara) :: character_4_read
 !
@@ -85,14 +93,17 @@
      &     'Read ascii restart file: ', trim(file_name)
       open (id_phys_file, file = file_name, form='formatted')
 !
-      call read_step_data(id_phys_file, t_IO)
+      call read_step_data(id_phys_file, t_IO, iend)
+      if(iend .gt. 0) return
 !
-      call skip_comment(character_4_read,id_phys_file)
+      call skip_comment(id_phys_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) fld_IO%num_field_IO
 !
       call alloc_phys_name_IO(fld_IO)
 !
-      call read_rst_field_comps(fld_IO)
+      call read_rst_field_comps(fld_IO, iend)
+      if(iend .gt. 0) return
       close (id_phys_file)
 !
       call cal_istack_phys_comp_IO(fld_IO)
@@ -102,13 +113,14 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_rst_field_comps(fld_IO)
+      subroutine read_rst_field_comps(fld_IO, iend)
 !
       use skip_comment_f
       use set_restart_data
       use skip_comment_f
 !
       type(field_IO), intent(inout) :: fld_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=kchara) :: character_4_read
       integer(kind = kint) :: i, inod
@@ -116,7 +128,8 @@
 !
 !
       do i = 1, fld_IO%num_field_IO
-        call skip_comment(character_4_read,id_phys_file)
+        call skip_comment(id_phys_file, character_4_read, iend)
+        if(iend .gt. 0) return
         read(character_4_read,*) fld_IO%fld_name(i)
 !
         call set_num_comps_4_rst(fld_IO%fld_name(i),                    &

@@ -89,6 +89,10 @@
       call bcast_surfacing_controls(add_SMHD_ctl%surfacing_ctls)
       call s_bcast_dynamo_section_control(add_SMHD_ctl%zm_sects)
 !
+      if(MHD_ctl%i_mhd_ctl .ne. 1) then
+        call calypso_MPI_abort(MHD_ctl%i_mhd_ctl, trim(file_name))
+      end if
+!
       end subroutine load_control_4_sph_MHD_w_psf
 !
 ! ----------------------------------------------------------------------
@@ -107,6 +111,10 @@
       end if
 !
       call bcast_sph_mhd_control_data(MHD_ctl)
+!
+      if(MHD_ctl%i_mhd_ctl .le. 0) then
+        call calypso_MPI_abort(MHD_ctl%i_mhd_ctl, trim(file_name))
+      end if
 !
       end subroutine load_control_4_sph_MHD_noviz
 !

@@ -11,11 +11,13 @@
 !!        type(time_data), intent(in) :: t_IO
 !!        type(ucd_data), intent(in) :: ucd
 !!
-!!      subroutine read_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
+!!      subroutine read_ucd_2_fld_file                                  &
+!!     &         (id_rank, file_name, t_IO, ucd, iend)
 !!      subroutine read_alloc_ucd_2_fld_file                            &
-!!     &         (id_rank, file_name, t_IO, ucd)
+!!     &         (id_rank, file_name, t_IO, ucd, iend)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
+!!        integer(kind = kint), intent(inout) :: iend
 !!@endverbatim
 !!
 !!@param id_rank    process ID
@@ -72,7 +74,8 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
+      subroutine read_ucd_2_fld_file                                    &
+     &         (id_rank, file_name, t_IO, ucd, iend)
 !
       use skip_comment_f
 !
@@ -80,6 +83,7 @@
       integer, intent(in) :: id_rank
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=255) :: character_4_read
 !
@@ -89,14 +93,17 @@
 !
       open(id_fld_file, file = file_name, form = 'formatted')
 !
-      call read_step_data(id_fld_file, t_IO)
+      call read_step_data(id_fld_file, t_IO, iend)
+      if(iend .gt. 0) return
 !
-      call skip_comment(character_4_read, id_fld_file)
+      call skip_comment(id_fld_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) ucd%nnod, ucd%num_field
       read(id_fld_file,*) ucd%num_comp(1:ucd%num_field)
 !
       call read_field_data(id_fld_file, ucd%nnod, ucd%num_field,        &
-     &          ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd)
+     &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd, iend)
+      if(iend .gt. 0) return
 !
       close (id_fld_file)
 !
@@ -105,7 +112,7 @@
 !------------------------------------------------------------------
 !
       subroutine read_alloc_ucd_2_fld_file                              &
-     &         (id_rank, file_name, t_IO, ucd)
+     &         (id_rank, file_name, t_IO, ucd, iend)
 !
       use skip_comment_f
 !
@@ -113,6 +120,7 @@
       integer, intent(in) :: id_rank
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=255) :: character_4_read
 !
@@ -122,9 +130,11 @@
 !
       open(id_fld_file, file = file_name, form = 'formatted')
 !
-      call read_step_data(id_fld_file, t_IO)
+      call read_step_data(id_fld_file, t_IO, iend)
+      if(iend .gt. 0) return
 !
-      call skip_comment(character_4_read, id_fld_file)
+      call skip_comment(id_fld_file, character_4_read, iend)
+      if(iend .gt. 0) return
       read(character_4_read,*) ucd%nnod, ucd%num_field
 !
       call allocate_ucd_phys_name(ucd)
@@ -135,7 +145,8 @@
 !
       call read_field_data(id_fld_file,                                 &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp,                       &
-     &    ucd%num_comp, ucd%phys_name, ucd%d_ucd)
+     &    ucd%num_comp, ucd%phys_name, ucd%d_ucd, iend)
+      if(iend .gt. 0) return
 !
       close (id_fld_file)
 !

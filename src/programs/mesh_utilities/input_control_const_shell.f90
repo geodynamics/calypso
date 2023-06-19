@@ -60,6 +60,11 @@
       end if
       call bcast_sph_shell_construct_ctl(gen_SPH_ctl)
 !
+      if(gen_SPH_ctl%i_sph_mesh_ctl .ne. 1) then
+        call calypso_MPI_abort(gen_SPH_ctl%i_sph_mesh_ctl,              &
+     &                         trim(file_name))
+      end if
+!
 !       set control data
       call set_control_4_gen_shell_grids                                &
      &   (my_rank, gen_SPH_ctl%plt, gen_SPH_ctl%psph_ctl,               &

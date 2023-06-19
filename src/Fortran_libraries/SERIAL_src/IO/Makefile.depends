@@ -204,7 +204,7 @@ t_control_array_charaint.o: $(IO_DIR)/t_control_array_charaint.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_array_charaint3.o: $(IO_DIR)/t_control_array_charaint3.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_array_charareal.o: $(IO_DIR)/t_control_array_charareal.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
+t_control_array_charareal.o: $(IO_DIR)/t_control_array_charareal.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o write_control_items.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_array_charareal2.o: $(IO_DIR)/t_control_array_charareal2.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<

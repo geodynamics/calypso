@@ -74,13 +74,14 @@
 !      write(id_file,'(a)') '! 2.1 element ID for import '
 !      write(id_file,'(a)') '!'
 !
-      call read_import_data(id_file, comm_IO)
+      call read_import_data(id_file, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 2.2 element ID for export '
 !      write(id_file,'(a)') '! '
 !
-      call read_export_data(id_file, comm_IO)
+      call read_export_data(id_file, comm_IO, ierr)
 !
       end subroutine read_comm_table
 !
@@ -125,11 +126,12 @@
 !
       call read_domain_info(id_file, id_rank, import_IO, ierr)
       if(ierr .ne. 0) return
-      call read_import_data(id_file, import_IO)
+      call read_import_data(id_file, import_IO, ierr)
+      if(ierr .ne. 0) return
 !
       call read_domain_info(id_file, id_rank, export_IO, ierr)
       if(ierr .ne. 0) return
-      call read_export_data(id_file, export_IO)
+      call read_export_data(id_file, export_IO, ierr)
 !
       end subroutine read_calypso_comm_tbl
 !

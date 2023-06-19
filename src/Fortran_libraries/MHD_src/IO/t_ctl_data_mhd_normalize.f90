@@ -152,7 +152,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(eqs_ctl%i_coef_term_ctl .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_thermal_ctl                                           &
@@ -184,9 +185,7 @@
 !
       if(eqs_ctl%i_coef_term_ctl .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_thermal_ctl                                            &
      &   (id_control, hd_thermal, eqs_ctl%heat_ctl, level)
       call write_momentum_ctl                                           &
