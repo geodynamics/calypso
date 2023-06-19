@@ -2,7 +2,7 @@ bcast_maps_control_data.o: $(MAP_RENDERING_DIR)/bcast_maps_control_data.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_data_map_rendering_IO.o: $(MAP_RENDERING_DIR)/ctl_data_map_rendering_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_data_4_map.o t_ctl_data_pvr_section.o calypso_mpi.o t_ctl_data_pvr_colormap_bar.o ctl_file_pvr_modelview_IO.o ctl_data_pvr_section_IO.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ctl_file_map_renderings_IO.o: $(MAP_RENDERING_DIR)/ctl_file_map_renderings_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o t_control_data_maps.o t_read_control_elements.o ctl_data_section_IO.o skip_comment_f.o ctl_data_map_rendering_IO.o write_control_elements.o
+ctl_file_map_renderings_IO.o: $(MAP_RENDERING_DIR)/ctl_file_map_renderings_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o t_control_data_maps.o t_read_control_elements.o ctl_data_section_IO.o skip_comment_f.o write_control_elements.o ctl_data_map_rendering_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 draw_aitoff_map.o: $(MAP_RENDERING_DIR)/draw_aitoff_map.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_pvr_image_array.o t_map_rendering_data.o t_map_patch_from_1patch.o map_patch_from_1patch.o draw_pixels_on_map.o set_color_4_pvr.o draw_isoline_in_triangle.o
 	$(F90) -c $(F90OPTFLAGS) $<

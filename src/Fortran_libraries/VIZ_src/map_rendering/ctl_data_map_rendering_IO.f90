@@ -225,13 +225,13 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call sel_read_ctl_modelview_file(id_control, hd_map_projection, &
-     &      map_c%fname_mat_ctl, map_c%mat, c_buf)
+     &      izero, map_c%fname_mat_ctl, map_c%mat, c_buf)
         call sel_read_ctl_pvr_colormap_file                             &
      &     (id_control, hd_map_colormap_file, map_c%fname_cmap_cbar_c,  &
      &      map_c%cmap_cbar_c, c_buf)
 !
         call read_pvr_section_ctl(id_control, hd_section_ctl,           &
-     &                            map_c%map_define_ctl, c_buf)
+     &                            izero, map_c%map_define_ctl, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_map_image_prefix,            &
      &      map_c%map_image_prefix_ctl)
@@ -280,6 +280,7 @@
       maxlen = max(maxlen, len_trim(hd_map_isoline_field))
       maxlen = max(maxlen, len_trim(hd_map_isoline_comp))
 !
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_map_image_prefix, map_c%map_image_prefix_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &

@@ -102,17 +102,17 @@
 !>  Structure of control data for PVR rendering
       type pvr_parameter_ctl
 !>     file name for modelview matrix
-        character(len=kchara) :: fname_mat_ctl
+        character(len=kchara) :: fname_mat_ctl = 'NO_FILE'
 !>     Structure for modelview marices
         type(modeview_ctl) :: mat
 !
 !>     file name for lighting parameter
-        character(len=kchara) :: fname_pvr_light_c
+        character(len=kchara) :: fname_pvr_light_c = 'NO_FILE'
 !>     Structure for lighting
         type(pvr_light_ctl) :: light
 !
 !>     file name for colormap and colorbar
-        character(len=kchara) :: fname_cmap_cbar_c
+        character(len=kchara) :: fname_cmap_cbar_c = 'NO_FILE'
 !>     Structure for colormap and colorbar
         type(pvr_colormap_bar_ctl) :: cmap_cbar_c
 !
@@ -180,6 +180,10 @@
       pvr_ctl%anaglyph_ctl%iflag =    0
       pvr_ctl%pvr_field_ctl%iflag =   0
       pvr_ctl%pvr_comp_ctl%iflag =    0
+!
+      pvr_ctl%fname_mat_ctl = 'NO_FILE'
+      pvr_ctl%fname_pvr_light_c = 'NO_FILE'
+      pvr_ctl%fname_cmap_cbar_c = 'NO_FILE'
 !
       pvr_ctl%i_pvr_ctl = 0
 !

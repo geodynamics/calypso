@@ -111,7 +111,6 @@
      &         (id_control, hd_block, pvr_scts_c, c_buf)
 !
       use ctl_data_pvr_section_IO
-      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -132,9 +131,8 @@
         if(check_begin_flag(c_buf, hd_block)) then
           call append_new_pvr_section_ctl(pvr_scts_c)
 !
-          call write_multi_ctl_file_message                             &
-     &       (hd_block, pvr_scts_c%num_pvr_sect_ctl, c_buf%level)
-          call read_pvr_section_ctl(id_control, hd_block,               &
+          call read_pvr_section_ctl                                     &
+     &       (id_control, hd_block, pvr_scts_c%num_pvr_sect_ctl,        &
      &        pvr_scts_c%pvr_sect_ctl(pvr_scts_c%num_pvr_sect_ctl),     &
      &        c_buf)
         end if
@@ -162,8 +160,7 @@
 !
       level = write_array_flag_for_ctl(id_control, level, hd_block)
       do i = 1, pvr_scts_c%num_pvr_sect_ctl
-        write(*,'(3a,i4)', ADVANCE='NO') '!  ', trim(hd_block),         &
-     &                                   ' No. ', i
+        write(*,'(3a,i4)') '!  ', trim(hd_block), ' No. ', i
         call write_pvr_section_ctl(id_control, hd_block,                &
      &      pvr_scts_c%pvr_sect_ctl(i), level)
       end do

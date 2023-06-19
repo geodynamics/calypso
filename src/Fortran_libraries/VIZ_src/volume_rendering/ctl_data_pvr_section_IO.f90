@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine read_pvr_section_ctl                                 &
-!!     &         (id_control, hd_block, pvr_sect_ctl, c_buf)
+!!     &         (id_control, hd_block, icou, pvr_sect_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
@@ -98,11 +98,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_pvr_section_ctl                                   &
-     &         (id_control, hd_block, pvr_sect_ctl, c_buf)
+     &         (id_control, hd_block, icou, pvr_sect_ctl, c_buf)
 !
       use ctl_file_section_def_IO
+      use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control
+      integer(kind = kint), intent(in) :: id_control, icou
       character(len=kchara), intent(in) :: hd_block
       type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
@@ -117,6 +118,8 @@
 !
         if(check_file_flag(c_buf, hd_surface_define)                    &
      &        .or. check_begin_flag(c_buf, hd_surface_define)) then
+          call write_multi_ctl_file_message                             &
+     &       (hd_block, icou, c_buf%level)
           call sel_read_ctl_pvr_section_def(id_control,                 &
      &        hd_surface_define, pvr_sect_ctl%fname_sect_ctl,           &
      &        pvr_sect_ctl%psf_def_c, c_buf)

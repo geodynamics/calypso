@@ -132,25 +132,12 @@
         if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
-!
-        if(check_file_flag(c_buf, hd_start_view_control)                &
-     &        .or. check_begin_flag(c_buf, hd_start_view_control)) then
-          call write_multi_ctl_file_message                             &
-     &       (hd_start_view_control, izero, c_buf%level)
-          call sel_read_ctl_modelview_file                              &
-     &       (id_control, hd_start_view_control,                        &
-     &        movie%fname_view_start_ctl, movie%view_start_ctl, c_buf)
-        end if
-!
-        if(check_file_flag(c_buf, hd_end_view_control)                  &
-     &        .or. check_begin_flag(c_buf, hd_end_view_control)) then
-          call write_multi_ctl_file_message                             &
-     &       (hd_end_view_control, izero, c_buf%level)
-         call sel_read_ctl_modelview_file                               &
-     &       (id_control, hd_end_view_control,                          &
-     &        movie%fname_view_end_ctl, movie%view_end_ctl, c_buf)
-        end if
-!
+        call sel_read_ctl_modelview_file                                &
+     &     (id_control, hd_start_view_control, izero,                   &
+     &      movie%fname_view_start_ctl, movie%view_start_ctl, c_buf)
+        call sel_read_ctl_modelview_file                                &
+     &     (id_control, hd_end_view_control, izero,                     &
+     &      movie%fname_view_end_ctl, movie%view_end_ctl, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_movie_mode,                  &
      &      movie%movie_mode_ctl)

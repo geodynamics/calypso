@@ -106,7 +106,6 @@
 !
       use ctl_file_pvr_modelview_IO
       use ctl_data_view_transfer_IO
-      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -128,9 +127,8 @@
      &        .or. check_begin_flag(c_buf, hd_block)) then
           call append_mul_view_trans_ctl(mul_mats_c)
 !
-          call write_multi_ctl_file_message                             &
-     &       (hd_block, mul_mats_c%num_modelviews_c, c_buf%level)
-          call sel_read_ctl_modelview_file(id_control, hd_block,        &
+          call sel_read_ctl_modelview_file                              &
+     &       (id_control, hd_block, mul_mats_c%num_modelviews_c,        &
      &        mul_mats_c%fname_mat_ctl(mul_mats_c%num_modelviews_c),    &
      &        mul_mats_c%matrices(mul_mats_c%num_modelviews_c), c_buf)
         end if

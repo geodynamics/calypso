@@ -50,7 +50,7 @@ ctl_file_each_pvr_IO.o: $(PVR_DIR)/ctl_file_each_pvr_IO.f90 m_precision.o calyps
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_file_pvr_light_IO.o: $(PVR_DIR)/ctl_file_pvr_light_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ctl_data_pvr_light.o t_read_control_elements.o write_control_elements.o ctl_data_view_transfer_IO.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ctl_file_pvr_modelview_IO.o: $(PVR_DIR)/ctl_file_pvr_modelview_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ctl_data_4_view_transfer.o t_read_control_elements.o ctl_data_view_transfer_IO.o skip_comment_f.o write_control_elements.o
+ctl_file_pvr_modelview_IO.o: $(PVR_DIR)/ctl_file_pvr_modelview_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ctl_data_4_view_transfer.o t_read_control_elements.o ctl_data_view_transfer_IO.o write_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 draw_pvr_colorbar.o: $(PVR_DIR)/draw_pvr_colorbar.f90 m_precision.o m_constants.o t_pvr_colormap_parameter.o draw_pvr_colorbar_nums.o set_color_4_pvr.o set_rgba_4_each_pixel.o
 	$(F90) -c $(F90OPTFLAGS) $<

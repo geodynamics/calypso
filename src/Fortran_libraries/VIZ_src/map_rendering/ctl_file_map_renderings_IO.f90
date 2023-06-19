@@ -10,8 +10,6 @@
 !!     &         (id_control, hd_block, map_ctls, c_buf)
 !!      subroutine sel_read_control_4_map_file(id_control, hd_block,    &
 !!     &          file_name, map_ctl_struct, c_buf)
-!!      subroutine read_control_4_map_file(id_control, file_name,       &
-!!     &                                   hd_block, map_ctl_struct)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        character(len = kchara), intent(inout) :: file_name
@@ -53,6 +51,8 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_map_rendering = 'map_rendering_ctl'
 !
+      private :: read_control_4_map_file
+!
 !   --------------------------------------------------------------------
 !
       contains
@@ -65,12 +65,14 @@
       use t_read_control_elements
       use ctl_data_section_IO
       use skip_comment_f
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
       type(map_rendering_controls), intent(inout) :: map_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
 !
+      integer :: i
 !
       if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(map_ctls%map_ctl_struct)) return
@@ -85,8 +87,9 @@
         if(check_file_flag(c_buf, hd_block)                             &
      &      .or. check_begin_flag(c_buf, hd_block)) then
           call append_new_map_render_control(map_ctls)
-          write(*,'(3a,i4)', ADVANCE='NO') 'Control for ',              &
-     &        trim(hd_block), ' No. ',  map_ctls%num_map_ctl
+!
+          call write_multi_ctl_file_message                             &
+     &       (hd_block, map_ctls%num_map_ctl, c_buf%level)
           call sel_read_control_4_map_file(id_control, hd_block,        &
      &        map_ctls%fname_map_ctl(map_ctls%num_map_ctl),             &
      &        map_ctls%map_ctl_struct(map_ctls%num_map_ctl), c_buf)
@@ -114,13 +117,13 @@
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
-        write(*,'(a)', ADVANCE='NO') ' is read file from ... '
+        write(*,'(2a)') ' is read file from ... ',  trim(file_name)
         call read_control_4_map_file((id_control+2), file_name,         &
-     &                               hd_block, map_ctl_struct)
+     &                               hd_block, map_ctl_struct, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
         file_name = 'NO_FILE'
 !
-        write(*,*) ' is included'
+        write(*,'(a)') ' is included.'
         call s_read_map_control_data(id_control, hd_block,              &
      &                               map_ctl_struct, c_buf)
       end if
@@ -130,7 +133,7 @@
 !   --------------------------------------------------------------------
 !
       subroutine read_control_4_map_file(id_control, file_name,         &
-     &                                   hd_block, map_ctl_struct)
+     &          hd_block, map_ctl_struct, c_buf)
 !
       use t_read_control_elements
       use t_control_data_4_map
@@ -141,24 +144,24 @@
       character(len = kchara), intent(in) :: file_name
       character(len=kchara), intent(in) :: hd_block
       type(map_ctl), intent(inout) :: map_ctl_struct
+      type(buffer_for_control), intent(inout) :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
-      write(*,'(a)') trim(file_name)
+      c_buf%level = c_buf%level + 1
       open(id_control, file=file_name, status='old')
 !
       do
-        call load_one_line_from_control(id_control, hd_block, c_buf1)
-        if(c_buf1%iend .gt. 0) exit
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
 !
         call s_read_map_control_data(id_control, hd_block,              &
-     &      map_ctl_struct, c_buf1)
+     &      map_ctl_struct, c_buf)
         call s_read_map_control_data(id_control, hd_map_rendering,      &
-     &      map_ctl_struct, c_buf1)
+     &      map_ctl_struct, c_buf)
         if(map_ctl_struct%i_map_ctl .gt. 0) exit
       end do
       close(id_control)
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_control_4_map_file
 !
@@ -177,6 +180,8 @@
 !
       integer(kind = kint) :: i
 !
+!
+      if(map_ctls%num_map_ctl .le. 0) return
       level = write_array_flag_for_ctl(id_control, level, hd_block)
       do i = 1, map_ctls%num_map_ctl
         write(*,'(3a,i4)', ADVANCE='NO') '!  ', trim(hd_block),         &

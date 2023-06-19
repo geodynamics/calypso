@@ -242,7 +242,7 @@
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(psf_ctls%num_psf_ctl .gt. 0) return
+      if(psf_ctls%num_psf_ctl .le. 0) return
       call sel_write_control_4_psf_file(id_control, hd_section,         &
      &    psf_ctls%fname_psf_ctl(1), psf_ctls%psf_ctl_struct(1), level)
 !

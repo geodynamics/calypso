@@ -194,12 +194,12 @@
         type(read_character_item) :: isoline_comp_ctl
 !
 !>     file name for modelview matrix
-        character(len=kchara) :: fname_mat_ctl
+        character(len=kchara) :: fname_mat_ctl = 'NO_FILE'
 !>     Structure for modelview marices
         type(modeview_ctl) :: mat
 !
 !>     file name for colormap and colorbar
-        character(len=kchara) :: fname_cmap_cbar_c
+        character(len=kchara) :: fname_cmap_cbar_c = 'NO_FILE'
 !>     Structure for colormap and colorbar
         type(pvr_colormap_bar_ctl) :: cmap_cbar_c
 !
@@ -241,6 +241,9 @@
       map_c%isoline_field_ctl%iflag =    0
       map_c%isoline_comp_ctl%iflag =     0
 !
+      map_c%fname_mat_ctl = 'NO_FILE'
+      map_c%fname_cmap_cbar_c = 'NO_FILE'
+!
       map_c%i_map_ctl =        0
       map_c%i_output_field =   0
 !
@@ -272,6 +275,9 @@
      &                    new_map_c%isoline_field_ctl)
       call copy_chara_ctl(org_map_c%isoline_comp_ctl,                   &
      &                    new_map_c%isoline_comp_ctl)
+!
+      new_map_c%fname_mat_ctl =     org_map_c%fname_mat_ctl
+      new_map_c%fname_cmap_cbar_c = org_map_c%fname_cmap_cbar_c
 !
       new_map_c%i_map_ctl =        org_map_c%i_map_ctl
       new_map_c%i_output_field =   org_map_c%i_output_field
