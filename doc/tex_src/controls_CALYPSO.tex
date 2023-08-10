@@ -275,7 +275,7 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \begin{tabular}{|c|c|c|}
 \hline
 \tt [Name] & field name & Description \\ \hline \hline
-\tt velocity &    Velocity &  \bvec{u} \\
+\tt velocity &    Velocity &  $\bvec{u}$ \\
 \tt vorticity &   Vorticity & $\bvec{\omega} = \nabla \times \bvec{u} $ \\
 \tt pressure &    Pressure & $P$ \\
 \hline
@@ -510,6 +510,7 @@ Boundary conditions for magnetic field are defined by this array. Position of bo
 \begin{description}
 \item{\tt insulator}	Magnetic field is connected to potential field at boundary defined in [Group]. real value is required at \verb|[Value]|, but they value is not used in the program.
 \item{\tt sph\_to\_center}	 If this condition is set, magnetic field in conductive inner core ($r < r_{i}$) is solved. This boundary condition can be used for {\tt ICB}, and grid is filled to center. The value at \verb|[Value]| does not used.
+\item{\tt pseudo\_vacuum}    Magetic field has only radial componenet at the specified boundary.
 \end{description}
 %
 
@@ -561,7 +562,7 @@ Dimensionless numbers are defined in this block. \\
 \paragraph{\tt array dimless\_ctl}
 \label{href_t:dimless_ctl}
 \verb|[Name] [Value]| \\
-Dimensionless are listed in this array. The name is defined in \verb|[Name]| by text, and value is defined in \verb|[Value]| by real. These name of the dimensionless numbers are used to construct coefficients for each terms in governing equations. The following names can not be used because of reserved name in the program.
+Dimensionless nummbers are defined in this array. The name is defined in \verb|[Name]| by text, and value is defined in \verb|[Value]| by real. These name of the dimensionless numbers are used to construct coefficients for each terms in governing equations. The following names can not be used because of reserved name in the program.
 %
 \begin{table}[htp]
 \caption{List of reserved name of dimensionless numbers}
@@ -895,6 +896,11 @@ Time evolution scheme is defined by text. Currently, Crank-Nicolson scheme is on
 \end{description}
 %
 
+\paragraph{\tt coef\_implicit\_ctl}
+\label{href_t:coef_implicit_ctl}
+\verb|[COEF_INPLICIT]| \\
+Coefficients for the implicit parts of the Crank-Nicolson scheme for all diffusion terms  \verb|[COEF_INPLICIT]| is defined by real.
+
 \paragraph{\tt coef\_imp\_v\_ctl}
 \label{href_t:coef_imp_v_ctl}
 \verb|[COEF_INP_U]| \\
@@ -920,25 +926,30 @@ Coefficients for the implicit parts of the Crank-Nicolson scheme for composition
 \label{href_t:FFT_library_ctl}
 \verb|[FFT_Name]| \\
 FFT library name for Fourier transform is defined by text. The following libraries are available for \verb|[FFT_Name]|. 
-If this flag is not defined, program searches the fastest library in the initialization process.
+If this flag is not defined, `FFTW` is chosen if FFTW library is included.
 %
 \begin{description}
 \item{\tt FFTW}		Use FFTW
 \item{\tt FFTPACK}	Use FFTPACK
 % \item{\tt ISPACK}	Use ISPACK
+% \item{\tt Search_fastest} Compare elapsed time of FFTW and FFTPACK at the initialization and choose faster one.
 \end{description}
 %
 
 \paragraph{\tt Legendre\_trans\_loop\_ctl}
 \label{href_t:Legendre_trans_loop_ctl}
-\verb|[FFT_Name]| \\
+\verb|[Leg_Loop]| \\
 Loop configuration for Legendre transform is defined by text. The following settings are available for \verb|[Leg_Loop]|. 
-If this flag is not defined, program searches the fastest approarch in the initialization process.
+If this flag is not defined, \verb|Symmetric_matmul_big| is chosen as a default value because \verb|Symmetric_matmul_big| is the fastest approarch in many platforms. In the all spherical transform, equatorial syymetry is taken into account.
 %
 \begin{description}
-\item{\tt Inner\_radial\_loop}	Loop for the radial grids is set as the innermost loop
-\item{\tt Outer\_radial\_loop}	Loop for the radial grids is set as the outermost loop
-\item{\tt Long\_loop}	        Long one-dimentional loop is used
+\item{\tt Symmetric_original_loop}	Set radial loop as the inner most loop for Legendre transform.
+\item{\tt Symmetric_outer_radial_loop}	Set radial loop as the outmost loop for Legendre transform.
+\item{\tt Symmetric_matmul}    Use Fortran90's intrinsic function for matrix-matrix products for each components.
+\item{\tt Symmetric_matmul_big}   Use Fortran90's intrinsic function for matrix-matrix products. The matrix operation is combined for all radial and fielc components.
+\item{\tt Symmetric_BLAS_big}    Use BLAS library for matrix-matrix products if BLAS library is linked. The matrix operation is combined for all radial and fielc components.
+\item{\tt On_the_fly_Plm}   Evaluate Legendre polynomial in every Legendre transforms.
+\item{\tt Search_fastest}	Compare elapsed time among above six approarch at the initialization and choose the fastest one.
 \end{description}
 %
 
@@ -951,25 +962,31 @@ Monitoring data is defined in this block. Monitoring data output (mean square, a
 \paragraph{\tt volume\_average\_prefix}
 \label{href_t:volume_average_prefix}
 \verb|[vol_ave_prefix]| \\
-File prefix for volume average data \verb|[vol_ave_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, volume average data are not generated. 
+File prefix for volume average data \verb|[vol_ave_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, volume average data file is not generated. 
 
 \paragraph{\tt volume\_pwr\_spectr\_prefix}
 \label{href_t:volume_pwr_spectr_prefix}
 \verb|[vol_pwr_prefix]| \\
 File prefix for mean square spectrum data averaged over the fluid shell \verb|[vol_pwr_prefix]| is defined by Text. 
 
-Spectrum as a function of degree {l} is written in \verb|[vol_pwr_prefix])_l.dat|, spectrum as a function of order {m} is written in \verb|[vol_pwr_prefix]_m.dat|, and spectrum as a function of $(l-m)$ is written in \verb|[vol_pwr_prefix]_lm.dat|. This prefix is also used for the file name of the volume mean square data as \verb|[vol_pwr_prefix]_s.dat|.
+Spectrum as a function of degree $l$ is written in \verb|[vol_pwr_prefix]_l.dat|, spectrum as a function of order $m$ is written in \verb|[vol_pwr_prefix]_m.dat|, and spectrum as a function of $(l-m)$ is written in \verb|[vol_pwr_prefix]_lm.dat|. This prefix is also used for the file name of the volume mean square data as \verb|[vol_pwr_prefix]_s.dat|.
 If this file prefix is not defined, volume spectrum data are not generated and volume mean square data is written as \verb|sph_pwr_volume_s.dat|.
 
 \paragraph{\tt volume\_pwr\_spectr\_format}
 \label{href_t:volume_pwr_spectr_format}
 \verb|[file_format]| \\
-File format for mean square spectrum data averaged over the fluid shell. If \verb|[file_format]| is \verb|gzip|, volume average, mean square and spectrum data are compressed by zlib.  If the mean square data file exist, this setting is ignored and append data in the existing file.
+File format for mean square spectrum data averaged over the fluid shell. The following formats are avaiable for \verb|[file_format]|. The default value is \verb|ASCII|. If the mean square data file exist, this setting is ignored and append data to the existing file.
+%
+\begin{description}
+\item{\tt ASCII}   Text data.
+\item{\tt gzip}    Text data is compressed by the gzip format.
+\end{description}
+%
 
 \paragraph{\tt nusselt\_number\_prefix}
 \label{href_t:nusselt_number_prefix}
 \verb|[nusselt_number_prefix]| \\
-File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, Nusselt number data are not generated. \\
+File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, Nusselt number data file is not generated. \\
 {\bf CAUTION: Nusselt number is not evaluated if heat source exsists.}
 
 \paragraph{\tt nusselt\_number\_format}
@@ -1234,7 +1251,7 @@ Method of the cross sectioning is defined as character \verb|[METHOD]|. Supporte
 \hline
 \verb|[METHOD]| & Surface type \\ \hline
 \verb|equation| & Quadrature surface \\
-% & $a x^2 + b y^2 + c z^2 + d y x + e z x + f x y + g x + h y + j z + k = 0$ \\
+% & $a x^2 + b y^2 + c z^2 + d y x + e z x + f x y + g x + h y + i z + j = 0$ \\
 \verb|plane| & Plane surface \\
 %& $a \left(x-x_{0} \right) + b \left(y-y_{0} \right) + c \left(z-z_{0} \right) = 0$ \\
 \verb|sphere| & Sphere \\
@@ -1253,9 +1270,9 @@ Method of the cross sectioning is defined as character \verb|[METHOD]|. Supporte
 \verb|[TERM]	[COEFFICIENT]| \\
 This array defines coefficients for a quadrature surface described by 
 \begin{eqnarray*}
-a x^2 + b y^2 + c z^2 + d y z + e z x + f x y + g x + h y + j z + k &=& 0.
+a x^2 + b y^2 + c z^2 + d y z + e z x + f x y + g x + h y + i z + j &=& 0.
 \end{eqnarray*}
-Each coefficient $a$ to $k$ are defined by the name of the term \verb|[TERM]| and real value \verb|[COEFFICIENT]| as shown in Table \ref{table:psf_coefs}.
+Each coefficient $a$ to $k$ are defined by the name of the term \verb|[TERM]| and real value \verb|[COEFFICIENT]| as shown in Table \ref{table:psf_coefs}. Undefined terms are set to be 0.
 %
 \begin{table}[htp]
 \caption{List of coefficient labels for quadrature surface}
@@ -1266,7 +1283,7 @@ Each coefficient $a$ to $k$ are defined by the name of the term \verb|[TERM]| an
 \verb|x2| & $a$ & \verb|y2| & $b$  & \verb|z2| & $c$ \\
 \verb|yz| & $d$ & \verb|zx| & $e$  & \verb|xy| & $f$ \\
 \verb|x | & $g$ & \verb|y| & $h$  & \verb|z| & $i$ \\
-\verb|const| & $h$ &  &   & &  \\ \hline
+\verb|const| & $j$ &  &   & &  \\ \hline
 \end{tabular}
 \end{center}
 \label{table:psf_coefs}
@@ -1444,7 +1461,8 @@ Output data type is defined by \verb|[TYPE]|. Following types can be defined:
 %
 \paragraph{\tt result\_value}
 \label{href_t:result_value}
-Isosurface value is defined as real value \verb|VALUE|.
+Value in output data `[VALUE]` is defined as real value.
+
 
 %
 \paragraph{\tt output\_field}

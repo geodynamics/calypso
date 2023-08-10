@@ -391,6 +391,6 @@ begin MHD_control
   end  visual_control
 !
   begin dynamo vizs control
-    file zonal mean section ctl  control_psf_zm
+    file zonal_mean_section_ctl  control_psf_zm
   end dynamo vizs control
 end MHD_control
