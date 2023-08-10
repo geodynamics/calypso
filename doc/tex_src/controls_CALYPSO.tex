@@ -171,15 +171,15 @@ Spatial resolution of the spherical shell is defined in this block. Old block na
 \paragraph{\tt sph\_center\_coef\_ctl}
 \label{href_t:sph_center_coef_ctl}
 \verb|[TYPE]| \\
-Set flag `with_center` into `[type]` to include spherical harmonics coefficient for $l = m = 0$. This fliag is required when temperature or composition is solved to the center.
+Set flag \verb|with_center| into \verb|[type]| to include spherical harmonics coefficient for $l = m = 0$. This fliag is required when temperature or composition is solved to the center.
 
 \paragraph{\tt sph\_grid\_type\_ctl}
 \label{href_t:sph_grid_type_ctl}
 \verb|[TYPE]| \\
-Set spherical shell grid type for visualization. The follwing types are avaiable. Default value is `no_pole`. The following flags are avaiable.
+Set spherical shell grid type for visualization. The follwing types are avaiable. Default value is \verb|no_pole|. The following flags are avaiable.
 %
 \begin{description}
-    \item{\tt no_pole} Spherical shell grid is only generated from grids on Gauss-Legendle points on latitude. Corequently, small empty tube (circle on a sphere surface) has to be made in visualization.
+    \item{\tt no\_pole} Spherical shell grid is only generated from grids on Gauss-Legendle points on latitude. Corequently, small empty tube (circle on a sphere surface) has to be made in visualization.
     \item{\tt with\_pole} Grid points are added at poles in the grids. There is still empty sphere in the whole sphre grid.
     \item{\tt with\_center}  Grid at poles and centere is added in the grid. The mesh inceludes center is degenerated from hexahedral mesh to pyramid mesh. This mode increases initialization time.
 \end{description}
@@ -190,9 +190,9 @@ Set spherical shell grid type for visualization. The follwing types are avaiable
 \verb|[Lmax]| \\
 Truncation level $L$ is defined by integer. Spherical harmonics is truncated by triangular $0 \le l \le L$ and $0 <m < l$.
 
-\paragraph{\tt longitude\_symmetry\_ctl    [M_sym]}
+\paragraph{\tt longitude\_symmetry\_ctl    [M\_sym]}
 \label{href_t:longitude_symmetry_ctl}
-Longitudinal folding symmtery [M_sym] is defeined by integer.
+Longitudinal folding symmtery \verb|[M_sym]| is defeined by integer.
 
 \paragraph{\tt ngrid\_meridonal\_ctl}
 \label{href_t:ngrid_meridonal_ctl}
@@ -321,7 +321,7 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \hline \hline
 \tt viscous\_diffusion & Viscous diffusion
 & $-\nu \nabla \times \nabla \times \bvec{u}$ \\
-\tt inertia & Inertia term &  $ \bvec{\omega} \times \bvec{u} $ \\
+\tt inertia & Inertia term &  $ -\bvec{\omega} \times \bvec{u} $ \\
 \tt buoyancy                   & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
 \tt composite\_buoyancy & Compositional buoyancy &  $ -\alpha_{C} C\bvec{g}  $\\
 \tt Lorentz\_force & Lorentz force &  $ \bvec{J} \times \bvec{B} $ \\
@@ -357,7 +357,7 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \begin{tabular}{|c|c|c|}
 \hline
 \tt [Name] & field name & Description \\ \hline \hline
-\tt rot\_inertia & Curl of inertia &  $ \nabla \times \left(\bvec{\omega} \times \bvec{u}\right) $ \\
+\tt rot\_inertia & Curl of inertia &  $ -\nabla \times \left(\bvec{\omega} \times \bvec{u}\right) $ \\
 \tt rot\_Lorentz\_force & Curl of Lorentz force &  $ \nabla \times \left(\bvec{J} \times \bvec{B}\right) $ \\
 \tt rot\_Coriolis\_force & Curl of Coriolis force &  $ -2 \Omega \nabla \times \left(\hat{z} \times \bvec{u} \right) $ \\
 \tt rot\_buoyancy                   & Curl of thermal buoyancy &  $ - \nabla \times \left(\alpha_{T} T \bvec{g}\right)  $ \\
