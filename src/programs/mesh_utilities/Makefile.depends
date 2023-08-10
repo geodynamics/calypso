@@ -8,7 +8,7 @@ cmp_trans_sph_indices.o: $(GEN_SPH_GRIDDIR)/cmp_trans_sph_indices.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 cmp_trans_sph_tests.o: $(GEN_SPH_GRIDDIR)/cmp_trans_sph_tests.f90 m_precision.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_solver_SR.o calypso_mpi.o sel_spherical_SRs.o spherical_SRs_N.o cmp_trans_sph_indices.o
 	$(F90) -c $(F90OPTFLAGS) $<
-input_control_const_shell.o: $(GEN_SPH_GRIDDIR)/input_control_const_shell.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_ctl_data_const_sph_mesh.o t_ctl_params_gen_sph_shell.o t_sph_grid_maker_in_sim.o m_error_IDs.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o bcast_4_platform_ctl.o bcast_4_sphere_ctl.o
+input_control_const_shell.o: $(GEN_SPH_GRIDDIR)/input_control_const_shell.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_ctl_data_const_sph_mesh.o t_ctl_params_gen_sph_shell.o t_sph_grid_maker_in_sim.o t_read_control_elements.o m_error_IDs.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o bcast_4_platform_ctl.o bcast_4_sphere_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
 main_check_sph_grids.o: $(GEN_SPH_GRIDDIR)/main_check_sph_grids.f90 m_precision.o calypso_mpi.o analyzer_check_sph_grids.o
 	$(F90) -c $(F90OPTFLAGS) $<

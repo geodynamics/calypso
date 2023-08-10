@@ -565,7 +565,10 @@ Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
 %
 		\item Block \hyperref[href_t:num_grid_sph]{\tt num\_grid\_sph}
 			\begin{itemize} \label{href_i:num_grid_sph}
+            \item \hyperref[href_t:sph_center_coef_ctl]{\tt sph\_center\_coef\_ctl   [TYPE]}
+            \item \hyperref[href_t:sph_grid_type_ctl]{\tt   sph\_grid\_type\_ctl    [TYPE]}
 	        \item \hyperref[href_t:truncation_level_ctl]{\tt truncation\_level\_ctl	[Lmax]}
+            \item \hyperref[href_t:longitude_symmetry_ctl]{\tt longitude\_symmetry\_ctl    [M\_sym]}
 			\item \hyperref[href_t:ngrid_meridonal_ctl]{\tt ngrid\_meridonal\_ctl [Ntheta]}
 			\item \hyperref[href_t:ngrid_zonal_ctl]{\tt ngrid\_zonal\_ctl [Nphi]}
 %
@@ -582,6 +585,7 @@ Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
 %
 \\
 			\item Array \hyperref[href_t:r_layer]{\tt r\_layer  [Layer \#]  [Radius]}    
+            \item Array \hyperref[href_t:add_external_layer]{\tt add\_external\_layer  [Radius]}
 %
 			\item Array \hyperref[href_t:boundaries_ctl]{\tt boundaries\_ctl  [Boundary\_name]  [Layer \#]}    
 			\end{itemize}
@@ -1045,7 +1049,7 @@ Area for visualization can be defined by array \verb|chosen_ele_grp_ctl| by choo
 \end{table}
 %
 \paragraph{Control data} \label{section:section_control}
-The format of the control file or block for cross sections is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|cross_section_ctl| block can be read from an external file. 
+The format of the control file or block for cross sections is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|cross_section_ctl| and \verb|output_field| block can be read from an external file and share with different cross section controls. See \verb|tests/snapshot_test| for an example of shared \verb|output_field| block.
 
 To define the external file name, as \verb|file cross_section_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. \\
 \\
@@ -1057,7 +1061,7 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 			{\tt section\_file\_prefix    [section\_prefix]}
 	\item \hyperref[href_t:psf_output_type]
 			{\tt psf\_output\_type        [file\_format]}
-	\item Block \hyperref[href_t:surface_define]{\tt surface\_define}
+	\item File or Block \hyperref[href_t:surface_define]{\tt surface\_define    [File\_Name]}
 		\begin{itemize}
 			\item \hyperref[href_t:section_method]
 				{\tt section\_method    [METHOD]}
@@ -1075,7 +1079,7 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 				{\tt section\_area\_ctl        [AREA\_NAME]}
 	\end{itemize}
 %
-	\item \hyperref[href_t:output_field_define]{\tt output\_field\_define}
+	\item File or Block \hyperref[href_t:output_field_define]{\tt output\_field\_define    [File\_Name]}
 		\begin{itemize}
 			\item Array \hyperref[href_t:psf_output_field]
                 {\tt output\_field     [FIELD]    [COMPONENT]}
@@ -1109,7 +1113,7 @@ Compressed binary & \verb|PSF_gzip| & \verb|.0.sgd.gz| (grid) & 1.17 & \\
 %
 Calypso can also output isosurface data for visualization. Generally, data size of the isosurface is much larger than the sectioning data. The isosurface data is also written as a unstructured grid data with VTK format. The isosurface also consists of triangle patches.
 
-To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurface_ctl| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurface_ctl| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
+To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurface_ctl| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurface_ctl| block defines one cross section.
 %
 \paragraph{Control data}  \label{section:isosurface_control}
 The format of the control file or block for isosurfaces is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|isosurface_ctl| block can be read from an external file. To define the external file name, as \verb|file isosurface_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. \\
@@ -1134,7 +1138,7 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 						{\tt isosurf\_area\_ctl  [AREA\_NAME]}
 		\end{itemize}
 %
-	\item Block \hyperref[href_t:field_on_isosurf]{\tt field\_on\_isosurf}
+	\item Block \hyperref[href_t:field_on_isosurf]{\tt field\_on\_isosurf    [File\_Name]}
 		\begin{itemize}
 			\item \hyperref[href_t:result_type]{\tt result\_type    [TYPE]}
 			\item \hyperref[href_t:result_value]{\tt result\_value    [VALUE]}
@@ -1725,6 +1729,64 @@ When \hyperref[href_t:field_on_circle_format]{{\tt field\_on\_circle\_format}}, 
 
 \section{Utility programs}
 Calypso includes some utility programs. These programs are useful to data analysis and debugging the simulation programs.
+
+\subsection{Control file Editor}
+This program is a simple Jupyter notebook (\url{https://jupyterbook.org/en/stable/intro.html#}) to edit control files. There are two Jupter notebook files \\
+(\verb|Calypso_control_editor.ipynb| and \verb|Calypso_control_glossary.ipynb|) in \verb|[CALYPSO_DIR]/src/Jupyter/| folder. \verb|Calypso_control_editor.ipynb| is the notebook to edit control files, and \verb|Calypso_control_glossary.ipynb| is the document of the control data based on the Section \label{section:def_control}. Using JupyterLab (\url{https://jupyter.org}) is recommended because JupyterLab can open the editor \\
+\verb|Calypso_control_editor.ipynb| and document \\
+\verb|Calypso_control_glossary.ipynb| side by side as showin in Figure{fig:notebook}.
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=110mm]{Images/Editor_notebook}
+\end{center}
+\caption{Example of control editor on JupyterLab.}
+\label{fig:notebook}
+\end{figure}
+%
+
+If JupyterLab starts at the \verb|[CALYPSO_DIR]| directory, and you can find the notebook files under \verb|src/Jupyter/| directory. On JupyterLab, two notebooks can be opened side by side. After opening either notebook file, you can split the view by choosing \verb|File -> New View for Notebook|. Then, another file can be opened on the either side of view. This editor supports drag and drop from another notebook or programs. The instruction of usege of the editor is written in \\
+     \verb|Calypso_control_editor.ipynb|.
+
+\subsection{Vim scripts for folding the control files}
+This Vim scripts add the folding the control blocks and concurrent comment lines.
+After starting the vim, this scripts can be loaded by the following command: \\
+\\
+\\
+\verb|: source  [CALYPSO_DIR]/src/Vim_script/Folding_Calypso.vim|
+\\
+\\
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=90mm]{Images/vim_folding}
+\end{center}
+\caption{Example of data folding on Vim.}
+\label{fig:vim_folding}
+\end{figure}
+%
+After loading the script, the control data will already be folded. The basic commands for the folding are the following:
+%
+\begin{description}
+\item{\tt za: } Toggles the current fold open or closed. – The most useful command to know of all of these.
+\item{\tt zA: }  Same as \verb|za| except it toggles all folds beneath as well. Since folds can be nested (such as with indent folding), this will toggle the state of all the folds underneath of it, not just the current fold.
+\item{\tt zc: } Close the current fold.
+\item{\tt zC: } Same as \verb|zc|, but closes folds nested underneath as well.
+\item{\tt zo: } Open the current fold.
+\item{\tt zO: } Same as \verb|zo|, but opens folds nested underneath as well.
+\end{description}
+%
+
+The \verb|vi| in Mac OS is equivalent to the \verb|vim|, so the this script works on Mac OS without any instllation. However, the full featured vim may be refquired on Linux. You can check the avaiable feature by \verb|vi (or vim) --version| command. On Ubuntu, you can install large version of vim by \verb|% apt install vim|.
+
+
+\subsection{Control file consistency check ({\tt check\_control\_mhd})}
+This small program checks if the control file \verb|control_MHD| and its external files can be read correctly by using Calypso's IO routines. The program will start by the following command:\\
+\\
+\verb|% [CALYPSO_DIR]/bin/check_control_mhd control_MHD|
+\\
+If the control files read successfully, the program outputs read control data on screeen. If program stopped with error, or missing control parameters in the output, please check the control files.
+
 
 \subsection{Data transform program ({\tt sph\_snapshot})}
 \label{section:sph_snapshot}

@@ -14,8 +14,8 @@
 !!      function field_comp_buffer(num_field, ncomp_field)
 !!      function each_field_name_buffer(field_name)
 !!
-!!      subroutine read_arrays_for_stacks(file_id, num, istack_begin,   &
-!!      &         ntot, istack)
+!!      subroutine read_arrays_for_stacks(id_file, num, istack_begin,   &
+!!      &         ntot, istack, iend)
 !!      subroutine read_field_num_buffer(textbuf, nnod, num_field)
 !!      subroutine read_buffer_istack_nod_buffer                        &
 !!     &         (textbuf, num_pe, istack_nod)
@@ -24,16 +24,15 @@
 !!      subroutine read_each_field_name_buffer                          &
 !!     &         (textbuf, field_name, len_text)
 !!
-!!      subroutine write_arrays_for_stacks(file_id, num, istack)
+!!      subroutine write_arrays_for_stacks(id_file, num, istack)
 !!      subroutine write_field_data                                     &
 !!     &         (id_file, nnod64, num_field, ntot_comp,                &
 !!     &          ncomp_field, field_name, field_data)
 !!      subroutine read_field_data                                      &
 !!     &         (id_file, nnod64, num_field, ntot_comp,                &
-!!     &          ncomp_field, field_name, field_data)
-!!      subroutine read_field_name                                      &
-!!     &         (id_file, nnod64, num_field, ntot_comp,                &
-!!     &          ncomp_field, field_name)
+!!     &          ncomp_field, field_name, field_data, iend)
+!!      subroutine read_field_name(id_file, nnod64, num_field,          &
+!!     &                           ncomp_field, field_name, iend)
 !!@endverbatim
 !
       module field_data_IO
@@ -137,15 +136,16 @@
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine read_arrays_for_stacks(file_id, num, istack_begin,     &
-      &         ntot, istack)
+      subroutine read_arrays_for_stacks(id_file, num, istack_begin,     &
+      &                                 ntot, istack, iend)
 !
       use skip_comment_f
 !
-      integer (kind = kint), intent(in) :: file_id
+      integer (kind = kint), intent(in) :: id_file
       integer (kind = kint), intent(in) :: num, istack_begin
       integer (kind = kint), intent(inout) :: ntot
       integer (kind = kint), intent(inout) :: istack(0:num)
+      integer (kind=kint), intent(inout) :: iend
 !
       integer (kind = kint) :: i, ii
       character(len=255) :: character_4_read = ''
@@ -155,7 +155,8 @@
 !
       if(num .gt. 0) then
         character_4_read = ''
-        call skip_comment(character_4_read,file_id)
+        call skip_comment(id_file, character_4_read, iend)
+        if(iend .gt. 0) return
         read(character_4_read,*,end=41) istack
    41   continue
 !
@@ -170,7 +171,7 @@
         istack(0) = istack_begin
 !
         if ( ii .le. num ) then
-          read(file_id,*) (istack(i),i=ii,num)
+          read(id_file,*) (istack(i),i=ii,num)
         end if
       end if
 !
@@ -267,14 +268,14 @@
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine write_arrays_for_stacks(file_id, num, istack)
+      subroutine write_arrays_for_stacks(id_file, num, istack)
 !
-      integer (kind = kint), intent(in) :: file_id
+      integer (kind = kint), intent(in) :: id_file
       integer (kind = kint), intent(in) :: num
       integer (kind = kint), intent(in) :: istack(0:num)
 !
 !
-      if(num .gt. 0) write(file_id,'(8i16)') istack(1:num)
+      if(num .gt. 0) write(id_file,'(8i16)') istack(1:num)
 !
       end subroutine write_arrays_for_stacks
 !
@@ -321,7 +322,7 @@
 !
       subroutine read_field_data                                        &
      &         (id_file, nnod64, num_field, ntot_comp,                  &
-     &          ncomp_field, field_name, field_data)
+     &          ncomp_field, field_name, field_data, iend)
 !
       use skip_comment_f
 !
@@ -335,6 +336,7 @@
       character(len=kchara), intent(inout) :: field_name(num_field)
       real(kind = kreal), intent(inout)                                 &
      &                   :: field_data(nnod64, ntot_comp)
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=255) :: character_4_read
       integer(kind = kint_gl) :: inod
@@ -343,7 +345,8 @@
 !
       icou = 0
       do i_fld = 1, num_field
-        call skip_comment(character_4_read,id_file)
+        call skip_comment(id_file, character_4_read, iend)
+        if(iend .gt. 0) return
         read(character_4_read,*) field_name(i_fld)
 !
         ist = icou + 1
@@ -357,8 +360,8 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine read_field_name                                        &
-     &         (id_file, nnod64, num_field, ncomp_field, field_name)
+      subroutine read_field_name(id_file, nnod64, num_field,            &
+     &                           ncomp_field, field_name, iend)
 !
       use skip_comment_f
 !
@@ -369,6 +372,7 @@
       integer(kind = kint), intent(in) :: ncomp_field(num_field)
 !
       character(len=kchara), intent(inout) :: field_name(num_field)
+      integer(kind = kint), intent(inout) :: iend
 !
       character(len=255) :: character_4_read
       integer(kind = kint_gl) :: inod
@@ -378,7 +382,8 @@
 !
       icou = 0
       do i_fld = 1, num_field
-        call skip_comment(character_4_read,id_file)
+        call skip_comment(id_file, character_4_read, iend)
+        if(iend .gt. 0) return
         read(character_4_read,*) field_name(i_fld)
 !
         ist = icou + 1

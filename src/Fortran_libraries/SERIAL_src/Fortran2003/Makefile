@@ -13,7 +13,9 @@ MOD_F2003 = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'F2003DIR = $(F2003DIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_F2003)' >> $(MAKENAME)
 
 

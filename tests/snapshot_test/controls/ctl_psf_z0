@@ -28,15 +28,5 @@ begin surface_rendering
     end plot_area_ctl
   end surface_define
 !
-  begin output_field_define
-    array output_field
-      output_field  temperature           scalar            
-      output_field  velocity              cylindrical_vector
-      output_field  vorticity             cylindrical_vector
-      output_field  magnetic_field        cylindrical_vector
-!
-      output_field  Lorentz_work            scalar
-      output_field  buoyancy_flux           scalar
-    end array output_field
-  end output_field_define
+  file output_field_define 'controls/ctl_fields_z_sections'
 end surface_rendering

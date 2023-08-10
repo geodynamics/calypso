@@ -30,6 +30,8 @@
       subroutine bcast_time_loop_ctl(mevo_ctl)
 !
       use t_ctl_data_mhd_evo_scheme
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -46,6 +48,7 @@
 !
       call bcast_ctl_type_r1(mevo_ctl%eps_4_velo_ctl)
       call bcast_ctl_type_r1(mevo_ctl%eps_4_magne_ctl)
+      call bcast_ctl_type_r1(mevo_ctl%coef_implicit_ctl)
       call bcast_ctl_type_r1(mevo_ctl%coef_imp_v_ctl)
       call bcast_ctl_type_r1(mevo_ctl%coef_imp_t_ctl)
       call bcast_ctl_type_r1(mevo_ctl%coef_imp_b_ctl)
@@ -63,6 +66,8 @@
       call bcast_ctl_type_i1(mevo_ctl%maxiter_ctl)
       call bcast_ctl_type_i1(mevo_ctl%leg_vector_len)
 !
+      call calypso_mpi_bcast_character(mevo_ctl%block_name,             &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(mevo_ctl%i_time_loop, 0)
 !
       end subroutine bcast_time_loop_ctl
@@ -72,6 +77,8 @@
       subroutine bcast_restart_ctl(mr_ctl)
 !
       use t_ctl_data_mhd_restart
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -79,6 +86,9 @@
 !
 !
       call bcast_ctl_type_c1(mr_ctl%restart_flag_ctl)
+!
+      call calypso_mpi_bcast_character(mr_ctl%block_name,               &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(mr_ctl%i_restart_file, 0)
 !
       end subroutine bcast_restart_ctl

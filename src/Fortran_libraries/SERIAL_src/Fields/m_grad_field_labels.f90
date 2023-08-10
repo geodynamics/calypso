@@ -10,10 +10,9 @@
 !!      logical function check_divergence_field(field_name)
 !!      logical function check_gradient_field(field_name)
 !!
-!!      integer(kind = kint) function num_divergence_fields()
-!!      integer(kind = kint) function num_gradient_fields()
-!!      subroutine set_divergence_field_labels(n_comps, names, maths)
-!!      subroutine set_gradient_field_labels(n_comps, names, maths)
+!!      subroutine set_divergence_field_names(array_c2i)
+!!      subroutine set_gradient_field_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !! !!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !! field names 
@@ -49,9 +48,6 @@
       use t_field_labels
 !
       implicit none
-!
-      integer(kind = kint), parameter, private :: ndiv_vector =   3
-      integer(kind = kint), parameter, private :: ngrad_scalar =  8
 !
 !>        Divergence of velocity
 !!         @f$ \partial_{i} u_{i} @f$
@@ -166,67 +162,41 @@
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
-! 
-      integer(kind = kint) function num_divergence_fields()
-      num_divergence_fields = ndiv_vector
-      return
-      end function num_divergence_fields
 !
-! ----------------------------------------------------------------------
-! 
-      integer(kind = kint) function num_gradient_fields()
-      num_gradient_fields = ngrad_scalar
-      return
-      end function num_gradient_fields
+      subroutine set_divergence_field_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      subroutine set_divergence_field_labels(n_comps, names, maths)
+      call set_field_label_to_ctl(div_velocity,         array_c2i)
+      call set_field_label_to_ctl(div_magnetic,         array_c2i)
+      call set_field_label_to_ctl(div_vector_potential, array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ndiv_vector)
-      character(len = kchara), intent(inout) :: names(ndiv_vector)
-      character(len = kchara), intent(inout) :: maths(ndiv_vector)
-!
-!
-      call set_field_labels(div_velocity,                               &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(div_magnetic,                               &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(div_vector_potential,                       &
-     &    n_comps( 3), names( 3), maths( 3))
-!
-      end subroutine set_divergence_field_labels
+      end subroutine set_divergence_field_names
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_gradient_field_labels(n_comps, names, maths)
+      subroutine set_gradient_field_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ngrad_scalar)
-      character(len = kchara), intent(inout) :: names(ngrad_scalar)
-      character(len = kchara), intent(inout) :: maths(ngrad_scalar)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
+      call set_field_label_to_ctl(grad_temp,             array_c2i)
+      call set_field_label_to_ctl(grad_pert_temp,        array_c2i)
+      call set_field_label_to_ctl(grad_composition,      array_c2i)
+      call set_field_label_to_ctl(grad_pert_composition, array_c2i)
+      call set_field_label_to_ctl(grad_density,          array_c2i)
+      call set_field_label_to_ctl(grad_pert_density,     array_c2i)
+      call set_field_label_to_ctl(grad_entropy,          array_c2i)
+      call set_field_label_to_ctl(grad_pert_entropy,     array_c2i)
 !
-      call set_field_labels(grad_temp,                                  &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(grad_pert_temp,                             &
-     &    n_comps( 2), names( 2), maths( 2))
-!
-      call set_field_labels(grad_composition,                           &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(grad_pert_composition,                      &
-     &    n_comps( 4), names( 4), maths( 4))
-!
-      call set_field_labels(grad_density,                               &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(grad_pert_density,                          &
-     &    n_comps( 6), names( 6), maths( 6))
-!
-      call set_field_labels(grad_entropy,                               &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(grad_pert_entropy,                          &
-     &    n_comps( 8), names( 8), maths( 8))
-!
-      end subroutine set_gradient_field_labels
+      end subroutine set_gradient_field_names
 !
 ! ----------------------------------------------------------------------
 !

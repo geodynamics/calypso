@@ -101,6 +101,7 @@
      &         (psf_def_c, ele_grp, sf_grp, psf_param, psf_def, ierr)
 !
       use m_error_IDs
+      use m_section_coef_flags
       use t_control_data_4_psf_def
       use t_group_data
       use t_psf_patch_data

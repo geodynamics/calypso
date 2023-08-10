@@ -8,15 +8,13 @@
 !> @brief flags of components in control
 !!
 !!@verbatim
-!!      integer(kind = kint) function num_flag_scalar_comp()
-!!      integer(kind = kint) function num_flag_vector_comp()
-!!      integer(kind = kint) function num_flag_sym_tensor_comp()
-!!      integer(kind = kint) function num_flag_asym_tensor_comp()
-!!
-!!      subroutine set_flag_scalar_comp(n_comps, names, maths)
-!!      subroutine set_flag_vector_comp(n_comps, names, maths)
-!!      subroutine set_flag_sym_tensor_comp(n_comps, names, maths)
-!!      subroutine set_flag_asym_tensor_comp(n_comps, names, maths)
+!!      subroutine set_xyz_direction_array(array_c2i)
+!!      subroutine set_xyzw_direction_array(array_c2i)
+!!      subroutine set_scalar_direction_array(array_c2i)
+!!      subroutine set_vector_direction_array(array_c2i)
+!!      subroutine set_sym_tensor_direction_array(array_c2i)
+!!      subroutine set_asym_tensor_direction_array(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  Base field names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -114,11 +112,6 @@
 !
       implicit  none
 !!
-      integer(kind = kint), parameter, private :: ntype_scalar =  1
-      integer(kind = kint), parameter, private :: ntype_vector = 11
-      integer(kind = kint), parameter, private :: ntype_tensor = 22
-      integer(kind = kint), parameter, private :: ntype_as_tsr = 13
-!
 !>        Field label for scalar
 !!         @f$ S @f$
       type(field_def), parameter :: scalar                              &
@@ -170,6 +163,13 @@
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'z',                                       &
      &                math = '$ V_{z} $')
+!
+!>        Field label for w-component
+!!         @f$ V_{w}  @f$
+      type(field_def), parameter :: V_w                                 &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'w',                                       &
+     &                math = '$ V_{w} $')
 !
 !>        Field label for radial component
 !!         @f$ V_{r} @f$
@@ -349,185 +349,146 @@
 !
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_flag_scalar_comp()
-      num_flag_scalar_comp = ntype_scalar
-      return
-      end function num_flag_scalar_comp
+      subroutine set_xyz_direction_array(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
+!
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
+!
+      call set_field_label_to_ctl(V_x, array_c2i)
+      call set_field_label_to_ctl(V_y, array_c2i)
+      call set_field_label_to_ctl(V_z, array_c2i)
+!
+      end subroutine set_xyz_direction_array
 !
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_flag_vector_comp()
-      num_flag_vector_comp = ntype_vector
-      return
-      end function num_flag_vector_comp
+      subroutine set_xyzw_direction_array(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      integer(kind = kint) function num_flag_sym_tensor_comp()
-      num_flag_sym_tensor_comp = ntype_tensor
-      return
-      end function num_flag_sym_tensor_comp
+      call set_field_label_to_ctl(V_x, array_c2i)
+      call set_field_label_to_ctl(V_y, array_c2i)
+      call set_field_label_to_ctl(V_z, array_c2i)
+      call set_field_label_to_ctl(V_w, array_c2i)
 !
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_flag_asym_tensor_comp()
-      num_flag_asym_tensor_comp = ntype_as_tsr
-      return
-      end function num_flag_asym_tensor_comp
+      end subroutine set_xyzw_direction_array
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_flag_scalar_comp(n_comps, names, maths)
+      subroutine set_scalar_direction_array(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ntype_scalar)
-      character(len = kchara), intent(inout) :: names(ntype_scalar)
-      character(len = kchara), intent(inout) :: maths(ntype_scalar)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
+      call set_field_label_to_ctl(scalar, array_c2i)
 !
-      call set_field_labels(scalar,                                     &
-     &    n_comps( 1), names( 1), maths( 1))
-!
-      end subroutine set_flag_scalar_comp
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_flag_vector_comp(n_comps, names, maths)
-!
-      integer(kind = kint_4b), intent(inout) :: n_comps(ntype_vector)
-      character(len = kchara), intent(inout) :: names(ntype_vector)
-      character(len = kchara), intent(inout) :: maths(ntype_vector)
-!
-!
-      call set_field_labels(vector,                                     &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(spherical_vector,                           &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(cylindrical_vector,                         &
-     &    n_comps( 3), names( 3), maths( 3))
-!
-      call set_field_labels(magnitude,                                  &
-     &    n_comps( 4), names( 4), maths( 4))
-!
-      call set_field_labels(V_x,                                        &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(V_y,                                        &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(V_z,                                        &
-     &    n_comps( 7), names( 7), maths( 7))
-!
-      call set_field_labels(V_r,                                        &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(V_theta,                                    &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(V_phi,                                      &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(V_s,                                        &
-     &    n_comps(11), names(11), maths(11))
-!
-      end subroutine set_flag_vector_comp
+      end subroutine set_scalar_direction_array
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_flag_sym_tensor_comp(n_comps, names, maths)
+      subroutine set_vector_direction_array(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ntype_tensor)
-      character(len = kchara), intent(inout) :: names(ntype_tensor)
-      character(len = kchara), intent(inout) :: maths(ntype_tensor)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
+      call set_field_label_to_ctl(vector, array_c2i)
+      call set_field_label_to_ctl(spherical_vector, array_c2i)
+      call set_field_label_to_ctl(cylindrical_vector, array_c2i)
 !
-      call set_field_labels(sym_tensor,                                 &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(spherical_sym_tensor,                       &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(cylindrical_sym_tensor,                     &
-     &    n_comps( 3), names( 3), maths( 3))
+      call set_field_label_to_ctl(magnitude, array_c2i)
 !
-      call set_field_labels(magnitude,                                  &
-     &    n_comps( 4), names( 4), maths( 4))
+      call set_field_label_to_ctl(V_x, array_c2i)
+      call set_field_label_to_ctl(V_y, array_c2i)
+      call set_field_label_to_ctl(V_z, array_c2i)
 !
-      call set_field_labels(T_xx,                                       &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(T_xy,                                       &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(T_xz,                                       &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(T_yy,                                       &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(T_yz,                                       &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(T_zz,                                       &
-     &    n_comps(10), names(10), maths(10))
+      call set_field_label_to_ctl(V_r, array_c2i)
+      call set_field_label_to_ctl(V_theta, array_c2i)
+      call set_field_label_to_ctl(V_phi, array_c2i)
+      call set_field_label_to_ctl(V_s, array_c2i)
 !
-      call set_field_labels(T_rr,                                       &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(T_rt,                                       &
-     &    n_comps(12), names(12), maths(12))
-      call set_field_labels(T_rp,                                       &
-     &    n_comps(13), names(13), maths(13))
-      call set_field_labels(T_tt,                                       &
-     &    n_comps(14), names(14), maths(14))
-      call set_field_labels(T_tp,                                       &
-     &    n_comps(15), names(15), maths(15))
-      call set_field_labels(T_pp,                                       &
-     &    n_comps(16), names(16), maths(16))
-!
-      call set_field_labels(T_ss,                                       &
-     &    n_comps(17), names(17), maths(17))
-      call set_field_labels(T_sp,                                       &
-     &    n_comps(18), names(18), maths(18))
-      call set_field_labels(T_sz,                                       &
-     &    n_comps(19), names(19), maths(19))
-      call set_field_labels(T_pp,                                       &
-     &    n_comps(20), names(20), maths(20))
-      call set_field_labels(T_pz,                                       &
-     &    n_comps(21), names(21), maths(21))
-      call set_field_labels(T_zz,                                       &
-     &    n_comps(22), names(22), maths(22))
-!
-      end subroutine set_flag_sym_tensor_comp
+      end subroutine set_vector_direction_array
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_flag_asym_tensor_comp(n_comps, names, maths)
+      subroutine set_sym_tensor_direction_array(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ntype_as_tsr)
-      character(len = kchara), intent(inout) :: names(ntype_as_tsr)
-      character(len = kchara), intent(inout) :: maths(ntype_as_tsr)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
+      call set_field_label_to_ctl(sym_tensor, array_c2i)
+      call set_field_label_to_ctl(spherical_sym_tensor, array_c2i)
+      call set_field_label_to_ctl(cylindrical_sym_tensor, array_c2i)
 !
-      call set_field_labels(asym_tensor,                                &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(spherical_asym_tensor,                      &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(cylindrical_asym_tensor,                    &
-     &    n_comps( 3), names( 3), maths( 3))
+      call set_field_label_to_ctl(magnitude, array_c2i)
 !
-      call set_field_labels(magnitude,                                  &
-     &    n_comps( 4), names( 4), maths( 4))
+      call set_field_label_to_ctl(T_xx, array_c2i)
+      call set_field_label_to_ctl(T_xy, array_c2i)
+      call set_field_label_to_ctl(T_xz, array_c2i)
+      call set_field_label_to_ctl(T_yy, array_c2i)
+      call set_field_label_to_ctl(T_yz, array_c2i)
+      call set_field_label_to_ctl(T_zz, array_c2i)
 !
-      call set_field_labels(T_xy,                                       &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(T_xz,                                       &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(T_yz,                                       &
-     &    n_comps( 7), names( 7), maths( 7))
+      call set_field_label_to_ctl(T_rr, array_c2i)
+      call set_field_label_to_ctl(T_rt, array_c2i)
+      call set_field_label_to_ctl(T_rp, array_c2i)
+      call set_field_label_to_ctl(T_tt, array_c2i)
+      call set_field_label_to_ctl(T_tp, array_c2i)
+      call set_field_label_to_ctl(T_pp, array_c2i)
 !
-      call set_field_labels(T_rt,                                       &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(T_rp,                                       &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(T_tp,                                       &
-     &    n_comps(10), names(10), maths(10))
+      call set_field_label_to_ctl(T_ss, array_c2i)
+      call set_field_label_to_ctl(T_sp, array_c2i)
+      call set_field_label_to_ctl(T_sz, array_c2i)
+      call set_field_label_to_ctl(T_pp, array_c2i)
+      call set_field_label_to_ctl(T_pz, array_c2i)
+      call set_field_label_to_ctl(T_zz, array_c2i)
 !
-      call set_field_labels(T_sp,                                       &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(T_sz,                                       &
-     &    n_comps(12), names(12), maths(12))
-      call set_field_labels(T_pz,                                       &
-     &    n_comps(13), names(13), maths(13))
+      end subroutine set_sym_tensor_direction_array
 !
-      end subroutine set_flag_asym_tensor_comp
+! ----------------------------------------------------------------------
+!
+      subroutine set_asym_tensor_direction_array(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
+!
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
+!
+      call set_field_label_to_ctl(asym_tensor, array_c2i)
+      call set_field_label_to_ctl(spherical_asym_tensor, array_c2i)
+      call set_field_label_to_ctl(cylindrical_asym_tensor, array_c2i)
+      call set_field_label_to_ctl(magnitude, array_c2i)
+!
+      call set_field_label_to_ctl(T_xy, array_c2i)
+      call set_field_label_to_ctl(T_xz, array_c2i)
+      call set_field_label_to_ctl(T_yz, array_c2i)
+!
+      call set_field_label_to_ctl(T_rt, array_c2i)
+      call set_field_label_to_ctl(T_rp, array_c2i)
+      call set_field_label_to_ctl(T_tp, array_c2i)
+!
+      call set_field_label_to_ctl(T_sp, array_c2i)
+      call set_field_label_to_ctl(T_sz, array_c2i)
+      call set_field_label_to_ctl(T_pz, array_c2i)
+!
+      end subroutine set_asym_tensor_direction_array
 !
 ! ----------------------------------------------------------------------
 !

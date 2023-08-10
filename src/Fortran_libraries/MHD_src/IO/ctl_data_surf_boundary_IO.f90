@@ -8,6 +8,7 @@
 !!@n        Modified by H. Matsui on Oct., 2007
 !!
 !!@verbatim
+!!      subroutine init_bc_4_surf_ctl_label(hd_block, sbc_ctl)
 !!      subroutine read_bc_4_surf_ctl                                   &
 !!     &         (id_control, hd_block, sbc_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -160,7 +161,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(sbc_ctl%i_bc_4_surf .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_array_c2_r(id_control,                        &
@@ -204,30 +206,59 @@
 !
       if(sbc_ctl%i_bc_4_surf .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_hf, sbc_ctl%surf_bc_HF_ctl)
+     &    sbc_ctl%surf_bc_HF_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_mf, sbc_ctl%surf_bc_ST_ctl)
+     &    sbc_ctl%surf_bc_ST_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_gradp, sbc_ctl%surf_bc_PN_ctl)
+     &    sbc_ctl%surf_bc_PN_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_gradb, sbc_ctl%surf_bc_BN_ctl)
+     &    sbc_ctl%surf_bc_BN_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_grada, sbc_ctl%surf_bc_AN_ctl)
+     &    sbc_ctl%surf_bc_AN_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_gradj, sbc_ctl%surf_bc_JN_ctl)
+     &    sbc_ctl%surf_bc_JN_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_gradmp, sbc_ctl%surf_bc_MPN_ctl)
+     &    sbc_ctl%surf_bc_MPN_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_gradc, sbc_ctl%surf_bc_CF_ctl)
+     &    sbc_ctl%surf_bc_CF_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_n_bc_infty, sbc_ctl%surf_bc_INF_ctl)
+     &    sbc_ctl%surf_bc_INF_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_bc_4_surf_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_bc_4_surf_ctl_label(hd_block, sbc_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(surf_bc_control), intent(inout) :: sbc_ctl
+!
+!
+      sbc_ctl%block_name = hd_block
+!
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_hf, sbc_ctl%surf_bc_HF_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_mf, sbc_ctl%surf_bc_ST_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_gradp, sbc_ctl%surf_bc_PN_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_gradb, sbc_ctl%surf_bc_BN_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_gradj, sbc_ctl%surf_bc_JN_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_grada, sbc_ctl%surf_bc_AN_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_gradmp, sbc_ctl%surf_bc_MPN_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_gradc, sbc_ctl%surf_bc_CF_ctl)
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_n_bc_infty, sbc_ctl%surf_bc_INF_ctl)
+!
+      end subroutine init_bc_4_surf_ctl_label
 !
 !   --------------------------------------------------------------------
 !

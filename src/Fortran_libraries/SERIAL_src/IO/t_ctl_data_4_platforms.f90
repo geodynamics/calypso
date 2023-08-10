@@ -75,10 +75,10 @@
 !>                File name for boundary conditions
 !>@n@param      radial_field_file_name
 !>                File name for reference radial data
-!>@n@param      interpolate_sph_to_fem_ctl 
+!>@n@param      interpolate_sph_to_fem 
 !>               File header for interpolation table
 !>               from spherical grid to FEM grid
-!>@n@param      interpolate_fem_to_sph_ctl  
+!>@n@param      interpolate_fem_to_sph  
 !>               File header for interpolation table
 !>               from FEM grid to spherical grid
 !>@n
@@ -102,6 +102,9 @@
 !
 !>      Structure of parallel and file information
       type platform_data_control
+!>        Block name
+        character(len=kchara) :: block_name = 'data_files_def'
+!
 !>        Structure of number of subdomain control
         type(read_integer_item) :: ndomain_ctl
 !>        Structure of number of OpenMP threads
@@ -131,10 +134,10 @@
 !
 !>        Structure of interpolation table file prefix
 !!        from spherical shell to FEM
-        type(read_character_item) :: interpolate_sph_to_fem_ctl
+        type(read_character_item) :: interpolate_sph_to_fem
 !>        Structure of interpolation table file prefix
 !!        from FEM to spherical shell
-        type(read_character_item) :: interpolate_fem_to_sph_ctl
+        type(read_character_item) :: interpolate_fem_to_sph
 !
 !>        Structure of Rayleigh spectr data directory name
         type(read_character_item) :: rayleigh_spectr_dir
@@ -188,8 +191,8 @@
       plt%coriolis_int_file_name%iflag =     0
       plt%bc_data_file_name_ctl%iflag =      0
       plt%radial_data_file_name_ctl%iflag =  0
-      plt%interpolate_sph_to_fem_ctl%iflag = 0
-      plt%interpolate_fem_to_sph_ctl%iflag = 0
+      plt%interpolate_sph_to_fem%iflag = 0
+      plt%interpolate_fem_to_sph%iflag = 0
 !
       plt%mesh_file_fmt_ctl%iflag =     0
       plt%sph_file_fmt_ctl%iflag =      0
@@ -241,10 +244,10 @@
       call copy_chara_ctl(org_plt%rayleigh_field_dir,                   &
      &                    new_plt%rayleigh_field_dir)
 !
-      call copy_chara_ctl(org_plt%interpolate_sph_to_fem_ctl,           &
-     &                    new_plt%interpolate_sph_to_fem_ctl)
-      call copy_chara_ctl(org_plt%interpolate_fem_to_sph_ctl,           &
-     &                    new_plt%interpolate_fem_to_sph_ctl)
+      call copy_chara_ctl(org_plt%interpolate_sph_to_fem,               &
+     &                    new_plt%interpolate_sph_to_fem)
+      call copy_chara_ctl(org_plt%interpolate_fem_to_sph,               &
+     &                    new_plt%interpolate_fem_to_sph)
 !
       call copy_chara_ctl(org_plt%mesh_file_fmt_ctl,                    &
      &                    new_plt%mesh_file_fmt_ctl)
@@ -268,6 +271,7 @@
      &                    new_plt%del_org_data_ctl)
 !
       new_plt%i_platform = org_plt%i_platform
+      new_plt%block_name = org_plt%block_name
 !
       end subroutine copy_ctl_data_4_platform
 !

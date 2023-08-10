@@ -114,6 +114,9 @@
       implicit  none
 !
       type node_bc_control
+!>        Block name
+        character(len=kchara) :: block_name = 'boundary_condition'
+!
 !>        Structure for nodal boundary conditions for temperature
 !!@n       node_bc_T_ctl%c1_tbl:  Type of boundary conditions
 !!@n       node_bc_T_ctl%c2_tbl:  Node (radial) group name for boundary

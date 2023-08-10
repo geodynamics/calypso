@@ -186,7 +186,7 @@
       real(kind = kreal), allocatable :: detail_out(:)
 !
 !
-      if(bench%detail_bench_file_prefix .eq. 'NO_FILE') return
+      if(no_file_flag(bench%detail_bench_file_prefix)) return
       if(my_rank .ne. 0) return
 !
       call dup_detail_dbench_header_to_IO                               &

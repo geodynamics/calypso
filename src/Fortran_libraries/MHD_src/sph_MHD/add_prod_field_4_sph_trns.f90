@@ -214,6 +214,12 @@
      &    ipol_cmp%i_velo_s, iphys_cmp%i_velo_s,                        &
      &    f_trns_cmp%i_velo_s, trns)
       call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_velo_x, iphys_cmp%i_velo_x,                        &
+     &    f_trns_cmp%i_velo_x, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_velo_y, iphys_cmp%i_velo_y,                        &
+     &    f_trns_cmp%i_velo_y, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_cmp%i_velo_z, iphys_cmp%i_velo_z,                        &
      &    f_trns_cmp%i_velo_z, trns)
 !

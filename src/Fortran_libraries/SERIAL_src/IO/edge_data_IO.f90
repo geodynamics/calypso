@@ -18,11 +18,12 @@
 !!        type(element_data), intent(in) :: ele_IO
 !!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
-!!      subroutine read_edge_geometry(id_file, nod_IO, sfed_IO)
+!!      subroutine read_edge_geometry(id_file, nod_IO, sfed_IO, iend)
 !!        type(communication_table), intent(inout) :: comm_IO
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!        integer(kind = kint), intent(inout) :: iend
 !!      subroutine write_edge_geometry(id_file, nod_IO, sfed_IO)
 !!      subroutine write_edge_geometry_sph(id_file, nod_IO, sfed_IO)
 !!      subroutine write_edge_geometry_cyl(id_file, nod_IO, sfed_IO)
@@ -72,6 +73,7 @@
 !      write(id_file,'(a)', advance='NO') hd_fem_para()
 !
       call read_domain_info(id_file, id_rank, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '!  2  edge connectivity'
@@ -79,7 +81,8 @@
 !      write(id_file,'(a)') '!      (type and connection) '
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_element(id_file, ele_IO)
+      call read_number_of_element(id_file, ele_IO, ierr)
+      if(ierr .ne. 0) return
       call read_element_info(id_file, ele_IO)
 !
 !      write(id_file,'(a)') '!'
@@ -101,13 +104,14 @@
 !      write(id_file,'(a)') '! 3.1 edge ID for import '
 !      write(id_file,'(a)') '!'
 !
-      call read_import_data(id_file, comm_IO)
+      call read_import_data(id_file, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 3.2 edge ID for export '
 !      write(id_file,'(a)') '!'
 !
-      call read_export_data(id_file, comm_IO)
+      call read_export_data(id_file, comm_IO, ierr)
 !
       end subroutine read_edge_connection
 !
@@ -152,34 +156,36 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_edge_geometry(id_file, nod_IO, sfed_IO)
+      subroutine read_edge_geometry(id_file, nod_IO, sfed_IO, iend)
 !
       use node_geometry_IO
 !
       integer (kind = kint), intent(in) :: id_file
       type(node_data), intent(inout) :: nod_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
+      integer(kind = kint), intent(inout) :: iend
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 4.   geometry of edge'
 !      write(id_file,'(a)') '!  4.1. center of edge'
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_node(id_file, nod_IO)
+      call read_number_of_node(id_file, nod_IO, iend)
+      if(iend .ne. 0) return
       call read_geometry_info(id_file, nod_IO)
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '!  4.2  direction of edge'
 !      write(id_file,'(a)') '!'
 !
-      call read_vector_in_element(id_file, nod_IO, sfed_IO)
+      call read_vector_in_element(id_file, nod_IO, sfed_IO, iend)
+      if(iend .ne. 0) return
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '!  4.3  length of edge'
 !      write(id_file,'(a)') '!'
 !
-      call read_scalar_in_element(id_file, nod_IO, sfed_IO)
+      call read_scalar_in_element(id_file, nod_IO, sfed_IO, iend)
 !
       end subroutine read_edge_geometry
 !

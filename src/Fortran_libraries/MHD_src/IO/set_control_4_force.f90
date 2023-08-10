@@ -26,22 +26,6 @@
 !
       implicit  none
 !
-!>       Filtered thermal buoyancy label
-      character(len=kchara), parameter                                  &
-     &             :: Filtered_gravity_label = 'Filtered_buoyancy'
-!
-      character(len=kchara), parameter                                  &
-     &             :: Filtered_gravity_e1 = 'Filtered_gravity'
-!
-!>       Filtered compositional buoyancy label
-      character(len=kchara), parameter                                  &
-     &             :: Filtered_comp_gravity_label                       &
-     &                        = 'Filtered_compositional_buoyancy'
-!
-      character(len=kchara), parameter                                  &
-     &             :: Filtered_comp_gravity_e1                          &
-     &                        = 'Filtered_compositional_gravity'
-!
       private :: set_control_force_flags, set_control_4_gravity
       private :: set_control_4_Coriolis_force, set_control_4_induction
 !
@@ -148,17 +132,17 @@
      &     .or. cmp_no_case(tmpchara, Filtered_comp_gravity_e1)         &
      &       ) fl_prop%iflag_4_filter_comp_buo = .TRUE.
 !
-          if (cmp_no_case(tmpchara, 'Coriolis')                         &
+          if (cmp_no_case(tmpchara, coriolis_e1)                        &
      &       ) fl_prop%iflag_4_coriolis = .TRUE.
 !
-          if(cmp_no_case(tmpchara, 'filtered_inertia')) then
+          if(cmp_no_case(tmpchara, hd_filtered_inertia)) then
             fl_prop%iflag_4_filter_inertia = .TRUE.
             fl_prop%iflag_4_inertia = .FALSE.
           end if
 !
           if(cmp_no_case(tmpchara, lorentz_label)) then
             fl_prop%iflag_4_lorentz = .TRUE.
-          else if(cmp_no_case(tmpchara, 'filtered_Lorentz')) then
+          else if(cmp_no_case(tmpchara, hd_filtered_Lorentz)) then
             fl_prop%iflag_4_filter_lorentz = .TRUE.
           end if
 !

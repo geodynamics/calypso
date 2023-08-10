@@ -13,7 +13,9 @@ MOD_SPH_SPECTR = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'SPH_SPECTR_DIR = $(SPH_SPECTR_DIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_SPH_SPECTR)' >> $(MAKENAME)
 
 mod_list:

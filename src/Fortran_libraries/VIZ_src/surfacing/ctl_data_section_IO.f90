@@ -7,6 +7,7 @@
 !>@brief  control ID data for surfacing module
 !!
 !!@verbatim
+!!      subroutine init_psf_ctl_stract(psf_c)
 !!      subroutine s_read_psf_control_data                              &
 !!     &         (id_control, hd_block, psf_c, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -19,11 +20,6 @@
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(psf_ctl), intent(inout) :: psf_c
 !!        integer(kind = kint), intent(inout) :: level
-!!
-!!      integer(kind = kint) function num_label_psf_ctl()
-!!      integer(kind = kint) function num_label_psf_ctl_w_dpl()
-!!      subroutine set_label_psf_ctl(names)
-!!      subroutine set_label_psf_ctl_w_dpl(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!! example of control for Kemo's surface rendering
 !!
@@ -154,11 +150,6 @@
       character(len=kchara), parameter                                  &
      &                  :: hd_psf_file_head =   'psf_file_head'
 !
-      integer(kind = kint), parameter :: n_label_psf_ctl = 4
-      integer(kind = kint), parameter :: n_label_psf_ctl_w_dpl = 5
-!
-      private :: n_label_psf_ctl, n_label_psf_ctl_w_dpl
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -169,6 +160,8 @@
      &         (id_control, hd_block, psf_c, c_buf)
 !
       use ctl_file_section_def_IO
+      use ctl_file_field_on_psf_IO
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -177,18 +170,25 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(psf_c%i_psf_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
-        call sel_read_ctl_pvr_section_def                               &
-     &     (id_control, hd_surface_define, psf_c%fname_section_ctl,     &
-     &      psf_c%psf_def_c, c_buf)
+        if(check_file_flag(c_buf, hd_surface_define)                    &
+     &        .or. check_begin_flag(c_buf, hd_surface_define)) then
+          call write_multi_ctl_file_message                             &
+     &       (hd_surface_define, izero, c_buf%level)
+          call sel_read_ctl_pvr_section_def(id_control,                 &
+     &        hd_surface_define, psf_c%fname_section_ctl,               &
+     &        psf_c%psf_def_c, c_buf)
+        end if
 !
-        call read_fld_on_psf_control(id_control, hd_output_field,       &
-     &                               psf_c%fld_on_psf_c, c_buf)
+        call sel_read_ctl_field_on_psf_file                             &
+     &     (id_control, hd_output_field, psf_c%fname_fld_on_psf,        &
+     &      psf_c%fld_on_psf_c, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_psf_file_prefix,             &
      &      psf_c%psf_file_head_ctl)
@@ -207,6 +207,7 @@
      &         (id_control, hd_block, psf_c, level)
 !
       use ctl_file_section_def_IO
+      use ctl_file_field_on_psf_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
@@ -223,63 +224,41 @@
       maxlen = len_trim(hd_psf_file_prefix)
       maxlen = max(maxlen, len_trim(hd_psf_out_type))
 !
-      write(id_control,'(a1)') '!'
+      level =  write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_psf_file_prefix, psf_c%psf_file_head_ctl)
+     &    psf_c%psf_file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_psf_out_type, psf_c%psf_output_type_ctl)
+     &    psf_c%psf_output_type_ctl)
 !
       call sel_write_ctl_pvr_section_def(id_control, hd_surface_define, &
      &    psf_c%fname_section_ctl, psf_c%psf_def_c, level)
-      call write_fld_on_psf_control(id_control, hd_output_field,        &
-     &                              psf_c%fld_on_psf_c, level)
+      call sel_write_ctl_field_on_psf_file(id_control, hd_output_field, &
+     &    psf_c%fname_fld_on_psf, psf_c%fld_on_psf_c, level)
 !
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_psf_control_data
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
 !
-      integer(kind = kint) function num_label_psf_ctl()
-      num_label_psf_ctl = n_label_psf_ctl
-      return
-      end function num_label_psf_ctl
+      subroutine init_psf_ctl_stract(hd_block, psf_c)
 !
-! ----------------------------------------------------------------------
+      use ctl_data_section_def_IO
 !
-      integer(kind = kint) function num_label_psf_ctl_w_dpl()
-      num_label_psf_ctl_w_dpl = n_label_psf_ctl_w_dpl
-      return
-      end function num_label_psf_ctl_w_dpl
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_psf_ctl(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_psf_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
-      call set_control_labels(hd_psf_file_prefix, names( 1))
-      call set_control_labels(hd_psf_out_type,    names( 2))
-      call set_control_labels(hd_surface_define,  names( 3))
-      call set_control_labels(hd_output_field,    names( 4))
+      psf_c%block_name = hd_block
+      call init_psf_def_ctl_stract(hd_surface_define, psf_c%psf_def_c)
+      call init_fld_on_psf_control(hd_output_field, psf_c%fld_on_psf_c)
 !
-      end subroutine set_label_psf_ctl
+        call init_chara_ctl_item_label(hd_psf_file_prefix,              &
+     &      psf_c%psf_file_head_ctl)
+        call init_chara_ctl_item_label(hd_psf_out_type,                 &
+     &      psf_c%psf_output_type_ctl)
 !
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_psf_ctl_w_dpl(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_psf_ctl_w_dpl)
-!
-!
-      call set_label_psf_ctl(names(1))
-      call set_control_labels(hd_psf_file_head,  names( 5))
-!
-      end subroutine set_label_psf_ctl_w_dpl
+      end subroutine init_psf_ctl_stract
 !
 !  ---------------------------------------------------------------------
 !

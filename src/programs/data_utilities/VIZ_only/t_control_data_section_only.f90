@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine read_control_file_section_only(file_name,            &
-!!     &                                          sec_viz_ctl)
+!!     &                                          sec_viz_ctl, c_buf)
 !!      subroutine write_control_file_section_only(file_name,           &
 !!     &                                           sec_viz_ctl)
 !!        character(len=kchara), intent(in) :: file_name
@@ -54,6 +54,9 @@
 !
 !>      Structure of control data for sectioning only
       type control_data_section_only
+!>        Control block name
+        character(len = kchara) :: block_name = 'visualizer'
+!
 !>      Structure for file settings
         type(platform_data_control) :: sect_plt
 !>      Structure for time stepping control
@@ -91,24 +94,32 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_control_file_section_only(file_name,              &
-     &                                          sec_viz_ctl)
+     &                                          sec_viz_ctl, c_buf)
 !
       use skip_comment_f
       use t_control_data_surfacings
 !
       character(len=kchara), intent(in) :: file_name
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
-      type(buffer_for_control) :: c_buf1
+      type(buffer_for_control), intent(inout) :: c_buf
 !
 !
+      c_buf%level = c_buf%level + 1
+      call init_section_control_label(hd_viz_only_file, sec_viz_ctl)
       open (viz_ctl_file_code, file=file_name, status='old' )
       do
-        call load_one_line_from_control(viz_ctl_file_code, c_buf1)
+        call load_one_line_from_control                                 &
+     &     (viz_ctl_file_code, hd_viz_only_file, c_buf)
+        if(c_buf%iend .gt. 0) exit
+!
         call read_section_control_data                                  &
-     &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf1)
+     &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf)
         if(sec_viz_ctl%i_viz_only_file .gt. 0) exit
       end do
       close(viz_ctl_file_code)
+!
+      c_buf%level = c_buf%level - 1
+      if(c_buf%iend .gt. 0) return
 !
       call section_step_ctls_to_time_ctl                                &
      &   (sec_viz_ctl%surfacing_ctls, sec_viz_ctl%t_sect_ctl)
@@ -164,10 +175,11 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(sec_viz_ctl%i_viz_only_file .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_platforms                                     &
@@ -202,19 +214,39 @@
 !
       if(sec_viz_ctl%i_viz_only_file .le. 0) return
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_control_platforms                                      &
      &   (id_control, hd_platform, sec_viz_ctl%sect_plt, level)
       call write_control_time_step_data                                 &
-     &   (id_control, hd_time_step, sec_viz_ctl%t_sect_ctl, level)
+     &   (id_control, sec_viz_ctl%t_sect_ctl, level)
 !
       call write_surfacing_controls                                     &
      &   (id_control, hd_viz_ctl, sec_viz_ctl%surfacing_ctls, level)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_section_control_data
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_section_control_label(hd_block, sec_viz_ctl)
+!
+      use skip_comment_f
+      use ctl_data_platforms_IO
+      use ctl_data_4_time_steps_IO
+      use control_data_surfacing_IO
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(control_data_section_only), intent(inout) :: sec_viz_ctl
+!
+!
+      sec_viz_ctl%block_name = hd_block
+      call init_platforms_labels(hd_platform, sec_viz_ctl%sect_plt)
+      call init_ctl_time_step_label(hd_time_step,                       &
+     &                              sec_viz_ctl%t_sect_ctl)
+      call init_surfacing_ctl_label(hd_viz_ctl,                         &
+     &                              sec_viz_ctl%surfacing_ctls)
+!
+      end subroutine init_section_control_label
 !
 !   --------------------------------------------------------------------
 !

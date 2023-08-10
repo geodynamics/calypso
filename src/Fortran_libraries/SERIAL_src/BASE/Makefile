@@ -13,7 +13,9 @@ MOD_BASE = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'BASEDIR = $(BASEDIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_BASE)' >> $(MAKENAME)
 
 

@@ -12,8 +12,9 @@
 !!      subroutine dealloc_each_bc_item_ctl(bc_ctls)
 !!        type(each_boundary_spectr), intent(inout) :: bc_ctls
 !!
-!!      subroutine read_each_boundary_spectr(id_file, bc_ctls)
+!!      subroutine read_each_boundary_spectr(id_file, bc_ctls, iend)
 !!        type(each_boundary_spectr), intent(inout) :: bc_ctls
+!!        integer(kind = kint), intent(inout) :: iend
 !!      subroutine write_each_boundary_spectr(id_file, bc_ctls)
 !!        type(each_boundary_spectr), intent(in) :: bc_ctls
 !!
@@ -139,7 +140,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_each_boundary_spectr(id_file, bc_ctls)
+      subroutine read_each_boundary_spectr(id_file, bc_ctls, iend)
 !
       use m_machine_parameter
       use set_sph_boundary_from_file
@@ -147,23 +148,30 @@
 !
       integer(kind = kint), intent(in) :: id_file
       type(each_boundary_spectr), intent(inout) :: bc_ctls
+      integer(kind = kint), intent(inout) :: iend
 !
       integer(kind = kint) :: inum
       character(len=255) :: tmpchara
 !
 !
-      call skip_comment(tmpchara,id_file)
+      call skip_comment(id_file, tmpchara, iend)
+      if(iend .gt. 0) return
       read(tmpchara,*)  bc_ctls%bc_field
-      call skip_comment(tmpchara,id_file)
+!
+      call skip_comment(id_file, tmpchara, iend)
+      if(iend .gt. 0) return
       read(tmpchara,*) bc_ctls%bc_group
-      call skip_comment(tmpchara,id_file)
+!
+      call skip_comment(id_file, tmpchara, iend)
+      if(iend .gt. 0) return
       read(tmpchara,*) bc_ctls%num_bc_mode
 !
       bc_ctls%ncomp_bc = num_comp_bc_data(bc_ctls%bc_field)
       call alloc_each_bc_item_ctl(bc_ctls)
 !
       do inum = 1, bc_ctls%num_bc_mode
-        call skip_comment(tmpchara,id_file)
+        call skip_comment(id_file, tmpchara, iend)
+        if(iend .gt. 0) return
         read(tmpchara,*) bc_ctls%imode_gl(1:2,inum),                    &
      &      bc_ctls%bc_input(inum,1:bc_ctls%ncomp_bc)
       end do

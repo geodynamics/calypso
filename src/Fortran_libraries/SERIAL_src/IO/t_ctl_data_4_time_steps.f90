@@ -172,6 +172,8 @@
 !
 !>   Structure of time stepping controls
       type time_data_control
+!>        Block name
+        character(len=kchara) :: block_name = 'time_step_ctl'
 !>   First step
         type(read_integer_item) :: i_step_init_ctl
 !>   End step

@@ -13,7 +13,9 @@ MOD_ZLIB_IO = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'ZLIB_IO_DIR = $(ZLIB_IO_DIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_ZLIB_IO)' >> $(MAKENAME)
 
 mod_list:

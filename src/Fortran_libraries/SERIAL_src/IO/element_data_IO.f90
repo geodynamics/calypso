@@ -7,7 +7,7 @@
 !>@brief Data IO routines for element data
 !!
 !!@verbatim
-!!      subroutine read_element_geometry(id_file, nod_IO, sfed_IO)
+!!      subroutine read_element_geometry(id_file, nod_IO, sfed_IO, iend)
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!      subroutine write_element_geometry(id_file, nod_IO, sfed_IO)
@@ -35,14 +35,14 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_element_geometry(id_file, nod_IO, sfed_IO)
+      subroutine read_element_geometry(id_file, nod_IO, sfed_IO, iend)
 !
       use node_geometry_IO
 !
       integer (kind = kint), intent(in) :: id_file
       type(node_data), intent(inout) :: nod_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
+      integer(kind = kint), intent(inout) :: iend
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 3.element information'
@@ -50,14 +50,15 @@
 !      write(id_file,'(a)') '! 3.1 center of element (position) '
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_node(id_file, nod_IO)
+      call read_number_of_node(id_file, nod_IO, iend)
+      if(iend .ne. 0) return
       call read_geometry_info(id_file, nod_IO)
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 3.2 Volume of element '
 !      write(id_file,'(a)') '!'
 !
-      call read_scalar_in_element(id_file, nod_IO, sfed_IO)
+      call read_scalar_in_element(id_file, nod_IO, sfed_IO, iend)
 !
       end subroutine read_element_geometry
 !

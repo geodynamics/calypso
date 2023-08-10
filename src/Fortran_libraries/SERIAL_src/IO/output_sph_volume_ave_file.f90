@@ -66,7 +66,7 @@
       do i = 1, pwr%num_vol_spectr
         if(pwr%v_spectr(i)%iflag_volume_ave_sph .eq. 0)  cycle
 !
-        if(cmp_no_case(pwr%v_spectr(i)%fhead_ave, 'NO_FILE')) cycle
+        if(no_file_flag(pwr%v_spectr(i)%fhead_ave)) cycle
         fname_rms = add_dat_extension(pwr%v_spectr(i)%fhead_ave)
         write(mode_label,'(a)') 'EMPTY'
         call write_sph_volume_pwr_file(fname_rms, mode_label,           &

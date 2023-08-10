@@ -13,13 +13,22 @@
 !!      subroutine set_pseudo_vacuum_group_types(bc_type_ctl, ibc_type)
 !!      subroutine set_surf_wall_group_types(bc_type_ctl, ibc_type)
 !!      subroutine set_surf_infty_group_types(bc_type_ctl, ibc_type)
+!!
+!!      subroutine surf_bc_label_thermal_bc(array_c)
+!!      subroutine surf_bc_label_momentum_bc(array_c)
+!!      subroutine surf_bc_label_induction_bc(array_c)
+!!      subroutine surf_bc_label_infinity_bc(array_c)
+!!      subroutine surf_bc_label_potential_bc(array_c)
+!!      subroutine surf_bc_label_vector_p_bc(array_c)
+!!      subroutine surf_bc_label_current_bc(array_c)
+!!        type(ctl_array_chara), intent(inout) :: array_c
 !!@endverbatim
 !
       module set_surface_group_types
 !
       use m_precision
       use m_boundary_condition_IDs
-      use set_node_group_types
+      use m_fem_node_group_types
       use skip_comment_f
 !
       implicit none
@@ -108,6 +117,8 @@
 !
       subroutine set_surf_group_types_scalar(bc_type_ctl, ibc_type)
 !
+      use m_sph_node_group_types
+!
       character (len=kchara), intent(in) :: bc_type_ctl
       integer(kind = kint), intent(inout) :: ibc_type
 !
@@ -136,6 +147,7 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
+      call set_bc_group_types_each_dir(bc_type_ctl, ibc_type)
       call set_bc_group_types_vector(bc_type_ctl, ibc_type)
       call set_bc_group_types_sgs_vect(bc_type_ctl, ibc_type)
 !
@@ -236,5 +248,213 @@
       end subroutine set_surf_infty_group_types
 !
 !-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine surf_bc_label_thermal_bc(array_c)
+      use m_sph_node_group_types
+      use m_fem_node_group_types
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
+!
+      call add_bc_group_types_sph_center(array_c)
+      call add_bc_group_types_scalar(array_c)
+      call add_bc_group_types_sgs_scalar(array_c)
+!
+      call add_surf_group_types_scalar(array_c)
+!
+      end subroutine surf_bc_label_thermal_bc
+!
+!-----------------------------------------------------------------------
+!
+      subroutine surf_bc_label_momentum_bc(array_c)
+      use m_sph_node_group_types
+      use m_fem_node_group_types
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call set_label_momentum_bc(array_c)
+!
+      call add_bc_group_types_sph_velo(array_c)
+      call add_bc_group_types_each_dir(array_c)
+      call add_bc_group_types_vector(array_c)
+      call add_bc_group_types_sgs_vect(array_c)
+!
+      call add_surf_group_types_vector(array_c)
+      call add_stress_free_group_types(array_c)
+!
+      end subroutine surf_bc_label_momentum_bc
+!
+!-----------------------------------------------------------------------
+!
+      subroutine surf_bc_label_induction_bc(array_c)
+      use m_sph_node_group_types
+      use m_fem_node_group_types
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
+!
+      call add_bc_group_types_sph_magne(array_c)
+      call add_bc_group_types_sph_center(array_c)
+!
+      call add_bc_group_types_each_dir(array_c)
+      call add_bc_group_types_vector(array_c)
+      call add_bc_group_types_sgs_vect(array_c)
+!
+      call add_surf_group_types_vector(array_c)
+!
+      end subroutine surf_bc_label_induction_bc
+!
+! ----------------------------------------------------------------------
+!
+      subroutine surf_bc_label_potential_bc(array_c)
+      use m_fem_node_group_types
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
+!
+      call add_surf_group_types_scalar(array_c)
+      call add_bc_group_types_scalar(array_c)
+      call add_bc_group_types_sgs_scalar(array_c)
+!
+      call add_surf_wall_group_types(array_c)
+!
+      end subroutine surf_bc_label_potential_bc
+!
+! ----------------------------------------------------------------------
+!
+      subroutine surf_bc_label_vector_p_bc(array_c)
+      use m_fem_node_group_types
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
+!
+      call add_bc_group_types_each_dir(array_c)
+      call add_bc_group_types_vector(array_c)
+      call add_bc_group_types_sgs_vect(array_c)
+!
+      call add_surf_group_types_vector(array_c)
+      call add_pseudo_vacuum_group_types(array_c)
+!
+      end subroutine surf_bc_label_vector_p_bc
+!
+! ----------------------------------------------------------------------
+!
+      subroutine surf_bc_label_current_bc(array_c)
+      use m_fem_node_group_types
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
+!
+      call add_bc_group_types_each_dir(array_c)
+      call add_bc_group_types_vector(array_c)
+      call add_bc_group_types_sgs_vect(array_c)
+!
+      call add_surf_group_types_vector(array_c)
+!
+      end subroutine surf_bc_label_current_bc
+!
+! ----------------------------------------------------------------------
+!
+      subroutine surf_bc_label_infinity_bc(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
+!
+      call append_c_to_ctl_array(infty_surf, array_c)
+!
+      end subroutine surf_bc_label_infinity_bc
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine add_surf_group_types_scalar(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      call append_c_to_ctl_array(grad_sf, array_c)
+      call append_c_to_ctl_array(grad_file, array_c)
+      call append_c_to_ctl_array(grad_lead, array_c)
+!
+      end subroutine add_surf_group_types_scalar
+!
+! ----------------------------------------------------------------------
+!
+      subroutine add_surf_group_types_vector(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      call append_c_to_ctl_array(fixed_norm, array_c)
+      call append_c_to_ctl_array(norm_file, array_c)
+!
+      call append_c_to_ctl_array(fixed_grad_x, array_c)
+      call append_c_to_ctl_array(fixed_grad_y, array_c)
+      call append_c_to_ctl_array(fixed_grad_z, array_c)
+!
+      call append_c_to_ctl_array(grad_file_x, array_c)
+      call append_c_to_ctl_array(grad_file_y, array_c)
+      call append_c_to_ctl_array(grad_file_z, array_c)
+!
+      call append_c_to_ctl_array(grad_lead_x, array_c)
+      call append_c_to_ctl_array(grad_lead_y, array_c)
+      call append_c_to_ctl_array(grad_lead_z, array_c)
+!
+      end subroutine add_surf_group_types_vector
+!
+! ----------------------------------------------------------------------
+!
+      subroutine add_stress_free_group_types(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      call append_c_to_ctl_array(free_sph_in, array_c)
+      call append_c_to_ctl_array(free_sph_out, array_c)
+!
+      end subroutine add_stress_free_group_types
+!
+! ----------------------------------------------------------------------
+!
+      subroutine add_surf_wall_group_types(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      call append_c_to_ctl_array(wall_surf, array_c)
+      call append_c_to_ctl_array(sphere_in, array_c)
+      call append_c_to_ctl_array(sphere_out, array_c)
+!
+      end subroutine add_surf_wall_group_types
+!
+! ----------------------------------------------------------------------
+!
+      subroutine add_pseudo_vacuum_group_types(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      call append_c_to_ctl_array(pseudo_in, array_c)
+      call append_c_to_ctl_array(pseudo_out, array_c)
+!
+      end subroutine add_pseudo_vacuum_group_types
+!
+! ----------------------------------------------------------------------
 !
       end module set_surface_group_types

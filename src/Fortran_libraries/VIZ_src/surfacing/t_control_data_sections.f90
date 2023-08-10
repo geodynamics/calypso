@@ -8,9 +8,14 @@
 !!@verbatim
 !!      subroutine alloc_psf_ctl_stract(psf_ctls)
 !!      subroutine dealloc_psf_ctl_stract(psf_ctls)
-!!
-!!      subroutine append_new_section_control(psf_ctls)
+!!      subroutine init_psf_ctls_labels(hd_block, psf_ctls)
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(section_controls), intent(inout) :: psf_ctls
+!!
+!!      subroutine append_section_control(idx_in, hd_block, psf_ctls)
+!!      subroutine delete_section_control(idx_in, psf_ctls)
+!!        type(section_controls), intent(inout) :: psf_ctls
+!!
 !!      subroutine add_fields_4_psfs_to_fld_ctl(psf_ctls, field_ctl)
 !!        type(section_controls), intent(in) :: psf_ctls
 !!        type(ctl_array_c3), intent(inout) :: field_ctl
@@ -32,14 +37,15 @@
 !
 !
       type section_controls
+!>        Control block name
+        character(len = kchara) :: block_name = 'cross_section_ctl'
+!>        # of Structure for isosurface control
         integer(kind = kint) :: num_psf_ctl = 0
 !>        External section control file names
         character(len = kchara), allocatable :: fname_psf_ctl(:)
 !>        Structure of sections control
         type(psf_ctl), allocatable :: psf_ctl_struct(:)
       end type section_controls
-!
-      private :: dup_control_4_psfs
 !
 !   --------------------------------------------------------------------
 !
@@ -50,19 +56,13 @@
       subroutine alloc_psf_ctl_stract(psf_ctls)
 !
       type(section_controls), intent(inout) :: psf_ctls
-      integer(kind = kint) :: i
 !
 !
       allocate(psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl))
       allocate(psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl))
 !
-      do i = 1, psf_ctls%num_psf_ctl
-        call init_psf_ctl_stract(psf_ctls%psf_ctl_struct(i))
-      end do
-!
       end subroutine alloc_psf_ctl_stract
 !
-!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine dealloc_psf_ctl_stract(psf_ctls)
@@ -83,7 +83,19 @@
       end subroutine dealloc_psf_ctl_stract
 !
 !  ---------------------------------------------------------------------
-!   --------------------------------------------------------------------
+!
+      subroutine init_psf_ctls_labels(hd_block, psf_ctls)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(section_controls), intent(inout) :: psf_ctls
+!
+      psf_ctls%num_psf_ctl = 0
+      psf_ctls%block_name = hd_block
+!
+      end subroutine init_psf_ctls_labels
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
 !
       subroutine add_fields_4_psfs_to_fld_ctl(psf_ctls, field_ctl)
 !
@@ -105,50 +117,90 @@
 !  ---------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine append_new_section_control(psf_ctls)
+      subroutine append_section_control(idx_in, hd_block, psf_ctls)
 !
+      use ctl_data_section_IO
+!
+      integer(kind = kint), intent(in) :: idx_in
+      character(len=kchara), intent(in) :: hd_block
       type(section_controls), intent(inout) :: psf_ctls
 !
       type(section_controls) :: tmp_psf_c
+      integer(kind = kint) :: i
 !
+!
+      if(idx_in.lt.0 .or. idx_in.gt.psf_ctls%num_psf_ctl) return
 !
       tmp_psf_c%num_psf_ctl = psf_ctls%num_psf_ctl
       call alloc_psf_ctl_stract(tmp_psf_c)
-      call dup_control_4_psfs                                           &
-     &    (tmp_psf_c%num_psf_ctl, psf_ctls, tmp_psf_c)
+      do i = 1, tmp_psf_c%num_psf_ctl
+        call dup_control_4_psf(psf_ctls%psf_ctl_struct(i),              &
+                               tmp_psf_c%psf_ctl_struct(i))
+        tmp_psf_c%fname_psf_ctl(i) = psf_ctls%fname_psf_ctl(i)
+      end do
 !
       call dealloc_psf_ctl_stract(psf_ctls)
-!
       psf_ctls%num_psf_ctl = tmp_psf_c%num_psf_ctl + 1
       call alloc_psf_ctl_stract(psf_ctls)
 !
-      call dup_control_4_psfs                                           &
-     &   (tmp_psf_c%num_psf_ctl, tmp_psf_c, psf_ctls)
+      do i = 1, idx_in
+        call dup_control_4_psf(tmp_psf_c%psf_ctl_struct(i),             &
+                               psf_ctls%psf_ctl_struct(i))
+        psf_ctls%fname_psf_ctl(i) = tmp_psf_c%fname_psf_ctl(i)
+      end do
+      call init_psf_ctl_stract(hd_block,                                &
+     &                         psf_ctls%psf_ctl_struct(idx_in+1))
+      psf_ctls%fname_psf_ctl(idx_in+1) = 'NO_FILE'
+      do i = idx_in+1, tmp_psf_c%num_psf_ctl
+        call dup_control_4_psf(tmp_psf_c%psf_ctl_struct(i),             &
+     &                         psf_ctls%psf_ctl_struct(i+1))
+        psf_ctls%fname_psf_ctl(i+1) = tmp_psf_c%fname_psf_ctl(i)
+      end do
 !
       call dealloc_psf_ctl_stract(tmp_psf_c)
 !
-      end subroutine append_new_section_control
+      end subroutine append_section_control
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dup_control_4_psfs                                     &
-     &         (num_psf, org_psf_ctls, new_psf_ctls)
+      subroutine delete_section_control(idx_in, psf_ctls)
 !
-      integer(kind = kint), intent(in) :: num_psf
-      type(section_controls), intent(in) :: org_psf_ctls
-      type(section_controls), intent(inout) :: new_psf_ctls
+      integer(kind = kint), intent(in) :: idx_in
+      type(section_controls), intent(inout) :: psf_ctls
 !
+      type(section_controls) :: tmp_psf_c
       integer(kind = kint) :: i
 !
-      do i = 1, num_psf
-        call dup_control_4_psf(org_psf_ctls%psf_ctl_struct(i),          &
-            new_psf_ctls%psf_ctl_struct(i))
+!
+      if(idx_in.le.0 .or. idx_in.gt.psf_ctls%num_psf_ctl) return
+!
+      tmp_psf_c%num_psf_ctl = psf_ctls%num_psf_ctl
+      call alloc_psf_ctl_stract(tmp_psf_c)
+      do i = 1, tmp_psf_c%num_psf_ctl
+        call dup_control_4_psf(psf_ctls%psf_ctl_struct(i),              &
+                               tmp_psf_c%psf_ctl_struct(i))
+        tmp_psf_c%fname_psf_ctl(i) = psf_ctls%fname_psf_ctl(i)
       end do
-      new_psf_ctls%fname_psf_ctl(1:num_psf)                             &
-     &      = org_psf_ctls%fname_psf_ctl(1:num_psf)
 !
-      end subroutine dup_control_4_psfs
+      call dealloc_psf_ctl_stract(psf_ctls)
+      psf_ctls%num_psf_ctl = tmp_psf_c%num_psf_ctl - 1
+      call alloc_psf_ctl_stract(psf_ctls)
 !
-!  ---------------------------------------------------------------------
+      do i = 1, idx_in-1
+        call dup_control_4_psf(tmp_psf_c%psf_ctl_struct(i),             &
+                               psf_ctls%psf_ctl_struct(i))
+        psf_ctls%fname_psf_ctl(i) = tmp_psf_c%fname_psf_ctl(i)
+      end do
+      do i = idx_in, psf_ctls%num_psf_ctl
+        call dup_control_4_psf(tmp_psf_c%psf_ctl_struct(i+1),           &
+     &                         psf_ctls%psf_ctl_struct(i))
+        psf_ctls%fname_psf_ctl(i) = tmp_psf_c%fname_psf_ctl(i+1)
+      end do
+!
+      call dealloc_psf_ctl_stract(tmp_psf_c)
+!
+      end subroutine delete_section_control
+!
+! -----------------------------------------------------------------------
 !
       end module t_control_data_sections

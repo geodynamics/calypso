@@ -13,7 +13,10 @@
 !!      subroutine write_edge_4_element(id_file, sfed_IO)
 !!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
-!!      subroutine read_number_of_element(id_file, ele_IO)
+!!      subroutine read_number_of_element(id_file, ele_IO, iend)
+!!        integer (kind = kint), intent(in) :: id_file
+!!        type(element_data), intent(inout) :: ele_IO
+!!        integer (kind=kint), intent(inout) :: iend
 !!      subroutine read_element_info(id_file, ele_IO)
 !!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
@@ -100,15 +103,17 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_number_of_element(id_file, ele_IO)
+      subroutine read_number_of_element(id_file, ele_IO, iend)
 !
       use skip_comment_f
 !
       integer (kind = kint), intent(in) :: id_file
       type(element_data), intent(inout) :: ele_IO
+      integer (kind=kint), intent(inout) :: iend
 !
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, iend)
+      if(iend .gt. 0) return
 !
       read(character_4_read,*) ele_IO%numele
 !

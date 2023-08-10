@@ -36,11 +36,13 @@
 !
       use t_read_sph_spectra
       use t_tave_sph_volume_spectr
+      use count_monitor_time_series
 !
       implicit  none
 !
       type(read_sph_spectr_data), save, private :: tave_sph_IN
       type(vol_spectr_ave_sigma_work), save, private :: WK_tave_s
+      type(sph_spectr_head_labels), save, private :: sph_lbl_IN1
 !
 ! -------------------------------------------------------------------
 !
@@ -192,9 +194,9 @@
       end if
 !
       tave_spectr(1:l_truncation+1)                                     &
-     &           = tave_spectr(id_pick,0:l_truncation,1)
+     &           = WK_tave_s%ave_spec_l(id_pick,0:l_truncation)
       sdev_spectr(1:l_truncation+1)                                     &
-     &           = sdev_spectr(id_pick,0:l_truncation,1)
+     &           = WK_tave_s%sigma_spec_l(id_pick,0:l_truncation)
 !
 !      write(*,*) 'In Fortran: ', trim(draw_name), id_pick
 !      do i = 0, l_truncation

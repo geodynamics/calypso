@@ -25,8 +25,8 @@
 !!        character(len=kchara), intent(in) :: file_name
 !!        type(ucd_data), intent(inout) :: ucd
 !!
-!!      subroutine read_alloc_vtk_file(id_rank, file_name, ucd)
-!!      subroutine read_alloc_vtk_phys(id_rank, file_name, ucd)
+!!      subroutine read_alloc_vtk_file(id_rank, file_name, ucd, iend)
+!!      subroutine read_alloc_vtk_phys(id_rank, file_name, ucd, iend)
 !!      subroutine read_alloc_vtk_grid(id_rank, file_name, ucd)
 !!        integer, intent(in) :: id_rank
 !!        character(len=kchara), intent(in) :: file_name
@@ -214,11 +214,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_alloc_vtk_file(id_rank, file_name, ucd)
+      subroutine read_alloc_vtk_file(id_rank, file_name, ucd, iend)
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
       type(ucd_data), intent(inout) :: ucd
+      integer(kind = kint), intent(inout) ::  iend
 !
 !
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -227,18 +228,19 @@
       open(id_vtk_file, file=file_name,                                 &
      &    form='formatted', status ='old')
       call read_alloc_ucd_mesh_from_VTK(id_vtk_file, ucd)
-      call read_alloc_udt_field_from_VTK(id_vtk_file, ucd)
+      call read_alloc_udt_field_from_VTK(id_vtk_file, ucd, iend)
       close(id_vtk_file)
 !
       end subroutine read_alloc_vtk_file
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_alloc_vtk_phys(id_rank, file_name, ucd)
+      subroutine read_alloc_vtk_phys(id_rank, file_name, ucd, iend)
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
       type(ucd_data), intent(inout) :: ucd
+      integer(kind = kint), intent(inout) ::  iend
 !
 !
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -246,7 +248,7 @@
 !
       open(id_vtk_file, file=file_name,                                 &
      &    form='formatted', status ='old')
-      call read_alloc_udt_field_from_VTK(id_vtk_file, ucd)
+      call read_alloc_udt_field_from_VTK(id_vtk_file, ucd, iend)
       close(id_vtk_file)
 !
       end subroutine read_alloc_vtk_phys

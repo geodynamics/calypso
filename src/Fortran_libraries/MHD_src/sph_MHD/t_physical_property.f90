@@ -11,9 +11,6 @@
 !!      subroutine alloc_force_list(num, fl_prop)
 !!      subroutine dealloc_force_list(fl_prop)
 !!        type(fluid_property), intent(inout) :: fl_prop
-!!      subroutine set_reference_scalar_ctl(ref_ctl, scl_prop)
-!!        type(reference_temperature_ctl), intent(in) :: ref_ctl
-!!        type(scalar_property), intent(inout) :: scl_prop
 !!@endverbatim
 !
       module t_physical_property

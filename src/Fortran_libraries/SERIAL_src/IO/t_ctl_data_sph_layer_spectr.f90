@@ -8,16 +8,15 @@
 !> @brief control date for volume averaged spectr data
 !!
 !!@verbatim
+!!      subroutine init_layerd_spectr_ctl_labels(hd_block, lp_ctl)
 !!      subroutine read_layerd_spectr_ctl                               &
 !!     &         (id_control, hd_block, lp_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(layerd_spectr_control), intent(inout) :: lp_ctl
 !!        type(buffer_for_control), intent(inout) :: c_buf
-!!      subroutine write_layerd_spectr_ctl                              &
-!!     &         (id_control, hd_block, lp_ctl, level)
+!!      subroutine write_layerd_spectr_ctl(id_control, lp_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(layerd_spectr_control), intent(in) :: lp_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!      subroutine dealloc_num_spec_layer_ctl(lp_ctl)
@@ -65,6 +64,9 @@
 !
 !
       type layerd_spectr_control
+!>        Block name
+        character(len=kchara) :: block_name = 'layered_spectrum_ctl'
+!
 !>        Structure for layered spectrum file prefix
         type(read_character_item) :: layered_pwr_spectr_prefix
 !>        Structure for layered spectrum file format
@@ -129,10 +131,11 @@
       type(buffer_for_control), intent(inout) :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if (lp_ctl%i_layer_spectr_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_array_i1(id_control,                          &
@@ -160,13 +163,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_layerd_spectr_ctl                                &
-     &         (id_control, hd_block, lp_ctl, level)
+      subroutine write_layerd_spectr_ctl(id_control, lp_ctl, level)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(layerd_spectr_control), intent(in) :: lp_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -185,31 +186,60 @@
       maxlen = max(maxlen, len_trim(hd_diff_lm_spectr_switch))
       maxlen = max(maxlen, len_trim(hd_axis_spectr_switch))
 !
-      write(id_control,'(a1)') '!'
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 lp_ctl%block_name)
       call write_control_array_i1(id_control, level,                    &
-     &    hd_spctr_layer, lp_ctl%idx_spec_layer_ctl)
+     &    lp_ctl%idx_spec_layer_ctl)
       call write_control_array_r1(id_control, level,                    &
-     &    hd_spctr_radius, lp_ctl%layer_radius_ctl)
+     &    lp_ctl%layer_radius_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_layer_rms_head, lp_ctl%layered_pwr_spectr_prefix)
+     &    lp_ctl%layered_pwr_spectr_prefix)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_layer_rms_fmt, lp_ctl%layered_pwr_spectr_format)
+     &    lp_ctl%layered_pwr_spectr_format)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_degree_spectr_switch, lp_ctl%degree_spectra_switch)
+     &    lp_ctl%degree_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_order_spectr_switch, lp_ctl%order_spectra_switch)
+     &    lp_ctl%order_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_diff_lm_spectr_switch, lp_ctl%diff_lm_spectra_switch)
+     &    lp_ctl%diff_lm_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_axis_spectr_switch, lp_ctl%axis_power_switch)
-!
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+     &    lp_ctl%axis_power_switch)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                lp_ctl%block_name)
 !
       end subroutine write_layerd_spectr_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine init_layerd_spectr_ctl_labels(hd_block, lp_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(layerd_spectr_control), intent(inout) :: lp_ctl
+!
+!
+      lp_ctl%block_name = hd_block
+        call init_int_ctl_array_label                                   &
+     &     (hd_spctr_layer, lp_ctl%idx_spec_layer_ctl)
+        call init_real_ctl_array_label                                  &
+     &     (hd_spctr_radius, lp_ctl%layer_radius_ctl)
+!
+        call init_chara_ctl_item_label(hd_layer_rms_head,               &
+     &      lp_ctl%layered_pwr_spectr_prefix)
+        call init_chara_ctl_item_label(hd_layer_rms_fmt,                &
+     &      lp_ctl%layered_pwr_spectr_format)
+!
+        call init_chara_ctl_item_label(hd_degree_spectr_switch,         &
+     &      lp_ctl%degree_spectra_switch)
+        call init_chara_ctl_item_label(hd_order_spectr_switch,          &
+     &      lp_ctl%order_spectra_switch)
+        call init_chara_ctl_item_label(hd_diff_lm_spectr_switch,        &
+     &      lp_ctl%diff_lm_spectra_switch)
+        call init_chara_ctl_item_label(hd_axis_spectr_switch,           &
+     &      lp_ctl%axis_power_switch)
+!
+      end subroutine init_layerd_spectr_ctl_labels
 !
 ! -----------------------------------------------------------------------
 !

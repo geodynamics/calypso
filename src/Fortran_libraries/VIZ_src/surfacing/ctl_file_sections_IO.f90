@@ -10,8 +10,6 @@
 !!     &         (id_control, hd_block, psf_ctls, c_buf)
 !!      subroutine sel_read_control_4_psf_file(id_control, hd_block,    &
 !!     &          file_name, psf_ctl_struct, c_buf)
-!!      subroutine read_control_4_psf_file(id_control, file_name,       &
-!!     &                                   hd_block, psf_ctl_struct)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        character(len = kchara), intent(inout) :: file_name
@@ -57,6 +55,8 @@
      &             :: hd_psf_ctl = 'surface_rendering'
       private :: hd_section_ctl, hd_psf_ctl
 !
+      private :: read_control_4_psf_file
+!
 !   --------------------------------------------------------------------
 !
       contains
@@ -68,6 +68,7 @@
 !
       use t_read_control_elements
       use ctl_data_section_IO
+      use write_control_elements
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
@@ -75,6 +76,7 @@
       type(section_controls), intent(inout) :: psf_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
 !
+      integer(kind = kint) :: n_append
 !
       if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(psf_ctls%psf_ctl_struct)) return
@@ -82,14 +84,17 @@
       call alloc_psf_ctl_stract(psf_ctls)
 !
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_array_flag(c_buf, hd_block)) exit
 !
         if(check_file_flag(c_buf, hd_block)                             &
      &      .or. check_begin_flag(c_buf, hd_block)) then
-          call append_new_section_control(psf_ctls)
-          write(*,'(3a,i4)', ADVANCE='NO') 'Control for ',              &
-     &        trim(hd_block), ' No. ',  psf_ctls%num_psf_ctl
+          n_append = psf_ctls%num_psf_ctl
+          call append_section_control(n_append, hd_block, psf_ctls)
+!
+          call write_multi_ctl_file_message                             &
+     &       (hd_block, psf_ctls%num_psf_ctl, c_buf%level)
           call sel_read_control_4_psf_file(id_control, hd_block,        &
      &        psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl),             &
      &        psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl), c_buf)
@@ -117,9 +122,9 @@
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
-        write(*,'(a)', ADVANCE='NO') ' is read file from ... '
+        write(*,'(a)', ADVANCE='NO') ' is read from file ... '
         call read_control_4_psf_file((id_control+2), file_name,         &
-     &                               hd_block, psf_ctl_struct)
+     &                               hd_block, psf_ctl_struct, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
         file_name = 'NO_FILE'
 !
@@ -133,7 +138,7 @@
 !   --------------------------------------------------------------------
 !
       subroutine read_control_4_psf_file(id_control, file_name,         &
-     &                                   hd_block, psf_ctl_struct)
+     &          hd_block, psf_ctl_struct, c_buf)
 !
       use t_read_control_elements
       use t_control_data_4_psf
@@ -144,24 +149,28 @@
       character(len = kchara), intent(in) :: file_name
       character(len=kchara), intent(in) :: hd_block
       type(psf_ctl), intent(inout) :: psf_ctl_struct
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
-      type(buffer_for_control) :: c_buf1
 !
-!
+      c_buf%level = c_buf%level + 1
       write(*,'(a)') trim(file_name)
       open(id_control, file=file_name, status='old')
 !
       do
-        call load_one_line_from_control(id_control, c_buf1)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
+!
         call s_read_psf_control_data(id_control, hd_block,              &
-     &      psf_ctl_struct, c_buf1)
+     &      psf_ctl_struct, c_buf)
         call s_read_psf_control_data(id_control, hd_section_ctl,        &
-     &      psf_ctl_struct, c_buf1)
+     &      psf_ctl_struct, c_buf)
         call s_read_psf_control_data(id_control, hd_psf_ctl,            &
-     &      psf_ctl_struct, c_buf1)
+     &      psf_ctl_struct, c_buf)
         if(psf_ctl_struct%i_psf_ctl .gt. 0) exit
       end do
       close(id_control)
+!
+      c_buf%level = c_buf%level - 1
 !
       end subroutine read_control_4_psf_file
 !
@@ -180,13 +189,13 @@
 !
       integer(kind = kint) :: i
 !
-      write(id_control,'(a1)') '!'
       level = write_array_flag_for_ctl(id_control, level, hd_block)
       do i = 1, psf_ctls%num_psf_ctl
-          write(*,'(2a,i4)', ADVANCE='NO') trim(hd_block), ' No. ', i
-          call sel_write_control_4_psf_file(id_control, hd_block,       &
-     &        psf_ctls%fname_psf_ctl(i), psf_ctls%psf_ctl_struct(i),    &
-     &        level)
+        write(*,'(3a,i4)', ADVANCE='NO') '!  ', trim(hd_block),         &
+     &                                   ' No. ', i
+        call sel_write_control_4_psf_file(id_control, hd_block,         &
+     &      psf_ctls%fname_psf_ctl(i), psf_ctls%psf_ctl_struct(i),      &
+     &      level)
       end do
       level = write_end_array_flag_for_ctl(id_control, level, hd_block)
 !
@@ -209,11 +218,17 @@
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(cmp_no_case(file_name, 'NO_FILE')) then
+      if(no_file_flag(file_name)) then
+        write(*,'(a)') ' is included.'
+        call write_psf_control_data(id_control, hd_block,               &
+     &                              psf_ctl_struct, level)
+      else if(id_control .eq. id_monitor) then
+        write(*,'(2a)') ' should be written to file ... ',              &
+     &                trim(file_name)
         call write_psf_control_data(id_control, hd_block,               &
      &                              psf_ctl_struct, level)
       else
-        write(*,'(a)', ADVANCE='NO') ' is write file ... '
+        write(*,'(2a)') ' is written to file ... ', trim(file_name)
         call write_file_name_for_ctl_line(id_control, level,            &
      &                                    hd_block, file_name)
         call write_control_4_psf_file((id_control+2), file_name,        &
@@ -239,7 +254,6 @@
       integer(kind = kint) :: level
 !
 !
-      write(*,'(a)') trim(file_name)
       level = 0
       open(id_control, file=file_name)
       call write_psf_control_data(id_control, hd_block,                 &

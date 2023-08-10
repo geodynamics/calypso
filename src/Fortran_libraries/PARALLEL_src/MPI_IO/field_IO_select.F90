@@ -405,7 +405,8 @@
 #endif
 !
       else
-        call read_step_field_file(file_name, id_rank, t_IO, fld_IO)
+        call read_step_field_file(file_name, id_rank, t_IO,             &
+     &                            fld_IO, ierr)
       end if
 !
       if(ierr .gt. 0) call calypso_mpi_abort(ierr,                      &
@@ -462,7 +463,7 @@
 !
       else
         call read_and_alloc_step_field                                  &
-     &     (file_name, id_rank, t_IO, fld_IO)
+     &     (file_name, id_rank, t_IO, fld_IO, ierr)
       end if
 !
       if(ierr .gt. 0) call calypso_mpi_abort(ierr,                      &
@@ -519,7 +520,7 @@
 !
       else
         call read_and_allocate_step_head                                &
-     &     (file_name, id_rank, t_IO, fld_IO)
+     &     (file_name, id_rank, t_IO, fld_IO, ierr)
       end if
 !
       if(ierr .gt. 0) call calypso_mpi_abort(ierr,                      &

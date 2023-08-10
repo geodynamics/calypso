@@ -8,6 +8,7 @@
 !!@n        Modified by H. Matsui on Oct., 2007
 !!
 !!@verbatim
+!!      subroutine init_takepiro_ctl_label(hd_block, takepiro_ctl)
 !!      subroutine read_takepiro_ctl                                    &
 !!     &         (id_control, hd_block, takepiro_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -54,6 +55,9 @@
 !
 !
       type takepiro_model_control
+!>        Block name
+        character(len=kchara) :: block_name  = 'low_temp_ctl'
+!
         type(read_real_item) :: stratified_sigma_ctl
         type(read_real_item) :: stratified_width_ctl
         type(read_real_item) :: stratified_outer_r_ctl
@@ -89,7 +93,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(takepiro_ctl%i_takepiro_t_ctl .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_real_ctl_type                                         &
@@ -125,18 +130,32 @@
       maxlen = max(maxlen, len_trim(hd_strat_width))
       maxlen = max(maxlen, len_trim(hd_strat_outer))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_strat_sigma, takepiro_ctl%stratified_sigma_ctl)
+     &    takepiro_ctl%stratified_sigma_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_strat_width, takepiro_ctl%stratified_width_ctl)
+     &    takepiro_ctl%stratified_width_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_strat_outer, takepiro_ctl%stratified_outer_r_ctl)
+     &    takepiro_ctl%stratified_outer_r_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_takepiro_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_takepiro_ctl_label(hd_block, takepiro_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(takepiro_model_control), intent(inout) :: takepiro_ctl
+!
+      takepiro_ctl%block_name = hd_block
+        call init_real_ctl_item_label                                   &
+     &     (hd_strat_sigma, takepiro_ctl%stratified_sigma_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_strat_width, takepiro_ctl%stratified_width_ctl)
+        call init_real_ctl_item_label(hd_strat_outer,                   &
+     &      takepiro_ctl%stratified_outer_r_ctl)
+!
+      end subroutine init_takepiro_ctl_label
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

@@ -68,7 +68,10 @@
       call bcast_sph_monitoring_ctl(MHD_ctl%smonitor_ctl)
 !
       call calypso_mpi_bcast_character                                  &
-     &   (MHD_ctl%fname_psph_ctl, cast_long(kchara), 0)
+     &   (MHD_ctl%fname_psph, cast_long(kchara), 0)
+!
+      call calypso_mpi_bcast_character                                  &
+     &   (MHD_ctl%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(MHD_ctl%i_mhd_ctl, 0)
 !
       end subroutine bcast_sph_mhd_control_data
@@ -79,6 +82,8 @@
       subroutine bcast_sph_mhd_control(smctl_ctl)
 !
       use t_ctl_data_SPH_MHD_control
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_4_time_step_ctl
       use bcast_ctl_data_mhd_time_rst
@@ -90,6 +95,8 @@
       call bcast_time_loop_ctl(smctl_ctl%mevo_ctl)
       call bcast_ctl_data_4_time_step(smctl_ctl%tctl)
 !
+      call calypso_mpi_bcast_character(smctl_ctl%block_name,            &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(smctl_ctl%i_control, 0)
 !
       end subroutine bcast_sph_mhd_control
@@ -99,6 +106,8 @@
       subroutine bcast_crustal_filtering_ctl(crust_filter_c)
 !
       use t_ctl_data_crust_filter
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -106,6 +115,9 @@
 !
 !
       call bcast_ctl_type_i1(crust_filter_c%crust_truncation_ctl)
+!
+      call calypso_mpi_bcast_character(crust_filter_c%block_name,       &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int                                    &
      &   (crust_filter_c%i_crustal_filtering, 0)
 !

@@ -13,7 +13,9 @@ MOD_MESH = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'MESHDIR = $(MESHDIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_MESH)' >> $(MAKENAME)
 
 

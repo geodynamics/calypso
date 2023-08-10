@@ -8,6 +8,8 @@
 !!
 !!@verbatim
 !!      subroutine load_one_line_from_control(id_control, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: label
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
 !!      character(len = kchara) function first_word(c_buf)
@@ -20,13 +22,11 @@
 !!      logical function check_end_flag(c_buf, label)
 !!      logical function check_array_flag(c_buf, label)
 !!      logical function check_end_array_flag(c_buf, label)
-!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
 !!      subroutine monitor_read_control_label(c_buf)
 !!      subroutine monitor_read_control_buffer(c_buf)
 !!        type(buffer_for_control), intent(in)  :: c_buf
-!!
-!!      subroutine set_control_labels(label_f, label_c)
 !!@endverbatim
 !!
       module t_read_control_elements
@@ -49,6 +49,10 @@
          character(len = kchara) :: header_chara
 !>     temporal character for reading line
          character(len = 255) :: ctl_buffer
+!>     nesting level of control blocks
+         integer(kind = kint) :: level = 0
+!>     flag for end of file
+         integer(kind = kint) :: iend = 0
       end type buffer_for_control
 !
 !   --------------------------------------------------------------------
@@ -57,15 +61,23 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine load_one_line_from_control(id_control, c_buf)
+      subroutine load_one_line_from_control(id_control, label, c_buf)
 !
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: label
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      call skip_comment(c_buf%ctl_buffer, id_control)
+      call skip_comment(id_control, c_buf%ctl_buffer, c_buf%iend)
+!
+      if(c_buf%iend .gt. 0) then
+        write(*,*) 'End of file is detected in reading ',               &
+     &            trim(label), ' block.'
+        return
+      end if
+!
       c_buf%header_chara = first_word(c_buf)
 !
       end subroutine load_one_line_from_control
@@ -125,7 +137,7 @@
 !
       use skip_comment_f
 !
-      type(buffer_for_control), intent(in)  :: c_buf
+      type(buffer_for_control), intent(inout)  :: c_buf
       character(len=kchara), intent(in) :: label
 !
 !
@@ -159,7 +171,7 @@
 !
       use skip_comment_f
 !
-      type(buffer_for_control), intent(in)  :: c_buf
+      type(buffer_for_control), intent(inout)  :: c_buf
       character(len=kchara), intent(in) :: label
 !
 !
@@ -176,7 +188,7 @@
 !
       use skip_comment_f
 !
-      type(buffer_for_control), intent(in)  :: c_buf
+      type(buffer_for_control), intent(inout)  :: c_buf
       character(len=kchara), intent(in) :: label
 !
       character(len=kchara)  :: tmpchara
@@ -200,7 +212,7 @@
 !
       use skip_comment_f
 !
-      type(buffer_for_control), intent(in)  :: c_buf
+      type(buffer_for_control), intent(inout)  :: c_buf
       character(len=kchara), intent(in) :: label
 !
 !
@@ -237,18 +249,5 @@
       end subroutine monitor_read_control_buffer
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine set_control_labels(label_f, label_c)
-!
-      character(len = kchara), intent(inout) :: label_c
-      character(len = kchara), intent(in) :: label_f
-!
-!
-      write(label_c, '(a,a1)') trim(label_f) // char(0)
-!
-      end subroutine set_control_labels
-!
-! ----------------------------------------------------------------------
 !
       end module t_read_control_elements

@@ -7,7 +7,6 @@
 !>@brief  control ID data for surfacing module
 !!
 !!@verbatim
-!!      subroutine init_psf_ctl_stract(psf_c)
 !!      subroutine dealloc_cont_dat_4_psf(psf_c)
 !!        type(psf_ctl), intent(inout) :: psf_c
 !!      subroutine dup_control_4_psf(org_psf_c, new_psf_c)
@@ -133,10 +132,15 @@
 !
 !
       type psf_ctl
+!>        Block name
+        character(len=kchara) :: block_name = 'cross_section_ctl'
+!
 !>        file name for surface definision
         character(len=kchara) :: fname_section_ctl
 !>        Structure of cross section definition
         type(psf_define_ctl) :: psf_def_c
+!>        file name for fields on isosurface control
+        character(len=kchara) :: fname_fld_on_psf
 !>        Structure of fields on isosurface control
         type(field_on_psf_ctl) :: fld_on_psf_c
 !
@@ -154,17 +158,6 @@
 !  ---------------------------------------------------------------------
 !
       contains
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine init_psf_ctl_stract(psf_c)
-!
-      type(psf_ctl), intent(inout) :: psf_c
-!
-      call init_psf_def_ctl_stract(psf_c%psf_def_c)
-      call init_fld_on_psf_control(psf_c%fld_on_psf_c)
-!
-      end subroutine init_psf_ctl_stract
 !
 !  ---------------------------------------------------------------------
 !
@@ -203,6 +196,8 @@
      &                    new_psf_c%psf_output_type_ctl)
 !
       new_psf_c%fname_section_ctl = org_psf_c%fname_section_ctl
+      new_psf_c%fname_fld_on_psf =  org_psf_c%fname_fld_on_psf
+      new_psf_c%block_name =        org_psf_c%block_name
       new_psf_c%i_psf_ctl =         org_psf_c%i_psf_ctl
       new_psf_c%i_output_field =    org_psf_c%i_output_field
 !

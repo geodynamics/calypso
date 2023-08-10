@@ -8,6 +8,7 @@
 !> @brief Control data for gravity define
 !!
 !!@verbatim
+!!      subroutine init_gravity_ctl_label(hd_block, g_ctl)
 !!      subroutine read_gravity_ctl(id_control, hd_block, g_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
@@ -20,7 +21,7 @@
 !!        integer(kind = kint), intent(inout) :: level
 !!
 !!      subroutine dealloc_gravity_ctl(g_ctl)
-!!        type(forces_control), intent(inout) :: g_ctl
+!!        type(gravity_control), intent(inout) :: g_ctl
 !!
 !! !!!! gravity_type !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!      0: constant
@@ -57,6 +58,8 @@
 !
 !>      Structure for gravity definistion
       type gravity_control
+!>        Block name
+        character(len=kchara) :: block_name = 'gravity_define'
 !>        Coliolis force modeling in FEM
 !!@n        element: Coriolis force in element
 !!@n        node:    Coriolis force at node
@@ -98,7 +101,8 @@
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(g_ctl%i_gravity_ctl .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_array_c_r(id_control,                         &
@@ -133,21 +137,35 @@
       maxlen = len_trim(hd_FEM_gravity_mode)
       maxlen = max(maxlen, len_trim(hd_gravity_type))
 !
-      write(id_control,'(a1)') '!'
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_FEM_gravity_mode, g_ctl%FEM_gravity_model)
+     &    g_ctl%FEM_gravity_model)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_gravity_type, g_ctl%gravity)
+     &    g_ctl%gravity)
 !
       call write_control_array_c_r(id_control, level,                 &
-     &    hd_gravity_vect, g_ctl%gravity_vector)
+     &    g_ctl%gravity_vector)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_gravity_ctl
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine init_gravity_ctl_label(hd_block, g_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(gravity_control), intent(inout) :: g_ctl
+!
+      g_ctl%block_name = hd_block
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_gravity_vect, g_ctl%gravity_vector)
+        call init_chara_ctl_item_label(hd_gravity_type, g_ctl%gravity)
+        call init_chara_ctl_item_label(hd_FEM_gravity_mode,             &
+     &      g_ctl%FEM_gravity_model)
+!
+      end subroutine init_gravity_ctl_label
+!
+!   --------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine dealloc_gravity_ctl(g_ctl)

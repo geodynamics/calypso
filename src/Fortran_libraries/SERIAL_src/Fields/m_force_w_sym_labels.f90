@@ -13,8 +13,8 @@
 !!      logical function check_flux_tensors_w_sym(field_name)
 !!      logical function check_flux_asym_tensors_w_sym(field_name)
 !!
-!!      integer(kind = kint) function num_forces_w_symmetry()
-!!      subroutine set_force_w_symmetry_names(n_comps, names, maths)
+!!      subroutine set_force_w_symmetry_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  Base field names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -84,8 +84,6 @@
       use t_field_labels
 !
       implicit  none
-! 
-      integer(kind = kint), parameter, private :: nforce_w_sym = 70
 !
 !>        Field label of advection of momentum
 !!         @f$ u_{symj} \partial_{j} u_{symi} @f$
@@ -675,179 +673,100 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_forces_w_symmetry()
-      num_forces_w_symmetry = nforce_w_sym
-      return
-      end function num_forces_w_symmetry
+      subroutine set_force_w_symmetry_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      subroutine set_force_w_symmetry_names(n_comps, names, maths)
+      call set_field_label_to_ctl(wsym_x_usym,              array_c2i)
+      call set_field_label_to_ctl(wasym_x_uasym,            array_c2i)
+      call set_field_label_to_ctl(wsym_x_uasym,             array_c2i)
+      call set_field_label_to_ctl(wasym_x_usym,             array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(nforce_w_sym)
-      character(len = kchara), intent(inout) :: names(nforce_w_sym)
-      character(len = kchara), intent(inout) :: maths(nforce_w_sym)
+      call set_field_label_to_ctl(Jsym_x_Bsym,              array_c2i)
+      call set_field_label_to_ctl(Jasym_x_Basym,            array_c2i)
+      call set_field_label_to_ctl(Jsym_x_Basym,             array_c2i)
+      call set_field_label_to_ctl(Jasym_x_Bsym,             array_c2i)
 !
+      call set_field_label_to_ctl(Bsym_nabla_Bsym,          array_c2i)
+      call set_field_label_to_ctl(Basym_nabla_Basym,        array_c2i)
+      call set_field_label_to_ctl(Bsym_nabla_Basym,         array_c2i)
+      call set_field_label_to_ctl(Basym_nabla_Bsym,         array_c2i)
 !
+      call set_field_label_to_ctl(sym_thermal_buoyancy,     array_c2i)
+      call set_field_label_to_ctl(asym_thermal_buoyancy,    array_c2i)
+      call set_field_label_to_ctl(sym_composite_buoyancy,   array_c2i)
+      call set_field_label_to_ctl(asym_composite_buoyancy,  array_c2i)
 !
-      call set_field_labels(wsym_x_usym,                                &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(wasym_x_uasym,                              &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(wsym_x_uasym,                               &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(wasym_x_usym,                               &
-     &    n_comps( 4), names( 4), maths( 4))
+      call set_field_label_to_ctl(usym_x_Bsym,              array_c2i)
+      call set_field_label_to_ctl(uasym_x_Basym,            array_c2i)
+      call set_field_label_to_ctl(usym_x_Basym,             array_c2i)
+      call set_field_label_to_ctl(uasym_x_Bsym,             array_c2i)
+
+      call set_field_label_to_ctl(rot_usym_x_Bsym,          array_c2i)
+      call set_field_label_to_ctl(rot_uasym_x_Basym,        array_c2i)
+      call set_field_label_to_ctl(rot_usym_x_Basym,         array_c2i)
+      call set_field_label_to_ctl(rot_uasym_x_Bsym,         array_c2i)
 !
-      call set_field_labels(Jsym_x_Bsym,                                &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(Jasym_x_Basym,                              &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(Jsym_x_Basym,                               &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(Jasym_x_Bsym,                               &
-     &    n_comps( 8), names( 8), maths( 8))
+      call set_field_label_to_ctl(Bsym_nabla_usym,          array_c2i)
+      call set_field_label_to_ctl(Basym_nabla_uasym,        array_c2i)
+      call set_field_label_to_ctl(Bsym_nabla_uasym,         array_c2i)
+      call set_field_label_to_ctl(Basym_nabla_usym,         array_c2i)
 !
-      call set_field_labels(Bsym_nabla_Bsym,                            &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(Basym_nabla_Basym,                          &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(Bsym_nabla_Basym,                           &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(Basym_nabla_Bsym,                           &
-     &    n_comps(12), names(12), maths(12))
+      call set_field_label_to_ctl(usym_nabla_Tsym,          array_c2i)
+      call set_field_label_to_ctl(uasym_nabla_Tasym,        array_c2i)
+      call set_field_label_to_ctl(usym_nabla_Tasym,         array_c2i)
+      call set_field_label_to_ctl(uasym_nabla_Tsym,         array_c2i)
 !
-      call set_field_labels(sym_thermal_buoyancy,                        &
-     &    n_comps(13), names(13), maths(13))
-      call set_field_labels(asym_thermal_buoyancy,                       &
-     &    n_comps(14), names(14), maths(14))
+      call set_field_label_to_ctl(usym_nabla_pTsym,         array_c2i)
+      call set_field_label_to_ctl(uasym_nabla_pTasym,       array_c2i)
+      call set_field_label_to_ctl(usym_nabla_pTasym,        array_c2i)
+      call set_field_label_to_ctl(uasym_nabla_pTsym,        array_c2i)
 !
-      call set_field_labels(sym_composite_buoyancy,                     &
-     &    n_comps(15), names(15), maths(15))
-      call set_field_labels(asym_composite_buoyancy,                    &
-     &    n_comps(16), names(16), maths(16))
+      call set_field_label_to_ctl(usym_nabla_Csym,          array_c2i)
+      call set_field_label_to_ctl(uasym_nabla_Casym,        array_c2i)
+      call set_field_label_to_ctl(usym_nabla_Casym,         array_c2i)
 !
-      call set_field_labels(usym_x_Bsym,                                &
-     &    n_comps(17), names(17), maths(17))
-      call set_field_labels(uasym_x_Basym,                              &
-     &    n_comps(18), names(18), maths(18))
-      call set_field_labels(usym_x_Basym,                               &
-     &    n_comps(19), names(19), maths(19))
-      call set_field_labels(uasym_x_Bsym,                               &
-     &    n_comps(20), names(20), maths(20))
+      call set_field_label_to_ctl(usym_nabla_pCsym,         array_c2i)
+      call set_field_label_to_ctl(uasym_nabla_pCasym,       array_c2i)
+      call set_field_label_to_ctl(usym_nabla_pCasym,        array_c2i)
+      call set_field_label_to_ctl(uasym_nabla_pCsym,        array_c2i)
 !
-      call set_field_labels(rot_usym_x_Bsym,                            &
-     &    n_comps(21), names(21), maths(21))
-      call set_field_labels(rot_uasym_x_Basym,                          &
-     &    n_comps(22), names(22), maths(22))
-      call set_field_labels(rot_usym_x_Basym,                           &
-     &    n_comps(23), names(23), maths(23))
-      call set_field_labels(rot_uasym_x_Bsym,                           &
-     &    n_comps(24), names(24), maths(24))
+      call set_field_label_to_ctl(heat_flux_sym_sym,        array_c2i)
+      call set_field_label_to_ctl(heat_flux_asym_asym,      array_c2i)
+      call set_field_label_to_ctl(heat_flux_sym_asym,       array_c2i)
+      call set_field_label_to_ctl(heat_flux_asym_sym,       array_c2i)
 !
-      call set_field_labels(Bsym_nabla_usym,                            &
-     &    n_comps(25), names(25), maths(25))
-      call set_field_labels(Basym_nabla_uasym,                          &
-     &    n_comps(26), names(26), maths(26))
-      call set_field_labels(Bsym_nabla_uasym,                           &
-     &    n_comps(27), names(27), maths(27))
-      call set_field_labels(Basym_nabla_usym,                           &
-     &    n_comps(28), names(28), maths(28))
+      call set_field_label_to_ctl(pert_h_flux_sym_sym,      array_c2i)
+      call set_field_label_to_ctl(pert_h_flux_asym_asym,    array_c2i)
+      call set_field_label_to_ctl(pert_h_flux_sym_asym,     array_c2i)
+      call set_field_label_to_ctl(pert_h_flux_asym_sym,     array_c2i)
 !
-      call set_field_labels(usym_nabla_Tsym,                            &
-     &    n_comps(29), names(29), maths(29))
-      call set_field_labels(uasym_nabla_Tasym,                          &
-     &    n_comps(30), names(30), maths(30))
-      call set_field_labels(usym_nabla_Tasym,                           &
-     &    n_comps(31), names(31), maths(31))
-      call set_field_labels(uasym_nabla_Tsym,                           &
-     &    n_comps(32), names(32), maths(32))
+      call set_field_label_to_ctl(composite_flux_sym_sym,   array_c2i)
+      call set_field_label_to_ctl(composite_flux_asym_asym, array_c2i)
+      call set_field_label_to_ctl(composite_flux_sym_asym,  array_c2i)
+      call set_field_label_to_ctl(composite_flux_asym_sym,  array_c2i)
 !
-      call set_field_labels(usym_nabla_pTsym,                           &
-     &    n_comps(33), names(33), maths(33))
-      call set_field_labels(uasym_nabla_pTasym,                         &
-     &    n_comps(34), names(34), maths(34))
-      call set_field_labels(usym_nabla_pTasym,                          &
-     &    n_comps(35), names(35), maths(35))
-      call set_field_labels(uasym_nabla_pTsym,                          &
-     &    n_comps(36), names(36), maths(36))
+      call set_field_label_to_ctl(pert_c_flux_sym_sym,      array_c2i)
+      call set_field_label_to_ctl(pert_c_flux_asym_asym,    array_c2i)
+      call set_field_label_to_ctl(pert_c_flux_sym_asym,     array_c2i)
+      call set_field_label_to_ctl(pert_c_flux_asym_sym,     array_c2i)
 !
-      call set_field_labels(usym_nabla_Csym,                            &
-     &    n_comps(37), names(37), maths(37))
-      call set_field_labels(uasym_nabla_Casym,                          &
-     &    n_comps(38), names(38), maths(38))
-      call set_field_labels(usym_nabla_Casym,                           &
-     &    n_comps(39), names(39), maths(39))
-      call set_field_labels(uasym_nabla_Csym,                           &
-     &    n_comps(40), names(40), maths(40))
+      call set_field_label_to_ctl(m_flux_sym_sym,           array_c2i)
+      call set_field_label_to_ctl(m_flux_asym_asym,         array_c2i)
+      call set_field_label_to_ctl(m_flux_sym_asym,          array_c2i)
 !
-      call set_field_labels(usym_nabla_pCsym,                           &
-     &    n_comps(41), names(41), maths(41))
-      call set_field_labels(uasym_nabla_pCasym,                         &
-     &    n_comps(42), names(42), maths(42))
-      call set_field_labels(usym_nabla_pCasym,                          &
-     &    n_comps(43), names(43), maths(43))
-      call set_field_labels(uasym_nabla_pCsym,                          &
-     &    n_comps(44), names(44), maths(44))
+      call set_field_label_to_ctl(maxwell_tensor_sym_sym,   array_c2i)
+      call set_field_label_to_ctl(maxwell_tensor_asym_asym, array_c2i)
+      call set_field_label_to_ctl(maxwell_tensor_sym_asym,  array_c2i)
 !
-      call set_field_labels(heat_flux_sym_sym,                          &
-     &    n_comps(45), names(45), maths(45))
-      call set_field_labels(heat_flux_asym_asym,                        &
-     &    n_comps(46), names(46), maths(46))
-      call set_field_labels(heat_flux_sym_asym,                         &
-     &    n_comps(47), names(47), maths(47))
-      call set_field_labels(heat_flux_asym_sym,                         &
-     &    n_comps(48), names(48), maths(48))
-!
-      call set_field_labels(pert_h_flux_sym_sym,                        &
-     &    n_comps(49), names(49), maths(49))
-      call set_field_labels(pert_h_flux_asym_asym,                      &
-     &    n_comps(50), names(50), maths(50))
-      call set_field_labels(pert_h_flux_sym_asym,                       &
-     &    n_comps(51), names(51), maths(51))
-      call set_field_labels(pert_h_flux_asym_sym,                       &
-     &    n_comps(52), names(52), maths(52))
-!
-      call set_field_labels(composite_flux_sym_sym,                     &
-     &    n_comps(53), names(53), maths(53))
-      call set_field_labels(composite_flux_asym_asym,                   &
-     &    n_comps(54), names(54), maths(54))
-      call set_field_labels(composite_flux_sym_asym,                    &
-     &    n_comps(55), names(55), maths(55))
-      call set_field_labels(composite_flux_asym_sym,                    &
-     &    n_comps(56), names(56), maths(56))
-!
-      call set_field_labels(pert_c_flux_sym_sym,                        &
-     &    n_comps(57), names(57), maths(57))
-      call set_field_labels(pert_c_flux_asym_asym,                      &
-     &    n_comps(58), names(58), maths(58))
-      call set_field_labels(pert_c_flux_sym_asym,                       &
-     &    n_comps(59), names(59), maths(59))
-      call set_field_labels(pert_c_flux_asym_sym,                       &
-     &    n_comps(60), names(60), maths(60))
-!
-      call set_field_labels(m_flux_sym_sym,                             &
-     &    n_comps(61), names(61), maths(61))
-      call set_field_labels(m_flux_asym_asym,                           &
-     &    n_comps(62), names(62), maths(62))
-      call set_field_labels(m_flux_sym_asym,                            &
-     &    n_comps(63), names(63), maths(63))
-!
-      call set_field_labels(maxwell_tensor_sym_sym,                     &
-     &    n_comps(64), names(64), maths(64))
-      call set_field_labels(maxwell_tensor_asym_asym,                   &
-     &    n_comps(65), names(65), maths(65))
-      call set_field_labels(maxwell_tensor_sym_asym,                    &
-     &    n_comps(66), names(66), maths(66))
-!
-      call set_field_labels(usym_Bsym,                                  &
-     &    n_comps(67), names(67), maths(67))
-      call set_field_labels(uasym_Basym,                                &
-     &    n_comps(68), names(68), maths(68))
-      call set_field_labels(usym_Basym,                                 &
-     &    n_comps(69), names(69), maths(69))
-      call set_field_labels(uasym_Bsym,                                 &
-     &    n_comps(70), names(70), maths(70))
+      call set_field_label_to_ctl(usym_Bsym,                array_c2i)
+      call set_field_label_to_ctl(uasym_Basym,              array_c2i)
+      call set_field_label_to_ctl(usym_Basym,               array_c2i)
+      call set_field_label_to_ctl(uasym_Bsym,               array_c2i)
 !
       end subroutine set_force_w_symmetry_names
 !

@@ -48,10 +48,12 @@
       subroutine bcast_ctl_data_mhd_model(model_ctl)
 !
       use t_ctl_data_MHD_model
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_4_field_ctl
       use bcast_ctl_data_mhd_evo
       use bcast_ctl_data_mhd_forces
+      use transfer_to_long_integers
 !
       type(mhd_model_control), intent(inout) :: model_ctl
 !
@@ -73,6 +75,8 @@
       call bcast_ref_scalar_ctl(model_ctl%reft_ctl)
       call bcast_ref_scalar_ctl(model_ctl%refc_ctl)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (model_ctl%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(model_ctl%i_model, 0)
 !
       end subroutine bcast_ctl_data_mhd_model
@@ -83,12 +87,17 @@
       subroutine bcast_dimless_ctl(dless_ctl)
 !
       use t_ctl_data_dimless_numbers
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
       type(dimless_control), intent(inout) :: dless_ctl
 !
       call bcast_ctl_array_cr(dless_ctl%dimless)
+!
+      call calypso_mpi_bcast_character                                  &
+     &   (dless_ctl%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(dless_ctl%i_dimless_ctl, 0)
 !
       end subroutine bcast_dimless_ctl
@@ -98,6 +107,8 @@
       subroutine bcast_coef_term_ctl(eqs_ctl)
 !
       use t_ctl_data_mhd_normalize
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -109,6 +120,8 @@
       call bcast_induction_ctl(eqs_ctl%induct_ctl)
       call bcast_thermal_ctl(eqs_ctl%comp_ctl)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (eqs_ctl%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(eqs_ctl%i_coef_term_ctl, 0)
 !
       end subroutine bcast_coef_term_ctl
@@ -118,6 +131,8 @@
       subroutine bcast_thermal_ctl(heat_ctl)
 !
       use t_ctl_data_termal_norm
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -127,6 +142,8 @@
       call bcast_ctl_array_cr(heat_ctl%coef_4_diffuse)
       call bcast_ctl_array_cr(heat_ctl%coef_4_source)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (heat_ctl%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(heat_ctl%i_diff_adv, 0)
 !
       end subroutine bcast_thermal_ctl
@@ -137,6 +154,8 @@
       subroutine bcast_momentum_ctl(mom_ctl)
 !
       use t_ctl_data_momentum_norm
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -152,6 +171,8 @@
       call bcast_ctl_array_cr(mom_ctl%coef_4_Coriolis)
       call bcast_ctl_array_cr(mom_ctl%coef_4_Lorentz)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (mom_ctl%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(mom_ctl%i_momentum, 0)
 !
       end subroutine bcast_momentum_ctl
@@ -161,6 +182,8 @@
       subroutine bcast_induction_ctl(induct_ctl)
 !
       use t_ctl_data_induct_norm
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -171,6 +194,8 @@
       call bcast_ctl_array_cr(induct_ctl%coef_4_mag_diffuse)
       call bcast_ctl_array_cr(induct_ctl%coef_4_induction)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (induct_ctl%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(induct_ctl%i_induct_ctl, 0)
 !
       end subroutine bcast_induction_ctl

@@ -51,7 +51,7 @@ File prefix of field data for visualize snapshots \verb|[fld_prefix]| is defined
 \paragraph{\tt sph\_file\_fmt\_ctl}
 \label{href_t:sph_file_fmt_ctl}
 \verb|[sph_formayt]| \\
-File format of spherical harmonics indexing and FEM mesh file \verb|[sph_format]| is defined by text. Following data formats can be defined. Extensions of each data format is listed in Table \ref{table:mesh_format}.
+File format of spherical harmonics indexing and FEM mesh file \verb|[sph_format]| is defined by text. Following data formats can be defined. Flags of each data format is listed in Table \ref{table:mesh_format}.
 %
 \begin{description}
 \item{\tt ascii: }   Distributed ASCII data
@@ -73,7 +73,7 @@ File format of FEM mesh file \verb|[mesh_format]| is defined by text. Data forma
 \paragraph{\tt restart\_file\_fmt\_ctl}
 \label{href_t:restart_file_fmt_ctl}
 \verb|[rst_format]| \\
-File format of restart files \verb|[rst_format]| is defined by text. Following data formats can be defined. Extensions of each data format is listed in Table \ref{table:restart_format}.
+File format of restart files \verb|[rst_format]| is defined by text. Following data formats can be defined. Flags of each data format is listed in Table \ref{table:restart_format}.
 %
 \begin{description}
 \item{\tt ascii: }   Distributed ASCII data
@@ -144,7 +144,7 @@ Number of subdomains in the radial direction for the spherical grid $(r, \theta,
 \paragraph{\tt num\_horizontal\_domain\_ctl}
 \label{href_t:num_horizontal_domain_ctl} 
 \verb|[Ndomain]| \\
-Number of subdomains in the horizontal direction. The number will be the number of subdomains for the meridional directios for the spherical grid $(r, \theta, \phi)$ and Fourier transform $(r, \theta, m)$. For Legendre transform $(r, \theta, m)$ and $(r, l, m)$, the number will be the number of subdomains for the h.armonics ordedr $m$.
+Number of subdomains in the horizontal direction. The number will be the number of subdomains for the meridional directios for the spherical grid $(r, \theta, \phi)$ and Fourier transform $(r, \theta, m)$. For Legendre transform $(r, \theta, m)$ and $(r, l, m)$, the number will be the number of subdomains for the harmonics ordedr $m$.
 
 
 \paragraph{\color{magenta} \tt num\_domain\_sph\_grid    [Direction]    [Ndomain]}
@@ -163,24 +163,44 @@ Number of subdomains in the horizontal direction. The number will be the number 
 Definition of number of subdomains for spectrum data in $(r, l, m)$. Direction {\tt  modes} is set in the \verb|[Direction]| field, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
 
 
-\subsubsection{\tt num\_grid\_sph}
+\subsubsection{{\tt shell\_define\_ctl} (Previously {\tt num\_grid\_sph})}
 \label{href_t:num_grid_sph}
-Spatial resolution of the spherical shell is defined in this block. \\
+Spatial resolution of the spherical shell is defined in this block. Old block name \verb|num_grid_sph| is also accept as this block label.\\
 \hyperref[href_i:num_grid_sph]{(Back to {\tt control\_sph\_shell})}
+
+\paragraph{\tt sph\_center\_coef\_ctl}
+\label{href_t:sph_center_coef_ctl}
+\verb|[TYPE]| \\
+Set flag \verb|with_center| into \verb|[type]| to include spherical harmonics coefficient for $l = m = 0$. This fliag is required when temperature or composition is solved to the center.
+
+\paragraph{\tt sph\_grid\_type\_ctl}
+\label{href_t:sph_grid_type_ctl}
+\verb|[TYPE]| \\
+Set spherical shell grid type for visualization. The follwing types are avaiable. Default value is \verb|no_pole|. The following flags are avaiable.
+%
+\begin{description}
+    \item{\tt no\_pole} Spherical shell grid is only generated from grids on Gauss-Legendle points on latitude. Corequently, small empty tube (circle on a sphere surface) has to be made in visualization.
+    \item{\tt with\_pole} Grid points are added at poles in the grids. There is still empty sphere in the whole sphre grid.
+    \item{\tt with\_center}  Grid at poles and centere is added in the grid. The mesh inceludes center is degenerated from hexahedral mesh to pyramid mesh. This mode increases initialization time.
+\end{description}
+%
 
 \paragraph{\tt truncation\_level\_ctl}
 \label{href_t:truncation_level_ctl}
 \verb|[Lmax]| \\
 Truncation level $L$ is defined by integer. Spherical harmonics is truncated by triangular $0 \le l \le L$ and $0 <m < l$.
 
+\paragraph{\tt longitude\_symmetry\_ctl    [M\_sym]}
+\label{href_t:longitude_symmetry_ctl}
+Longitudinal folding symmtery \verb|[M_sym]| is defeined by integer.
+
 \paragraph{\tt ngrid\_meridonal\_ctl}
 \label{href_t:ngrid_meridonal_ctl}
 \verb|[Ntheta]| \\
-Number of grid in the meridional direction \verb|[Ntheta]| is defined by integer
-\paragraph{\tt ngrid\_zonal\_ctl}
+Number of grid in the meridional direction $N_{\theta}$ is defined by integer \verb|[Ntheta]|. $N_{\theta}$ needs to satisfy $N_{\theta} > 1.5 L$.\paragraph{\tt ngrid\_zonal\_ctl}
 \label{href_t:ngrid_zonal_ctl}
 \verb|[Nphi]| \\
-Number of grid in the zonal direction \verb|[Nphi]| is defined by integer.
+Number of grid in the zonal direction $N_{\phi}$ is defined by integer [Nphi]. $N_{\phi}$ needs to satisfy $N_{\phi} = 2 N_{\theta}$.
 
 \paragraph{\tt raidal\_grid\_type\_ctl}
 \label{href_t:radial_grid_type_ctl}
@@ -188,9 +208,9 @@ Number of grid in the zonal direction \verb|[Nphi]| is defined by integer.
 Type of the radial grid spacing is defined by text. The following types are supported in Calypso.
 %
 \begin{description}
-	\item{\tt explicit}  Equi-distance grid
 	\item{\tt Chebyshev} Chebyshev collocation points
-	\item{\tt equi\_distance} Set explicitly by \verb|r_layer| array
+	\item{\tt equi\_distance} Equi-distance grid
+    \item{\tt explicit}  Set explicitly by \verb|r_layer| array
 \end{description}
 %
 
@@ -224,11 +244,16 @@ Minimum radius of the domains \verb|[Rmin]| is defined by real. If this value is
 (This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
 Maximum radius of the domains \verb|[Rmax]| is defined by real. If this value is not defined, CMB becomes outer boundary of the domain.
 
-\paragraph{\tt r\_layer}
+\paragraph{\tt array r\_layer}
 \label{href_t:r_layer}
 \verb|[Layer #]   [Radius]| \\
 (This option works with \verb|[radial_grid_type_ctl]| is {\tt explicit}.)
 List of the radial grid points in the simulation domain. Index of the radial point \verb|[Layer #]| is defined by integer, and radius \verb|[Radius]| is defined by real.
+
+\paragraph{\tt array add\_external\_layer}
+\label{href_t:add_external_layer}
+\verb|[Radius]| \\
+List of additional radial grid points. More grid points can be added in the Chebyshev or equi-distance grid. Radius of the additional points \verb|[Radius]| is defined by real.
 
 \paragraph{\tt array boundaries\_ctl}
 \verb|[Boundary_name]  [Layer #]| \\
@@ -296,7 +321,7 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \hline \hline
 \tt viscous\_diffusion & Viscous diffusion
 & $-\nu \nabla \times \nabla \times \bvec{u}$ \\
-\tt inertia & Inertia term &  $ \bvec{\omega} \times \bvec{u} $ \\
+\tt inertia & Inertia term &  $ -\bvec{\omega} \times \bvec{u} $ \\
 \tt buoyancy                   & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
 \tt composite\_buoyancy & Compositional buoyancy &  $ -\alpha_{C} C\bvec{g}  $\\
 \tt Lorentz\_force & Lorentz force &  $ \bvec{J} \times \bvec{B} $ \\
@@ -332,7 +357,7 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \begin{tabular}{|c|c|c|}
 \hline
 \tt [Name] & field name & Description \\ \hline \hline
-\tt rot\_inertia & Curl of inertia &  $ \nabla \times \left(\bvec{\omega} \times \bvec{u}\right) $ \\
+\tt rot\_inertia & Curl of inertia &  $ -\nabla \times \left(\bvec{\omega} \times \bvec{u}\right) $ \\
 \tt rot\_Lorentz\_force & Curl of Lorentz force &  $ \nabla \times \left(\bvec{J} \times \bvec{B}\right) $ \\
 \tt rot\_Coriolis\_force & Curl of Coriolis force &  $ -2 \Omega \nabla \times \left(\hat{z} \times \bvec{u} \right) $ \\
 \tt rot\_buoyancy                   & Curl of thermal buoyancy &  $ - \nabla \times \left(\alpha_{T} T \bvec{g}\right)  $ \\

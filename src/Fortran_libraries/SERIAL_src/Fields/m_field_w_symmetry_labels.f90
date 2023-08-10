@@ -11,8 +11,8 @@
 !!      logical function check_base_vector_symmetry(field_name)
 !!      logical function check_base_scalar_w_symmetry(field_name)
 !!
-!!      integer(kind = kint) function num_fields_w_symmetry()
-!!      subroutine set_field_w_symmetry_labels(n_comps, names, maths)
+!!      subroutine set_field_w_symmetry_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  Base field names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -41,9 +41,6 @@
 !
       implicit  none
 ! 
-!
-      integer(kind = kint), parameter, private :: nfld_w_sym = 2 * 16
-!
 !>        Field label for symmetric velocity @f$ u_{sym} @f$
       type(field_def), parameter :: sym_velocity                        &
      &    = field_def(n_comp = n_vector,                                &
@@ -300,91 +297,51 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_fields_w_symmetry()
-      num_fields_w_symmetry = nfld_w_sym
-      return
-      end function num_fields_w_symmetry
+      subroutine set_field_w_symmetry_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      subroutine set_field_w_symmetry_labels(n_comps, names, maths)
+      call set_field_label_to_ctl(sym_velocity,              array_c2i)
+      call set_field_label_to_ctl(asym_velocity,             array_c2i)
+      call set_field_label_to_ctl(sym_vorticity,             array_c2i)
+      call set_field_label_to_ctl(asym_vorticity,            array_c2i)
+      call set_field_label_to_ctl(sym_pressure,              array_c2i)
+      call set_field_label_to_ctl(asym_pressure,             array_c2i)
+      call set_field_label_to_ctl(sym_magnetic_field,        array_c2i)
+      call set_field_label_to_ctl(asym_magnetic_field,       array_c2i)
+      call set_field_label_to_ctl(sym_vector_potential,      array_c2i)
+      call set_field_label_to_ctl(asym_vector_potential,     array_c2i)
+      call set_field_label_to_ctl(sym_current_density,       array_c2i)
+      call set_field_label_to_ctl(asym_current_density,      array_c2i)
+      call set_field_label_to_ctl(sym_magnetic_potential,    array_c2i)
+      call set_field_label_to_ctl(asym_magnetic_potential,   array_c2i)
+      call set_field_label_to_ctl(sym_scalar_potential,      array_c2i)
+      call set_field_label_to_ctl(asym_scalar_potential,     array_c2i)
+      call set_field_label_to_ctl(sym_density,               array_c2i)
+      call set_field_label_to_ctl(asym_density,              array_c2i)
+      call set_field_label_to_ctl(sym_temperature,           array_c2i)
+      call set_field_label_to_ctl(asym_temperature,          array_c2i)
+      call set_field_label_to_ctl(sym_composition,           array_c2i)
+      call set_field_label_to_ctl(asym_composition,          array_c2i)
+      call set_field_label_to_ctl(sym_entropy,               array_c2i)
+      call set_field_label_to_ctl(asym_entropy,              array_c2i)
+      call set_field_label_to_ctl(sym_perturbation_density,  array_c2i)
+      call set_field_label_to_ctl(asym_perturbation_density, array_c2i)
+      call set_field_label_to_ctl(sym_perturbation_temp,     array_c2i)
+      call set_field_label_to_ctl(asym_perturbation_temp,               &
+     &                            array_c2i)
+      call set_field_label_to_ctl(sym_perturbation_composition,         &
+     &                            array_c2i)
+      call set_field_label_to_ctl(asym_perturbation_composition,        &
+     &                            array_c2i)
+      call set_field_label_to_ctl(sym_perturbation_entropy,  array_c2i)
+      call set_field_label_to_ctl(asym_perturbation_entropy, array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(nfld_w_sym)
-      character(len = kchara), intent(inout) :: names(nfld_w_sym)
-      character(len = kchara), intent(inout) :: maths(nfld_w_sym)
-!
-!
-      call set_field_labels(sym_velocity,                               &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(asym_velocity,                              &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(sym_vorticity,                              &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(asym_vorticity,                             &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(sym_pressure,                               &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(asym_pressure,                              &
-     &    n_comps( 6), names( 6), maths( 6))
-!
-      call set_field_labels(sym_magnetic_field,                         &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(asym_magnetic_field,                        &
-     &    n_comps( 8), names( 8), maths( 8))
-!
-      call set_field_labels(sym_vector_potential,                       &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(asym_vector_potential,                      &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(sym_current_density,                        &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(asym_current_density,                       &
-     &    n_comps(12), names(12), maths(12))
-!
-      call set_field_labels(sym_magnetic_potential,                     &
-     &    n_comps(13), names(13), maths(13))
-      call set_field_labels(asym_magnetic_potential,                    &
-     &    n_comps(14), names(14), maths(14))
-      call set_field_labels(sym_scalar_potential,                       &
-     &    n_comps(15), names(15), maths(15))
-      call set_field_labels(asym_scalar_potential,                      &
-     &    n_comps(16), names(16), maths(16))
-!
-      call set_field_labels(sym_density,                                &
-     &    n_comps(17), names(17), maths(17))
-      call set_field_labels(asym_density,                               &
-     &    n_comps(18), names(18), maths(18))
-      call set_field_labels(sym_temperature,                            &
-     &    n_comps(19), names(19), maths(19))
-      call set_field_labels(asym_temperature,                           &
-     &    n_comps(20), names(20), maths(20))
-      call set_field_labels(sym_composition,                            &
-     &    n_comps(21), names(21), maths(21))
-      call set_field_labels(asym_composition,                           &
-     &    n_comps(22), names(22), maths(22))
-      call set_field_labels(sym_entropy,                                &
-     &    n_comps(23), names(23), maths(23))
-      call set_field_labels(asym_entropy,                               &
-     &    n_comps(24), names(24), maths(24))
-!
-      call set_field_labels(sym_perturbation_density,                   &
-     &    n_comps(25), names(25), maths(25))
-      call set_field_labels(asym_perturbation_density,                  &
-     &    n_comps(26), names(26), maths(26))
-      call set_field_labels(sym_perturbation_temp,                      &
-     &    n_comps(27), names(27), maths(27))
-      call set_field_labels(asym_perturbation_temp,                     &
-     &    n_comps(28), names(28), maths(28))
-      call set_field_labels(sym_perturbation_composition,               &
-     &    n_comps(29), names(29), maths(29))
-      call set_field_labels(asym_perturbation_composition,              &
-     &    n_comps(30), names(30), maths(30))
-      call set_field_labels(sym_perturbation_entropy,                   &
-     &    n_comps(31), names(31), maths(31))
-      call set_field_labels(asym_perturbation_entropy,                  &
-     &    n_comps(32), names(32), maths(32))
-!
-      end subroutine set_field_w_symmetry_labels
+      end subroutine set_field_w_symmetry_names
 !
 ! ----------------------------------------------------------------------
 !

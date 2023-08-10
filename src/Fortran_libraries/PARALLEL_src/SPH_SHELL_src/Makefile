@@ -13,7 +13,9 @@ MOD_COMM_SPH = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'SPH_COMMDIR = $(SPH_COMMDIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_COMM_SPH)' >> $(MAKENAME)
 
 

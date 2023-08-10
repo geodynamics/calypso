@@ -108,6 +108,8 @@
 !
 !
       type surf_bc_control
+!>        Block name
+        character(len=kchara) :: block_name = 'bc_4_surface'
 !>        Structure for surface boundary conditions for heat flux
 !!@n       surf_bc_HF_ctl%c1_tbl:  Type of boundary conditions
 !!@n       surf_bc_HF_ctl%c2_tbl:  Surface group name for boundary

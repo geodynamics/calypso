@@ -8,6 +8,7 @@
 !> @brief Monitoring section IO for Control data
 !!
 !!@verbatim
+!!      subroutine init_sph_monitoring_labels(hd_block, smonitor_ctl)
 !!      subroutine read_sph_monitoring_ctl                              &
 !!     &         (id_control, hd_block, smonitor_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -15,9 +16,8 @@
 !!        type(sph_monitor_control), intent(inout) :: smonitor_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_sph_monitoring_ctl                             &
-!!     &         (id_control, hd_block, smonitor_ctl, level)
+!!     &         (id_control, smonitor_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(sph_monitor_control), intent(in) :: smonitor_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!      subroutine dealloc_sph_monitoring_ctl(smonitor_ctl)
@@ -150,10 +150,8 @@
      &    :: hd_comp_Nusselt_file_fmt = 'comp_Nusselt_number_format'
 !
 !     Deprecated labels
-       character(len=kchara), parameter, private                         &
+       character(len=kchara), parameter, private                        &
      &            :: hd_mid_eq_monitor_ctl = 'mid_equator_monitor_ctl'
-!
-      private :: read_volume_spectr_ctl, write_volume_spectr_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -164,6 +162,9 @@
       subroutine read_sph_monitoring_ctl                                &
      &         (id_control, hd_block, smonitor_ctl, c_buf)
 !
+      use ctl_data_volume_spectr_IO
+      use t_ctl_data_circles
+!
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
@@ -171,10 +172,13 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
+      if(smonitor_ctl%i_sph_monitor .gt. 0) return
+      call init_sph_monitoring_labels(hd_block, smonitor_ctl)
+!
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(smonitor_ctl%i_sph_monitor  .gt. 0) return
       do
-        call load_one_line_from_control(id_control, c_buf)
+        call load_one_line_from_control(id_control, hd_block, c_buf)
+        if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_gauss_spectr_ctl(id_control, hd_gauss_spec_block,     &
@@ -189,9 +193,9 @@
      &      hd_dynamobench_ctl, smonitor_ctl%dbench_ctl, c_buf)
 !
         call read_data_on_circles_ctl(id_control,                       &
-     &      hd_field_on_circle_ctl, smonitor_ctl%circ_ctls, c_buf)
+     &      hd_field_on_circle_ctl, smonitor_ctl, c_buf)
         call read_data_on_circles_ctl(id_control,                       &
-     &      hd_mid_eq_monitor_ctl,  smonitor_ctl%circ_ctls, c_buf)
+     &      hd_mid_eq_monitor_ctl,  smonitor_ctl, c_buf)
 !
         call read_volume_spectr_ctl                                     &
      &     (id_control, hd_vol_spec_block, smonitor_ctl, c_buf)
@@ -235,48 +239,16 @@
       end subroutine read_sph_monitoring_ctl
 !
 ! -----------------------------------------------------------------------
-!
-      subroutine read_volume_spectr_ctl                                 &
-     &         (id_control, hd_block, smonitor_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      type(sph_monitor_control), intent(inout) :: smonitor_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-      type(volume_spectr_control) :: read_vpwr
-!
-!
-      if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(smonitor_ctl%num_vspec_ctl .gt. 0) return
-      read_vpwr%i_vol_spectr_ctl = 0
-      smonitor_ctl%num_vspec_ctl = 0
-      call alloc_volume_spectr_control(smonitor_ctl)
-!
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_array_flag(c_buf, hd_block)) exit
-!
-        call read_each_vol_spectr_ctl(id_control, hd_block,             &
-     &                                read_vpwr, c_buf)
-        if(read_vpwr%i_vol_spectr_ctl .gt. 0) then
-          call append_volume_spectr_ctls(read_vpwr, smonitor_ctl)
-          read_vpwr%i_vol_spectr_ctl = 0
-        end if
-      end do
-!
-      end subroutine read_volume_spectr_ctl
-!
-!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine write_sph_monitoring_ctl                               &
-     &         (id_control, hd_block, smonitor_ctl, level)
+     &         (id_control, smonitor_ctl, level)
 !
       use write_control_elements
+      use t_ctl_data_circles
+      use ctl_data_volume_spectr_IO
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(sph_monitor_control), intent(in) :: smonitor_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -301,107 +273,88 @@
       maxlen = max(maxlen, len_trim(hd_diff_lm_spectr_switch))
       maxlen = max(maxlen, len_trim(hd_axis_spectr_switch))
 !
-      write(id_control,'(a1)') '!'
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 smonitor_ctl%block_name)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_voume_ave_head, smonitor_ctl%volume_average_prefix)
+     &    smonitor_ctl%volume_average_prefix)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_voume_rms_head, smonitor_ctl%volume_pwr_spectr_prefix)
+     &    smonitor_ctl%volume_pwr_spectr_prefix)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_diff_lm_spectr_switch,                                     &
      &    smonitor_ctl%volume_pwr_spectr_format)
 !
-      write(id_control,'(a1)') '!'
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &   hd_degree_spectr_switch, smonitor_ctl%degree_v_spectra_switch)
+     &    smonitor_ctl%degree_v_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &   hd_order_spectr_switch, smonitor_ctl%order_v_spectra_switch)
+     &    smonitor_ctl%order_v_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_diff_lm_spectr_switch,                                     &
      &    smonitor_ctl%diff_v_lm_spectra_switch)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_axis_spectr_switch, smonitor_ctl%axis_v_power_switch)
+     &    smonitor_ctl%axis_v_power_switch)
 !
-      call write_volume_spectr_ctl(id_control, hd_vol_spec_block,       &
-     &                             smonitor_ctl, level)
-      write(id_control,'(a1)') '!'
-      call write_layerd_spectr_ctl(id_control, hd_layer_spec_block,     &
+      call write_volume_spectr_ctl(id_control, smonitor_ctl, level)
+      call write_layerd_spectr_ctl(id_control,                          &
      &                             smonitor_ctl%lp_ctl, level)
 !
-      write(id_control,'(a1)') '!'
-      call write_pickup_spectr_ctl(id_control, hd_pick_sph_ctl,         &
+      call write_pickup_spectr_ctl(id_control,                          &
      &                             smonitor_ctl%pspec_ctl, level)
-      write(id_control,'(a1)') '!'
-      call write_gauss_spectr_ctl(id_control, hd_gauss_spec_block,      &
+      call write_gauss_spectr_ctl(id_control,                           &
      &                            smonitor_ctl%g_pwr, level)
 !
-      write(id_control,'(a1)') '!'
       call write_sph_dipolarity_ctl(id_control,                         &
-     &    hd_sph_dipolarity_ctl, smonitor_ctl%fdip_ctl, level)
+     &                              smonitor_ctl%fdip_ctl, level)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_Nusselt_file_head, smonitor_ctl%heat_Nusselt_file_prefix)
+     &    smonitor_ctl%heat_Nusselt_file_prefix)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_Nusselt_file_fmt, smonitor_ctl%heat_Nusselt_file_format)
+     &    smonitor_ctl%heat_Nusselt_file_format)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &                          hd_heat_Nusselt_file_head,              &
      &                          smonitor_ctl%heat_Nusselt_file_prefix)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &                          hd_heat_Nusselt_file_fmt,               &
      &                          smonitor_ctl%heat_Nusselt_file_format)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &                          hd_comp_Nusselt_file_head,              &
      &                          smonitor_ctl%comp_Nusselt_file_prefix)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &                          hd_comp_Nusselt_file_fmt,               &
      &                          smonitor_ctl%comp_Nusselt_file_format)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &                          hd_typ_scale_file_head,                 &
      &                          smonitor_ctl%typ_scale_file_prefix_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &                          hd_typ_scale_file_format,               &
      &                          smonitor_ctl%typ_scale_file_format_ctl)
 !
       call write_ctl_data_dynamobench(id_control,                       &
-     &    hd_dynamobench_ctl, smonitor_ctl%dbench_ctl, level)
-      call write_data_on_circles_ctl(id_control,                        &
-     &    hd_field_on_circle_ctl, smonitor_ctl%circ_ctls, level)
+     &                                smonitor_ctl%dbench_ctl, level)
+      call write_data_on_circles_ctl(id_control, smonitor_ctl, level)
 !
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                smonitor_ctl%block_name)
 !
       end subroutine write_sph_monitoring_ctl
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_volume_spectr_ctl                                &
-     &         (id_control, hd_block, smonitor_ctl, level)
+      subroutine init_sph_monitoring_labels(hd_block, smonitor_ctl)
 !
-      use write_control_elements
-!
-      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
-      type(sph_monitor_control), intent(in) :: smonitor_ctl
 !
-      integer(kind = kint), intent(inout) :: level
-!
-      integer(kind = kint) :: i
+      type(sph_monitor_control), intent(inout) :: smonitor_ctl
 !
 !
-      if(smonitor_ctl%num_vspec_ctl .le. 0) return
+      smonitor_ctl%block_name = trim(hd_block)
+      smonitor_ctl%v_pwr_name = hd_vol_spec_block
+      smonitor_ctl%d_circ_name = hd_field_on_circle_ctl
+      call init_gauss_spectr_ctl_labels(hd_gauss_spec_block,            &
+     &                                  smonitor_ctl%g_pwr)
+      call init_pickup_spectr_ctl_labels(hd_pick_sph_ctl,               &
+     &                                   smonitor_ctl%pspec_ctl)
+      call init_layerd_spectr_ctl_labels(hd_layer_spec_block,           &
+     &                                   smonitor_ctl%lp_ctl)
+      call init_sph_dipolarity_ctl_label(hd_sph_dipolarity_ctl,         &
+     &                                   smonitor_ctl%fdip_ctl)
+      call init_ctl_data_dynamobench_label(hd_dynamobench_ctl,          &
+     &                                     smonitor_ctl%dbench_ctl)
 !
-      write(id_control,'(a1)') '!'
-      level = write_array_flag_for_ctl(id_control, level, hd_block)
-      do i = 1, smonitor_ctl%num_vspec_ctl
-        write(id_control,'(a1)') '!'
-        call write_each_vol_spectr_ctl(id_control, hd_block,            &
-     &     smonitor_ctl%v_pwr(i), level)
-      end do
-      level = write_end_array_flag_for_ctl(id_control, level, hd_block)
-!
-      end subroutine write_volume_spectr_ctl
+      end subroutine init_sph_monitoring_labels
 !
 !  ---------------------------------------------------------------------
 !

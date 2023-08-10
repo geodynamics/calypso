@@ -8,9 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine read_domain_info(id_file, id_rank, comm_IO, ierr)
-!!      subroutine read_import_data(id_file, comm_IO)
-!!      subroutine read_export_data(id_file, comm_IO)
+!!      subroutine read_import_data(id_file, comm_IO, ierr)
+!!      subroutine read_export_data(id_file, comm_IO, ierr)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(communication_table), intent(inout) :: comm_IO
+!!        integer(kind = kint), intent(inout) :: ierr
 !!
 !!      subroutine write_domain_info(id_file, id_rank, comm_IO)
 !!      subroutine write_import_data(id_file, comm_IO)
@@ -51,7 +53,8 @@
       character(len=255) :: character_4_read = ''
 !
 !
-      call skip_comment(character_4_read,id_file)
+      call skip_comment(id_file, character_4_read, ierr)
+      if(ierr .gt. 0) return
       read(character_4_read,*) irank_read
 !
       ierr = 0
@@ -73,22 +76,23 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_import_data(id_file, comm_IO)
+      subroutine read_import_data(id_file, comm_IO, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(communication_table), intent(inout) :: comm_IO
+      integer(kind = kint), intent(inout) :: ierr
 !
 !
       call alloc_import_num(comm_IO)
 !
       if (comm_IO%num_neib .gt. 0) then
-!
         call read_arrays_for_stacks(id_file, comm_IO%num_neib,          &
-     &      izero, comm_IO%ntot_import, comm_IO%istack_import)
+     &      izero, comm_IO%ntot_import, comm_IO%istack_import, ierr)
+        if(ierr .ne. 0) return
 !
         call alloc_import_item(comm_IO)
         call read_send_recv_item(id_file, comm_IO%ntot_import,          &
-     &      comm_IO%item_import)
+     &      comm_IO%item_import, ierr)
       else
         comm_IO%ntot_import = 0
         call alloc_import_item(comm_IO)
@@ -98,21 +102,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_export_data(id_file, comm_IO)
+      subroutine read_export_data(id_file, comm_IO, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(communication_table), intent(inout) :: comm_IO
+      integer(kind = kint), intent(inout) :: ierr
 !
 !
       call alloc_export_num(comm_IO)
 !
       if (comm_IO%num_neib .gt. 0) then
-!
         call read_arrays_for_stacks(id_file, comm_IO%num_neib,          &
-     &      izero, comm_IO%ntot_export, comm_IO%istack_export)
+     &      izero, comm_IO%ntot_export, comm_IO%istack_export, ierr)
+        if(ierr .ne. 0) return
+!
         call alloc_export_item(comm_IO)
         call read_send_recv_item(id_file, comm_IO%ntot_export,          &
-     &      comm_IO%item_export)
+     &      comm_IO%item_export, ierr)
       else
         comm_IO%ntot_export = 0
         call alloc_export_item(comm_IO)

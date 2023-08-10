@@ -4,7 +4,7 @@ analyzer_VTK_convert.o: $(VIZ_PLUG_DIR)/analyzer_VTK_convert.f90 m_precision.o m
 	$(F90) -c $(F90OPTFLAGS) $<
 analyzer_psf.o: $(VIZ_PLUG_DIR)/analyzer_psf.f90 m_precision.o m_work_time.o t_viz_sections.o t_VIZ_only_step_parameter.o t_control_data_section_only.o t_FEM_mesh_field_4_viz.o t_mesh_SR.o FEM_analyzer_viz_surf.o calypso_mpi.o m_elapsed_labels_4_VIZ.o m_elapsed_labels_SEND_RECV.o input_control_section_only.o
 	$(F90) -c $(F90OPTFLAGS) $<
-input_control_section_only.o: $(VIZ_PLUG_DIR)/input_control_section_only.f90 m_precision.o m_machine_parameter.o t_control_data_section_only.o t_FEM_mesh_field_4_viz.o t_VIZ_only_step_parameter.o calypso_mpi.o calypso_mpi_int.o bcast_4_platform_ctl.o bcast_4_time_step_ctl.o bcast_ctl_data_surfacings.o bcast_control_arrays.o t_viz_sections.o m_file_format_switch.o m_default_file_prefix.o set_control_platform_item.o set_control_platform_data.o parallel_ucd_IO_select.o
+input_control_section_only.o: $(VIZ_PLUG_DIR)/input_control_section_only.f90 m_precision.o m_machine_parameter.o t_control_data_section_only.o t_FEM_mesh_field_4_viz.o t_VIZ_only_step_parameter.o calypso_mpi.o t_read_control_elements.o calypso_mpi_int.o bcast_4_platform_ctl.o bcast_4_time_step_ctl.o bcast_ctl_data_surfacings.o bcast_control_arrays.o t_viz_sections.o m_file_format_switch.o m_default_file_prefix.o set_control_platform_item.o set_control_platform_data.o parallel_ucd_IO_select.o
 	$(F90) -c $(F90OPTFLAGS) $<
 main_VTK_convert.o: $(VIZ_PLUG_DIR)/main_VTK_convert.f90 m_precision.o calypso_mpi.o analyzer_VTK_convert.o
 	$(F90) -c $(F90OPTFLAGS) $<
