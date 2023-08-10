@@ -21,8 +21,6 @@
 !
 !>      File name for control file
       character(len=kchara) :: MHD_ctl_name
-      character(len=kchara), parameter                                  &
-     &                    :: hd_mhd_ctl = 'MHD_control'
 !
       type(mhd_simulation_control) :: MHD_ctl1
       type(add_psf_sph_mhd_ctl) :: add_SMHD_ctl1
@@ -44,7 +42,7 @@
       write(id_monitor,'(a)') '!  '
       write(id_monitor,'(a)') '!  Checked control data'
       write(id_monitor,'(a)') '!  '
-      call write_sph_mhd_ctl_w_psf(id_monitor, hd_mhd_ctl,              &
+      call write_sph_mhd_ctl_w_psf(id_monitor,                          &
      &    MHD_ctl1, add_SMHD_ctl1, c_buf1%level)
 !
       stop '***** program finished *****'

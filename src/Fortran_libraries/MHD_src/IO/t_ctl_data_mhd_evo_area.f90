@@ -7,6 +7,7 @@
 !>@brief  Control data of time integration flags
 !!
 !!@verbatim
+!!      subroutine init_mhd_layer_ctl_label(hd_block, earea_ctl)
 !!      subroutine read_mhd_layer_ctl                                   &
 !!     &         (id_control, hd_block, earea_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -66,6 +67,8 @@
       implicit  none
 !
       type mhd_evo_area_control
+!>        Block name
+        character(len=kchara) :: block_name = 'layers_ctl'
 !>        Structure for list of element group for time evolution in fluid
 !!@n       evo_fluid_group_ctl%num:   Number of groups
 !!@n       evo_fluid_group_ctl%c_tbl: Name list of groups
@@ -137,12 +140,25 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_control_array_c1(id_control, level,                    &
-     &    hd_fluid_grp, earea_ctl%evo_fluid_group_ctl)
+     &    earea_ctl%evo_fluid_group_ctl)
       call write_control_array_c1(id_control, level,                    &
-     &    hd_conduct_grp, earea_ctl%evo_conduct_group_ctl)
+     &    earea_ctl%evo_conduct_group_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_mhd_layer_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_mhd_layer_ctl_label(hd_block, earea_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(mhd_evo_area_control), intent(inout) :: earea_ctl
+!
+      earea_ctl%block_name = hd_block
+        call init_chara_ctl_array_label                                 &
+     &     (hd_fluid_grp, earea_ctl%evo_fluid_group_ctl)
+        call init_chara_ctl_array_label                                 &
+     &     (hd_conduct_grp, earea_ctl%evo_conduct_group_ctl)
+      end subroutine init_mhd_layer_ctl_label
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

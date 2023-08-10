@@ -234,6 +234,8 @@ set_initial_sph_scalars.o: $(MHD_SPH_DIR)/set_initial_sph_scalars.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 set_radial_mat_sph.o: $(MHD_SPH_DIR)/set_radial_mat_sph.f90 m_precision.o calypso_mpi.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
+set_reference_scalar_param.o: $(MHD_SPH_DIR)/set_reference_scalar_param.f90 m_precision.o m_error_IDs.o m_machine_parameter.o t_reference_scalar_param.o t_ctl_data_temp_model.o t_file_IO_parameter.o calypso_mpi.o t_control_array_character.o m_file_format_switch.o delete_data_files.o t_ctl_data_stratified_model.o
+	$(F90) -c $(F90OPTFLAGS) $<
 set_reference_sph_mhd.o: $(MHD_SPH_DIR)/set_reference_sph_mhd.f90 m_precision.o m_constants.o calypso_mpi.o t_phys_address.o t_boundary_params_sph_MHD.o t_boundary_sph_spectr.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_scalar_boundary_sph.o: $(MHD_SPH_DIR)/set_scalar_boundary_sph.f90 m_precision.o m_constants.o
@@ -346,7 +348,7 @@ t_radial_matrices_sph_MHD.o: $(MHD_SPH_DIR)/t_radial_matrices_sph_MHD.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 t_radial_reference_field.o: $(MHD_SPH_DIR)/t_radial_reference_field.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_grad_field_labels.o t_field_component_labels.o t_file_IO_parameter.o t_sph_radial_interpolate.o t_field_data_IO.o m_base_field_labels.o m_grad_field_labels.o m_field_component_labels.o append_phys_data.o interpolate_reference_data.o init_external_magne_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_reference_scalar_param.o: $(MHD_SPH_DIR)/t_reference_scalar_param.f90 m_precision.o m_error_IDs.o m_machine_parameter.o t_ctl_data_temp_model.o t_file_IO_parameter.o calypso_mpi.o t_control_array_character.o m_file_format_switch.o delete_data_files.o t_ctl_data_stratified_model.o
+t_reference_scalar_param.o: $(MHD_SPH_DIR)/t_reference_scalar_param.f90 m_precision.o m_error_IDs.o m_machine_parameter.o t_file_IO_parameter.o t_control_array_character.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_MHD_w_psf.o: $(MHD_SPH_DIR)/t_sph_MHD_w_psf.f90 m_precision.o t_FEM_mesh_field_data.o t_SPH_MHD_zmean_sections.o t_viz_sections.o t_comm_table.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -366,7 +368,7 @@ test_legendre_transforms.o: $(MHD_SPH_DIR)/test_legendre_transforms.F90 m_precis
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 write_dynamo_benchmark_file.o: $(MHD_SPH_DIR)/write_dynamo_benchmark_file.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_spheric_rj_data.o t_boundary_data_sph_MHD.o t_boundary_params_sph_MHD.o t_phys_address.o t_base_field_labels.o t_sph_volume_mean_square.o t_field_4_dynamobench.o t_field_on_circle.o t_read_sph_spectra.o t_time_data.o write_monitors_circle_file.o t_buffer_4_gzip.o set_parallel_file_name.o sph_monitor_data_text.o gz_open_sph_vol_mntr_file.o select_gz_stream_file_IO.o dup_dynamobench_data_to_IO.o dup_detailed_dbench_to_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-write_monitors_circle_file.o: $(MHD_SPH_DIR)/write_monitors_circle_file.f90 m_precision.o m_constants.o t_spheric_parameter.o t_time_data.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_read_sph_spectra.o t_field_on_circle.o t_circle_transform.o t_sph_circle_parameters.o t_FFT_selector.o t_buffer_4_gzip.o set_parallel_file_name.o sph_monitor_data_text.o gz_open_sph_layer_mntr_file.o gz_layer_mean_monitor_IO.o dup_fields_on_circle_to_IO.o sel_open_sph_fld_on_circle.o gz_volume_spectr_monitor_IO.o
+write_monitors_circle_file.o: $(MHD_SPH_DIR)/write_monitors_circle_file.f90 m_precision.o m_constants.o t_spheric_parameter.o t_time_data.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_read_sph_spectra.o t_field_on_circle.o t_circle_transform.o t_sph_circle_parameters.o t_FFT_selector.o t_buffer_4_gzip.o set_parallel_file_name.o sph_monitor_data_text.o gz_open_sph_layer_mntr_file.o gz_layer_mean_monitor_IO.o dup_fields_on_circle_to_IO.o sel_open_sph_fld_on_circle.o skip_comment_f.o gz_volume_spectr_monitor_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 write_typical_scale.o: $(MHD_SPH_DIR)/write_typical_scale.f90 m_precision.o m_constants.o calypso_mpi.o t_sph_typical_scales.o t_field_labels.o t_phys_data.o t_spheric_parameter.o t_spheric_rj_data.o t_boundary_params_sph_MHD.o t_buffer_4_gzip.o t_rms_4_sph_spectr.o t_read_sph_spectra.o t_sph_volume_mean_square.o sph_monitor_data_text.o select_gz_stream_file_IO.o gz_open_sph_vol_mntr_file.o set_parallel_file_name.o check_sph_monitor_header.o compare_sph_monitor_header.o sph_power_spectr_data_text.o sel_gz_input_sph_mtr_head.o
 	$(F90) -c $(F90OPTFLAGS) $<

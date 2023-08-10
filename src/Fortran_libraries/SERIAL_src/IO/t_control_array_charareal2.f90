@@ -11,7 +11,7 @@
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!        type(read_chara_real2_item), intent(inout) :: cr2_item
 !!      subroutine write_charreal2_ctl_type                             &
-!!     &         (id_file, level, maxlen, label, cr2_item)
+!!     &         (id_file, level, maxlen, cr2_item)
 !!        type(read_chara_real2_item), intent(in) :: cr2_item
 !!      subroutine copy_charreal2_ctl(org_cr2, new_cr2)
 !!        type(read_chara_real2_item), intent(in) :: org_cr2
@@ -24,7 +24,7 @@
 !!        type(ctl_array_cr2), intent(inout) :: array_cr2
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_control_array_c_r2                             &
-!!     &         (id_control, level, label, array_cr2)
+!!     &         (id_control, level, array_cr2)
 !!        type(ctl_array_cr2), intent(in) :: array_cr2
 !!
 !!      subroutine append_control_array_c_r2(read_cr2, array_cr2)
@@ -48,6 +48,8 @@
 !
 !>        structure of control item with three characters
       type read_chara_real2_item
+!>        Item name
+        character(len=kchara) :: item_name = 'char_item'
 !>        read flag (If item is read iflag = 1)
         integer(kind = kint) ::  iflag = 0
 !>        array for read character items
@@ -58,6 +60,8 @@
 !
 !>  Structure for charactor and two reals control array 
       type ctl_array_cr2
+!>        Item name
+        character(len=kchara) :: array_name = 'char_array'
 !>     number of array items
         integer(kind=kint) :: num = 0
 !>     array counter
@@ -87,7 +91,9 @@
        character(len=kchara) :: tmpchara
 !
 !
-      if(cr2_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+      if(cr2_item%iflag.gt.0) return
+      cr2_item%item_name = trim(label)
+      if(c_buf%header_chara.ne.label) return
 !
       read(c_buf%ctl_buffer,*) tmpchara, cr2_item%charavalue,           &
      &                        cr2_item%realvalue(1:2)
@@ -103,19 +109,18 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_charreal2_ctl_type                               &
-     &         (id_file, level, maxlen, label, cr2_item)
+     &         (id_file, level, maxlen, cr2_item)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level, maxlen
-      character(len=kchara), intent(in) :: label
       type(read_chara_real2_item), intent(in) :: cr2_item
 !
 !
       if(cr2_item%iflag .eq. 0) return
 !
-      call write_chara_real2_ctl_item                                   &
-     &   (id_file, level, maxlen, label, cr2_item%charavalue,           &
+      call write_chara_real2_ctl_item(id_file, level, maxlen,           &
+     &    cr2_item%item_name, cr2_item%charavalue,                      &
      &    cr2_item%realvalue(1), cr2_item%realvalue(2))
 !
        end subroutine write_charreal2_ctl_type
@@ -128,6 +133,7 @@
       type(read_chara_real2_item), intent(inout) :: new_cr2
 !
 !
+      new_cr2%item_name =      org_cr2%item_name
       new_cr2%iflag =          org_cr2%iflag
       new_cr2%charavalue =     org_cr2%charavalue
       new_cr2%realvalue(1:2) = org_cr2%realvalue(1:2)
@@ -181,8 +187,9 @@
       type(read_chara_real2_item) :: read_cr2
 !
 !
-      if(check_array_flag(c_buf, label) .eqv. .FALSE.) return
       if(array_cr2%icou .gt. 0) return
+      array_cr2%array_name = trim(label)
+      if(check_array_flag(c_buf, label) .eqv. .FALSE.) return
 !
       read_cr2%iflag = 0
       array_cr2%num =  0
@@ -204,13 +211,12 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_control_array_c_r2                              &
-     &         (id_control, level, label, array_cr2)
+     &         (id_control, level, array_cr2)
 !
       use skip_comment_f
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: label
       type(ctl_array_cr2), intent(in) :: array_cr2
 !
       integer(kind = kint), intent(inout) :: level
@@ -220,13 +226,15 @@
 !
       if(array_cr2%num .le. 0) return
 !
-      level = write_array_flag_for_ctl(id_control, level, label)
+      level = write_array_flag_for_ctl(id_control, level,               &
+     &                                 array_cr2%array_name)
       do i = 1, array_cr2%num
-        call write_chara_real2_ctl_item                                 &
-     &    (id_control, level, len_trim(label), label,                   &
+        call write_chara_real2_ctl_item(id_control, level,              &
+     &     len_trim(array_cr2%array_name), array_cr2%array_name,        &
      &     array_cr2%c_tbl(i), array_cr2%vec1(i), array_cr2%vec2(i))
       end do
-      level = write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level,           &
+     &                                     array_cr2%array_name)
 !
       end subroutine write_control_array_c_r2
 !
@@ -265,8 +273,10 @@
       type(ctl_array_cr2), intent(inout) :: tgt_cr2
 !
 !
+      tgt_cr2%array_name = org_cr2%array_name
+      tgt_cr2%icou =       org_cr2%icou
+!
       if(num_copy .le. 0) return
-      tgt_cr2%icou = org_cr2%icou
       tgt_cr2%c_tbl(1:num_copy) = org_cr2%c_tbl(1:num_copy)
       tgt_cr2%vec1(1:num_copy) =  org_cr2%vec1(1:num_copy)
       tgt_cr2%vec2(1:num_copy) =  org_cr2%vec2(1:num_copy)

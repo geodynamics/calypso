@@ -7,25 +7,32 @@
 !>@brief  Subroutines to read char-real control arrays
 !!
 !!@verbatim
+!!      subroutine init_charareal_ctl_item_label(label, cr_item)
 !!      subroutine read_charareal_ctl_type(c_buf, label, cr_item)
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!        type(read_chara_real_item), intent(inout) :: cr_item
 !!      subroutine write_charareal_ctl_type                             &
-!!     &         (id_file, level, label, cr_item)
+!!     &         (id_file, level, cr_item)
 !!        type(read_chara_real_item), intent(in) :: cr_item
 !!      subroutine copy_charareal_ctl(org_cr, new_cr)
 !!        type(read_chara_real_item), intent(in) :: org_cr
 !!        type(read_chara_real_item), intent(inout) :: new_cr
+!!      logical function cmp_read_charreal_item(cr_item1, cr_item2)
+!!        type(read_chara_real_item), intent(in) :: cr_item1
+!!        type(read_chara_real_item), intent(in) :: cr_item2
 !!
 !!      subroutine alloc_control_array_c_r(array_cr)
 !!      subroutine dealloc_control_array_c_r(array_cr)
+!!      subroutine init_c_r_ctl_array_label(label, array_cr)
 !!      subroutine read_control_array_c_r                               &
 !!     &         (id_control, label, array_cr, c_buf)
 !!        type(ctl_array_cr), intent(inout) :: array_cr
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_c_r                              &
-!!     &         (id_control, level, label, array_cr)
+!!     &         (id_control, level, array_cr)
 !!        type(ctl_array_cr), intent(in) :: array_cr
+!!      logical function cmp_control_array_c_r(array1_cr, array2_cr)
+!!        type(ctl_array_cr), intent(in) :: array1_cr, array2_cr
 !!
 !!      subroutine append_control_array_c_r(read_cr, array_cr)
 !!        type(read_chara_real_item), intent(inout) ::    read_cr
@@ -49,6 +56,8 @@
 !
 !>        structure of control item with three characters
       type read_chara_real_item
+!>        Item name
+        character(len=kchara) :: item_name = 'char_item'
 !>        read flag (If item is read iflag = 1)
         integer(kind = kint) ::  iflag = 0
 !>        array for read character items
@@ -59,6 +68,8 @@
 !
 !>  Structure for charactor and real control array 
       type ctl_array_cr
+!>        Item name
+        character(len=kchara) :: array_name = 'char_array'
 !>     number of array items
         integer(kind=kint) :: num = 0
 !>     array counter
@@ -75,6 +86,15 @@
 !
 !   --------------------------------------------------------------------
 !
+      subroutine init_charareal_ctl_item_label(label, cr_item)
+      character(len=kchara), intent(in) :: label
+      type(read_chara_real_item), intent(inout) :: cr_item
+!
+      cr_item%item_name = trim(label)
+      end subroutine init_charareal_ctl_item_label
+!
+! ----------------------------------------------------------------------
+!
       subroutine read_charareal_ctl_type(c_buf, label, cr_item)
 !
       use t_read_control_elements
@@ -86,7 +106,9 @@
        character(len=kchara) :: tmpchara
 !
 !
-      if(cr_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+      if(cr_item%iflag.gt.0) return
+      cr_item%item_name = trim(label)
+      if(c_buf%header_chara.ne.label) return
 !
       read(c_buf%ctl_buffer,*) tmpchara, cr_item%charavalue,            &
      &                         cr_item%realvalue
@@ -101,12 +123,11 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_charareal_ctl_type                               &
-     &         (id_file, level, label, cr_item)
+     &         (id_file, level, cr_item)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
-      character(len=kchara), intent(in) :: label
       type(read_chara_real_item), intent(in) :: cr_item
 !
       integer(kind = kint) :: maxlen(0:1)
@@ -114,11 +135,11 @@
 !
       if(cr_item%iflag .eq. 0) return
 !
-      maxlen(0) = len_trim(label)
+      maxlen(0) = len_trim(cr_item%item_name)
       maxlen(1) = len_trim(cr_item%charavalue)
 !
-      call write_chara_real_ctl_item(id_file, level, maxlen, label,     &
-     &    cr_item%charavalue, cr_item%realvalue)
+      call write_chara_real_ctl_item(id_file, level, maxlen,            &
+     &    cr_item%item_name, cr_item%charavalue, cr_item%realvalue)
 !
        end subroutine write_charareal_ctl_type
 !
@@ -130,6 +151,7 @@
       type(read_chara_real_item), intent(inout) :: new_cr
 !
 !
+      new_cr%item_name =   org_cr%item_name
       new_cr%iflag =       org_cr%iflag
       new_cr%charavalue =  org_cr%charavalue
       new_cr%realvalue =   org_cr%realvalue
@@ -137,6 +159,29 @@
        end subroutine copy_charareal_ctl
 !
 !   --------------------------------------------------------------------
+!
+      logical function cmp_read_charreal_item(cr_item1, cr_item2)
+!
+      use skip_comment_f
+!
+      type(read_chara_real_item), intent(in) :: cr_item1
+      type(read_chara_real_item), intent(in) :: cr_item2
+!
+      cmp_read_charreal_item = .FALSE.
+      if(cmp_no_case(trim(cr_item1%item_name),                          &
+     &               trim(cr_item2%item_name)) .eqv. .FALSE.) return
+      if(cr_item1%iflag .ne. cr_item2%iflag) return
+      if(cr_item1%iflag .gt. 0) then
+        if(cmp_no_case(trim(cr_item1%charavalue),                       &
+     &                 trim(cr_item2%charavalue)) .eqv. .FALSE.) return
+        if(cr_item1%realvalue .ne. cr_item2%realvalue) return
+      end if
+!
+      cmp_read_charreal_item = .TRUE.
+!
+      end function cmp_read_charreal_item
+!
+! ----------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_c_r(array_cr)
@@ -168,6 +213,15 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
+      subroutine init_c_r_ctl_array_label(label, array_cr)
+      character(len=kchara), intent(in) :: label
+      type(ctl_array_cr), intent(inout) :: array_cr
+!
+      array_cr%array_name = trim(label)
+      end subroutine init_c_r_ctl_array_label
+!
+!   --------------------------------------------------------------------
+!
       subroutine read_control_array_c_r                                 &
      &         (id_control, label, array_cr, c_buf)
 !
@@ -181,8 +235,9 @@
       type(read_chara_real_item) :: read_cr
 !
 !
-      if(check_array_flag(c_buf, label) .eqv. .FALSE.) return
       if(array_cr%icou .gt. 0) return
+      array_cr%array_name = trim(label)
+      if(check_array_flag(c_buf, label) .eqv. .FALSE.) return
 !
       read_cr%iflag = 0
       array_cr%num =  0
@@ -204,14 +259,13 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_control_array_c_r                                &
-     &         (id_control, level, label, array_cr)
+     &         (id_control, level, array_cr)
 !
       use skip_comment_f
       use write_control_elements
       use write_control_items
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: label
       type(ctl_array_cr), intent(in) :: array_cr
 !
       integer(kind = kint), intent(inout) :: level
@@ -222,17 +276,42 @@
 !
       if(array_cr%num .le. 0) return
 !
-      maxlen(0) = len_trim(label)
+      maxlen(0) = len_trim(array_cr%array_name)
       maxlen(1) = max_len_of_charaarray(array_cr%num, array_cr%c_tbl)
 !
-      level = write_array_flag_for_ctl(id_control, level, label)
+      level = write_array_flag_for_ctl(id_control, level,               &
+     &                                 array_cr%array_name)
       do i = 1, array_cr%num
         call write_chara_real_ctl_item(id_control, level, maxlen,       &
-     &      label, array_cr%c_tbl(i), array_cr%vect(i))
+     &      array_cr%array_name, array_cr%c_tbl(i), array_cr%vect(i))
       end do
-      level = write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level,           &
+     &                                     array_cr%array_name)
 !
       end subroutine write_control_array_c_r
+!
+!   --------------------------------------------------------------------
+!
+      logical function cmp_control_array_c_r(array1_cr, array2_cr)
+!
+      use skip_comment_f
+!
+      type(ctl_array_cr), intent(in) :: array1_cr, array2_cr
+      integer(kind = kint) :: i
+!
+      cmp_control_array_c_r = .FALSE.
+      if(cmp_no_case(trim(array1_cr%array_name),                        &
+     &               trim(array2_cr%array_name)) .eqv. .FALSE.) return
+      if(array1_cr%num .ne.  array2_cr%num) return
+      if(array1_cr%icou .ne. array2_cr%icou) return
+      do i = 1, array1_cr%num
+        if(cmp_no_case(trim(array1_cr%c_tbl(i)),                        &
+     &                trim(array2_cr%c_tbl(i))) .eqv. .FALSE.) return
+        if(array1_cr%vect(i) .ne. array2_cr%vect(i)) return
+      end do
+      cmp_control_array_c_r = .TRUE.
+!
+      end function cmp_control_array_c_r
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -282,9 +361,10 @@
       type(ctl_array_cr), intent(in) ::    org_cr
       type(ctl_array_cr), intent(inout) :: tgt_cr
 !
+      tgt_cr%array_name = org_cr%array_name
+      tgt_cr%icou =       org_cr%icou
 !
       if(num_copy .le. 0) return
-      tgt_cr%icou = org_cr%icou
       tgt_cr%c_tbl(1:num_copy) = org_cr%c_tbl(1:num_copy)
       tgt_cr%vect(1:num_copy) =  org_cr%vect(1:num_copy)
 !

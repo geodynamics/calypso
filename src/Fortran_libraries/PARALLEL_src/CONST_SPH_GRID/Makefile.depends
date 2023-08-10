@@ -1,4 +1,4 @@
-bcast_4_sphere_ctl.o: $(SPH_GRID_SRCDIR)/bcast_4_sphere_ctl.f90 m_precision.o m_constants.o calypso_mpi.o t_ctl_data_gen_sph_shell.o calypso_mpi_int.o bcast_4_platform_ctl.o t_ctl_data_4_sphere_model.o bcast_control_arrays.o t_ctl_data_4_divide_sphere.o
+bcast_4_sphere_ctl.o: $(SPH_GRID_SRCDIR)/bcast_4_sphere_ctl.f90 m_precision.o m_constants.o calypso_mpi.o t_ctl_data_gen_sph_shell.o transfer_to_long_integers.o calypso_mpi_char.o calypso_mpi_int.o bcast_4_platform_ctl.o t_ctl_data_4_sphere_model.o bcast_control_arrays.o t_ctl_data_4_divide_sphere.o
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_comm_stacks_sph.o: $(SPH_GRID_SRCDIR)/bcast_comm_stacks_sph.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_sph_trans_comm_tbl.o calypso_mpi_int.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<

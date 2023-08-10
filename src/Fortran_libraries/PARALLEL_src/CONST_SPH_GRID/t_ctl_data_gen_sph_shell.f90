@@ -7,6 +7,7 @@
 !>@brief  control data for resolutions of spherical shell
 !!
 !!@verbatim
+!!      subroutine init_parallel_shell_ctl_label(hd_block, psph_ctl)
 !!      subroutine read_parallel_shell_ctl                              &
 !!     &         (id_control, hd_block, psph_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -15,11 +16,9 @@
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
-!!      subroutine write_parallel_shell_ctl                             &
-!!     &         (id_control, hd_block, psph_ctl, level)
+!!      subroutine write_parallel_shell_ctl(id_control, psph_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len = kchara), intent(in) :: file_name
-!!        character(len = kchara), intent(in) :: hd_block
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!
@@ -70,6 +69,8 @@
 !
 !>      structure of parallel spherical shell data
       type parallel_sph_shell_control
+!>        Block name
+        character(len=kchara) :: block_name = 'spherical_shell_ctl'
 !>        Structure of mesh IO controls and sleeve informations
         type(FEM_mesh_control) :: Fmesh_ctl
 !>        Structure of spherical shell configuration
@@ -112,8 +113,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(psph_ctl%iflag_sph_shell .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -135,14 +136,12 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_parallel_shell_ctl                               &
-     &         (id_control, hd_block, psph_ctl, level)
+      subroutine write_parallel_shell_ctl(id_control, psph_ctl, level)
 !
       use ctl_data_sphere_model_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(parallel_sph_shell_control), intent(in) :: psph_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -150,18 +149,34 @@
 !
       if(psph_ctl%iflag_sph_shell .le. 0) return
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 psph_ctl%block_name)
       call write_FEM_mesh_control                                       &
-     &   (id_control, hd_FEM_mesh, psph_ctl%Fmesh_ctl, level)
-      call write_control_shell_define                                   &
-     &   (id_control, hd_sph_def, psph_ctl%spctl, level)
-!
+     &   (id_control, psph_ctl%Fmesh_ctl, level)
       call write_control_shell_domain                                   &
-     &   (id_control, hd_domains_sph, psph_ctl%sdctl, level)
-!
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+     &   (id_control, psph_ctl%sdctl, level)
+      call write_control_shell_define                                   &
+     &   (id_control, psph_ctl%spctl, level)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                psph_ctl%block_name)
 !
       end subroutine write_parallel_shell_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_parallel_shell_ctl_label(hd_block, psph_ctl)
+!
+      use ctl_data_sphere_model_IO
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
+!
+      psph_ctl%block_name = trim(hd_block)
+      call init_ctl_shell_define_label(hd_sph_def, psph_ctl%spctl)
+      call init_ctl_shell_domain_label(hd_domains_sph, psph_ctl%sdctl)
+      call init_FEM_mesh_ctl_label(hd_FEM_mesh, psph_ctl%Fmesh_ctl)
+!
+      end subroutine init_parallel_shell_ctl_label
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

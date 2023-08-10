@@ -28,6 +28,8 @@
       subroutine bcast_surfacing_controls(surfacing_ctls)
 !
       use t_control_data_surfacings
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
       use bcast_section_control_data
@@ -48,6 +50,8 @@
 !
       call bcast_ctl_type_c1(surfacing_ctls%output_ucd_fmt_s_ctl)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (surfacing_ctls%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int                                    &
      &   (surfacing_ctls%i_surfacing_control, 0)
 !

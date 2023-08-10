@@ -182,8 +182,11 @@
      & .or. check_field_list_ctl(theta_velocity, field_ctl)             &
      & .or. check_field_list_ctl(phi_velocity, field_ctl)               &
      & .or. check_field_list_ctl(cyl_r_velocity, field_ctl)             &
+     & .or. check_field_list_ctl(x_velocity, field_ctl)                 &
+     & .or. check_field_list_ctl(y_velocity, field_ctl)                 &
      & .or. check_field_list_ctl(z_velocity, field_ctl))                &
      &  call add_phys_name_ctl(velocity, field_ctl)
+!
       if(   check_field_list_ctl(r_magnetic_f, field_ctl)               &
      & .or. check_field_list_ctl(theta_magnetic_f, field_ctl)           &
      & .or. check_field_list_ctl(phi_magnetic_f, field_ctl)             &

@@ -6,6 +6,7 @@
 !>@brief control data for each isosurface
 !!
 !!@verbatim
+!!      subroutine init_iso_ctl_stract(hd_block, iso_c)
 !!      subroutine s_read_iso_control_data                              &
 !!     &         (id_control, hd_block, iso_c, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -19,10 +20,6 @@
 !!        type(iso_ctl), intent(in) :: iso_c
 !!        integer(kind = kint), intent(inout) :: level
 !!
-!!      integer(kind = kint) function num_label_iso_ctl()
-!!      integer(kind = kint) function num_label_iso_ctl_w_dpl()
-!!      subroutine set_label_iso_ctl(names)
-!!      subroutine set_label_iso_ctl_w_dpl(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of control for Kemo's surface rendering
 !!
@@ -106,11 +103,6 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_iso_result = 'isosurf_result_define'
 !
-      integer(kind = kint), parameter :: n_label_iso_ctl = 4
-      integer(kind = kint), parameter :: n_label_iso_ctl_w_dpl = 6
-!
-      private :: n_label_iso_ctl, n_label_iso_ctl_w_dpl
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -180,9 +172,9 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_isosurf_prefix, iso_c%iso_file_head_ctl)
+     &    iso_c%iso_file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_iso_out_type, iso_c%iso_output_type_ctl)
+     &    iso_c%iso_output_type_ctl)
 !
       call write_iso_define_data(id_control, hd_iso_define,             &
      &                           iso_c%iso_def_c, level)
@@ -193,48 +185,25 @@
       end subroutine write_iso_control_data
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
 !
-      integer(kind = kint) function num_label_iso_ctl()
-      num_label_iso_ctl = n_label_iso_ctl
-      return
-      end function num_label_iso_ctl
+      subroutine init_iso_ctl_stract(hd_block, iso_c)
 !
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_iso_ctl_w_dpl()
-      num_label_iso_ctl_w_dpl = n_label_iso_ctl_w_dpl
-      return
-      end function num_label_iso_ctl_w_dpl
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_iso_ctl(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_iso_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(iso_ctl), intent(inout) :: iso_c
 !
 !
-      call set_control_labels(hd_isosurf_prefix, names( 1))
-      call set_control_labels(hd_iso_out_type,   names( 2))
-      call set_control_labels(hd_iso_define,     names( 3))
-      call set_control_labels(hd_field_on_iso,   names( 4))
+      iso_c%block_name = hd_block
+      call init_iso_define_control(hd_iso_define, iso_c%iso_def_c)
+      call init_fld_on_psf_control(hd_field_on_iso, iso_c%fld_on_iso_c)
 !
-      end subroutine set_label_iso_ctl
+        call init_chara_ctl_item_label(hd_isosurf_prefix,               &
+     &      iso_c%iso_file_head_ctl)
+        call init_chara_ctl_item_label(hd_iso_file_head,                &
+     &      iso_c%iso_file_head_ctl)
+        call init_chara_ctl_item_label(hd_iso_out_type,                 &
+     &      iso_c%iso_output_type_ctl)
 !
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_iso_ctl_w_dpl(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_iso_ctl_w_dpl)
-!
-!
-      call set_label_iso_ctl(names(1))
-      call set_control_labels(hd_iso_file_head,  names( 5))
-      call set_control_labels(hd_iso_result,     names( 6))
-!
-      end subroutine set_label_iso_ctl_w_dpl
+      end subroutine init_iso_ctl_stract
 !
 !  ---------------------------------------------------------------------
 !

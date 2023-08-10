@@ -7,15 +7,14 @@
 !> @brief data structure for restart data control block
 !!
 !!@verbatim
+!!      subroutine init_restart_ctl_label(hd_block, mr_ctl)
 !!      subroutine read_restart_ctl(id_control, hd_block, mr_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(mhd_restart_control), intent(inout) :: mr_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
-!!      subroutine write_restart_ctl(id_control, hd_block,              &
-!!     &                             mr_ctl, level)
+!!      subroutine write_restart_ctl(id_control, mr_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(mhd_restart_control), intent(in) :: mr_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!
@@ -56,6 +55,9 @@
 !
 !>   control flage for restart data
       type mhd_restart_control
+!>        Block name
+        character(len=kchara) :: block_name = 'restart_file_ctl'
+!>        Initial data type control
         type(read_character_item) :: restart_flag_ctl
 !
         integer (kind=kint) :: i_restart_file =   0
@@ -84,15 +86,16 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(mr_ctl%i_restart_file .gt. 0) return
+      mr_ctl%block_name = hd_block
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_chara_ctl_type(c_buf, hd_rst_flag,                    &
-     &      mr_ctl%restart_flag_ctl)
+     &                           mr_ctl%restart_flag_ctl)
       end do
       mr_ctl%i_restart_file = 1
 !
@@ -100,15 +103,13 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_restart_ctl(id_control, hd_block,                &
-     &                             mr_ctl, level)
+      subroutine write_restart_ctl(id_control, mr_ctl, level)
 !
       use t_read_control_elements
       use skip_comment_f
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(mhd_restart_control), intent(in) :: mr_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -119,12 +120,28 @@
       if(mr_ctl%i_restart_file .le. 0) return
       maxlen = len_trim(hd_rst_flag)
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 mr_ctl%block_name)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &      hd_rst_flag, mr_ctl%restart_flag_ctl)
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+     &                          mr_ctl%restart_flag_ctl)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                mr_ctl%block_name)
 !
       end subroutine write_restart_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_restart_ctl_label(hd_block, mr_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(mhd_restart_control), intent(inout) :: mr_ctl
+!
+!
+      mr_ctl%block_name = hd_block
+        call init_chara_ctl_item_label(hd_rst_flag,                     &
+     &                           mr_ctl%restart_flag_ctl)
+!
+      end subroutine init_restart_ctl_label
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

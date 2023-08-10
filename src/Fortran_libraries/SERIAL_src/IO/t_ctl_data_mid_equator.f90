@@ -10,16 +10,15 @@
 !!@verbatim
 !!      subroutine reset_mid_equator_control(meq_ctl)
 !!        type(mid_equator_control), intent(inout) :: meq_ctl
+!!      subroutine init_mid_eq_monitor_ctl_label(hd_block, meq_ctl)
 !!      subroutine read_mid_eq_monitor_ctl                              &
 !!     &         (id_control, hd_block, meq_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(mid_equator_control), intent(inout) :: meq_ctl
 !!        type(buffer_for_control), intent(inout) :: c_buf
-!!      subroutine write_mid_eq_monitor_ctl                             &
-!!     &         (id_control, hd_block, meq_ctl, level)
+!!      subroutine write_mid_eq_monitor_ctl(id_control, meq_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(mid_equator_control), intent(in) :: meq_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!
@@ -57,6 +56,8 @@
       implicit  none
 !
       type mid_equator_control
+!>        Block name
+        character(len=kchara) :: block_name = 'fields_on_circle_ctl'
 !>        Structure for field on circle data file prefix
         type(read_character_item) :: circle_field_file_ctl
 !>        Structure for spectr on circle data file prefix
@@ -142,6 +143,8 @@
      &                   new_meq_ctl%pick_s_ctl)
       call copy_real_ctl(org_meq_ctl%pick_z_ctl,                        &
      &                   new_meq_ctl%pick_z_ctl)
+!
+      new_meq_ctl%block_name = org_meq_ctl%block_name
       new_meq_ctl%i_mid_equator_ctl = org_meq_ctl%i_mid_equator_ctl
 !
       end subroutine dup_mid_equator_control
@@ -159,8 +162,8 @@
       type(buffer_for_control), intent(inout) :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(meq_ctl%i_mid_equator_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -190,13 +193,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_mid_eq_monitor_ctl                               &
-     &         (id_control, hd_block, meq_ctl, level)
+      subroutine write_mid_eq_monitor_ctl(id_control, meq_ctl, level)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(mid_equator_control), intent(in) :: meq_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -214,28 +215,59 @@
       maxlen = max(maxlen, len_trim(hd_spec_on_circ_prefix))
       maxlen = max(maxlen, len_trim(hd_fld_on_circ_format))
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 meq_ctl%block_name)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_fld_on_circ_prefix, meq_ctl%circle_field_file_ctl)
+     &    meq_ctl%circle_field_file_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_spec_on_circ_prefix, meq_ctl%circle_spectr_file_ctl)
+     &    meq_ctl%circle_spectr_file_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_fld_on_circ_format, meq_ctl%circle_file_format_ctl)
+     &    meq_ctl%circle_file_format_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_circle_coord, meq_ctl%pick_circle_coord_ctl)
-!
-      call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_pick_s_ctl, meq_ctl%pick_s_ctl)
-      call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_pick_z_ctl, meq_ctl%pick_z_ctl)
+     &    meq_ctl%pick_circle_coord_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_nphi_mid_eq, meq_ctl%nphi_mid_eq_ctl)
+     &    meq_ctl%nphi_mid_eq_ctl)
 !
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    meq_ctl%pick_s_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    meq_ctl%pick_z_ctl)
+!
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                 meq_ctl%block_name)
 !
       end subroutine write_mid_eq_monitor_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine init_mid_eq_monitor_ctl_label(hd_block, meq_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(mid_equator_control), intent(inout) :: meq_ctl
+!
+!
+      meq_ctl%block_name = hd_block
+        call init_chara_ctl_item_label(hd_fld_on_circ_prefix,           &
+     &      meq_ctl%circle_field_file_ctl)
+        call init_chara_ctl_item_label(hd_spec_on_circ_prefix,          &
+     &      meq_ctl%circle_spectr_file_ctl)
+        call init_chara_ctl_item_label(hd_fld_on_circ_format,           &
+     &      meq_ctl%circle_file_format_ctl)
+!
+        call init_real_ctl_item_label                                   &
+     &     (hd_pick_s_ctl, meq_ctl%pick_s_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_pick_z_ctl, meq_ctl%pick_z_ctl)
+!
+        call init_int_ctl_item_label(hd_nphi_mid_eq,                    &
+     &      meq_ctl%nphi_mid_eq_ctl)
+!
+        call init_chara_ctl_item_label(hd_circle_coord,                 &
+     &      meq_ctl%pick_circle_coord_ctl)
+!
+      end subroutine init_mid_eq_monitor_ctl_label
 !
 ! -----------------------------------------------------------------------
 !

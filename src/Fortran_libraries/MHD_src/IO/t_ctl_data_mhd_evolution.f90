@@ -7,6 +7,7 @@
 !>@brief  Control data of time integration flags
 !!
 !!@verbatim
+!!      subroutine init_mhd_time_evo_ctl_label(hd_block, evo_ctl)
 !!      subroutine read_mhd_time_evo_ctl                                &
 !!     &         (id_control, hd_block, evo_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -30,7 +31,7 @@
 !!                    vector_potential, composition
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    begin time_evolution_ctl
-!!      array time_evo_ctl   4
+!!      array time_evo_ctl
 !!        time_evo_ctl  temperature
 !!        time_evo_ctl  velocity
 !!        time_evo_ctl  vector_potential
@@ -53,6 +54,8 @@
 !
 !
       type mhd_evolution_control
+!>        Block name
+        character(len=kchara) :: block_name = 'time_evolution_ctl'
 !>        Structure for list of field for time evolution
 !!@n       t_evo_field_ctl%icou:  Read flag for 'time_evolution_ctl'
 !!@n       t_evo_field_ctl%num:   Number of field
@@ -124,10 +127,21 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_control_array_c1(id_control, level,                    &
-     &    hd_t_evo_field, evo_ctl%t_evo_field_ctl)
+     &    evo_ctl%t_evo_field_ctl)
       level = write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_mhd_time_evo_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_mhd_time_evo_ctl_label(hd_block, evo_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(mhd_evolution_control), intent(inout) :: evo_ctl
+!
+      evo_ctl%block_name = hd_block
+        call init_chara_ctl_array_label(hd_t_evo_field,                 &
+     &                                  evo_ctl%t_evo_field_ctl)
+      end subroutine init_mhd_time_evo_ctl_label
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

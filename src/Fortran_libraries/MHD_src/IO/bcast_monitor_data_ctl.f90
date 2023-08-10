@@ -29,6 +29,8 @@
 !
       subroutine bcast_node_monitor_data_ctl(nmtr_ctl)
 !
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -39,6 +41,8 @@
       call bcast_ctl_array_r3(nmtr_ctl%xx_4_monitor_ctl)
       call bcast_ctl_array_i2(nmtr_ctl%node_4_monitor_ctl)
 !
+      call calypso_mpi_bcast_character(nmtr_ctl%block_name,             &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(nmtr_ctl%i_monitor_data, 0)
 !
       end subroutine bcast_node_monitor_data_ctl

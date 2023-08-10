@@ -18,12 +18,11 @@
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
 !!      subroutine sel_write_ctl_gen_shell_grids                        &
-!!     &         (id_control, hd_block, file_name, psph_ctl, level)
+!!     &         (id_control, file_name, psph_ctl, level)
 !!      subroutine write_ctl_file_gen_shell_grids(id_control, file_name,&
-!!     &                                          hd_block, psph_ctl)
+!!     &                                          psph_ctl)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len = kchara), intent(in) :: file_name
-!!        character(len = kchara), intent(in) :: hd_block
 !!        type(parallel_sph_shell_control), intent(in) :: psph_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !! =======================================================
@@ -148,33 +147,30 @@
 !   --------------------------------------------------------------------
 !
       subroutine sel_write_ctl_gen_shell_grids                          &
-     &         (id_control, hd_block, file_name, psph_ctl, level)
+     &         (id_control, file_name, psph_ctl, level)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: file_name
-      character(len = kchara), intent(in) :: hd_block
       type(parallel_sph_shell_control), intent(in) :: psph_ctl
 !
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(cmp_no_case(file_name, 'NO_FILE')) then
-        call write_parallel_shell_ctl(id_control, hd_block,             &
-     &                                psph_ctl, level)
+      if(no_file_flag(file_name)) then
+        call write_parallel_shell_ctl(id_control, psph_ctl, level)
       else if(id_control .eq. id_monitor) then
-        write(*,'(4a)') '!  ', trim(hd_block),                          &
+        write(*,'(4a)') '!  ', trim(psph_ctl%block_name),               &
      &           ' should be written to file ... ', trim(file_name)
-        call write_parallel_shell_ctl(id_control, hd_block,             &
-     &                                psph_ctl, level)
+        call write_parallel_shell_ctl(id_control, psph_ctl, level)
       else
-        write(*,'(3a)') trim(hd_block),                                 &
+        write(*,'(3a)') trim(psph_ctl%block_name),                      &
      &           ' is written to file ... ', trim(file_name)
         call write_file_name_for_ctl_line(id_control, level,            &
-     &                                    hd_block, file_name)
+     &      psph_ctl%block_name, file_name)
         call write_ctl_file_gen_shell_grids((id_control+2), file_name,  &
-     &                                     hd_block, psph_ctl)
+     &                                      psph_ctl)
       end if
 !
       end subroutine sel_write_ctl_gen_shell_grids
@@ -182,13 +178,12 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_ctl_file_gen_shell_grids(id_control, file_name,  &
-     &                                          hd_block, psph_ctl)
+     &                                          psph_ctl)
 !
       use delete_data_files
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: file_name
-      character(len=kchara), intent(in) :: hd_block
       type(parallel_sph_shell_control), intent(in) :: psph_ctl
 !
       integer(kind = kint) :: level
@@ -201,8 +196,7 @@
 !
       level = 0
       open(id_control, file = file_name)
-      call write_parallel_shell_ctl(id_control, hd_block,               &
-     &                              psph_ctl, level)
+      call write_parallel_shell_ctl(id_control, psph_ctl, level)
       close(id_control)
 !
       end subroutine write_ctl_file_gen_shell_grids

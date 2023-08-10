@@ -11,8 +11,8 @@
 !!      logical function check_div_flux_tensor(field_name)
 !!      logical function check_div_scalar_flux(field_name)
 !!
-!!      integer(kind = kint) function num_div_forces()
-!!      subroutine set_div_force_labels(n_comps, names, maths)
+!!      subroutine set_div_force_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  divergence of forces by filtered field !!!!!!!!!!!!!!!!!!
 !!
@@ -41,9 +41,6 @@
       use m_precision
       use m_phys_constants
       use t_field_labels
-!
-!>      Number of field labels
-      integer(kind = kint), parameter, private :: ndiv_force = 12
 !
 !  divergence of momentum equations
 !>        Field label for divergence of advection
@@ -181,49 +178,29 @@
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
-! 
-      integer(kind = kint) function num_div_forces()
-      num_div_forces = ndiv_force
-      return
-      end function num_div_forces
 !
-! ----------------------------------------------------------------------
+      subroutine set_div_force_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      subroutine set_div_force_labels(n_comps, names, maths)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ndiv_force)
-      character(len = kchara), intent(inout) :: names(ndiv_force)
-      character(len = kchara), intent(inout) :: maths(ndiv_force)
+      call set_field_label_to_ctl(div_inertia,               array_c2i)
+      call set_field_label_to_ctl(div_Coriolis_force,        array_c2i)
+      call set_field_label_to_ctl(div_Lorentz_force,         array_c2i)
+      call set_field_label_to_ctl(div_buoyancy,              array_c2i)
+      call set_field_label_to_ctl(div_composite_buoyancy,    array_c2i)
+      call set_field_label_to_ctl(div_momentum_flux,         array_c2i)
+      call set_field_label_to_ctl(div_maxwell_tensor,        array_c2i)
+      call set_field_label_to_ctl(div_induction_tensor,      array_c2i)
+      call set_field_label_to_ctl(div_heat_flux,             array_c2i)
+      call set_field_label_to_ctl(div_pert_heat_flux,        array_c2i)
+      call set_field_label_to_ctl(div_composition_flux,      array_c2i)
+      call set_field_label_to_ctl(div_pert_composition_flux, array_c2i)
 !
-!
-      call set_field_labels(div_inertia,                                &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(div_Coriolis_force,                         &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(div_Lorentz_force,                          &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(div_buoyancy,                               &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(div_composite_buoyancy,                     &
-     &    n_comps( 5), names( 5), maths( 5))
-!
-      call set_field_labels(div_momentum_flux,                          &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(div_maxwell_tensor,                         &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(div_induction_tensor,                       &
-     &    n_comps( 8), names( 8), maths( 8))
-!
-      call set_field_labels(div_heat_flux,                              &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(div_pert_heat_flux,                         &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(div_composition_flux,                       &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(div_pert_composition_flux,                  &
-     &    n_comps(12), names(12), maths(12))
-!
-      end subroutine set_div_force_labels
+      end subroutine set_div_force_names
 !
 ! ----------------------------------------------------------------------
 !

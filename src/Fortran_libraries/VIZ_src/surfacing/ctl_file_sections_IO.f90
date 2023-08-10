@@ -76,6 +76,7 @@
       type(section_controls), intent(inout) :: psf_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
 !
+      integer(kind = kint) :: n_append
 !
       if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(psf_ctls%psf_ctl_struct)) return
@@ -89,7 +90,8 @@
 !
         if(check_file_flag(c_buf, hd_block)                             &
      &      .or. check_begin_flag(c_buf, hd_block)) then
-          call append_new_section_control(psf_ctls)
+          n_append = psf_ctls%num_psf_ctl
+          call append_section_control(n_append, hd_block, psf_ctls)
 !
           call write_multi_ctl_file_message                             &
      &       (hd_block, psf_ctls%num_psf_ctl, c_buf%level)
@@ -216,7 +218,7 @@
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(cmp_no_case(file_name, 'NO_FILE')) then
+      if(no_file_flag(file_name)) then
         write(*,'(a)') ' is included.'
         call write_psf_control_data(id_control, hd_block,               &
      &                              psf_ctl_struct, level)

@@ -13,7 +13,9 @@ MOD_SOLVER_LU = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'SOLVER_LU_DIR =  $(SOLVER_LU_DIR)'       >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	''$$(AR)' '$$(ARFLUGS)' rcsv '$$@' '$$(MOD_SOLVER_LU)' >> $(MAKENAME)
 
 

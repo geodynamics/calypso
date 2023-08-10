@@ -20,8 +20,8 @@
 !!          'merged_gz':    gziopped text (formatted) data in merged file
 !!          'merged_bin_gz': gziopped binary data in merged file
 !!
-!!      integer(kind = kint) function num_label_file_fmt()
-!!      subroutine set_label_file_fmt(names)
+!!      subroutine set_label_file_fmt(array_c)
+!!        type(ctl_array_chara), intent(inout) :: array_c
 !!      subroutine cvt_default_field_format_flag(file_fmt_ctl)
 !!@endverbatim
 !
@@ -33,8 +33,6 @@
 !
       implicit none
 !
-!
-      integer(kind = kint), parameter :: n_label_file_fmt = 10
 !
 !>      flag parts for distributed ascii data
       character(len = kchara), parameter :: hd_ascii =  'ascii'
@@ -214,33 +212,26 @@
 ! -----------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      integer(kind = kint) function num_label_file_fmt()
-      num_label_file_fmt = n_label_file_fmt
-      return
-      end function num_label_file_fmt
+      subroutine set_label_file_fmt(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
 !
-! ----------------------------------------------------------------------
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
 !
-      subroutine set_label_file_fmt(names)
+      call append_c_to_ctl_array(hd_ascii, array_c)
+      call append_c_to_ctl_array(hd_binary, array_c)
+      call append_c_to_ctl_array(hd_gzip, array_c)
+      call append_c_to_ctl_array(hd_bin_gz, array_c)
+
+      call append_c_to_ctl_array(hd_merged, array_c)
+      call append_c_to_ctl_array(hd_merged_bin, array_c)
+      call append_c_to_ctl_array(hd_merged_gz, array_c)
+      call append_c_to_ctl_array(hd_merged_bin_gz, array_c)
 !
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_file_fmt)
-!
-!
-      call set_control_labels(hd_ascii,  names( 1))
-      call set_control_labels(hd_binary, names( 2))
-      call set_control_labels(hd_gzip,   names( 3))
-      call set_control_labels(hd_bin_gz, names( 4))
-!
-      call set_control_labels(hd_merged,        names( 5))
-      call set_control_labels(hd_merged_bin,    names( 6))
-      call set_control_labels(hd_merged_gz,     names( 7))
-      call set_control_labels(hd_merged_bin_gz, names( 8))
-!
-      call set_control_labels(hd_rayleigh, names( 9))
-      call set_control_labels(hd_rayleigh99, names(10))
+      call append_c_to_ctl_array(hd_rayleigh, array_c)
+      call append_c_to_ctl_array(hd_rayleigh99, array_c)
 !
       end subroutine set_label_file_fmt
 !

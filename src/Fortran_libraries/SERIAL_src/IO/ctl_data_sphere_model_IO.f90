@@ -7,16 +7,15 @@
 !>@brief  control data for resolutions of spherical shell
 !!
 !!@verbatim
+!!      subroutine init_ctl_shell_define_label(hd_block, spctl)
 !!      subroutine read_control_shell_define                            &
 !!     &         (id_control, hd_block, spctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(sphere_data_control), intent(inout) :: spctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
-!!      subroutine write_control_shell_define                           &
-!!     &         (id_control, hd_block, spctl, level)
+!!      subroutine write_control_shell_define(id_control, spctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(sphere_data_control), intent(in) :: spctl
 !!        integer(kind = kint), intent(inout) :: level
 !!
@@ -25,7 +24,7 @@
 !!
 !!  begin num_grid_sph
 !!! ----------------------------------------------------------------
-!!!   sph_coef_type_ctl:  grid type for spherical harmonics data
+!!!   sph_center_coef_ctl:  grid type for spherical harmonics data
 !!!         no_pole:      Coefficients on spherical shell only
 !!!         with_center:  Add center
 !!!   sph_grid_type_ctl:  grid type for mesh data
@@ -34,8 +33,8 @@
 !!!         with_center:  Add center
 !!! ----------------------------------------------------------------
 !!
-!!    sph_coef_type_ctl       no_pole
-!!    sph_grid_type_ctl       no_pole
+!!    sph_center_coef_ctl       no_pole
+!!    sph_grid_type_ctl         no_pole
 !!    truncation_level_ctl     4
 !!    longitude_symmetry_ctl   2
 !!    ngrid_meridonal_ctl     12
@@ -121,7 +120,7 @@
       character(len=kchara), parameter, private                         &
      &      ::  hd_phi_symmetry = 'longitude_symmetry_ctl'
       character(len=kchara), parameter, private                         &
-     &      ::  hd_sph_c_type =   'sph_coef_type_ctl'
+     &      ::  hd_sph_c_type =   'sph_center_coef_ctl'
       character(len=kchara), parameter, private                         &
      &      ::  hd_sph_g_type =   'sph_grid_type_ctl'
 !
@@ -159,6 +158,13 @@
       character(len=kchara), parameter, private                         &
      &      ::  hd_list_med_grp = 'meridional_layering_ctl'
 !
+!!    Deprecated flags
+!
+      character(len=kchara), parameter, private                         &
+     &      ::  hd_sph_ctl_type =   'sph_coef_type_ctl'
+!
+!
+!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -179,8 +185,9 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(spctl%i_shell_def .gt. 0) return
+      spctl%block_name = hd_block
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -197,6 +204,9 @@
 !
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_sph_c_type, spctl%sph_coef_type_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_sph_ctl_type, spctl%sph_coef_type_ctl)
+!
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_sph_g_type, spctl%sph_grid_type_ctl)
         call read_chara_ctl_type                                        &
@@ -247,8 +257,7 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_control_shell_define                             &
-     &         (id_control, hd_block, spctl, level)
+      subroutine write_control_shell_define(id_control, spctl, level)
 !
       use m_machine_parameter
       use t_read_control_elements
@@ -256,7 +265,6 @@
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(sphere_data_control), intent(in) :: spctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -290,61 +298,130 @@
       maxlen = max(maxlen, len_trim(hd_num_radial_grp))
       maxlen = max(maxlen, len_trim(hd_num_med_grp))
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 spctl%block_name)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_sph_c_type, spctl%sph_coef_type_ctl)
+     &    spctl%sph_coef_type_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_sph_g_type, spctl%sph_grid_type_ctl)
+     &    spctl%sph_grid_type_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_sph_truncate, spctl%ltr_ctl)
+     &    spctl%ltr_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_phi_symmetry, spctl%phi_symmetry_ctl)
+     &    spctl%phi_symmetry_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_ntheta_shell, spctl%ngrid_elevation_ctl)
+     &    spctl%ngrid_elevation_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_nphi_shell, spctl%ngrid_azimuth_ctl)
+     &    spctl%ngrid_azimuth_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_r_grid_type, spctl%radial_grid_type_ctl)
+     &    spctl%radial_grid_type_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_n_fluid_grid, spctl%num_fluid_grid_ctl)
+     &    spctl%num_fluid_grid_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_cheby_increment, spctl%increment_cheby_ctl)
+     &    spctl%increment_cheby_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_shell_size, spctl%fluid_core_size_ctl)
+     &    spctl%fluid_core_size_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_shell_ratio, spctl%ICB_to_CMB_ratio_ctl)
+     &    spctl%ICB_to_CMB_ratio_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_Min_radius, spctl%Min_radius_ctl)
+     &    spctl%Min_radius_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_ICB_radius, spctl%ICB_radius_ctl)
+     &    spctl%ICB_radius_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_CMB_radius, spctl%CMB_radius_ctl)
+     &    spctl%CMB_radius_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_Max_radius, spctl%Max_radius_ctl)
+     &    spctl%Max_radius_ctl)
 !
       call write_control_array_i_r(id_control, level,                   &
-     &    hd_numlayer_shell, spctl%radius_ctl)
+     &    spctl%radius_ctl)
       call write_control_array_r1(id_control, level,                    &
-     &    hd_add_external_layer, spctl%add_ext_layer_ctl)
+     &    spctl%add_ext_layer_ctl)
 !
       call write_control_array_c_i(id_control, level,                   &
-     &    hd_bc_sph, spctl%radial_grp_ctl)
+     &    spctl%radial_grp_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_num_radial_grp, spctl%num_radial_layer_ctl)
+     &    spctl%num_radial_layer_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_num_med_grp, spctl%num_med_layer_ctl)
+     &    spctl%num_med_layer_ctl)
 !
       call write_control_array_i2(id_control, level,                    &
-     &    hd_list_radial_grp, spctl%radial_layer_list_ctl)
+     &    spctl%radial_layer_list_ctl)
       call write_control_array_i2(id_control, level,                    &
-     &    hd_list_med_grp, spctl%med_layer_list_ctl)
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+     &    spctl%med_layer_list_ctl)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                spctl%block_name)
 !
       end subroutine write_control_shell_define
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_ctl_shell_define_label(hd_block, spctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+!
+      type(sphere_data_control), intent(inout) :: spctl
+!
+!
+      spctl%block_name = hd_block
+!
+        call init_i_r_array_label                                       &
+     &     (hd_numlayer_shell, spctl%radius_ctl)
+        call init_c_i_array_label                                       &
+     &     (hd_bc_sph, spctl%radial_grp_ctl)
+        call init_real_ctl_array_label                                  &
+     &     (hd_add_external_layer, spctl%add_ext_layer_ctl)
+!
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_sph_c_type, spctl%sph_coef_type_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_sph_g_type, spctl%sph_grid_type_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_r_grid_type, spctl%radial_grid_type_ctl)
+!
+        call init_int_ctl_item_label                                    &
+     &     (hd_phi_symmetry, spctl%phi_symmetry_ctl)
+        call init_int_ctl_item_label                                    &
+     &     (hd_sph_truncate, spctl%ltr_ctl)
+        call init_int_ctl_item_label                                    &
+     &     (hd_ntheta_shell, spctl%ngrid_elevation_ctl)
+        call init_int_ctl_item_label                                    &
+     &     (hd_nphi_shell, spctl%ngrid_azimuth_ctl)
+!
+        call init_int_ctl_item_label                                    &
+     &     (hd_n_fluid_grid, spctl%num_fluid_grid_ctl)
+        call init_int_ctl_item_label                                    &
+     &     (hd_cheby_increment, spctl%increment_cheby_ctl)
+!
+!
+        call init_real_ctl_item_label                                   &
+     &     (hd_Min_radius, spctl%Min_radius_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_ICB_radius, spctl%ICB_radius_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_CMB_radius, spctl%CMB_radius_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_Max_radius, spctl%Max_radius_ctl)
+!
+        call init_real_ctl_item_label                                   &
+     &     (hd_shell_size, spctl%fluid_core_size_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_shell_ratio, spctl%ICB_to_CMB_ratio_ctl)
+!
+        call init_int_ctl_item_label                                    &
+     &     (hd_num_radial_grp, spctl%num_radial_layer_ctl)
+        call init_int_ctl_item_label                                    &
+     &     (hd_num_med_grp, spctl%num_med_layer_ctl)
+!
+        call init_int2_ctl_array_label                                  &
+     &     (hd_list_radial_grp, spctl%radial_layer_list_ctl)
+        call init_int2_ctl_array_label                                  &
+     &     (hd_list_med_grp, spctl%med_layer_list_ctl)
+!
+      end subroutine init_ctl_shell_define_label
 !
 !   --------------------------------------------------------------------
 !

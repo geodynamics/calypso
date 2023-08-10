@@ -7,14 +7,14 @@
 !>@brief  Control data of node monitoring
 !!
 !!@verbatim
+!!      subroutine init_monitor_data_ctl_label(hd_block, nmtr_ctl)
 !!      subroutine read_monitor_data_ctl                                &
 !!     &         (id_control, hd_block, nmtr_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(node_monitor_control), intent(inout) :: nmtr_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
-!!      subroutine write_monitor_data_ctl                               &
-!!     &         (id_control, hd_block, nmtr_ctl, level)
+!!      subroutine write_monitor_data_ctl(id_control, nmtr_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(node_monitor_control), intent(in) :: nmtr_ctl
@@ -56,6 +56,8 @@
 !
 !
       type node_monitor_control
+!>        Block name
+        character(len=kchara) :: block_name = 'monitor_data_ctl'
 !>        Structure for monitoring plave list
 !!@n       xx_4_monitor_ctl%vec1: X position
 !!@n       xx_4_monitor_ctl%vec2: Y position
@@ -100,8 +102,9 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(nmtr_ctl%i_monitor_data .gt. 0) return
+      nmtr_ctl%block_name = hd_block
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -120,15 +123,13 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_monitor_data_ctl                                 &
-     &         (id_control, hd_block, nmtr_ctl, level)
+      subroutine write_monitor_data_ctl(id_control, nmtr_ctl, level)
 !
       use t_read_control_elements
       use skip_comment_f
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(node_monitor_control), intent(in) :: nmtr_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -136,16 +137,35 @@
 !
       if(nmtr_ctl%i_monitor_data .le. 0) return
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
-      call write_control_array_c1(id_control, level,                   &
-     &    hd_monitor_grp, nmtr_ctl%group_4_monitor_ctl)
-      call write_control_array_r3(id_control, level,                   &
-     &    hd_monitor_position, nmtr_ctl%xx_4_monitor_ctl)
-      call write_control_array_i2(id_control, level,                   &
-     &    hd_monitor_node, nmtr_ctl%node_4_monitor_ctl)
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 nmtr_ctl%block_name)
+      call write_control_array_c1(id_control, level,                    &
+     &    nmtr_ctl%group_4_monitor_ctl)
+      call write_control_array_r3(id_control, level,                    &
+     &    nmtr_ctl%xx_4_monitor_ctl)
+      call write_control_array_i2(id_control, level,                    &
+     &    nmtr_ctl%node_4_monitor_ctl)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                 nmtr_ctl%block_name)
 !
       end subroutine write_monitor_data_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_monitor_data_ctl_label(hd_block, nmtr_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(node_monitor_control), intent(inout) :: nmtr_ctl
+!
+      nmtr_ctl%block_name = hd_block
+!
+        call init_chara_ctl_array_label                                 &
+     &     (hd_monitor_grp, nmtr_ctl%group_4_monitor_ctl)
+        call init_r3_ctl_array_label                                    &
+     &     (hd_monitor_position, nmtr_ctl%xx_4_monitor_ctl)
+        call init_int2_ctl_array_label                                  &
+     &     (hd_monitor_node, nmtr_ctl%node_4_monitor_ctl)
+!
+      end subroutine init_monitor_data_ctl_label
 !
 !   --------------------------------------------------------------------
 !

@@ -12,8 +12,8 @@
 !!      logical function check_flux_tensors(field_name)
 !!      logical function check_asym_flux_tensors(field_name)
 !!
-!!      integer(kind = kint) function num_base_forces()
-!!      subroutine set_base_force_labels(n_comps, names, maths)
+!!      subroutine set_base_force_names_to_ctl(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  Base force names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -66,8 +66,6 @@
 !
       implicit  none
 ! 
-      integer(kind = kint), parameter, private :: nforce_base = 21
-!
 !>        Field label for pressure gradient
 !!         @f$ \partial_{i} p @f$
       type(field_def), parameter :: pressure_gradient                   &
@@ -276,70 +274,37 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_base_forces()
-      num_base_forces = nforce_base
-      return
-      end function num_base_forces
+      subroutine set_base_force_names_to_ctl(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      subroutine set_base_force_labels(n_comps, names, maths)
+      call set_field_label_to_ctl(pressure_gradient,  array_c2i)
+      call set_field_label_to_ctl(inertia,            array_c2i)
+      call set_field_label_to_ctl(Coriolis_force,     array_c2i)
+      call set_field_label_to_ctl(Lorentz_force,      array_c2i)
+      call set_field_label_to_ctl(magnetic_tension,   array_c2i)
+      call set_field_label_to_ctl(buoyancy,           array_c2i)
+      call set_field_label_to_ctl(composite_buoyancy, array_c2i)
+      call set_field_label_to_ctl(magnetic_induction, array_c2i)
+      call set_field_label_to_ctl(vecp_induction,     array_c2i)
+      call set_field_label_to_ctl(magnetic_stretch,   array_c2i)
+      call set_field_label_to_ctl(heat_advect,        array_c2i)
+      call set_field_label_to_ctl(pert_heat_advect,   array_c2i)
+      call set_field_label_to_ctl(composition_advect, array_c2i)
+      call set_field_label_to_ctl(pert_comp_advect,   array_c2i)
+      call set_field_label_to_ctl(momentum_flux,      array_c2i)
+      call set_field_label_to_ctl(maxwell_tensor,     array_c2i)
+      call set_field_label_to_ctl(induction_tensor,   array_c2i)
+      call set_field_label_to_ctl(heat_flux,          array_c2i)
+      call set_field_label_to_ctl(pert_heat_flux,     array_c2i)
+      call set_field_label_to_ctl(composite_flux,     array_c2i)
+      call set_field_label_to_ctl(pert_comp_flux,     array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(nforce_base)
-      character(len = kchara), intent(inout) :: names(nforce_base)
-      character(len = kchara), intent(inout) :: maths(nforce_base)
-!
-!
-      call set_field_labels(pressure_gradient,                          &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(inertia,                                    &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(Coriolis_force,                             &
-     &    n_comps( 3), names( 3), maths( 3))
-!
-      call set_field_labels(Lorentz_force,                              &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(magnetic_tension,                           &
-     &    n_comps( 5), names( 5), maths( 5))
-!
-      call set_field_labels(buoyancy,                                   &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(composite_buoyancy,                         &
-     &    n_comps( 7), names( 7), maths( 7))
-!
-      call set_field_labels(magnetic_induction,                         &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(vecp_induction,                             &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(magnetic_stretch,                           &
-     &    n_comps(10), names(10), maths(10))
-!
-      call set_field_labels(heat_advect,                                &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(pert_heat_advect,                           &
-     &    n_comps(12), names(12), maths(12))
-      call set_field_labels(composition_advect,                         &
-     &    n_comps(13), names(13), maths(13))
-      call set_field_labels(pert_comp_advect,                           &
-     &    n_comps(14), names(14), maths(14))
-!
-      call set_field_labels(momentum_flux,                              &
-     &    n_comps(15), names(15), maths(15))
-      call set_field_labels(maxwell_tensor,                             &
-     &    n_comps(16), names(16), maths(16))
-      call set_field_labels(induction_tensor,                           &
-     &    n_comps(17), names(17), maths(17))
-!
-      call set_field_labels(heat_flux,                                  &
-     &    n_comps(18), names(18), maths(18))
-      call set_field_labels(pert_heat_flux,                             &
-     &    n_comps(19), names(19), maths(19))
-      call set_field_labels(composite_flux,                             &
-     &    n_comps(20), names(20), maths(20))
-      call set_field_labels(pert_comp_flux,                             &
-     &    n_comps(21), names(21), maths(21))
-!
-      end subroutine set_base_force_labels
+      end subroutine set_base_force_names_to_ctl
 !
 ! ----------------------------------------------------------------------
 !

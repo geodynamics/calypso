@@ -23,6 +23,7 @@
 !
       use m_precision
       use m_machine_parameter
+      use calypso_mpi
 !
       use t_mesh_data
       use t_group_data
@@ -48,7 +49,6 @@
       subroutine s_set_iso_control(num_iso, group, nod_fld,             &
      &          iso_ctls, iso_param, iso_def, iso_mesh, iso_file_IO)
 !
-      use calypso_mpi
       use t_read_control_elements
       use t_control_data_isosurfaces
       use t_control_data_sections
@@ -161,6 +161,8 @@
      &         (iso_c, ele_grp, num_nod_phys, phys_nod_name,            &
      &          iso_fld, iso_param, iso_def)
 !
+      use m_error_IDs
+!
       type(group_data), intent(in) :: ele_grp
 !
       integer(kind = kint), intent(in) :: num_nod_phys
@@ -171,10 +173,16 @@
       type(psf_parameters), intent(inout) :: iso_param
       type(isosurface_define), intent(inout) :: iso_def
 !
+      integer(kind = kint) :: ierr
+!
 !
       call alloc_area_group_psf(iso_param)
       call set_control_iso_def(iso_c%iso_def_c, ele_grp,                &
-     &    num_nod_phys, phys_nod_name, iso_param, iso_def)
+     &    num_nod_phys, phys_nod_name, iso_param, iso_def, ierr)
+      if(ierr .gt. 0) then
+        call calypso_MPI_abort(ierr_VIZ, 'set scalar for rendering')
+      end if
+!
 !
       call set_control_4_field_on_iso                                   &
      &   (iso_c%fld_on_iso_c, num_nod_phys, phys_nod_name,              &

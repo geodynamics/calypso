@@ -135,7 +135,7 @@
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(cmp_no_case(fname_sect_ctl,'NO_FILE')) then
+      if(no_file_flag(fname_sect_ctl)) then
         call write_section_def_control(id_control, hd_block,            &
      &                                 psf_def_c, level)
       else if(id_control .eq. id_monitor) then

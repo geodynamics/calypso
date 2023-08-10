@@ -410,8 +410,7 @@
      &   (smonitor_ctl%typ_scale_file_prefix_ctl,                       &
      &    smonitor_ctl%typ_scale_file_format_ctl, rj_fld, monitor%tsl)
 !
-      call set_control_circles_def(smonitor_ctl%circ_ctls,              &
-     &                             monitor%mul_circle)
+      call set_control_circles_def(smonitor_ctl, monitor%mul_circle)
 !
       end subroutine set_control_SPH_MHD_monitors
 !

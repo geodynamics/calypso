@@ -48,7 +48,7 @@ time_ave_sph_monitor_data.o: $(SPH_UTILS_DIR)/time_ave_sph_monitor_data.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 time_ave_sph_volume_mean.o: $(SPH_UTILS_DIR)/time_ave_sph_volume_mean.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o t_sph_volume_mean_series.o count_monitor_time_series.o sph_monitor_data_text.o set_parallel_file_name.o sph_volume_monitor_snap_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-time_average_sph_ene_spectr.o: $(SPH_UTILS_DIR)/time_average_sph_ene_spectr.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_tave_sph_volume_spectr.o time_ave_sph_volume_mean.o time_ave_sph_monitor_data.o t_tave_sph_layer_mean.o tave_sdev_sph_layer_mean.o t_tave_sph_layer_spectr.o tave_sdev_sph_layer_spec.o tave_sdev_sph_volume_spec.o count_monitor_time_series.o
+time_average_sph_ene_spectr.o: $(SPH_UTILS_DIR)/time_average_sph_ene_spectr.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_tave_sph_volume_spectr.o count_monitor_time_series.o time_ave_sph_volume_mean.o time_ave_sph_monitor_data.o t_tave_sph_layer_mean.o tave_sdev_sph_layer_mean.o t_tave_sph_layer_spectr.o tave_sdev_sph_layer_spec.o tave_sdev_sph_volume_spec.o
 	$(F90) -c $(F90OPTFLAGS) $<
 write_snap_pick_sph_spectr.o: $(SPH_UTILS_DIR)/write_snap_pick_sph_spectr.f90 m_precision.o m_constants.o t_pickup_sph_spectr_data.o t_picked_sph_spectr_data_IO.o t_buffer_4_gzip.o m_monitor_file_labels.o write_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<

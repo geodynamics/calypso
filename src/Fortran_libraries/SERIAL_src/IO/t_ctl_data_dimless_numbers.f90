@@ -8,16 +8,15 @@
 !!@n        Modified by H. Matsui on Merch, 2006
 !!
 !!@verbatim
+!!      subroutine init_dimless_ctl_label(hd_block, dless_ctl)
 !!      subroutine read_dimless_ctl                                     &
 !!     &         (id_control, hd_block, dless_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(dimless_control), intent(inout) :: dless_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
-!!      subroutine write_dimless_ctl                                    &
-!!     &         (id_control, hd_block, dless_ctl, level)
+!!      subroutine write_dimless_ctl(id_control, dless_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(dimless_control), intent(in) :: dless_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!      subroutine dealloc_dimless_ctl(dless_ctl)
@@ -62,6 +61,8 @@
 !
 !>        Structure for list of dimensionless numbers
       type dimless_control
+!>        Block name
+        character(len=kchara) :: block_name = 'dimensionless_ctl'
 !>        Structure for list of dimensionless numbers
 !!@n        dimless%c_tbl:  Name of each number 
 !!@n        dimless%vect:   valus of each number
@@ -91,8 +92,9 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(dless_ctl%i_dimless_ctl .gt. 0) return
+      dless_ctl%block_name = trim(hd_block)
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -107,13 +109,11 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_dimless_ctl                                      &
-     &         (id_control, hd_block, dless_ctl, level)
+      subroutine write_dimless_ctl(id_control, dless_ctl, level)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(dimless_control), intent(in) :: dless_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -121,12 +121,24 @@
 !
       if(dless_ctl%i_dimless_ctl .le. 0) return
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 dless_ctl%block_name)
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_dimless, dless_ctl%dimless)
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+     &    dless_ctl%dimless)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                dless_ctl%block_name)
 !
       end subroutine write_dimless_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_dimless_ctl_label(hd_block, dless_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(dimless_control), intent(inout) :: dless_ctl
+!
+      dless_ctl%block_name = trim(hd_block)
+        call init_c_r_ctl_array_label(hd_dimless, dless_ctl%dimless)
+      end subroutine init_dimless_ctl_label
 !
 !   --------------------------------------------------------------------
 !

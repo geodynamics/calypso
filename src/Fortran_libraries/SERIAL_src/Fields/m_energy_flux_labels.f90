@@ -10,8 +10,8 @@
 !!@verbatim
 !!      logical function check_enegy_fluxes(field_name)
 !!
-!!      integer(kind = kint) function num_energy_fluxes()
-!!      subroutine set_energy_flux_names(n_comps, names, maths)
+!!      subroutine set_energy_flux_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !! !!!!!  energy flux names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !! field names  [address]
@@ -62,9 +62,6 @@
 !
       implicit  none
 ! 
-!
-      integer(kind = kint), parameter, private :: nene_flux = 14
-!
 !>        Field label of work of inertia
 !!         @f$ -u_{i} (e_{ijk} \omega_{j} u_{k}) @f$
       type(field_def), parameter :: inertia_work                        &
@@ -200,51 +197,28 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_energy_fluxes()
-      num_energy_fluxes = nene_flux
-      return
-      end function num_energy_fluxes
+      subroutine set_energy_flux_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      subroutine set_energy_flux_names(n_comps, names, maths)
-!
-      integer(kind = kint_4b), intent(inout) :: n_comps(nene_flux)
-      character(len = kchara), intent(inout) :: names(nene_flux)
-      character(len = kchara), intent(inout) :: maths(nene_flux)
-!
-!
-      call set_field_labels(inertia_work,                               &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(work_against_Lorentz,                       &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(Lorentz_work,                               &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(mag_tension_work,                           &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(buoyancy_flux,                              &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(composite_buoyancy_flux,                    &
-     &    n_comps( 6), names( 6), maths( 6))
-!
-      call set_field_labels(magnetic_ene_generation,                    &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(magnetic_stretch_flux,                      &
-     &    n_comps( 8), names( 8), maths( 8))
-!
-      call set_field_labels(temp_generation,                            &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(pert_temp_generation,                       &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(comp_generation,                            &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(pert_comp_generation,                       &
-     &    n_comps(12), names(12), maths(12))
-!
-      call set_field_labels(viscous_ene_diffusion,                      &
-     &    n_comps(13), names(13), maths(13))
-      call set_field_labels(magnetic_ene_diffusion,                     &
-     &    n_comps(14), names(14), maths(14))
+      call set_field_label_to_ctl(inertia_work,             array_c2i)
+      call set_field_label_to_ctl(work_against_Lorentz,     array_c2i)
+      call set_field_label_to_ctl(Lorentz_work,             array_c2i)
+      call set_field_label_to_ctl(mag_tension_work,         array_c2i)
+      call set_field_label_to_ctl(buoyancy_flux,            array_c2i)
+      call set_field_label_to_ctl(composite_buoyancy_flux,  array_c2i)
+      call set_field_label_to_ctl(magnetic_ene_generation,  array_c2i)
+      call set_field_label_to_ctl(magnetic_stretch_flux,    array_c2i)
+      call set_field_label_to_ctl(temp_generation,          array_c2i)
+      call set_field_label_to_ctl(pert_temp_generation,     array_c2i)
+      call set_field_label_to_ctl(comp_generation,          array_c2i)
+      call set_field_label_to_ctl(pert_comp_generation,     array_c2i)
+      call set_field_label_to_ctl(viscous_ene_diffusion,    array_c2i)
+      call set_field_label_to_ctl(magnetic_ene_diffusion,   array_c2i)
 !
       end subroutine set_energy_flux_names
 !

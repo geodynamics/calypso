@@ -8,17 +8,12 @@
 !> @brief Control input routine for time step parameters
 !!
 !!@verbatim
-!!
+!!      subroutine init_ctl_time_step_label(hd_block, tctl)
 !!      subroutine read_control_time_step_data                          &
 !!     &         (id_control, hd_block, tctl, c_buf)
 !!        type(time_data_control), intent(inout) :: tctl
-!!      subroutine write_control_time_step_data                         &
-!!     &         (id_control, hd_block, tctl, level)
+!!      subroutine write_control_time_step_data(id_control, tctl, level)
 !!        type(time_data_control), intent(in) :: tctl
-!!
-!!      integer(kind = kint) function num_label_time_step_ctl()
-!!      integer(kind = kint) function num_label_time_step_ctl_w_dep()
-!!      subroutine set_label_time_step_ctl(names)
 !! ------------------------------------------------------------------
 !!      Example of control parameters for flexible time step
 !!
@@ -195,11 +190,6 @@
       character(len=kchara), parameter, private                         &
      &       :: hd_i_step_iso =       'i_step_iso_ctl'
 !
-      integer(kind = kint), parameter, private                          &
-     &                      :: n_label_time_step_ctl =       39
-      integer(kind = kint), parameter, private                          &
-     &                      :: n_label_time_step_ctl_w_dep = 41
-!
 ! -----------------------------------------------------------------------
 !
       contains
@@ -219,8 +209,9 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(tctl%i_tstep .gt. 0) return
+      tctl%block_name = hd_block
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -334,14 +325,12 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_control_time_step_data                           &
-     &         (id_control, hd_block, tctl, level)
+      subroutine write_control_time_step_data(id_control, tctl, level)
 !
       use t_read_control_elements
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(time_data_control), intent(in) :: tctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -393,182 +382,218 @@
       maxlen = max(maxlen, len_trim(hd_end_rst_step))
       maxlen = max(maxlen, len_trim(hd_flexible_step))
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 tctl%block_name)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_elapsed_time, tctl%elapsed_time_ctl)
+     &    tctl%elapsed_time_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_init, tctl%i_step_init_ctl)
+     &    tctl%i_step_init_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_finish_number, tctl%i_step_number_ctl)
+     &    tctl%i_step_number_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_check, tctl%i_step_check_ctl)
+     &    tctl%i_step_check_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_rst, tctl%i_step_rst_ctl)
+     &    tctl%i_step_rst_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_section, tctl%i_step_psf_ctl)
+     &    tctl%i_step_psf_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_isosurf,  tctl%i_step_iso_ctl)
+     &     tctl%i_step_iso_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_map_projection, tctl%i_step_map_ctl)
+     &    tctl%i_step_map_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_pvr, tctl%i_step_pvr_ctl)
+     &    tctl%i_step_pvr_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_fline, tctl%i_step_fline_ctl)
+     &    tctl%i_step_fline_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_lic, tctl%i_step_lic_ctl)
+     &    tctl%i_step_lic_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_ucd, tctl%i_step_ucd_ctl)
+     &    tctl%i_step_ucd_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_monitor, tctl%i_step_monitor_ctl)
+     &    tctl%i_step_monitor_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_dt, tctl%dt_ctl)
+     &    tctl%dt_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_time_init, tctl%time_init_ctl)
+     &    tctl%time_init_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_min_delta_t, tctl%min_delta_t_ctl)
+     &    tctl%min_delta_t_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_max_delta_t, tctl%max_delta_t_ctl)
+     &    tctl%max_delta_t_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_max_eps_to_shrink, tctl%max_eps_to_shrink_ctl)
+     &    tctl%max_eps_to_shrink_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_min_eps_to_expand, tctl%min_eps_to_expand_ctl)
+     &    tctl%min_eps_to_expand_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_check, tctl%delta_t_check_ctl)
+     &    tctl%delta_t_check_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_rst, tctl%delta_t_rst_ctl)
+     &    tctl%delta_t_rst_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_section, tctl%delta_t_psf_ctl)
+     &    tctl%delta_t_psf_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_isosurf, tctl%delta_t_iso_ctl)
+     &    tctl%delta_t_iso_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_map_projection, tctl%delta_t_map_ctl)
+     &    tctl%delta_t_map_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_pvr, tctl%delta_t_pvr_ctl)
+     &    tctl%delta_t_pvr_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_fline, tctl%delta_t_fline_ctl)
+     &    tctl%delta_t_fline_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_lic, tctl%delta_t_lic_ctl)
+     &    tctl%delta_t_lic_ctl)
 !
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_ucd, tctl%delta_t_field_ctl)
+     &    tctl%delta_t_field_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_monitor, tctl%delta_t_monitor_ctl)
+     &    tctl%delta_t_monitor_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_sgs_coefs, tctl%delta_t_sgs_coefs_ctl)
+     &    tctl%delta_t_sgs_coefs_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_boundary, tctl%delta_t_boundary_ctl)
+     &    tctl%delta_t_boundary_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_ratio_to_cfl, tctl%ratio_to_cfl_ctl)
-!
-      call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_sgs_coefs, tctl%i_step_sgs_coefs_ctl)
-      call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_boundary, tctl%i_step_boundary_ctl)
+     &    tctl%ratio_to_cfl_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_diff_steps, tctl%i_diff_steps_ctl)
+     &    tctl%i_step_sgs_coefs_ctl)
+      call write_integer_ctl_type(id_control, level, maxlen,            &
+     &    tctl%i_step_boundary_ctl)
 !
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_start_rst_step, tctl%start_rst_step_ctl)
+     &    tctl%i_diff_steps_ctl)
+!
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_end_rst_step, tctl%end_rst_step_ctl)
+     &    tctl%start_rst_step_ctl)
+      call write_integer_ctl_type(id_control, level, maxlen,            &
+     &    tctl%end_rst_step_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_flexible_step, tctl%flexible_step_ctl)
+     &    tctl%flexible_step_ctl)
 !
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                tctl%block_name)
 !
       end subroutine write_control_time_step_data
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
 !
-      integer(kind = kint) function num_label_time_step_ctl()
-      num_label_time_step_ctl = n_label_time_step_ctl
-      return
-      end function num_label_time_step_ctl
+      subroutine init_ctl_time_step_label(hd_block, tctl)
 !
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_time_step_ctl_w_dep()
-      num_label_time_step_ctl_w_dep = n_label_time_step_ctl_w_dep
-      return
-      end function num_label_time_step_ctl_w_dep
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_time_step_ctl(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_time_step_ctl_w_dep)
+      character(len=kchara), intent(in) :: hd_block
+      type(time_data_control), intent(inout) :: tctl
 !
 !
-      call set_control_labels(hd_elapsed_time,  names( 1))
-      call set_control_labels(hd_time_init,     names( 2))
-      call set_control_labels(hd_dt,            names( 3))
+      tctl%block_name = hd_block
 !
-      call set_control_labels(hd_i_step_init,     names( 4))
-      call set_control_labels(hd_i_finish_number, names( 5))
-      call set_control_labels(hd_i_step_check,    names( 6))
-      call set_control_labels(hd_i_step_rst,      names( 7))
+        call init_real_ctl_item_label                                   &
+     &     (hd_elapsed_time, tctl%elapsed_time_ctl)
 !
-      call set_control_labels(hd_i_step_section, names( 8))
-      call set_control_labels(hd_i_step_isosurf, names( 9))
-      call set_control_labels(hd_i_step_isosurf, names(10))
-      call set_control_labels(hd_i_step_pvr,     names(11))
-      call set_control_labels(hd_i_step_fline,   names(12))
-      call set_control_labels(hd_i_step_lic,     names(13))
+        call init_real_ctl_item_label(hd_dt, tctl%dt_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_time_init, tctl%time_init_ctl)
 !
-      call set_control_labels(hd_i_step_ucd,       names(14))
-      call set_control_labels(hd_i_step_monitor,   names(15))
-      call set_control_labels(hd_i_step_sgs_coefs, names(16))
-      call set_control_labels(hd_i_step_boundary,  names(17))
-      call set_control_labels(hd_i_diff_steps,     names(18))
+        call init_real_ctl_item_label(hd_min_delta_t,                   &
+     &      tctl%min_delta_t_ctl)
+        call init_real_ctl_item_label(hd_max_delta_t,                   &
+     &      tctl%max_delta_t_ctl)
+        call init_real_ctl_item_label(hd_max_eps_to_shrink,             &
+     &      tctl%max_eps_to_shrink_ctl)
+        call init_real_ctl_item_label(hd_min_eps_to_expand,             &
+     &      tctl%min_eps_to_expand_ctl)
+!
+        call init_real_ctl_item_label(hd_delta_t_check,                 &
+     &      tctl%delta_t_check_ctl)
+        call init_real_ctl_item_label(hd_delta_t_rst,                   &
+     &      tctl%delta_t_rst_ctl)
+!
+        call init_real_ctl_item_label(hd_delta_t_section,               &
+     &      tctl%delta_t_psf_ctl)
+        call init_real_ctl_item_label(hd_delta_t_isosurf,               &
+     &      tctl%delta_t_iso_ctl)
+        call init_real_ctl_item_label(hd_delta_t_map_projection,        &
+     &      tctl%delta_t_map_ctl)
+!
+        call init_real_ctl_item_label(hd_delta_t_pvr,                   &
+     &      tctl%delta_t_pvr_ctl)
+        call init_real_ctl_item_label(hd_delta_t_fline,                 &
+     &      tctl%delta_t_fline_ctl)
+        call init_real_ctl_item_label(hd_delta_t_lic,                   &
+     &      tctl%delta_t_lic_ctl)
+!
+        call init_real_ctl_item_label(hd_delta_t_ucd,                   &
+     &      tctl%delta_t_field_ctl)
+        call init_real_ctl_item_label(hd_delta_t_monitor,               &
+     &      tctl%delta_t_monitor_ctl)
+        call init_real_ctl_item_label(hd_delta_t_sgs_coefs,             &
+     &      tctl%delta_t_sgs_coefs_ctl)
+        call init_real_ctl_item_label(hd_delta_t_boundary,              &
+     &      tctl%delta_t_boundary_ctl)
+!
+        call init_real_ctl_item_label(hd_ratio_to_cfl,                  &
+     &      tctl%ratio_to_cfl_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_init,                    &
+     &      tctl%i_step_init_ctl)
+        call init_int_ctl_item_label(hd_i_step_number,                  &
+     &      tctl%i_step_number_ctl)
+        call init_int_ctl_item_label(hd_i_finish_number,                &
+     &      tctl%i_step_number_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_check,                   &
+     &      tctl%i_step_check_ctl)
+        call init_int_ctl_item_label(hd_i_step_rst,                     &
+     &      tctl%i_step_rst_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_section,                 &
+     &      tctl%i_step_psf_ctl)
+        call init_int_ctl_item_label(hd_i_step_psf,                     &
+     &      tctl%i_step_psf_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_isosurf,                 &
+     &      tctl%i_step_iso_ctl)
+        call init_int_ctl_item_label(hd_i_step_iso,                     &
+     &      tctl%i_step_iso_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_map_projection,          &
+     &      tctl%i_step_map_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_pvr,                     &
+     &      tctl%i_step_pvr_ctl)
+        call init_int_ctl_item_label(hd_i_step_lic,                     &
+     &      tctl%i_step_lic_ctl)
+        call init_int_ctl_item_label(hd_i_step_fline,                   &
+     &      tctl%i_step_fline_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_ucd,                     &
+     &      tctl%i_step_ucd_ctl)
+        call init_int_ctl_item_label(hd_i_step_monitor,                 &
+     &      tctl%i_step_monitor_ctl)
+!
+        call init_int_ctl_item_label(hd_i_step_sgs_coefs,               &
+     &      tctl%i_step_sgs_coefs_ctl)
+        call init_int_ctl_item_label(hd_i_step_boundary,                &
+     &      tctl%i_step_boundary_ctl)
+!
+        call init_int_ctl_item_label(hd_i_diff_steps,                   &
+     &      tctl%i_diff_steps_ctl)
+!
+        call init_int_ctl_item_label(hd_start_rst_step,                 &
+     &      tctl%start_rst_step_ctl)
+        call init_int_ctl_item_label(hd_end_rst_step,                   &
+     &      tctl%end_rst_step_ctl)
 !
 !
-      call set_control_labels(hd_flexible_step,      names(19))
-      call set_control_labels(hd_min_delta_t,        names(20))
-      call set_control_labels(hd_max_delta_t,        names(21))
-      call set_control_labels(hd_max_eps_to_shrink,  names(22))
-      call set_control_labels(hd_min_eps_to_expand,  names(23))
+        call init_chara_ctl_item_label(hd_flexible_step,                &
+     &      tctl%flexible_step_ctl)
 !
-      call set_control_labels(hd_ratio_to_cfl,       names(24))
-
-      call set_control_labels(hd_start_rst_step,     names(25))
-      call set_control_labels(hd_end_rst_step,       names(26))
+      end subroutine init_ctl_time_step_label
 !
-      call set_control_labels(hd_delta_t_check,   names(27))
-      call set_control_labels(hd_delta_t_rst,     names(28))
-!
-      call set_control_labels(hd_delta_t_section,        names(29))
-      call set_control_labels(hd_delta_t_isosurf,        names(30))
-      call set_control_labels(hd_delta_t_map_projection, names(31))
-      call set_control_labels(hd_delta_t_pvr,            names(32))
-      call set_control_labels(hd_delta_t_fline,          names(33))
-      call set_control_labels(hd_delta_t_lic,            names(34))
-!
-      call set_control_labels(hd_delta_t_ucd,        names(35))
-      call set_control_labels(hd_delta_t_monitor,    names(36))
-      call set_control_labels(hd_delta_t_sgs_coefs,  names(37))
-      call set_control_labels(hd_delta_t_boundary,   names(38))
-!
-!
-      call set_control_labels(hd_i_step_number,     names(39))
-      call set_control_labels(hd_i_step_psf,        names(40))
-      call set_control_labels(hd_i_step_iso,        names(41))
-!
-      end subroutine set_label_time_step_ctl
-!
-!  ---------------------------------------------------------------------
+!   --------------------------------------------------------------------
 !
       end module ctl_data_4_time_steps_IO

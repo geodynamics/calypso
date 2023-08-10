@@ -9,11 +9,12 @@
 !!@verbatim
 !!      subroutine dealloc_ndomain_rtp_ctl(sdctl)
 !!
+!!      subroutine init_ctl_shell_domain_label(hd_block, sdctl)
 !!      subroutine read_control_shell_domain                            &
 !!     &         (id_control, hd_block, sdctl, c_buf)
 !!        type(sphere_domain_control), intent(inout) :: sdctl
-!!      subroutine write_control_shell_domain                           &
-!!     &         (id_file, hd_block, sdctl, level)
+!!      subroutine write_control_shell_domain(id_file, sdctl, level)
+!!        type(sphere_domain_control), intent(in) :: sdctl
 !!
 !!  ---------------------------------------------------------------------
 !!    example of control data
@@ -67,6 +68,8 @@
 !
 !>      control data structure for spherical shell parallelization
       type sphere_domain_control
+!>        Block name
+        character(len=kchara) :: block_name = 'num_domain_ctl'
 !>        Orsering set control
         type(read_character_item) :: indices_ordering_set
 !
@@ -177,8 +180,9 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(sdctl%i_domains_sph .gt. 0) return
+      sdctl%block_name = hd_block
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -222,14 +226,12 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_control_shell_domain                             &
-     &         (id_file, hd_block, sdctl, level)
+      subroutine write_control_shell_domain(id_file, sdctl, level)
 !
       use t_read_control_elements
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file
-      character(len=kchara), intent(in) :: hd_block
       type(sphere_domain_control), intent(in) :: sdctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -243,26 +245,69 @@
       maxlen = max(maxlen, len_trim(hd_num_radial_domain))
       maxlen = max(maxlen, len_trim(hd_num_horiz_domain))
 !
-      level = write_begin_flag_for_ctl(id_file, level, hd_block)
+      level = write_begin_flag_for_ctl(id_file, level,sdctl%block_name)
 !
       call write_chara_ctl_type(id_file, level, maxlen,                 &
-     &    hd_inner_decomp, sdctl%inner_decomp_ctl)
+     &    sdctl%inner_decomp_ctl)
 !
       call write_integer_ctl_type(id_file, level, maxlen,               &
-     &    hd_num_radial_domain, sdctl%num_radial_domain_ctl)
+     &    sdctl%num_radial_domain_ctl)
       call write_integer_ctl_type(id_file, level, maxlen,               &
-     &    hd_num_horiz_domain, sdctl%num_horiz_domain_ctl)
+     &    sdctl%num_horiz_domain_ctl)
 !
       call write_control_array_c_i(id_file, level,                      &
-     &    hd_ndomain_rtp, sdctl%ndomain_sph_grid_ctl)
+     &    sdctl%ndomain_sph_grid_ctl)
       call write_control_array_c_i(id_file, level,                      &
-     &    hd_ndomain_rtm, sdctl%ndomain_legendre_ctl)
+     &    sdctl%ndomain_legendre_ctl)
       call write_control_array_c_i(id_file, level,                      &
-     &    hd_ndomain_rj, sdctl%ndomain_spectr_ctl)
+     &    sdctl%ndomain_spectr_ctl)
 !
-      level =  write_end_flag_for_ctl(id_file, level, hd_block)
+      level =  write_end_flag_for_ctl(id_file, level, sdctl%block_name)
 !
       end subroutine write_control_shell_domain
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine init_ctl_shell_domain_label(hd_block, sdctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(sphere_domain_control), intent(inout) :: sdctl
+!
+!
+      sdctl%block_name = hd_block
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_inner_decomp, sdctl%inner_decomp_ctl)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_rj_inner_loop,  sdctl%rj_inner_loop_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_rlm_inner_loop, sdctl%rlm_inner_loop_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_rtm_inner_loop, sdctl%rtm_inner_loop_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_rtp_inner_loop, sdctl%rtp_inner_loop_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_indices_ordering_set, sdctl%indices_ordering_set)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_rlm_order_dist, sdctl%rlm_distibution_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_simple_r_decomp, sdctl%simple_r_decomp_ctl)
+!
+        call init_int_ctl_item_label                                    &
+     &     (hd_num_radial_domain, sdctl%num_radial_domain_ctl)
+        call init_int_ctl_item_label                                    &
+     &     (hd_num_horiz_domain, sdctl%num_horiz_domain_ctl)
+!
+        call init_c_i_array_label                                       &
+     &     (hd_ndomain_rtp, sdctl%ndomain_sph_grid_ctl)
+        call init_c_i_array_label                                       &
+     &     (hd_ndomain_rtm, sdctl%ndomain_legendre_ctl)
+        call init_c_i_array_label                                       &
+     &     (hd_ndomain_rj, sdctl%ndomain_spectr_ctl)
+!
+      end subroutine init_ctl_shell_domain_label
 !
 !  ---------------------------------------------------------------------
 !

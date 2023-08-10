@@ -7,6 +7,7 @@
 !> @brief Control data structure for zonal mean visualization controls
 !!
 !!@verbatim
+!!      subroutine init_dynamo_sects_ctl_label(hd_block, zm_sects)
 !!      subroutine read_dynamo_sects_control                            &
 !!     &         (id_control, hd_block, zm_sects, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -50,6 +51,8 @@
 !
 !>      Structures of zonal mean controls
       type sph_dynamo_section_controls
+!>        Block name
+        character(len=kchara) :: block_name = 'dynamo_vizs_control'
 !>        Structure of crustal filtering of mangeitc field
         type(clust_filtering_ctl) :: crust_filter_ctl
 !
@@ -93,8 +96,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(zm_sects%i_viz_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -132,7 +135,7 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_crustal_filtering_ctl(id_control,                      &
-     &    hd_crustal_filtering, zm_sects%crust_filter_ctl, level)
+     &    zm_sects%crust_filter_ctl, level)
 !
       call write_single_sect_ctl(id_control, hd_zm_section,             &
      &    zm_sects%zm_psf_ctls, level)
@@ -141,6 +144,23 @@
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_dynamo_sects_control
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_dynamo_sects_ctl_label(hd_block, zm_sects)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(sph_dynamo_section_controls), intent(inout) :: zm_sects
+!
+!
+      zm_sects%block_name = trim(hd_block)
+      call init_crustal_filtering_ctl(hd_crustal_filtering,             &
+     &                                zm_sects%crust_filter_ctl)
+      call init_psf_ctls_labels(hd_zm_section,   zm_sects%zm_psf_ctls)
+      call init_psf_ctls_labels(hd_zRMS_section,                        &
+     &                          zm_sects%zRMS_psf_ctls)
+!
+      end subroutine init_dynamo_sects_ctl_label
 !
 !   --------------------------------------------------------------------
 !
@@ -180,6 +200,9 @@
      &     .or.  check_begin_flag(c_buf, hd_section)) then
         psf_ctls%num_psf_ctl = 1
         call alloc_psf_ctl_stract(psf_ctls)
+        call init_psf_ctl_stract(hd_section,                            &
+     &                           psf_ctls%psf_ctl_struct(1))
+        psf_ctls%fname_psf_ctl(1) = 'NO_FILE'
 !
         call write_multi_ctl_file_message                               &
      &     (hd_section, psf_ctls%num_psf_ctl, c_buf%level)

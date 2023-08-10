@@ -14,10 +14,9 @@
 !!      logical function check_vector_check_field(field_name)
 !!      logical function check_scalar_check_field(field_name)
 !!
-!!      integer(kind = kint) function num_work_4_explicit()
-!!      integer(kind = kint) function num_check_fields()
-!!      subroutine set_work_4_explicit_labels(n_comps, names, maths)
-!!      subroutine set_check_fields_labels(n_comps, names, maths)
+!!      subroutine set_explicit_work_names(array_c2i)
+!!      subroutine set_check_fields_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  force include SGS terms names  !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -66,9 +65,6 @@
       use t_field_labels
 !
       implicit  none
-!
-      integer(kind = kint), parameter, private :: nexp_work =  11
-      integer(kind = kint), parameter, private :: ncheck_fld = 12
 !
 !  arrays for current forces
 !
@@ -295,95 +291,52 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_work_4_explicit()
-      num_work_4_explicit = nexp_work
-      return
-      end function num_work_4_explicit
+      subroutine set_explicit_work_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
+!
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
+!
+      call set_field_label_to_ctl(sum_forces,           array_c2i)
+      call set_field_label_to_ctl(rot_sum_forces,       array_c2i)
+      call set_field_label_to_ctl(div_sum_forces,       array_c2i)
+      call set_field_label_to_ctl(previous_momentum,    array_c2i)
+      call set_field_label_to_ctl(previous_induction,   array_c2i)
+      call set_field_label_to_ctl(previous_heat,        array_c2i)
+      call set_field_label_to_ctl(previous_composition, array_c2i)
+      call set_field_label_to_ctl(previous_pressure,    array_c2i)
+      call set_field_label_to_ctl(previous_potential,   array_c2i)
+      call set_field_label_to_ctl(pressure_work,        array_c2i)
+      call set_field_label_to_ctl(m_potential_work,     array_c2i)
+!
+      end subroutine set_explicit_work_names
 !
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_check_fields()
-      num_check_fields = ncheck_fld
-      return
-      end function num_check_fields
+      subroutine set_check_fields_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      subroutine set_work_4_explicit_labels(n_comps, names, maths)
+      call set_field_label_to_ctl(check_momentum,      array_c2i)
+      call set_field_label_to_ctl(check_induction,     array_c2i)
+      call set_field_label_to_ctl(check_heat,          array_c2i)
+      call set_field_label_to_ctl(check_composition,   array_c2i)
+      call set_field_label_to_ctl(check_pressure,      array_c2i)
+      call set_field_label_to_ctl(check_potential,     array_c2i)
+      call set_field_label_to_ctl(check_momentum_2,    array_c2i)
+      call set_field_label_to_ctl(check_induction_2,   array_c2i)
+      call set_field_label_to_ctl(check_heat_2,        array_c2i)
+      call set_field_label_to_ctl(check_composition_2, array_c2i)
+      call set_field_label_to_ctl(check_pressure_2,    array_c2i)
+      call set_field_label_to_ctl(check_potential_2,   array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(nexp_work)
-      character(len = kchara), intent(inout) :: names(nexp_work)
-      character(len = kchara), intent(inout) :: maths(nexp_work)
-!
-!
-      call set_field_labels(sum_forces,                                 &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(rot_sum_forces,                             &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(div_sum_forces,                             &
-     &    n_comps( 3), names( 3), maths( 3))
-!
-      call set_field_labels(previous_momentum,                          &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(previous_induction,                         &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(previous_heat,                              &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(previous_composition,                       &
-     &    n_comps( 7), names( 7), maths( 7))
-!
-      call set_field_labels(previous_pressure,                          &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(previous_potential,                         &
-     &    n_comps( 9), names( 9), maths( 9))
-!
-      call set_field_labels(pressure_work,                              &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(m_potential_work,                           &
-     &    n_comps(11), names(11), maths(11))
-!
-      end subroutine set_work_4_explicit_labels
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_check_fields_labels(n_comps, names, maths)
-!
-      integer(kind = kint_4b), intent(inout) :: n_comps(ncheck_fld)
-      character(len = kchara), intent(inout) :: names(ncheck_fld)
-      character(len = kchara), intent(inout) :: maths(ncheck_fld)
-!
-!
-      call set_field_labels(check_momentum,                             &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(check_induction,                            &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(check_heat,                                 &
-     &    n_comps( 3), names( 3), maths( 3))
-!
-      call set_field_labels(check_composition,                          &
-     &    n_comps( 4), names( 4), maths( 4))
-!
-      call set_field_labels(check_pressure,                             &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(check_potential,                            &
-     &    n_comps( 6), names( 6), maths( 6))
-!
-      call set_field_labels(check_momentum_2,                           &
-     &    n_comps( 7), names( 7), maths( 7))
-!
-      call set_field_labels(check_induction_2,                          &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(check_heat_2,                               &
-     &    n_comps( 9), names( 9), maths( 9))
-!
-      call set_field_labels(check_composition_2,                        &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(check_pressure_2,                           &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(check_potential_2,                          &
-     &    n_comps(12), names(12), maths(12))
-!
-      end subroutine set_check_fields_labels
+      end subroutine set_check_fields_names
 !
 ! ----------------------------------------------------------------------
 !

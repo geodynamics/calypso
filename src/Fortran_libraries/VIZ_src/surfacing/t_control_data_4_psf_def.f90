@@ -7,7 +7,6 @@
 !>@brief  control ID data for surfacing module
 !!
 !!@verbatim
-!!      subroutine init_psf_def_ctl_stract(psf_def_c)
 !!      subroutine dealloc_cont_dat_4_psf_def(psf_def_c)
 !!        type(psf_define_ctl), intent(inout) :: psf_def_c
 !!      subroutine dup_control_4_psf_def(org_psf_def_c, new_psf_def_c)
@@ -115,6 +114,9 @@
 !
 !>        Structure of cross section definition
       type psf_define_ctl
+!>        Block name
+        character(len=kchara) :: block_name = 'surface_define'
+!
 !>        Structure for cross section type
         type(read_character_item) :: section_method_ctl
 !
@@ -178,17 +180,6 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_psf_def_ctl_stract(psf_def_c)
-!
-      type(psf_define_ctl), intent(inout) :: psf_def_c
-!
-      psf_def_c%radius_psf_ctl%realvalue = 0.0d0
-      psf_def_c%psf_area_ctl%num =      0
-!
-      end subroutine init_psf_def_ctl_stract
-!
-!  ---------------------------------------------------------------------
-!
       subroutine dealloc_cont_dat_4_psf_def(psf_def_c)
 !
       type(psf_define_ctl), intent(inout) :: psf_def_c
@@ -229,6 +220,7 @@
       type(psf_define_ctl), intent(inout) :: new_psf_def_c
 !
 !
+      new_psf_def_c%block_name =       org_psf_def_c%block_name
       new_psf_def_c%i_surface_define = org_psf_def_c%i_surface_define
 !
       call copy_chara_ctl(org_psf_def_c%section_method_ctl,             &

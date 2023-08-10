@@ -44,6 +44,8 @@
 !!          returns 1, othewwise returns 0
 !!      logical function yes_flag(control)
 !!      logical function no_flag(control)
+!!      logical function no_file_flag(control)
+!!        character(len=kchara), intent(in) :: control
 !!@endverbatim
 !
       module skip_comment_f
@@ -355,6 +357,14 @@
       end if
 !
       end function no_flag
+!
+!-----------------------------------------------------------------------
+!
+      logical function no_file_flag(control)
+      character(len=kchara), intent(in) :: control
+!
+      no_file_flag = cmp_no_case(control, 'NO_FILE')
+      end function no_file_flag
 !
 !-----------------------------------------------------------------------
 !

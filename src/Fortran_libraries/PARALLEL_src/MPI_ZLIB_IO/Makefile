@@ -13,7 +13,9 @@ MOD_MPI_ZLIB_IO = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'MPI_ZLIB_IO_DIR = $(MPI_ZLIB_IO_DIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_MPI_ZLIB_IO)' >> $(MAKENAME)
 
 

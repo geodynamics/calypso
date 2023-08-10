@@ -8,15 +8,14 @@
 !> @brief Control data for magnetic field controls
 !!
 !!@verbatim
+!!      subroutine init_forces_ctl_label(hd_block, frc_ctl)
 !!      subroutine read_forces_ctl(id_control, hd_block, frc_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(forces_control), intent(inout) :: frc_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
-!!      subroutine write_forces_ctl                                     &
-!!     &         (id_control, hd_block, frc_ctl, level)
+!!      subroutine write_forces_ctl(id_control, frc_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(forces_control), intent(in) :: frc_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!
@@ -54,6 +53,9 @@
 !
 !>      Structure for force list
       type forces_control
+!>        Block name
+        character(len=kchara) :: block_name = 'forces_define'
+!
 !>        Structure for constant force list
 !!@n        force_names%c_tbl: Name of force
         type(ctl_array_chara) :: force_names
@@ -80,8 +82,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(frc_ctl%i_forces_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -96,13 +98,11 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_forces_ctl                                       &
-     &         (id_control, hd_block, frc_ctl, level)
+      subroutine write_forces_ctl(id_control, frc_ctl, level)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(forces_control), intent(in) :: frc_ctl
 !
       integer(kind = kint), intent(inout) :: level
@@ -110,14 +110,27 @@
 !
       if(frc_ctl%i_forces_ctl .le. 0) return
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 frc_ctl%block_name)
       call write_control_array_c1(id_control, level,                    &
-     &                            hd_num_forces, frc_ctl%force_names)
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+     &                            frc_ctl%force_names)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                frc_ctl%block_name)
 !
       end subroutine write_forces_ctl
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine init_forces_ctl_label(hd_block, frc_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(forces_control), intent(inout) :: frc_ctl
+!
+      frc_ctl%block_name = hd_block
+        call init_chara_ctl_array_label(hd_num_forces,                  &
+     &                                  frc_ctl%force_names)
+      end subroutine init_forces_ctl_label
+!
+!   --------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine dealloc_name_force_ctl(frc_ctl)

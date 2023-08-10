@@ -1,6 +1,6 @@
 add_direction_labels.o: $(IO_DIR)/add_direction_labels.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_nodal_fields_ctl.o: $(IO_DIR)/add_nodal_fields_ctl.f90 m_precision.o m_machine_parameter.o t_field_labels.o t_control_array_character3.o skip_comment_f.o t_read_control_elements.o
+add_nodal_fields_ctl.o: $(IO_DIR)/add_nodal_fields_ctl.f90 m_precision.o m_machine_parameter.o t_field_labels.o t_control_array_character3.o skip_comment_f.o t_control_array_character.o
 	$(F90) -c $(F90OPTFLAGS) $<
 binary_IO.o: $(IO_DIR)/binary_IO.F90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o t_binary_IO_buffer.o set_parallel_file_name.o transfer_to_long_integers.o byte_swap_f.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
@@ -20,9 +20,11 @@ ctl_data_4_time_steps_IO.o: $(IO_DIR)/ctl_data_4_time_steps_IO.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_data_platforms_IO.o: $(IO_DIR)/ctl_data_platforms_IO.f90 m_precision.o m_machine_parameter.o t_control_array_character.o t_control_array_integer.o t_ctl_data_4_platforms.o t_read_control_elements.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ctl_data_sph_monitor_IO.o: $(IO_DIR)/ctl_data_sph_monitor_IO.f90 m_precision.o t_read_control_elements.o t_control_array_character.o t_ctl_data_sph_vol_spectr.o t_ctl_data_sph_layer_spectr.o t_ctl_data_pick_sph_spectr.o t_ctl_data_gauss_coefs.o t_ctl_data_mid_equator.o t_ctl_data_sph_dipolarity.o t_ctl_data_4_sph_monitor.o skip_comment_f.o write_control_elements.o
+ctl_data_sph_monitor_IO.o: $(IO_DIR)/ctl_data_sph_monitor_IO.f90 m_precision.o t_read_control_elements.o t_control_array_character.o t_ctl_data_sph_vol_spectr.o t_ctl_data_sph_layer_spectr.o t_ctl_data_pick_sph_spectr.o t_ctl_data_gauss_coefs.o t_ctl_data_mid_equator.o t_ctl_data_sph_dipolarity.o t_ctl_data_4_sph_monitor.o skip_comment_f.o ctl_data_volume_spectr_IO.o t_ctl_data_circles.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_data_sphere_model_IO.o: $(IO_DIR)/ctl_data_sphere_model_IO.f90 m_precision.o t_control_array_character.o t_control_array_real.o t_control_array_integer.o t_control_array_charaint.o t_control_array_integer2.o t_control_array_intreal.o t_ctl_data_4_sphere_model.o m_machine_parameter.o t_read_control_elements.o skip_comment_f.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_data_volume_spectr_IO.o: $(IO_DIR)/ctl_data_volume_spectr_IO.f90 m_precision.o t_read_control_elements.o t_ctl_data_sph_vol_spectr.o t_ctl_data_4_sph_monitor.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 data_IO_to_textline.o: $(IO_DIR)/data_IO_to_textline.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -66,7 +68,7 @@ gz_field_data_IO_b.o: $(IO_DIR)/gz_field_data_IO_b.f90 m_precision.o m_constants
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_field_file_IO_b.o: $(IO_DIR)/gz_field_file_IO_b.f90 m_precision.o m_constants.o m_machine_parameter.o t_time_data.o t_field_data_IO.o t_buffer_4_gzip.o gz_field_data_IO_b.o gz_binary_IO.o binary_IO.o transfer_to_long_integers.o gzip_file_access.o
 	$(F90) -c $(F90OPTFLAGS) $<
-m_component_flags.o: $(IO_DIR)/m_component_flags.f90 m_precision.o m_phys_constants.o t_field_labels.o
+m_component_flags.o: $(IO_DIR)/m_component_flags.f90 m_precision.o m_phys_constants.o t_field_labels.o t_control_array_chara2int.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_default_file_prefix.o: $(IO_DIR)/m_default_file_prefix.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -78,7 +80,7 @@ m_field_file_format.o: $(IO_DIR)/m_field_file_format.f90 m_precision.o m_file_fo
 	$(F90) -c $(F90OPTFLAGS) $<
 m_field_file_format_labels.o: $(IO_DIR)/m_field_file_format_labels.f90 m_precision.o m_constants.o m_file_format_labels.o t_multi_flag_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-m_file_format_labels.o: $(IO_DIR)/m_file_format_labels.f90 m_precision.o m_constants.o t_multi_flag_labels.o t_read_control_elements.o skip_comment_f.o
+m_file_format_labels.o: $(IO_DIR)/m_file_format_labels.f90 m_precision.o m_constants.o t_multi_flag_labels.o t_control_array_character.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_file_format_switch.o: $(IO_DIR)/m_file_format_switch.f90 m_precision.o m_constants.o m_file_format_labels.o t_multi_flag_labels.o t_control_array_character.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -192,6 +194,8 @@ surface_data_IO_b.o: $(IO_DIR)/surface_data_IO_b.f90 m_precision.o t_comm_table.
 	$(F90) -c $(F90OPTFLAGS) $<
 t_IO_step_parameter.o: $(IO_DIR)/t_IO_step_parameter.f90 m_precision.o m_constants.o t_control_array_integer.o t_control_array_real.o t_time_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
+t_control_array_chara2int.o: $(IO_DIR)/t_control_array_chara2int.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
+	$(F90) -c $(F90OPTFLAGS) $<
 t_control_array_chara2real.o: $(IO_DIR)/t_control_array_chara2real.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_array_character.o: $(IO_DIR)/t_control_array_character.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
@@ -236,7 +240,7 @@ t_ctl_data_4_fields.o: $(IO_DIR)/t_ctl_data_4_fields.f90 m_precision.o m_machine
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_4_platforms.o: $(IO_DIR)/t_ctl_data_4_platforms.f90 m_precision.o m_machine_parameter.o t_control_array_character.o t_control_array_integer.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_4_sph_monitor.o: $(IO_DIR)/t_ctl_data_4_sph_monitor.f90 m_precision.o t_read_control_elements.o t_control_array_character.o t_ctl_data_sph_vol_spectr.o t_ctl_data_sph_layer_spectr.o t_ctl_data_pick_sph_spectr.o t_ctl_data_gauss_coefs.o t_ctl_data_circles.o t_ctl_data_dynamobench.o t_ctl_data_sph_dipolarity.o skip_comment_f.o
+t_ctl_data_4_sph_monitor.o: $(IO_DIR)/t_ctl_data_4_sph_monitor.f90 m_precision.o t_read_control_elements.o t_control_array_character.o t_ctl_data_sph_vol_spectr.o t_ctl_data_sph_layer_spectr.o t_ctl_data_pick_sph_spectr.o t_ctl_data_gauss_coefs.o t_ctl_data_mid_equator.o t_ctl_data_dynamobench.o t_ctl_data_sph_dipolarity.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_4_sphere_model.o: $(IO_DIR)/t_ctl_data_4_sphere_model.f90 m_precision.o t_control_array_character.o t_control_array_real.o t_control_array_integer.o t_control_array_charaint.o t_control_array_integer2.o t_control_array_intreal.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -244,7 +248,7 @@ t_ctl_data_4_time_steps.o: $(IO_DIR)/t_ctl_data_4_time_steps.f90 m_precision.o m
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_FEM_sleeve_size.o: $(IO_DIR)/t_ctl_data_FEM_sleeve_size.f90 m_precision.o t_control_array_character.o t_control_array_integer.o t_control_array_real.o m_machine_parameter.o t_read_control_elements.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_circles.o: $(IO_DIR)/t_ctl_data_circles.f90 m_precision.o t_read_control_elements.o t_ctl_data_mid_equator.o skip_comment_f.o write_control_elements.o
+t_ctl_data_circles.o: $(IO_DIR)/t_ctl_data_circles.f90 m_precision.o t_read_control_elements.o t_ctl_data_4_sph_monitor.o t_ctl_data_mid_equator.o skip_comment_f.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_dimless_numbers.o: $(IO_DIR)/t_ctl_data_dimless_numbers.f90 m_precision.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_charareal.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -69,8 +69,10 @@
 !
       subroutine bcast_phys_data_ctl(fld_ctl)
 !
-      use calypso_mpi_int
       use bcast_control_arrays
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(field_control), intent(inout) :: fld_ctl
 !
@@ -82,6 +84,8 @@
       call bcast_ctl_array_ci3(fld_ctl%vector_phys)
 !
       call calypso_mpi_bcast_one_int(fld_ctl%i_phys_values, 0)
+      call calypso_mpi_bcast_character(fld_ctl%block_name,              &
+     &                                 cast_long(kchara), 0)
 !
       end subroutine bcast_phys_data_ctl
 !

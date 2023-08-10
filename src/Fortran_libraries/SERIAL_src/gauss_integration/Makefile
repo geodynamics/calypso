@@ -14,7 +14,9 @@ MOD_GAUSS = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'GAUSSDIR = $(GAUSSDIR)'  >> $(MAKENAME)
 
-lib_archve:
+libtarget:
+
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_GAUSS)' >> $(MAKENAME)
 
 mod_list:
