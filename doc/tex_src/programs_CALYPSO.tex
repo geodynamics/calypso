@@ -1729,6 +1729,64 @@ When \hyperref[href_t:field_on_circle_format]{{\tt field\_on\_circle\_format}}, 
 \section{Utility programs}
 Calypso includes some utility programs. These programs are useful to data analysis and debugging the simulation programs.
 
+\subsection{Control file Editor}
+This program is a simple Jupyter notebook (\url{https://jupyterbook.org/en/stable/intro.html#}) to edit control files. There are two Jupter notebook files \\
+(\verb|Calypso_control_editor.ipynb| and \verb|Calypso_control_glossary.ipynb|) in \verb|[CALYPSO_DIR]/src/Jupyter/| folder. \verb|Calypso_control_editor.ipynb| is the notebook to edit control files, and \verb|Calypso_control_glossary.ipynb| is the document of the control data based on the Section \label{section:def_control}. Using JupyterLab (\url{https://jupyter.org}) is recommended because JupyterLab can open the editor \\
+\verb|Calypso_control_editor.ipynb| and document \\
+\verb|Calypso_control_glossary.ipynb| side by side as showin in Figure{fig:notebook}.
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=110mm]{Images/Editor_notebook}
+\end{center}
+\caption{Example of control editor on JupyterLab.}
+\label{fig:notebook}
+\end{figure}
+%
+
+If JupyterLab starts at the \verb|[CALYPSO_DIR]| directory, and you can find the notebook files under \verb|src/Jupyter/| directory. On JupyterLab, two notebooks can be opened side by side. After opening either notebook file, you can split the view by choosing \verb|File -> New View for Notebook|. Then, another file can be opened on the either side of view. This editor supports drag and drop from another notebook or programs. The instruction of usege of the editor is written in \\
+     \verb|Calypso_control_editor.ipynb|.
+
+\subsection{Vim scripts for folding the control files}
+This Vim scripts add the folding the control blocks and concurrent comment lines.
+After starting the vim, this scripts can be loaded by the following command: \\
+\\
+\\
+\verb|: source  [CALYPSO_DIR]/src/Vim_script/Folding_Calypso.vim|
+\\
+\\
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=90mm]{Images/vim_folding}
+\end{center}
+\caption{Example of data folding on Vim.}
+\label{fig:vim_folding}
+\end{figure}
+%
+After loading the script, the control data will already be folded. The basic commands for the folding are the following:
+%
+\begin{description}
+\item{\tt za: } Toggles the current fold open or closed. – The most useful command to know of all of these.
+\item{\tt zA: }  Same as \verb|za| except it toggles all folds beneath as well. Since folds can be nested (such as with indent folding), this will toggle the state of all the folds underneath of it, not just the current fold.
+\item{\tt zc: } Close the current fold.
+\item{\tt zC: } Same as \verb|zc|, but closes folds nested underneath as well.
+\item{\tt zo: } Open the current fold.
+\item{\tt zO: } Same as \verb|zo|, but opens folds nested underneath as well.
+\end{description}
+%
+
+The \verb|vi| in Mac OS is equivalent to the \verb|vim|, so the this script works on Mac OS without any instllation. However, the full featured vim may be refquired on Linux. You can check the avaiable feature by \verb|vi (or vim) --version| command. On Ubuntu, you can install large version of vim by \verb|% apt install vim|.
+
+
+\subsection{Control file consistency check ({\tt check\_control\_mhd})}
+This small program checks if the control file \verb|control_MHD| and its external files can be read correctly by using Calypso's IO routines. The program will start by the following command:\\
+\\
+\verb|% [CALYPSO_DIR]/bin/check_control_mhd control_MHD|
+\\
+If the control files read successfully, the program outputs read control data on screeen. If program stopped with error, or missing control parameters in the output, please check the control files.
+
+
 \subsection{Data transform program ({\tt sph\_snapshot})}
 \label{section:sph_snapshot}
 %
