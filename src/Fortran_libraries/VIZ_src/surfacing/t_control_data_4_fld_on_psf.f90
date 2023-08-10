@@ -114,7 +114,6 @@
       fld_on_psf_c%block_name = hd_block
         call init_chara2_ctl_array_label                                &
      &     (hd_iso_result_field, fld_on_psf_c%field_output_ctl)
-      write(*,*) 'fld_on_psf_c%field_output_ctl', fld_on_psf_c%field_output_ctl%array_name
 !
         call init_chara_ctl_item_label(hd_result_type,                  &
      &      fld_on_psf_c%output_type_ctl)

@@ -187,7 +187,8 @@
 !
       level = write_array_flag_for_ctl(id_control, level, hd_block)
       do i = 1, iso_ctls%num_iso_ctl
-        write(*,'(2a,i4)', ADVANCE='NO') trim(hd_block), ' No. ', i
+        write(*,'(3a,i4)', ADVANCE='NO') '! ', trim(hd_block),          &
+     &                                   ' No. ', i
         call sel_write_control_4_iso_file                               &
      &     (id_control, hd_block, iso_ctls%fname_iso_ctl(i),            &
      &      iso_ctls%iso_ctl_struct(i), level)
@@ -218,12 +219,12 @@
         call write_iso_control_data(id_control, hd_block,               &
      &                              iso_ctl_struct, level)
       else if(id_control .eq. id_monitor) then
-        write(*,'(2a)', ADVANCE='NO')                                   &
+        write(*,'(2a)')                                                 &
      &            ' should be written to file ... ', trim(file_name)
         call write_iso_control_data(id_control, hd_block,               &
      &                              iso_ctl_struct, level)
       else
-        write(*,'(3a)', ADVANCE='NO')  trim(hd_block),                  &
+        write(*,'(3a)')  trim(hd_block),                                &
      &            ' is written to file ... ', trim(file_name)
         call write_file_name_for_ctl_line(id_control, level,            &
      &                                    hd_block, file_name)
