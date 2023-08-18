@@ -1,0 +1,25 @@
+!
+begin isosurface_ctl
+  isosurface_file_prefix    'Isosurfaces/temp0_7'
+!
+  begin isosurf_define
+    isosurf_field        temperature
+    isosurf_component      scalar
+    isosurf_value            0.7
+!
+    array isosurf_area_ctl
+      isosurf_area_ctl   all
+    end array isosurf_area_ctl
+  end isosurf_define
+!
+  begin field_on_isosurf
+    result_type      'field'
+!
+    array output_field
+      output_field    velocity           vector         end
+      output_field    velocity           radial         end
+      output_field    magnetic_field     vector         end
+    end array output_field
+  end field_on_isosurf
+!
+end isosurface_ctl

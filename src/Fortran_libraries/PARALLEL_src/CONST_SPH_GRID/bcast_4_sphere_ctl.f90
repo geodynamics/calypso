@@ -35,12 +35,16 @@
       subroutine bcast_parallel_shell_ctl(psph_ctl)
 !
       use t_ctl_data_gen_sph_shell
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_4_platform_ctl
 !
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !
 !
+      call calypso_mpi_bcast_character(psph_ctl%block_name,             &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(psph_ctl%iflag_sph_shell, 0)
 !
       if(psph_ctl%iflag_sph_shell .eq. 0) return
@@ -57,6 +61,8 @@
       subroutine bcast_ctl_4_shell_define(spctl)
 !
       use t_ctl_data_4_sphere_model
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -95,6 +101,8 @@
       call bcast_ctl_array_i2(spctl%radial_layer_list_ctl)
       call bcast_ctl_array_i2(spctl%med_layer_list_ctl)
 !
+      call calypso_mpi_bcast_character(spctl%block_name,                &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(spctl%i_shell_def, 0)
 !
       end subroutine bcast_ctl_4_shell_define
@@ -104,6 +112,8 @@
       subroutine bcast_ctl_ndomain_4_shell(sdctl)
 !
       use t_ctl_data_4_divide_sphere
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -129,6 +139,8 @@
       call bcast_ctl_array_ci(sdctl%ndomain_legendre_ctl)
       call bcast_ctl_array_ci(sdctl%ndomain_spectr_ctl)
 !
+      call calypso_mpi_bcast_character(sdctl%block_name,                &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(sdctl%i_domains_sph, 0)
 !
       end subroutine bcast_ctl_ndomain_4_shell

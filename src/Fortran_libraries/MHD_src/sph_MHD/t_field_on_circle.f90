@@ -11,8 +11,8 @@
 !!      subroutine dealloc_mul_fields_on_circle(mul_circle)
 !!        integer(kind = kint), intent(in) :: num_circle
 !!        type(mul_fields_on_circle), intent(inout) :: mul_circle
-!!      subroutine set_control_circles_def(circ_ctls, mul_circle)
-!!        type(data_on_circles_ctl), intent(in) :: circ_ctls
+!!      subroutine set_control_circles_def(smonitor_ctl, mul_circle)
+!!        type(sph_monitor_control), intent(in) :: smonitor_ctl
 !!        type(mul_fields_on_circle), intent(inout) :: mul_circle
 !!
 !!      subroutine init_circle_point_global(sph, comms_sph, trans_p,    &
@@ -100,20 +100,20 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_control_circles_def(circ_ctls, mul_circle)
+      subroutine set_control_circles_def(smonitor_ctl, mul_circle)
 !
       use t_ctl_data_circles
 !
-      type(data_on_circles_ctl), intent(in) :: circ_ctls
+      type(sph_monitor_control), intent(in) :: smonitor_ctl
       type(mul_fields_on_circle), intent(inout) :: mul_circle
 !
       integer(kind = kint) :: i
 !
-      call alloc_mul_fields_on_circle(circ_ctls%num_circ_ctl,           &
+      call alloc_mul_fields_on_circle(smonitor_ctl%num_circ_ctl,        &
      &                                mul_circle)
 !
       do i = 1, mul_circle%num_circles
-        call set_control_circle_def(circ_ctls%meq_ctl(i),               &
+        call set_control_circle_def(smonitor_ctl%meq_ctl(i),            &
      &                              mul_circle%cdat(i)%circle)
       end do
 !

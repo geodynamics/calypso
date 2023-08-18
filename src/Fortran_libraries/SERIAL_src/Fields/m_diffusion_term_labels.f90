@@ -12,10 +12,9 @@
 !!      logical function check_scalar_diffusion(field_name)
 !!      logical function check_diffusivity(field_name)
 !!
-!!      integer(kind = kint) function num_base_diffusions()
-!!      integer(kind = kint) function num_base_diffusivities()
-!!      subroutine set_base_diffusion_labels(n_comps, names, maths)
-!!      subroutine set_base_diffusivity_labels(n_comps, names, maths)
+!!      subroutine set_base_diffusion_names(array_c2i)
+!!      subroutine set_base_diffusivity_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  SGS model coefficients names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -49,12 +48,6 @@
       use t_field_labels
 !
       implicit  none
-!
-!>      Numbder of diffusion terms
-      integer(kind = kint), parameter, private :: ndiffusion = 7
-!>      Numbder of diffusivities
-      integer(kind = kint), parameter, private :: ndiffusivities = 7
-!
 !
 !>        Field label for viscous diffusion
 !!         @f$ \nu \partial_{j}\partial_{j} u_{i} @f$
@@ -201,72 +194,44 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_base_diffusions()
-      num_base_diffusions = ndiffusion
-      return
-      end function num_base_diffusions
+      subroutine set_base_diffusion_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
+!
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
+!
+      call set_field_label_to_ctl(viscous_diffusion,   array_c2i)
+      call set_field_label_to_ctl(vorticity_diffusion, array_c2i)
+      call set_field_label_to_ctl(vector_potential_diffusion,           &
+     &                            array_c2i)
+      call set_field_label_to_ctl(magnetic_diffusion,    array_c2i)
+      call set_field_label_to_ctl(thermal_diffusion,     array_c2i)
+      call set_field_label_to_ctl(composition_diffusion, array_c2i)
+      call set_field_label_to_ctl(div_viscousity,        array_c2i)
+!
+      end subroutine set_base_diffusion_names
 !
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_base_diffusivities()
-      num_base_diffusivities = ndiffusivities
-      return
-      end function num_base_diffusivities
+      subroutine set_base_diffusivity_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-! ----------------------------------------------------------------------
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      subroutine set_base_diffusion_labels(n_comps, names, maths)
+      call set_field_label_to_ctl(kinetic_viscosity,     array_c2i)
+      call set_field_label_to_ctl(magnetic_diffusivity,  array_c2i)
+      call set_field_label_to_ctl(thermal_diffusivity,   array_c2i)
+      call set_field_label_to_ctl(chemical_diffusivity,  array_c2i)
+      call set_field_label_to_ctl(viscosity,             array_c2i)
+      call set_field_label_to_ctl(thermal_conductivity,  array_c2i)
+      call set_field_label_to_ctl(chemical_conductivity, array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ndiffusion)
-      character(len = kchara), intent(inout) :: names(ndiffusion)
-      character(len = kchara), intent(inout) :: maths(ndiffusion)
-!
-!
-      call set_field_labels(viscous_diffusion,                          &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(vorticity_diffusion,                        &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(vector_potential_diffusion,                 &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(magnetic_diffusion,                         &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(thermal_diffusion,                          &
-     &    n_comps( 5), names( 5), maths( 5))
-!
-      call set_field_labels(composition_diffusion,                      &
-     &    n_comps( 6), names( 6), maths( 6))
-!
-      call set_field_labels(div_viscousity,                             &
-     &    n_comps( 7), names( 7), maths( 7))
-!
-      end subroutine set_base_diffusion_labels
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_base_diffusivity_labels(n_comps, names, maths)
-!
-      integer(kind = kint_4b), intent(inout) :: n_comps(ndiffusivities)
-      character(len = kchara), intent(inout) :: names(ndiffusivities)
-      character(len = kchara), intent(inout) :: maths(ndiffusivities)
-!
-!
-      call set_field_labels(kinetic_viscosity,                          &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(magnetic_diffusivity,                       &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(thermal_diffusivity,                        &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(chemical_diffusivity,                       &
-     &    n_comps( 4), names( 4), maths( 4))
-!
-      call set_field_labels(viscosity,                                  &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(thermal_conductivity,                       &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(chemical_conductivity,                      &
-     &    n_comps( 7), names( 7), maths( 7))
-!
-      end subroutine set_base_diffusivity_labels
+      end subroutine set_base_diffusivity_names
 !
 ! ----------------------------------------------------------------------
 !

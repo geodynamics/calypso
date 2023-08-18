@@ -8,6 +8,7 @@
 !> @brief Control data for magnetic field controls
 !!
 !!@verbatim
+!!      subroutine init_coriolis_ctl_label(hd_block, cor_ctl)
 !!      subroutine read_coriolis_ctl                                    &
 !!     &         (id_control, hd_block, cor_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -55,6 +56,8 @@
 !
 !>      Structure for Coriolis force
       type coriolis_control
+!>        Block name
+        character(len=kchara) :: block_name = 'Coriolis_define'
 !>        Coliolis force modeling in FEM
 !!@n        element: Coriolis force in element
 !!@n        node:    Coriolis force at node
@@ -136,15 +139,33 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_FEM_Coriolis_model, cor_ctl%FEM_coriolis_model)
+     &    cor_ctl%FEM_coriolis_model)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_FEM_Coriolis_imp, cor_ctl%FEM_coriolis_implicit)
+     &    cor_ctl%FEM_coriolis_implicit)
 !
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_rotation_vec, cor_ctl%system_rotation)
+     &    cor_ctl%system_rotation)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_coriolis_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine init_coriolis_ctl_label(hd_block, cor_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(coriolis_control), intent(inout) :: cor_ctl
+!
+!
+      cor_ctl%block_name = hd_block
+        call init_chara_ctl_item_label(hd_FEM_Coriolis_model,           &
+     &      cor_ctl%FEM_coriolis_model)
+        call init_chara_ctl_item_label(hd_FEM_Coriolis_imp,             &
+     &      cor_ctl%FEM_coriolis_implicit)
+!
+        call init_c_r_ctl_array_label(hd_rotation_vec,                  &
+     &      cor_ctl%system_rotation)
+      end subroutine init_coriolis_ctl_label
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

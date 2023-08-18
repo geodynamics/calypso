@@ -8,6 +8,7 @@
 !> @brief Control data for magnetic field controls
 !!
 !!@verbatim
+!!      subroutine init_magnetic_scale_ctl_label(hd_block, bscale_ctl)
 !!      subroutine read_magnetic_scale_ctl                              &
 !!     &         (id_control, hd_block, bscale_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -53,6 +54,9 @@
 !
 !>      Structure for magnetic field scaling
       type magnetic_field_scale_control
+!>        Block name
+        character(len=kchara) :: block_name                             &
+     &                          = 'magnetic_field_scale_ctl'
 !>        array structure for magnetic energy ratio
 !!@n        mag_to_kin_energy_ctl%c_tbl:  name of coefficients
 !!@n        mag_to_kin_energy_ctl%vect:   order
@@ -113,10 +117,22 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_mag_to_kin_ratio, bscale_ctl%mag_to_kin_energy_ctl)
+     &    bscale_ctl%mag_to_kin_energy_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_magnetic_scale_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine init_magnetic_scale_ctl_label(hd_block, bscale_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(magnetic_field_scale_control), intent(inout) :: bscale_ctl
+!
+      bscale_ctl%block_name = hd_block
+        call init_c_r_ctl_array_label(hd_mag_to_kin_ratio,              &
+     &      bscale_ctl%mag_to_kin_energy_ctl)
+      end subroutine init_magnetic_scale_ctl_label
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

@@ -1,8 +1,12 @@
-!set_field_comp_for_viz.f90
-!      module set_field_comp_for_viz
+!>@file   set_field_comp_for_viz.f90
+!!@brief  module set_field_comp_for_viz
+!!
+!!@author H. Matsui
+!!@date Programmed in May., 2006
 !
-!        programmed by H.Matsui on May. 2006
-!
+!>@brief set field components for visualizartions
+!!
+!!@verbatim
 !!      subroutine check_field_4_viz(num_nod_phys, phys_nod_name,       &
 !!     &          n_field_ctl, field_name, num_field, num_field_vis)
 !!      subroutine set_components_4_viz(num_nod_phys, phys_nod_name,    &
@@ -13,7 +17,7 @@
 !!     &          ncomp_org, rst_name)
 !!
 !!      subroutine count_total_comps_4_viz(psf_fld)
-!
+!!@endverbatim
       module set_field_comp_for_viz
 !
       use m_precision

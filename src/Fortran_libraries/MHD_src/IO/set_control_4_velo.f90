@@ -36,11 +36,12 @@
      &          velo_nod, torque_surf)
 !
       use m_machine_parameter
+      use m_sph_node_group_types
       use calypso_mpi
       use t_physical_property
       use t_control_array_chara2real
       use t_bc_data_list
-      use set_node_group_types
+      use m_fem_node_group_types
       use set_surface_group_types
       use skip_comment_f
 !
@@ -76,27 +77,25 @@
 !
         iflag_4_hemi = 0
         do i = 1, velo_nod%num_bc
-          if ( velo_nod%bc_name(i)  .eq. 'equator') then
-            iflag_4_hemi = 1
-          end if
+          call set_bc_group_types_equator(velo_nod%bc_name(i),          &
+     &                                    iflag_4_hemi)
         end do
 !
         do i = 1, velo_nod%num_bc
+         call set_bc_group_types_each_dir(node_bc_U_ctl%c1_tbl(i),      &
+     &                                    velo_nod%ibc_type(i))
          call set_bc_group_types_vector(node_bc_U_ctl%c1_tbl(i),        &
-     &       velo_nod%ibc_type(i))
+     &                                  velo_nod%ibc_type(i))
          call set_bc_group_types_sgs_vect(node_bc_U_ctl%c1_tbl(i),      &
-     &       velo_nod%ibc_type(i))
+     &                                    velo_nod%ibc_type(i))
          call set_bc_group_types_rotation(node_bc_U_ctl%c1_tbl(i),      &
-     &       velo_nod%ibc_type(i))
+     &                                    velo_nod%ibc_type(i))
          call set_bc_group_types_sph_center(node_bc_U_ctl%c1_tbl(i),    &
-     &       velo_nod%ibc_type(i))
+     &                                      velo_nod%ibc_type(i))
          call set_bc_group_types_sph_velo(node_bc_U_ctl%c1_tbl(i),      &
-     &       velo_nod%ibc_type(i))
-!
-         if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'vr_0'))               &
-     &       velo_nod%ibc_type(i) = iflag_no_vr
-         if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'special'))            &
-     &       velo_nod%ibc_type(i) = iflag_bc_special
+     &                                    velo_nod%ibc_type(i))
+         call set_bc_group_special_velocity(node_bc_U_ctl%c1_tbl(i),    &
+     &                                      velo_nod%ibc_type(i))
         end do
 !
         if(iflag_debug .gt. 0) then

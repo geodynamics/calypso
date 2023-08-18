@@ -125,7 +125,7 @@
 !
       do i = 1, pwr%num_vol_spectr
         if(id_rank .eq. pwr%v_spectr(i)%irank_m)  then
-          if(cmp_no_case(pwr%v_spectr(i)%fhead_rms_v, 'NO_FILE')) cycle
+          if(no_file_flag(pwr%v_spectr(i)%fhead_rms_v)) cycle
 !          write(*,*) 'write_sph_volume_pwr_file', id_rank, i
           write(fname_rms,   '(a,a6)')                                  &
      &      trim(pwr%v_spectr(i)%fhead_rms_v), '_s.dat'
@@ -166,7 +166,7 @@
         if(pwr%v_spectr(i)%flag_skip_v_spec_l) cycle
 !
         if(id_rank .eq. pwr%v_spectr(i)%irank_l) then
-          if(cmp_no_case(pwr%v_spectr(i)%fhead_rms_v, 'NO_FILE')) cycle
+          if(no_file_flag(pwr%v_spectr(i)%fhead_rms_v)) cycle
 !          write(*,*) 'write_sph_vol_ms_spectr_file l', id_rank, i
           write(fname_rms, '(a,a6)')                                    &
      &         trim(pwr%v_spectr(i)%fhead_rms_v), '_l.dat'
@@ -182,7 +182,7 @@
         if(pwr%v_spectr(i)%flag_skip_v_spec_lm) cycle
 !
         if(id_rank .eq. pwr%v_spectr(i)%irank_lm) then
-          if(cmp_no_case(pwr%v_spectr(i)%fhead_rms_v, 'NO_FILE')) cycle
+          if(no_file_flag(pwr%v_spectr(i)%fhead_rms_v)) cycle
 !          write(*,*) 'write_sph_vol_ms_spectr_file lm', id_rank, i
           write(fname_rms, '(a,a7)')                                    &
      &       trim(pwr%v_spectr(i)%fhead_rms_v), '_lm.dat'
@@ -198,7 +198,7 @@
         if(pwr%v_spectr(i)%flag_skip_v_spec_m) cycle
 !
         if(id_rank .eq. pwr%v_spectr(i)%irank_m) then
-          if(cmp_no_case(pwr%v_spectr(i)%fhead_rms_v, 'NO_FILE')) cycle
+          if(no_file_flag(pwr%v_spectr(i)%fhead_rms_v)) cycle
 !          write(*,*) 'write_sph_vol_ms_spectr_file m', id_rank, i
           write(fname_rms,'(a,a6)')                                     &
      &       trim(pwr%v_spectr(i)%fhead_rms_v), '_m.dat'
@@ -214,7 +214,7 @@
         if(pwr%v_spectr(i)%flag_skip_v_spec_m0) cycle
 !
         if(id_rank .eq. pwr%v_spectr(i)%irank_m) then
-          if(cmp_no_case(pwr%v_spectr(i)%fhead_rms_v, 'NO_FILE')) cycle
+          if(no_file_flag(pwr%v_spectr(i)%fhead_rms_v)) cycle
           write(fname_rms, '(a,a7)')                                    &
      &       trim(pwr%v_spectr(i)%fhead_rms_v), '_m0.dat'
           write(mode_label,'(a)') 'EMPTY'

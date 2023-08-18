@@ -20,6 +20,8 @@
 !!   theta_velocity            [i_velo_t]:
 !!   phi_velocity              [i_velo_p]:
 !!   cyl_r_velocity            [i_velo_s]:
+!!   x_velocity                [i_velo_x]:
+!!   y_velocity                [i_velo_y]:
 !!   z_velocity                [i_velo_z]:
 !!
 !!   r_magnetic_f              [i_magne_r]:
@@ -53,6 +55,10 @@
         integer (kind=kint) :: i_velo_p  =           izero
 !>        Start address for cylindrical radial velocity @f$ u_{s} @f$
         integer (kind=kint) :: i_velo_s  =           izero
+!>        Start address for x-componennt of velocity @f$ u_{z} @f$
+        integer (kind=kint) :: i_velo_x  =           izero
+!>        Start address for y-componennt of velocity @f$ u_{z} @f$
+        integer (kind=kint) :: i_velo_y  =           izero
 !>        Start address for z-componennt of velocity @f$ u_{z} @f$
         integer (kind=kint) :: i_velo_z  =           izero
 !
@@ -106,15 +112,19 @@
           fld_cmp%i_velo_p = i_phys
         else if (field_name .eq. cyl_r_velocity%name) then
           fld_cmp%i_velo_s = i_phys
+        else if (field_name .eq. x_velocity%name) then
+          fld_cmp%i_velo_x = i_phys
+        else if (field_name .eq. y_velocity%name) then
+          fld_cmp%i_velo_y = i_phys
         else if (field_name .eq. z_velocity%name) then
           fld_cmp%i_velo_z = i_phys
 !
         else if (field_name .eq. r_magnetic_f%name) then
-          fld_cmp%i_magne_r =        i_phys
+          fld_cmp%i_magne_r =      i_phys
         else if (field_name .eq. theta_magnetic_f%name) then
-          fld_cmp%i_magne_t =           i_phys
+          fld_cmp%i_magne_t =      i_phys
         else if (field_name .eq. phi_magnetic_f%name) then
-          fld_cmp%i_magne_p =          i_phys
+          fld_cmp%i_magne_p =      i_phys
         else if (field_name .eq. cyl_r_magnetic_f%name) then
           fld_cmp%i_magne_s =      i_phys
         else if (field_name .eq. x_magnetic_f%name) then

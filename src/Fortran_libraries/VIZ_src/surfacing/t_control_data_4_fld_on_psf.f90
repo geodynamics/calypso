@@ -6,7 +6,7 @@
 !>@brief control data for field on isosurface
 !!
 !!@verbatim
-!!      subroutine init_fld_on_psf_control(fld_on_psf_c)
+!!      subroutine init_fld_on_psf_control(hd_block, fld_on_psf_c)
 !!      subroutine dealloc_fld_on_psf_control(fld_on_psf_c)
 !!        type(field_on_psf_ctl), intent(inout) :: fld_on_psf_c
 !!      subroutine dup_fld_on_psf_control                               &
@@ -31,8 +31,6 @@
 !!        type(field_on_psf_ctl), intent(in) :: fld_on_psf_c
 !!        type(ctl_array_c3), intent(inout) :: field_ctl
 !!
-!!      integer(kind = kint) function num_label_fld_on_psf_control()
-!!      subroutine set_label_fld_on_psf_control(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of control for Kemo's surface rendering
 !!
@@ -73,6 +71,9 @@
 !
 !>      Structure of fields on isosurface control
       type field_on_psf_ctl
+!>        Block name
+        character(len=kchara) :: block_name = 'output_field_define'
+!
 !>      Structure for list of output field
 !!@n      field_output_ctl%c1_tbl: Name of field
 !!@n      field_output_ctl%c2_tbl: Name of component
@@ -93,8 +94,6 @@
       character(len=kchara), parameter                                  &
      &             :: hd_result_value =      'result_value'
 !
-      integer(kind = kint), parameter :: n_label_fld_on_psf_ctl = 3
-!
       private :: hd_result_type, hd_iso_result_field, hd_result_value
 !
 !  ---------------------------------------------------------------------
@@ -103,13 +102,23 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_fld_on_psf_control(fld_on_psf_c)
+      subroutine init_fld_on_psf_control(hd_block, fld_on_psf_c)
 !
+      character(len=kchara), intent(in) :: hd_block
       type(field_on_psf_ctl), intent(inout) :: fld_on_psf_c
 !
 !
       fld_on_psf_c%field_output_ctl%num = 0
       fld_on_psf_c%output_value_ctl%realvalue = 0.0d0
+!
+      fld_on_psf_c%block_name = hd_block
+        call init_chara2_ctl_array_label                                &
+     &     (hd_iso_result_field, fld_on_psf_c%field_output_ctl)
+!
+        call init_chara_ctl_item_label(hd_result_type,                  &
+     &      fld_on_psf_c%output_type_ctl)
+        call init_real_ctl_item_label(hd_result_value,                  &
+     &      fld_on_psf_c%output_value_ctl)
 !
       end subroutine init_fld_on_psf_control
 !
@@ -147,7 +156,8 @@
       call dup_control_array_c2(org_fld_on_iso_c%field_output_ctl,      &
      &                          new_fld_on_iso_c%field_output_ctl)
 !
-      new_fld_on_iso_c%i_iso_result =    org_fld_on_iso_c%i_iso_result
+      new_fld_on_iso_c%block_name =   org_fld_on_iso_c%block_name
+      new_fld_on_iso_c%i_iso_result = org_fld_on_iso_c%i_iso_result
 !
       end subroutine dup_fld_on_psf_control
 !
@@ -163,8 +173,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(fld_on_psf_c%i_iso_result .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -205,13 +215,13 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_result_type, fld_on_psf_c%output_type_ctl)
+     &    fld_on_psf_c%output_type_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_result_value, fld_on_psf_c%output_value_ctl)
+     &    fld_on_psf_c%output_value_ctl)
 !
       call write_control_array_c2(id_control, level,                    &
-     &    hd_iso_result_field, fld_on_psf_c%field_output_ctl)
+     &    fld_on_psf_c%field_output_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_fld_on_psf_control
@@ -236,28 +246,6 @@
       end do
 !
       end subroutine add_fields_on_psf_to_fld_ctl
-!
-!  ---------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_fld_on_psf_control()
-      num_label_fld_on_psf_control = n_label_fld_on_psf_ctl
-      return
-      end function num_label_fld_on_psf_control
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_fld_on_psf_control(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_fld_on_psf_ctl)
-!
-!
-      call set_control_labels(hd_result_type,      names( 1))
-      call set_control_labels(hd_iso_result_field, names( 2))
-      call set_control_labels(hd_result_value,  names( 3))
-!
-      end subroutine set_label_fld_on_psf_control
 !
 !  ---------------------------------------------------------------------
 !

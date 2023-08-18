@@ -7,6 +7,7 @@
 !> @brief Control input routine for data file headers
 !!
 !!@verbatim
+!!      subroutine init_FEM_sleeve_ctl_label(hd_block, sleeve_ctl)
 !!      subroutine read_FEM_sleeve_control                              &
 !!     &         (id_control, hd_block, sleeve_ctl, c_buf)
 !!        type(FEM_sleeve_control), intent(inout) :: sleeve_ctl
@@ -43,6 +44,8 @@
 !
 !>      Structure of Sleeve size controls
       type FEM_sleeve_control
+!>        Control block name
+        character(len = kchara) :: block_name = 'FEM_sleeve_ctl'
 !>        Structure of Sleeve extension mode
         type(read_character_item) :: sleeve_extension_mode_ctl
 !>        Structure of number of sleeve level
@@ -134,19 +137,39 @@
       maxlen = max(maxlen, len_trim(hd_reference_vector))
 !
       level =  write_begin_flag_for_ctl(id_file, level, hd_block)
-      call write_chara_ctl_type                                         &
-     &   (id_file, level, maxlen, hd_sleeve_extension_mode,             &
+      call write_chara_ctl_type(id_file, level, maxlen,                 &
      &    sleeve_ctl%sleeve_extension_mode_ctl)
       call write_integer_ctl_type(id_file, level, maxlen,               &
-     &    hd_sleeve_level, sleeve_ctl%sleeve_level_ctl)
+     &    sleeve_ctl%sleeve_level_ctl)
       call write_real_ctl_type(id_file, level, maxlen,                  &
-     &    hd_sleeve_size, sleeve_ctl%sleeve_size_ctl)
+     &    sleeve_ctl%sleeve_size_ctl)
       call write_chara_ctl_type(id_file, level, maxlen,                 &
-     &    hd_reference_vector, sleeve_ctl%ref_vector_ctl)
+     &    sleeve_ctl%ref_vector_ctl)
 !
       level =  write_end_flag_for_ctl(id_file, level, hd_block)
 !
       end subroutine write_FEM_sleeve_control
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine init_FEM_sleeve_ctl_label(hd_block, sleeve_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(FEM_sleeve_control), intent(inout) :: sleeve_ctl
+!
+      sleeve_ctl%block_name = hd_block
+!
+        call init_int_ctl_item_label                                    &
+     &     (hd_sleeve_level, sleeve_ctl%sleeve_level_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_sleeve_size,  sleeve_ctl%sleeve_size_ctl)
+!
+        call init_chara_ctl_item_label(hd_sleeve_extension_mode,        &
+     &      sleeve_ctl%sleeve_extension_mode_ctl)
+        call init_chara_ctl_item_label(hd_reference_vector,             &
+     &      sleeve_ctl%ref_vector_ctl)
+!
+      end subroutine init_FEM_sleeve_ctl_label
 !
 !  ---------------------------------------------------------------------
 !
@@ -183,6 +206,7 @@
       call copy_real_ctl(org_sleeve_c%sleeve_size_ctl,                  &
      &                   new_sleeve_c%sleeve_size_ctl)
 !
+      new_sleeve_c%block_name =       org_sleeve_c%block_name
       new_sleeve_c%i_FEM_sleeve_ctl = org_sleeve_c%i_FEM_sleeve_ctl
 !
       end subroutine copy_FEM_sleeve_control

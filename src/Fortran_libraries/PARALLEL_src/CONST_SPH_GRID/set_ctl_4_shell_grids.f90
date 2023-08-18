@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine set_control_4_shell_grids(nprocs_check,              &
 !!     &          spctl, sdctl, sph, gen_sph, ierr)
-!!        type(sphere_data_control), intent(inout) :: spctl
+!!        type(sphere_data_control), intent(in) :: spctl
 !!        type(sphere_domain_control), intent(in) :: sdctl
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph

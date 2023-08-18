@@ -27,8 +27,6 @@
 !!      subroutine monitor_read_control_label(c_buf)
 !!      subroutine monitor_read_control_buffer(c_buf)
 !!        type(buffer_for_control), intent(in)  :: c_buf
-!!
-!!      subroutine set_control_labels(label_f, label_c)
 !!@endverbatim
 !!
       module t_read_control_elements
@@ -251,18 +249,5 @@
       end subroutine monitor_read_control_buffer
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine set_control_labels(label_f, label_c)
-!
-      character(len = kchara), intent(inout) :: label_c
-      character(len = kchara), intent(in) :: label_f
-!
-!
-      write(label_c, '(a,a1)') trim(label_f) // char(0)
-!
-      end subroutine set_control_labels
-!
-! ----------------------------------------------------------------------
 !
       end module t_read_control_elements

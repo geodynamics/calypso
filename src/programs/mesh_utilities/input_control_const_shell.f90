@@ -94,7 +94,7 @@
 !
       call calypso_mpi_bcast_one_int(gen_SPH_ctl%i_sph_mesh_ctl, 0)
       call calypso_mpi_bcast_character                                  &
-     &   (gen_SPH_ctl%fname_psph_ctl, cast_long(kchara), 0)
+     &   (gen_SPH_ctl%fname_psph, cast_long(kchara), 0)
 !
       end subroutine bcast_sph_shell_construct_ctl
 !

@@ -17,7 +17,7 @@ lib_name:
 
 libtarget:
 
-lib_archve:
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_FFT_WRAP)' >> $(MAKENAME)
 
 mod_list:

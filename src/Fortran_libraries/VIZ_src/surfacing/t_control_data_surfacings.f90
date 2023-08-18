@@ -55,6 +55,9 @@
 !
 !>        Structures of surfacing controls
       type surfacing_controls
+!>        Control block name
+        character(len = kchara) :: block_name = 'visual_control'
+!
 !>        Structures of setioning controls
         type(section_controls) :: psf_s_ctls
 !>        Structures of isosurface controls

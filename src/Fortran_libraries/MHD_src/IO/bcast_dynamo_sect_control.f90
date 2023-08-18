@@ -34,13 +34,19 @@
       subroutine s_bcast_dynamo_section_control(zm_sects)
 !
       use t_control_data_dynamo_sects
-      use calypso_mpi_int
       use bcast_control_arrays
       use bcast_section_control_data
       use bcast_control_sph_MHD
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(sph_dynamo_section_controls), intent(inout) :: zm_sects
 !
+!
+      call calypso_mpi_bcast_character(zm_sects%block_name,             &
+     &                                 cast_long(kchara), 0)
+      call calypso_mpi_bcast_one_int(zm_sects%i_viz_ctl, 0)
 !
       call bcast_crustal_filtering_ctl(zm_sects%crust_filter_ctl)
       call bcast_files_4_psf_ctl(zm_sects%zm_psf_ctls)

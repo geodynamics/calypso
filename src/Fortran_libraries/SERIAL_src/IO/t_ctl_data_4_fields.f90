@@ -9,10 +9,14 @@
 !!@verbatim
 !!      subroutine dealloc_phys_control(fld_ctl)
 !!
+!!      subroutine init_phys_data_ctl_label(hd_block, fld_ctl)
 !!      subroutine read_phys_data_control                               &
 !!     &         (id_control, hd_block, fld_ctl, c_buf)
-!!      subroutine write_phys_data_control                              &
-!!     &         (id_control, hd_block, fld_ctl, level)
+!!      subroutine write_phys_data_control(id_control, fld_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(field_control), intent(inout) :: fld_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
 !! ---------------------------------------------------------------------
 !!
@@ -72,6 +76,9 @@
 !
 !>      Structure of field information control
       type field_control
+!>        Control block name
+        character(len = kchara) :: block_name = 'phys_values_ctl'
+!
 !>        Structure for list of field
 !!@n       field_ctl%icou:  Read flag for 'nod_value_ctl'
 !!@n       field_ctl%num:   Number of field
@@ -175,34 +182,58 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_phys_data_control                                &
-     &         (id_control, hd_block, fld_ctl, level)
+      subroutine write_phys_data_control(id_control, fld_ctl, level)
 !
       use t_read_control_elements
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(field_control), intent(in) :: fld_ctl
 !
       integer(kind = kint), intent(inout) :: level
 !
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      if(fld_ctl%i_phys_values .le. 0) return
+!
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 fld_ctl%block_name)
       call write_control_array_c3                                       &
-     &   (id_control, level, hd_field_list, fld_ctl%field_ctl)
+     &   (id_control, level, fld_ctl%field_ctl)
 !
       call write_control_array_c1                                       &
-     &   (id_control, level, hd_quad_field, fld_ctl%quad_phys)
+     &   (id_control, level, fld_ctl%quad_phys)
 !
       call write_control_array_c_i                                      &
-     &   (id_control, level, hd_scalar_field, fld_ctl%scalar_phys)
+     &   (id_control, level, fld_ctl%scalar_phys)
       call write_control_array_c_i3                                     &
-     &   (id_control, level, hd_vector_field, fld_ctl%vector_phys)
+     &   (id_control, level, fld_ctl%vector_phys)
 !
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+      level =  write_end_flag_for_ctl(id_control, level,                &
+     &                                fld_ctl%block_name)
 !
       end subroutine write_phys_data_control
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_phys_data_ctl_label(hd_block, fld_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(field_control), intent(inout) :: fld_ctl
+!
+!
+      fld_ctl%block_name = hd_block
+!
+        call init_c3_ctl_array_label                                    &
+     &     (hd_field_list, fld_ctl%field_ctl)
+        call init_chara_ctl_array_label                                 &
+     &     (hd_quad_field, fld_ctl%quad_phys)
+!
+        call init_c_i_array_label                                       &
+     &     (hd_scalar_field, fld_ctl%scalar_phys)
+        call init_c_i3_ctl_array_label                                  &
+     &     (hd_vector_field, fld_ctl%vector_phys)
+!
+      end subroutine init_phys_data_ctl_label
 !
 !   --------------------------------------------------------------------
 !

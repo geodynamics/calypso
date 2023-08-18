@@ -20,10 +20,9 @@
 !!      character(len = kchara) function set_monitor_control_flag       &
 !!     &                               (iflag_fld_monitor)
 !!
-!!      integer(kind = kint) function num_ctl_flag_visualize_field()
-!!      integer(kind = kint) function num_ctl_flag_monitored_field()
-!!      subroutine set_ctl_flag_visualize_field(names)
-!!      subroutine set_ctl_flag_monitored_field(names)
+!!      subroutine field_viz_flag_array(array_c)
+!!      subroutine field_monitor_flag_array(array_c)
+!!        type(ctl_array_chara), intent(inout) :: array_c
 !!@endverbatim
 !
       module add_nodal_fields_ctl
@@ -35,7 +34,6 @@
 !
       implicit  none
 !
-      integer(kind = kint), parameter :: n_label_viz_flag = 2
       character(len = kchara), parameter :: cflag_viz_on =  'Viz_On'
       character(len = kchara), parameter :: cflag_viz_off = 'Viz_Off'
 !
@@ -190,47 +188,35 @@
       end function set_monitor_control_flag
 !
 ! -----------------------------------------------------------------------
-!  ---------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_ctl_flag_visualize_field()
-      num_ctl_flag_visualize_field = n_label_viz_flag
-      return
-      end function num_ctl_flag_visualize_field
+      subroutine field_viz_flag_array(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
+!
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
+!
+      call append_c_to_ctl_array(cflag_viz_on,  array_c)
+      call append_c_to_ctl_array(cflag_viz_off,  array_c)
+!
+      end subroutine field_viz_flag_array
 !
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function num_ctl_flag_monitored_field()
-      num_ctl_flag_monitored_field = n_label_viz_flag
-      return
-      end function num_ctl_flag_monitored_field
+      subroutine field_monitor_flag_array(array_c)
+      use t_control_array_character
+      type(ctl_array_chara), intent(inout) :: array_c
 !
-! ----------------------------------------------------------------------
+      array_c%array_name = '  '
+      array_c%num =         0
+      call alloc_control_array_chara(array_c)
 !
-      subroutine set_ctl_flag_visualize_field(names)
+      call append_c_to_ctl_array(cflag_monitor_on,  array_c)
+      call append_c_to_ctl_array(cflag_monitor_off,  array_c)
 !
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout) :: names(n_label_viz_flag)
-!
-!
-      call set_control_labels(cflag_viz_on,  names( 1))
-      call set_control_labels(cflag_viz_off, names( 2))
-!
-      end subroutine set_ctl_flag_visualize_field
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_ctl_flag_monitored_field(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout) :: names(n_label_viz_flag)
-!
-!
-      call set_control_labels(cflag_monitor_on,  names( 1))
-      call set_control_labels(cflag_monitor_off, names( 2))
-!
-      end subroutine set_ctl_flag_monitored_field
+      end subroutine field_monitor_flag_array
 !
 ! ----------------------------------------------------------------------
 !

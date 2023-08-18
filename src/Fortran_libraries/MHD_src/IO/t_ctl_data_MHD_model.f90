@@ -40,6 +40,9 @@
       implicit none
 !
       type mhd_model_control
+!>        Block name
+        character(len=kchara) :: block_name = 'model'
+!
 !>        Structure for field information control
         type(field_control) :: fld_ctl
 !

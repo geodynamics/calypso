@@ -90,6 +90,8 @@
 !
       subroutine bcast_ctl_data_4_time_step(tctl)
 !
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use t_ctl_data_4_time_steps
       use bcast_control_arrays
@@ -149,6 +151,8 @@
 !
       call bcast_ctl_type_c1(tctl%flexible_step_ctl)
 !
+      call calypso_mpi_bcast_character(tctl%block_name,                 &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(tctl%i_tstep, 0)
 !
       end subroutine bcast_ctl_data_4_time_step

@@ -92,6 +92,7 @@
       use gz_layer_mean_monitor_IO
       use dup_fields_on_circle_to_IO
       use sel_open_sph_fld_on_circle
+      use skip_comment_f
 !
       integer, intent(in) :: my_rank
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -110,7 +111,7 @@
       real(kind = kreal), allocatable :: spectr_IO(:,:)
 !
 !
-      if(circle%circle_field_file_prefix .eq. 'NO_FILE') return
+      if(no_file_flag(circle%circle_field_file_prefix)) return
       if(my_rank .ne. 0) return
 !
       call dup_field_on_circ_header_to_IO(sph_params,                   &
@@ -148,6 +149,7 @@
       use gz_volume_spectr_monitor_IO
       use dup_fields_on_circle_to_IO
       use sel_open_sph_fld_on_circle
+      use skip_comment_f
 !
       integer, intent(in) :: my_rank
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -164,7 +166,7 @@
       real(kind = kreal), allocatable :: spectr_IO(:,:)
 !
 !
-      if(circle%circle_spectr_file_prefix .eq. 'NO_FILE') return
+      if(no_file_flag(circle%circle_spectr_file_prefix)) return
       if(my_rank .ne. 0) return
 !
       call dup_spectr_on_circ_header_to_IO(sph_params,                  &
@@ -204,6 +206,7 @@
       use gz_volume_spectr_monitor_IO
       use dup_fields_on_circle_to_IO
       use sel_open_sph_fld_on_circle
+      use skip_comment_f
 !
       integer, intent(in) :: my_rank
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -220,7 +223,7 @@
       real(kind = kreal), allocatable :: spectr_IO(:,:)
 !
 !
-      if(circle%circle_spectr_file_prefix .eq. 'NO_FILE') return
+      if(no_file_flag(circle%circle_spectr_file_prefix)) return
       if(my_rank .ne. 0) return
 !
       call dup_spectr_on_circ_header_to_IO(sph_params,                  &

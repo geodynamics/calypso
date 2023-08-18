@@ -35,11 +35,12 @@
      &          magne_nod, magne_surf)
 !
       use m_machine_parameter
+      use m_sph_node_group_types
       use calypso_mpi
       use t_physical_property
       use t_control_array_chara2real
       use t_bc_data_list
-      use set_node_group_types
+      use m_fem_node_group_types
       use set_surface_group_types
 !
       type(conductive_property), intent(in)  :: cd_prop
@@ -74,14 +75,16 @@
      &      = node_bc_B_ctl%vect(1:magne_nod%num_bc)
 !
         do i = 1, magne_nod%num_bc
+          call set_bc_group_types_each_dir(node_bc_B_ctl%c1_tbl(i),     &
+     &                                     magne_nod%ibc_type(i))
           call set_bc_group_types_vector(node_bc_B_ctl%c1_tbl(i),       &
-     &       magne_nod%ibc_type(i))
+     &                                   magne_nod%ibc_type(i))
           call set_bc_group_types_sgs_vect(node_bc_B_ctl%c1_tbl(i),     &
-     &       magne_nod%ibc_type(i))
+     &                                     magne_nod%ibc_type(i))
           call set_bc_group_types_sph_center(node_bc_B_ctl%c1_tbl(i),   &
-     &       magne_nod%ibc_type(i))
+     &                                     magne_nod%ibc_type(i))
           call set_bc_group_types_sph_magne(node_bc_B_ctl%c1_tbl(i),    &
-     &       magne_nod%ibc_type(i))
+     &                                     magne_nod%ibc_type(i))
 !
 !          if(cmp_no_case(node_bc_B_ctl%c1_tbl(i),'sph')                &
 !     &       ) magne_nod%ibc_type(i) = 999

@@ -32,6 +32,9 @@
 !
 !>        Structure for merged program control
       type control_data_4_merge
+!>        Block name
+        character(len=kchara) :: block_name = 'assemble_control'
+!
 !>        File name to read original spherical shell control file
         character (len = kchara) :: fname_src_psph_ctl
 !>        Structure for file information for original data
@@ -184,8 +187,14 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(mgd_ctl%i_assemble .gt. 0) return
+      call init_platforms_labels(hd_platform, mgd_ctl%source_plt)
+      call init_platforms_labels(hd_new_data, mgd_ctl%assemble_plt)
+      call init_parallel_shell_ctl_label(hd_orgsph_shell,               &
+     &                                   mgd_ctl%src_psph_ctl)
+      call init_parallel_shell_ctl_label(hd_newsph_shell,               &
+     &                                   mgd_ctl%asbl_psph_ctl)
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -245,8 +254,10 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(mgd_ctl%i_model .gt. 0) return
+      call init_phys_data_ctl_label(hd_phys_values,                     &
+     &                              mgd_ctl%fld_mge_ctl)
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -286,8 +297,11 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(mgd_ctl%i_control .gt. 0) return
+      call init_ctl_time_step_label(hd_time_step, mgd_ctl%t_mge_ctl)
+      call init_ctl_time_step_label(hd_new_time_step,                   &
+     &                              mgd_ctl%t2_mge_ctl)
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit

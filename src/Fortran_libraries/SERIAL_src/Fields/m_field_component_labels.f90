@@ -11,8 +11,8 @@
 !!@verbatim
 !!      logical function check_field_comp_list(field_name)
 !!
-!!      integer(kind = kint) function num_field_comp_list()
-!!      subroutine set_field_component_labels(n_comps, names, maths)
+!!      subroutine set_field_component_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  product of field component names  !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -22,6 +22,8 @@
 !!   theta_velocity            [i_velo_t]:
 !!   phi_velocity              [i_velo_p]:
 !!   cyl_r_velocity            [i_velo_s]:
+!!   x_velocity                [i_velo_x]:
+!!   y_velocity                [i_velo_y]:
 !!   z_velocity                [i_velo_z]:
 !!
 !!   r_magnetic_f              [i_magne_r]:
@@ -43,9 +45,6 @@
 !
       implicit  none
 ! 
-      integer(kind = kint), parameter, private :: nfid_comps = 12
-!
-!
 !>        Field label for radial velocity @f$ u_{r} @f$
       type(field_def), parameter :: r_velocity                          &
      &    = field_def(n_comp = n_scalar,                                &
@@ -66,6 +65,16 @@
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'cyl_r_velocity',                          &
      &                math = '$ u_{s} $')
+!>        Field label for z-componennt of velocity @f$ u_{x} @f$
+      type(field_def), parameter :: x_velocity                          &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'x_velocity',                              &
+     &                math = '$ u_{x} $')
+!>        Field label for z-componennt of velocity @f$ u_{y} @f$
+      type(field_def), parameter :: y_velocity                          &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'y_velocity',                              &
+     &                math = '$ u_{y} $')
 !>        Field label for z-componennt of velocity @f$ u_{z} @f$
       type(field_def), parameter :: z_velocity                          &
      &    = field_def(n_comp = n_scalar,                                &
@@ -131,6 +140,8 @@
      &   .or. (field_name .eq. theta_velocity%name)                     &
      &   .or. (field_name .eq. phi_velocity%name)                       &
      &   .or. (field_name .eq. cyl_r_velocity%name)                     &
+     &   .or. (field_name .eq. x_velocity%name)                         &
+     &   .or. (field_name .eq. y_velocity%name)                         &
      &   .or. (field_name .eq. z_velocity%name)                         &
 !
      &   .or. (field_name .eq. r_magnetic_f%name)                       &
@@ -146,48 +157,32 @@
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
-! 
-      integer(kind = kint) function num_field_comp_list()
-      num_field_comp_list = nfid_comps
-      return
-      end function num_field_comp_list
 !
-! ----------------------------------------------------------------------
+      subroutine set_field_component_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      subroutine set_field_component_labels(n_comps, names, maths)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(nfid_comps)
-      character(len = kchara), intent(inout) :: names(nfid_comps)
-      character(len = kchara), intent(inout) :: maths(nfid_comps)
+      call set_field_label_to_ctl(r_velocity,  array_c2i)
+      call set_field_label_to_ctl(theta_velocity,  array_c2i)
+      call set_field_label_to_ctl(phi_velocity,  array_c2i)
+      call set_field_label_to_ctl(cyl_r_velocity,  array_c2i)
+      call set_field_label_to_ctl(x_velocity,  array_c2i)
+      call set_field_label_to_ctl(y_velocity,  array_c2i)
+      call set_field_label_to_ctl(z_velocity,  array_c2i)
 !
+      call set_field_label_to_ctl(r_magnetic_f,  array_c2i)
+      call set_field_label_to_ctl(theta_magnetic_f,  array_c2i)
+      call set_field_label_to_ctl(phi_magnetic_f,  array_c2i)
+      call set_field_label_to_ctl(cyl_r_magnetic_f,  array_c2i)
+      call set_field_label_to_ctl(x_magnetic_f,  array_c2i)
+      call set_field_label_to_ctl(y_magnetic_f,  array_c2i)
+      call set_field_label_to_ctl(z_magnetic_f,  array_c2i)
 !
-      call set_field_labels(r_velocity,                                 &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(theta_velocity,                             &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(phi_velocity,                               &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(cyl_r_velocity,                             &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(z_velocity,                                 &
-     &    n_comps( 5), names( 5), maths( 5))
-!
-      call set_field_labels(r_magnetic_f,                               &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(theta_magnetic_f,                           &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(phi_magnetic_f,                             &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(cyl_r_magnetic_f,                           &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(x_magnetic_f,                               &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(y_magnetic_f,                               &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(z_magnetic_f,                               &
-     &    n_comps(12), names(12), maths(12))
-!
-      end subroutine set_field_component_labels
+      end subroutine set_field_component_names
 !
 ! ----------------------------------------------------------------------
 !

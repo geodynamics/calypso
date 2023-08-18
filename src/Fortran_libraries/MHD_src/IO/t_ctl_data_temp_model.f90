@@ -91,6 +91,9 @@
 !
 !
       type reference_point_control
+!>        Block name
+        character(len=kchara) :: block_name  = 'low_temp_ctl'
+
         type(read_real_item) :: value
         type(read_real_item) :: depth
 !
@@ -98,6 +101,10 @@
       end type reference_point_control
 !
       type reference_temperature_ctl
+!>        Block name
+        character(len=kchara) :: block_name                             &
+     &                          = 'temperature_define'
+
         type(read_character_item) :: filterd_advect_ctl
         type(read_character_item) :: reference_ctl
         type(read_character_item) :: stratified_ctl

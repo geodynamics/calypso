@@ -9,8 +9,8 @@
 !!@verbatim
 !!      logical function check_difference_vectors(field_name)
 !!
-!!      integer(kind = kint) function num_difference_vector()
-!!      subroutine set_differnce_vector_labels(n_comps, names, maths)
+!!      subroutine set_differnce_vector_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  diffrence of vector fields !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -37,9 +37,6 @@
       use t_field_labels
 !
       implicit none
-!
-      integer(kind = kint), parameter, private :: ngrad_vector = 15
-!
 !
 !  difference of field
 !>        Field label for gradient of velocity
@@ -173,57 +170,32 @@
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
-! 
-      integer(kind = kint) function num_difference_vector()
-      num_difference_vector = ngrad_vector
-      return
-      end function num_difference_vector
 !
-! ----------------------------------------------------------------------
+      subroutine set_differnce_vector_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      subroutine set_differnce_vector_labels(n_comps, names, maths)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(ngrad_vector)
-      character(len = kchara), intent(inout) :: names(ngrad_vector)
-      character(len = kchara), intent(inout) :: maths(ngrad_vector)
+      call set_field_label_to_ctl(grad_v_1,  array_c2i)
+      call set_field_label_to_ctl(grad_v_2,  array_c2i)
+      call set_field_label_to_ctl(grad_v_3,  array_c2i)
+      call set_field_label_to_ctl(grad_w_1,  array_c2i)
+      call set_field_label_to_ctl(grad_w_2,  array_c2i)
+      call set_field_label_to_ctl(grad_w_3,  array_c2i)
+      call set_field_label_to_ctl(grad_b_1,  array_c2i)
+      call set_field_label_to_ctl(grad_b_2,  array_c2i)
+      call set_field_label_to_ctl(grad_b_3,  array_c2i)
+      call set_field_label_to_ctl(grad_a_1,  array_c2i)
+      call set_field_label_to_ctl(grad_a_2,  array_c2i)
+      call set_field_label_to_ctl(grad_a_3,  array_c2i)
+      call set_field_label_to_ctl(grad_j_1,  array_c2i)
+      call set_field_label_to_ctl(grad_j_2,  array_c2i)
+      call set_field_label_to_ctl(grad_j_3,  array_c2i)
 !
-!
-      call set_field_labels(grad_v_1,                                   &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(grad_v_2,                                   &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(grad_v_3,                                   &
-     &    n_comps( 3), names( 3), maths( 3))
-!
-      call set_field_labels(grad_w_1,                                   &
-     &    n_comps( 4), names( 4), maths( 4))
-      call set_field_labels(grad_w_2,                                   &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(grad_w_3,                                   &
-     &    n_comps( 6), names( 6), maths( 6))
-!
-      call set_field_labels(grad_b_1,                                   &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(grad_b_2,                                   &
-     &    n_comps( 8), names( 8), maths( 8))
-      call set_field_labels(grad_b_3,                                   &
-     &    n_comps( 9), names( 9), maths( 9))
-!
-      call set_field_labels(grad_a_1,                                   &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(grad_a_2,                                   &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(grad_a_3,                                   &
-     &    n_comps(12), names(12), maths(12))
-!
-      call set_field_labels(grad_j_1,                                   &
-     &    n_comps(13), names(13), maths(13))
-      call set_field_labels(grad_j_2,                                   &
-     &    n_comps(14), names(14), maths(14))
-      call set_field_labels(grad_j_3,                                   &
-     &    n_comps(15), names(15), maths(15))
-!
-      end subroutine set_differnce_vector_labels
+      end subroutine set_differnce_vector_names
 !
 ! ----------------------------------------------------------------------
 !

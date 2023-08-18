@@ -101,6 +101,8 @@
 !
 !>      control data structure for spherical shell
       type sphere_data_control
+!>        Block name
+        character(len=kchara) :: block_name = 'shell_define_ctl'
 !>        Truncation lavel of spherical harmonics
         type(read_integer_item) :: ltr_ctl
 !>        longitudinal symmetry

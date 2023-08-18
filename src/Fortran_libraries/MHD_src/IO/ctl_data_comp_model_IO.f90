@@ -9,13 +9,14 @@
 !!@n        Modified by H. Matsui on Oct., 2007
 !!
 !!@verbatim
-!!      subroutine read_refcomp_ctl                                     &
+!!      subroutine init_comp_model_ctl_label(hd_block, refc_ctl)
+!!      subroutine read_comp_model_ctl                                  &
 !!     &          (id_control, hd_block, refc_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(reference_temperature_ctl), intent(inout) :: refc_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
-!!      subroutine write_refcomp_ctl                                    &
+!!      subroutine write_comp_model_ctl                                 &
 !!     &         (id_control, hd_block, refc_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
@@ -104,6 +105,7 @@
      &       :: hd_comp_value = 'composition'
 !
       private :: read_ref_comp_ctl, write_ref_comp_ctl
+      private :: init_ref_comp_ctl_label
 !
 !   --------------------------------------------------------------------
 !
@@ -111,7 +113,7 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_refcomp_ctl                                       &
+      subroutine read_comp_model_ctl                                    &
      &          (id_control, hd_block, refc_ctl, c_buf)
 !
       integer(kind = kint), intent(in) :: id_control
@@ -149,11 +151,11 @@
       end do
       refc_ctl%i_temp_def = 1
 !
-      end subroutine read_refcomp_ctl
+      end subroutine read_comp_model_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_refcomp_ctl                                      &
+      subroutine write_comp_model_ctl                                   &
      &         (id_control, hd_block, refc_ctl, level)
 !
       use write_control_elements
@@ -177,28 +179,55 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_filterd_advection, refc_ctl%filterd_advect_ctl)
+     &    refc_ctl%filterd_advect_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_diffusivity_reduction,                                     &
      &    refc_ctl%ICB_diffuse_reduction_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_ref_comp, refc_ctl%reference_ctl)
+     &    refc_ctl%reference_ctl)
       call write_ref_comp_ctl                                           &
      &   (id_control, hd_low_comp, refc_ctl%low_ctl, level)
       call write_ref_comp_ctl                                           &
      &   (id_control, hd_high_comp, refc_ctl%high_ctl, level)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_start_ctl, refc_ctl%stratified_ctl)
+     &    refc_ctl%stratified_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_ref_field_file, refc_ctl%ref_file_ctl)
+     &    refc_ctl%ref_file_ctl)
       call write_takepiro_ctl(id_control, hd_takepiro_ctl,              &
      &    refc_ctl%takepiro_ctl, level)
 !
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
-      end subroutine write_refcomp_ctl
+      end subroutine write_comp_model_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_comp_model_ctl_label(hd_block, refc_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(reference_temperature_ctl), intent(inout) :: refc_ctl
+!
+!
+      refc_ctl%block_name = hd_block
+      call init_ref_comp_ctl_label(hd_low_comp, refc_ctl%low_ctl)
+      call init_ref_comp_ctl_label(hd_high_comp, refc_ctl%high_ctl)
+      call init_takepiro_ctl_label(hd_takepiro_ctl,                     &
+     &                             refc_ctl%takepiro_ctl)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_filterd_advection, refc_ctl%filterd_advect_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_ref_comp, refc_ctl%reference_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_start_ctl, refc_ctl%stratified_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_ref_field_file, refc_ctl%ref_file_ctl)
+!
+        call init_real_ctl_item_label(hd_diffusivity_reduction,         &
+     &                          refc_ctl%ICB_diffuse_reduction_ctl)
+!
+      end subroutine init_comp_model_ctl_label
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -250,12 +279,23 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_position, ref_ctl%depth)
+     &    ref_ctl%depth)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_comp_value, ref_ctl%value)
+     &    ref_ctl%value)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_ref_comp_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine init_ref_comp_ctl_label(hd_block, ref_ctl)
+      character(len=kchara), intent(in) :: hd_block
+      type(reference_point_control), intent(inout) :: ref_ctl
+!
+      ref_ctl%block_name = hd_block
+        call init_real_ctl_item_label(hd_position, ref_ctl%depth)
+        call init_real_ctl_item_label(hd_comp_value, ref_ctl%value)
+      end subroutine init_ref_comp_ctl_label
 !
 !   --------------------------------------------------------------------
 !

@@ -9,7 +9,6 @@
     "examples/**",
     "doxygen/**",
     "**/*m4",
-    "**/CMakeLists.txt",
     "config.guess",
     "config.sub",
     "configure",

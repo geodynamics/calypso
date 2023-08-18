@@ -51,6 +51,7 @@
 !!      eps_4_magne_ctl          5.0e-1
 !!      scheme_ctl              Crank_Nicolson
 !!      diffuse_correct_ctl     On
+!!      coef_implicit_ctl       5.0e-1
 !!      coef_imp_v_ctl          5.0e-1
 !!      coef_imp_t_ctl          5.0e-1
 !!      coef_imp_b_ctl          5.0e-1
@@ -81,6 +82,10 @@
       implicit  none
 !
       type mhd_evo_scheme_control
+!>        Block name
+        character(len=kchara) :: block_name = 'time_loop_ctl'
+!
+        type(read_real_item) :: coef_implicit_ctl
         type(read_real_item) :: coef_imp_v_ctl
         type(read_real_item) :: coef_imp_t_ctl
         type(read_real_item) :: coef_imp_b_ctl
@@ -138,6 +143,7 @@
 !
       mevo_ctl%eps_4_velo_ctl%iflag =  0
       mevo_ctl%eps_4_magne_ctl%iflag = 0
+      mevo_ctl%coef_implicit_ctl%iflag =  0
       mevo_ctl%coef_imp_v_ctl%iflag =  0
       mevo_ctl%coef_imp_t_ctl%iflag =  0
       mevo_ctl%coef_imp_b_ctl%iflag =  0

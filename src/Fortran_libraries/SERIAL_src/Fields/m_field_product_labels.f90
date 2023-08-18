@@ -13,8 +13,8 @@
 !!      logical function check_field_product_vectors(field_name)
 !!      logical function check_field_product_scalars(field_name)
 !!
-!!      integer(kind = kint) function num_field_products()
-!!      subroutine set_field_product_labels(n_comps, names, maths)
+!!      subroutine set_field_product_names(array_c2i)
+!!        type(ctl_array_c2i), intent(inout) :: array_c2i
 !!
 !! !!!!!  product of fields names  !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -63,9 +63,6 @@
 !
       implicit  none
 ! 
-      integer(kind = kint), parameter, private :: nfid_product = 26
-!
-!
 !>        Field label for ageostrophic balance
 !!         @f$ -2 e_{ijk} \Omega_{j} u_{k} - \partial_{i} p @f$
       type(field_def), parameter :: rest_of_geostrophic                 &
@@ -291,80 +288,43 @@
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
-! 
-      integer(kind = kint) function num_field_products()
-      num_field_products = nfid_product
-      return
-      end function num_field_products
 !
-! ----------------------------------------------------------------------
+      subroutine set_field_product_names(array_c2i)
+      use t_control_array_chara2int
+      type(ctl_array_c2i), intent(inout) :: array_c2i
 !
-      subroutine set_field_product_labels(n_comps, names, maths)
+      array_c2i%array_name = '  '
+      array_c2i%num =         0
+      call alloc_control_array_c2_i(array_c2i)
 !
-      integer(kind = kint_4b), intent(inout) :: n_comps(nfid_product)
-      character(len = kchara), intent(inout) :: names(nfid_product)
-      character(len = kchara), intent(inout) :: maths(nfid_product)
+      call set_field_label_to_ctl(rest_of_geostrophic,      array_c2i)
+      call set_field_label_to_ctl(truncated_magnetic_field, array_c2i)
+      call set_field_label_to_ctl(electric_field,           array_c2i)
+      call set_field_label_to_ctl(poynting_flux,            array_c2i)
+      call set_field_label_to_ctl(kinetic_helicity,         array_c2i)
+      call set_field_label_to_ctl(magnetic_helicity,        array_c2i)
+      call set_field_label_to_ctl(current_helicity,         array_c2i)
+      call set_field_label_to_ctl(cross_helicity,           array_c2i)
+      call set_field_label_to_ctl(square_velocity,          array_c2i)
+      call set_field_label_to_ctl(square_vorticity,         array_c2i)
+      call set_field_label_to_ctl(square_magne,             array_c2i)
+      call set_field_label_to_ctl(square_vector_potential,  array_c2i)
+      call set_field_label_to_ctl(square_current,           array_c2i)
+      call set_field_label_to_ctl(square_temperature,       array_c2i)
+      call set_field_label_to_ctl(square_composition,       array_c2i)
+      call set_field_label_to_ctl(velocity_scale,           array_c2i)
+      call set_field_label_to_ctl(magnetic_scale,           array_c2i)
+      call set_field_label_to_ctl(temperature_scale,        array_c2i)
+      call set_field_label_to_ctl(composition_scale,        array_c2i)
+      call set_field_label_to_ctl(stream_pol_velocity,      array_c2i)
+      call set_field_label_to_ctl(stream_pol_magne,         array_c2i)
+      call set_field_label_to_ctl(magnetic_intensity,       array_c2i)
+      call set_field_label_to_ctl(declination,              array_c2i)
+      call set_field_label_to_ctl(inclination,              array_c2i)
+      call set_field_label_to_ctl(vgp_latitude,             array_c2i)
+      call set_field_label_to_ctl(vgp_longigude,            array_c2i)
 !
-!
-      call set_field_labels(rest_of_geostrophic,                        &
-     &    n_comps( 1), names( 1), maths( 1))
-      call set_field_labels(truncated_magnetic_field,                   &
-     &    n_comps( 2), names( 2), maths( 2))
-      call set_field_labels(electric_field,                             &
-     &    n_comps( 3), names( 3), maths( 3))
-      call set_field_labels(poynting_flux,                              &
-     &    n_comps( 4), names( 4), maths( 4))
-!
-      call set_field_labels(kinetic_helicity,                           &
-     &    n_comps( 5), names( 5), maths( 5))
-      call set_field_labels(magnetic_helicity,                          &
-     &    n_comps( 6), names( 6), maths( 6))
-      call set_field_labels(current_helicity,                           &
-     &    n_comps( 7), names( 7), maths( 7))
-      call set_field_labels(cross_helicity,                             &
-     &    n_comps( 8), names( 8), maths( 8))
-!
-      call set_field_labels(square_velocity,                            &
-     &    n_comps( 9), names( 9), maths( 9))
-      call set_field_labels(square_vorticity,                           &
-     &    n_comps(10), names(10), maths(10))
-      call set_field_labels(square_magne,                               &
-     &    n_comps(11), names(11), maths(11))
-      call set_field_labels(square_vector_potential,                    &
-     &    n_comps(12), names(12), maths(12))
-      call set_field_labels(square_current,                             &
-     &    n_comps(13), names(13), maths(13))
-      call set_field_labels(square_temperature,                         &
-     &    n_comps(14), names(14), maths(14))
-      call set_field_labels(square_composition,                         &
-     &    n_comps(15), names(15), maths(15))
-!
-      call set_field_labels(velocity_scale,                             &
-     &    n_comps(16), names(16), maths(16))
-      call set_field_labels(magnetic_scale,                             &
-     &    n_comps(17), names(17), maths(17))
-      call set_field_labels(temperature_scale,                          &
-     &    n_comps(18), names(18), maths(18))
-      call set_field_labels(composition_scale,                          &
-     &    n_comps(19), names(19), maths(19))
-!
-      call set_field_labels(stream_pol_velocity,                        &
-     &    n_comps(20), names(20), maths(20))
-      call set_field_labels(stream_pol_magne,                           &
-     &    n_comps(21), names(21), maths(21))
-!
-      call set_field_labels(magnetic_intensity,                         &
-     &    n_comps(22), names(22), maths(22))
-      call set_field_labels(declination,                                &
-     &    n_comps(23), names(23), maths(23))
-      call set_field_labels(inclination,                                &
-     &    n_comps(24), names(24), maths(24))
-      call set_field_labels(vgp_latitude,                               &
-     &    n_comps(25), names(25), maths(25))
-      call set_field_labels(vgp_longigude,                              &
-     &    n_comps(26), names(26), maths(26))
-!
-      end subroutine set_field_product_labels
+      end subroutine set_field_product_names
 !
 ! ----------------------------------------------------------------------
 !

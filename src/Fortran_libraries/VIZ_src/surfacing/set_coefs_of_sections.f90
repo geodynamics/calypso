@@ -13,10 +13,6 @@
 !!        real(kind = kreal) function side_of_plane(const_psf, xx)
 !!      subroutine cal_normal_of_plane(const_psf, xx, normal)
 !!      subroutine cal_normal4_of_plane(const_psf, xx4, normal4)
-!!
-!!      integer(kind = kint) function num_label_psf_def_type()
-!!      integer(kind = kint) function num_label_psf_def_type_grp()
-!!      subroutine set_label_psf_def_type_grp(names)
 !!@endverbatim
 !
       module set_coefs_of_sections
@@ -25,20 +21,6 @@
       use m_constants
 !
       implicit  none
-!
-      character(len = kchara), parameter :: cflag_eq =  'equation'
-      character(len = kchara), parameter :: cflag_pln = 'plane'
-      character(len = kchara), parameter :: cflag_sph = 'sphere'
-      character(len = kchara), parameter :: cflag_elp = 'ellipsoid'
-      character(len = kchara), parameter :: cflag_hyp = 'hyperboloid'
-      character(len = kchara), parameter :: cflag_prb = 'paraboloid'
-      character(len = kchara), parameter :: cflag_grp = 'group'
-!
-      integer(kind = kint), parameter :: n_label_psf_def_type =     6
-      integer(kind = kint), parameter :: n_label_psf_def_type_grp = 7
-!
-      private :: cflag_pln, cflag_sph, cflag_elp
-      private :: cflag_hyp, cflag_prb
 !
 !  ---------------------------------------------------------------------
 !
@@ -176,41 +158,6 @@
       normal4(4) =   0.0d0
 !
       end subroutine cal_normal4_of_plane
-!
-!  ---------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_psf_def_type()
-      num_label_psf_def_type = n_label_psf_def_type
-      return
-      end function num_label_psf_def_type
-!
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_psf_def_type_grp()
-      num_label_psf_def_type_grp = n_label_psf_def_type_grp
-      return
-      end function num_label_psf_def_type_grp
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_psf_def_type_grp(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_psf_def_type_grp)
-!
-!
-      call set_control_labels(cflag_eq,  names( 1))
-      call set_control_labels(cflag_pln, names( 2))
-      call set_control_labels(cflag_sph, names( 3))
-      call set_control_labels(cflag_elp, names( 4))
-      call set_control_labels(cflag_hyp, names( 5))
-      call set_control_labels(cflag_prb, names( 6))
-      call set_control_labels(cflag_grp, names( 7))
-!
-      end subroutine set_label_psf_def_type_grp
 !
 !  ---------------------------------------------------------------------
 !

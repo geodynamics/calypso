@@ -26,14 +26,14 @@ lib_name:
 	@echo  'LIB_FFTPACK_FILE = $(LIB_FFTPACK_FILE)' >> $(MAKENAME)
 	@echo   >> $(MAKENAME)
 
-lib_tasks: libtarget lib_archve
+lib_tasks: lib_archve
 	@echo '	''$$(RANLIB) $$@' >> $(MAKENAME)
 
 libtarget:
 	@echo '' >> $(MAKENAME)
 	@echo  '$$(LIB_FFTPACK_FILE): $$(MOD_FFTPACK)'>> $(MAKENAME)
 
-lib_archve:
+lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_FFTPACK)' >> $(MAKENAME)
 
 mod_list:
