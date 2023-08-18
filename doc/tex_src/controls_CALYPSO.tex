@@ -968,13 +968,13 @@ Loop configuration for Legendre transform is defined by text. The following sett
 If this flag is not defined, \verb|Symmetric_matmul_big| is chosen as a default value because \verb|Symmetric_matmul_big| is the fastest approarch in many platforms. In the all spherical transform, equatorial syymetry is taken into account.
 %
 \begin{description}
-\item{\tt Symmetric_original_loop}	Set radial loop as the inner most loop for Legendre transform.
-\item{\tt Symmetric_outer_radial_loop}	Set radial loop as the outmost loop for Legendre transform.
-\item{\tt Symmetric_matmul}    Use Fortran90's intrinsic function for matrix-matrix products for each components.
-\item{\tt Symmetric_matmul_big}   Use Fortran90's intrinsic function for matrix-matrix products. The matrix operation is combined for all radial and fielc components.
-\item{\tt Symmetric_BLAS_big}    Use BLAS library for matrix-matrix products if BLAS library is linked. The matrix operation is combined for all radial and fielc components.
-\item{\tt On_the_fly_Plm}   Evaluate Legendre polynomial in every Legendre transforms.
-\item{\tt Search_fastest}	Compare elapsed time among above six approarch at the initialization and choose the fastest one.
+\item{\tt Symmetric\_original\_loop}	Set radial loop as the inner most loop for Legendre transform.
+\item{\tt Symmetric\_outer\_radial\_loop}	Set radial loop as the outmost loop for Legendre transform.
+\item{\tt Symmetric\_matmul}    Use Fortran90's intrinsic function for matrix-matrix products for each components.
+\item{\tt Symmetric\_matmul\_big}   Use Fortran90's intrinsic function for matrix-matrix products. The matrix operation is combined for all radial and fielc components.
+\item{\tt Symmetric\_BLAS\_big}    Use BLAS library for matrix-matrix products if BLAS library is linked. The matrix operation is combined for all radial and fielc components.
+\item{\tt On\_the\_fly\_Plm}   Evaluate Legendre polynomial in every Legendre transforms.
+\item{\tt Search\_fastest}	Compare elapsed time among above six approarch at the initialization and choose the fastest one.
 \end{description}
 %
 

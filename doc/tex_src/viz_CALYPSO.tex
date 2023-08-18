@@ -1,0 +1,88 @@
+\subsection{Volume rendering data (Parallel volume rendering module}
+
+Calypso includes parallel volume rendering (PVR) module for scalar field visualization. The PVR module generates volume rendering data during time integration without writing large size volume data.
+
+To output volume rendering data, increment of the volume rendering needs to be defined at \verb|i_step_sectioning_ctl| in \verb|time_step_ctl| block. Parameters foe each rendering are defined in array block \verb|volume_rendering| in \verb|visual_control|. Each  \verb|volume_rendering| block can be stored in an external file, and the external file can be defined as \verb|file volume_rendering [File_Name]|.
+
+\paragraph{Control data}
+The control parameters for PVR is the following:
+\\
+%
+Block \verb|volume_rendering| (Top level for volume rendering)
+\\
+\label{href_i:volume_rendering}
+\begin{itemize}
+	\item \hyperref[href_t:updated_sign]
+			{\tt updated\_sign    [Signal]}
+	\item \hyperref[href_t:pvr_file_prefix]
+			{\tt pvr\_file\_prefix    [File\_Prefix]}
+	\item \hyperref[href_t:pvr_output_format]
+			{\tt pvr\_output\_format    [File\_Format]}
+	\item \hyperref[href_t:monitoring_mode]
+			{\tt monitoring\_mode       [ON/OFF]}
+%
+	\item \hyperref[href_t:stereo_imaging]
+			{\tt stereo\_imaging          [ON/OFF]}
+	\item \hyperref[href_t:anaglyph_switch]
+			{\tt anaglyph\_switch         [ON/OFF]}
+	\item \hyperref[href_t:quilt_3d_imaging]
+			{\tt quilt\_3d\_imaging       [ON/OFF]}
+%
+	\item \hyperref[href_t:output_field]
+			{\tt output\_field            [Field\_Name]}
+	\item \hyperref[href_t:output_component]
+			{\tt output\_component       [Component\_Name]}
+%
+    \item File or Block \verb|view_transform_ctl|
+			\label{href_i:view_transform_ctl}
+    \item Block \verb|plot_area_ctl|
+			\label{href_i:plot_area_ctl}
+    \item File or Block \verb|pvr_color_ctl|
+			\label{href_i:pvr_color_ctl}
+    \item Block \verb|colormap_ctl|
+			\label{href_i:colormap_ctl}
+    \item Block \verb|colorbar_ctl|
+			\label{href_i:colorbar_ctl}
+    \item File or Block \verb|lighting_ctl|
+			\label{href_i:lighting_ctl}
+%
+    \item File or Block \verb|section_ctl|
+			\label{href_i:section_ctl}
+    \item Block        \verb|isosurface_ctl|
+			\label{href_i:isosurface_ctl}
+%
+    \item Block        \verb|quilt_image_ctl|
+			\label{href_i:quilt_image_ctl}
+	\begin{itemize}
+		\item \hyperref[href_t:num_column_row_ctl]
+				{\tt num\_column\_row\_ctl     [\# of column] [\# of row]}
+		\item \hyperref[href_t:num_row_column_ctl]
+				{\tt num\_row\_column\_ctl     [\# of row] [\# of column]}
+	    \item Array Block \verb|view_transform_ctl|
+				\label{href_i:quilt_view_transform_ctl}
+	\end{itemize}
+%
+    \item Block        \verb|snapshot_movie_ctl|
+			\label{href_i:snapshot_movie_ctl}
+	\begin{itemize}
+		\item \hyperref[href_t:movie_mode_ctl]
+				{\tt movie\_mode\_ctl       [Mode]}
+		\item \hyperref[href_t:num_frames_ctl]
+				{\tt num\_frames\_ctl       [\# of Flame]}
+		\item \hyperref[href_t:rotation_axis_ctl]
+				{\tt rotation\_axis\_ctl    [X/Y/Z]}
+		\item \hyperref[href_t:angle_range]
+				{\tt angle\_range    [START] [END]}
+		\item \hyperref[href_t:apature_range]
+				{\tt apature\_range  [START] [END]}
+		\item \hyperref[href_t:LIC_kernel_peak_range]
+				{\tt LIC\_kernel\_peak\_range  [START] [END]}
+%
+	    \item File or Block \verb|start_view_control|
+				\label{href_i:start_view_control}
+	    \item File or Block \verb|end_view_control|
+				\label{href_i:end_view_control}
+	    \item Array Block \verb|view_transform_ctl|
+				\label{href_i:movie_view_transform_ctl}
+	\end{itemize}
+\end{itemize}
