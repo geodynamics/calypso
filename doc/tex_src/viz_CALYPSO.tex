@@ -1,4 +1,4 @@
-\subsection{Volume rendering data (Parallel volume rendering module}
+\subsection{Volume rendering data (Parallel volume rendering module)}
 
 Calypso includes parallel volume rendering (PVR) module for scalar field visualization. The PVR module generates volume rendering data during time integration without writing large size volume data.
 
@@ -13,7 +13,7 @@ Block \verb|volume_rendering| (Top level for volume rendering)
 \label{href_i:volume_rendering}
 \begin{itemize}
 	\item \hyperref[href_t:updated_sign]
-			{\tt updated\_sign    [Signal]}
+			{\tt updated\_sign    [SIGNAL]}
 	\item \hyperref[href_t:pvr_file_prefix]
 			{\tt pvr\_file\_prefix    [File\_Prefix]}
 	\item \hyperref[href_t:pvr_output_format]
@@ -33,56 +33,403 @@ Block \verb|volume_rendering| (Top level for volume rendering)
 	\item \hyperref[href_t:output_component]
 			{\tt output\_component       [Component\_Name]}
 %
-    \item File or Block \verb|view_transform_ctl|
-			\label{href_i:view_transform_ctl}
-    \item Block \verb|plot_area_ctl|
-			\label{href_i:plot_area_ctl}
-    \item File or Block \verb|pvr_color_ctl|
+    	\item File or Block \verb|view_transform_ctl|
+				\label{href_i:view_transform_ctl}
+		\begin{itemize}
+    			\item Block \verb|image_size_ctl|
+						\label{href_i:image_size_ctl}
+				\begin{itemize}
+					\item \hyperref[href_t:x_pixel_ctl]
+							{\tt x\_pixel\_ctl   [\# of PIXELS]}
+					\item \hyperref[href_t:y_pixel_ctl]
+							{\tt y\_pixel\_ctl   [\# of PIXELS]}
+				\end{itemize}
+%
+			\item Array \hyperref[href_t:modelview_matrix_ctl]
+					{\tt modelview\_matrix\_ctl   [X/Y/X/W] [X/Y/Z/W]  [VALUE]}
+			\item Array \hyperref[href_t:look_at_point_ctl]
+					{\tt look\_at\_point\_ctl   [X/Y/Z]    [VALUE]}
+			\item Array \hyperref[href_t:eye_position_ctl]
+					{\tt eye\_position\_ctl   [X/Y/Z]     [VALUE]}
+			\item Array \hyperref[href_t:up_direction_ctl]
+					{\tt up\_direction\_ctl   [X/Y/Z]     [VALUE]}
+			\item Array \hyperref[href_t:view_rotation_vec_ctl]
+					{\tt view\_rotation\_vec\_ctl   [X/Y/Z]     [VALUE]}
+			\item \hyperref[href_t:view_rotation_deg_ctl]
+					{\tt view\_rotation\_deg\_ctl     [DEGREE]}
+			\item \hyperref[href_t:scale_factor_ctl]
+					{\tt scale\_factor\_ctl     [SCALE]}
+			\item Array \hyperref[href_t:scale_factor_vec_ctl]
+					{\tt scale\_factor\_vec\_ctl  [X/Y/Z]     [SCALE]}
+			\item Array \hyperref[href_t:eye_position_in_viewer_ctl]
+					{\tt eye\_position\_in\_viewer\_ctl   [X/Y/Z]    [VALUE]}
+%
+			\item \hyperref[href_t:projection_type_ctl]
+					{\tt projection\_type\_ctl   [TYPE]}
+%
+   			\item Block \verb|projection_matrix_ctl|
+						\label{href_i:projection_matrix_ctl}
+				\begin{itemize}
+					\item \hyperref[href_t:perspective_angle_ctl]
+							{\tt perspective\_angle\_ctl   [DEGREE]}
+					\item \hyperref[href_t:perspective_xy_ratio_ctl]
+							{\tt perspective\_xy\_ratio\_ctl   [ASPECT]}
+					\item \hyperref[href_t:perspective_near_ctl]
+							{\tt perspective\_near\_ctl   [NEAR\_DISTANCE]}
+					\item \hyperref[href_t:perspective_far_ctl]
+							{\tt perspective\_far\_ctl   [FAR\_DISTANCE]}
+%
+%					\item \hyperref[href_t:horizontal_range_ctl]
+%							{\tt horizontal\_range\_ctl   [LEFT]  [RIGHT[}
+%					\item \hyperref[href_t:vertical_range_ctl]
+%							{\tt vertical\_range\_ctl   [BOTTOM]  [TOP]}
+				\end{itemize}
+%
+    			\item Block \verb|stereo_view_parameter_ctl|
+						\label{href_i:stereo_view_parameter_ctl}
+				\begin{itemize}
+					\item \hyperref[href_t:focal_distance_ctl]
+							{\tt focal\_distance\_ctl   [DISTANCE]}
+					\item \hyperref[href_t:eye_separation_ctl]
+							{\tt eye\_separation\_ctl   [SEPARATION]}
+					\item \hyperref[href_t:eye_separation_angle]
+							{\tt eye\_separation\_angle   [DEGREE]}
+					\item \hyperref[href_t:eye_separation_step_by_angle]
+							{\tt eye\_separation\_step\_by\_angle   [ON/OFF]}
+				\end{itemize}
+%
+		\end{itemize}
+%
+	\item Block \verb|plot_area_ctl|
+				\label{href_i:plot_area_ctl}
+		\begin{itemize}
+			\item \hyperref[href_t:chosen_ele_grp_ctl]
+					{\tt chosen\_ele\_grp\_ctl    [AREA\_NAME]}
+			\item \hyperref[href_t:surface_enhanse_ctl]
+					{\tt surface\_enhanse\_ctl    [SURFACE\_NAME]  [TYPE]  [OPACITY]}
+		\end{itemize}
+%
+	\item File or Block \verb|pvr_color_ctl|
 			\label{href_i:pvr_color_ctl}
-    \item Block \verb|colormap_ctl|
+		\begin{itemize}
+    			\item Block \verb|colormap_ctl|
+ 			\item Block \verb|colorbar_ctl|
+		\end{itemize}
+%
+	\item Block \verb|colormap_ctl|
 			\label{href_i:colormap_ctl}
-    \item Block \verb|colorbar_ctl|
+		\begin{itemize}
+			\item \hyperref[href_t:colormap_mode_ctl]
+					{\tt colormap\_mode\_ctl    [MODE]}
+			\item \hyperref[href_t:background_color_ctl]
+					{\tt background\_color\_ctl    [MODE]}
+%
+%			\item \hyperref[href_t:LIC_color_field]
+%					{\tt LIC\_color\_field    [Field\_Name]}
+%			\item \hyperref[href_t:LIC_color_componenet]
+%					{\tt LIC\_color\_componenet    [Component\_Name]}
+%			\item \hyperref[href_t:LIC_transparent_field]
+%					{\tt LIC\_transparent\_field    [Field\_Name]}
+%			\item \hyperref[href_t:LIC_transparent_componenet]
+%					{\tt LIC\_transparent\_componenet    [Component\_Name]}
+%
+			\item \hyperref[href_t:data_mapping_ctl]
+					{\tt data\_mapping\_ctl    [TYPE]}
+			\item \hyperref[href_t:range_min_ctl]
+					{\tt range\_min\_ctl    []MIN\_VALUE}
+			\item \hyperref[href_t:range_max_ctl]
+					{\tt range\_max\_ctl    [MAX\_VALUE]}
+			\item \hyperref[href_t:color_table_ctl]
+					Array {\tt color\_table\_ctl    [VALUE]  [COLOR\_VAL]}
+			\item \hyperref[href_t:opacity_style_ctl]
+					{\tt opacity\_style\_ctl    [TYPE]}
+			\item \hyperref[href_t:constant_opacity_ctl]
+					{\tt constant\_opacity\_ctl    [OPACITY]}
+			\item \hyperref[href_t:linear_opacity_ctl]
+					Array {\tt linear\_opacity\_ctl    [VALUE]  [OPACITY]}
+		\end{itemize}
+%
+	\item Block \verb|colorbar_ctl|
 			\label{href_i:colorbar_ctl}
-    \item File or Block \verb|lighting_ctl|
-			\label{href_i:lighting_ctl}
+		\begin{itemize}
+			\item \hyperref[href_t:colorbar_switch_ctl]
+					{\tt colorbar\_switch\_ctl    [ON/OFF]}
+			\item \hyperref[href_t:colorbar_scale_ctl]
+					{\tt colorbar\_scale\_ctl    [ON/OFF]}
+			\item \hyperref[href_t:font_size_ctl]
+					{\tt font\_size\_ctl    [SIZE]}
+			\item \hyperref[href_t:num_grid_ctl]
+					{\tt num\_grid\_ctl    [\# of grid]}
+			\item \hyperref[href_t:zeromarker_switch]
+					{\tt zeromarker\_switch    [ON/OFF]}
+			\item \hyperref[href_t:colorbar_range]
+					{\tt colorbar\_range    [MIN]  [MAX]}
+			\item \hyperref[href_t:axis_label_switch]
+					{\tt axis\_label\_switch    [ON/OFF]}
+			\item \hyperref[href_t:time_label_switch]
+					{\tt time\_label\_switch    [ON/OFF]}
+			\item \hyperref[href_t:map_grid_switch]
+					{\tt map\_grid\_switch    [ON/OFF]}
+		\end{itemize}
 %
-    \item File or Block \verb|section_ctl|
-			\label{href_i:section_ctl}
-    \item Block        \verb|isosurface_ctl|
-			\label{href_i:isosurface_ctl}
+	\item File or Block \verb|lighting_ctl  [File_Name]|
+				\label{href_i:lighting_ctl}
+		\begin{itemize}
+			\item \hyperref[href_t:ambient_coef_ctl]
+					{\tt ambient\_coef\_ctl     [VALUE]}
+			\item \hyperref[href_t:diffuse_coef_ctl]
+					{\tt diffuse\_coef\_ctl     [VALUE]}
+			\item \hyperref[href_t:specular_coef_ctl]
+					{\tt specular\_coef\_ctl     [VALUE]}
+			\item \hyperref[href_t:position_of_lights]
+					Array {\tt position\_of\_lights     [X]  [Y]  [Z]}
+			\item \hyperref[href_t:sph_position_of_lights]
+					Array {\tt sph\_position\_of\_lights     [R]  [THETA]  [PHI]}
+		\end{itemize}
 %
-    \item Block        \verb|quilt_image_ctl|
+	\item Array Block \verb|section_ctl|
+				\label{href_i:section_ctl}
+		\begin{itemize}
+   			 \item File or Block \hyperref[href_t:surface_define]
+			 		{\tt surface\_define  [File\_Name]}
+			\item \hyperref[href_t:opacity_ctl]
+					{\tt opacity\_ctl     [VALUE]}
+			\item \hyperref[href_t:zeroline_switch_ctl]
+				{\tt zeroline\_switch\_ctl     [ON/OFF]}
+		\end{itemize}
+%
+	\item Array Block \verb|isosurface_ctl|
+				\label{href_i:isosurface_ctl}
+		\begin{itemize}
+			\item \hyperref[href_t:isosurf_value]
+					{\tt isosurf\_value     [VALUE]}
+			\item \hyperref[href_t:opacity_ctl]
+					{\tt opacity\_ctl     [VALUE]}
+			\item \hyperref[href_t:surface_direction]
+					{\tt surface\_direction     [DIRECTION]}
+		\end{itemize}
+%
+	\item Block        \verb|quilt_image_ctl|
 			\label{href_i:quilt_image_ctl}
-	\begin{itemize}
-		\item \hyperref[href_t:num_column_row_ctl]
-				{\tt num\_column\_row\_ctl     [\# of column] [\# of row]}
-		\item \hyperref[href_t:num_row_column_ctl]
-				{\tt num\_row\_column\_ctl     [\# of row] [\# of column]}
-	    \item Array Block \verb|view_transform_ctl|
-				\label{href_i:quilt_view_transform_ctl}
-	\end{itemize}
+		\begin{itemize}
+			\item \hyperref[href_t:num_column_row_ctl]
+					{\tt num\_column\_row\_ctl     [\# of column] [\# of row]}
+			\item \hyperref[href_t:num_row_column_ctl]
+					{\tt num\_row\_column\_ctl     [\# of row] [\# of column]}
+	    	\item Array Block \verb|view_transform_ctl|
+					\label{href_i:quilt_view_transform_ctl}
+		\end{itemize}
 %
-    \item Block        \verb|snapshot_movie_ctl|
-			\label{href_i:snapshot_movie_ctl}
-	\begin{itemize}
-		\item \hyperref[href_t:movie_mode_ctl]
-				{\tt movie\_mode\_ctl       [Mode]}
-		\item \hyperref[href_t:num_frames_ctl]
-				{\tt num\_frames\_ctl       [\# of Flame]}
-		\item \hyperref[href_t:rotation_axis_ctl]
-				{\tt rotation\_axis\_ctl    [X/Y/Z]}
-		\item \hyperref[href_t:angle_range]
-				{\tt angle\_range    [START] [END]}
-		\item \hyperref[href_t:apature_range]
-				{\tt apature\_range  [START] [END]}
-		\item \hyperref[href_t:LIC_kernel_peak_range]
-				{\tt LIC\_kernel\_peak\_range  [START] [END]}
+	\item Block        \verb|snapshot_movie_ctl|
+				\label{href_i:snapshot_movie_ctl}
+		\begin{itemize}
+			\item \hyperref[href_t:movie_mode_ctl]
+					{\tt movie\_mode\_ctl       [Mode]}
+			\item \hyperref[href_t:num_frames_ctl]
+					{\tt num\_frames\_ctl       [\# of Flame]}
+			\item \hyperref[href_t:rotation_axis_ctl]
+					{\tt rotation\_axis\_ctl    [X/Y/Z]}
+			\item \hyperref[href_t:angle_range]
+					{\tt angle\_range    [START] [END]}
+			\item \hyperref[href_t:apature_range]
+					{\tt apature\_range  [START] [END]}
+			\item \hyperref[href_t:LIC_kernel_peak_range]
+					{\tt LIC\_kernel\_peak\_range  [START] [END]}
 %
-	    \item File or Block \verb|start_view_control|
-				\label{href_i:start_view_control}
-	    \item File or Block \verb|end_view_control|
-				\label{href_i:end_view_control}
-	    \item Array Block \verb|view_transform_ctl|
-				\label{href_i:movie_view_transform_ctl}
-	\end{itemize}
+	    		\item File or Block \verb|start_view_control [File_Name]|
+					\label{href_i:start_view_control}
+	   	 	\item File or Block \verb|end_view_control  [File_Name]|
+					\label{href_i:end_view_control}
+	  	  	\item Array File or Block \verb|view_transform_ctl  [File_Name] |
+					\label{href_i:movie_view_transform_ctl}
+		\end{itemize}
 \end{itemize}
+
+
+\subsection{Map projection data (Parallel volume rendering module)}
+Map projection module generate visualization image using map projection through surfacing module. Currently, contour plots for scalar fields can only be generated, and Aitoff projection is only supported in this module.
+
+To output map projection data, increment of the map projection needs to be defined at \verb|i_step_map_projection_ctl| in \verb|time_step_ctl| block. Parameters foe each rendering are defined in array block \verb|map_rendering_ctl| in \verb|visual_control|. Same the other visualizatiom modules, each  \verb|map_rendering_ctl| block can be stored in an external file, and the external file can be defined as \\
+ \verb|file map_rendering_ctl [File_Name]|.
+%
+\paragraph{Control data}
+The control parameters for map projection module is the following:
+\\
+%
+Block \verb|map_rendering_ctl| (Top level for map prodection)
+\\
+\label{href_i:map_rendering_ctl}
+\begin{itemize}
+	\item \hyperref[href_t:map_image_prefix]
+			{\tt map\_image\_prefix    [File\_Prefix]}
+	\item \hyperref[href_t:map_image_format]
+			{\tt map\_image\_format    [File\_Format]}
+%
+	\item \hyperref[href_t:output_field]
+			{\tt output\_field            [Field\_Name]}
+	\item \hyperref[href_t:output_component]
+			{\tt output\_component       [Component\_Name]}
+	\item \hyperref[href_t:isoline_field]
+			{\tt isoline\_field                [Field\_Name]}
+	\item \hyperref[href_t:isoline_component]
+			{\tt isoline\_component     [Component\_Name]}
+%
+	\item Block \verb|section_ctl|
+			\label{href_i:map_section_ctl}
+		\begin{itemize}
+    			\item File or Block \verb|surface_define|
+						\label{href_i:map_surface_define}
+%
+			\item \hyperref[href_t:zeroline_switch_ctl]
+					{\tt zeroline\_switch\_ctl     [ON/OFF]}
+			\item \hyperref[href_t:isoline_color_mode]
+					{\tt isoline\_color\_mode     [MODE]}
+			\item \hyperref[href_t:isoline_number_ctl]
+					{\tt isoline\_number\_ctl     [\# of LINES]}
+			\item \hyperref[href_t:isoline_range_ctl]
+					{\tt isoline\_range\_ctl     [MIN\_VALUE]  [MAX\_VALUE]}
+			\item \hyperref[href_t:isoline_width_ctl]
+					{\tt isoline\_width\_ctl     [WIDTH]}
+			\item \hyperref[href_t:grid_width_ctl]
+					{\tt grid\_width\_ctl     [WIDTH]}
+			\item \hyperref[href_t:tangent_cylinder_switch_ctl]
+					{\tt tangent\_cylinder\_switch\_ctl     [ON/OFF]}
+			\item \hyperref[href_t:inner_radius_ctl]
+					{\tt inner\_radius\_ctl     [RADIUS]}
+			\item \hyperref[href_t:outer_radius_ctl]
+					{\tt outer\_radius\_ctl     [RADIUS]}
+		\end{itemize}
+%
+	\item File or Block \verb|map_projection_ctl|
+				\label{href_i:map_projection_ctl}
+		\begin{itemize}
+    			\item Block \verb|image_size_ctl|
+						\label{href_i:image_size_ctl}
+				\begin{itemize}
+					\item \hyperref[href_t:x_pixel_ctl]
+							{\tt x\_pixel\_ctl   [\# of PIXELS]}
+					\item \hyperref[href_t:y_pixel_ctl]
+							{\tt y\_pixel\_ctl   [\# of PIXELS]}
+				\end{itemize}
+%
+%			\item Array \hyperref[href_t:modelview_matrix_ctl]
+%					{\tt modelview\_matrix\_ctl   [X/Y/X/W] [X/Y/Z/W]  [VALUE]}
+%			\item Array \hyperref[href_t:look_at_point_ctl]
+%					{\tt look\_at\_point\_ctl   [X/Y/Z]    [VALUE]}
+%			\item Array \hyperref[href_t:eye_position_ctl]
+%					{\tt eye\_position\_ctl   [X/Y/Z]     [VALUE]}
+%			\item Array \hyperref[href_t:up_direction_ctl]
+%					{\tt up\_direction\_ctl   [X/Y/Z]     [VALUE]}
+%			\item Array \hyperref[href_t:view_rotation_vec_ctl]
+%					{\tt view\_rotation\_vec\_ctl   [X/Y/Z]     [VALUE]}
+%			\item \hyperref[href_t:view_rotation_deg_ctl]
+%					{\tt view\_rotation\_deg\_ctl     [DEGREE]}
+%			\item \hyperref[href_t:scale_factor_ctl]
+%					{\tt scale\_factor\_ctl     [SCALE]}
+%			\item Array \hyperref[href_t:scale_factor_vec_ctl]
+%					{\tt scale\_factor\_vec\_ctl  [X/Y/Z]     [SCALE]}
+%			\item Array \hyperref[href_t:eye_position_in_viewer_ctl]
+%					{\tt eye\_position\_in\_viewer\_ctl   [X/Y/Z]    [VALUE]}
+%
+			\item \hyperref[href_t:projection_type_ctl]
+					{\tt projection\_type\_ctl   [TYPE]}
+%
+   			\item Block \verb|projection_matrix_ctl|
+						\label{href_i:projection_matrix_ctl}
+				\begin{itemize}
+%					\item \hyperref[href_t:perspective_angle_ctl]
+%							{\tt perspective\_angle\_ctl   [DEGREE]}
+%					\item \hyperref[href_t:perspective_xy_ratio_ctl]
+%							{\tt perspective\_xy\_ratio\_ctl   [ASPECT]}
+%					\item \hyperref[href_t:perspective_near_ctl]
+%							{\tt perspective\_near\_ctl   [NEAR\_DISTANCE]}
+%					\item \hyperref[href_t:perspective_far_ctl]
+%							{\tt perspective\_far\_ctl   [FAR\_DISTANCE]}
+%
+					\item \hyperref[href_t:horizontal_range_ctl]
+							{\tt horizontal\_range\_ctl   [LEFT]  [RIGHT[}
+					\item \hyperref[href_t:vertical_range_ctl]
+							{\tt vertical\_range\_ctl   [BOTTOM]  [TOP]}
+				\end{itemize}
+		\end{itemize}
+%
+	\item File \verb|map_color_ctl|
+				\label{href_i:map_color_ctl}
+		\begin{itemize}
+    			\item Block \verb|colormap_ctl|
+ 			\item Block \verb|colorbar_ctl|
+		\end{itemize}
+%
+	\item Block \verb|colormap_ctl|
+				\label{href_i:colormap_ctl}
+		\begin{itemize}
+			\item \hyperref[href_t:colormap_mode_ctl]
+					{\tt colormap\_mode\_ctl    [MODE]}
+			\item \hyperref[href_t:background_color_ctl]
+					{\tt background\_color\_ctl    [MODE]}
+%
+			\item \hyperref[href_t:data_mapping_ctl]
+					{\tt data\_mapping\_ctl    [TYPE]}
+			\item \hyperref[href_t:range_min_ctl]
+					{\tt range\_min\_ctl    []MIN\_VALUE}
+			\item \hyperref[href_t:range_max_ctl]
+					{\tt range\_max\_ctl    [MAX\_VALUE]}
+			\item \hyperref[href_t:color_table_ctl]
+					Array {\tt color\_table\_ctl    [VALUE]  [COLOR\_VAL]}
+		\end{itemize}
+%
+	\item Block \verb|colorbar_ctl|
+			\label{href_i:colorbar_ctl}
+		\begin{itemize}
+			\item \hyperref[href_t:colorbar_switch_ctl]
+					{\tt colorbar\_switch\_ctl    [ON/OFF]}
+			\item \hyperref[href_t:colorbar_scale_ctl]
+					{\tt colorbar\_scale\_ctl    [ON/OFF]}
+			\item \hyperref[href_t:font_size_ctl]
+					{\tt font\_size\_ctl    [SIZE]}
+			\item \hyperref[href_t:num_grid_ctl]
+					{\tt num\_grid\_ctl    [\# of grid]}
+			\item \hyperref[href_t:zeromarker_switch]
+					{\tt zeromarker\_switch    [ON/OFF]}
+			\item \hyperref[href_t:colorbar_range]
+					{\tt colorbar\_range    [MIN]  [MAX]}
+			\item \hyperref[href_t:time_label_switch]
+					{\tt time\_label\_switch    [ON/OFF]}
+			\item \hyperref[href_t:map_grid_switch]
+					{\tt map\_grid\_switch    [ON/OFF]}
+		\end{itemize}
+\end{itemize}
+
+
+
+\subsubsection{\tt volume\_rendering}
+\label{href_t:volume_rendering}
+%
+\paragraph{\tt updated\_sign}
+\label{href_t:updated_sign}  
+\verb|[SIGNAL]| \\
+The program will read again PVR parameter files and updates PVR parameters if the text \verb|[SIGNAL]| is changed. 
+%
+\paragraph{\tt pvr\_file\_prefix}
+\label{href_t:pvr_file_prefix}  
+\verb|[File_Prefix]| \\
+File prefix of the output image file  \verb|[File_Prefix]| is defined by text. 
+%
+\paragraph{\tt pvr\_output\_format}
+\label{href_t:pvr_output_format}  
+\verb|[File_Format]| \\
+File format of the output image file  \verb|[File_Format]| is defined by text.  The following format can be defined.
+\begin{description}
+\item{\tt BMP: }               Bitmap format
+\item{\tt PNG: }               PNG format  (zlib or libpng is required to build)
+\item{\tt QUILT: }             BMP Quilt format for holograms
+\item{\tt QUILT\_GZ: }      Compressed BMP Quilt format for holograms
+\end{description}
+%
+
+%
+\subsubsection{\tt map\_rendering\_ctl}
+\label{href_t:map_rendering_ctl}
+%
+
+
