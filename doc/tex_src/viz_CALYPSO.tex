@@ -426,6 +426,70 @@ File format of the output image file  \verb|[File_Format]| is defined by text.  
 \item{\tt QUILT\_GZ: }      Compressed BMP Quilt format for holograms
 \end{description}
 %
+\paragraph{\tt monitoring\_mode}
+\label{href_t:monitoring_mode}  
+\verb|[ON/OFF]| \\
+When the monitoring mode is turned on, the program outputs two same image files. One file is named with step number, and another file is named without step number. Consequently, the image file without step number is overwritten every PVR data output. During the simulation, we can check the latest image.
+%
+\paragraph{\tt stereo\_imaging}
+\label{href_t:stereo_imaging}  
+\verb|[ON/OFF]| \\
+When stereo imaging switch is turned on, Stereo image is generated. In stereo imaing mode, the following \hyperref[href_t:anaglyph_switch]{\tt anaglyph\_switch} or \hyperref[href_t:quilt_3d_imaging]{\tt quilt\_3d\_imaging} needs to be turned on.
+%
+\paragraph{\tt anaglyph\_switch}
+\label{href_t:anaglyph_switch}  
+\verb|[ON/OFF]| \\
+When anaglyph switch is turned on, stereo anaglyph image is generated. To look anaglyph, red and blue glass is required.
+%
+\paragraph{\tt quilt\_3d\_imaging}
+\label{href_t:quilt_3d_imaging}  
+\verb|[ON/OFF]| \\
+When anaglyph switch is turned on, stereo image for looking glass is generated. This switch is also turned on if stereo image with side-by-side is generated.
+%
+\paragraph{\tt output\_field}
+\label{href_t:output_field}  
+\verb|[Field_Name]| \\
+Field name \verb|[Field_Name]| for rendering is defined by text.
+%
+\paragraph{\tt output\_component}
+\label{href_t:output_component}  
+\verb|[Component_Name]| \\
+Component name \verb|[Component_Name]| for rendering is defined by text.
+%
+\subsubsection{\tt view\_transform\_ctl}
+\label{href_t:view_transform_ctl}
+Parameters for view point and direction are defined in this block. This block can be saved into an external file. (Go to \hyperref[href_i:view_transform_ctl] {\tt view\_transform\_ctl})
+
+\subsubsection*{\tt image\_size\_ctl}
+\label{href_t:image_size_ctl}
+Image size (number of pixels) are defined in this block. (Go to \hyperref[href_i:image_size_ctl] {\tt image\_size\_ctl})
+%
+\paragraph{\tt x\_pixel\_ctl}
+\label{href_t:x_pixel_ctl}  
+\verb|[\# of PIXELS]| \\
+Number of pixels in the horizontal direction \verb|[\# of PIXELS]| is defined by integer.
+%
+\paragraph{\tt y\_pixel\_ctl}
+\label{href_t:y_pixel_ctl}  
+\verb|[\# of PIXELS]| \\
+Number of pixels in the vertical direction \verb|[\# of PIXELS]| is defined by integer.
+%
+\paragraph{\tt modelview\_matrix\_ctl}
+\label{href_t:modelview_matrix_ctl}  
+\verb|[X/Y/X/W] [X/Y/Z/W]  [VALUE]| \\
+Modelview matrix $A_{ij}$ is defined by array. Directions of row and columns are defined in the first and second texts, respectively, and the value of the each matrix component is defined by the third real value.
+%
+\paragraph{\tt look\_at\_point\_ctl}
+\label{href_t:look_at_point_ctl}  
+\verb|[X/Y/X] [VALUE]| \\
+Position to look at is defined by array. Directions are defined in the first text, and the value is defined by the third real value.
+%
+\paragraph{\tt eye\_position\_ctl}
+\label{href_t:eye_position_ctl}  
+\verb|[X/Y/X] [VALUE]| \\
+Position of eye (or camera) is defined by array. Directions are defined in the first text, and the value is defined by the third real value.
+%
+%
 
 %
 \subsubsection{\tt map\_rendering\_ctl}
