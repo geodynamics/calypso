@@ -64,8 +64,8 @@ Block \verb|volume_rendering| (Top level for volume rendering)
 			\item Array \hyperref[href_t:eye_position_in_viewer_ctl]
 					{\tt eye\_position\_in\_viewer\_ctl   [X/Y/Z]    [VALUE]}
 %
-			\item \hyperref[href_t:projection_type_ctl]
-					{\tt projection\_type\_ctl   [TYPE]}
+%			\item \hyperref[href_t:projection_type_ctl]
+%					{\tt projection\_type\_ctl   [TYPE]}
 %
    			\item Block \verb|projection_matrix_ctl|
 						\label{href_i:projection_matrix_ctl}
@@ -476,20 +476,53 @@ Number of pixels in the vertical direction \verb|[\# of PIXELS]| is defined by i
 %
 \paragraph{\tt modelview\_matrix\_ctl}
 \label{href_t:modelview_matrix_ctl}  
-\verb|[X/Y/X/W] [X/Y/Z/W]  [VALUE]| \\
+\verb|[X/Y/Z/W] [X/Y/Z/W]  [VALUE]| \\
 Modelview matrix $A_{ij}$ is defined by array. Directions of row and columns are defined in the first and second texts, respectively, and the value of the each matrix component is defined by the third real value.
 %
 \paragraph{\tt look\_at\_point\_ctl}
 \label{href_t:look_at_point_ctl}  
-\verb|[X/Y/X] [VALUE]| \\
-Position to look at is defined by array. Directions are defined in the first text, and the value is defined by the third real value.
+\verb|[X/Y/Z] [VALUE]| \\
+Position to look at is defined by array. Directions are defined in the first text, and the value is defined by the second real value.
 %
 \paragraph{\tt eye\_position\_ctl}
 \label{href_t:eye_position_ctl}  
-\verb|[X/Y/X] [VALUE]| \\
-Position of eye (or camera) is defined by array. Directions are defined in the first text, and the value is defined by the third real value.
+\verb|[X/Y/Z] [VALUE]| \\
+Position of eye (or camera) is defined by array. Directions are defined in the first text, and the value is defined by the second real value.
+%
+\paragraph{\tt up\_direction\_ctl}
+\label{href_t:up_direction_ctl}  
+\verb|[X/Y/Z] [VALUE]| \\
+Up direction (positive in vertical) in image is defined by array. Directions are defined in the first text, and the value is defined by the second real value.
+%
+\paragraph{\tt view\_rotation\_vec\_ctl}
+\label{href_t:view_rotation_vec_ctl}  
+\verb|[X/Y/Z] [VALUE]| \\
+Axis of rotation is defined in this array. Direction is defined in the first text, and the value is defined by the second real value.
+%
+\paragraph{\tt view\_rotation\_deg\_ctl}
+\label{href_t:view_rotation_deg_ctl}  
+\verb|[DEGREE]| \\
+Angle of rotation using degree is defined by real value.
+%
+\paragraph{\tt scale\_factor\_vec\_ctl}
+\label{href_t:scale_factor_ctl}  
+\verb|[SCALE]| \\
+Scale of object is defined by real value.
+%
+\paragraph{\tt scale\_factor\_vec\_ctl}
+\label{href_t:scale_factor_vec_ctl}  
+\verb|[X/Y/Z] [SCALE]| \\
+Scale for each direction is defined in this array. Direction is defined in the first text, and the scale for each direction is defined by the second real value.
+%
+\paragraph{\tt eye\_position\_in\_viewer\_ctl}
+\label{href_t:eye_position_in_viewer_ctl}  
+\verb|[X/Y/Z] [VALUE]| \\
+Eye (camera) position in the screen coordinate is defined by array. Direction is defined in the first text, and the scale for each direction is defined by the second real value.
 %
 %
+\subsubsection{\tt projection\_matrix\_ctl}
+\label{href_t:projection_matrix_ctl}
+Parameters for projection onto screen are defined in this block (Go to \hyperref[href_i:projection_matrix_ctl] {\tt projection\_matrix\_ctl})
 
 %
 \subsubsection{\tt map\_rendering\_ctl}
