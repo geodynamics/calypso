@@ -20,10 +20,9 @@
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
 !!
-!!      subroutine prt_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd,     &
-!!     &          n_WS, X_rtp, WS, fftpack_t)
+!!      subroutine prt_RFFTMF_to_send                                   &
+!!     &         (sph_rtp, ncomp_fwd, n_WS, X_rtp, WS, fftpack_t)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(sph_comm_tbl), intent(in) :: comm_rtp
 !!        type(work_for_fftpack), intent(inout) :: fftpack_t
 !! ------------------------------------------------------------------
 !!
@@ -116,7 +115,8 @@
      &   (comm_rtp%ntot_item_sr, fftpack_t%comm_sph_FFTPACK)
       call set_comm_item_prt_4_FFTPACK(sph_rtp%nnod_rtp,                &
      &    comm_rtp%ntot_item_sr, comm_rtp%irev_sr,                      &
-     &    sph_rtp%nidx_rtp(3), sph_rtp%istack_rtp_rt_smp(np_smp),       &
+     &    sph_rtp%nidx_rtp(3), sph_rtp%istep_rtp,                       &
+     &    sph_rtp%istack_rtp_rt_smp(np_smp),                            &
      &    fftpack_t%comm_sph_FFTPACK)
 !
       end subroutine init_prt_FFTPACK5
@@ -141,7 +141,8 @@
      &     (comm_rtp%ntot_item_sr, fftpack_t%comm_sph_FFTPACK)
         call set_comm_item_prt_4_FFTPACK(sph_rtp%nnod_rtp,              &
      &      comm_rtp%ntot_item_sr, comm_rtp%irev_sr,                    &
-     &      sph_rtp%nidx_rtp(3), sph_rtp%istack_rtp_rt_smp(np_smp),     &
+     &      sph_rtp%nidx_rtp(3), sph_rtp%istep_rtp,                     &
+     &      sph_rtp%istack_rtp_rt_smp(np_smp),                          &
      &      fftpack_t%comm_sph_FFTPACK)
       end if
 !
@@ -153,14 +154,13 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine prt_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd,       &
-     &          n_WS, X_rtp, WS, fftpack_t)
+      subroutine prt_RFFTMF_to_send                                     &
+     &         (sph_rtp, ncomp_fwd, n_WS, X_rtp, WS, fftpack_t)
 !
       use copy_rtp_data_to_FFTPACK
       use set_comm_table_prt_FFTPACK
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       integer(kind = kint), intent(in) :: ncomp_fwd
       real(kind = kreal), intent(in)                                    &
@@ -196,10 +196,6 @@
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+5)
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+6)
-!      call copy_prt_FFTPACK_to_send                                    &
-!     &   (sph_rtp%nnod_rtp, comm_rtp%irev_sr,                          &
-!     &    sph_rtp%nidx_rtp(3), sph_rtp%istack_rtp_rt_smp(np_smp),      &
-!     &    ncomp_fwd, fftpack_t%X(1), n_WS, WS)
       call copy_all_prt_FFT_to_send                                     &
      &   (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp, ncomp_fwd,                &
      &    fftpack_t%X(1), fftpack_t%comm_sph_FFTPACK, n_WS, WS)
@@ -233,8 +229,8 @@
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
       call copy_prt_FFTPACK_from_recv                                   &
-     &   (sph_rtp%nnod_rtp, comm_rtp%irev_sr,                           &
-     &    sph_rtp%nidx_rtp(3), sph_rtp%istack_rtp_rt_smp(np_smp),       &
+     &   (sph_rtp%nnod_rtp, comm_rtp%irev_sr, sph_rtp%nidx_rtp(3),      &
+     &    sph_rtp%istep_rtp, sph_rtp%istack_rtp_rt_smp(np_smp),         &
      &    ncomp_bwd, n_WR, WR, fftpack_t%X(1))
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+1)
 !

@@ -50,7 +50,13 @@
 !!   inclination              [i_inclination]:
 !!   declination              [i_declination]:
 !!   vgp_latitude             [i_vgp_latitude]:
-!!   vgp_longigude            [i_vgp_llongigude]:
+!!   vgp_longigude            [i_vgp_longigude]:
+!!
+!!   magnetic_dipole          [i_dipole_B]
+!!   current_for_dipole       [i_dipole_J]
+!!
+!!   Lorentz_force_dipole     [i_dipole_Lorentz]:
+!!   Lorentz_work_dipole      [i_dipole_ujb]:
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -218,6 +224,31 @@
      &                name = 'vgp_longigude',                           &
      &                math = '$ VGP_{\phi} $')
 !
+!
+!>        Field label for dipole magnetic field @f$ B_{S1}^{0} @f$
+      type(field_def), parameter :: magnetic_dipole                     &
+     &    = field_def(n_comp = n_vector,                                &
+     &                name = 'magnetic_dipole',                         &
+     &                math = '$ B_{S1}^{0} $')
+!>        Field label for toroidal dipole current @f$ J_{T1}^{0} @f$
+      type(field_def), parameter :: current_for_dipole                  &
+     &    = field_def(n_comp = n_vector,                                &
+     &                name = 'current_for_dipole',                      &
+     &                math = '$ J_{T1}^{0} $')
+!
+!>      Lorentz force by dipole component  @f$ J_{1}^{0} \times B @f$
+      type(field_def), parameter :: Lorentz_force_dipole                &
+     &    = field_def(n_comp = n_vector,                                &
+     &                name = 'Lorentz_force_dipole',                    &
+     &                math = '$ J_{1}^{0} \times B $')
+!
+!>      Work of Lorentz force by dipole component
+!!             @f$ u \cdot (J_{1}^{0} \times B) @f$
+      type(field_def), parameter :: Lorentz_work_dipole                 &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'Lorentz_work_dipole',                     &
+     &                math = '$ u \cdot (J_{1}^{0} \times B) $')
+!
 !    ----------   Ole definision  ------------------
 !>        Field label for ageostrophic balance
 !!         @f$ -2 e_{ijk} \Omega_{j} u_{k} - \partial_{i} p @f$
@@ -252,6 +283,10 @@
 !
      &   .or. (field_name .eq. stream_pol_velocity%name)                &
      &   .or. (field_name .eq. stream_pol_magne%name)                   &
+!
+     &   .or. (field_name .eq. magnetic_dipole%name)                    &
+     &   .or. (field_name .eq. current_for_dipole%name)                 &
+     &   .or. (field_name .eq. Lorentz_force_dipole%name)               &
      &      )   check_field_product_vectors = .TRUE.
 !
       end function check_field_product_vectors
@@ -282,6 +317,8 @@
      &   .or. (field_name .eq. inclination%name)                        &
      &   .or. (field_name .eq. vgp_latitude%name)                       &
      &   .or. (field_name .eq. vgp_longigude%name)                      &
+!
+     &   .or. (field_name .eq. Lorentz_work_dipole%name)                &
      &      )   check_field_product_scalars = .TRUE.
 !
       end function check_field_product_scalars
@@ -323,6 +360,11 @@
       call set_field_label_to_ctl(inclination,              array_c2i)
       call set_field_label_to_ctl(vgp_latitude,             array_c2i)
       call set_field_label_to_ctl(vgp_longigude,            array_c2i)
+!
+      call set_field_label_to_ctl(magnetic_dipole,      array_c2i)
+      call set_field_label_to_ctl(current_for_dipole,   array_c2i)
+      call set_field_label_to_ctl(Lorentz_force_dipole, array_c2i)
+      call set_field_label_to_ctl(Lorentz_work_dipole,  array_c2i)
 !
       end subroutine set_field_product_names
 !

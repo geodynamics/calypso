@@ -591,8 +591,8 @@
      &   .or. (field_name .eq. Bsym_nabla_Basym%name)                   &
      &   .or. (field_name .eq. Basym_nabla_Bsym%name)                   &
 !
-     &   .or. (field_name .eq. sym_thermal_buoyancy%name)                &
-     &   .or. (field_name .eq. asym_thermal_buoyancy%name)               &
+     &   .or. (field_name .eq. sym_thermal_buoyancy%name)               &
+     &   .or. (field_name .eq. asym_thermal_buoyancy%name)              &
 !
      &   .or. (field_name .eq. sym_composite_buoyancy%name)             &
      &   .or. (field_name .eq. asym_composite_buoyancy%name)            &

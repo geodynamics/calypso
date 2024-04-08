@@ -234,6 +234,7 @@
       subroutine rtp_back_FFTW_from_recv                                &
      &         (sph_rtp, comm_rtp, ncomp_bwd, n_WR, WR, X_rtp, FFTW_f)
 !
+      use set_comm_table_prt_FFTW
       use set_comm_table_rtp_FFTW
       use copy_rtp_data_to_FFTPACK
 !
@@ -252,9 +253,9 @@
 !
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
-        call copy_rtp_FFTW_field_from_recv                              &
-     &     (sph_rtp%nnod_rtp, comm_rtp%irev_sr,                         &
-     &      sph_rtp%istack_rtp_rt_smp, ncomp_bwd,                       &
+        call copy_FFTW_field_from_recv_smp                              &
+     &     (sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                        &
+     &      sph_rtp%istack_rtp_rt_smp, comm_rtp%irev_sr, ncomp_bwd,     &
      &      n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C)
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+1)
 !

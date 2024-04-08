@@ -3,8 +3,8 @@
 
 #include "numbers_to_bin_c.h"
 
-void byte_swap_4(int lengh_byte, char *array){
-    int i;
+void byte_swap_4(const size_t lengh_byte, char *array){
+    long i;
     unsigned char tmp0, tmp1;
 
     for(i = 0; i < lengh_byte/4; i++){
@@ -15,12 +15,11 @@ void byte_swap_4(int lengh_byte, char *array){
         array[4*i+2] = tmp1; 
         array[4*i+3] = tmp0; 
     };
-
     return;
 }
 
-void byte_swap_8(int lengh_byte, char *array){
-    int i;
+void byte_swap_8(const size_t lengh_byte, char *array){
+    long i;
     unsigned char tmp0, tmp1, tmp2, tmp3;
     
     for(i = 0; i < lengh_byte/8; i++){
@@ -39,7 +38,6 @@ void byte_swap_8(int lengh_byte, char *array){
         array[8*i+6] = tmp1; 
         array[8*i+7] = tmp0; 
     };
-    
     return;
 }
 
@@ -62,9 +60,9 @@ void swap_4byte(char *buf8){
     return;
 }
 
-void swap_fortran_64bit(int *ilength, char *buf){
+void swap_fortran_64bit(int ilength, char *buf){
     int i;
-    for(i=0;i<*ilength/8;i++){swap_4byte((char *) &buf[8*i]);}
+    for(i=0;i<ilength/8;i++){swap_4byte((char *) &buf[8*i]);}
     return;
 }
 

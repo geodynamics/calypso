@@ -62,8 +62,8 @@
 !
       real(kind = kreal), intent(inout) :: coef
 !
-      integer(kind=kint) :: i, j, iflag
-!
+      integer(kind=kint) :: i, j
+      logical :: flag_missing
 !
       do i = 1, power_list%num
         if     (cmp_no_case(power_list%name(i), 'One'))  then
@@ -78,14 +78,22 @@
         else if(cmp_no_case(power_list%name(i), 'Radial_35')) then
           coef = coef * (one - 0.35d0)
         else
-          iflag = 0
+          flag_missing = .TRUE.
           do j = 1, dless_list%num
-            if ( power_list%name(i) .eq. dless_list%name(j) ) then
+            if(power_list%name(i) .eq. dless_list%name(j)) then
               coef = coef * dless_list%value(j)**power_list%power(i)
-              iflag = 1
+              flag_missing = .FALSE.
             end if
           end do
-          if (iflag .eq. 0) then
+          if(flag_missing) then
+            if(my_rank .eq. 0) then
+              write(*,*) 'refered numbers: ', power_list%name(i)
+              write(*,*) 'list of numbers: '
+              do j = 1, dless_list%num
+                write(*,*) j, trim(dless_list%name(j)), ': ',           &
+     &                    dless_list%value(j)
+              end do
+            end if
             write(e_message,*) 'there is missing dimensionless number'
             call calypso_MPI_abort(ierr_dless, e_message)
           end if

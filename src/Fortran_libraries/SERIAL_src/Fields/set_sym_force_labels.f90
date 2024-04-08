@@ -116,8 +116,7 @@
 !
             else if(field_name .eq. usym_x_Bsym%name) then
             force_by_sym_sym%i_vp_induct =    i_phys
-            else if(field_name .eq. rot_usym_x_Bsym%name)    &
-      &   then
+            else if(field_name .eq. rot_usym_x_Bsym%name) then
             force_by_sym_sym%i_induction =  i_phys
             else if(field_name .eq. Bsym_nabla_usym%name) then
             force_by_sym_sym%i_mag_stretch =  i_phys

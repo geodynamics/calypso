@@ -34,6 +34,12 @@
 !!   y_magnetic_f              [i_magne_y]:
 !!   z_magnetic_f              [i_magne_z]:
 !!
+!!   temperature_from_CMB     [i_temp_from_CMB]
+!!   composition_from_CMB     [i_light_from_CMB]
+!!   entropy_from_CMB         [i_entropy_from_CMB]
+!!   density_from_CMB         [i_density_from_CMB]
+!!   aspherical_pressure      [i_asph_pressure]
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
 !!
@@ -124,6 +130,41 @@
      &                math = '$ B_{z} $')
 !
 !
+!>        Field label for temperature from CMB average
+!!         @f$ T-|T(r_{o})| @f$
+      type(field_def), parameter :: temperature_from_CMB                &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'temperature_from_CMB',                    &
+     &                math = '$ T-|T(r_{o})| $')
+!
+!>        Field label for light element from CMB average
+!!         @f$ C-|C(r_{o})| @f$
+      type(field_def), parameter :: composition_from_CMB                &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'composition_from_CMB',                    &
+     &                math = '$ C-|C(r_{o})| $')
+!
+!>        Field label for entropy from CMB average
+!!         @f$ S-|S(r_{o})| @f$
+      type(field_def), parameter :: entropy_from_CMB                    &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'entropy_from_CMB',                        &
+     &                math = '$ S-|S(r_{o})| $')
+!
+!>        Field label for density from CMB average
+!!         @f$ \rho-|\rho(r_{o})| @f$
+      type(field_def), parameter :: density_from_CMB                    &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'density_from_CMB',                        &
+     &                math = '$ \rho-|\rho(r_{o})| $')
+!
+!>        Field label for aspherical component of pressure
+!!         @f$ P-|\int P dS| @f$
+      type(field_def), parameter :: aspherical_pressure                 &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'aspherical_pressure',                     &
+     &                math = '$ P-\int P dS| $')
+!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -151,6 +192,12 @@
      &   .or. (field_name .eq. x_magnetic_f%name)                       &
      &   .or. (field_name .eq. y_magnetic_f%name)                       &
      &   .or. (field_name .eq. z_magnetic_f%name)                       &
+!
+     &   .or. (field_name .eq. temperature_from_CMB%name)               &
+     &   .or. (field_name .eq. composition_from_CMB%name)               &
+     &   .or. (field_name .eq. entropy_from_CMB%name)                   &
+     &   .or. (field_name .eq. density_from_CMB%name)                   &
+     &   .or. (field_name .eq. aspherical_pressure%name)                &
      &      )   check_field_comp_list = .TRUE.
 !
       end function check_field_comp_list
@@ -181,6 +228,12 @@
       call set_field_label_to_ctl(x_magnetic_f,  array_c2i)
       call set_field_label_to_ctl(y_magnetic_f,  array_c2i)
       call set_field_label_to_ctl(z_magnetic_f,  array_c2i)
+!
+      call set_field_label_to_ctl(temperature_from_CMB,     array_c2i)
+      call set_field_label_to_ctl(composition_from_CMB,     array_c2i)
+      call set_field_label_to_ctl(entropy_from_CMB,         array_c2i)
+      call set_field_label_to_ctl(density_from_CMB,         array_c2i)
+      call set_field_label_to_ctl(aspherical_pressure,      array_c2i)
 !
       end subroutine set_field_component_names
 !

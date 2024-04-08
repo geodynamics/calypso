@@ -168,7 +168,7 @@
      &      asbl_param_s%org_fld_file, ra_rst_s)
         call dealloc_rayleigh_radial_grid(ra_rst_s)
 !
-        istep_out =          istep/ asbl_param_s%increment_step
+        istep_out =          istep / asbl_param_s%increment_step
         init_t%i_time_step = istep
         init_t%time =        ra_rst_s%time_org
 !

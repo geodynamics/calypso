@@ -114,8 +114,6 @@
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(sph_IO_data), intent(in) :: sph_IO
 !
-      integer(kind = kint_gl) :: num64
-!
 !
       call mpi_write_mul_inthead_b                                      &
      &   (IO_param, sph_IO%numdir_sph, sph_IO%nidx_gl_sph)

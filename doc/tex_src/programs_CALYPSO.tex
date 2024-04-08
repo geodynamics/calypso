@@ -1730,7 +1730,7 @@ When \hyperref[href_t:field_on_circle_format]{{\tt field\_on\_circle\_format}}, 
 \section{Utility programs}
 Calypso includes some utility programs. These programs are useful to data analysis and debugging the simulation programs.
 
-\subsection{Control file Editor}
+\subsection{Control file Editor} \label{sec:control_editor}
 This program is a simple Jupyter notebook (\url{https://jupyterbook.org/en/stable/intro.html#}) to edit control files. There are two Jupter notebook files \\
 (\verb|Calypso_control_editor.ipynb| and \verb|Calypso_control_glossary.ipynb|) in \verb|[CALYPSO_DIR]/src/Jupyter/| folder. \verb|Calypso_control_editor.ipynb| is the notebook to edit control files, and \verb|Calypso_control_glossary.ipynb| is the document of the control data based on the Section \label{section:def_control}. Using JupyterLab (\url{https://jupyter.org}) is recommended because JupyterLab can open the editor \\
 \verb|Calypso_control_editor.ipynb| and document \\
@@ -1748,7 +1748,7 @@ This program is a simple Jupyter notebook (\url{https://jupyterbook.org/en/stabl
 If JupyterLab starts at the \verb|[CALYPSO_DIR]| directory, and you can find the notebook files under \verb|src/Jupyter/| directory. On JupyterLab, two notebooks can be opened side by side. After opening either notebook file, you can split the view by choosing \verb|File -> New View for Notebook|. Then, another file can be opened on the either side of view. This editor supports drag and drop from another notebook or programs. The instruction of usege of the editor is written in \\
      \verb|Calypso_control_editor.ipynb|.
 
-\subsection{Vim scripts for folding the control files}
+\subsection{Vim scripts for folding the control files}  \label{sec:vim_folding}
 This Vim scripts add the folding the control blocks and concurrent comment lines.
 After starting the vim, this scripts can be loaded by the following command: \\
 \\

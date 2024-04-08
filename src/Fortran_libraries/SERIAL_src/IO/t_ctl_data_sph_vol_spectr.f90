@@ -36,6 +36,7 @@
 !!      begin volume_spectrum_ctl
 !!        volume_average_prefix        'sph_ave_convective'
 !!        volume_pwr_spectr_prefix     'sph_pwr_convective'
+!!        volume_work_spectr_prefix    'sph_work_convective'
 !!        volume_pwr_spectr_format     'ASCII'
 !!        inner_radius_ctl           0.55
 !!        outer_radius_ctl           1.4
@@ -43,7 +44,8 @@
 !!
 !!      begin volume_spectrum_ctl
 !!        volume_average_prefix        'sph_ave_inner_core'
-!!        volume_pwr_spectr_prefix     'sph_pwr_outer_core'
+!!        volume_pwr_spectr_prefix     'sph_pwr_inner_core'
+!!        volume_work_spectr_prefix    'sph_work_inner_core'
 !!        volume_pwr_spectr_format     'gzip'
 !!
 !!        degree_spectra_switch         'On'
@@ -79,6 +81,8 @@
         type(read_character_item) :: volume_spec_file_ctl
 !>        file name for volume average
         type(read_character_item) :: volume_ave_file_ctl
+!>        file name for volume average of work of Lorentz force spectr
+        type(read_character_item) :: volume_lor_spec_file_ctl
 !>        file format for volume mean square
         type(read_character_item) :: volume_spec_format_ctl
 !
@@ -103,9 +107,12 @@
 !   labels for item
 !
       character(len=kchara), parameter, private                         &
-     &            :: hd_vol_pwr = 'volume_pwr_spectr_prefix'
+     &            :: hd_vol_pwr =    'volume_pwr_spectr_prefix'
       character(len=kchara), parameter, private                         &
-     &            :: hd_vol_ave = 'volume_average_prefix'
+     &            :: hd_vol_ave =    'volume_average_prefix'
+      character(len=kchara), parameter, private                         &
+     &            :: hd_vol_lor_wk = 'volume_work_spectr_prefix'
+!
       character(len=kchara), parameter, private                         &
      &            :: hd_vol_fmt = 'volume_pwr_spectr_format'
       character(len=kchara), parameter, private                         &
@@ -135,25 +142,27 @@
 !
 !
       call copy_chara_ctl(org_vpwr%volume_spec_file_ctl,                &
-     &    new_vpwr%volume_spec_file_ctl)
+     &                    new_vpwr%volume_spec_file_ctl)
       call copy_chara_ctl(org_vpwr%volume_ave_file_ctl,                 &
-     &    new_vpwr%volume_ave_file_ctl)
+     &                    new_vpwr%volume_ave_file_ctl)
+      call copy_chara_ctl(org_vpwr%volume_lor_spec_file_ctl,            &
+     &                    new_vpwr%volume_lor_spec_file_ctl)
       call copy_chara_ctl(org_vpwr%volume_spec_format_ctl,              &
-     &    new_vpwr%volume_spec_format_ctl)
+     &                    new_vpwr%volume_spec_format_ctl)
 !
       call copy_chara_ctl(org_vpwr%degree_v_spectra_switch,             &
-     &    new_vpwr%degree_v_spectra_switch)
+     &                    new_vpwr%degree_v_spectra_switch)
       call copy_chara_ctl(org_vpwr%order_v_spectra_switch,              &
-     &    new_vpwr%order_v_spectra_switch)
+     &                    new_vpwr%order_v_spectra_switch)
       call copy_chara_ctl(org_vpwr%diff_v_lm_spectra_switch,            &
-     &    new_vpwr%diff_v_lm_spectra_switch)
+     &                    new_vpwr%diff_v_lm_spectra_switch)
       call copy_chara_ctl(org_vpwr%axis_v_power_switch,                 &
-     &    new_vpwr%axis_v_power_switch)
+     &                    new_vpwr%axis_v_power_switch)
 !
       call copy_real_ctl(org_vpwr%inner_radius_ctl,                     &
-     &    new_vpwr%inner_radius_ctl)
+     &                    new_vpwr%inner_radius_ctl)
       call copy_real_ctl(org_vpwr%outer_radius_ctl,                     &
-     &    new_vpwr%outer_radius_ctl)
+     &                    new_vpwr%outer_radius_ctl)
 !
       new_vpwr%i_vol_spectr_ctl = org_vpwr%i_vol_spectr_ctl
       new_vpwr%block_name = org_vpwr%block_name
@@ -180,25 +189,27 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_chara_ctl_type(c_buf, hd_vol_pwr,                     &
-     &      v_pwr%volume_spec_file_ctl)
+     &                           v_pwr%volume_spec_file_ctl)
+        call read_chara_ctl_type(c_buf, hd_vol_ave,                     &
+     &                           v_pwr%volume_ave_file_ctl)
+        call read_chara_ctl_type(c_buf, hd_vol_lor_wk,                  &
+     &                           v_pwr%volume_lor_spec_file_ctl)
         call read_chara_ctl_type(c_buf, hd_vol_fmt,                     &
-     &      v_pwr%volume_spec_format_ctl)
+     &                           v_pwr%volume_spec_format_ctl)
 !
         call read_chara_ctl_type(c_buf, hd_degree_spectr_switch,        &
-     &      v_pwr%degree_v_spectra_switch)
+     &                           v_pwr%degree_v_spectra_switch)
         call read_chara_ctl_type(c_buf, hd_order_spectr_switch,         &
-     &      v_pwr%order_v_spectra_switch)
+     &                           v_pwr%order_v_spectra_switch)
         call read_chara_ctl_type(c_buf, hd_diff_lm_spectr_switch,       &
-     &      v_pwr%diff_v_lm_spectra_switch)
+     &                           v_pwr%diff_v_lm_spectra_switch)
         call read_chara_ctl_type(c_buf, hd_axis_spectr_switch,          &
-     &      v_pwr%axis_v_power_switch)
+     &                           v_pwr%axis_v_power_switch)
 !
-        call read_chara_ctl_type(c_buf, hd_vol_ave,                     &
-     &      v_pwr%volume_ave_file_ctl)
         call read_real_ctl_type(c_buf, hd_inner_r,                      &
-     &      v_pwr%inner_radius_ctl)
+     &                           v_pwr%inner_radius_ctl)
         call read_real_ctl_type(c_buf, hd_outer_r,                      &
-     &      v_pwr%outer_radius_ctl)
+     &                           v_pwr%outer_radius_ctl)
       end do
       v_pwr%i_vol_spectr_ctl = 1
 !
@@ -221,6 +232,7 @@
       if(v_pwr%i_vol_spectr_ctl .le. 0) return
 !
       maxlen = len_trim(hd_vol_pwr)
+      maxlen = max(maxlen, len_trim(hd_vol_lor_wk))
       maxlen = max(maxlen, len_trim(hd_vol_fmt))
       maxlen = max(maxlen, len_trim(hd_vol_ave))
       maxlen = max(maxlen, len_trim(hd_inner_r))
@@ -235,6 +247,10 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    v_pwr%volume_spec_file_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    v_pwr%volume_ave_file_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    v_pwr%volume_lor_spec_file_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    v_pwr%volume_spec_format_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
@@ -246,8 +262,6 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    v_pwr%axis_v_power_switch)
 !
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    v_pwr%volume_ave_file_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    v_pwr%inner_radius_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
@@ -270,6 +284,10 @@
       v_pwr%block_name = hd_block
         call init_chara_ctl_item_label(hd_vol_pwr,                      &
      &      v_pwr%volume_spec_file_ctl)
+        call init_chara_ctl_item_label(hd_vol_ave,                      &
+     &      v_pwr%volume_ave_file_ctl)
+        call init_chara_ctl_item_label(hd_vol_lor_wk,                   &
+     &      v_pwr%volume_lor_spec_file_ctl)
         call init_chara_ctl_item_label(hd_vol_fmt,                      &
      &      v_pwr%volume_spec_format_ctl)
 !
@@ -282,8 +300,6 @@
         call init_chara_ctl_item_label(hd_axis_spectr_switch,           &
      &      v_pwr%axis_v_power_switch)
 !
-        call init_chara_ctl_item_label(hd_vol_ave,                      &
-     &      v_pwr%volume_ave_file_ctl)
         call init_real_ctl_item_label(hd_inner_r,                       &
      &      v_pwr%inner_radius_ctl)
         call init_real_ctl_item_label(hd_outer_r,                       &
@@ -300,6 +316,7 @@
 !
       v_pwr%volume_spec_file_ctl%iflag =   0
       v_pwr%volume_ave_file_ctl%iflag =    0
+      v_pwr%volume_lor_spec_file_ctl%iflag =   0
       v_pwr%volume_spec_format_ctl%iflag = 0
 !
       v_pwr%degree_v_spectra_switch%iflag =  0

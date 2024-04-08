@@ -47,11 +47,39 @@
       use check_energy_fluxes
       use check_base_forces
       use check_base_field
+      use check_field_w_symmetry
+      use check_forces_w_symmetry
+      use check_ene_flux_w_symmetry
       use check_workarea_4_explicit
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
+!
+!
+      call add_ene_flux_by_sym_asym_ctl(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_ene_flux_by_sym_asym_ctl end'
+      call add_ene_flux_by_sym_sym_ctl(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_ene_flux_by_sym_sym_ctl end'
+      call add_ene_flux_by_asym_asym_ctl(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_ene_flux_by_asym_asym_ctl end'
+!
+      call add_force_by_sym_asym_ctl(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_force_by_sym_asym_ctl end'
+      call add_force_by_asym_asym_ctl(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_force_by_asym_asym_ctl end'
+      call add_force_by_sym_sym_ctl(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_force_by_sym_sym_ctl end'
+!
+      call add_field_w_symmetry_ctl(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_field_w_symmetry_ctl end'
 !
       call add_field_ctl_4_check_evo(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &

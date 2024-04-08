@@ -78,8 +78,6 @@
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(communication_table), intent(inout) :: comm_IO
 !
-      integer(kind = kint) :: nprocs_read
-!
 !
       call gz_mpi_check_num_of_domains(IO_param)
 !

@@ -166,11 +166,11 @@ sph_prt_domain_FFTW.o: $(SPH_COMMDIR)/sph_prt_domain_FFTW.f90 m_precision.o m_co
 	$(F90) -c $(F90OPTFLAGS) $<
 sph_rtp_FFTPACK5.o: $(SPH_COMMDIR)/sph_rtp_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o t_sph_FFTPACK5.o calypso_mpi.o set_comm_table_rtp_FFTPACK.o copy_rtp_data_to_FFTPACK.o
 	$(F90) -c $(F90OPTFLAGS) $<
-sph_rtp_FFTW.o: $(SPH_COMMDIR)/sph_rtp_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_rtp_FFTW.o copy_rtp_data_to_FFTPACK.o
+sph_rtp_FFTW.o: $(SPH_COMMDIR)/sph_rtp_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_rtp_FFTW.o copy_rtp_data_to_FFTPACK.o set_comm_table_prt_FFTW.o
 	$(F90) -c $(F90OPTFLAGS) $<
 sph_rtp_domain_FFTPACK5.o: $(SPH_COMMDIR)/sph_rtp_domain_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o t_sph_domain_FFTPACK5.o set_comm_table_rtp_FFTPACK.o copy_rtp_data_to_FFTPACK.o
 	$(F90) -c $(F90OPTFLAGS) $<
-sph_rtp_domain_FFTW.o: $(SPH_COMMDIR)/sph_rtp_domain_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_rtp_FFTW.o copy_rtp_data_to_FFTPACK.o
+sph_rtp_domain_FFTW.o: $(SPH_COMMDIR)/sph_rtp_domain_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_rtp_FFTW.o copy_rtp_data_to_FFTPACK.o set_comm_table_prt_FFTW.o
 	$(F90) -c $(F90OPTFLAGS) $<
 sph_rtp_zonal_rms_data.o: $(SPH_COMMDIR)/sph_rtp_zonal_rms_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_rtp_data.o t_geometry_data.o t_phys_data.o coordinate_convert_4_sph.o cal_sph_zonal_ave_rms_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

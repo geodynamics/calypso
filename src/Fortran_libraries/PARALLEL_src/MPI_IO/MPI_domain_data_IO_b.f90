@@ -45,7 +45,6 @@
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(communication_table), intent(inout) :: comm_IO
 !
-      integer(kind = kint) :: nprocs_read
       integer(kind = kint_gl) :: num64
 !
 !

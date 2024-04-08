@@ -10,8 +10,8 @@
 !!      subroutine cal_rms_sph_spec_one_mode                            &
 !!     &         (j, sph_rj, ipol, ncomp_rj, g_sph_rj, icomp_rj,        &
 !!     &          n_point, ntot_phys_rj, d_rj, rms_sph_r)
-!!      subroutine cal_rms_sph_spec_one_field                           &
-!!     &         (sph_rj, ipol, ncomp_rj, g_sph_rj, icomp_rj,           &
+!!      subroutine cal_rms_sph_spec_one_field(sph_rj, ncomp_rj,         &
+!!     &          g_sph_rj, icomp1_rj, icomp2_rj,                       &
 !!     &          n_point, ntot_phys_rj, d_rj, rms_sph_rj)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!
@@ -94,8 +94,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_rms_sph_spec_one_field                             &
-     &         (sph_rj, ipol, ncomp_rj, g_sph_rj, icomp_rj,             &
+      subroutine cal_rms_sph_spec_one_field(sph_rj, ncomp_rj,           &
+     &          g_sph_rj, icomp1_rj, icomp2_rj,                         &
      &          n_point, ntot_phys_rj, d_rj, rms_sph_rj)
 !
       use t_spheric_rj_data
@@ -104,8 +104,8 @@
       use cal_sph_mean_square
 !
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(phys_address), intent(in) :: ipol
-      integer(kind = kint), intent(in) :: ncomp_rj, icomp_rj
+      integer(kind = kint), intent(in) :: ncomp_rj
+      integer(kind = kint), intent(in) :: icomp1_rj, icomp2_rj
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       real(kind = kreal), intent(in) :: d_rj(n_point,ntot_phys_rj)
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
@@ -118,15 +118,12 @@
         call each_scalar_sph_spec(sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), &
      &      sph_rj%idx_rj_degree_zero, sph_rj%inod_rj_center,           &
      &      sph_rj%radius_1d_rj_r, g_sph_rj, n_point,                   &
-     &      d_rj(1,icomp_rj), rms_sph_rj(0,1,1))
+     &      d_rj(1,icomp1_rj), d_rj(1,icomp2_rj), rms_sph_rj(0,1,1))
       else if(ncomp_rj .eq. n_vector) then
         call each_vector_sph_spec(sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), &
      &      sph_rj%idx_rj_degree_zero, sph_rj%inod_rj_center,           &
-     &      sph_rj%a_r_1d_rj_r, g_sph_rj, n_point, d_rj(1,icomp_rj),    &
-     &      rms_sph_rj(0,1,1))
-!
-        call cvt_mag_or_kin_ene_spectr                                  &
-     &         (sph_rj, ipol%base, icomp_rj, rms_sph_rj(0,1,1))
+     &      sph_rj%a_r_1d_rj_r, g_sph_rj, n_point,                      &
+     &      d_rj(1,icomp1_rj), d_rj(1,icomp2_rj), rms_sph_rj(0,1,1))
       end if
 !
       end subroutine cal_rms_sph_spec_one_field

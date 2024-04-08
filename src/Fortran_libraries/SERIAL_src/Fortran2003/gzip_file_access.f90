@@ -113,7 +113,7 @@
           use ISO_C_BINDING
 !
           type(C_ptr), value :: FP_gzip
-          integer(C_int), intent(in) :: num_buffer
+          integer(C_int), value :: num_buffer
           integer(C_int), intent(inout) :: num_word
           integer(C_int), intent(inout) :: nchara
           type(C_ptr), value :: line_buf
@@ -124,7 +124,7 @@
           use ISO_C_BINDING
 !
           type(C_ptr), value :: FP_gzip
-          integer(C_int), intent(in) :: nchara
+          integer(C_int), value :: nchara
           type(C_ptr), value :: line_buf
         end subroutine write_compress_txt_c
 !  -----------------
@@ -133,41 +133,38 @@
           use ISO_C_BINDING
 !
           type(C_ptr), value :: FP_gzip
-          integer(C_int), intent(in) :: nchara
+          integer(C_int), value :: nchara
           type(C_ptr), value :: line_buf
         end subroutine write_compress_txt_nolf_c
 !  -----------------
-        subroutine gzread_32bit_c                                       &
-     &           (FP_gzip, iflag_swap, ilength, buf, ierr)              &
-     &            BIND(C, name = 'gzread_32bit_c')
+        integer(C_int) function gzread_32bit_c                          &
+     &               (FP_gzip, iflag_swap, ilength, buf)                &
+     &                BIND(C, name = 'gzread_32bit_c')
           use ISO_C_BINDING
 !
           type(C_ptr), value :: FP_gzip
-          integer(C_int), intent(in) :: iflag_swap, ilength
+          integer(C_int), value :: iflag_swap, ilength
           type(C_ptr), value, intent(in) :: buf
-          integer(C_int), intent(inout) :: ierr
-        end subroutine gzread_32bit_c
+        end function gzread_32bit_c
 !  -----------------
-        subroutine gzread_64bit_c                                       &
-     &           (FP_gzip, iflag_swap, ilength, buf, ierr)              &
-     &            BIND(C, name = 'gzread_64bit_c')
+        integer(C_int) function gzread_64bit_c                          &
+     &               (FP_gzip, iflag_swap, ilength, buf)                &
+     &                BIND(C, name = 'gzread_64bit_c')
           use ISO_C_BINDING
 !
           type(C_ptr), value :: FP_gzip
-          integer(C_int), intent(in) :: iflag_swap, ilength
+          integer(C_int), value :: iflag_swap, ilength
           type(C_ptr), value, intent(in) :: buf
-          integer(C_int), intent(inout) :: ierr
-        end subroutine gzread_64bit_c
+        end function gzread_64bit_c
 !  -----------------
-        subroutine gzwrite_c(FP_gzip, ilength, buf, ierr)               &
+        integer(C_int) function gzwrite_c(FP_gzip, ilength, buf)        &
      &            BIND(C, name = 'gzwrite_c')
           use ISO_C_BINDING
 !
           type(C_ptr), value :: FP_gzip
-          integer(C_int), intent(in) :: ilength
+          integer(C_int), value :: ilength
           type(C_ptr), value, intent(in) :: buf
-          integer(C_int), intent(inout) :: ierr
-        end subroutine gzwrite_c
+        end function gzwrite_c
 !  -----------------
       end interface
 !
@@ -312,8 +309,9 @@
 !
 !
       call link_real_buffer_for_zlib(num, data, zbuf)
-      call gzread_64bit_c(C_LOC(FPz_f), zbuf%iflag_swap,                &
-     &    zbuf%len_buf, C_LOC(zbuf%dat_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib = gzread_64bit_c(C_LOC(FPz_f), zbuf%iflag_swap,    &
+     &                                zbuf%len_buf,                     &
+     &                                C_LOC(zbuf%dat_p(1)))
       call unlink_real_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_real_f
@@ -330,8 +328,9 @@
 !
 !
       call link_int8_buffer_for_zlib(num, int8_dat, zbuf)
-      call gzread_64bit_c(C_LOC(FPz_f), zbuf%iflag_swap,                &
-     &    zbuf%len_buf , C_LOC(zbuf%idat8_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib = gzread_64bit_c(C_LOC(FPz_f), zbuf%iflag_swap,    &
+     &                                zbuf%len_buf,                     &
+     &                                C_LOC(zbuf%idat8_p(1)))
       call unlink_int8_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_int8_f
@@ -348,8 +347,9 @@
 !
 !
       call link_int4_buffer_for_zlib(num, int4_dat, zbuf)
-      call gzread_32bit_c(C_LOC(FPz_f), zbuf%iflag_swap, zbuf%len_buf,  &
-     &                    C_LOC(zbuf%idat4_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib =  gzread_32bit_c(C_LOC(FPz_f), zbuf%iflag_swap,   &
+     &                                 zbuf%len_buf,                    &
+     &                                 C_LOC(zbuf%idat4_p(1)))
       call unlink_int4_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_int4_f
@@ -369,8 +369,9 @@
       integer(C_int), parameter :: iflag_noswap = iendian_KEEP
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call gzread_32bit_c(C_LOC(FPz_f), iflag_noswap, zbuf%len_buf,     &
-     &                    C_LOC(zbuf%buf_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib = gzread_32bit_c(C_LOC(FPz_f), iflag_noswap,       &
+     &                                zbuf%len_buf,                     &
+     &                                C_LOC(zbuf%buf_p(1)))
       call unlink_text_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_chara_f
@@ -388,8 +389,8 @@
 !
 !
       call link_real_buffer_for_zlib(num, data, zbuf)
-      call gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,                        &
-     &               C_LOC(zbuf%dat_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib = gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,            &
+     &                           C_LOC(zbuf%dat_p(1)))
       call unlink_real_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_real_f
@@ -406,8 +407,8 @@
 !
 !
       call link_int8_buffer_for_zlib(num, int8_dat, zbuf)
-      call gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,                        &
-     &               C_LOC(zbuf%idat8_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib = gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,            &
+     &                           C_LOC(zbuf%idat8_p(1)))
       call unlink_int8_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_int8_f
@@ -424,8 +425,8 @@
 !
 !
       call link_int4_buffer_for_zlib(num, int4_dat, zbuf)
-      call gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,                        &
-     &               C_LOC(zbuf%idat4_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib = gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,            &
+     &                           C_LOC(zbuf%idat4_p(1)))
       call unlink_int4_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_int4_f
@@ -442,8 +443,8 @@
 !
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,                        &
-     &               C_LOC(zbuf%buf_p(1)), zbuf%ierr_zlib)
+      zbuf%ierr_zlib = gzwrite_c(C_LOC(FPz_f), zbuf%len_buf,            &
+     &                           C_LOC(zbuf%buf_p(1)))
       call unlink_text_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_chara_f

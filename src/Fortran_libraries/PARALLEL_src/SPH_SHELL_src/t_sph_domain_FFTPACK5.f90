@@ -9,24 +9,13 @@
 !!@verbatim
 !!  ---------------------------------------------------------------------
 !!
-!!      subroutine init_sph_domain_FFTPACK5                             &
-!!     &         (sph_rtp, comm_rtp, fftpack_d)
+!!      subroutine init_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
 !!      subroutine finalize_sph_domain_FFTPACK5(fftpack_d)
-!!      subroutine verify_sph_domain_FFTPACK5                           &
-!!     &         (sph_rtp, comm_rtp, fftpack_d)
+!!      subroutine verify_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(sph_comm_tbl), intent(in) :: comm_rtp
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
-!!
-!!      subroutine prt_domain_RFFTMF_to_send(sph_rtp, comm_rtp,         &
-!!     &          ncomp_fwd, n_WS, X_rtp, WS, fftpack_d)
-!!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(sph_comm_tbl), intent(in) :: comm_rtp
-!! ------------------------------------------------------------------
-!!
-!! wrapper subroutine for forward Fourier transform by FFTPACK5
 !!
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!          *  \cos (\frac{2\pi j k}{Nfft})
@@ -39,14 +28,6 @@
 !!          * \cos (\frac{2\pi j k}{Nfft})
 !!
 !! ------------------------------------------------------------------
-!!
-!!      subroutine prt_domain_RFFTMB_from_recv(sph_rtp, comm_rtp,       &
-!!     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_d)
-!!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(sph_comm_tbl), intent(in) :: comm_rtp
-!! ------------------------------------------------------------------
-!!
-!! wrapper subroutine for backward Fourier transform by FFTPACK5
 !!
 !!   x_{k} = a_{0} + (-1)^{j} a_{Nfft/2} + sum_{k=1}^{Nfft/2-1}
 !!          (a_{k} \cos(2\pijk/Nfft) + b_{k} \sin(2\pijk/Nfft))
@@ -115,11 +96,9 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_sph_domain_FFTPACK5                               &
-     &         (sph_rtp, comm_rtp, fftpack_d)
+      subroutine init_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       type(work_for_domain_fftpack), intent(inout) :: fftpack_d
 !
@@ -151,11 +130,9 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_sph_domain_FFTPACK5                             &
-     &         (sph_rtp, comm_rtp, fftpack_d)
+      subroutine verify_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       type(work_for_domain_fftpack), intent(inout) :: fftpack_d
 !

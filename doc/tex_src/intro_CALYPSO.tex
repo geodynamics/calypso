@@ -65,6 +65,10 @@ In Version 2.0, there are a number of changes as;
 \item Number of array information is not required to define "array" block in control files.
 \item Block layout of the control file is changed for spatial resolution and spherical harmonic data IO. See Section \ref{section:resolution_block}
 
+\item Jupyter notebook to edit control files is added (See Section \ref{sec:control_editor}).
+\item Vim script to fold control blocks is added  \ref{sec:vim_folding}).
+\item Time averaging programs for power spectrum, GAuss coefficients, and Nusselt number data  are integrated into one program (See \ref{sec:ave_mean_square})
+
 \item Using MPI-IO for data IO to generate a single date file from MPI processes
 \item Include interface to zlib library (\url{https://www.zlib.net}) for data IO with data compression. zlib is pre-installed in MacOS and most of Linux distributions.
 \item For easier data handling, Calypso now support various format of data IO (ascii, binary, gzipped ascii, and gzipped binary) through MPI-IO.
