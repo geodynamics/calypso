@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!      subroutine init_quilt_image_ctl_label(hd_block, quilt_c)
 !!      subroutine read_quilt_image_ctl                                 &
 !!     &         (id_control, hd_block, quilt_c, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -25,9 +26,6 @@
 !!        type(quilt_image_ctl), intent(inout) :: new_quilt
 !!      subroutine reset_quilt_image_ctl(quilt_c)
 !!        type(quilt_image_ctl), intent(inout) :: quilt_c
-!!
-!!      integer(kind = kint) function num_label_quilt_image()
-!!      subroutine set_label_quilt_image(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !!  begin quilt_image_ctl
@@ -62,13 +60,16 @@
 !
 !>       Structure of quilt image controls
       type quilt_image_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'quilt_image_ctl'
+!
 !>        Structure of number of columns and row of image
         type(read_int2_item) :: num_column_row_ctl
 !>        Structure of number of row and columns of image
         type(read_int2_item) :: num_row_column_ctl
 !
 !         Lists of multiple view parameters
-        type(multi_modeview_ctl) :: mul_qmats_c
+        type(multi_modelview_ctl) :: mul_qmats_c
 !
 !         integer flag of used block
         integer (kind=kint) :: i_quilt_image = 0
@@ -82,9 +83,6 @@
      &             :: hd_row_column =    'num_row_column_ctl'
       character(len=kchara), parameter, private                         &
      &             :: hd_qview_transform =   'view_transform_ctl'
-!
-      integer(kind = kint), parameter :: n_label_quilt_ctl =   3
-      private :: n_label_quilt_ctl
 !
 !  ---------------------------------------------------------------------
 !
@@ -103,8 +101,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if (quilt_c%i_quilt_image.gt.0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -146,15 +144,36 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_integer2_ctl_type(id_control, level, maxlen,           &
-     &    hd_column_row, quilt_c%num_column_row_ctl)
+     &    quilt_c%num_column_row_ctl)
       call write_integer2_ctl_type(id_control, level, maxlen,           &
-     &    hd_row_column, quilt_c%num_row_column_ctl)
+     &    quilt_c%num_row_column_ctl)
 !
       call write_mul_view_transfer_ctl                                  &
      &   (id_control, hd_qview_transform, quilt_c%mul_qmats_c, level)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_quilt_image_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine init_quilt_image_ctl_label(hd_block, quilt_c)
+!
+      use ctl_file_pvr_modelview_IO
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(quilt_image_ctl), intent(inout) :: quilt_c
+!
+!
+      quilt_c%block_name = hd_block
+      call init_multi_modeview_ctl(hd_qview_transform,                  &
+     &                             quilt_c%mul_qmats_c)
+!
+        call init_integer2_ctl_item_label(hd_column_row,                &
+     &      quilt_c%num_column_row_ctl)
+        call init_integer2_ctl_item_label(hd_row_column,                &
+     &      quilt_c%num_row_column_ctl)
+!
+      end subroutine init_quilt_image_ctl_label
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -174,6 +193,7 @@
      &                       new_quilt%num_row_column_ctl)
 !
       new_quilt%i_quilt_image = org_quilt%i_quilt_image
+      new_quilt%block_name =    org_quilt%block_name
 !
       end subroutine dup_quilt_image_ctl
 !
@@ -194,27 +214,5 @@
       end subroutine reset_quilt_image_ctl
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_quilt_image()
-      num_label_quilt_image = n_label_quilt_ctl
-      return
-      end function num_label_quilt_image
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_quilt_image(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_quilt_ctl)
-!
-!
-      call set_control_labels(hd_column_row, names( 1))
-      call set_control_labels(hd_row_column, names( 2))
-      call set_control_labels(hd_qview_transform, names( 3))
-!
-      end subroutine set_label_quilt_image
-!
-! ----------------------------------------------------------------------
 !
       end module t_ctl_data_quilt_image

@@ -95,8 +95,8 @@
      &            BIND(C, name = 'copy_rgb_from_png_c')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: num_x, num_y
-          integer(C_int), intent(in) :: iflag_rgba
+          integer(C_int), value :: num_x, num_y
+          integer(C_int), value :: iflag_rgba
           type(C_ptr), value, intent(in) :: cimage
         end subroutine copy_rgb_from_png_c
 !  -----------------
@@ -105,8 +105,8 @@
      &            BIND(C, name = 'copy_rgba_from_png_c')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: num_x, num_y
-          integer(C_int), intent(in) :: iflag_rgba
+          integer(C_int), value :: num_x, num_y
+          integer(C_int), value :: iflag_rgba
           type(C_ptr), value, intent(in) :: cimage
         end subroutine copy_rgba_from_png_c
 !  -----------------
@@ -115,8 +115,8 @@
      &            BIND(C, name = 'copy_grayscale_from_png_c')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: num_x, num_y
-          integer(C_int), intent(in) :: iflag_rgba
+          integer(C_int), value :: num_x, num_y
+          integer(C_int), value :: iflag_rgba
           type(C_ptr), value, intent(in) :: cimage
         end subroutine copy_grayscale_from_png_c
 !  -----------------
@@ -125,8 +125,8 @@
      &            BIND(C, name = 'copy_grayalpha_from_png_c')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: num_x, num_y
-          integer(C_int), intent(in) :: iflag_rgba
+          integer(C_int), value :: num_x, num_y
+          integer(C_int), value :: iflag_rgba
           type(C_ptr), value, intent(in) :: cimage
         end subroutine copy_grayalpha_from_png_c
 !  -----------------

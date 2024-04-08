@@ -7,6 +7,7 @@
 !>@brief Control inputs for PVR projection and streo parameter
 !!
 !!@verbatim
+!!      subroutine init_image_size_ctl_label(hd_block, pixel)
 !!      subroutine read_image_size_ctl                                  &
 !!     &         (id_control, hd_block, pixel, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -19,13 +20,12 @@
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(screen_pixel_ctl), intent(in) :: pixel
 !!        integer(kind = kint), intent(inout) :: level
+!!      logical function cmp_screen_pixel_ctl(pixel1, pixel2)
+!!        type(screen_pixel_ctl), intent(in) :: pixel1, pixel2
 !!      subroutine reset_image_size_ctl(pixel)
 !!      subroutine copy_image_size_ctl(org_pixel, new_pixel)
 !!        type(screen_pixel_ctl), intent(in) :: org_pixel
 !!        type(screen_pixel_ctl), intent(inout) :: new_pixel
-!!
-!!      integer(kind = kint) function num_label_pvr_pixels()
-!!      subroutine set_label_pvr_pixels(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  Input example
 !!
@@ -46,7 +46,6 @@
       use m_machine_parameter
       use t_read_control_elements
       use t_control_array_integer
-      use skip_comment_f
 !
       implicit  none
 !
@@ -54,6 +53,8 @@
 !
 !>      Structure of screen resolution
       type screen_pixel_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'image_size_ctl'
 !>        Structure of number of horizontal pixels
         type(read_integer_item) :: num_xpixel_ctl
 !>        Structure of number of vertical pixels
@@ -64,8 +65,6 @@
       end type screen_pixel_ctl
 !
 !     4th level for image size
-      integer(kind = kint), parameter, private                          &
-     &             :: n_label_pvr_pixels = 2
       character(len=kchara), parameter, private                         &
      &             :: hd_x_pixel = 'x_pixel_ctl'
       character(len=kchara), parameter, private                         &
@@ -79,6 +78,8 @@
 !
       subroutine read_image_size_ctl                                    &
      &         (id_control, hd_block, pixel, c_buf)
+!
+      use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -126,14 +127,52 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &   hd_x_pixel, pixel%num_xpixel_ctl)
+     &    pixel%num_xpixel_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &   hd_y_pixel, pixel%num_ypixel_ctl)
+     &    pixel%num_ypixel_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_image_size_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine init_image_size_ctl_label(hd_block, pixel)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(screen_pixel_ctl), intent(inout) :: pixel
+!
+!
+      pixel%block_name = hd_block
+      call init_int_ctl_item_label(hd_x_pixel, pixel%num_xpixel_ctl)
+      call init_int_ctl_item_label(hd_y_pixel, pixel%num_ypixel_ctl)
+!
+      end subroutine init_image_size_ctl_label
+!
+!  ---------------------------------------------------------------------
+!
+      logical function cmp_screen_pixel_ctl(pixel1, pixel2)
+!
+      use skip_comment_f
+!
+      type(screen_pixel_ctl), intent(in) :: pixel1, pixel2
+!
+      cmp_screen_pixel_ctl = .FALSE.
+      if(pixel1%i_image_size .ne. pixel2%i_image_size) return
+      if(cmp_no_case(trim(pixel1%block_name),                           &
+     &               trim(pixel2%block_name)) .eqv. .FALSE.) return
+!
+      if(cmp_read_integer_item(pixel1%num_xpixel_ctl,                   &
+     &                         pixel2%num_xpixel_ctl)                   &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_integer_item(pixel1%num_ypixel_ctl,                   &
+     &                         pixel2%num_ypixel_ctl)                   &
+     &                                          .eqv. .FALSE.) return
+      cmp_screen_pixel_ctl = .TRUE.
+!
+      end function cmp_screen_pixel_ctl
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
       subroutine reset_image_size_ctl(pixel)
 !
@@ -155,6 +194,7 @@
       type(screen_pixel_ctl), intent(inout) :: new_pixel
 !
 !
+      new_pixel%block_name =   org_pixel%block_name
       new_pixel%i_image_size = org_pixel%i_image_size
 !
       call copy_integer_ctl(org_pixel%num_xpixel_ctl,                   &
@@ -163,27 +203,6 @@
      &                      new_pixel%num_ypixel_ctl)
 !
       end subroutine copy_image_size_ctl
-!
-!  ---------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_pixels()
-      num_label_pvr_pixels = n_label_pvr_pixels
-      return
-      end function num_label_pvr_pixels
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_pvr_pixels(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_pixels)
-!
-!
-      call set_control_labels(hd_x_pixel, names( 1))
-      call set_control_labels(hd_y_pixel, names( 2))
-!
-      end subroutine set_label_pvr_pixels
 !
 ! ----------------------------------------------------------------------
 !

@@ -26,8 +26,6 @@
       implicit none
 !
 !
-      integer(kind = kint), parameter, private :: BAR_WIDTH = 12
-!
       private :: draw_bottom_pvr_colorbar, gen_bottom_colormark
       private :: draw_left_pvr_colorbar, gen_right_colormark
 !
@@ -51,15 +49,8 @@
       real(kind = kreal), intent(inout)  :: rgba_gl(4,num_pixel)
 !
 !
-      integer(kind = kint):: isleeve_bar
-!
-!
-      isleeve_bar = BAR_WIDTH + 6 + 8 * 9 * cbar_param%iscale_font
-      isleeve_bar = isleeve_bar + ithree                                &
-     &                  - mod((isleeve_bar-ione),ifour) 
-!
       call gen_time_label(cbar_param%iscale_font, time,                 &
-     &    n_pvr_pixel, isleeve_bar, num_pixel, rgba_gl)
+     &                    n_pvr_pixel, num_pixel, rgba_gl)
 !
       end subroutine set_pvr_timelabel
 !
@@ -128,7 +119,7 @@
       integer(kind = kint):: isleeve_bar
 !
 !
-      isleeve_bar = BAR_WIDTH + 6 + 8 * 9
+      isleeve_bar = l_bar_width() + 6 + 8 * 9
       isleeve_bar = isleeve_bar + 8                                     &
      &                  - mod((isleeve_bar-ione),ifour)
 !
@@ -173,7 +164,7 @@
       integer(kind = kint):: isleeve_bar
 !
 !
-      isleeve_bar = BAR_WIDTH + 6 + 8 * 9 * iscale
+      isleeve_bar = (l_bar_width() + 6 + 8 * 9) * iscale
       isleeve_bar = isleeve_bar + ithree                                &
      &                  - mod((isleeve_bar-ione),ifour) 
 !
@@ -215,7 +206,7 @@
 !
       real(kind = kreal) :: anb_opacity, opa_current
       real(kind = kreal) :: value, color(3)
-      integer(kind = kint) :: i, j, k
+      integer(kind = kint) :: i, j, inod
       integer(kind = kint) :: num_of_features
 !
       integer(kind = kint) :: ist_h, jst_h, ied_h, jed_h
@@ -245,31 +236,34 @@
      &      color_param%num_pvr_datamap_pnt,                            &
      &      color_param%pvr_datamap_param, value, color)
 !
-        do j = jst_h, jst_h+BAR_WIDTH/2-1
-          k = (j-1)*npix_img(1) + i
-          dimage(1:3,k) = color(1:3) * opa_current
-          dimage(4,k) = one
+        do j = jst_h, jst_h+iscale*l_bar_width()/2-1
+          inod = (j-1)*npix_img(1) + i
+          dimage(1:3,inod) = color(1:3) * opa_current
+          dimage(4,inod) = one
         end do
-        do j = jst_h+BAR_WIDTH/2, jst_h+BAR_WIDTH
-          k = (j-1)*npix_img(1) + i
-          dimage(1:3,k) = color(1:3)
-          dimage(4,k) = one
+        do j = jst_h+iscale*l_bar_width()/2, jst_h+iscale*l_bar_width()
+          inod = (j-1)*npix_img(1) + i
+          dimage(1:3,inod) = color(1:3)
+          dimage(4,inod) = one
         end do
       end do
 !
-      do j = jst_h, jed_h
-        k = (j-1)*npix_img(1) + ist_h
-        dimage(1:4,k) = one
-        k = (j-1)*npix_img(1) + ied_h
-        dimage(1:4,k) = one
+      do i = -iscale/4, (iscale+1)/4
+        do j = jst_h, jed_h
+          inod = (j-1)*npix_img(1) + ist_h+i
+          dimage(1:4,inod) = one
+          inod = (j-1)*npix_img(1) + ied_h+i
+          dimage(1:4,inod) = one
+        end do
       end do
 !
-      do i = ist_h, ied_h
-        j = jst_h
-        k = i + (jst_h-1)*npix_img(1)
-        dimage(1:4,k) = one
-        k = i + (jed_h+1)*npix_img(1)
-        dimage(1:4,k) = one
+      do j = -iscale/4, (iscale+1)/4
+        do i = ist_h, ied_h
+          inod = i + (jst_h+j-1)*npix_img(1)
+          dimage(1:4,inod) = one
+          inod = i + (jed_h+j+1)*npix_img(1)
+          dimage(1:4,inod) = one
+        end do
       end do
 !
       end subroutine gen_bottom_colormark
@@ -296,7 +290,7 @@
 !
       real(kind = kreal) :: anb_opacity, opa_current
       real(kind = kreal) :: value, color(3)
-      integer(kind = kint) :: i, j, k
+      integer(kind = kint) :: i, j, inod
       integer(kind = kint) :: num_of_features
       integer(kind = kint) :: ist, jst, ied, jed
 !
@@ -325,31 +319,34 @@
      &      color_param%num_pvr_datamap_pnt,                            &
      &      color_param%pvr_datamap_param, value, color)
 !
-        do i = ist, ist+BAR_WIDTH/2-1
-          k = j*npix_img(1) + i + 1
-          dimage(1:3,k) = color(1:3)
-          dimage(4,k) = one
+        do i = ist, ist+iscale*l_bar_width()/2-1
+          inod = j*npix_img(1) + i + 1
+          dimage(1:3,inod) = color(1:3)
+          dimage(4,inod) = one
         end do
-        do i = ist+BAR_WIDTH/2, ist+BAR_WIDTH-1
-          k = j*npix_img(1) + i + 1
-          dimage(1:3,k) = color(1:3) * opa_current
-          dimage(4,k) = one
+        do i = ist+iscale*l_bar_width()/2, ist+iscale*l_bar_width()-1
+          inod = j*npix_img(1) + i + 1
+          dimage(1:3,inod) = color(1:3) * opa_current
+          dimage(4,inod) = one
         end do
       end do
 !
-      do j = jst, jed
-        k = j*npix_img(1) + ist
-        dimage(1:4,k) = one
-        k = j*npix_img(1) + ied + 1
-        dimage(1:4,k) = one
+      do i = -iscale/4, (iscale+1)/4
+        do j = jst, jed
+          inod = j*npix_img(1) + ist + i
+          dimage(1:4,inod) = one
+          inod = j*npix_img(1) + ied + i + 1
+          dimage(1:4,inod) = one
+        end do
       end do
 !
-      do i = ist-1, ied
-        j = jst
-        k = jst*npix_img(1) + i + 1
-        dimage(1:4,k) = one
-        k = jed*npix_img(1) + i + 1
-        dimage(1:4,k) = one
+      do j = -iscale/4, (iscale+1)/4
+        do i = ist-1, ied
+          inod = (jst+j)*npix_img(1) + i + 1
+          dimage(1:4,inod) = one
+          inod = (jed+j)*npix_img(1) + i + 1
+          dimage(1:4,inod) = one
+        end do
       end do
 !
       end subroutine gen_right_colormark

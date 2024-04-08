@@ -7,6 +7,7 @@
 !>@brief Control inputs for PVR projection and streo parameter
 !!
 !!@verbatim
+!!      subroutine init_projection_mat_ctl_label(hd_block, proj)
 !!      subroutine read_projection_mat_ctl                              &
 !!     &         (id_control, hd_block, proj, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -24,9 +25,8 @@
 !!      subroutine copy_projection_mat_ctl(org_proj, new_proj)
 !!        type(projection_ctl), intent(in) :: org_proj
 !!        type(projection_ctl), intent(inout) :: new_proj
-!!
-!!      integer(kind = kint) function num_label_pvr_projection()
-!!      subroutine set_label_pvr_projection(names)
+!!      logical function cmp_projection_ctl(proj1, proj2)
+!!        type(projection_ctl), intent(in) :: proj1, proj2
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  Input example
 !!
@@ -53,13 +53,14 @@
       use t_read_control_elements
       use t_control_array_real
       use t_control_array_real2
-      use skip_comment_f
 !
       implicit  none
 !
 !
 !>      Structure of projection parameters
       type projection_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'projection_matrix_ctl'
 !>        Structure of perspective view angle
         type(read_real_item) :: perspective_angle_ctl
 !>        Structure of aspect ration of screen
@@ -78,8 +79,6 @@
       end type projection_ctl
 !
 !     4th level for projection_matrix
-      integer(kind = kint), parameter, private                          &
-     &             :: n_label_pvr_projection = 6
       character(len=kchara), parameter, private                         &
      &             :: hd_perspect_angle = 'perspective_angle_ctl'
       character(len=kchara), parameter, private                         &
@@ -102,6 +101,8 @@
 !
       subroutine read_projection_mat_ctl                                &
      &         (id_control, hd_block, proj, c_buf)
+!
+      use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -162,23 +163,86 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_perspect_angle, proj%perspective_angle_ctl)
+     &    proj%perspective_angle_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_perspect_xy, proj%perspective_xy_ratio_ctl)
+     &    proj%perspective_xy_ratio_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_perspect_near, proj%perspective_near_ctl)
+     &    proj%perspective_near_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_perspect_far, proj%perspective_far_ctl)
+     &    proj%perspective_far_ctl)
 !
       call write_real2_ctl_type(id_control, level, maxlen,              &
-     &    hd_horizontal_range, proj%horizontal_range_ctl)
+     &    proj%horizontal_range_ctl)
       call write_real2_ctl_type(id_control, level, maxlen,              &
-     &    hd_vertical_range, proj%vertical_range_ctl)
+     &    proj%vertical_range_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_projection_mat_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine init_projection_mat_ctl_label(hd_block, proj)
+!
+      character(len=kchara), intent(in) :: hd_block
+!
+      type(projection_ctl), intent(inout) :: proj
+!
+!
+      proj%block_name = hd_block
+        call init_real_ctl_item_label(hd_perspect_angle,                &
+     &      proj%perspective_angle_ctl)
+        call init_real_ctl_item_label(hd_perspect_xy,                   &
+     &      proj%perspective_xy_ratio_ctl)
+        call init_real_ctl_item_label(hd_perspect_near,                 &
+     &      proj%perspective_near_ctl)
+        call init_real_ctl_item_label(hd_perspect_far,                  &
+     &      proj%perspective_far_ctl)
+!
+        call init_real2_ctl_item_label(hd_horizontal_range,             &
+     &      proj%horizontal_range_ctl)
+        call init_real2_ctl_item_label(hd_vertical_range,               &
+     &      proj%vertical_range_ctl)
+!
+      end subroutine init_projection_mat_ctl_label
+!
+!  ---------------------------------------------------------------------
+!
+      logical function cmp_projection_ctl(proj1, proj2)
+!
+      use skip_comment_f
+!
+      type(projection_ctl), intent(in) :: proj1, proj2
+!
+      cmp_projection_ctl = .FALSE.
+      if(proj1%i_project_mat .ne. proj2%i_project_mat) return
+      if(cmp_no_case(trim(proj1%block_name),                            &
+     &               trim(proj2%block_name)) .eqv. .FALSE.) return
+!
+      if(cmp_read_real_item(proj1%perspective_angle_ctl,                &
+     &                      proj2%perspective_angle_ctl)                &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real_item(proj1%perspective_xy_ratio_ctl,             &
+     &                      proj2%perspective_xy_ratio_ctl)             &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real_item(proj1%perspective_near_ctl,                 &
+     &                      proj2%perspective_near_ctl)                 &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real_item(proj1%perspective_far_ctl,                  &
+     &                      proj2%perspective_far_ctl)                  &
+     &                                          .eqv. .FALSE.) return
+!
+      if(cmp_read_real2_item(proj1%horizontal_range_ctl,                &
+     &                       proj2%horizontal_range_ctl)                &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real2_item(proj1%vertical_range_ctl,                  &
+     &                       proj2%vertical_range_ctl)                  &
+     &                                          .eqv. .FALSE.) return
+      cmp_projection_ctl = .TRUE.
+!
+      end function cmp_projection_ctl
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
       subroutine reset_projection_view_ctl(proj)
 !
@@ -204,6 +268,7 @@
       type(projection_ctl), intent(inout) :: new_proj
 !
 !
+      new_proj%block_name =    org_proj%block_name
       new_proj%i_project_mat = org_proj%i_project_mat
 !
       call copy_real_ctl(org_proj%perspective_angle_ctl,                &
@@ -223,31 +288,5 @@
       end subroutine copy_projection_mat_ctl
 !
 !  ---------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_projection()
-      num_label_pvr_projection = n_label_pvr_projection
-      return
-      end function num_label_pvr_projection
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_pvr_projection(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_projection)
-!
-!
-      call set_control_labels(hd_perspect_angle, names( 1))
-      call set_control_labels(hd_perspect_xy,    names( 2))
-      call set_control_labels(hd_perspect_near,  names( 3))
-      call set_control_labels(hd_perspect_far,   names( 4))
-!
-      call set_control_labels(hd_horizontal_range, names( 5))
-      call set_control_labels(hd_vertical_range,   names( 6))
-!
-      end subroutine set_label_pvr_projection
-!
-! ----------------------------------------------------------------------
 !
       end module t_ctl_data_4_projection

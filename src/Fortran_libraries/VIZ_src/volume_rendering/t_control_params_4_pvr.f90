@@ -10,11 +10,6 @@
 !!      subroutine alloc_pvr_element_group(pvr_area)
 !!      subroutine dealloc_pvr_element_group(pvr_area)
 !!        type(viz_area_parameter), intent(inout) :: pvr_area
-!!
-!!      integer(kind = kint) function num_flag_pvr_movie_mode()
-!!      integer(kind = kint) function num_flag_LIC_movie_mode()
-!!      subroutine set_flag_pvr_movie_mode(names)
-!!      subroutine set_flag_LIC_movie_mode(names)
 !!@endverbatim
 !
       module t_control_params_4_pvr
@@ -28,16 +23,6 @@
 !
       real(kind = kreal), parameter :: SMALL_RAY_TRACE = 0.1d0
       real(kind = kreal), parameter :: SMALL_NORM = -0.1d0
-!
-      integer(kind = kint), parameter :: n_flag_pvr_movie_mode =   3
-      integer(kind = kint), parameter :: n_flag_LIC_movie_mode =   4
-      character(len=kchara), parameter                                  &
-     &                      :: FLAG_ROTATE_MOVIE =    'rotation'
-      character(len=kchara), parameter :: FLAG_ZOOM = 'zoom'
-      character(len=kchara), parameter                                  &
-     &                      :: FLAG_START_END_VIEW =  'view_matrices'
-      character(len=kchara), parameter                                  &
-     &                      :: FLAG_LIC_KERNEL = 'LIC_kernel'
 !
       integer(kind = kint), parameter :: IFLAG_NO_MOVIE =   0
       integer(kind = kint), parameter :: I_ROTATE_MOVIE =   1
@@ -170,53 +155,5 @@
       end subroutine dealloc_pvr_element_group
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_flag_pvr_movie_mode()
-      num_flag_pvr_movie_mode = n_flag_pvr_movie_mode
-      return
-      end function num_flag_pvr_movie_mode
-!
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_flag_LIC_movie_mode()
-      num_flag_LIC_movie_mode = n_flag_LIC_movie_mode
-      return
-      end function num_flag_LIC_movie_mode
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_flag_pvr_movie_mode(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_flag_pvr_movie_mode)
-!
-!
-      call set_control_labels(FLAG_ROTATE_MOVIE,   names( 1))
-      call set_control_labels(FLAG_ZOOM,           names( 2))
-      call set_control_labels(FLAG_START_END_VIEW, names( 3))
-!
-      end subroutine set_flag_pvr_movie_mode
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_flag_LIC_movie_mode(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_flag_LIC_movie_mode)
-!
-!
-      call set_control_labels(FLAG_ROTATE_MOVIE,   names( 1))
-      call set_control_labels(FLAG_ZOOM,           names( 2))
-      call set_control_labels(FLAG_START_END_VIEW, names( 3))
-      call set_control_labels(FLAG_LIC_KERNEL,     names( 4))
-!
-      end subroutine set_flag_LIC_movie_mode
-!
-! ----------------------------------------------------------------------
 !
       end module t_control_params_4_pvr

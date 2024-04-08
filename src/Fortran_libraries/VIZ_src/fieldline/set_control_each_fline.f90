@@ -44,6 +44,7 @@
      &         (fln, ele, ele_grp, sf_grp, fln_prm, fln_src)
 !
       use m_field_file_format
+      use m_control_fline_flags
 !
       use t_source_of_filed_line
       use set_area_4_viz

@@ -12,6 +12,8 @@
 !!      subroutine dup_view_transfer_ctl(org_mat, new_mat)
 !!        type(modeview_ctl), intent(in) :: org_mat
 !!        type(modeview_ctl), intent(inout) :: new_mat
+!!      logical function cmp_modeview_ctl(mat1, mat2)
+!!        type(modeview_ctl), intent(in) :: mat1, mat2
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  Input example
 !
@@ -128,8 +130,8 @@
 !
 !>    Structure for modelview marices
       type modeview_ctl
-!>        File name for external control file
-        character(len=kchara) :: mat_ctl_fname
+!>        Control block name
+        character(len = kchara) :: block_name = 'view_transform_ctl'
 !
 !>        Structure of screen resolution
         type(screen_pixel_ctl) :: pixel
@@ -182,8 +184,11 @@
 !>      Structure for projection type for 2D plot
         type(read_character_item) :: projection_type_ctl
 !
-!>         entry label for this block
+!>        loaded flag
         integer (kind=kint) :: i_view_transform = 0
+!
+!>        Consistency check flag
+        logical :: flag_checked = .FALSE.
       end type modeview_ctl
 !
 !  ---------------------------------------------------------------------
@@ -246,6 +251,7 @@
       type(modeview_ctl), intent(inout) :: new_mat
 !
 !
+      new_mat%block_name =       org_mat%block_name
       new_mat%i_view_transform = org_mat%i_view_transform
 !
       call dup_control_array_c_r(org_mat%lookpoint_ctl,                 &
@@ -280,5 +286,57 @@
       end subroutine dup_view_transfer_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      logical function cmp_modeview_ctl(mat1, mat2)
+!
+      type(modeview_ctl), intent(in) :: mat1, mat2
+!
+      cmp_modeview_ctl = .FALSE.
+      if(mat1%i_view_transform .ne. mat2%i_view_transform) return
+      if(cmp_no_case(trim(mat1%block_name),                             &
+     &               trim(mat2%block_name)) .eqv. .FALSE.) return
+!
+      if(cmp_screen_pixel_ctl(mat1%pixel, mat2%pixel)                   &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_projection_ctl(mat1%proj, mat2%proj) .eqv. .FALSE.) return
+      if(cmp_streo_view_ctl(mat1%streo, mat2%streo)                     &
+     &                                            .eqv. .FALSE.) return
+!
+      if(cmp_control_array_c2_r(mat1%modelview_mat_ctl,                 &
+     &                          mat2%modelview_mat_ctl)                 &
+     &                                            .eqv. .FALSE.) return
+!
+      if(cmp_control_array_c_r(mat1%lookpoint_ctl, mat2%lookpoint_ctl)  &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_control_array_c_r(mat1%viewpoint_ctl, mat2%viewpoint_ctl)  &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_control_array_c_r(mat1%up_dir_ctl, mat2%up_dir_ctl)        &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_control_array_c_r(mat1%view_rot_vec_ctl,                   &
+     &                         mat2%view_rot_vec_ctl)                   &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_control_array_c_r(mat1%scale_vector_ctl,                   &
+     &                         mat2%scale_vector_ctl)                   &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_control_array_c_r(mat1%viewpt_in_viewer_ctl,               &
+     &                         mat2%viewpt_in_viewer_ctl)               &
+     &                                            .eqv. .FALSE.) return
+!
+      if(cmp_read_real_item(mat1%view_rotation_deg_ctl,                 &
+     &                      mat2%view_rotation_deg_ctl)                 &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_read_real_item(mat1%scale_factor_ctl,                      &
+     &                      mat2%scale_factor_ctl)                      &
+     &                                            .eqv. .FALSE.) return
+!
+      if(cmp_read_chara_item(mat1%projection_type_ctl,                  &
+     &                       mat2%projection_type_ctl)                  &
+     &                                            .eqv. .FALSE.) return
+!
+      cmp_modeview_ctl = .TRUE.
+!
+      end function cmp_modeview_ctl
+!
+!   --------------------------------------------------------------------
 !
       end module t_ctl_data_4_view_transfer

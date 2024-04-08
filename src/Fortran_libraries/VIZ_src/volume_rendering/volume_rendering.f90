@@ -97,7 +97,7 @@
       call dealloc_pvr_ctl_struct(pvr_ctls)
       if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+6)
 !      do i_pvr = 1, pvr_ctls%num_pvr_ctl
-!        if(pvr_ctls%fname_pvr_ctl(i_pvr) .ne. 'NO_FILE'                &
+!        if((no_file_flag(pvr_ctls%fname_pvr_ctl(i_pvr)) .eqv. .FALSE.) &
 !     &      .or. my_rank .ne. 0) then
 !          call deallocate_cont_dat_pvr(pvr_ctls%pvr_ctl_type(i_pvr))
 !        end if

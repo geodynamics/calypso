@@ -101,6 +101,7 @@
       use m_error_IDs
 !
       use set_control_sph_mhd
+      use set_control_SPH_MHD_w_viz
       use sph_file_IO_select
       use set_control_4_SPH_to_FEM
       use parallel_load_data_4_sph
@@ -130,7 +131,7 @@
      &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
      &    SPH_WK%trns_WK, SPH_MHD)
 !
-      call set_control_SPH_MHD_w_viz                                    &
+      call s_set_control_SPH_MHD_w_viz                                  &
      &   (MHD_ctl%model_ctl, MHD_ctl%psph_ctl, MHD_ctl%smonitor_ctl,    &
      &    add_VMHD_ctl%zm_ctls%crust_filter_ctl, MHD_ctl%nmtr_ctl,      &
      &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_MHD%sph,            &

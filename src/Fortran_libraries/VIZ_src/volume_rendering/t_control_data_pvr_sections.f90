@@ -8,6 +8,11 @@
 !!
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!      subroutine alloc_pvr_sections_ctl(pvr_scts_c)
+!!      subroutine dealloc_pvr_sections_ctl(pvr_scts_c)
+!!      subroutine init_pvr_sections_ctl(hd_block, pvr_scts_c)
+!!        type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
+!!
 !!      subroutine read_pvr_sections_ctl                                &
 !!     &         (id_control, hd_block, pvr_scts_c, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -21,11 +26,11 @@
 !!        type(pvr_sections_ctl), intent(in) :: pvr_scts_c
 !!        integer(kind = kint), intent(inout) :: level
 !!
-!!      subroutine append_new_pvr_section_ctl(pvr_scts_c)
+!!      subroutine append_pvr_section_ctl(idx_in, hd_block,             &
+!!     &                                  pvr_scts_c)
+!!      subroutine delete_pvr_section_ctl(idx_in, pvr_scts_c)
 !!        type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
 !!      subroutine dup_pvr_sections_ctl(org_pvr_scts_c, new_pvr_scts_c)
-!!      subroutine copy_pvr_sections_ctl                                &
-!!     &         (num_pvr_sect, org_pvr_sect_c, new_pvr_sect_c)
 !!        type(pvr_section_ctl), intent(in)                             &
 !!     &                       :: org_pvr_sect_c(num_pvr_sect)
 !!        type(pvr_section_ctl), intent(inout)                          &
@@ -64,6 +69,9 @@
 !
 !
       type pvr_sections_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'section_ctl'
+!
         integer(kind = kint) :: num_pvr_sect_ctl = 0
         type(pvr_section_ctl), allocatable :: pvr_sect_ctl(:)
       end type pvr_sections_ctl
@@ -105,22 +113,33 @@
       end subroutine alloc_pvr_sections_ctl
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine init_pvr_sections_ctl(hd_block, pvr_scts_c)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
+!
+!
+      pvr_scts_c%block_name = hd_block
+      pvr_scts_c%num_pvr_sect_ctl = 0
+!
+      end subroutine init_pvr_sections_ctl
+!
+! -----------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine read_pvr_sections_ctl                                  &
      &         (id_control, hd_block, pvr_scts_c, c_buf)
-!
-      use ctl_data_pvr_section_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
       type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
       type(buffer_for_control), intent(inout)  :: c_buf
 !
+      integer(kind = kint) :: n_append
 !
       if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(pvr_scts_c%pvr_sect_ctl)) return
-      pvr_scts_c%num_pvr_sect_ctl = 0
       call alloc_pvr_sections_ctl(pvr_scts_c)
 !
       do
@@ -129,7 +148,8 @@
         if(check_end_array_flag(c_buf, hd_block)) exit
 !
         if(check_begin_flag(c_buf, hd_block)) then
-          call append_new_pvr_section_ctl(pvr_scts_c)
+          n_append = pvr_scts_c%num_pvr_sect_ctl
+          call append_pvr_section_ctl(n_append, hd_block, pvr_scts_c)
 !
           call read_pvr_section_ctl                                     &
      &       (id_control, hd_block, pvr_scts_c%num_pvr_sect_ctl,        &
@@ -145,7 +165,6 @@
       subroutine write_pvr_sections_ctl                                 &
      &         (id_control, hd_block, pvr_scts_c, level)
 !
-      use ctl_data_pvr_section_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
@@ -172,47 +191,80 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine copy_pvr_sections_ctl                                  &
-     &         (num_pvr_sect, org_pvr_scts_c, new_pvr_scts_c)
+      subroutine append_pvr_section_ctl(idx_in, hd_block, pvr_scts_c)
 !
-      integer(kind = kint), intent(in) :: num_pvr_sect
-      type(pvr_sections_ctl), intent(in) :: org_pvr_scts_c
-      type(pvr_sections_ctl), intent(inout) :: new_pvr_scts_c
-!
-      integer(kind = kint) :: i
-!
-      do i = 1, num_pvr_sect
-        call dup_pvr_section_ctl(org_pvr_scts_c%pvr_sect_ctl(i),        &
-     &                           new_pvr_scts_c%pvr_sect_ctl(i))
-      end do
-!
-      end subroutine copy_pvr_sections_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine append_new_pvr_section_ctl(pvr_scts_c)
-!
+      integer(kind = kint), intent(in) :: idx_in
+      character(len=kchara), intent(in) :: hd_block
       type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
 !
       type(pvr_sections_ctl) :: tmp_pvr_scts
+      integer(kind = kint) :: i
 !
+!
+      if(idx_in.lt.0 .or. idx_in.gt.pvr_scts_c%num_pvr_sect_ctl) return
 !
       tmp_pvr_scts%num_pvr_sect_ctl = pvr_scts_c%num_pvr_sect_ctl
       call alloc_pvr_sections_ctl(tmp_pvr_scts)
-      call copy_pvr_sections_ctl(tmp_pvr_scts%num_pvr_sect_ctl,         &
-     &                           pvr_scts_c, tmp_pvr_scts)
+      do i = 1, tmp_pvr_scts%num_pvr_sect_ctl
+        call dup_pvr_section_ctl(pvr_scts_c%pvr_sect_ctl(i),            &
+     &                           tmp_pvr_scts%pvr_sect_ctl(i))
+      end do
 !
       call dealloc_pvr_sections_ctl(pvr_scts_c)
-!
       pvr_scts_c%num_pvr_sect_ctl = tmp_pvr_scts%num_pvr_sect_ctl + 1
       call alloc_pvr_sections_ctl(pvr_scts_c)
 !
-      call copy_pvr_sections_ctl(tmp_pvr_scts%num_pvr_sect_ctl,         &
-     &                           tmp_pvr_scts, pvr_scts_c)
+      do i = 1, idx_in
+        call dup_pvr_section_ctl(tmp_pvr_scts%pvr_sect_ctl(i),          &
+     &                           pvr_scts_c%pvr_sect_ctl(i))
+      end do
+      call init_pvr_section_ctl_label(hd_block,                         &
+     &                                pvr_scts_c%pvr_sect_ctl(idx_in+1))
+      do i = idx_in+1, tmp_pvr_scts%num_pvr_sect_ctl
+        call dup_pvr_section_ctl(tmp_pvr_scts%pvr_sect_ctl(i),          &
+     &                           pvr_scts_c%pvr_sect_ctl(i+1))
+      end do
 !
       call dealloc_pvr_sections_ctl(tmp_pvr_scts)
 !
-      end subroutine append_new_pvr_section_ctl
+      end subroutine append_pvr_section_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine delete_pvr_section_ctl(idx_in, pvr_scts_c)
+!
+      integer(kind = kint), intent(in) :: idx_in
+      type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
+!
+      type(pvr_sections_ctl) :: tmp_pvr_scts
+      integer(kind = kint) :: i
+!
+!
+      if(idx_in.le.0 .or. idx_in.gt.pvr_scts_c%num_pvr_sect_ctl) return
+!
+      tmp_pvr_scts%num_pvr_sect_ctl = pvr_scts_c%num_pvr_sect_ctl
+      call alloc_pvr_sections_ctl(tmp_pvr_scts)
+      do i = 1, tmp_pvr_scts%num_pvr_sect_ctl
+        call dup_pvr_section_ctl(pvr_scts_c%pvr_sect_ctl(i),            &
+     &                           tmp_pvr_scts%pvr_sect_ctl(i))
+      end do
+!
+      call dealloc_pvr_sections_ctl(pvr_scts_c)
+      pvr_scts_c%num_pvr_sect_ctl = tmp_pvr_scts%num_pvr_sect_ctl - 1
+      call alloc_pvr_sections_ctl(pvr_scts_c)
+!
+      do i = 1, idx_in-1
+        call dup_pvr_section_ctl(tmp_pvr_scts%pvr_sect_ctl(i),          &
+     &                           pvr_scts_c%pvr_sect_ctl(i))
+      end do
+      do i = idx_in, pvr_scts_c%num_pvr_sect_ctl
+        call dup_pvr_section_ctl(tmp_pvr_scts%pvr_sect_ctl(i+1),        &
+     &                           pvr_scts_c%pvr_sect_ctl(i))
+      end do
+!
+      call dealloc_pvr_sections_ctl(tmp_pvr_scts)
+!
+      end subroutine delete_pvr_section_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -221,11 +273,16 @@
       type(pvr_sections_ctl), intent(in) :: org_pvr_scts_c
       type(pvr_sections_ctl), intent(inout) :: new_pvr_scts_c
 !
+      integer(kind = kint) :: i
 !
+      new_pvr_scts_c%block_name =       org_pvr_scts_c%block_name
       new_pvr_scts_c%num_pvr_sect_ctl = org_pvr_scts_c%num_pvr_sect_ctl
       call alloc_pvr_sections_ctl(new_pvr_scts_c)
-      call copy_pvr_sections_ctl(org_pvr_scts_c%num_pvr_sect_ctl,       &
-     &                           org_pvr_scts_c, new_pvr_scts_c)
+!
+      do i = 1, org_pvr_scts_c%num_pvr_sect_ctl
+        call dup_pvr_section_ctl(org_pvr_scts_c%pvr_sect_ctl(i),        &
+     &                           new_pvr_scts_c%pvr_sect_ctl(i))
+      end do
 !
       end subroutine dup_pvr_sections_ctl
 !

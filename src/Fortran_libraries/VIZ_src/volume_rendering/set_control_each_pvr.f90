@@ -249,6 +249,7 @@
 !
       use t_control_data_pvr_isosurfs
       use t_geometries_in_pvr_screen
+      use m_pvr_control_labels
       use pvr_surface_enhancement
 !
       type(pvr_isosurfs_ctl), intent(in) :: pvr_isos_c

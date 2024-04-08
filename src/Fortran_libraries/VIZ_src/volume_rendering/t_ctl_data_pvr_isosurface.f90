@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!      subroutine init_pvr_isosurface_ctl_label(hd_block, pvr_iso_ctl)
 !!      subroutine read_pvr_isosurface_ctl                              &
 !!     &         (id_control, hd_block, pvr_iso_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -26,9 +27,6 @@
 !!        type(pvr_isosurf_ctl), intent(inout) :: new_pvr_iso_c
 !!      subroutine reset_pvr_isosurface_ctl(pvr_iso_ctl)
 !!        type(pvr_isosurf_ctl), intent(inout) :: pvr_iso_ctl
-!!
-!!      integer(kind = kint) function num_label_pvr_isosurface()
-!!      subroutine set_label_pvr_isosurface(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    begin isosurface_ctl
 !!      isosurf_value       0.3
@@ -53,6 +51,9 @@
 !
 !
       type pvr_isosurf_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'isosurface_ctl'
+!
         type(read_character_item) :: isosurf_type_ctl
         type(read_real_item) :: iso_value_ctl
         type(read_real_item) :: opacity_ctl
@@ -65,10 +66,7 @@
       character(len=kchara) :: hd_pvr_opacity =   'opacity_ctl'
       character(len=kchara) :: hd_iso_direction = 'surface_direction'
 !
-      integer(kind = kint), parameter :: n_label_pvr_isosurface =   3
-!
       private :: hd_isosurf_value, hd_pvr_opacity, hd_iso_direction
-      private :: n_label_pvr_isosurface
 !
 !  ---------------------------------------------------------------------
 !
@@ -124,14 +122,32 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_iso_direction, pvr_iso_ctl%isosurf_type_ctl)
+     &    pvr_iso_ctl%isosurf_type_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_isosurf_value, pvr_iso_ctl%iso_value_ctl)
+     &    pvr_iso_ctl%iso_value_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_pvr_opacity, pvr_iso_ctl%opacity_ctl)
+     &    pvr_iso_ctl%opacity_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_pvr_isosurface_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine init_pvr_isosurface_ctl_label(hd_block, pvr_iso_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(pvr_isosurf_ctl), intent(inout) :: pvr_iso_ctl
+!
+!
+      pvr_iso_ctl%block_name = hd_block
+        call init_chara_ctl_item_label(hd_iso_direction,                &
+     &      pvr_iso_ctl%isosurf_type_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_isosurf_value, pvr_iso_ctl%iso_value_ctl)
+        call init_real_ctl_item_label                                   &
+     &     (hd_pvr_opacity, pvr_iso_ctl%opacity_ctl)
+!
+      end subroutine init_pvr_isosurface_ctl_label
 !
 !  ---------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -167,27 +183,5 @@
       end subroutine reset_pvr_isosurface_ctl
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_isosurface()
-      num_label_pvr_isosurface = n_label_pvr_isosurface
-      return
-      end function num_label_pvr_isosurface
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_pvr_isosurface(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_isosurface)
-!
-!
-      call set_control_labels(hd_isosurf_value, names( 1))
-      call set_control_labels(hd_pvr_opacity,   names( 2))
-      call set_control_labels(hd_iso_direction, names( 3))
-!
-      end subroutine set_label_pvr_isosurface
-!
-! ----------------------------------------------------------------------
 !
       end module t_ctl_data_pvr_isosurface

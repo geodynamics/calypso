@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!      subroutine int_pvr_render_area_ctl(hd_block, render_area_c)
 !!      subroutine read_pvr_render_area_ctl                             &
 !!     &         (id_control, hd_block, render_area_c, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -25,9 +26,6 @@
 !!        type(pvr_render_area_ctl), intent(inout) :: new_rarea_c
 !!      subroutine dealloc_pvr_render_area_ctl(render_area_c)
 !!        type(pvr_render_area_ctl), intent(inout) :: render_area_c
-!!
-!!      integer(kind = kint) function num_label_pvr_area()
-!!      subroutine set_label_pvr_area(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !!  begin plot_area_ctl
@@ -58,6 +56,9 @@
 !
 !
       type pvr_render_area_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'FEM_sleeve_ctl'
+!
         type(ctl_array_chara) :: pvr_area_ctl
         type(ctl_array_c2r) :: surf_enhanse_ctl
 !
@@ -69,9 +70,7 @@
       character(len=kchara) :: hd_plot_grp = 'chosen_ele_grp_ctl'
       character(len=kchara) :: hd_sf_enhanse = 'surface_enhanse_ctl'
 !
-      integer(kind = kint), parameter :: n_label_pvr_area =   2
-!
-      private :: hd_plot_grp, hd_sf_enhanse, n_label_pvr_area
+      private :: hd_plot_grp, hd_sf_enhanse
 !
 !  ---------------------------------------------------------------------
 !
@@ -122,12 +121,28 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_control_array_c1(id_control, level,                    &
-     &    hd_plot_grp, render_area_c%pvr_area_ctl)
+     &    render_area_c%pvr_area_ctl)
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_sf_enhanse, render_area_c%surf_enhanse_ctl)
+     &    render_area_c%surf_enhanse_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_pvr_render_area_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine int_pvr_render_area_ctl(hd_block, render_area_c)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(pvr_render_area_ctl), intent(inout) :: render_area_c
+!
+!
+      render_area_c%block_name = hd_block
+        call init_chara_ctl_array_label(hd_plot_grp,                    &
+     &      render_area_c%pvr_area_ctl)
+        call init_c2_r_ctl_array_label(hd_sf_enhanse,                   &
+     &      render_area_c%surf_enhanse_ctl)
+!
+      end subroutine int_pvr_render_area_ctl
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -144,6 +159,7 @@
      &                            new_rarea_c%surf_enhanse_ctl)
 !
       new_rarea_c%i_plot_area = org_rarea_c%i_plot_area
+      new_rarea_c%block_name = org_rarea_c%block_name
 !
       end subroutine dup_pvr_render_area_ctl
 !
@@ -164,26 +180,5 @@
       end subroutine dealloc_pvr_render_area_ctl
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_area()
-      num_label_pvr_area = n_label_pvr_area
-      return
-      end function num_label_pvr_area
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_pvr_area(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_area)
-!
-!
-      call set_control_labels(hd_plot_grp,    names( 1))
-      call set_control_labels(hd_sf_enhanse,    names( 2))
-!
-      end subroutine set_label_pvr_area
-!
-! ----------------------------------------------------------------------
 !
       end module  t_ctl_data_pvr_area

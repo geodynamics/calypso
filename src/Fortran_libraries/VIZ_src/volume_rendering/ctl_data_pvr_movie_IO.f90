@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!      subroutine init_pvr_rotation_ctl_label(hd_block, movie)
 !!      subroutine read_pvr_rotation_ctl                                &
 !!     &         (id_control, hd_block, movie, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -20,11 +21,6 @@
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_movie_ctl), intent(in) :: movie
 !!        integer(kind = kint), intent(inout) :: level
-!!
-!!      integer(kind = kint) function num_label_pvr_movie()
-!!      integer(kind = kint) function num_label_LIC_movie()
-!!      subroutine set_label_pvr_movie(names)
-!!      subroutine set_label_LIC_movie(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    Avaiable parameters for movie_mode_ctl:
 !!        rotation, zoom, view_matrices, LIC_kernel, looking_glass
@@ -102,11 +98,6 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_LIC_kernel_peak = 'LIC_kernel_peak_range'
 !
-      integer(kind = kint), parameter :: n_label_pvr_movie =  8
-      integer(kind = kint), parameter :: n_label_LIC_movie =  9
-!
-      private :: n_label_pvr_movie, n_label_LIC_movie
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -118,6 +109,7 @@
 !
       use ctl_file_pvr_modelview_IO
       use write_control_elements
+      use ctl_data_view_transfer_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -125,8 +117,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
+      if(movie%i_pvr_rotation.gt.0) return
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if (movie%i_pvr_rotation.gt.0) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -188,12 +180,12 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_movie_mode, movie%movie_mode_ctl)
+     &    movie%movie_mode_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_movie_num_frame, movie%num_frames_ctl)
+     &    movie%num_frames_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_movie_rot_axis, movie%rotation_axis_ctl)
+     &    movie%rotation_axis_ctl)
 !
       write(*,'(2a)', ADVANCE='NO') '!  ', trim(hd_start_view_control)
       call sel_write_ctl_modelview_file                                 &
@@ -208,76 +200,51 @@
      &   (id_control, hd_mview_transform, movie%mul_mmats_c, level)
 !
       call write_real2_ctl_type(id_control, level, maxlen,              &
-     &    hd_angle_range, movie%angle_range_ctl)
+     &    movie%angle_range_ctl)
       call write_real2_ctl_type(id_control, level, maxlen,              &
-     &    hd_apature_range, movie%apature_range_ctl)
+     &    movie%apature_range_ctl)
       call write_real2_ctl_type(id_control, level, maxlen,              &
-     &    hd_LIC_kernel_peak, movie%LIC_kernel_peak_range_ctl)
+     &    movie%LIC_kernel_peak_range_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_pvr_rotation_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine init_pvr_rotation_ctl_label(hd_block, movie)
+!
+      use ctl_file_pvr_modelview_IO
+      use ctl_data_view_transfer_IO
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(pvr_movie_ctl), intent(inout) :: movie
+!
+!
+      movie%block_name = hd_block
+      call init_view_transfer_ctl_label(hd_start_view_control,          &
+     &                                  movie%view_start_ctl)
+      call init_view_transfer_ctl_label(hd_end_view_control,            &
+     &                                  movie%view_end_ctl)
+      call init_multi_modeview_ctl(hd_mview_transform,                  &
+     &                             movie%mul_mmats_c)
+!
+        call init_chara_ctl_item_label(hd_movie_mode,                   &
+     &      movie%movie_mode_ctl)
+!
+        call init_int_ctl_item_label(hd_movie_num_frame,                &
+     &      movie%num_frames_ctl)
+        call init_chara_ctl_item_label(hd_movie_rot_axis,               &
+     &      movie%rotation_axis_ctl)
+!
+        call init_real2_ctl_item_label(hd_angle_range,                  &
+     &      movie%angle_range_ctl)
+        call init_real2_ctl_item_label(hd_apature_range,                &
+     &      movie%apature_range_ctl)
+        call init_real2_ctl_item_label(hd_LIC_kernel_peak,              &
+     &      movie%LIC_kernel_peak_range_ctl)
+!
+      end subroutine init_pvr_rotation_ctl_label
+!
 !  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_movie()
-      num_label_pvr_movie = n_label_pvr_movie
-      return
-      end function num_label_pvr_movie
-!
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_LIC_movie()
-      num_label_LIC_movie = n_label_LIC_movie
-      return
-      end function num_label_LIC_movie
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_pvr_movie(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_movie)
-!
-!
-      call set_control_labels(hd_movie_mode,      names( 1))
-      call set_control_labels(hd_movie_num_frame, names( 2))
-!
-      call set_control_labels(hd_movie_rot_axis,   names( 3))
-!
-      call set_control_labels(hd_start_view_control, names( 4))
-      call set_control_labels(hd_end_view_control,   names( 5))
-      call set_control_labels(hd_mview_transform,    names( 6))
-!
-      call set_control_labels(hd_angle_range,        names( 7))
-      call set_control_labels(hd_apature_range,      names( 8))
-!
-      end subroutine set_label_pvr_movie
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_LIC_movie(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_LIC_movie)
-!
-!
-      call set_control_labels(hd_movie_mode,      names( 1))
-      call set_control_labels(hd_movie_num_frame, names( 2))
-!
-      call set_control_labels(hd_movie_rot_axis,   names( 3))
-!
-      call set_control_labels(hd_start_view_control, names( 4))
-      call set_control_labels(hd_end_view_control,   names( 5))
-      call set_control_labels(hd_mview_transform,    names( 6))
-!
-      call set_control_labels(hd_angle_range,        names( 7))
-      call set_control_labels(hd_apature_range,      names( 8))
-!
-      call set_control_labels(hd_LIC_kernel_peak,   names( 9))
-!
-      end subroutine set_label_LIC_movie
-!
-! ----------------------------------------------------------------------
 !
       end module ctl_data_pvr_movie_IO

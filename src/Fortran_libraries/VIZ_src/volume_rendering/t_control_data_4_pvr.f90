@@ -15,6 +15,11 @@
 !!      subroutine add_field_4_pvr_to_fld_ctl(pvr_ctl, field_ctl)
 !!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl
 !!        type(ctl_array_c3), intent(inout) :: field_ctl
+!!
+!!      subroutine dup_pvr_ctl(org_pvr, new_pvr)
+!!      subroutine copy_pvr_update_flag(org_pvr, new_pvr)
+!!        type(pvr_parameter_ctl), intent(in) :: org_pvr
+!!        type(pvr_parameter_ctl), intent(inout) :: new_pvr
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of control for Kemo's volume rendering
 !!
@@ -101,6 +106,9 @@
 !
 !>  Structure of control data for PVR rendering
       type pvr_parameter_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'volume_rendering'
+!
 !>     file name for modelview matrix
         character(len=kchara) :: fname_mat_ctl = 'NO_FILE'
 !>     Structure for modelview marices
@@ -218,6 +226,64 @@
       end if
 !
       end subroutine add_field_4_pvr_to_fld_ctl
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine dup_pvr_ctl(org_pvr, new_pvr)
+!
+      use t_ctl_data_4_view_transfer
+      use bcast_control_arrays
+!
+      type(pvr_parameter_ctl), intent(in) :: org_pvr
+      type(pvr_parameter_ctl), intent(inout) :: new_pvr
+!
+!
+      new_pvr%block_name =        org_pvr%block_name
+      new_pvr%i_pvr_ctl =         org_pvr%i_pvr_ctl
+      new_pvr%fname_mat_ctl =     org_pvr%fname_mat_ctl
+      new_pvr%fname_cmap_cbar_c = org_pvr%fname_cmap_cbar_c
+      new_pvr%fname_pvr_light_c = org_pvr%fname_pvr_light_c
+!
+      call dup_view_transfer_ctl(org_pvr%mat, new_pvr%mat)
+!
+      call dup_pvr_isosurfs_ctl(org_pvr%pvr_isos_c, new_pvr%pvr_isos_c)
+      call dup_pvr_sections_ctl(org_pvr%pvr_scts_c, new_pvr%pvr_scts_c)
+!
+      call dup_lighting_ctl(org_pvr%light, new_pvr%light)
+      call dup_pvr_cmap_cbar(org_pvr%cmap_cbar_c, new_pvr%cmap_cbar_c)
+!
+      call dup_quilt_image_ctl(org_pvr%quilt_c, new_pvr%quilt_c)
+      call dup_pvr_movie_control_flags(org_pvr%movie, new_pvr%movie)
+      call dup_pvr_render_area_ctl(org_pvr%render_area_c,               &
+     &                             new_pvr%render_area_c)
+!
+      call copy_chara_ctl(org_pvr%updated_ctl, new_pvr%updated_ctl)
+      call copy_chara_ctl(org_pvr%file_head_ctl, new_pvr%file_head_ctl)
+      call copy_chara_ctl(org_pvr%file_fmt_ctl, new_pvr%file_fmt_ctl)
+      call copy_chara_ctl(org_pvr%monitoring_ctl,                       &
+     &                    new_pvr%monitoring_ctl)
+!
+      call copy_chara_ctl(org_pvr%streo_ctl, new_pvr%streo_ctl)
+      call copy_chara_ctl(org_pvr%anaglyph_ctl, new_pvr%anaglyph_ctl)
+      call copy_chara_ctl(org_pvr%quilt_ctl, new_pvr%quilt_ctl)
+!
+      call copy_chara_ctl(org_pvr%pvr_field_ctl, new_pvr%pvr_field_ctl)
+      call copy_chara_ctl(org_pvr%pvr_comp_ctl, new_pvr%pvr_comp_ctl)
+!
+      end subroutine dup_pvr_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine copy_pvr_update_flag(org_pvr, new_pvr)
+!
+      type(pvr_parameter_ctl), intent(in) :: org_pvr
+      type(pvr_parameter_ctl), intent(inout) :: new_pvr
+!
+!
+      call copy_chara_ctl(org_pvr%updated_ctl, new_pvr%updated_ctl)
+!
+      end subroutine copy_pvr_update_flag
 !
 !  ---------------------------------------------------------------------
 !

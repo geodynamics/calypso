@@ -72,7 +72,7 @@
       type(map_rendering_controls), intent(inout) :: map_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
 !
-      integer :: i
+      integer(kind = kint) :: n_append
 !
       if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(map_ctls%map_ctl_struct)) return
@@ -86,7 +86,8 @@
 !
         if(check_file_flag(c_buf, hd_block)                             &
      &      .or. check_begin_flag(c_buf, hd_block)) then
-          call append_new_map_render_control(map_ctls)
+          n_append = map_ctls%num_map_ctl
+          call append_map_render_control(n_append, hd_block, map_ctls)
 !
           call write_multi_ctl_file_message                             &
      &       (hd_block, map_ctls%num_map_ctl, c_buf%level)
@@ -211,7 +212,7 @@
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(cmp_no_case(file_name, 'NO_FILE')) then
+      if(no_file_flag(file_name)) then
         call write_map_control_data(id_control, hd_block,               &
      &                              map_ctl_struct, level)
       else if(id_control .eq. id_monitor) then

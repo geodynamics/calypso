@@ -28,6 +28,8 @@
       subroutine bcast_viz3_controls(viz3_ctls)
 !
       use t_control_data_viz3
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
       use bcast_section_control_data
@@ -59,6 +61,8 @@
 !
       call bcast_ctl_type_c1(viz3_ctls%output_field_file_fmt_ctl)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (viz3_ctls%block_name, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(viz3_ctls%i_viz_control, 0)
 !
       end subroutine bcast_viz3_controls

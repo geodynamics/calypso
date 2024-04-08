@@ -7,6 +7,7 @@
 !>@brief Control inputs for PVR view parameter
 !!
 !!@verbatim
+!!      subroutine init_view_transfer_ctl_label(hd_block, mat)
 !!      subroutine read_view_transfer_ctl                               &
 !!     &         (id_control, hd_block, mat, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -20,8 +21,6 @@
 !!        type(modeview_ctl), intent(in) :: mat
 !!        integer(kind = kint), intent(inout) :: level
 !!
-!!      integer(kind = kint) function num_label_pvr_modelview()
-!!      subroutine set_label_pvr_modelview(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  Input example
 !
@@ -166,9 +165,6 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_viewpt_in_view = 'viewpoint_in_viewer_ctl'
 !
-      integer(kind = kint), parameter :: n_label_pvr_modelview =  13
-      private :: n_label_pvr_modelview
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -185,8 +181,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(mat%i_view_transform .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -259,7 +255,7 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_projection_type, mat%projection_type_ctl)
+     &    mat%projection_type_ctl)
       call write_projection_mat_ctl                                     &
      &   (id_control, hd_project_mat, mat%proj, level)
       call write_image_size_ctl                                         &
@@ -268,66 +264,77 @@
      &   (id_control, hd_stereo_view, mat%streo, level)
 !
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_look_point, mat%lookpoint_ctl)
+     &    mat%lookpoint_ctl)
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_eye_position, mat%viewpoint_ctl)
+     &    mat%viewpoint_ctl)
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_up_dir, mat%up_dir_ctl)
+     &    mat%up_dir_ctl)
 !
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_view_rot_dir, mat%view_rot_vec_ctl)
+     &    mat%view_rot_vec_ctl)
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_scale_fac_dir, mat%scale_vector_ctl)
+     &    mat%scale_vector_ctl)
       call write_control_array_c_r(id_control, level,                   &
-     &    hd_eye_in_view, mat%viewpt_in_viewer_ctl)
+     &    mat%viewpt_in_viewer_ctl)
 !
       call write_control_array_c2_r(id_control, level,                  &
-     &    hd_model_mat, mat%modelview_mat_ctl)
+     &    mat%modelview_mat_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_view_rot_deg, mat%view_rotation_deg_ctl)
+     &    mat%view_rotation_deg_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_scale_factor, mat%scale_factor_ctl)
+     &    mat%scale_factor_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_view_transfer_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine init_view_transfer_ctl_label(hd_block, mat)
+!
+      character(len=kchara), intent(in) :: hd_block
+!
+      type(modeview_ctl), intent(inout) :: mat
+!
+!
+      mat%block_name = hd_block
+      call init_image_size_ctl_label(hd_image_size, mat%pixel)
+      call init_projection_mat_ctl_label(hd_project_mat, mat%proj)
+      call init_stereo_view_ctl_label(hd_stereo_view, mat%streo)
+!
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_look_point, mat%lookpoint_ctl)
+!
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_eye_position, mat%viewpoint_ctl)
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_view_point, mat%viewpoint_ctl)
+!
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_up_dir, mat%up_dir_ctl)
+!
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_view_rot_dir, mat%view_rot_vec_ctl)
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_scale_fac_dir, mat%scale_vector_ctl)
+!
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_eye_in_view, mat%viewpt_in_viewer_ctl)
+        call init_c_r_ctl_array_label                                   &
+     &     (hd_viewpt_in_view, mat%viewpt_in_viewer_ctl)
+!
+        call init_c2_r_ctl_array_label                                  &
+     &     (hd_model_mat, mat%modelview_mat_ctl)
+!
+        call init_real_ctl_item_label(hd_view_rot_deg,                  &
+     &      mat%view_rotation_deg_ctl)
+        call init_real_ctl_item_label(hd_scale_factor,                  &
+     &      mat%scale_factor_ctl)
+        call init_chara_ctl_item_label(hd_projection_type,              &
+     &      mat%projection_type_ctl)
+!
+      end subroutine init_view_transfer_ctl_label
+!
 !  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_modelview()
-      num_label_pvr_modelview = n_label_pvr_modelview
-      return
-      end function num_label_pvr_modelview
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_pvr_modelview(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_modelview)
-!
-!
-      call set_control_labels(hd_image_size,   names( 1))
-!
-      call set_control_labels(hd_look_point,   names( 2))
-      call set_control_labels(hd_eye_position, names( 3))
-      call set_control_labels(hd_up_dir,       names( 4))
-      call set_control_labels(hd_view_rot_dir, names( 5))
-      call set_control_labels(hd_view_rot_deg, names( 6))
-!
-      call set_control_labels(hd_scale_factor,   names( 7))
-      call set_control_labels(hd_scale_fac_dir,  names( 8))
-      call set_control_labels(hd_eye_in_view,    names( 9))
-!
-      call set_control_labels(hd_project_mat, names(10))
-      call set_control_labels(hd_model_mat,   names(11))
-!
-      call set_control_labels(hd_stereo_view, names(12))
-      call set_control_labels(hd_projection_type, names(13))
-!
-      end subroutine set_label_pvr_modelview
-!
-! ----------------------------------------------------------------------
 !
       end module ctl_data_view_transfer_IO

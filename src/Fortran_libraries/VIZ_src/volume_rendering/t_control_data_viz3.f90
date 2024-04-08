@@ -62,6 +62,9 @@
 !
 !>        Structures of visualization controls
       type vis3_controls
+!>        Block name
+        character(len=kchara) :: block_name = 'visual_control'
+!
 !>        Structures of setioning controls
         type(section_controls) :: psf_ctls
 !>        Structures of isosurface controls

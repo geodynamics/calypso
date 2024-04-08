@@ -16,9 +16,6 @@
 !!        type(surface_data), intent(in) :: surf
 !!        type(surface_group_data), intent(in) :: surf_grp
 !!        type(sf_grp_list_each_surf), intent(in) :: sf_grp_4_sf
-!!
-!!      integer(kind = kint) function num_flag_pvr_isosurf_dir()
-!!      subroutine set_flag_pvr_isosurf_dir(names)
 !!@endverbatim
 !
       module pvr_surface_enhancement
@@ -37,21 +34,6 @@
       use calypso_mpi
 !
       implicit  none
-!
-      character(len = kchara), parameter                                &
-     &                        :: LABEL_INCREASE = 'increase'
-      character(len = kchara), parameter                                &
-     &                        :: LABEL_DECREASE = 'decrease'
-!
-      character(len = kchara), parameter :: LABEL_EDGE = 'boarder'
-      character(len = kchara), parameter                                &
-     &                        :: LABEL_FORWARD = 'forward_surface'
-      character(len = kchara), parameter                                &
-     &                        :: LABEL_REVERSE = 'reverse_surface'
-      character(len = kchara), parameter                                &
-     &                        :: LABEL_BOTH =    'both_surface'
-!
-      integer(kind = kint), parameter :: n_flag_pvr_isosurf_dir =   3
 !
       integer(kind = kint), parameter :: IFLAG_NONE =           0
       integer(kind = kint), parameter :: IFLAG_SHOW_EDGE =      2
@@ -72,6 +54,7 @@
      &          fixed_opacity, iflag_enhanse, enhansed_opacity)
 !
       use t_control_params_4_pvr
+      use m_pvr_control_labels
       use skip_comment_f
 !
       type(surface_group_data), intent(in) :: surf_grp
@@ -173,29 +156,5 @@
       end function opacity_by_surf_grp
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_flag_pvr_isosurf_dir()
-      num_flag_pvr_isosurf_dir = n_flag_pvr_isosurf_dir
-      return
-      end function num_flag_pvr_isosurf_dir
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_flag_pvr_isosurf_dir(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_flag_pvr_isosurf_dir)
-!
-!
-      call set_control_labels(LABEL_FORWARD, names( 1))
-      call set_control_labels(LABEL_REVERSE, names( 2))
-      call set_control_labels(LABEL_EDGE,    names( 3))
-!
-      end subroutine set_flag_pvr_isosurf_dir
-!
-! ----------------------------------------------------------------------
 !
       end module pvr_surface_enhancement

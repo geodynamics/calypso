@@ -65,6 +65,9 @@
 !
 !
       type pvr_movie_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'snapshot_movie_ctl'
+!
 !>        Structure of movie mode control
         type(read_character_item) :: movie_mode_ctl
 !>        Structure of number of flame control
@@ -82,16 +85,16 @@
         type(read_real2_item) :: LIC_kernel_peak_range_ctl
 !
 !>        file name for start modelview matrix
-        character(len=kchara) :: fname_view_start_ctl
+        character(len=kchara) :: fname_view_start_ctl = 'NO_FILE'
 !>        file name for end modelview matrix
-        character(len=kchara) :: fname_view_end_ctl
+        character(len=kchara) :: fname_view_end_ctl = 'NO_FILE'
 !>    Structure for start modelview marices
         type(modeview_ctl) :: view_start_ctl
 !>    Structure for end modelview marices
         type(modeview_ctl) :: view_end_ctl
 !
 !         Lists of multiple view parameters
-        type(multi_modeview_ctl) :: mul_mmats_c
+        type(multi_modelview_ctl) :: mul_mmats_c
 !
 !     2nd level for volume rendering
         integer (kind=kint) :: i_pvr_rotation = 0
@@ -135,6 +138,7 @@
      &    new_movie%view_end_ctl)
 !
       new_movie%i_pvr_rotation = org_movie%i_pvr_rotation
+      new_movie%block_name =     org_movie%block_name
 !
       end subroutine dup_pvr_movie_control_flags
 !

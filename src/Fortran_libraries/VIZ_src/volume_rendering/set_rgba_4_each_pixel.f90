@@ -46,15 +46,9 @@
       character(len = kchara), parameter                                &
      &                        :: hd_intensity =   'intense_chenge'
       character(len = kchara), parameter                                &
-     &                        :: hd_pointdelta =  'point_delta'
-      character(len = kchara), parameter                                &
-     &                        :: hd_pointrange =  'point_ranges'
-      character(len = kchara), parameter                                &
      &                        :: hd_pointlinear = 'point_linear'
       integer(kind = kint), parameter :: iflag_anbient =     1
       integer(kind = kint), parameter :: iflag_intense =     2
-      integer(kind = kint), parameter :: iflag_pointdelta =  3
-      integer(kind = kint), parameter :: iflag_pointrange =  4
       integer(kind = kint), parameter :: iflag_pointlinear = 5
 !
 ! ----------------------------------------------------------------------
@@ -258,32 +252,6 @@
       opacity_local = zero
       if     (transfer_function_style .eq. iflag_anbient) then
         opacity_local = opa_value
-      else if(transfer_function_style .eq. iflag_pointdelta) then
-        mint = 1.0d-17
-        do i = 1, num_of_features
-          t = abs(value - fea_point(1,i))
-          if(t .lt. mint) then
-            mint = t
-            min_type = i
-          end if
-          if(mint .lt. fea_point(2,min_type)) then
-            opacity_local = opa_value + fea_point(3,min_type)          &
-     &                                 * (fea_point(2,min_type)-mint)  &
-     &                                 / fea_point(2,min_type)
-          else
-            opacity_local = opa_value
-          end if
-        end do
-!
-      else if(transfer_function_style .eq. iflag_pointrange) then
-        opacity_local = opa_value
-        do i = 1, num_of_features
-          if(value.ge.fea_point(1,i)                                    &
-     &         .and. value.le.fea_point(2,i)) then
-            opacity_local = fea_point(3,i)
-          end if
-        end do
-!
       else if(transfer_function_style .eq. iflag_pointlinear) then
         opacity_local = opa_value
         do i = 1, num_of_features-1

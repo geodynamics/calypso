@@ -37,6 +37,8 @@
       type(volume_rendering_controls), intent(inout) :: pvr_ctls
 !
 !
+      call calypso_mpi_bcast_character(pvr_ctls%block_name,             &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(pvr_ctls%num_pvr_ctl, 0)
       if(pvr_ctls%num_pvr_ctl .le. 0) return
 !

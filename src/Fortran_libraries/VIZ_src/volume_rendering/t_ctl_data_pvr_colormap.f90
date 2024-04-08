@@ -13,6 +13,8 @@
 !!      subroutine dup_pvr_colordef_ctl(org_color, new_color)
 !!        type(pvr_colormap_ctl), intent(in) :: org_color
 !!        type(pvr_colormap_ctl), intent(inout) :: new_color
+!!      logical function cmp_pvr_colormap_ctl(color1, color2)
+!!        type(pvr_colormap_ctl), intent(in) :: color1, color2
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of color control for Kemo's volume rendering
 !!
@@ -43,16 +45,6 @@
 !!      linear_opacity_ctl   0.85    0.01
 !!      linear_opacity_ctl   0.95    0.001
 !!    end array linear_opacity_ctl
-!!
-!!    array  step_opacity_ctl         7
-!!      step_opacity_ctl   0.0     0.01    0.01
-!!      step_opacity_ctl   0.01    0.2     0.015
-!!      step_opacity_ctl   0.2     0.35    0.02
-!!      step_opacity_ctl   0.6     0.7     0.04
-!!      step_opacity_ctl   0.7     0.85    0.03
-!!      step_opacity_ctl   0.85    0.95    0.01
-!!      step_opacity_ctl   0.95    1.0     0.001
-!!    end array step_opacity_ctl
 !!    constant_opacity_ctl           0.003
 !!!
 !!    range_min_ctl   0.0
@@ -73,12 +65,14 @@
       use t_control_array_real
       use t_control_array_real2
       use t_control_array_real3
-      use skip_comment_f
 !
       implicit  none
 !
 !
       type pvr_colormap_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'colormap_ctl'
+!!
         type(read_character_item) :: lic_color_fld_ctl
         type(read_character_item) :: lic_color_comp_ctl
         type(read_character_item) :: lic_opacity_fld_ctl
@@ -101,11 +95,6 @@
 !!@n        linear_opacity_ctl%vec1:  field value to define opacity
 !!@n        linear_opacity_ctl%vec3:  Opacity at this point
         type(ctl_array_r2) :: linear_opacity_ctl
-!>        Structure for opacity controls
-!!@n        step_opacity_ctl%vec1:  Minimum value for one opacity
-!!@n        step_opacity_ctl%vec2:  Maximum value for one opacity
-!!@n        step_opacity_ctl%vec3:  Opacity for each level
-        type(ctl_array_r3) :: step_opacity_ctl
 !
 !>        Structure for background color (R,G,B)
         type(read_real3_item) :: background_color_ctl
@@ -151,14 +140,11 @@
 !
 !
       call reset_pvr_colormap_flags(color)
-      call dealloc_control_array_r3(color%step_opacity_ctl)
       call dealloc_control_array_r2(color%linear_opacity_ctl)
       call dealloc_control_array_r2(color%colortbl_ctl)
 !
       color%colortbl_ctl%num =       0
       color%colortbl_ctl%icou = 0
-      color%step_opacity_ctl%num =   0
-      color%step_opacity_ctl%icou =    0
       color%linear_opacity_ctl%num = 0
       color%linear_opacity_ctl%icou =  0
 !
@@ -173,15 +159,13 @@
       type(pvr_colormap_ctl), intent(inout) :: new_color
 !
 !
+      new_color%block_name =     org_color%block_name
       new_color%i_pvr_colordef = org_color%i_pvr_colordef
 !
       call dup_control_array_r2(org_color%colortbl_ctl,                 &
      &                          new_color%colortbl_ctl)
       call dup_control_array_r2(org_color%linear_opacity_ctl,           &
      &                          new_color%linear_opacity_ctl)
-!
-      call dup_control_array_r3(org_color%step_opacity_ctl,             &
-     &                          new_color%step_opacity_ctl)
 !
       call copy_chara_ctl(org_color%lic_color_fld_ctl,                  &
      &                    new_color%lic_color_fld_ctl)
@@ -210,5 +194,65 @@
       end subroutine dup_pvr_colordef_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      logical function cmp_pvr_colormap_ctl(color1, color2)
+!
+      use skip_comment_f
+!
+      type(pvr_colormap_ctl), intent(in) :: color1, color2
+!
+      cmp_pvr_colormap_ctl = .FALSE.
+      if(color1%i_pvr_colordef .ne. color2%i_pvr_colordef) return
+      if(cmp_no_case(trim(color1%block_name),                           &
+     &               trim(color2%block_name)) .eqv. .FALSE.) return
+      if(cmp_read_chara_item(color1%lic_color_fld_ctl,                  &
+     &                       color2%lic_color_fld_ctl)                  &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_chara_item(color1%lic_color_comp_ctl,                 &
+     &                       color2%lic_color_comp_ctl)                 &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_chara_item(color1%lic_opacity_fld_ctl,                &
+     &                       color2%lic_opacity_fld_ctl)                &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_chara_item(color1%lic_opacity_comp_ctl,               &
+     &                       color2%lic_opacity_comp_ctl)               &
+     &                                          .eqv. .FALSE.) return
+!
+      if(cmp_read_chara_item(color1%colormap_mode_ctl,                  &
+     &                       color2%colormap_mode_ctl)                  &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_chara_item(color1%data_mapping_ctl,                   &
+     &                       color2%data_mapping_ctl)                   &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_chara_item(color1%opacity_style_ctl,                  &
+     &                       color2%opacity_style_ctl)                  &
+     &                                          .eqv. .FALSE.) return
+!
+      if(cmp_read_real_item(color1%range_min_ctl,                       &
+     &                      color2%range_min_ctl)                       &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real_item(color1%range_max_ctl,                       &
+     &                      color2%range_max_ctl)                       &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real_item(color1%fix_opacity_ctl,                     &
+     &                      color2%fix_opacity_ctl)                     &
+     &                                          .eqv. .FALSE.) return
+!
+      if(cmp_control_array_r2(color1%colortbl_ctl,                      &
+     &                        color2%colortbl_ctl)                      &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_control_array_r2(color1%linear_opacity_ctl,                &
+     &                        color2%linear_opacity_ctl)                &
+     &                                          .eqv. .FALSE.) return
+!
+      if(cmp_read_real3_item(color1%background_color_ctl,               &
+     &                       color2%background_color_ctl)               &
+     &                                          .eqv. .FALSE.) return
+!
+      cmp_pvr_colormap_ctl = .TRUE.
+!
+      end function cmp_pvr_colormap_ctl
+!
+!   --------------------------------------------------------------------
 !
       end module t_ctl_data_pvr_colormap

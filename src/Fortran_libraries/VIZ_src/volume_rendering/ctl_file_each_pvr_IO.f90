@@ -31,7 +31,6 @@
       module ctl_file_each_pvr_IO
 !
       use m_precision
-      use calypso_mpi
 !
       use t_control_data_4_pvr
 !
@@ -106,7 +105,7 @@
      &                                   hd_pvr_ctl, pvr_ctl_type)
 !
       use ctl_data_each_pvr_IO
-      use bcast_control_data_4_pvr
+      use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in)  :: fname_pvr_ctl
@@ -115,7 +114,7 @@
 !
       type(buffer_for_control) :: c_buf1
 !
-      if(fname_pvr_ctl .eq. 'NO_FILE') return
+      if(no_file_flag(fname_pvr_ctl)) return
 !
       c_buf1%level = 0
       open(id_control, file=fname_pvr_ctl, status='old')
@@ -130,12 +129,7 @@
         if(pvr_ctl_type%i_pvr_ctl .gt. 0) exit
       end do
       close(id_control)
-!
-      call bcast_pvr_update_flag(pvr_ctl_type)
-!
-      if(c_buf1%iend .gt. 0) then
-        call calypso_MPI_abort(c_buf1%iend, 'control file is broken')
-      end if
+      if(c_buf1%iend .gt. 0) pvr_ctl_type%i_pvr_ctl = - c_buf1%iend
 !
       end subroutine read_control_pvr_update
 !
@@ -147,6 +141,7 @@
 !
       use ctl_data_each_pvr_IO
       use write_control_elements
+      use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: fname_pvr_ctl
@@ -155,7 +150,7 @@
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(cmp_no_case(fname_pvr_ctl, 'NO_FILE')) then
+      if(no_file_flag(fname_pvr_ctl)) then
         write(*,'(a)') ' is included.'
         call write_pvr_ctl(id_control, hd_pvr_ctl,                      &
      &                     pvr_ctl_type, level)

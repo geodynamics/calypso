@@ -17,13 +17,6 @@
 !!
 !!      subroutine check_control_params_fline(fln_prm)
 !!        type(fieldline_paramter), intent(in) :: fln_prm
-!!
-!!      integer(kind = kint) function num_fline_start_flags()
-!!      integer(kind = kint) function num_fline_direction_flags()
-!!      integer(kind = kint) function num_fline_seeds_flags()
-!!      subroutine set_fline_start_flags(names)
-!!      subroutine set_fline_direction_flags(names)
-!!      subroutine set_fline_seeds_flags(names)
 !!@endverbatim
 !
       module t_control_params_4_fline
@@ -88,40 +81,16 @@
       end type fieldline_paramter
 !
 !
-      integer(kind = kint), parameter :: n_fline_start_flags = 4
-!
-      character(len = kchara), parameter                                &
-     &               :: cflag_surface_group = 'surface_group'
-      character(len = kchara), parameter                                &
-     &               :: cflag_surface_list =  'surface_list'
-      character(len = kchara), parameter                                &
-     &               :: cflag_position_list = 'position_list'
-      character(len = kchara), parameter                                &
-     &               :: cflag_spray_in_domain = 'spray_in_domain'
       integer(kind = kint), parameter :: iflag_surface_group =   0
       integer(kind = kint), parameter :: iflag_surface_list =    1
       integer(kind = kint), parameter :: iflag_position_list =   2
       integer(kind = kint), parameter :: iflag_spray_in_domain = 3
 !
 !
-      integer(kind = kint), parameter :: n_fline_direction_flags = 3
-      character(len = kchara), parameter                                &
-     &               :: cflag_forward_trace =  'forward'
-      character(len = kchara), parameter                                &
-     &               :: cflag_backward_trace = 'backward'
-      character(len = kchara), parameter                                &
-     &               :: cflag_both_trace =     'both'
       integer(kind = kint), parameter :: iflag_backward_trace = -1
       integer(kind = kint), parameter :: iflag_both_trace =      0
       integer(kind = kint), parameter :: iflag_forward_trace =   1
 !
-      integer(kind = kint), parameter :: n_fline_seeds_flags = 3
-      character(len = kchara), parameter                                &
-     &               :: cflag_random_by_amp =  'amplitude'
-      character(len = kchara), parameter                                &
-     &               :: cflag_random_by_area = 'area_size'
-      character(len = kchara), parameter                                &
-     &               :: cflag_no_random =      'no_random'
       integer(kind = kint), parameter :: iflag_random_by_amp =   0
       integer(kind = kint), parameter :: iflag_random_by_area =  1
       integer(kind = kint), parameter :: iflag_no_random =       2
@@ -251,78 +220,6 @@
         end if
 !
       end subroutine check_control_params_fline
-!
-!  ---------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_fline_start_flags()
-      num_fline_start_flags = n_fline_start_flags
-      return
-      end function num_fline_start_flags
-!
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_fline_direction_flags()
-      num_fline_direction_flags = n_fline_direction_flags
-      return
-      end function num_fline_direction_flags
-!
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_fline_seeds_flags()
-      num_fline_seeds_flags = n_fline_seeds_flags
-      return
-      end function num_fline_seeds_flags
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine set_fline_start_flags(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_fline_start_flags)
-!
-!
-      call set_control_labels(cflag_surface_group,   names( 1))
-      call set_control_labels(cflag_surface_list,    names( 2))
-      call set_control_labels(cflag_position_list,   names( 3))
-      call set_control_labels(cflag_spray_in_domain, names( 4))
-!
-      end subroutine set_fline_start_flags
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_fline_direction_flags(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_fline_direction_flags)
-!
-!
-      call set_control_labels(cflag_forward_trace,  names( 1))
-      call set_control_labels(cflag_backward_trace, names( 2))
-      call set_control_labels(cflag_both_trace,     names( 3))
-!
-      end subroutine set_fline_direction_flags
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_fline_seeds_flags(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_fline_seeds_flags)
-!
-!
-      call set_control_labels(cflag_random_by_amp,  names( 1))
-      call set_control_labels(cflag_random_by_area, names( 2))
-      call set_control_labels(cflag_no_random,      names( 3))
-!
-      end subroutine set_fline_seeds_flags
 !
 !  ---------------------------------------------------------------------
 !

@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!      subroutine init_pvr_ctl_label(hd_block, pvr_ctl)
 !!      subroutine read_pvr_ctl(id_control, hd_block, pvr_ctl, c_buf)
 !!      subroutine read_pvr_update_flag                                 &
 !!     &         (id_control, hd_block, pvr_ctl, c_buf)
@@ -21,10 +22,6 @@
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl
 !!        integer(kind = kint), intent(inout) :: level
-!!
-!!      integer(kind = kint) function num_label_pvr_ctl()
-!!      integer(kind = kint) function num_label_pvr_ctl_w_dup()
-!!      subroutine set_label_pvr_ctl_w_dup(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of control for Kemo's volume rendering
 !!
@@ -34,7 +31,7 @@
 !!  pvr_output_format    PNG
 !!  monitoring_mode      YES
 !!
-!!  streo_imaging        YES
+!!  stereo_imaging       YES
 !!  anaglyph_switch      NO
 !!  quilt_3d_imaging     YES
 !!!
@@ -125,7 +122,7 @@
      &             :: hd_pvr_monitor =     'monitoring_mode'
 !
       character(len=kchara), parameter, private                         &
-     &             :: hd_pvr_streo =    'streo_imaging'
+     &             :: hd_pvr_stereo =    'stereo_imaging'
       character(len=kchara), parameter, private                         &
      &             :: hd_anaglyph_switch = 'anaglyph_switch'
       character(len=kchara), parameter, private                         &
@@ -168,11 +165,8 @@
      &             :: hd_pvr_out_type =    'pvr_output_type'
       character(len=kchara), parameter, private                         &
      &             :: hd_pvr_rotation =    'image_rotation_ctl'
-!
-      integer(kind = kint), parameter :: n_label_pvr_ctl =       19
-      integer(kind = kint), parameter :: n_label_pvr_ctl_w_dup = 22
-!
-      private :: n_label_pvr_ctl, n_label_pvr_ctl_w_dup
+      character(len=kchara), parameter, private                         &
+     &             :: hd_pvr_streo =    'streo_imaging'
 !
 !  ---------------------------------------------------------------------
 !
@@ -185,6 +179,7 @@
       use ctl_file_pvr_modelview_IO
       use ctl_file_pvr_light_IO
       use ctl_data_pvr_movie_IO
+      use ctl_data_view_transfer_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -193,8 +188,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(pvr_ctl%i_pvr_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
 !
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
@@ -242,7 +237,10 @@
      &     (c_buf, hd_pvr_monitor, pvr_ctl%monitoring_ctl)
 !
         call read_chara_ctl_type                                        &
+     &     (c_buf, hd_pvr_stereo, pvr_ctl%streo_ctl)
+        call read_chara_ctl_type                                        &
      &     (c_buf, hd_pvr_streo, pvr_ctl%streo_ctl)
+!
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_anaglyph_switch, pvr_ctl%anaglyph_ctl)
         call read_chara_ctl_type                                        &
@@ -309,33 +307,33 @@
       maxlen = max(maxlen, len_trim(hd_pvr_out_format))
       maxlen = max(maxlen, len_trim(hd_pvr_monitor))
       maxlen = max(maxlen, len_trim(hd_anaglyph_switch))
-      maxlen = max(maxlen, len_trim(hd_pvr_streo))
+      maxlen = max(maxlen, len_trim(hd_pvr_stereo))
       maxlen = max(maxlen, len_trim(hd_pvr_quilt_3d))
       maxlen = max(maxlen, len_trim(hd_output_field_def))
       maxlen = max(maxlen, len_trim(hd_output_comp_def))
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_updated, pvr_ctl%updated_ctl)
+     &    pvr_ctl%updated_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_file_prefix, pvr_ctl%file_head_ctl)
+     &    pvr_ctl%file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_out_format, pvr_ctl%file_fmt_ctl)
+     &    pvr_ctl%file_fmt_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_monitor, pvr_ctl%monitoring_ctl)
+     &    pvr_ctl%monitoring_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_streo, pvr_ctl%streo_ctl)
+     &    pvr_ctl%streo_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_anaglyph_switch, pvr_ctl%anaglyph_ctl)
+     &    pvr_ctl%anaglyph_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_pvr_quilt_3d, pvr_ctl%quilt_ctl)
+     &    pvr_ctl%quilt_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_output_field_def, pvr_ctl%pvr_field_ctl)
+     &    pvr_ctl%pvr_field_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_output_comp_def, pvr_ctl%pvr_comp_ctl)
+     &    pvr_ctl%pvr_comp_ctl)
 !
       call sel_write_ctl_modelview_file(id_control, hd_view_transform,  &
      &    pvr_ctl%fname_mat_ctl, pvr_ctl%mat, level)
@@ -362,61 +360,60 @@
       end subroutine write_pvr_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine init_pvr_ctl_label(hd_block, pvr_ctl)
+!
+      use ctl_file_pvr_modelview_IO
+      use ctl_file_pvr_light_IO
+      use ctl_data_pvr_movie_IO
+      use ctl_data_view_transfer_IO
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(pvr_parameter_ctl), intent(inout) :: pvr_ctl
+!
+!
+      pvr_ctl%block_name = hd_block
+      call int_pvr_render_area_ctl(hd_plot_area, pvr_ctl%render_area_c)
+      call init_pvr_cmap_cbar_label(hd_colormap_file,                   &
+     &                              pvr_ctl%cmap_cbar_c)
+      call init_view_transfer_ctl_label(hd_view_transform, pvr_ctl%mat)
+      call init_lighting_ctl_label(hd_pvr_lighting, pvr_ctl%light)
+      call init_pvr_sections_ctl(hd_pvr_sections, pvr_ctl%pvr_scts_c)
+      call init_pvr_isosurfs_ctl(hd_pvr_isosurf, pvr_ctl%pvr_isos_c)
+      call init_quilt_image_ctl_label(hd_quilt_image, pvr_ctl%quilt_c)
+      call init_pvr_rotation_ctl_label(hd_snapshot_movie,               &
+     &                                 pvr_ctl%movie)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_updated, pvr_ctl%updated_ctl)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_file_prefix, pvr_ctl%file_head_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_file_head, pvr_ctl%file_head_ctl)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_out_format, pvr_ctl%file_fmt_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_out_type, pvr_ctl%file_fmt_ctl)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_monitor, pvr_ctl%monitoring_ctl)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_stereo, pvr_ctl%streo_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_anaglyph_switch, pvr_ctl%anaglyph_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_pvr_quilt_3d, pvr_ctl%quilt_ctl)
+!
+        call init_chara_ctl_item_label                                  &
+     &     (hd_output_field_def, pvr_ctl%pvr_field_ctl)
+        call init_chara_ctl_item_label                                  &
+     &     (hd_output_comp_def, pvr_ctl%pvr_comp_ctl)
+!
+      end subroutine init_pvr_ctl_label
+!
 !  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_ctl()
-      num_label_pvr_ctl = n_label_pvr_ctl
-      return
-      end function num_label_pvr_ctl
-!
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_ctl_w_dup()
-      num_label_pvr_ctl_w_dup = n_label_pvr_ctl_w_dup
-      return
-      end function num_label_pvr_ctl_w_dup
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_pvr_ctl_w_dup(names)
-!
-      use t_read_control_elements
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_ctl_w_dup)
-!
-!
-      call set_control_labels(hd_pvr_updated,        names( 1))
-!
-      call set_control_labels(hd_pvr_file_prefix,    names( 2))
-      call set_control_labels(hd_pvr_out_format,     names( 3))
-      call set_control_labels(hd_pvr_monitor,        names( 4))
-!
-      call set_control_labels(hd_pvr_streo,          names( 5))
-      call set_control_labels(hd_anaglyph_switch,    names( 6))
-      call set_control_labels(hd_pvr_quilt_3d,       names( 7))
-!
-      call set_control_labels(hd_output_field_def, names( 8))
-      call set_control_labels(hd_output_comp_def,  names( 9))
-!
-      call set_control_labels(hd_plot_area,      names(10))
-      call set_control_labels(hd_view_transform, names(11))
-      call set_control_labels(hd_colormap_file,  names(12))
-      call set_control_labels(hd_colormap,       names(13))
-      call set_control_labels(hd_pvr_lighting,   names(14))
-      call set_control_labels(hd_pvr_colorbar,   names(15))
-!
-      call set_control_labels(hd_pvr_sections,   names(16))
-      call set_control_labels(hd_pvr_isosurf,    names(17))
-      call set_control_labels(hd_quilt_image,    names(18))
-      call set_control_labels(hd_snapshot_movie, names(19))
-!
-      call set_control_labels(hd_pvr_file_head,  names(20))
-      call set_control_labels(hd_pvr_out_type,   names(21))
-      call set_control_labels(hd_pvr_rotation,   names(22))
-!
-      end subroutine set_label_pvr_ctl_w_dup
-!
-! ----------------------------------------------------------------------
 !
       end module ctl_data_each_pvr_IO

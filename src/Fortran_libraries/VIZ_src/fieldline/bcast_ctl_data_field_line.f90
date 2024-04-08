@@ -40,6 +40,8 @@
       integer (kind=kint) :: i_fline
 !
 !
+      call calypso_mpi_bcast_character(fline_ctls%block_name,           &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(fline_ctls%num_fline_ctl, 0)
       if(fline_ctls%num_fline_ctl .le. 0) return
 !
@@ -58,12 +60,16 @@
       subroutine bcast_field_line_ctl(fln)
 !
       use t_ctl_data_field_line
+      use transfer_to_long_integers
+      use calypso_mpi_char
       use calypso_mpi_int
       use bcast_control_arrays
 !
       type(fline_ctl), intent(inout) :: fln
 !
 !
+      call calypso_mpi_bcast_character(fln%block_name,                  &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(fln%i_vr_fline_ctl, 0)
 !
       call bcast_ctl_array_c1(fln%fline_area_grp_ctl)

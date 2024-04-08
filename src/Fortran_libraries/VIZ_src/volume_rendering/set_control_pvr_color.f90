@@ -45,7 +45,8 @@
 !
       type(pvr_colormap_parameter), intent(inout) :: color_param
 !
-      integer(kind = kint) :: i
+      integer(kind = kint) :: i, icou
+      real(kind = kreal) :: r, t, p
 !
 !
       if(light%ambient_coef_ctl%iflag .gt. 0) then
@@ -70,16 +71,26 @@
       end if
 !
 !
+      color_param%num_pvr_lights = 0
       if(light%light_position_ctl%num .gt. 0) then
-        color_param%num_pvr_lights = light%light_position_ctl%num
-      else
-        color_param%num_pvr_lights = 1
+        color_param%num_pvr_lights = color_param%num_pvr_lights         &
+     &                              + light%light_position_ctl%num
       end if
+!
+      if(light%light_sph_posi_ctl%num .gt. 0) then
+        color_param%num_pvr_lights = color_param%num_pvr_lights         &
+     &                              + light%light_sph_posi_ctl%num
+      end if
+      if(color_param%num_pvr_lights .eq. 0)                             &
+     &                             color_param%num_pvr_lights = 1
 !
       call alloc_light_posi_in_view(color_param)
 !
+      i = 0
       if(light%light_position_ctl%num .gt. 0) then
-        do i = 1, color_param%num_pvr_lights
+!$omp parallel do private(icou,i)
+        do icou = 1, light%light_position_ctl%num
+          i = icou + 1
           color_param%xyz_pvr_lights(1,i)                               &
      &          = light%light_position_ctl%vec1(i)
           color_param%xyz_pvr_lights(2,i)                               &
@@ -87,6 +98,23 @@
           color_param%xyz_pvr_lights(3,i)                               &
      &          = light%light_position_ctl%vec3(i)
         end do
+!$omp end parallel do
+      end if
+      if(light%light_sph_posi_ctl%num .gt. 0) then
+!$omp parallel do private(icou,i,r,t,p)
+        do icou = 1, light%light_sph_posi_ctl%num
+          i = icou + 1
+          r = light%light_sph_posi_ctl%vec1(i)
+          t = light%light_sph_posi_ctl%vec2(i) * atan(one) / 45.0
+          p = light%light_sph_posi_ctl%vec3(i) * atan(one) / 45.0
+          color_param%xyz_pvr_lights(1,i) = r * sin(t) * cos(p)
+          color_param%xyz_pvr_lights(2,i) = r * sin(t) * sin(p)
+          color_param%xyz_pvr_lights(3,i) = r * cos(t)
+        end do
+!$omp end parallel do
+      end if
+
+      if(i .gt. 0) then
         color_param%iflag_pvr_lights = 1
       else
         color_param%xyz_pvr_lights(1,1) = one
@@ -191,19 +219,7 @@
 !        if     (cmp_no_case(tmpchara, hd_intensity) then
 !          color_param%id_pvr_color(3) = iflag_intense
 !        end if
-        if     (cmp_no_case(tmpchara, hd_pointdelta)) then
-          if( color%step_opacity_ctl%num .gt. 0) then
-            color_param%id_pvr_color(3) = iflag_pointdelta
-            color_param%num_opacity_pnt = color%step_opacity_ctl%num
-          end if
-!
-        else if(cmp_no_case(tmpchara, hd_pointrange)) then
-          if( color%step_opacity_ctl%num .gt. 0) then
-            color_param%id_pvr_color(3) = iflag_pointrange
-            color_param%num_opacity_pnt = color%step_opacity_ctl%num
-          end if
-!
-        else if(cmp_no_case(tmpchara, hd_pointlinear)) then
+        if(cmp_no_case(tmpchara, hd_pointlinear)) then
           if( color%linear_opacity_ctl%num .gt. 0) then
             color_param%id_pvr_color(3) = iflag_pointlinear
             color_param%num_opacity_pnt = color%linear_opacity_ctl%num
@@ -213,21 +229,7 @@
 !
       call alloc_pvr_opacity_list(color_param)
 !
-      if    (color_param%id_pvr_color(3) .eq. iflag_pointdelta          &
-     &  .or. color_param%id_pvr_color(3) .eq. iflag_pointrange) then
-        do i = 1, color_param%num_opacity_pnt
-          color_param%pvr_opacity_param(1,i)                            &
-     &                  = color%step_opacity_ctl%vec1(i)
-          color_param%pvr_opacity_param(2,i)                            &
-     &                  = color%step_opacity_ctl%vec2(i)
-          color_param%pvr_opacity_param(3,i)                            &
-     &                  = color%step_opacity_ctl%vec3(i)
-          color_param%pvr_max_opacity                                   &
-     &       = max(color_param%pvr_max_opacity,                         &
-     &             color_param%pvr_opacity_param(3,i))
-        end do
-!
-      else if(color_param%id_pvr_color(3) .eq. iflag_pointlinear) then
+      if(color_param%id_pvr_color(3) .eq. iflag_pointlinear) then
         do i = 1, color_param%num_opacity_pnt
           color_param%pvr_opacity_param(1,i)                            &
      &                  = color%linear_opacity_ctl%vec1(i)

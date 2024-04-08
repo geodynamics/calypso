@@ -171,7 +171,7 @@
       use set_pvr_modelview_matrix
 !
       integer(kind = kint), intent(in) :: num_views
-      type(multi_modeview_ctl), intent(in) :: mul_mmats_c
+      type(multi_modelview_ctl), intent(in) :: mul_mmats_c
 !
       type(PVR_control_params), intent(inout) :: pvr_param
 !

@@ -12,7 +12,7 @@
 !!      subroutine bcast_quilt_image_ctl(quilt_c)
 !!        type(quilt_image_ctl), intent(inout) :: quilt_c
 !!      subroutine bcast_mul_view_trans_ctl(mul_mats_c)
-!!        type(multi_modeview_ctl), intent(inout) :: mul_mats_c
+!!        type(multi_modelview_ctl), intent(inout) :: mul_mats_c
 !!      subroutine bcast_view_transfer_ctl(mat)
 !!        type(modeview_ctl), intent(inout) :: mat
 !!
@@ -56,6 +56,8 @@
 !
 !
       call calypso_mpi_bcast_one_int(movie%i_pvr_rotation, 0)
+      call calypso_mpi_bcast_character(movie%block_name,                &
+     &                                 cast_long(kchara), 0)
 !
       call bcast_ctl_type_c1(movie%movie_mode_ctl)
       call bcast_ctl_type_i1(movie%num_frames_ctl)
@@ -90,6 +92,8 @@
 !
 !
       call calypso_mpi_bcast_one_int(quilt_c%i_quilt_image, 0)
+      call calypso_mpi_bcast_character(quilt_c%block_name,              &
+     &                                 cast_long(kchara), 0)
 !
       call bcast_ctl_type_i2(quilt_c%num_column_row_ctl)
       call bcast_ctl_type_i2(quilt_c%num_row_column_ctl)
@@ -108,12 +112,15 @@
       use calypso_mpi_char
       use transfer_to_long_integers
 !
-      type(multi_modeview_ctl), intent(inout) :: mul_mats_c
+      type(multi_modelview_ctl), intent(inout) :: mul_mats_c
 !
       integer(kind = kint) :: i, num
 !
 !
       call calypso_mpi_bcast_one_int(mul_mats_c%num_modelviews_c, 0)
+      call calypso_mpi_bcast_character(mul_mats_c%block_name,           &
+     &                                 cast_long(kchara), 0)
+!
       if(mul_mats_c%num_modelviews_c .gt. 0 .and. my_rank .gt. 0) then
         num = mul_mats_c%num_modelviews_c
         call alloc_multi_modeview_ctl(mul_mats_c)
@@ -132,12 +139,16 @@
       subroutine bcast_view_transfer_ctl(mat)
 !
       use t_ctl_data_4_view_transfer
-      use calypso_mpi_int
       use bcast_control_arrays
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(modeview_ctl), intent(inout) :: mat
 !
 !
+      call calypso_mpi_bcast_character(mat%block_name,                  &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(mat%i_view_transform, 0)
 !
       call bcast_ctl_array_cr(mat%lookpoint_ctl)
@@ -167,12 +178,16 @@
       subroutine bcast_image_size_ctl(pixel)
 !
       use t_ctl_data_4_screen_pixel
-      use calypso_mpi_int
       use bcast_control_arrays
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(screen_pixel_ctl), intent(inout) :: pixel
 !
 !
+      call calypso_mpi_bcast_character(pixel%block_name,                &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(pixel%i_image_size, 0)
 !
       call bcast_ctl_type_i1(pixel%num_xpixel_ctl)
@@ -185,12 +200,16 @@
       subroutine bcast_projection_mat_ctl(proj)
 !
       use t_ctl_data_4_projection
-      use calypso_mpi_int
       use bcast_control_arrays
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(projection_ctl), intent(inout) :: proj
 !
 !
+      call calypso_mpi_bcast_character(proj%block_name,                 &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(proj%i_project_mat, 0)
 !
       call bcast_ctl_type_r1(proj%perspective_angle_ctl)
@@ -208,12 +227,16 @@
       subroutine bcast_stereo_view_ctl(streo)
 !
       use t_ctl_data_4_streo_view
-      use calypso_mpi_int
       use bcast_control_arrays
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(streo_view_ctl), intent(inout) :: streo
 !
 !
+      call calypso_mpi_bcast_character(streo%block_name,                &
+     &                                 cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(streo%i_stereo_view, 0)
 !
       call bcast_ctl_type_r1(streo%focalpoint_ctl)

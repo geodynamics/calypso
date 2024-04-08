@@ -1,6 +1,8 @@
-bcast_maps_control_data.o: $(MAP_RENDERING_DIR)/bcast_maps_control_data.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_control_data_maps.o t_control_data_4_map.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o bcast_control_arrays.o bcast_ctl_data_pvr_surfaces.o bcast_ctl_data_view_trans.o bcast_pvr_color_ctl.o
+bcast_maps_control_data.o: $(MAP_RENDERING_DIR)/bcast_maps_control_data.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_control_data_maps.o t_control_data_4_map.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o bcast_control_arrays.o bcast_ctl_data_pvr_surfaces.o bcast_ctl_data_view_trans.o bcast_pvr_color_ctl.o t_ctl_data_map_section.o bcast_section_control_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ctl_data_map_rendering_IO.o: $(MAP_RENDERING_DIR)/ctl_data_map_rendering_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_data_4_map.o t_ctl_data_pvr_section.o calypso_mpi.o t_ctl_data_pvr_colormap_bar.o ctl_file_pvr_modelview_IO.o ctl_data_pvr_section_IO.o write_control_elements.o
+ctl_data_map_rendering_IO.o: $(MAP_RENDERING_DIR)/ctl_data_map_rendering_IO.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o t_control_data_4_map.o t_ctl_data_pvr_section.o calypso_mpi.o t_ctl_data_pvr_colormap_bar.o ctl_file_pvr_modelview_IO.o ctl_data_map_section_IO.o ctl_data_view_transfer_IO.o write_control_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+ctl_data_map_section_IO.o: $(MAP_RENDERING_DIR)/ctl_data_map_section_IO.f90 m_precision.o calypso_mpi.o m_machine_parameter.o t_read_control_elements.o t_control_data_4_psf_def.o t_control_array_real.o t_control_array_real2.o t_control_array_character.o t_ctl_data_map_section.o skip_comment_f.o ctl_file_section_def_IO.o write_control_elements.o ctl_data_section_def_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 ctl_file_map_renderings_IO.o: $(MAP_RENDERING_DIR)/ctl_file_map_renderings_IO.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o t_control_data_maps.o t_read_control_elements.o ctl_data_section_IO.o skip_comment_f.o write_control_elements.o ctl_data_map_rendering_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -26,15 +28,17 @@ set_scalar_on_xyz_plane.o: $(MAP_RENDERING_DIR)/set_scalar_on_xyz_plane.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 set_xyz_plot_from_1patch.o: $(MAP_RENDERING_DIR)/set_xyz_plot_from_1patch.f90 m_precision.o m_constants.o t_geometry_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_4_map.o: $(MAP_RENDERING_DIR)/t_control_data_4_map.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_character.o t_ctl_data_pvr_section.o t_ctl_data_4_view_transfer.o t_ctl_data_pvr_colormap_bar.o t_control_array_character3.o add_nodal_fields_ctl.o
+t_control_data_4_map.o: $(MAP_RENDERING_DIR)/t_control_data_4_map.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_character.o t_ctl_data_map_section.o t_ctl_data_4_view_transfer.o t_ctl_data_pvr_colormap_bar.o t_control_array_character3.o add_nodal_fields_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_maps.o: $(MAP_RENDERING_DIR)/t_control_data_maps.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o t_control_array_character3.o
+t_control_data_maps.o: $(MAP_RENDERING_DIR)/t_control_data_maps.f90 m_precision.o m_machine_parameter.o t_control_data_4_map.o ctl_data_map_rendering_IO.o t_control_array_character3.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_ctl_data_map_section.o: $(MAP_RENDERING_DIR)/t_ctl_data_map_section.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_data_4_psf_def.o t_control_array_real.o t_control_array_real2.o t_control_array_integer.o t_control_array_character.o t_control_array_chara2real.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_map_patch_from_1patch.o: $(MAP_RENDERING_DIR)/t_map_patch_from_1patch.f90 m_precision.o m_constants.o m_phys_constants.o m_geometry_constants.o coordinate_converter.o aitoff.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_map_projection.o: $(MAP_RENDERING_DIR)/t_map_projection.f90 calypso_mpi.o m_precision.o t_cross_section.o t_psf_results.o t_control_data_maps.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_pvr_image_array.o t_map_rendering_data.o m_field_file_format.o set_map_control.o set_psf_control.o set_fields_for_psf.o find_node_and_patch_psf.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_map_rendering_data.o: $(MAP_RENDERING_DIR)/t_map_rendering_data.f90 calypso_mpi.o m_precision.o m_machine_parameter.o t_geometry_data.o t_phys_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_control_array_character.o t_ctl_data_pvr_section.o t_ctl_data_4_projection.o skip_comment_f.o t_psf_patch_data.o t_pvr_image_array.o
+t_map_rendering_data.o: $(MAP_RENDERING_DIR)/t_map_rendering_data.f90 calypso_mpi.o m_precision.o m_machine_parameter.o t_geometry_data.o t_phys_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_control_array_character.o t_ctl_data_map_section.o t_ctl_data_4_projection.o skip_comment_f.o t_psf_patch_data.o t_pvr_image_array.o
 	$(F90) -c $(F90OPTFLAGS) $<
 xyz_plane_rendering.o: $(MAP_RENDERING_DIR)/xyz_plane_rendering.f90 m_precision.o m_constants.o t_psf_patch_data.o t_time_data.o t_file_IO_parameter.o t_map_patch_from_1patch.o t_pvr_image_array.o t_map_rendering_data.o set_ucd_data_to_type.o ucd_IO_select.o draw_aitoff_map.o draw_lines_on_map.o draw_pvr_colorbar.o draw_pixels_on_map.o set_scalar_on_xyz_plane.o draw_xyz_plane_isolines.o cal_mesh_position.o
 	$(F90) -c $(F90OPTFLAGS) $<

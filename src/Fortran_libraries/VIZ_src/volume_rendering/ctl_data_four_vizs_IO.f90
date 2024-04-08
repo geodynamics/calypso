@@ -145,8 +145,13 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(viz_ctls%i_viz_control .gt. 0) return
+      call init_psf_ctls_labels(hd_section_ctl, viz_ctls%psf_ctls)
+      call init_iso_ctls_labels(hd_isosurf_ctl, viz_ctls%iso_ctls)
+      call init_map_ctls_labels(hd_map_rendering, viz_ctls%map_ctls)
+      call init_pvr_ctls_labels(hd_pvr_ctl, viz_ctls%pvr_ctls)
+      call init_fline_ctl_struct(hd_fline_ctl, viz_ctls%fline_ctls)
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -238,46 +243,46 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_section, viz_ctls%delta_t_psf_v_ctl)
+     &    viz_ctls%delta_t_psf_v_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_section, viz_ctls%i_step_psf_v_ctl)
+     &    viz_ctls%i_step_psf_v_ctl)
       call write_files_4_psf_ctl(id_control, hd_section_ctl,            &
      &                             viz_ctls%psf_ctls, level)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_isosurf, viz_ctls%delta_t_iso_v_ctl)
+     &    viz_ctls%delta_t_iso_v_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_isosurf, viz_ctls%i_step_iso_v_ctl)
+     &    viz_ctls%i_step_iso_v_ctl)
       call write_files_4_iso_ctl(id_control, hd_isosurf_ctl,            &
      &                           viz_ctls%iso_ctls, level)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_map_projection, viz_ctls%delta_t_map_v_ctl)
+     &    viz_ctls%delta_t_map_v_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_map_projection, viz_ctls%i_step_map_v_ctl)
+     &    viz_ctls%i_step_map_v_ctl)
       call write_files_4_map_ctl(id_control, hd_map_rendering,          &
      &                           viz_ctls%map_ctls, level)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_pvr, viz_ctls%delta_t_pvr_v_ctl)
+     &    viz_ctls%delta_t_pvr_v_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_pvr, viz_ctls%i_step_pvr_v_ctl)
+     &    viz_ctls%i_step_pvr_v_ctl)
       call write_files_4_pvr_ctl(id_control, hd_pvr_ctl,                &
      &                           viz_ctls%pvr_ctls, level)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_fline, viz_ctls%delta_t_fline_v_ctl)
+     &    viz_ctls%delta_t_fline_v_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_fline, viz_ctls%i_step_fline_v_ctl)
+     &    viz_ctls%i_step_fline_v_ctl)
       call write_files_4_fline_ctl(id_control, hd_fline_ctl,            &
      &                             viz_ctls%fline_ctls, level)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_delta_t_ucd, viz_ctls%delta_t_ucd_v_ctl)
+     &    viz_ctls%delta_t_ucd_v_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_i_step_ucd, viz_ctls%i_step_ucd_v_ctl)
+     &    viz_ctls%i_step_ucd_v_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_output_fld_file_fmt, viz_ctls%output_field_file_fmt_ctl)
+     &    viz_ctls%output_field_file_fmt_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_viz4_controls

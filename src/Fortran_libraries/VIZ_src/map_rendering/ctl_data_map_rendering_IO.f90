@@ -7,6 +7,7 @@
 !>@brief  control ID data for surfacing module
 !!
 !!@verbatim
+!!      subroutine init_map_control_label(hd_block, map_c)
 !!      subroutine s_read_map_control_data                              &
 !!     &         (id_control, hd_block, map_c, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -19,11 +20,6 @@
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(map_ctl), intent(inout) :: map_c
 !!        integer(kind = kint), intent(inout) :: level
-!!
-!!      integer(kind = kint) function num_label_map_ctl()
-!!      integer(kind = kint) function num_label_map_ctl_w_dpl()
-!!      subroutine set_label_map_ctl(names)
-!!      subroutine set_label_map_ctl_w_dpl(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!! example of control for Kemo's surface rendering
 !!
@@ -85,7 +81,7 @@
 !!      colorbar_switch_ctl    ON
 !!      colorbar_position_ctl  'left' or 'bottom'
 !!      colorbar_scale_ctl     ON
-!!      iflag_zeromarker       ON
+!!      zeromarker_switch      ON
 !!      colorbar_range     0.0   1.0
 !!      font_size_ctl         3
 !!      num_grid_ctl     4
@@ -194,9 +190,6 @@
       character(len=kchara), parameter, private                         &
      &                  :: hd_map_colormap_file =  'map_color_ctl'
 !
-      integer(kind = kint), parameter :: n_label_map_ctl = 9
-      private :: n_label_map_ctl
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -208,7 +201,8 @@
 !
       use t_ctl_data_pvr_colormap_bar
       use ctl_file_pvr_modelview_IO
-      use ctl_data_pvr_section_IO
+      use ctl_data_map_section_IO
+      use ctl_data_view_transfer_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -217,8 +211,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(map_c%i_map_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -230,7 +224,7 @@
      &     (id_control, hd_map_colormap_file, map_c%fname_cmap_cbar_c,  &
      &      map_c%cmap_cbar_c, c_buf)
 !
-        call read_pvr_section_ctl(id_control, hd_section_ctl,           &
+        call read_map_section_ctl(id_control, hd_section_ctl,           &
      &                            izero, map_c%map_define_ctl, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_map_image_prefix,            &
@@ -259,7 +253,7 @@
 !
       use t_ctl_data_pvr_colormap_bar
       use ctl_file_pvr_modelview_IO
-      use ctl_data_pvr_section_IO
+      use ctl_data_map_section_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
@@ -282,20 +276,20 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_map_image_prefix, map_c%map_image_prefix_ctl)
+     &    map_c%map_image_prefix_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_map_image_format, map_c%map_image_fmt_ctl)
+     &    map_c%map_image_fmt_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_map_output_field, map_c%map_field_ctl)
+     &    map_c%map_field_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_map_output_comp, map_c%map_comp_ctl)
+     &    map_c%map_comp_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_map_isoline_field, map_c%isoline_field_ctl)
+     &    map_c%isoline_field_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_map_isoline_comp, map_c%isoline_comp_ctl)
+     &    map_c%isoline_comp_ctl)
 !
-      call write_pvr_section_ctl(id_control, hd_section_ctl,            &
+      call write_map_section_ctl(id_control, hd_section_ctl,            &
      &                           map_c%map_define_ctl, level)
 !
       call sel_write_ctl_modelview_file(id_control, hd_map_projection,  &
@@ -309,35 +303,42 @@
       end subroutine write_map_control_data
 !
 !   --------------------------------------------------------------------
+!
+      subroutine init_map_control_label(hd_block, map_c)
+!
+      use t_ctl_data_pvr_colormap_bar
+      use ctl_file_pvr_modelview_IO
+      use ctl_data_view_transfer_IO
+      use ctl_data_map_section_IO
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(map_ctl), intent(inout) :: map_c
+!
+!
+      map_c%block_name = hd_block
+      call init_map_section_ctl_label(hd_section_ctl,                   &
+     &                                map_c%map_define_ctl)
+      call init_pvr_cmap_cbar_label(hd_map_colormap_file,               &
+     &                              map_c%cmap_cbar_c)
+      call init_view_transfer_ctl_label(hd_map_projection, map_c%mat)
+!
+        call init_chara_ctl_item_label(hd_map_image_prefix,             &
+     &      map_c%map_image_prefix_ctl)
+        call init_chara_ctl_item_label(hd_map_image_format,             &
+     &      map_c%map_image_fmt_ctl)
+!
+        call init_chara_ctl_item_label(hd_map_output_field,             &
+     &      map_c%map_field_ctl)
+        call init_chara_ctl_item_label(hd_map_output_comp,              &
+     &      map_c%map_comp_ctl)
+!
+        call init_chara_ctl_item_label(hd_map_isoline_field,            &
+     &      map_c%isoline_field_ctl)
+        call init_chara_ctl_item_label(hd_map_isoline_comp,             &
+     &      map_c%isoline_comp_ctl)
+!
+      end subroutine init_map_control_label
+!
 !   --------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_map_ctl()
-      num_label_map_ctl = n_label_map_ctl
-      return
-      end function num_label_map_ctl
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_map_ctl(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_map_ctl)
-!
-!
-      call set_control_labels(hd_map_image_prefix, names( 1))
-      call set_control_labels(hd_map_image_format, names( 2))
-      call set_control_labels(hd_section_ctl,      names( 3))
-!
-      call set_control_labels(hd_map_output_field,   names( 4))
-      call set_control_labels(hd_map_output_comp,    names( 5))
-      call set_control_labels(hd_map_isoline_field,  names( 6))
-      call set_control_labels(hd_map_isoline_comp,   names( 7))
-!
-      call set_control_labels(hd_map_projection,    names( 8))
-      call set_control_labels(hd_map_colormap_file, names( 9))
-!
-      end subroutine set_label_map_ctl
-!
-!  ---------------------------------------------------------------------
 !
       end module ctl_data_map_rendering_IO

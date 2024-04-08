@@ -32,6 +32,7 @@
       use t_ctl_data_pvr_movie
       use t_control_params_4_pvr
       use t_geometries_in_pvr_screen
+      use m_pvr_control_labels
       use output_image_sel_4_png
       use skip_comment_f
 !

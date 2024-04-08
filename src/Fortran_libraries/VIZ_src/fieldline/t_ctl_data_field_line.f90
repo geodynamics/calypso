@@ -78,6 +78,9 @@
 !
 !
       type fline_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'fieldline'
+!
         type(read_character_item) :: fline_file_head_ctl
         type(read_character_item) :: fline_output_type_ctl
 !
@@ -208,6 +211,7 @@
       call dup_control_array_i2(org_fln%seed_surface_ctl,               &
      &                          new_fln%seed_surface_ctl)
 !
+      new_fln%block_name =      org_fln%block_name
       new_fln%i_vr_fline_ctl =  org_fln%i_vr_fline_ctl
 !
       end subroutine dup_control_4_fline

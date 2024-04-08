@@ -7,6 +7,7 @@
 !>@brief Control inputs for PVR streo parameter
 !!
 !!@verbatim
+!!      subroutine init_stereo_view_ctl_label(hd_block, streo)
 !!      subroutine read_stereo_view_ctl                                 &
 !!     &         (id_control, hd_block, streo, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -19,14 +20,14 @@
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(streo_view_ctl), intent(in) :: streo
 !!        integer(kind = kint), intent(inout) :: level
+!!      logical function cmp_streo_view_ctl(streo1, streo2)
+!!        type(streo_view_ctl), intent(in) :: streo1, streo2
+!!
 !!      subroutine reset_stereo_view_ctl(streo)
 !!        type(streo_view_ctl), intent(inout) :: streo
 !!      subroutine copy_stereo_view_ctl(org_streo, new_streo)
 !!        type(streo_view_ctl), intent(in) :: org_streo
 !!        type(streo_view_ctl), intent(inout) :: new_streo
-!!
-!!      integer(kind = kint) function num_label_pvr_streo()
-!!      subroutine set_label_pvr_streo(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  Input example
 !!
@@ -50,12 +51,14 @@
       use t_read_control_elements
       use t_control_array_character
       use t_control_array_real
-      use skip_comment_f
 !
       implicit  none
 !
 !>      Structure of streo view parameters
       type streo_view_ctl
+!>        Control block name
+        character(len = kchara) :: block_name                           &
+     &                         = 'stereo_view_parameter_ctl'
 !>        Structure of focal point
         type(read_real_item) :: focalpoint_ctl
 !>        Structure of eye separation
@@ -69,8 +72,6 @@
       end type streo_view_ctl
 !
 !     4th level for stereo view
-      integer(kind = kint), parameter, private                          &
-     &             :: n_label_pvr_streo =       4
       character(len=kchara), parameter, private                         &
      &             :: hd_focaldistance =  'focal_distance_ctl'
       character(len=kchara), parameter, private                         &
@@ -92,6 +93,8 @@
 !
       subroutine read_stereo_view_ctl                                   &
      &         (id_control, hd_block, streo, c_buf)
+!
+      use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -149,19 +152,73 @@
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_focaldistance, streo%focalpoint_ctl)
+     &    streo%focalpoint_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_eye_separation, streo%eye_separation_ctl)
+     &    streo%eye_separation_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    hd_eye_sep_angle, streo%eye_sep_angle_ctl)
+     &    streo%eye_sep_angle_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_eye_step_mode, streo%step_eye_sep_angle_ctl)
+     &    streo%step_eye_sep_angle_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_stereo_view_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine init_stereo_view_ctl_label(hd_block, streo)
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(streo_view_ctl), intent(inout) :: streo
+!
+!
+      streo%block_name = hd_block
+        call init_real_ctl_item_label(hd_focaldistance,                 &
+     &      streo%focalpoint_ctl)
+        call init_real_ctl_item_label(hd_focalpoint,                    &
+     &      streo%focalpoint_ctl)
+!
+        call init_real_ctl_item_label(hd_eye_separation,                &
+     &      streo%eye_separation_ctl)
+        call init_real_ctl_item_label(hd_eye_sep_angle,                 &
+     &      streo%eye_sep_angle_ctl)
+!
+        call init_chara_ctl_item_label(hd_eye_step_mode,                &
+     &      streo%step_eye_sep_angle_ctl)
+!
+      end subroutine init_stereo_view_ctl_label
+!
+!  ---------------------------------------------------------------------
+!
+      logical function cmp_streo_view_ctl(streo1, streo2)
+!
+      use skip_comment_f
+!
+      type(streo_view_ctl), intent(in) :: streo1, streo2
+!
+      cmp_streo_view_ctl = .FALSE.
+      if(streo1%i_stereo_view .ne. streo2%i_stereo_view) return
+      if(cmp_no_case(trim(streo1%block_name),                           &
+     &               trim(streo2%block_name)) .eqv. .FALSE.) return
+!
+      if(cmp_read_real_item(streo1%focalpoint_ctl,                      &
+     &                      streo2%focalpoint_ctl)                      &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real_item(streo1%eye_separation_ctl,                  &
+     &                      streo2%eye_separation_ctl)                  &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_real_item(streo1%eye_sep_angle_ctl,                   &
+     &                      streo2%eye_sep_angle_ctl)                   &
+     &                                          .eqv. .FALSE.) return
+      if(cmp_read_chara_item(streo1%step_eye_sep_angle_ctl,             &
+     &                       streo2%step_eye_sep_angle_ctl)             &
+     &                                          .eqv. .FALSE.) return
+      cmp_streo_view_ctl = .TRUE.
+!
+      end function cmp_streo_view_ctl
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
       subroutine reset_stereo_view_ctl(streo)
 !
@@ -185,6 +242,7 @@
       type(streo_view_ctl), intent(inout) :: new_streo
 !
 !
+      new_streo%block_name =    org_streo%block_name
       new_streo%i_stereo_view = org_streo%i_stereo_view
 !
       call copy_real_ctl(org_streo%focalpoint_ctl,                      &
@@ -199,28 +257,5 @@
       end subroutine copy_stereo_view_ctl
 !
 !  ---------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_streo()
-      num_label_pvr_streo = n_label_pvr_streo
-      return
-      end function num_label_pvr_streo
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_pvr_streo(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_streo)
-!
-!
-      call set_control_labels(hd_focaldistance,  names( 1))
-      call set_control_labels(hd_eye_separation, names( 2))
-      call set_control_labels(hd_eye_sep_angle,  names( 3))
-      call set_control_labels(hd_eye_step_mode,  names( 4))
-!
-      end subroutine set_label_pvr_streo
-!
-! ----------------------------------------------------------------------
 !
       end module t_ctl_data_4_streo_view

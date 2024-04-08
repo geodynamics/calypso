@@ -34,6 +34,10 @@
       subroutine s_bcast_dynamo_viz_control(zm_ctls)
 !
       use t_control_data_dynamo_vizs
+!
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
       use bcast_section_control_data
       use bcast_maps_control_data
       use bcast_control_sph_MHD
@@ -46,6 +50,10 @@
       call bcast_files_4_psf_ctl(zm_ctls%zRMS_psf_ctls)
       call bcast_files_4_map_ctl(zm_ctls%zm_map_ctls)
       call bcast_files_4_map_ctl(zm_ctls%zRMS_map_ctls)
+!
+      call calypso_mpi_bcast_character                                  &
+     &   (zm_ctls%block_name, cast_long(kchara), 0)
+      call calypso_mpi_bcast_one_int(zm_ctls%i_viz_ctl, 0)
 !
       end subroutine s_bcast_dynamo_viz_control
 !

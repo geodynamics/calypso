@@ -12,7 +12,7 @@
 !!     &         (proj_type_c, proj_c, map_define_ctl, map_data)
 !!        type(read_character_item), intent(in) :: proj_type_c
 !!        type(projection_ctl), intent(in) :: proj_c
-!!        type(pvr_section_ctl), intent(in) :: map_define_ctl
+!!        type(map_section_ctl), intent(in) :: map_define_ctl
 !!        type(map_rendering_data), intent(inout) :: map_data
 !!      subroutine init_map_rendering_data                              &
 !!     &         (view_param, pvr_rgb, map_data)
@@ -91,13 +91,13 @@
      &         (proj_type_c, proj_c, map_define_ctl, map_data)
 !
       use t_control_array_character
-      use t_ctl_data_pvr_section
+      use t_ctl_data_map_section
       use t_ctl_data_4_projection
       use skip_comment_f
 !
       type(read_character_item), intent(in) :: proj_type_c
       type(projection_ctl), intent(in) :: proj_c
-      type(pvr_section_ctl), intent(in) :: map_define_ctl
+      type(map_section_ctl), intent(in) :: map_define_ctl
       type(map_rendering_data), intent(inout) :: map_data
 !
       character(len = kchara) :: tmpchara

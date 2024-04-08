@@ -7,7 +7,6 @@
 !>@brief  control ID data for surfacing module
 !!
 !!@verbatim
-!!      subroutine init_map_ctl_stract(map_c)
 !!      subroutine dealloc_cont_dat_4_map(map_c)
 !!        type(map_ctl), intent(inout) :: map_c
 !!      subroutine dup_control_4_map(org_map_c, new_map_c)
@@ -95,7 +94,7 @@
 !!      colorbar_switch_ctl    ON
 !!      colorbar_position_ctl  'left' or 'bottom'
 !!      colorbar_scale_ctl     ON
-!!      iflag_zeromarker       ON
+!!      zeromarker_switch      ON
 !!      colorbar_range     0.0   1.0
 !!      font_size_ctl         3
 !!      num_grid_ctl          4
@@ -167,7 +166,7 @@
       use skip_comment_f
       use t_read_control_elements
       use t_control_array_character
-      use t_ctl_data_pvr_section
+      use t_ctl_data_map_section
       use t_ctl_data_4_view_transfer
       use t_ctl_data_pvr_colormap_bar
 !
@@ -175,8 +174,11 @@
 !
 !
       type map_ctl
+!>        Control block name
+        character(len = kchara) :: block_name = 'cross_section_ctl'
+!
 !>        Structure of cross section definition
-        type(pvr_section_ctl) :: map_define_ctl
+        type(map_section_ctl) :: map_define_ctl
 !
 !>        Structure for file prefix
         type(read_character_item) :: map_image_prefix_ctl
@@ -215,22 +217,12 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_map_ctl_stract(map_c)
-!
-      type(map_ctl), intent(inout) :: map_c
-!
-      call init_psf_def_ctl_stract(map_c%map_define_ctl%psf_def_c)
-!
-      end subroutine init_map_ctl_stract
-!
-!  ---------------------------------------------------------------------
-!
       subroutine dealloc_cont_dat_4_map(map_c)
 !
       type(map_ctl), intent(inout) :: map_c
 !
 !
-      call dealloc_pvr_section_ctl(map_c%map_define_ctl)
+      call dealloc_map_section_ctl(map_c%map_define_ctl)
       call dealloc_view_transfer_ctl(map_c%mat)
       call deallocate_pvr_cmap_cbar(map_c%cmap_cbar_c)
 !
@@ -257,7 +249,7 @@
       type(map_ctl), intent(inout) :: new_map_c
 !
 !
-      call dup_pvr_section_ctl(org_map_c%map_define_ctl,                &
+      call dup_map_section_ctl(org_map_c%map_define_ctl,                &
      &                         new_map_c%map_define_ctl)
       call dup_view_transfer_ctl(org_map_c%mat, new_map_c%mat)
       call dup_pvr_cmap_cbar(org_map_c%cmap_cbar_c,                     &
@@ -279,6 +271,7 @@
       new_map_c%fname_mat_ctl =     org_map_c%fname_mat_ctl
       new_map_c%fname_cmap_cbar_c = org_map_c%fname_cmap_cbar_c
 !
+      new_map_c%block_name =       org_map_c%block_name
       new_map_c%i_map_ctl =        org_map_c%i_map_ctl
       new_map_c%i_output_field =   org_map_c%i_output_field
 !

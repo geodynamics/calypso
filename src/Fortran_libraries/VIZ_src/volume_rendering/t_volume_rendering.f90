@@ -166,6 +166,7 @@
      &         (id_control, pvr_ctls, pvr, iflag_redraw)
 !
       use calypso_mpi_int
+      use bcast_control_data_4_pvr
       use ctl_file_each_pvr_IO
       use skip_comment_f
 !
@@ -195,6 +196,12 @@
         call reset_pvr_update_flags(pvr_ctls%pvr_ctl_type(1))
       end if
 !
+      call bcast_pvr_update_flag(pvr_ctls%pvr_ctl_type(1))
+      if(pvr_ctls%pvr_ctl_type(1)%i_pvr_ctl .lt. 0) then
+        call calypso_MPI_abort(pvr_ctls%pvr_ctl_type(1)%i_pvr_ctl,      &
+     &                           'control file is broken')
+      end if
+!
       call calypso_mpi_bcast_one_int(iflag_redraw, 0)
       call calypso_mpi_barrier
 !
@@ -221,7 +228,7 @@
       if(my_rank .ne. 0) return
       c_buf1%level = 0
       do i_pvr = 1, pvr_ctls%num_pvr_ctl
-        if(pvr_ctls%fname_pvr_ctl(i_pvr) .ne. 'NO_FILE') then
+        if(.not. no_file_flag(pvr_ctls%fname_pvr_ctl(i_pvr))) then
           call read_control_pvr_file                                    &
      &     (id_control, pvr_ctls%fname_pvr_ctl(i_pvr), hd_pvr_ctl,      &
      &      pvr_ctls%pvr_ctl_type(i_pvr), c_buf1)

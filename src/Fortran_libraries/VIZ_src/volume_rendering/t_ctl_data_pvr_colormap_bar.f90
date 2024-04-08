@@ -7,6 +7,7 @@
 !> @brief colormap control data for parallel volume rendering
 !!
 !!@verbatim
+!!      subroutine init_pvr_cmap_cbar_label(hd_block, cmap_cbar_c)
 !!      subroutine sel_read_ctl_pvr_colormap_file                       &
 !!     &         (id_control, hd_block, file_name, cmap_cbar_c, c_buf)
 !!      subroutine read_pvr_cmap_cbar                                   &
@@ -30,15 +31,17 @@
 !!        type(pvr_colormap_bar_ctl), intent(in) :: cmap_cbar_c
 !!        integer(kind = kint), intent(inout) :: level
 !!
+!!      logical function cmp_pvr_colormap_bar_ctl(cmap_cbar1,           &
+!!     &                                          cmap_cbar2)
+!!        type(pvr_colormap_bar_ctl), intent(in) :: cmap_cbar1
+!!        type(pvr_colormap_bar_ctl), intent(in) :: cmap_cbar2
+!!
 !!      subroutine deallocate_pvr_cmap_cbar(cmap_cbar_c)
 !!        type(pvr_colormap_bar_ctl), intent(inout) :: cmap_cbar_c
 !!
 !!      subroutine dup_pvr_cmap_cbar(org_cmap_cbar_c, new_cmap_cbar_c)
 !!        type(pvr_colormap_bar_ctl), intent(in) :: org_cmap_cbar_c
 !!        type(pvr_colormap_bar_ctl), intent(inout) :: new_cmap_cbar_c
-!!
-!!      integer(kind = kint) function num_label_pvr_cmap_bar()
-!!      subroutine set_label_pvr_cmap_bar(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of color control for Kemo's volume rendering
 !!
@@ -70,16 +73,6 @@
 !!        linear_opacity_ctl   0.85    0.01
 !!        linear_opacity_ctl   0.95    0.001
 !!      end array linear_opacity_ctl
-!!
-!!      array  step_opacity_ctl
-!!        step_opacity_ctl   0.0     0.01    0.01
-!!        step_opacity_ctl   0.01    0.2     0.015
-!!        step_opacity_ctl   0.2     0.35    0.02
-!!        step_opacity_ctl   0.6     0.7     0.04
-!!        step_opacity_ctl   0.7     0.85    0.03
-!!        step_opacity_ctl   0.85    0.95    0.01
-!!        step_opacity_ctl   0.95    1.0     0.001
-!!      end array step_opacity_ctl
 !!      constant_opacity_ctl           0.003
 !!!
 !!      range_min_ctl   0.0
@@ -90,7 +83,7 @@
 !!      colorbar_switch_ctl    ON
 !!      colorbar_position_ctl  'left' or 'bottom'
 !!      colorbar_scale_ctl     ON
-!!      iflag_zeromarker       ON
+!!      zeromarker_switch      ON
 !!      colorbar_range     0.0   1.0
 !!      font_size_ctl         3
 !!      num_grid_ctl     4
@@ -117,9 +110,11 @@
 !
 !>  Structure of control data for PVR colormap and colorbar
       type pvr_colormap_bar_ctl
-!>    Structure for colormap
+!>        Control block name
+        character(len = kchara) :: block_name = 'pvr_color_ctl'
+!>        Structure for colormap
         type(pvr_colormap_ctl) :: color
-!>    Structure for colorbar
+!>        Structure for colorbar
         type(pvr_colorbar_ctl) :: cbar_ctl
 !
         integer (kind=kint) :: i_cmap_cbar = 0
@@ -131,9 +126,8 @@
 !
       character(len=kchara) :: hd_colormap =      'colormap_ctl'
       character(len=kchara) :: hd_pvr_colorbar =  'colorbar_ctl'
-      integer(kind = kint), parameter :: n_label_pvr_cmap_bar = 2
 !
-      private :: hd_colormap, hd_pvr_colorbar, n_label_pvr_cmap_bar
+      private :: hd_colormap, hd_pvr_colorbar
       private :: hd_colormap_file
 !
       private ::  read_control_pvr_colormap_file
@@ -165,7 +159,13 @@
         call write_one_ctl_file_message                                 &
      &     (hd_block, c_buf%level, file_name)
         call read_control_pvr_colormap_file                             &
-     &     (id_control+1, file_name, hd_block, cmap_cbar_c, c_buf)
+     &     (id_control+2, file_name, hd_block, cmap_cbar_c, c_buf)
+!
+      else if(check_begin_flag(c_buf, hd_block)) then
+        file_name = 'NO_FILE'
+        call write_included_message(hd_block, c_buf%level)
+        call read_pvr_cmap_cbar(id_control, hd_block,                   &
+     &                          cmap_cbar_c, c_buf)
       else if(cmap_cbar_c%i_cmap_cbar .eq. 0) then
         file_name = 'NO_FILE'
 !
@@ -185,6 +185,8 @@
       subroutine read_control_pvr_colormap_file                         &
      &         (id_control, file_name, hd_block, cmap_cbar_c, c_buf)
 !
+      use skip_comment_f
+!
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: file_name
       character(len=kchara), intent(in) :: hd_block
@@ -192,7 +194,7 @@
       type(buffer_for_control), intent(inout) :: c_buf
 !
 !
-      if(file_name .eq. 'NO_FILE') then
+      if(no_file_flag(file_name)) then
         write(*,*)  'Colormap control is included'
         return
       end if
@@ -233,8 +235,8 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(cmap_cbar_c%i_cmap_cbar .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
@@ -248,6 +250,25 @@
       cmap_cbar_c%i_cmap_cbar = 1
 !
       end subroutine read_pvr_cmap_cbar
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine init_pvr_cmap_cbar_label(hd_block, cmap_cbar_c)
+!
+      use ctl_data_pvr_colorbar_IO
+      use ctl_data_pvr_colormap_IO
+!
+      character(len=kchara), intent(in) :: hd_block
+      type(pvr_colormap_bar_ctl), intent(inout) :: cmap_cbar_c
+!
+!
+      cmap_cbar_c%block_name = hd_block
+      call init_pvr_colordef_ctl_labels(hd_colormap,                    &
+     &                                  cmap_cbar_c%color)
+      call init_pvr_colorbar_ctl_label(hd_pvr_colorbar,                 &
+     &                                 cmap_cbar_c%cbar_ctl)
+!
+      end subroutine init_pvr_cmap_cbar_label
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -274,7 +295,7 @@
         call write_pvr_colorbar_ctl(id_control, hd_pvr_colorbar,        &
      &      cmap_cbar_c%cbar_ctl, level)
       else if(id_control .eq. id_monitor) then
-        write(*,'(4a)') '!  ', trim(hd_block),                           &
+        write(*,'(4a)') '!  ', trim(hd_block),                          &
      &        ' should be written to file ... ', trim(file_name)
         call write_pvr_colorbar_ctl(id_control, hd_pvr_colorbar,        &
      &      cmap_cbar_c%cbar_ctl, level)
@@ -284,7 +305,7 @@
         call write_file_name_for_ctl_line(id_control, level,            &
      &                                    hd_block, file_name)
         call write_control_pvr_colormap_file                            &
-     &     (id_control+1, file_name, hd_block, cmap_cbar_c)
+     &     (id_control+2, file_name, hd_block, cmap_cbar_c)
       end if
 !
       end subroutine sel_write_ctl_pvr_colormap_file
@@ -302,7 +323,7 @@
       integer(kind = kint) :: level
 !
 !
-      if(file_name .eq. 'NO_FILE') return
+      if(no_file_flag(file_name)) return
 !
       level = 0
       open(id_control, file = file_name)
@@ -340,6 +361,27 @@
       end subroutine write_pvr_cmap_cbar
 !
 !  ---------------------------------------------------------------------
+!
+      logical function cmp_pvr_colormap_bar_ctl(cmap_cbar1,             &
+     &                                          cmap_cbar2)
+!
+      type(pvr_colormap_bar_ctl), intent(in) :: cmap_cbar1
+      type(pvr_colormap_bar_ctl), intent(in) :: cmap_cbar2
+!
+      cmp_pvr_colormap_bar_ctl = .FALSE.
+      if(cmap_cbar1%i_cmap_cbar .ne. cmap_cbar2%i_cmap_cbar) return
+      if(cmp_no_case(trim(cmap_cbar1%block_name),                       &
+     &               trim(cmap_cbar2%block_name)) .eqv. .FALSE.) return
+      if(cmp_pvr_colormap_ctl(cmap_cbar1%color, cmap_cbar2%color)       &
+     &                                            .eqv. .FALSE.) return
+      if(cmp_pvr_colorbar_ctl(cmap_cbar1%cbar_ctl, cmap_cbar2%cbar_ctl) &
+     &                                            .eqv. .FALSE.) return
+!
+      cmp_pvr_colormap_bar_ctl = .TRUE.
+!
+      end function cmp_pvr_colormap_bar_ctl
+!
+!   --------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine deallocate_pvr_cmap_cbar(cmap_cbar_c)
@@ -362,6 +404,7 @@
       type(pvr_colormap_bar_ctl), intent(inout) :: new_cmap_cbar_c
 !
 !
+      new_cmap_cbar_c%block_name = org_cmap_cbar_c%block_name
       new_cmap_cbar_c%i_cmap_cbar = org_cmap_cbar_c%i_cmap_cbar
 !
       call dup_pvr_colordef_ctl(org_cmap_cbar_c%color,                  &
@@ -372,26 +415,5 @@
       end subroutine dup_pvr_cmap_cbar
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_pvr_cmap_bar()
-      num_label_pvr_cmap_bar = n_label_pvr_cmap_bar
-      return
-      end function num_label_pvr_cmap_bar
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine set_label_pvr_cmap_bar(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_pvr_cmap_bar)
-!
-!
-      call set_control_labels(hd_colormap,     names( 1))
-      call set_control_labels(hd_pvr_colorbar, names( 2))
-!
-      end subroutine set_label_pvr_cmap_bar
-!
-! ----------------------------------------------------------------------
 !
       end module t_ctl_data_pvr_colormap_bar

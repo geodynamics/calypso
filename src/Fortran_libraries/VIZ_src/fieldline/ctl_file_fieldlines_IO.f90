@@ -68,10 +68,10 @@
       type(fieldline_controls), intent(inout) :: fline_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
 !
+      integer(kind = kint) :: n_append
 !
       if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(fline_ctls%fline_ctl_struct)) return
-      fline_ctls%num_fline_ctl = 0
       call alloc_fline_ctl_struct(fline_ctls)
 !
       do
@@ -81,7 +81,8 @@
 !
         if(check_file_flag(c_buf, hd_block)                             &
      &        .or. check_begin_flag(c_buf, hd_block)) then
-          call append_new_fline_control(fline_ctls)
+          n_append = fline_ctls%num_fline_ctl
+          call append_fline_control(n_append, hd_block, fline_ctls)
 !
           call write_multi_ctl_file_message                             &
      &       (hd_block, fline_ctls%num_fline_ctl, c_buf%level)
@@ -202,7 +203,7 @@
       integer(kind = kint), intent(inout) :: level
 !
 !
-      if(cmp_no_case(file_name, 'NO_FILE')) then
+      if(no_file_flag(file_name)) then
         write(*,'(a)') ' is included.'
         call write_field_line_ctl(id_control, hd_block,                 &
      &                            fline_ctl_struct, level)

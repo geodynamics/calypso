@@ -9,9 +9,10 @@
 !!@verbatim
 !!      subroutine axis_direction_in_screen(pvr_screen)
 !!        type(pvr_projected_position), intent(inout) :: pvr_screen
-!!      subroutine set_pvr_axislabel                                    &
-!!     &         (num_pixel, n_pvr_pixel, pvr_screen, rgba_gl)
+!!      subroutine set_pvr_axislabel(num_pixel, n_pvr_pixel, iscale,    &
+!!     &                             pvr_screen, rgba_gl)
 !!        integer(kind = kint), intent(in) :: num_pixel
+!!        integer(kind = kint), intent(in) :: iscale
 !!        integer(kind = kint), intent(in) :: n_pvr_pixel(2)
 !!        type(pvr_projected_position), intent(in) :: pvr_screen
 !!        real(kind = kreal), intent(inout)  :: rgba_gl(4,num_pixel)
@@ -57,8 +58,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_pvr_axislabel                                      &
-     &         (num_pixel, n_pvr_pixel, pvr_screen, rgba_gl)
+      subroutine set_pvr_axislabel(num_pixel, n_pvr_pixel, iscale,      &
+     &                             pvr_screen, rgba_gl)
 !
       use t_control_params_4_pvr
       use t_geometries_in_pvr_screen
@@ -66,13 +67,15 @@
       use draw_pvr_colorbar_nums
 !
       integer(kind = kint), intent(in) :: num_pixel
+      integer(kind = kint), intent(in) :: iscale
       integer(kind = kint), intent(in) :: n_pvr_pixel(2)
 !
       type(pvr_projected_position), intent(in) :: pvr_screen
 !
       real(kind = kreal), intent(inout)  :: rgba_gl(4,num_pixel)
 !
-      integer(kind = kint) :: i, j, k, l, n, m, length, ist_px, ist_py
+      integer(kind = kint) :: i, j, l, n, m, i2, j2
+      integer(kind = kint) :: length, ist_px, ist_py, inod
       real(kind = kreal) :: rlen, rhgt
       real(kind = kreal) :: r, rmax
 !
@@ -85,28 +88,32 @@
         rmax = max(rmax,r)
       end do
 !
-      length = 30
+      length = 30 * iscale
 !      length =  int(0.13 * rmax * min(n_pvr_pixel(1),n_pvr_pixel(2)))
       rmax = one / rmax
       do m = 1, 3
         ist_px = int(length * 1.3, KIND(ist_px))
         ist_py = int(length * 1.3, KIND(ist_py))
         n = pvr_screen%axis_order(m)
-        do l = 0, length
-          rlen = l * pvr_screen%axis_view(n,1) * rmax
-          rhgt = l * pvr_screen%axis_view(n,2) * rmax
-          i = ist_px + int(rlen, KIND(i))
-          j = ist_py + int(rhgt, KIND(j))
-          k = j*n_pvr_pixel(1) + i + 1
-          rgba_gl(n,k) = one
-          rgba_gl(4,k) = one
+        do j2 = -iscale/4, (iscale+1)/4
+          do i2 = -iscale/4, (iscale+1)/4
+            do l = 0, length
+              rlen = l * pvr_screen%axis_view(n,1) * rmax
+              rhgt = l * pvr_screen%axis_view(n,2) * rmax
+              i = ist_px + int(rlen, KIND(i))
+              j = ist_py + int(rhgt, KIND(j))
+              inod = (j+j2)*n_pvr_pixel(1) + (i+i2) + 1
+              rgba_gl(n,inod) = one
+              rgba_gl(4,inod) = one
+            end do
+          end do
         end do
         rlen = (length+10) * pvr_screen%axis_view(n,1) * rmax
         rhgt = (length+12) * pvr_screen%axis_view(n,2) * rmax
         ist_px = ist_px + int(rlen, KIND(ist_px))
         ist_py = ist_py + int(rhgt, KIND(ist_py))
 !
-        call set_one_label(axis_label(n), ione, ist_px, ist_py,         &
+        call set_one_label(axis_label(n), iscale, ist_px, ist_py,       &
      &      n_pvr_pixel, num_pixel, rgba_gl)
       end do
 !
