@@ -15,6 +15,9 @@
 !!        integer(kind = kint), intent(in) :: iflag_dipolarity
 !!        type(sph_mean_squares), intent(inout) :: pwr
 !!        type(sph_mean_square_work), intent(inout) :: WK_pwr
+!!      subroutine set_domains_4_spectr_output(sph_rj, pwr)
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(sph_mean_squares), intent(inout) :: pwr
 !!@endverbatim
 !
       module init_rms_4_sph_spectr
@@ -33,7 +36,6 @@
 !
       implicit none
 !
-      private :: set_domains_4_spectr_output
       private :: set_field_list_sph_monitor
 !
 ! -----------------------------------------------------------------------
@@ -68,7 +70,7 @@
       call set_layers_4_sph_spectr(sph_rj, pwr)
 !
       call set_field_list_sph_monitor(sph_params, sph_rj,               &
-     &                                      rj_fld, pwr, WK_pwr)
+     &                                rj_fld, pwr, WK_pwr)
 !
       do i = 1, pwr%num_vol_spectr
         call init_sph_vol_spectr_r_param(sph_params, sph_rj,            &
@@ -79,7 +81,7 @@
 !
       if(iflag_debug .gt. 0) then
 !      if(my_rank .eq. 0) then
-        write(*,*) 'spectr later data:', pwr%nri_rms
+        write(*,*) 'spectr layer data:', pwr%nri_rms
         do k = 1, pwr%nri_rms
           write(*,*) k, pwr%r_4_rms(k,1), pwr%kr_4_rms(k,1:2),          &
      &            sph_rj%radius_1d_rj_r(pwr%kr_4_rms(k,1:2)),           &

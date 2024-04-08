@@ -631,6 +631,7 @@ begin MHD_control
   begin sph_monitor_ctl
     volume_average_prefix        'sph_ave_volume'
     volume_pwr_spectr_prefix     'sph_pwr_volume'
+    volume_work_spectr_prefix    'monitor/sph_work_volume'
     nusselt_number_prefix        'Nusselt'
 !
 !   if num_pick_layer_ctl = 0 or negative: 
@@ -638,6 +639,7 @@ begin MHD_control
 !
     begin layered_spectrum_ctl
       layered_pwr_spectr_prefix    'sph_pwr_layer'
+      layered_work_spectr_prefix    'monitor/sph_work_layer'
       layered_pwr_spectr_format    'gzip'
 !
       degree_spectra_switch         'On'
@@ -701,6 +703,7 @@ begin MHD_control
       begin volume_spectrum_ctl
         volume_pwr_spectr_prefix     'sph_pwr_convective'
         volume_average_prefix        'sph_ave_convective'
+        volume_work_spectr_prefix 'monitor/sph_work_convective'
         inner_radius_ctl           0.55
         outer_radius_ctl           1.4
       end volume_spectrum_ctl

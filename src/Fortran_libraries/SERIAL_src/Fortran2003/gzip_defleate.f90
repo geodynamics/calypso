@@ -46,91 +46,79 @@
       interface
 !
 !  ---------------------------------------------------------------------
-        subroutine calypso_gzip_defleat_once                            &
-     &           (len_buf, buf, len_gzipbuf, len_gzipped, gzipbuf)      &
+      integer(C_int) function  calypso_gzip_defleat_once                &
+     &           (len_buf, buf, len_gzipbuf, gzipbuf)                   &
      &            BIND(C, name = 'calypso_gzip_defleat_once')
 !
         use ISO_C_BINDING
 !
-        integer(C_int), intent(in) :: len_buf
+        integer(C_int), value :: len_buf
         type(C_ptr), value, intent(in) :: buf
-!
-        integer(C_int), intent(in) :: len_gzipbuf
+        integer(C_int), value :: len_gzipbuf
         character(C_char), intent(inout) :: gzipbuf(*)
-        integer(C_int), intent(inout) :: len_gzipped
 !
-        end subroutine calypso_gzip_defleat_once
+        end function calypso_gzip_defleat_once
 !  -----------------
-        subroutine calypso_gzip_defleat_begin                           &
-     &           (len_buf, buf, len_gzipbuf, len_gzipped, gzipbuf)      &
+        integer(C_int) function calypso_gzip_defleat_begin              &
+     &           (len_buf, buf, len_gzipbuf, gzipbuf)                   &
      &            BIND(C, name = 'calypso_gzip_defleat_begin')
 !
         use ISO_C_BINDING
 !
-        integer(C_int), intent(in) :: len_buf
+        integer(C_int), value :: len_buf
         type(C_ptr), value, intent(in) :: buf
-!
-        integer(C_int), intent(in) :: len_gzipbuf
+        integer(C_int), value :: len_gzipbuf
         character(C_char), intent(inout) :: gzipbuf(*)
-        integer(C_int), intent(inout) :: len_gzipped
 !
-        end subroutine calypso_gzip_defleat_begin
+        end function calypso_gzip_defleat_begin
 !  -----------------
-        subroutine calypso_gzip_defleat_cont                            &
-     &           (len_buf, buf, len_gzipbuf, len_gzipped)               &
+        integer(C_int) function  calypso_gzip_defleat_cont              &
+     &           (len_buf, buf, len_gzipbuf)                            &
      &            BIND(C, name = 'calypso_gzip_defleat_cont')
 !
         use ISO_C_BINDING
 !
-        integer(C_int), intent(in) :: len_buf
+        integer(C_int), value :: len_buf
         type(C_ptr), value, intent(in) :: buf
+        integer(C_int), value :: len_gzipbuf
 !
-        integer(C_int), intent(in) :: len_gzipbuf
-        integer(C_int), intent(inout) :: len_gzipped
-!
-        end subroutine calypso_gzip_defleat_cont
+        end function calypso_gzip_defleat_cont
 !  -----------------
-        subroutine calypso_gzip_defleat_last                            &
-     &           (len_buf, buf, len_gzipbuf, len_gzipped)               &
+        integer(C_int) function calypso_gzip_defleat_last               &
+     &           (len_buf, buf, len_gzipbuf)                            &
      &            BIND(C, name = 'calypso_gzip_defleat_last')
 !
         use ISO_C_BINDING
 !
-        integer(C_int), intent(in) :: len_buf
+        integer(C_int), value :: len_buf
         type(C_ptr), value, intent(in) :: buf
+        integer(C_int), value :: len_gzipbuf
 !
-        integer(C_int), intent(in) :: len_gzipbuf
-        integer(C_int), intent(inout) :: len_gzipped
-!
-        end subroutine calypso_gzip_defleat_last
+        end function calypso_gzip_defleat_last
 !  -----------------
-        subroutine calypso_zlib_defleat_once                            &
-     &           (len_buf, buf, len_gzipbuf, len_gzipped, gzipbuf)      &
+        integer(C_int) function calypso_zlib_defleat_once               &
+     &           (len_buf, buf, len_gzipbuf, gzipbuf)                   &
      &            BIND(C, name = 'calypso_zlib_defleat_once')
 !
         use ISO_C_BINDING
 !
-        integer(C_int), intent(in) :: len_buf
+        integer(C_int), value :: len_buf
         type(C_ptr), value, intent(in) :: buf
-!
-        integer(C_int), intent(in) :: len_gzipbuf
+        integer(C_int), value :: len_gzipbuf
         character(C_char), intent(inout) :: gzipbuf(*)
-        integer(C_int), intent(inout) :: len_gzipped
 !
-        end subroutine calypso_zlib_defleat_once
+        end function calypso_zlib_defleat_once
 !  -----------------
-        type(C_ptr) function calypso_zlib_defleat_begin                 &
-     &           (len_buf, buf, len_gzipbuf, len_gzipped, gzipbuf)      &
+        integer(C_int) function calypso_zlib_defleat_begin              &
+     &           (len_buf, buf, len_gzipbuf, gzipbuf)                   &
      &            BIND(C, name = 'calypso_zlib_defleat_begin')
 !
         use ISO_C_BINDING
 !
-        integer(C_int), intent(in) :: len_buf
+        integer(C_int), value :: len_buf
         type(C_ptr), value, intent(in) :: buf
-!
-        integer(C_int), intent(in) :: len_gzipbuf
+        integer(C_int), value :: len_gzipbuf
         character(C_char), intent(inout) :: gzipbuf(*)
-        integer(C_int), intent(inout) :: len_gzipped
 !
         end function calypso_zlib_defleat_begin
 !  -----------------
@@ -156,9 +144,10 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_real_buffer_for_zlib(num, data, zbuf)
-      call calypso_gzip_defleat_once                                    &
-     &   (zbuf%len_buf, C_LOC(zbuf%dat_p(1)),                           &
-     &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
+      zbuf%len_used = calypso_gzip_defleat_once(zbuf%len_buf,           &
+     &                                          C_LOC(zbuf%dat_p(1)),   &
+     &                                          zbuf%len_gzipbuf,       &
+     &                                          zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
 !
@@ -179,9 +168,10 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_int8_buffer_for_zlib(num, int8_dat, zbuf)
-      call calypso_gzip_defleat_once                                    &
-     &   (zbuf%len_buf, C_LOC(zbuf%idat8_p(1)),                         &
-     &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
+      zbuf%len_used = calypso_gzip_defleat_once(zbuf%len_buf,           &
+     &                                          C_LOC(zbuf%idat8_p(1)), &
+     &                                          zbuf%len_gzipbuf,       &
+     &                                          zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
 !
@@ -202,9 +192,10 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_int4_buffer_for_zlib(num, int4_dat, zbuf)
-      call calypso_gzip_defleat_once                                    &
-     &   (zbuf%len_buf, C_LOC(zbuf%idat4_p(1)),                         &
-     &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
+      zbuf%len_used = calypso_gzip_defleat_once(zbuf%len_buf,           &
+     &                                          C_LOC(zbuf%idat4_p(1)), &
+     &                                          zbuf%len_gzipbuf,       &
+     &                                          zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
 !
@@ -226,9 +217,10 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call calypso_zlib_defleat_once                                    &
-     &   (zbuf%len_buf, C_LOC(zbuf%buf_p(1)),                           &
-     &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
+      zbuf%len_used = calypso_zlib_defleat_once(zbuf%len_buf,           &
+     &                                          C_LOC(zbuf%buf_p(1)),   &
+     &                                          zbuf%len_gzipbuf,       &
+     &                                          zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
 !
@@ -249,9 +241,10 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call calypso_gzip_defleat_once                                    &
-     &   (zbuf%len_buf, C_LOC(zbuf%buf_p(1)),                           &
-     &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
+      zbuf%len_used = calypso_gzip_defleat_once(zbuf%len_buf,           &
+     &                                          C_LOC(zbuf%buf_p(1)),   &
+     &                                          zbuf%len_gzipbuf,       &
+     &                                          zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
 !
@@ -272,9 +265,10 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call calypso_gzip_defleat_begin                                   &
-     &               (zbuf%len_buf, C_LOC(zbuf%buf_p(1)),               &
-     &                zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
+      zbuf%len_used = calypso_gzip_defleat_begin(zbuf%len_buf,          &
+     &                                           C_LOC(zbuf%buf_p(1)),  &
+     &                                           zbuf%len_gzipbuf,      &
+     &                                           zbuf%gzipbuf_p)
 !
       end subroutine gzip_defleat_char_begin
 !
@@ -288,9 +282,9 @@
 !
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call calypso_gzip_defleat_cont                                    &
-     &   (zbuf%len_buf, C_LOC(zbuf%buf_p(1)),                           &
-     &    zbuf%len_gzipbuf, zbuf%len_used)
+      zbuf%len_used = calypso_gzip_defleat_cont(zbuf%len_buf,           &
+     &                                          C_LOC(zbuf%buf_p(1)),   &
+     &                                          zbuf%len_gzipbuf)
 !
       end subroutine gzip_defleat_char_cont
 !
@@ -304,9 +298,9 @@
 !
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call calypso_gzip_defleat_last                                    &
-     &   (zbuf%len_buf, C_LOC(zbuf%buf_p(1)),                           &
-     &    zbuf%len_gzipbuf, zbuf%len_used)
+      zbuf%len_used = calypso_gzip_defleat_last(zbuf%len_buf,           &
+     &                                          C_LOC(zbuf%buf_p(1)),   &
+     &                                          zbuf%len_gzipbuf)
       call unlink_pointer_for_zlib_buffer(zbuf)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))

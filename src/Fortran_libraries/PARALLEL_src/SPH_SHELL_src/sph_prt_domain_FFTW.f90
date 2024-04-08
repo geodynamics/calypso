@@ -138,8 +138,9 @@
       call alloc_comm_table_sph_FFTW                                    &
      &   (comm_rtp%ntot_item_sr, FFTW_f%comm_sph_FFTW)
       call set_comm_item_prt_4_FFTW                                     &
-     &   (sph_rtp%nnod_rtp, comm_rtp%ntot_item_sr, comm_rtp%irev_sr,    &
+     &   (sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                          &
      &    sph_rtp%istack_rtp_rt_smp(np_smp),                            &
+     &    comm_rtp%ntot_item_sr, comm_rtp%irev_sr,                      &
      &    FFTW_f%Nfft_c, FFTW_f%aNfft, FFTW_f%comm_sph_FFTW)
 !
       end subroutine init_prt_field_FFTW
@@ -213,8 +214,8 @@
 !     &     (nd, sph_rtp%nnod_rtp, comm_rtp%irev_sr,                    &
 !     &      sph_rtp%istack_rtp_rt_smp(np_smp), ncomp_fwd,              &
 !     &      FFTW_f%Nfft_c, FFTW_f%aNfft, FFTW_f%C(1), n_WS, WS)
-        call copy_1comp_prt_FFTW_to_send                                &
-     &     (nd, sph_rtp%nnod_rtp, sph_rtp%istack_rtp_rt_smp(np_smp),    &
+        call copy_1comp_FFTW_to_send                                    &
+     &     (nd, sph_rtp%istack_rtp_rt_smp(np_smp),                      &
      &      ncomp_fwd, FFTW_f%Nfft_c, FFTW_f%C(1),                      &
      &      FFTW_f%comm_sph_FFTW, n_WS, WS)
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+6)
@@ -247,10 +248,10 @@
 !
       do nd = 1, ncomp_bwd
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
-        call copy_prt_FFTW_comp_from_recv                               &
-     &     (nd, sph_rtp%nnod_rtp, comm_rtp%irev_sr,                     &
-     &      sph_rtp%istack_rtp_rt_smp(np_smp), ncomp_bwd,               &
-     &      n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C(1))
+        call copy_FFTW_comp_from_recv                                   &
+     &     (nd, sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                    &
+     &      sph_rtp%istack_rtp_rt_smp(np_smp), comm_rtp%irev_sr,        &
+     &      ncomp_bwd, n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C(1))
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+1)
 !
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+2)

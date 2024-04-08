@@ -208,13 +208,8 @@
 !$omp end parallel do
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+5)
 !
-!   normalization
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+6)
-!        call copy_rtp_comp_FFTW_to_send                                &
-!     &     (nd, sph_rtp%nnod_rtp, comm_rtp%irev_sr,                    &
-!     &      sph_rtp%istack_rtp_rt_smp, ncomp_fwd,                      &
-!     &      FFTW_f%Nfft_c, FFTW_f%aNfft, FFTW_f%C, n_WS, WS)
-        call copy_1comp_rtp_FFTW_to_send_smp                            &
+        call copy_1comp_FFTW_to_send_smp                                &
      &     (nd, sph_rtp%istack_rtp_rt_smp, FFTW_f%Nfft_c,               &
      &      ncomp_fwd, FFTW_f%C, FFTW_f%comm_sph_FFTW, n_WS, WS)
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+6)
@@ -227,6 +222,7 @@
       subroutine rtp_field_back_FFTW_from_recv                          &
      &         (sph_rtp, comm_rtp, ncomp_bwd, n_WR, WR, X_rtp, FFTW_f)
 !
+      use set_comm_table_prt_FFTW
       use set_comm_table_rtp_FFTW
       use copy_rtp_data_to_FFTPACK
 !
@@ -247,9 +243,9 @@
 !
       do nd = 1, ncomp_bwd
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
-          call copy_rtp_FFTW_comp_from_recv                             &
-     &       (nd, sph_rtp%nnod_rtp, comm_rtp%irev_sr,                   &
-     &        sph_rtp%istack_rtp_rt_smp, ncomp_bwd,                     &
+          call copy_FFTW_comp_from_recv_smp                             &
+     &       (nd, sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                  &
+     &        sph_rtp%istack_rtp_rt_smp, comm_rtp%irev_sr, ncomp_bwd,   &
      &        n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C)
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+1)
 !

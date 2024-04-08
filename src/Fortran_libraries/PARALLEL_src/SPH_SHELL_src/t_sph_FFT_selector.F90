@@ -352,10 +352,10 @@
      &      n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_comp_FFTPACK)
       else if(WK_FFTs%iflag_FFT .eq. iflag_FFTPACK_DOMAIN) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
-          call prt_domain_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd,  &
+          call prt_domain_RFFTMF_to_send(sph_rtp, ncomp_fwd,            &
      &        n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_domain_FFTPACK)
         else
-          call rtp_domain_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd,  &
+          call rtp_domain_RFFTMF_to_send(sph_rtp, ncomp_fwd,            &
      &        n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_domain_FFTPACK)
         end if
 !
@@ -385,11 +385,11 @@
 #endif
       else
         if(sph_rtp%istep_rtp(3) .eq. 1) then
-          call prt_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd, n_WS,   &
-     &        v_rtp(1,1), WS(1), WK_FFTs%sph_FFTPACK)
+          call prt_RFFTMF_to_send(sph_rtp, ncomp_fwd, n_WS, v_rtp(1,1), &
+     &                            WS(1), WK_FFTs%sph_FFTPACK)
         else
-          call rtp_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd, n_WS,   &
-     &        v_rtp(1,1), WS(1), WK_FFTs%sph_FFTPACK)
+          call rtp_RFFTMF_to_send(sph_rtp, ncomp_fwd, n_WS, v_rtp(1,1), &
+     &                            WS(1), WK_FFTs%sph_FFTPACK)
         end if
       end if
 !

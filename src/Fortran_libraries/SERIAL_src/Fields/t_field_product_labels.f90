@@ -50,6 +50,12 @@
 !!   vgp_latitude             [i_vgp_latitude]:
 !!   vgp_longigude            [i_vgp_longigude]:
 !!
+!!   magnetic_dipole          [i_dipole_B]
+!!   current_for_dipole       [i_dipole_J]
+!!
+!!   Lorentz_force_dipole     [i_dipole_Lorentz]:
+!!   Lorentz_work_dipole      [i_dipole_ujb]:
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
 !!
@@ -134,6 +140,19 @@
         integer (kind=kint) :: i_vgp_latitude =       izero
 !>        start address for VGP longitude  @f$ \phi_{VGP} @f$
         integer (kind=kint) :: i_vgp_longigude =      izero
+!
+!
+!>        start address for dipole magnetic field @f$ B_{S1}^{0} @f$
+        integer (kind=kint) :: i_dipole_B =            izero
+!>        start address for toroidal dipole current @f$ J_{T1}^{0} @f$
+        integer (kind=kint) :: i_dipole_J =            izero
+!
+!>         start address force by dipole component
+!!             @f$ J_{1}^{0} \times B @f$
+        integer (kind=kint) :: i_dipole_Lorentz =      izero
+!>          start address of Work of Lorentz force by dipole component
+!!             @f$ u \cdot (J_{1}^{0} \times B) @f$
+        integer (kind=kint) :: i_dipole_ujb =          izero
       end type phys_products_address
 !
 ! ----------------------------------------------------------------------
@@ -215,6 +234,17 @@
           prod_fld%i_vgp_latitude = i_phys
         else if (field_name .eq. vgp_longigude%name) then
           prod_fld%i_vgp_longigude = i_phys
+!
+!
+        else if (field_name .eq. magnetic_dipole%name) then
+          prod_fld%i_dipole_B =    i_phys
+        else if (field_name .eq. current_for_dipole%name) then
+          prod_fld%i_dipole_J =    i_phys
+!
+        else if (field_name .eq. Lorentz_force_dipole%name) then
+          prod_fld%i_dipole_Lorentz = i_phys
+        else if (field_name .eq. Lorentz_work_dipole%name) then
+          prod_fld%i_dipole_ujb =     i_phys
         end if
       end if
 !

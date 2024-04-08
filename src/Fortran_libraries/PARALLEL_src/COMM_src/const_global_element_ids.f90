@@ -220,8 +220,8 @@
       use solver_SR_type
 !
       character(len=kchara), intent(in) :: txt
-      integer(kind = kint_gl), intent(in) :: inod_global(nele)
       integer(kind = kint), intent(in) :: nele, nnod_4_ele
+      integer(kind = kint_gl), intent(in) :: inod_global(nele)
       integer(kind = kint), intent(in) :: ie(nele,nnod_4_ele)
       integer(kind = kint_gl), intent(in) :: iele_global(nele)
       real(kind = kreal), intent(in)  :: x_ele(nele,3)

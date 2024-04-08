@@ -12,7 +12,7 @@
 !!     &          g_rj_11, n_point, d_rj, sq_r)
 !!      subroutine each_scalar_sph_spec(nri, jmax,                      &
 !!     &          idx_rj_degree_zero, inod_rj_center, radius_1d_rj_r,   &
-!!     &          g_sph_rj, n_point, d_rj, sq_rj)
+!!     &          g_sph_rj, n_point, d_rj1, d_rj2, sq_rj)
 !!        real(kind = kreal), intent(inout) :: sq_rj(0:nri,jmax)
 !!
 !!      subroutine one_mode_vector_mean_square(j, nri, jmax,            &
@@ -22,7 +22,7 @@
 !!     &          n_point, d_rj, sq_r)
 !!      subroutine each_vector_sph_spec(nri, jmax,                      &
 !!     &          idx_rj_degree_zero, inod_rj_center, a_r_1d_rj_r,      &
-!!     &          g_sph_rj, n_point, d_rj, sq_rj)
+!!     &          g_sph_rj, n_point, d_rj1, d_rj2, sq_rj)
 !!        real(kind = kreal), intent(inout) :: sq_rj(0:nri,jmax,3)
 !!
 !!      subroutine one_mode_mean_sq_to_energy(nri, ene_r)
@@ -77,14 +77,14 @@
 !
       subroutine each_scalar_sph_spec(nri, jmax,                        &
      &          idx_rj_degree_zero, inod_rj_center, radius_1d_rj_r,     &
-     &          g_sph_rj, n_point, d_rj, sq_rj)
+     &          g_sph_rj, n_point, d_rj1, d_rj2, sq_rj)
 !
       integer(kind = kint), intent(in) :: n_point, nri, jmax
       integer(kind = kint), intent(in) :: idx_rj_degree_zero
       integer(kind = kint), intent(in) :: inod_rj_center
       real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
       real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
-      real(kind = kreal), intent(in) :: d_rj(n_point)
+      real(kind = kreal), intent(in) :: d_rj1(n_point), d_rj2(n_point)
 !
       real(kind = kreal), intent(inout) :: sq_rj(0:nri,jmax)
 !
@@ -96,7 +96,7 @@
         sq_rj(0,j) = 0.0d0
         do k = 1, nri
           inod = j + (k-1) * jmax
-          sq_rj(k,j) = d_rj(inod)*d_rj(inod)*g_sph_rj(j,11)             &
+          sq_rj(k,j) = d_rj1(inod)*d_rj2(inod)*g_sph_rj(j,11)           &
      &         * radius_1d_rj_r(k) * radius_1d_rj_r(k)
         end do
       end do
@@ -104,7 +104,7 @@
 !
       if(inod_rj_center .eq. 0) return
       j = idx_rj_degree_zero
-      sq_rj(0,j) = d_rj(inod_rj_center)**2
+      sq_rj(0,j) = d_rj1(inod_rj_center) * d_rj2(inod_rj_center)
 !
       end subroutine each_scalar_sph_spec
 !
@@ -183,14 +183,15 @@
 !
       subroutine each_vector_sph_spec(nri, jmax,                        &
      &          idx_rj_degree_zero, inod_rj_center, a_r_1d_rj_r,        &
-     &          g_sph_rj, n_point, d_rj, sq_rj)
+     &          g_sph_rj, n_point, d_rj1, d_rj2, sq_rj)
 !
       integer(kind = kint), intent(in) :: n_point, nri, jmax
       integer(kind = kint), intent(in) :: idx_rj_degree_zero
       integer(kind = kint), intent(in) :: inod_rj_center
       real(kind = kreal), intent(in) :: a_r_1d_rj_r(nri)
       real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
-      real(kind = kreal), intent(in) :: d_rj(n_point,3)
+      real(kind = kreal), intent(in) :: d_rj1(n_point,3)
+      real(kind = kreal), intent(in) :: d_rj2(n_point,3)
 !
       real(kind = kreal), intent(inout) :: sq_rj(0:nri,jmax,3)
 !
@@ -204,9 +205,11 @@
         sq_rj(0,j,3) = 0.0d0
         do k = 1, nri
           inod = j + (k-1) * jmax
-          sq_rj(k,j,1) = g_sph_rj(j,12) * ( g_sph_rj(j,3)               &
-     &      * (a_r_1d_rj_r(k) * d_rj(inod,1))**2 + d_rj(inod,2)**2)
-          sq_rj(k,j,2) = g_sph_rj(j,12) * d_rj(inod,3)**2
+          sq_rj(k,j,1) = g_sph_rj(j,12)                                 &
+     &                 * (g_sph_rj(j,3) * a_r_1d_rj_r(k)**2             &
+     &                    * d_rj1(inod,1) * d_rj2(inod,1)               &
+     &                  + d_rj1(inod,2) * d_rj2(inod,2))
+sq_rj(k,j,2) = g_sph_rj(j,12) * d_rj1(inod,3) * d_rj2(inod,3)
           sq_rj(k,j,3) =  sq_rj(k,j,1) + sq_rj(k,j,2)
         end do
       end do
@@ -218,7 +221,8 @@
 !$omp parallel do private(k,inod)
       do k = 1, nri
         inod = idx_rj_degree_zero + (k-1) * jmax
-        sq_rj(k,j,1) = (half * d_rj(inod,1)* a_r_1d_rj_r(k))**2
+        sq_rj(k,j,1) = (half * a_r_1d_rj_r(k))**2                       &
+     &                * d_rj1(inod,1) * d_rj2(inod,1)
         sq_rj(k,j,2) = zero
         sq_rj(k,j,3) = sq_rj(k,j,1)
       end do
@@ -226,7 +230,8 @@
 !
       if(inod_rj_center .eq. 0) return
       j = idx_rj_degree_zero
-      sq_rj(0,j,1) = (half*d_rj(inod_rj_center,1))**2
+      sq_rj(0,j,1) = (half)**2 * d_rj1(inod_rj_center,1)                &
+     &                         * d_rj2(inod_rj_center,1) 
       sq_rj(0,j,2) = zero
       sq_rj(0,j,3) = sq_rj(0,j,1)
 !

@@ -32,6 +32,12 @@
 !!   y_magnetic_f              [i_magne_y]:
 !!   z_magnetic_f              [i_magne_z]:
 !!
+!!   temperature_from_CMB     [i_temp_from_CMB]
+!!   composition_from_CMB     [i_light_from_CMB]
+!!   entropy_from_CMB         [i_entropy_from_CMB]
+!!   density_from_CMB         [i_density_from_CMB]
+!!   aspherical_pressure      [i_asph_pressure]
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
 !!
@@ -82,6 +88,22 @@
 !>        Start address for x-component of magnetic field
 !!          @f$ B_{z} @f$
         integer (kind=kint) :: i_magne_z  =          izero
+!
+!>        start address for temperature from CMB average
+!!         @f$ T-|T(r_{o})| @f$
+        integer (kind=kint) :: i_temp_from_CMB =      izero
+!>        start address for light element from CMB average
+!!         @f$ C-|C(r_{o})| @f$
+        integer (kind=kint) :: i_light_from_CMB =      izero
+!>        start address for entropy from CMB average
+!!         @f$ S-|S(r_{o})| @f$
+        integer (kind=kint) :: i_entropy_from_CMB =    izero
+!>        start address for density from CMB average
+!!         @f$ \rho-|\rho(r_{o})| @f$
+        integer (kind=kint) :: i_density_from_CMB =    izero
+!>        start address for aspherical component of pressure
+!!         @f$ P-|\int P dS| @f$
+        integer (kind=kint) :: i_asph_pressure =       izero
       end type field_component_address
 !
 ! ----------------------------------------------------------------------
@@ -133,6 +155,18 @@
           fld_cmp%i_magne_y =      i_phys
         else if (field_name .eq. z_magnetic_f%name) then
           fld_cmp%i_magne_z =      i_phys
+!
+        else if (field_name .eq. temperature_from_CMB%name) then
+          fld_cmp%i_temp_from_CMB =    i_phys
+        else if (field_name .eq. composition_from_CMB%name) then
+          fld_cmp%i_light_from_CMB =   i_phys
+        else if (field_name .eq. entropy_from_CMB%name) then
+          fld_cmp%i_entropy_from_CMB = i_phys
+        else if (field_name .eq. density_from_CMB%name) then
+          fld_cmp%i_density_from_CMB = i_phys
+!
+        else if (field_name .eq. aspherical_pressure%name) then
+          fld_cmp%i_asph_pressure =    i_phys
         end if
       end if  
 !

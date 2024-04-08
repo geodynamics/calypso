@@ -65,6 +65,8 @@
       call alloc_volume_spectr_data(num_vspec, pwr)
       call set_ctl_params_base_vol_spectr(smonitor_ctl,                 &
      &                                    pwr%v_spectr(1))
+      call set_ctl_prm_base_vol_spectr(smonitor_ctl, pwr%v_spectr(1))
+!
       do inum = 1, smonitor_ctl%num_vspec_ctl
         call set_ctl_params_vol_sph_spectr(smonitor_ctl%v_pwr(inum),    &
      &                                     pwr%v_spectr(inum+1))

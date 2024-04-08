@@ -41,9 +41,9 @@
         integer(C_int) :: iflag_swap
 !
 !>        Size of decompressed buffer to binary IO
-        integer(C_int) :: len_buf
+        integer(C_long) :: len_buf
 !>        Actual size of compressed buffer to binary IO
-        integer(C_int) :: len_used
+        integer(C_long) :: len_used
 !
 !>        Pointer of decompressed text buffer
         character(C_char), pointer :: buf_p(:)

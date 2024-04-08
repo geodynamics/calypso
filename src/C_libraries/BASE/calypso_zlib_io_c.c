@@ -11,7 +11,7 @@
  message and exits the program. Zlib's error statuses are all less
  than zero. */
 
-static gzFile malloc_gzFile(){
+static gzFile malloc_gzFile(void){
 	gzFile file_gz = (gzFile) malloc(sizeof(gzFile));
 	if(file_gz == NULL){
 		printf("malloc error for gzFile structure\n");
@@ -73,7 +73,7 @@ int check_gzfile_eof_c(void *FP_gzip){
     return gzeof((gzFile) FP_gzip);
 }
 
-void write_compress_txt_c(void *FP_gzip, int *nchara, char *input_txt){
+void write_compress_txt_c(void *FP_gzip, const int nchara, char *input_txt){
 	int writelen, num_txt;
 	
 	num_txt = (int) strlen(input_txt);
@@ -82,7 +82,7 @@ void write_compress_txt_c(void *FP_gzip, int *nchara, char *input_txt){
 	num_txt = num_txt + 1;
 	/*
 	fprintf(stderr,"nchara: %d, num_txt %d,\n",
-			*nchara, num_txt);
+			nchara, num_txt);
 	*/
 	writelen = gzwrite((gzFile) FP_gzip, input_txt, num_txt);
 	if (writelen != num_txt) {
@@ -90,11 +90,11 @@ void write_compress_txt_c(void *FP_gzip, int *nchara, char *input_txt){
 		exit(1);
 	}
 	
-	/*memset(input_txt, '\0', *nchara*sizeof(char));*/
+	memset(input_txt, '\0', nchara*sizeof(char));
 	return;
 }
 
-void write_compress_txt_nolf_c(void *FP_gzip, int *nchara, char *input_txt){
+void write_compress_txt_nolf_c(void *FP_gzip, const int nchara, char *input_txt){
 	int writelen, num_txt;
 	
 	num_txt = (int) strlen(input_txt);
@@ -105,7 +105,7 @@ void write_compress_txt_nolf_c(void *FP_gzip, int *nchara, char *input_txt){
 		exit(1);
 	}
 	
-	memset(input_txt, '\0', sizeof(*nchara));
+	memset(input_txt, '\0', nchara*sizeof(char));
 	return;
 }
 
@@ -156,17 +156,17 @@ static int count_words(int nchara_l, const char *line_buf){
 }
 
 
-static void get_one_line_by_zlib(void *FP_gzip, int *num_buffer, int *num_word,
+static void get_one_line_by_zlib(void *FP_gzip, const int num_buffer, int *num_word,
 								 int *nchara, char *line_buf){
 	*nchara = 0;
-	gzgets(((gzFile) FP_gzip), line_buf, *num_buffer);
+	gzgets(((gzFile) FP_gzip), line_buf, num_buffer);
 	
-	*nchara = count_linechara(*num_buffer, line_buf);
+	*nchara = count_linechara(num_buffer, line_buf);
 	*num_word = count_words(*nchara, line_buf);
 	
 	/*
 	fprintf(stderr,"num_buffer: %d, nchar_line %d, num_word %d\n",
-			*num_buffer, *nchara, *num_word);
+			num_buffer, *nchara, *num_word);
 	*/
 	
 	if(*num_word == -1){
@@ -176,10 +176,10 @@ static void get_one_line_by_zlib(void *FP_gzip, int *num_buffer, int *num_word,
 	return;
 }
 
-void gzseek_go_fwd_c(void *FP_gzip, int *ioffset, int *ierr){
+int gzseek_go_fwd_c(void *FP_gzip, const int ioffset){
     z_off_t ierr_z;
-    ierr_z = gzseek((gzFile) FP_gzip, (z_off_t) *ioffset, SEEK_CUR);
-    *ierr =  (int)ierr_z;
+    ierr_z = gzseek((gzFile) FP_gzip, (z_off_t) ioffset, SEEK_CUR);
+    return (int)ierr_z;
 }
 
 int gztell_c(void *FP_gzip){
@@ -195,29 +195,28 @@ int gzoffset_c(void *FP_gzip){
 
 
 
-void gzread_32bit_c(void *FP_gzip, const int *iflag_swap,int *ilength,
-					char *textbuf, int *ierr){
-    *ierr =  gzread((gzFile) FP_gzip, textbuf, (uInt) *ilength);
-    *ierr = *ierr - *ilength;
-    if(*iflag_swap == IFLAG_SWAP) {byte_swap_4(*ilength, textbuf);};
-    return;
+int gzread_32bit_c(void *FP_gzip, const int iflag_swap, const int ilength,
+                   char *textbuf){
+    int ierr = gzread((gzFile) FP_gzip, textbuf, (unsigned int) ilength);
+    ierr = ierr - ilength;
+    if(iflag_swap == IFLAG_ON) {byte_swap_4((unsigned long) ilength, textbuf);};
+    return ierr;
 }
 
-void gzread_64bit_c(void *FP_gzip, const int *iflag_swap, int *ilength,
-                    char *textbuf, int *ierr){
-    *ierr =  gzread((gzFile) FP_gzip, textbuf, (uInt) *ilength);
-    *ierr = *ierr - *ilength;
-    if(*iflag_swap == IFLAG_SWAP) {byte_swap_8(*ilength, textbuf);};
-    return;
+int gzread_64bit_c(void *FP_gzip, const int iflag_swap, const int ilength,
+                   char *textbuf){
+    int ierr =  gzread((gzFile) FP_gzip, textbuf, (unsigned int) ilength);
+    ierr = ierr - ilength;
+    if(iflag_swap == IFLAG_ON) {byte_swap_8((unsigned long) ilength, textbuf);};
+    return ierr;
 }
 
-void gzwrite_c(void *FP_gzip, int *ilength, void *buf, int *ierr){
-    *ierr = gzwrite((gzFile) FP_gzip, buf, (uInt) *ilength);
-    *ierr = *ierr - *ilength;
-    return;
+int gzwrite_c(void *FP_gzip, const int ilength, void *buf){
+    int ierr = gzwrite((gzFile) FP_gzip, buf, (unsigned int) ilength);
+    return (ierr - ilength);
 }
 
-void get_one_line_from_gz_c(void *FP_gzip, int *num_buffer,
+void get_one_line_from_gz_c(void *FP_gzip, const int num_buffer,
 							int *num_word, int *nchara, char *line_buf){
 	get_one_line_by_zlib(FP_gzip, num_buffer, num_word, nchara, line_buf);
 	line_buf[*nchara-1] = ' ';
@@ -225,7 +224,7 @@ void get_one_line_from_gz_c(void *FP_gzip, int *num_buffer,
 	return;
 }
 
-int skip_comment_gz_c(void *FP_gzip, int *num_buffer, char *buf){
+int skip_comment_gz_c(void *FP_gzip, const int num_buffer, char *buf){
 	int nchara = 0, num_word = 0, icou = 0;
 	
     get_one_line_from_gz_c(FP_gzip, num_buffer, &num_word, &nchara, buf);

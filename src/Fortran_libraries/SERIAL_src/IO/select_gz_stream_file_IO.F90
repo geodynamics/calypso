@@ -143,6 +143,7 @@
 !
       call check_gzip_or_ascii_file                                     &
      &   (base_name, file_name, flag_gzip, flag_miss)
+!      write(*,*) 'check_gzip_or_ascii_file', flag_gzip
       if(flag_miss) return
 !
       call alloc_fixbuffer_for_zlib(zbuf)

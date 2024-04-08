@@ -196,6 +196,18 @@
      & .or. check_field_list_ctl(z_magnetic_f, field_ctl))              &
      &  call add_phys_name_ctl(magnetic_field, field_ctl)
 !
+      if(      check_field_list_ctl(temperature_from_CMB, field_ctl))   &
+     &   call add_phys_name_ctl(temperature, field_ctl)
+      if(      check_field_list_ctl(composition_from_CMB, field_ctl))   &
+     &   call add_phys_name_ctl(composition, field_ctl)
+      if(      check_field_list_ctl(density_from_CMB, field_ctl))       &
+     &   call add_phys_name_ctl(density, field_ctl)
+      if(      check_field_list_ctl(entropy_from_CMB, field_ctl))       &
+     &   call add_phys_name_ctl(entropy, field_ctl)
+!
+      if(check_field_list_ctl(aspherical_pressure, field_ctl))          &
+     &    call add_phys_name_ctl(pressure, field_ctl)
+!
       end subroutine add_field_ctl_4_field_comps
 !
 ! -----------------------------------------------------------------------

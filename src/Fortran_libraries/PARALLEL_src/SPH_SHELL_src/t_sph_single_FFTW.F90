@@ -111,6 +111,8 @@
       end type work_for_sgl_FFTW
 !
       private :: alloc_FFTW_plan
+      private :: copy_single_FFTW_to_send
+      private :: copy_single_FFTW_from_recv
 !
 ! ------------------------------------------------------------------
 !
@@ -235,9 +237,8 @@
 !
 !   normalization
             if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
-            call copy_single_FFTW_to_send                               &
-     &         (nd, j, sph_rtp%nnod_rtp, comm_rtp%irev_sr,              &
-     &          sph_rtp%istack_rtp_rt_smp(np_smp), ncomp_fwd,           &
+            call copy_single_FFTW_to_send(nd, j, sph_rtp%nnod_rtp,      &
+     &          sph_rtp%istep_rtp, comm_rtp%irev_sr, ncomp_fwd,         &
      &          FFTW_t%Nfft_c, FFTW_t%C(1,ip), FFTW_t%aNfft, n_WS, WS)
             if(iflag_FFT_time) FFTW_t%t_omp(ip,3)= FFTW_t%t_omp(ip,3)   &
      &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
@@ -289,9 +290,8 @@
           do j = ist, ied
 !
             if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
-            call copy_single_FFTW_from_recv                             &
-     &         (nd, j, sph_rtp%nnod_rtp, comm_rtp%irev_sr,              &
-     &          sph_rtp%istack_rtp_rt_smp(np_smp), ncomp_bwd,           &
+            call copy_single_FFTW_from_recv(nd, j, sph_rtp%nnod_rtp,    &
+     &          sph_rtp%istep_rtp, comm_rtp%irev_sr, ncomp_bwd,         &
      &          n_WR, WR, FFTW_t%Nfft_c, FFTW_t%C(1,ip))
             if(iflag_FFT_time) FFTW_t%t_omp(ip,1)= FFTW_t%t_omp(ip,1)   &
      &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
@@ -382,11 +382,11 @@
 ! ------------------------------------------------------------------
 !
       subroutine copy_single_FFTW_to_send                               &
-     &         (nd, j, nnod_rtp, irev_sr_rtp, nnod_rt, &
+     &         (nd, j, nnod_rtp, istep_rtp, irev_sr_rtp,                &
      &          ncomp_fwd, Nfft_c, C_fft, aNfft, n_WS, WS)
 !
       integer(kind = kint), intent(in) :: nd, j
-      integer(kind = kint), intent(in) :: nnod_rtp, nnod_rt
+      integer(kind = kint), intent(in) :: nnod_rtp, istep_rtp(3)
 !
       integer(kind = kint), intent(in) :: ncomp_fwd
       integer(kind = kint), intent(in) :: Nfft_c
@@ -397,20 +397,22 @@
       integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
       real (kind = kreal), intent(inout):: WS(n_WS)
 !
-      integer(kind = kint) :: m, ic_rtp, is_rtp, ic_send, is_send
+      integer(kind = kint) :: m, j0_rtp, ic_rtp, is_rtp
+      integer(kind = kint) :: ic_send, is_send
 !
 !
-      ic_send = nd + (irev_sr_rtp(j) - 1) * ncomp_fwd
+      j0_rtp = 1 + (j-1) * istep_rtp(1)
+      ic_send = nd + (irev_sr_rtp(j0_rtp) - 1) * ncomp_fwd
       WS(ic_send) = aNfft * real(C_fft(1))
       do m = 2, Nfft_c-1
-        ic_rtp = j + (2*m-2) * nnod_rt
-        is_rtp = j + (2*m-1) * nnod_rt
+        ic_rtp = j0_rtp + (2*m-2) * istep_rtp(3)
+        is_rtp = j0_rtp + (2*m-1) * istep_rtp(3)
         ic_send = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_fwd
         is_send = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp_fwd
         WS(ic_send) = two*aNfft * real(C_fft(m))
         WS(is_send) = two*aNfft * real(C_fft(m)*iu)
       end do 
-      ic_rtp = j + nnod_rt
+      ic_rtp = j0_rtp + istep_rtp(3)
       ic_send = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_fwd
       WS(ic_send) = two*aNfft * real(C_fft(Nfft_c))
 !
@@ -419,11 +421,11 @@
 ! ------------------------------------------------------------------
 !
       subroutine copy_single_FFTW_from_recv                           &
-     &         (nd, j, nnod_rtp, irev_sr_rtp, nnod_rt, &
+     &         (nd, j, nnod_rtp, istep_rtp, irev_sr_rtp,              &
      &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
 !
       integer(kind = kint), intent(in) :: nd, j
-      integer(kind = kint), intent(in) :: nnod_rtp, nnod_rt
+      integer(kind = kint), intent(in) :: nnod_rtp, istep_rtp(3)
 !
       integer(kind = kint), intent(in) :: ncomp_bwd
       integer(kind = kint), intent(in) :: n_WR
@@ -433,19 +435,21 @@
       integer(kind = kint), intent(in) :: Nfft_c
       complex(kind = fftw_complex), intent(inout) :: C_fft(Nfft_c)
 !
-      integer(kind = kint) :: m, ic_rtp, is_rtp, ic_recv, is_recv
+      integer(kind = kint) :: m, j0_rtp, ic_rtp, is_rtp
+      integer(kind = kint) :: ic_recv, is_recv
 !
 !
-      ic_recv = nd + (irev_sr_rtp(j) - 1) * ncomp_bwd
+      j0_rtp = 1 + (j-1) * istep_rtp(1)
+      ic_recv = nd + (irev_sr_rtp(j0_rtp) - 1) * ncomp_bwd
       C_fft(1) = cmplx(WR(ic_recv), zero, kind(0d0))
       do m = 2, Nfft_c-1
-        ic_rtp = j + (2*m-2) * nnod_rt
-        is_rtp = j + (2*m-1) * nnod_rt
+        ic_rtp = j0_rtp + (2*m-2) * istep_rtp(3)
+        is_rtp = j0_rtp + (2*m-1) * istep_rtp(3)
         ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
         is_recv = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp_bwd
         C_fft(m) = half * cmplx(WR(ic_recv), -WR(is_recv),kind(0d0))
       end do
-      ic_rtp = j + nnod_rt
+      ic_rtp = j0_rtp + istep_rtp(3)
       ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
       C_fft(Nfft_c) = half * cmplx(WR(ic_recv), zero, kind(0d0))
 !

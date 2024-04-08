@@ -244,7 +244,7 @@
       else if(cmp_no_case(FFT_library_ctl, hd_FFT_TEST)) then
         iflag = iflag_FFT_TEST
 !
-      else if(cmp_no_case(FFT_library_ctl, hd_FFTPACK_O)                &
+      else if(cmp_no_case(FFT_library_ctl, hd_FFTPACK_S)                &
      &     .or. cmp_no_case(FFT_library_ctl, hd_FFTPACK)) then
         iflag = iflag_FFTPACK_SINGLE
       end if

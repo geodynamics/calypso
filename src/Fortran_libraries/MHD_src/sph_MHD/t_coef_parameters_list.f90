@@ -105,20 +105,9 @@
 !
       type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
-      integer (kind = kint) :: i
-!
-!
 !   set dimensionless numbers
 !
       call set_dimensionless_numbers(dless_ctl, MHD_coef_list)
-!
-      if (iflag_debug .ge. iflag_routine_msg) then
-        write(*,*) 'num_dimless ', MHD_coef_list%dimless_list%num
-        do i = 1, MHD_coef_list%dimless_list%num
-          write(*,*) i, trim(MHD_coef_list%dimless_list%name(i)),       &
-     &              ': ', MHD_coef_list%dimless_list%value(i)
-        end do
-      end if
 !
 !    set normalization for thermal
 !

@@ -50,11 +50,12 @@
 #define OUTBUFSIZ  65536         /* buffer size for output data（arbitraly） */
 #define EPSILON  1.e-9
 
-#define IFLAG_SWAP  1
-
 #define RGBA_COLOR   1
 #define RGB_COLOR    0
 #define BW_ALPHA    11
 #define B_AND_W     10
+
+#define IFLAG_OFF  0
+#define IFLAG_ON   1
 
 #endif

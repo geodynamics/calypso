@@ -24,9 +24,6 @@
 !!      subroutine rawwrite_int4_f(num, int4_dat, bbuf)
 !!      subroutine rawwrite_chara_f(len_buf, textbuf, bbuf)
 !!        type(binary_IO_buffer), intent(inout) :: bbuf
-!!
-!!      subroutine rawseek_go_fwd(ioffset, bbuf)
-!!        type(binary_IO_buffer), intent(inout) :: bbuf
 !!@endverbatim
 !
       module binary_file_access
@@ -72,40 +69,40 @@
 !
 !  -----------------
 !
-        subroutine rawread_32bit(iflag_swap, ilength, buf, ilen_read)   &
-     &            BIND(C, name = 'rawread_32bit')
+        integer(C_long) function  rawread_32bit                         &
+     &                (iflag_swap, ilength, buf)                        &
+     &                 BIND(C, name = 'rawread_32bit')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: iflag_swap, ilength
+          integer(C_int), value :: iflag_swap
+          integer(C_long), value :: ilength
           type(C_ptr), value, intent(in) :: buf
-          integer(C_int), intent(inout) :: ilen_read
-        end subroutine rawread_32bit
+        end function rawread_32bit
 !  -----------------
-        subroutine rawread_64bit(iflag_swap, ilength, buf, ilen_read)   &
-     &            BIND(C, name = 'rawread_64bit')
+        integer(C_long) function rawread_64bit                          &
+     &                (iflag_swap, ilength, buf)                        &
+     &                 BIND(C, name = 'rawread_64bit')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: iflag_swap, ilength
+          integer(C_int), value :: iflag_swap
+          integer(C_long), value :: ilength
           type(C_ptr), value, intent(in) :: buf
-          integer(C_int), intent(inout) :: ilen_read
-        end subroutine rawread_64bit
+        end function rawread_64bit
 !  -----------------
-        subroutine rawwrite(ilength, buf, ilen_read)                    &
+        integer(C_long) function rawwrite(ilength, buf)                 &
      &            BIND(C, name = 'rawwrite')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: ilength
+          integer(C_long), value :: ilength
           type(C_ptr), value, intent(in) :: buf
-          integer(C_int), intent(inout) :: ilen_read
-        end subroutine rawwrite
+        end function rawwrite
 !  -----------------
-        subroutine rawseek_go_fwd(ioffset, ierr)                        &
+        integer(C_int) function  rawseek_go_fwd(ioffset)                &
      &            BIND(C, name = 'rawseek_go_fwd')
           use ISO_C_BINDING
 !
-          integer(C_int), intent(in) :: ioffset
-          integer(C_int), intent(inout) :: ierr
-        end subroutine rawseek_go_fwd
+          integer(C_long), value :: ioffset
+        end function rawseek_go_fwd
 !  -----------------
       end interface
 !
@@ -185,8 +182,8 @@
 !
 !
       call link_real_buffer_for_bin(num, data, bbuf)
-      call rawread_64bit(bbuf%iflag_swap,                               &
-     &    bbuf%len_buf, C_LOC(bbuf%dat_p(1)), bbuf%len_used)
+      bbuf%len_used = rawread_64bit(bbuf%iflag_swap, bbuf%len_buf,      &
+     &                              C_LOC(bbuf%dat_p(1)))
       call unlink_real_buffer_for_bin(bbuf)
 !
       end subroutine rawread_real_f
@@ -202,8 +199,8 @@
 !
 !
       call link_int8_buffer_for_bin(num, int8_dat, bbuf)
-      call rawread_64bit(bbuf%iflag_swap,                               &
-     &    bbuf%len_buf , C_LOC(bbuf%idat8_p(1)), bbuf%len_used)
+      bbuf%len_used = rawread_64bit(bbuf%iflag_swap, bbuf%len_buf,      &
+     &                              C_LOC(bbuf%idat8_p(1)))
       call unlink_int8_buffer_for_bin(bbuf)
 !
       end subroutine rawread_int8_f
@@ -219,10 +216,10 @@
 !
 !
       call link_int4_buffer_for_bin(num, int4_dat, bbuf)
-      call rawread_32bit(bbuf%iflag_swap,                               &
-     &    bbuf%len_buf, C_LOC(bbuf%idat4_p(1)), bbuf%len_used)
+      bbuf%len_used = rawread_32bit(bbuf%iflag_swap, bbuf%len_buf,      &
+     &                              C_LOC(bbuf%idat4_p(1)))
       call unlink_int4_buffer_for_bin(bbuf)
-      bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
+      bbuf%ierr_bin = int(bbuf%len_buf - bbuf%len_used)
 !
       end subroutine rawread_int4_f
 !
@@ -240,10 +237,10 @@
       integer(C_int), parameter :: iflag_noswap = iendian_KEEP
 !
       call link_text_buffer_for_bin(len_buf, textbuf, bbuf)
-      call rawread_32bit(iflag_noswap,                                  &
-     &    bbuf%len_buf, C_LOC(bbuf%buf_p(1)), bbuf%len_used)
+      bbuf%len_used = rawread_32bit(iflag_noswap, bbuf%len_buf,         &
+     &                              C_LOC(bbuf%buf_p(1)))
       call unlink_text_buffer_for_bin(bbuf)
-      bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
+      bbuf%ierr_bin = int(bbuf%len_buf - bbuf%len_used)
 !
       end subroutine rawread_chara_f
 !
@@ -259,9 +256,9 @@
 !
 !
       call link_real_buffer_for_bin(num, data, bbuf)
-      call rawwrite(bbuf%len_buf, C_LOC(bbuf%dat_p(1)), bbuf%len_used)
+      bbuf%len_used = rawwrite(bbuf%len_buf, C_LOC(bbuf%dat_p(1)))
       call unlink_real_buffer_for_bin(bbuf)
-      bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
+      bbuf%ierr_bin = int(bbuf%len_buf - bbuf%len_used)
 !
       end subroutine rawwrite_real_f
 !
@@ -276,10 +273,9 @@
 !
 !
       call link_int8_buffer_for_bin(num, int8_dat, bbuf)
-      call rawwrite                                                     &
-     &   (bbuf%len_buf, C_LOC(bbuf%idat8_p(1)), bbuf%len_used)
+      bbuf%len_used =  rawwrite(bbuf%len_buf, C_LOC(bbuf%idat8_p(1)))
       call unlink_int8_buffer_for_bin(bbuf)
-      bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
+      bbuf%ierr_bin = int(bbuf%len_buf - bbuf%len_used)
 !
       end subroutine rawwrite_int8_f
 !
@@ -294,10 +290,9 @@
 !
 !
       call link_int4_buffer_for_bin(num, int4_dat, bbuf)
-      call rawwrite                                                     &
-     &   (bbuf%len_buf, C_LOC(bbuf%idat4_p(1)), bbuf%len_used)
+      bbuf%len_used = rawwrite(bbuf%len_buf, C_LOC(bbuf%idat4_p(1)))
       call unlink_int4_buffer_for_bin(bbuf)
-      bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
+      bbuf%ierr_bin = int(bbuf%len_buf - bbuf%len_used)
 !
       end subroutine rawwrite_int4_f
 !
@@ -312,9 +307,9 @@
 !
 !
       call link_text_buffer_for_bin(len_buf, textbuf, bbuf)
-      call rawwrite(bbuf%len_buf , C_LOC(bbuf%buf_p(1)), bbuf%len_used)
+      bbuf%len_used = rawwrite(bbuf%len_buf, C_LOC(bbuf%buf_p(1)))
       call unlink_text_buffer_for_bin(bbuf)
-      bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
+      bbuf%ierr_bin = int(bbuf%len_buf - bbuf%len_used)
 !
       end subroutine rawwrite_chara_f
 !
@@ -329,7 +324,7 @@
 !
 !
       bbuf%len_buf = int(ioffset,KIND(bbuf%len_buf))
-      call rawseek_go_fwd(bbuf%len_buf, bbuf%ierr_bin)
+      bbuf%ierr_bin = rawseek_go_fwd(bbuf%len_buf)
 !
       end subroutine rawseek_go_fwd_f
 !

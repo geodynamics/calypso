@@ -287,9 +287,9 @@
       do mphi = 1, sph%sph_rtp%nidx_rtp(3)
         do lth = 1, sph%sph_rtp%nidx_rtp(2)
           do kr = 1, sph%sph_rtp%nidx_rtp(1)
-            inod = kr + sph%sph_rtp%nidx_rtp(1) * (lth - 1)             &
-     &                + sph%sph_rtp%nidx_rtp(1)                         &
-     &                 * sph%sph_rtp%nidx_rtp(2) * (mphi - 1)
+            inod = 1 + sph%sph_rtp%istep_rtp(1) * (kr - 1)              &
+     &               + sph%sph_rtp%istep_rtp(2) * (lth - 1)             &
+     &               + sph%sph_rtp%istep_rtp(3) * (mphi - 1)
             if(   idx_rtp_recieve(inod,1) .eq. 0                        &
      &       .or. idx_rtp_recieve(inod,2) .eq. 0                        &
      &       .or. idx_rtp_recieve(inod,3) .eq. 0) then
@@ -315,9 +315,9 @@
       do mphi = 1, sph%sph_rtm%nidx_rtm(3)
         do kr = 1, sph%sph_rtm%nidx_rtm(1)
           do lth = 1, sph%sph_rtm%nidx_rtm(2)
-            inod =  lth + (kr-1) * sph%sph_rtm%nidx_rtm(2)              &
-     &                  + (mphi-1) * sph%sph_rtm%nidx_rtm(1)            &
-     &                             * sph%sph_rtm%nidx_rtm(2)
+            inod =  1 + (kr-1) *   sph%sph_rtm%istep_rtm(1)             &
+&                     + (lth-1) *  sph%sph_rtm%istep_rtm(2)             &
+     &                + (mphi-1) * sph%sph_rtm%istep_rtm(3)
             if(   idx_rtm_recieve(inod,1) .eq. 0                        &
      &       .or. idx_rtm_recieve(inod,2) .eq. 0                        &
      &       .or. idx_rtm_recieve(inod,3) .eq. 0) then
@@ -337,7 +337,8 @@
      &     'local_id, global_r, global_j, global_r, global_l, global_m'
       do kr = 1, sph%sph_rlm%nidx_rlm(1)
         do j = 1, sph%sph_rlm%nidx_rlm(2)
-          inod = j + (kr-1) * sph%sph_rlm%nidx_rlm(2)
+          inod = 1 + (kr-1) * sph%sph_rlm%istep_rlm(1)                  &
+     &             + (j-1) *  sph%sph_rlm%istep_rlm(2)
           if(      idx_rlm_recieve(inod,1) .lt. 0                       &
      &        .or. idx_rlm_recieve(inod,2) .lt. 0) then
               write(id_file,'(4i16,6i5)') inod,                         &
@@ -354,7 +355,8 @@
      &     'local_id, global_r, global_j, global_r, global_l, global_m'
       do kr = 1, sph%sph_rj%nidx_rj(1)
         do j = 1, sph%sph_rj%nidx_rj(2)
-          inod = j + (kr-1) * sph%sph_rj%nidx_rj(2)
+          inod = 1 + (kr-1) * sph%sph_rj%istep_rj(1)                    &
+     &             + (j-1) *  sph%sph_rj%istep_rj(2)
           if(      idx_rj_recieve(inod,1) .lt. 0                        &
      &        .or. idx_rj_recieve(inod,2) .lt. 0) then
               write(id_file,'(4i16,6i5)') inod,                         &

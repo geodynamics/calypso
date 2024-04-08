@@ -24,6 +24,7 @@
 !!  begin sph_monitor_ctl
 !!    volume_average_prefix        'sph_ave_volume'
 !!    volume_pwr_spectr_prefix     'sph_pwr_volume'
+!!    volume_work_spectr_prefix    'sph_work_convective'
 !!    volume_pwr_spectr_format     'gzip'
 !!
 !!    degree_spectra_switch         'On'
@@ -121,11 +122,13 @@
 !>        Structure for dipolarity setting
         type(sph_dipolarity_control) :: fdip_ctl
 !
-!>        Structure for volume average file prefix
-        type(read_character_item) :: volume_average_prefix
-!
 !>        Structure for volume spectrum file prefix
         type(read_character_item) :: volume_pwr_spectr_prefix
+!>        Structure for volume average file prefix
+        type(read_character_item) :: volume_average_prefix
+!>        Structure for volume average of work of Lorentz force file prefix
+        type(read_character_item) :: volume_work_spectr_prefix
+!
 !>        Structure for volume spectrum file format
         type(read_character_item) :: volume_pwr_spectr_format
 !
@@ -178,9 +181,10 @@
       call reset_ctl_data_dynamobench(smonitor_ctl%dbench_ctl)
       call dealloc_sph_dipolarity_ctl(smonitor_ctl%fdip_ctl)
 !
-      smonitor_ctl%volume_average_prefix%iflag =     0
-      smonitor_ctl%volume_pwr_spectr_prefix%iflag =  0
-      smonitor_ctl%volume_pwr_spectr_format%iflag =  0
+      smonitor_ctl%volume_average_prefix%iflag =         0
+      smonitor_ctl%volume_pwr_spectr_prefix%iflag =      0
+      smonitor_ctl%volume_work_spectr_prefix%iflag =     0
+      smonitor_ctl%volume_pwr_spectr_format%iflag =      0
 !
       smonitor_ctl%degree_v_spectra_switch%iflag =   0
       smonitor_ctl%order_v_spectra_switch%iflag =    0
@@ -222,8 +226,6 @@
       subroutine alloc_data_on_circles_ctl(smonitor_ctl)
 !
       type(sph_monitor_control), intent(inout) :: smonitor_ctl
-      integer(kind = kint) :: i
-!
 !
       allocate(smonitor_ctl%meq_ctl(smonitor_ctl%num_circ_ctl))
 !

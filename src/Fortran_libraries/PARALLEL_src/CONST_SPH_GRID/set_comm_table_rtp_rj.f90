@@ -95,6 +95,7 @@
       use copy_sph_1d_global_index
       use set_local_sphere_param
       use set_local_sphere_by_global
+      use set_loaded_data_4_sph
 !
       integer, intent(in) :: id_rank
       integer, intent(in) :: num_pe
@@ -124,6 +125,8 @@
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                 'set_global_sph_rj_id', id_rank
       call set_global_sph_rj_id(sph_rj)
+      call count_interval_4_each_dir(itwo, sph_rj%nnod_rj,              &
+     &    sph_rj%idx_global_rj, sph_rj%istep_rj)
 !
       if(iflag_debug .gt. 0) then
         call check_spheric_param_rj(id_rank, sph_rj)
@@ -152,6 +155,7 @@
       use copy_sph_1d_global_index
       use set_local_sphere_param
       use set_local_sphere_by_global
+      use set_loaded_data_4_sph
 !
       integer, intent(in) :: id_rank
       integer, intent(in) :: num_pe
@@ -185,6 +189,8 @@
      &                 'set_global_sph_prt_id', id_rank
         call set_global_sph_prt_id(sph_rtp)
       end if
+      call count_interval_4_each_dir(ithree, sph_rtp%nnod_rtp,          &
+     &    sph_rtp%idx_global_rtp, sph_rtp%istep_rtp)
 !
       if(iflag_debug .gt. 0) then
         write(*,*) 'check_spheric_param_rtp', id_rank
@@ -265,7 +271,7 @@
 !
       call allocate_domain_sr_tmp(num_pe)
 !
-      call count_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,   &
+      call count_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,        &
      &    comm_rtp%nneib_domain)
 !
       call alloc_sph_comm_stack(comm_rtp)
@@ -376,11 +382,11 @@
         end do
         if(iflag_jp .eq. 0) cycle
 !
-        sph_rlm_lc%nidx_rlm(1) = 17
-        sph_rlm_lc%nidx_rlm(2) = 16384
-        call alloc_sph_1d_index_rlm(sph_rlm_lc)
+!        sph_rlm_lc%nidx_rlm(1) = 17
+!        sph_rlm_lc%nidx_rlm(2) = 16384
+!        call alloc_sph_1d_index_rlm(sph_rlm_lc)
 !      if(id_rank .eq. 0) write(*,*) 'nidx_rlm', sph_rlm_lc%nidx_rlm(:)
-        call dealloc_sph_1d_index_rlm(sph_rlm_lc)
+!        call dealloc_sph_1d_index_rlm(sph_rlm_lc)
 !
         call const_sph_rlm_modes(id_org_rank, gen_sph,                  &
      &                           sph_rlm_lc, comm_rlm_lc)
@@ -394,8 +400,8 @@
           j_glb = sph_rlm_lc%idx_global_rlm(jnod,2)
           k_tmp = sph_lcx_rj%idx_local_rj_r(k_glb)
           j_tmp = sph_lcx_rj%idx_local_rj_j(j_glb)
-          comm_rj%item_sr(icou) =  j_tmp                                &
-     &                           + (k_tmp-1) * sph_rj%nidx_rj(2)
+          comm_rj%item_sr(icou) =  1 + (k_tmp-1) * sph_rj%istep_rj(1)   &
+     &                               + (j_tmp-1) * sph_rj%istep_rj(2)
         end do
 !
         call dealloc_sph_comm_item(comm_rlm_lc)
@@ -506,10 +512,9 @@
           k_tmp = sph_lcx_rtp%idx_local_rtp_r(k_glb)
           l_tmp = sph_lcx_rtp%idx_local_rtp_t(l_glb)
           m_tmp = sph_lcx_rtp%idx_local_rtp_p(m_glb)
-          comm_rtp%item_sr(icou) =  k_tmp                               &
-     &                             + (l_tmp-1) * sph_rtp%nidx_rtp(1)    &
-     &                             + (m_tmp-1) * sph_rtp%nidx_rtp(1)    &
-     &                                         * sph_rtp%nidx_rtp(2)
+          comm_rtp%item_sr(icou) = 1 + (k_tmp-1) * sph_rtp%istep_rtp(1)  &
+     &                               + (l_tmp-1) * sph_rtp%istep_rtp(2)  &
+     &                               + (m_tmp-1) * sph_rtp%istep_rtp(3)
         end do
 !
         call dealloc_sph_comm_item(comm_rtm_lc)
