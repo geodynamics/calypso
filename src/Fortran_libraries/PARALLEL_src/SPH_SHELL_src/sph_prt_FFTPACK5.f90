@@ -157,6 +157,7 @@
       subroutine prt_RFFTMF_to_send                                     &
      &         (sph_rtp, ncomp_fwd, n_WS, X_rtp, WS, fftpack_t)
 !
+      use copy_field_smp
       use copy_rtp_data_to_FFTPACK
       use set_comm_table_prt_FFTPACK
 !
@@ -177,7 +178,9 @@
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+4)
       nsize = ncomp_fwd * sph_rtp%nnod_rtp
-      call copy_FFTPACK_to_prt_comp(nsize, X_rtp(1,1), fftpack_t%X(1))
+!$omp parallel
+      call copy_nod_scalar_smp(nsize, X_rtp(1,1), fftpack_t%X(1))
+!$omp end parallel
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+4)
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+5)
@@ -208,6 +211,7 @@
       subroutine prt_RFFTMB_from_recv(sph_rtp, comm_rtp, ncomp_bwd,     &
      &                                n_WR, WR, X_rtp, fftpack_t)
 !
+      use copy_field_smp
       use copy_rtp_data_to_FFTPACK
       use set_comm_table_prt_FFTPACK
 !
@@ -251,8 +255,10 @@
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+3)
       nsize = ncomp_bwd * sph_rtp%nnod_rtp
-      call copy_FFTPACK_to_prt_comp(nsize, fftpack_t%X(1), X_rtp(1,1))
-        if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+3)
+!$omp parallel
+      call copy_nod_scalar_smp(nsize, fftpack_t%X(1), X_rtp(1,1))
+!$omp end parallel
+      if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+3)
 !
       end subroutine prt_RFFTMB_from_recv
 !

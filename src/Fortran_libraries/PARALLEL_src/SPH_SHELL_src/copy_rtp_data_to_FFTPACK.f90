@@ -16,13 +16,6 @@
 !!     &          irt_rtp_smp_stack, X_FFT, X_rtp)
 !!      subroutine copy_FFTPACK_from_rtp_comp(nnod_rtp, nidx_rtp,       &
 !!     &          irt_rtp_smp_stack, X_rtp, X_FFT)
-!!
-!!      subroutine copy_FFTPACK_to_prt_field                            &
-!!     &         (nnod_rtp, ncomp_bwd, X_FFT, X_prt)
-!!      subroutine copy_FFTPACK_from_prt_field                          &
-!!     &         (nnod_rtp, ncomp_fwd, X_prt, X_FFT)
-!!
-!!      subroutine copy_FFTPACK_to_prt_comp(nnod_rtp, X_prt, X_FFT)
 !!@endverbatim
 !!
       module copy_rtp_data_to_FFTPACK
@@ -128,20 +121,18 @@
      &     :: X_rtp(irt_rtp_smp_stack(np_smp),nidx_rtp(3))
 !
 !
-      integer(kind = kint) :: m, j, ip, ist, num
+      integer(kind = kint) :: m, ip, ist, num
       integer(kind = kint) :: inod_c, ist_fft
 !
 !
-!$omp parallel do private(ip,m,j,ist,num,inod_c,ist_fft)
+!$omp parallel do private(ip,m,ist,num,inod_c,ist_fft)
       do ip = 1, np_smp
         ist = irt_rtp_smp_stack(ip-1)
         num = irt_rtp_smp_stack(ip) - irt_rtp_smp_stack(ip-1)
         ist_fft = irt_rtp_smp_stack(ip-1) * nidx_rtp(3)
         do m = 1, nidx_rtp(3)
           inod_c = (m-1)*num + ist_fft
-          do j = 1, num
-            X_rtp(j+ist,m) = X_FFT(j+inod_c)
-          end do
+          X_rtp(1+ist:num+ist,m) = X_FFT(1+inod_c:num+inod_c)
         end do
       end do
 !$omp end parallel do
@@ -162,11 +153,11 @@
 !
       real(kind = kreal), intent(inout) :: X_FFT(nnod_rtp)
 !
-      integer(kind = kint) :: m, j, ip, ist, num
+      integer(kind = kint) :: m, ip, ist, num
       integer(kind = kint) :: inod_c, ist_fft
 !
 !
-!$omp parallel do private(m,j,ist,num,inod_c,ist_fft)
+!$omp parallel do private(m,ist,num,inod_c,ist_fft)
       do ip = 1, np_smp
         ist = irt_rtp_smp_stack(ip-1)
         num =  irt_rtp_smp_stack(ip) - irt_rtp_smp_stack(ip-1)
@@ -174,82 +165,12 @@
 !
         do m = 1, nidx_rtp(3)
           inod_c = (m-1)*num + ist_fft
-          do j = 1, num
-            X_FFT(j+inod_c) = X_rtp(j+ist,m)
-          end do
+          X_FFT(1+inod_c:num+inod_c) = X_rtp(1+ist:num+ist,m)
         end do
       end do
 !$omp end parallel do
 !
       end subroutine copy_FFTPACK_from_rtp_comp
-!
-! ------------------------------------------------------------------
-! ------------------------------------------------------------------
-!
-      subroutine copy_FFTPACK_to_prt_field                              &
-     &         (nnod_rtp, ncomp_bwd, X_FFT, X_prt)
-!
-      integer(kind = kint), intent(in) :: nnod_rtp
-!
-      integer(kind = kint), intent(in) :: ncomp_bwd
-      real(kind = kreal), intent(in) :: X_FFT(ncomp_bwd*nnod_rtp)
-!
-      real(kind = kreal), intent(inout) :: X_prt(nnod_rtp,ncomp_bwd)
-!
-      integer(kind = kint) :: nd, inod_c, inod
-!
-!
-!$omp parallel do private(inod,nd,inod_c)
-      do inod = 1, nnod_rtp
-        do nd = 1, ncomp_bwd
-          inod_c = nd + (inod-1) * ncomp_bwd
-          X_prt(inod_c,nd) = X_FFT(inod_c)
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine copy_FFTPACK_to_prt_field
-!
-! ------------------------------------------------------------------
-!
-      subroutine copy_FFTPACK_from_prt_field                            &
-     &         (nnod_rtp, ncomp_fwd, X_prt, X_FFT)
-!
-      integer(kind = kint), intent(in) :: nnod_rtp
-!
-      integer(kind = kint), intent(in) :: ncomp_fwd
-      real(kind = kreal), intent(in) :: X_prt(nnod_rtp,ncomp_fwd)
-!
-      real(kind = kreal), intent(inout) :: X_FFT(ncomp_fwd*nnod_rtp)
-!
-      integer(kind = kint) :: inod, inod_c
-!
-!
-!$omp parallel do private(inod,inod_c)
-      do inod = 1, nnod_rtp
-        inod_c = (inod-1) * ncomp_fwd
-        X_FFT(inod_c+1:inod_c+ncomp_fwd) = X_prt(inod,1:ncomp_fwd)
-      end do
-!$omp end parallel do
-!
-      end subroutine copy_FFTPACK_from_prt_field
-!
-! ------------------------------------------------------------------
-! ------------------------------------------------------------------
-!
-      subroutine copy_FFTPACK_to_prt_comp(nnod_rtp, X_prt, X_FFT)
-!
-      integer(kind = kint), intent(in) :: nnod_rtp
-      real(kind = kreal), intent(in):: X_prt(nnod_rtp)
-!
-      real(kind = kreal), intent(inout) :: X_FFT(nnod_rtp)
-!
-!
-!$omp parallel workshare
-      X_FFT(1:nnod_rtp) = X_prt(1:nnod_rtp)
-!$omp end parallel workshare
-!
-      end subroutine copy_FFTPACK_to_prt_comp
 !
 ! ------------------------------------------------------------------
 !
