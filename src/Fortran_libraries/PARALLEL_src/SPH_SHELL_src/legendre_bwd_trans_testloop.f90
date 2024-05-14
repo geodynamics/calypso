@@ -49,6 +49,7 @@
 !
       implicit none
 !
+      private :: leg_bwd_trans_1latitude
       integer, external :: omp_get_max_threads
 !
 ! -----------------------------------------------------------------------
@@ -128,8 +129,7 @@
             call leg_bwd_trans_1latitude(lp_rtm, jst, mm,               &
      &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
-     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm,                   &
-     &          idx_trns, leg, n_WR, n_WS, WR, WS,                      &
+     &          sph_rlm, sph_rtm, comm_rtm, leg, n_WR, n_WS, WR, WS,    &
      &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),       &
      &          WK_l_tst%Smat(1), WK_l_tst%Pjt_mat(ip),                 &
      &          WK_l_tst%Fmat(ip), WK_l_tst%wk_plm(ip))
@@ -172,8 +172,7 @@
       subroutine leg_bwd_trans_1latitude                                &
      &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
-     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm,                   &
-     &          idx_trns, leg, n_WR, n_WS, WR, WS,                      &
+     &          sph_rlm, sph_rtm, comm_rtm, leg, n_WR, n_WS, WR, WS,    &
      &          n_jk_e, n_jk_o, Smat, Pjt_mat, Fmat, wk_plm)
 !
       use t_schmidt_poly_on_rtm
@@ -189,9 +188,8 @@
       integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_rtm_grid), intent(in) :: sph_rtm
-      type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
+      type(sph_comm_tbl), intent(in) :: comm_rtm
       type(legendre_4_sph_trans), intent(in) :: leg
-      type(index_4_sph_trans), intent(in) :: idx_trns
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR, n_WS
