@@ -154,6 +154,12 @@
           color_param%id_pvr_color(1) = iflag_grayscale
         else if(cmp_no_case(tmpchara, hd_sym_gray)) then
           color_param%id_pvr_color(1) = iflag_sym_gray
+        else if(cmp_no_case(tmpchara, hd_orangecyan)) then
+          color_param%id_pvr_color(1) = iflag_orangecyan
+        else if(cmp_no_case(tmpchara, hd_moltenmetal)) then
+          color_param%id_pvr_color(1) = iflag_moltenmetal
+        else if(cmp_no_case(tmpchara, hd_spacecolor)) then
+          color_param%id_pvr_color(1) = iflag_spacecolor
         end if
       end if
 !
