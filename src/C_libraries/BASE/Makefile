@@ -3,6 +3,8 @@
 #
 
 C_BASE_DIR =     $$(C_SRCDIR)/BASE
+
+CURRENTDIR = $(shell pwd)
 SRC_BASE_C = $(shell ls *.c)
 INC_BASE_C = $(addsuffix .h,$(basename $(SRC_BASE_C)) )
 OBJ_BASE_C = $(addsuffix .o,$(basename $(SRC_BASE_C)) )
@@ -37,11 +39,11 @@ depends:
 	@for sources in $(SRC_BASE_C) ; do \
 		( \
 		cd $(MAKEDIR); \
-		$(CC) $(DEPFLAGS) $(OPTFLAGS_GL) $(C_INCLUDE) $(MHDDIR)/C_libraries/BASE/$$sources >> $(MAKENAME).tmp; \
+		$(CC) $(DEPFLAGS) $(OPTFLAGS_GL) $(C_INCLUDE) $(CURRENTDIR)/$$sources >> $(MAKENAME).tmp; \
 		echo '	''$$(CC)' -c '$$(OPTFLAGS) $$(C_INCLUDE) $$<' >> $(MAKENAME).tmp \
 		) \
 	done
-	@sed -e 's@'$(MHDDIR)/C_libraries'@'$$\(C_SRCDIR\)'@g' $(MAKENAME).tmp > $(MHDDIR)/C_libraries/BASE/Makefile.depends
+	@sed -e 's@'$(MHDDIR)/C_libraries'@'$$\(C_SRCDIR\)'@g' $(CURRENTDIR)/Makefile.depends
 	@rm $(MAKENAME).tmp
 
 clean:
