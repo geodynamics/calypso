@@ -4,7 +4,7 @@
 
 SMDT_POLY_TEST_DIR = $$(TESTS_DIR)/Legendre_test
 
-TARGET_SMDT_POLY =    tests/test_schmidt_Legendre
+TARGET_SMDT_POLY =    test_schmidt_Legendre
 
 SOURCES = $(shell ls *.f90)
 
@@ -21,7 +21,7 @@ dir_list:
 	@echo 'SMDT_POLY_TEST_DIR = $(SMDT_POLY_TEST_DIR)' >> $(MAKENAME)
 
 target_list:
-	@echo 'TARGET_SMDT_POLY =   $$(BUILDDIR)/$(TARGET_SMDT_POLY)'  >> $(MAKENAME)
+	@echo 'TARGET_SMDT_POLY =   $$(TEST_BUILD_DIR)/$(TARGET_SMDT_POLY)'  >> $(MAKENAME)
 	@echo >> $(MAKENAME)
 
 target_task:
