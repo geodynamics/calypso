@@ -4,8 +4,8 @@
 
 GAUSS_TEST_DIR =     $$(TESTS_DIR)/Gauss_point_test
 
-TARGET_GAUSS_TEST =     tests/gauss_points
-TARGET_CMP_GAUSS_TEST = tests/compare_gauss_points
+TARGET_GAUSS_TEST =     gauss_points
+TARGET_CMP_GAUSS_TEST = compare_gauss_points
 
 SOURCES = $(shell ls *.f90)
 
@@ -26,9 +26,9 @@ dir_list:
 	@echo 'GAUSS_TEST_DIR = $(GAUSS_TEST_DIR)' >> $(MAKENAME)
 
 target_list:
-	@echo 'TARGET_GAUSS_TEST =    $$(BUILDDIR)/$(TARGET_GAUSS_TEST)'   \
+	@echo 'TARGET_GAUSS_TEST =    $$(TEST_BUILD_DIR)/$(TARGET_GAUSS_TEST)'   \
 	>> $(MAKENAME)
-	@echo 'TARGET_CMP_GAUSS_TEST = $$(BUILDDIR)/$(TARGET_CMP_GAUSS_TEST)'   \
+	@echo 'TARGET_CMP_GAUSS_TEST = $$(TEST_BUILD_DIR)/$(TARGET_CMP_GAUSS_TEST)'   \
 	>> $(MAKENAME)
 	@echo >> $(MAKENAME)
 

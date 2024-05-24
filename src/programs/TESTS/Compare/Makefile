@@ -4,7 +4,7 @@
 
 COMPARISON_DIR =     $$(TESTS_DIR)/Compare
 
-TARGET_COMPARE_PSF = tests/compare_psf
+TARGET_COMPARE_PSF = compare_psf
 
 SOURCES = $(shell ls *.f90)
 
@@ -22,7 +22,7 @@ dir_list:
 	@echo 'COMPARISON_DIR = $(COMPARISON_DIR)' >> $(MAKENAME)
 
 target_list:
-	@echo 'TARGET_COMPARE_PSF =    $$(BUILDDIR)/$(TARGET_COMPARE_PSF)'   \
+	@echo 'TARGET_COMPARE_PSF = $$(TEST_BUILD_DIR)/$(TARGET_COMPARE_PSF)'   \
 	>> $(MAKENAME)
 	@echo >> $(MAKENAME)
 
