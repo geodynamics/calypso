@@ -52,7 +52,9 @@
 !
       implicit none
 !
+#ifdef ZLIB_IO
       private :: gz_write_layer_mean_monitor
+#endif
 !
 ! -----------------------------------------------------------------------
 !
