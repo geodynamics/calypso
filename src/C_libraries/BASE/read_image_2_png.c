@@ -122,12 +122,13 @@ void read_png_file_c(const char *fhead, int *num_x, int *num_y, int *iflag_rgba)
 	read_png_image_w_gamma(fp, png_ptr, info_ptr, &bimage, &width, &height, 
 			iflag_rgba, display_gamma);
 	fclose(fp);
-	
+/*
 	{
-		/* Display gAMA Chunk */
+//		 Display gAMA Chunk 
 		if (png_get_gAMA(png_ptr, info_ptr, &file_gamma))
 		printf("gamma = %lf\n", file_gamma);
 	}
+*/
 	{
 		/* Display tEXT Chunk */
 		png_textp       text_ptr;

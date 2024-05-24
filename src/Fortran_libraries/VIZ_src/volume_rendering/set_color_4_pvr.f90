@@ -32,10 +32,20 @@
      &                        :: hd_radblue =  'blue_to_red'
       character(len = kchara), parameter                                &
      &                        :: hd_sym_gray = 'symmetric_grayscale'
-      integer(kind = kint), parameter :: iflag_redblue =    3
-      integer(kind = kint), parameter :: iflag_rainbow =    1
-      integer(kind = kint), parameter :: iflag_grayscale =  2
-      integer(kind = kint), parameter :: iflag_sym_gray =   4
+      character(len = kchara), parameter                                &
+     &                        :: hd_orangecyan = 'cyan_to_orange'
+      character(len = kchara), parameter                                &
+     &                        :: hd_moltenmetal = 'molten_metal'
+      character(len = kchara), parameter                                &
+     &                        :: hd_spacecolor = 'space'
+!
+      integer(kind = kint), parameter :: iflag_rainbow =     1
+      integer(kind = kint), parameter :: iflag_grayscale =   2
+      integer(kind = kint), parameter :: iflag_redblue =     3
+      integer(kind = kint), parameter :: iflag_sym_gray =    4
+      integer(kind = kint), parameter :: iflag_orangecyan =  5
+      integer(kind = kint), parameter :: iflag_moltenmetal = 6
+      integer(kind = kint), parameter :: iflag_spacecolor =  7
 !
       character(len = kchara), parameter :: hd_minmax =    'minmax'
       character(len = kchara), parameter :: hd_linear =    'linear'
@@ -103,6 +113,11 @@
       subroutine normvalue_to_rgb(id_color_system, colordat, color)
 !
       use set_rgb_colors
+      use colormap_rainbow
+      use colormap_two_colors
+      use colormap_grayscales
+      use colormap_metal
+      use colormap_space
 !
       integer(kind = kint), intent(in) :: id_color_system
       real(kind = kreal), intent(in) :: colordat
@@ -111,14 +126,22 @@
 !
 !
       if(id_color_system .eq. iflag_redblue) then
-        call color_redblue(colordat, color(1), color(2), color(3))
+        call s_colormap_redblue(colordat, color(1), color(2), color(3))
+      else if(id_color_system .eq. iflag_orangecyan) then
+        call s_colormap_orangecyan                                      &
+     &     (colordat, color(1), color(2), color(3))
+      else if(id_color_system .eq. iflag_moltenmetal) then
+        call s_colormap_metal(colordat, color(1), color(2), color(3))
+      else if(id_color_system .eq. iflag_spacecolor) then
+        call s_colormap_space(colordat, color(1), color(2), color(3))
       else if(id_color_system .eq. iflag_sym_gray) then
-        call color_sym_grayscale                                        &
+        call s_colormap_sym_grayscale                                   &
      &     (colordat, color(1), color(2), color(3))
       else if(id_color_system .eq. iflag_grayscale) then
-        call color_grayscale(colordat, color(1), color(2), color(3))
+        call s_colormap_grayscale                                       &
+     &     (colordat, color(1), color(2), color(3))
       else
-        call color_rainbow(colordat, color(1), color(2), color(3))
+        call s_colormap_rainbow(colordat, color(1), color(2), color(3))
       end if
 !
       end subroutine normvalue_to_rgb

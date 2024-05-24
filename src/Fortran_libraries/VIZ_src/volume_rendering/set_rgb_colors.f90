@@ -1,6 +1,34 @@
+!>@file   set_rgb_colors.F90
+!!@brief  module set_rgb_colors
+!!
+!!@author H. Matsui
+!!@date Programmed in Apr., 2024
 !
-!      module set_rgb_colors
-!
+!>@brief  Normalization for color mapping
+!!
+!!@verbatim
+!!      subroutine normalize_by_linear(dat_min, dat_max, value,         &
+!!     &          colordat)
+!!        real(kind = kreal), intent(in) :: value
+!!        real(kind = kreal), intent(in) :: dat_min, dat_max
+!!        real(kind = kreal), intent(out) :: colordat
+!!      subroutine normalize_by_linear_segment(num_point, datamap_param,&
+!!     &          value, colordat)
+!!        real(kind = kreal), intent(in) :: value
+!!        integer(kind = kint), intent(in) :: num_point
+!!        real(kind = kreal), intent(in) :: datamap_param(2,num_point)
+!!        real(kind = kreal), intent(out) :: colordat
+!!
+!!      subroutine restore_linear_normalize(value_rgb,                  &
+!!     &          mincolor, maxcolor, value)
+!!      subroutine restore_segment_normalize(value_rgb,                 &
+!!     &          mincolor, maxcolor, num_point, datamap_param, value)
+!!        real(kind = kreal), intent(in) :: value_rgb
+!!        real(kind = kreal), intent(in) :: mincolor, maxcolor
+!!        integer(kind = kint), intent(in) :: num_point
+!!        real(kind = kreal), intent(in) :: datamap_param(2,num_point)
+!!        real(kind = kreal), intent(out) :: value
+!!@endverbatim
       module set_rgb_colors
 !
       use m_precision
@@ -12,20 +40,6 @@
       private :: EPSILON
 !
 !
-!      subroutine normalize_by_linear(dat_min, dat_max, value,          &
-!     &          colordat)
-!      subroutine normalize_by_linear_segment(num_point, datamap_param, &
-!     &          value, colordat)
-!
-!      subroutine restore_linear_normalize(value_rgb,                   &
-!     &          mincolor, maxcolor, value)
-!      subroutine restore_segment_normalize(value_rgb,                  &
-!     &          mincolor, maxcolor, num_point, datamap_param, value)
-!
-!      subroutine color_rainbow(rnorm, r, g, b)
-!      subroutine color_redblue(rnorm, r, g, b)
-!      subroutine color_grayscale(rnorm, r, g, b)
-!      subroutine color_sym_grayscale(rnorm, r, g, b)
 !
 ! ----------------------------------------------------------------------
 !
@@ -137,156 +151,6 @@
       end if
 !
       end subroutine restore_segment_normalize
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine color_rainbow(rnorm, r, g, b)
-!
-      real(kind = kreal), intent(in) :: rnorm
-      real(kind = kreal), intent(inout) ::  r, g, b
-!
-      real(kind = kreal), parameter :: purple = zero
-      real(kind = kreal), parameter :: blue =   0.1e0
-      real(kind = kreal), parameter :: ocean =  0.325e0
-      real(kind = kreal), parameter :: green =  0.55e0
-      real(kind = kreal), parameter :: yellow = 0.775e0
-      real(kind = kreal), parameter :: red =    one
-      real(kind = kreal), parameter :: forty =  four*ten
-!
-!
-      if (rnorm .lt. purple ) then
-        r = half
-        g = zero
-        b = one
-      else if (rnorm .ge. purple .and. rnorm.lt.blue) then
-        r = half - five*rnorm
-        g = zero
-        b = one
-      else if (rnorm .ge. blue .and. rnorm.lt.ocean) then
-        r = zero
-        g = forty*(rnorm-blue) / dnine
-        b = one
-      else if (rnorm .ge. ocean .and. rnorm.lt.green) then
-        r = zero
-        g = one
-        b = one - forty*(rnorm-ocean) / dnine
-      else if (rnorm .ge. green .and. rnorm.lt.yellow) then
-        r = forty*(rnorm-green) / dnine
-        g = one
-        b = zero
-      else if (rnorm .ge. yellow .and. rnorm.lt. red) then
-        r = one
-        g = one - forty*(rnorm-yellow) / dnine
-        b = zero
-      else if (rnorm .ge. red ) then
-        r = one
-        g = zero
-        b = zero
-      end if
-!
-      end subroutine color_rainbow
-!
-! ----------------------------------------------------------------------
-!
-      subroutine color_redblue(rnorm, r, g, b)
-!
-      real(kind = kreal), intent(in) :: rnorm
-      real(kind = kreal), intent(inout) ::  r, g, b
-!
-      real(kind = kreal), parameter :: abyss = zero
-      real(kind = kreal), parameter :: blue =  0.1d0
-      real(kind = kreal), parameter :: white = half
-      real(kind = kreal), parameter :: red =   0.9d0
-      real(kind = kreal), parameter :: blood =  one
-!
-!
-      if (rnorm .lt. abyss ) then
-        r = zero
-        g = 0.2d0
-        b = 0.8d0
-      else if (rnorm .ge. abyss .and. rnorm.lt.blue) then
-        r = zero
-        g = 2.0d0 * (blue - rnorm)
-        b = 0.8d0 + 2.0d0 * rnorm
-      else if (rnorm .ge. blue .and. rnorm.lt.white) then
-        r = (rnorm - blue) * 2.0d0
-        g = (rnorm - blue) * 2.0d0
-        b = one - (rnorm - blue) * 0.25
-      else if (rnorm .ge. white .and. rnorm.lt.red) then
-        r = one - (red - rnorm) * 0.25
-        g = (red - rnorm) * 2.0d0
-        b = (red - rnorm) * 2.0d0
-      else if (rnorm .ge. red .and. rnorm.lt. blood) then
-        r = one - (rnorm - red) * 2.0d0
-        g = zero
-        b = zero
-      else if (rnorm .ge. blood) then
-        r = 0.8d0
-        g = zero
-        b = zero
-      end if
-!
-      end subroutine color_redblue
-!
-! ----------------------------------------------------------------------
-!
-      subroutine color_grayscale(rnorm, r, g, b)
-!
-      real(kind = kreal), intent(in) :: rnorm
-      real(kind = kreal), intent(inout) ::  r, g, b
-!
-      real(kind = kreal), parameter :: black = zero
-      real(kind = kreal), parameter :: white = one
-!
-!
-      if (rnorm .lt. zero ) then
-        r = zero
-        g = zero
-        b = zero
-      else if (rnorm .ge. zero .and. rnorm.lt.white) then
-        r = 0.85d0*rnorm
-        g = 0.85d0*rnorm
-        b = 0.85d0*rnorm
-      else if (rnorm .ge. white ) then
-        r = 0.85d0
-        g = 0.85d0
-        b = 0.85d0
-      end if
-!
-      end subroutine color_grayscale
-!
-! ----------------------------------------------------------------------
-!
-      subroutine color_sym_grayscale(rnorm, r, g, b)
-!
-      real(kind = kreal), intent(in) :: rnorm
-      real(kind = kreal), intent(inout) ::  r, g, b
-!
-      real(kind = kreal), parameter :: black = zero
-      real(kind = kreal), parameter :: white = one
-      real(kind = kreal), parameter :: half = one / two
-!
-!
-      if (rnorm .lt. zero ) then
-        r = zero
-        g = zero
-        b = zero
-      else if (rnorm .ge. zero .and. rnorm.lt.half) then
-        r = 0.85d0*two*rnorm
-        g = 0.85d0*two*rnorm
-        b = 0.85d0*two*rnorm
-      else if (rnorm .ge. half .and. rnorm.lt.white) then
-        r = 0.85d0*two*(one - rnorm)
-        g = 0.85d0*two*(one - rnorm)
-        b = 0.85d0*two*(one - rnorm)
-      else if (rnorm .ge. white ) then
-        r = zero
-        g = zero
-        b = zero
-      end if
-!
-      end subroutine color_sym_grayscale
 !
 ! ----------------------------------------------------------------------
 !

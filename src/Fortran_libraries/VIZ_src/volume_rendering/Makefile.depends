@@ -20,6 +20,16 @@ cal_pvr_modelview_mat.o: $(PVR_DIR)/cal_pvr_modelview_mat.f90 m_precision.o m_co
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_pvr_projection_mat.o: $(PVR_DIR)/cal_pvr_projection_mat.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_params_4_pvr.o t_control_params_stereo_pvr.o set_projection_matrix.o
 	$(F90) -c $(F90OPTFLAGS) $<
+colormap_grayscales.o: $(PVR_DIR)/colormap_grayscales.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+colormap_metal.o: $(PVR_DIR)/colormap_metal.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+colormap_rainbow.o: $(PVR_DIR)/colormap_rainbow.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+colormap_space.o: $(PVR_DIR)/colormap_space.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+colormap_two_colors.o: $(PVR_DIR)/colormap_two_colors.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
 comm_tbl_4_img_composit.o: $(PVR_DIR)/comm_tbl_4_img_composit.f90 m_precision.o m_constants.o quicksort.o
 	$(F90) -c $(F90OPTFLAGS) $<
 comm_tbl_4_img_output.o: $(PVR_DIR)/comm_tbl_4_img_output.f90 m_precision.o m_constants.o
@@ -88,7 +98,7 @@ rendering_vr_image.o: $(PVR_DIR)/rendering_vr_image.f90 m_precision.o m_machine_
 	$(F90) -c $(F90OPTFLAGS) $<
 set_PVR_view_and_image.o: $(PVR_DIR)/set_PVR_view_and_image.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o m_geometry_constants.o t_mesh_data.o t_pvr_image_array.o t_rendering_vr_image.o t_surf_grp_4_pvr_domain.o t_geometries_in_pvr_screen.o t_mesh_SR.o rendering_vr_image.o cal_pvr_modelview_mat.o cal_pvr_projection_mat.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_color_4_pvr.o: $(PVR_DIR)/set_color_4_pvr.f90 m_precision.o set_rgb_colors.o
+set_color_4_pvr.o: $(PVR_DIR)/set_color_4_pvr.f90 m_precision.o set_rgb_colors.o colormap_rainbow.o colormap_two_colors.o colormap_grayscales.o colormap_metal.o colormap_space.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_composition_pe_range.o: $(PVR_DIR)/set_composition_pe_range.f90 m_precision.o t_rendering_vr_image.o t_pvr_image_array.o
 	$(F90) -c $(F90OPTFLAGS) $<
