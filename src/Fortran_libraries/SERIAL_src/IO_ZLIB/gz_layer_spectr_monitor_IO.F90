@@ -55,7 +55,9 @@
 !
       implicit none
 !
+#ifdef ZLIB_IO
       private :: gz_write_layer_spectr_monitor
+#endif
 !
 ! -----------------------------------------------------------------------
 !

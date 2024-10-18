@@ -35,7 +35,10 @@
 !
       implicit  none
 !
+#ifdef ZLIB_IO
       private :: gz_write_picked_spec_data
+#endif
+!
       private :: dup_pick_sph_file_header_base
 !
 ! -----------------------------------------------------------------------
