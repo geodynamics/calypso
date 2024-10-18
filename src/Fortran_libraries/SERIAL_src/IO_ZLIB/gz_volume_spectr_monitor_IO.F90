@@ -46,7 +46,9 @@
 !
       implicit none
 !
+#ifdef ZLIB_IO
       private :: gz_write_volume_spectr_monitor
+#endif
 !
 ! -----------------------------------------------------------------------
 !
