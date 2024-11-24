@@ -315,9 +315,9 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
             dnl Make Fortran link line by inserting Fortran libraries
             if test "$static_hdf5" = "yes" ; then
 #              HDF5_PFLIBS=$(eval $H5PFC -show)
-              HDF5_PFLIBS=$(eval $H5PFC -show | cut -d " " -f 3-)
+              HDF5_PFLIBS=$(eval $H5PFC -show | tail -n 1 | cut -d " " -f 3-)
             else
-              HDF5_PFLIBS=$(eval $H5PFC -shlib -show  | cut -d " " -f 3-)
+              HDF5_PFLIBS=$($H5PFC -shlib -show  | tail -n 1 | cut -d " " -f 4-)
             fi
         else
             AC_MSG_RESULT([no])
