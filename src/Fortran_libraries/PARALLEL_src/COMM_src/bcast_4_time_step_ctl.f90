@@ -117,6 +117,7 @@
       call bcast_ctl_type_r1(tctl%delta_t_pvr_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_fline_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_lic_ctl)
+      call bcast_ctl_type_r1(tctl%delta_t_tracer_output_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_field_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_monitor_ctl)
       call bcast_ctl_type_r1(tctl%delta_t_sgs_coefs_ctl)
@@ -135,6 +136,7 @@
       call bcast_ctl_type_i1(tctl%i_step_map_ctl)
       call bcast_ctl_type_i1(tctl%i_step_pvr_ctl)
       call bcast_ctl_type_i1(tctl%i_step_lic_ctl)
+      call bcast_ctl_type_i1(tctl%i_step_tracer_output_ctl)
       call bcast_ctl_type_i1(tctl%i_step_fline_ctl)
 !
       call bcast_ctl_type_i1(tctl%i_step_ucd_ctl)

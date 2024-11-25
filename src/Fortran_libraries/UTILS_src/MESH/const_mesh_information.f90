@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine empty_mesh_info(id_rank, mesh, group)
-!!      subroutine dealloc_empty_mesh_info(mesh, group)
+!!      subroutine dealloc_empty_mesh_info(mesh)
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
 !!
@@ -85,12 +85,11 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_empty_mesh_info(mesh, group)
+      subroutine dealloc_empty_mesh_info(mesh)
 !
       use nod_and_ele_derived_info
 !
       type(mesh_geometry), intent(inout) :: mesh
-      type(mesh_groups), intent(inout) ::   group
 !
 !
       call dealloc_nod_and_ele_infos(mesh)
@@ -103,12 +102,14 @@
       subroutine const_surface_infos(id_rank, node, ele, surf_grp,      &
      &                               surf, surf_nod_grp)
 !
+      use m_connect_hexa_2_tetra
       use t_element_group_table
       use cal_mesh_position
       use const_surface_data
       use set_surf_edge_mesh
       use set_connects_4_surf_group
       use set_size_4_smp_types
+      use nod_and_ele_derived_info
 !      use check_surface_groups
 !
       integer, intent(in) :: id_rank
@@ -119,6 +120,16 @@
       type(surface_data), intent(inout) :: surf
       type(surface_node_grp_data), intent(inout) :: surf_nod_grp
 !
+      integer(kind = kint) :: num_internal_surf
+!
+!
+      if(ele%nnod_4_ele .eq. num_t_linear) then
+        call set_1_hexa_2_5_tetra
+      else if (ele%nnod_4_ele .eq. num_t_quad) then
+        call set_1_hexa_2_21_tetra
+      else if (ele%nnod_4_ele .eq. num_t_lag) then
+        call set_1_hexa_2_40_tetra
+      end if
 !
 !     set connectivity and geometry for surface and edge
       if(iflag_debug .gt. 0) write(*,*) 'const_surf_connectivity'
@@ -142,6 +153,11 @@
       if (iflag_debug.gt.0) write(*,*) 'set_center_of_surface'
       call alloc_surface_geometory(surf)
       call set_center_of_surface(node, surf)
+!
+      call alloc_interior_surf(surf)
+      call easy_internal_element_flag                                   &
+     &   (node%internal_node, surf%numsurf, surf%ie_surf,               &
+     &    num_internal_surf, surf%interior_surf)
 !
       end subroutine const_surface_infos
 !

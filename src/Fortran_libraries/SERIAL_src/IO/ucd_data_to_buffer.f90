@@ -28,8 +28,9 @@
       character(len=3), parameter :: UCD_HEX = 'hex'
       character(len=3), parameter :: UCD_TRI = 'tri'
       character(len=4), parameter :: UCD_LNE = 'line'
+      character(len=2), parameter :: UCD_PNT = 'pt'
 !
-      private :: UCD_HEX, UCD_TRI, UCD_LNE
+      private :: UCD_HEX, UCD_TRI, UCD_LNE, UCD_PNT
 !
 ! ----------------------------------------------------------------------
 !
@@ -140,6 +141,8 @@
         ucd_eletype = '  '// UCD_TRI // ' '
       else if(nnod_ele.eq.num_linear_edge) then
         ucd_eletype = ' '// UCD_LNE // ' '
+      else if(nnod_ele.eq.num_linear_point) then
+        ucd_eletype = '  '// UCD_PNT // '  '
       else
         ucd_eletype = '  '// UCD_HEX // ' '
       end if
@@ -163,6 +166,8 @@
         nnod_ele_by_ucd_eletype = num_triangle
       else if(cmp_no_case(eletype, UCD_LNE)) then
         nnod_ele_by_ucd_eletype = num_linear_edge
+      else if(cmp_no_case(eletype, UCD_PNT)) then
+        nnod_ele_by_ucd_eletype = num_linear_point
       else
         nnod_ele_by_ucd_eletype = num_t_linear
       end if

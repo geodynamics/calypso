@@ -110,7 +110,12 @@
      &   'Read ascii mesh file: ', trim(file_name)
 !
       call open_read_mpi_file(file_name, num_pe, id_rank, IO_param)
-      call mpi_read_num_node(IO_param, mesh_IO)
+!
+      call mpi_skip_read(IO_param, len(hd_fem_para()))
+      call mpi_read_domain_info(IO_param, mesh_IO%nod_comm)
+!
+      call mpi_skip_read(IO_param, len(hd_fem_node()))
+      call mpi_read_number_of_node(IO_param, mesh_IO%node)
       call close_mpi_file(IO_param)
 !
 !
@@ -134,7 +139,15 @@
      &   'Read ascii mesh file: ', trim(file_name)
 !
       call open_read_mpi_file(file_name, num_pe, id_rank, IO_param)
-      call mpi_read_num_node_ele(IO_param, mesh_IO)
+!
+      call mpi_skip_read(IO_param, len(hd_fem_para()))
+      call mpi_read_domain_info(IO_param, mesh_IO%nod_comm)
+!
+      call mpi_skip_read(IO_param, len(hd_fem_node()))
+      call mpi_read_geometry_info(IO_param, mesh_IO%node)
+!  ----  read element data -------
+      call mpi_skip_read(IO_param, len(hd_fem_elem()))
+      call mpi_read_num_element(IO_param, mesh_IO%ele)
       call close_mpi_file(IO_param)
 !
       end subroutine mpi_read_geometry_size

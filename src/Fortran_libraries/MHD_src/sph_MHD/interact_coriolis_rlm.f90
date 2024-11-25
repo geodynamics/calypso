@@ -230,7 +230,7 @@
 !
         tr_rlm(1,j3) = -(two + g_sph_rlm(j3,4) - g_sph_rlm(j3,3))       &
      &               * gi_cor_rlm(j3,1) * g_sph_rlm(j3,17) * half
-        tr_rlm(2,j3) = -(two - g_sph_rlm(j3,5) + g_sph_rlm(j3,3))       &
+        tr_rlm(2,j3) = -(two + g_sph_rlm(j3,5) - g_sph_rlm(j3,3))       &
      &               * gi_cor_rlm(j3,2) * g_sph_rlm(j3,17) * half
 !*
         sr_rlm(1,j3) = ei_cor_rlm(j3,1) * g_sph_rlm(j3,17)

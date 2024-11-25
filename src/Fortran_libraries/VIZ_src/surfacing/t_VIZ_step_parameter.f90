@@ -42,6 +42,8 @@
         type(IO_step_param) :: LIC_t
 !>        time step paremters for field lines
         type(IO_step_param) :: FLINE_t
+!>        time step paremters for tracer
+        type(IO_step_param) :: TRACER_t
 !
 !>        step number for sectioning file
         integer(kind = kint) :: istep_psf = 0
@@ -55,6 +57,8 @@
         integer(kind = kint) :: istep_lic = 0
 !>        step number for field lines file
         integer(kind = kint) :: istep_fline = 0
+!>        step number for field lines file
+        integer(kind = kint) :: istep_tracer = 0
       end type VIZ_step_params
 !
 !-----------------------------------------------------------------------
@@ -111,6 +115,8 @@
       viz_step%istep_lic = istep_file_w_fix_dt(i_step, viz_step%LIC_t)
       viz_step%istep_fline                                              &
      &          = istep_file_w_fix_dt(i_step, viz_step%FLINE_t)
+      viz_step%istep_tracer                                             &
+     &          = istep_file_w_fix_dt(i_step, viz_step%TRACER_t)
 !
       end subroutine istep_viz_w_fix_dt
 !
@@ -129,6 +135,8 @@
       viz_step%istep_lic = istep_file_w_flex_dt(time_d, viz_step%LIC_t)
       viz_step%istep_fline                                              &
      &          = istep_file_w_flex_dt(time_d, viz_step%FLINE_t)
+      viz_step%istep_tracer                                             &
+     &          = istep_file_w_flex_dt(time_d, viz_step%TRACER_t)
 !
       end subroutine istep_viz_w_flex_dt
 !
@@ -168,6 +176,10 @@
      &   (izero, dt, tctl%i_step_lic_ctl, tctl%delta_t_lic_ctl,         &
      &    viz_step%LIC_t)
 !
+      call output_step_4_fixed_step_ctl                                 &
+     &   (izero, dt, tctl%i_step_tracer_output_ctl,                     &
+     &    tctl%delta_t_tracer_output_ctl, viz_step%TRACER_t)
+!
       end subroutine viz_fixed_time_step_params
 !
 ! -----------------------------------------------------------------------
@@ -204,6 +216,10 @@
       call output_step_4_flex_step_ctl                                  &
      &   (izero, dt, tctl%i_step_lic_ctl, tctl%delta_t_lic_ctl,         &
      &    viz_step%LIC_t)
+!
+      call output_step_4_flex_step_ctl                                  &
+     &   (izero, dt, tctl%i_step_tracer_output_ctl,                     &
+     &    tctl%delta_t_tracer_output_ctl, viz_step%TRACER_t)
 !
       end subroutine viz_flex_time_step_controls
 !

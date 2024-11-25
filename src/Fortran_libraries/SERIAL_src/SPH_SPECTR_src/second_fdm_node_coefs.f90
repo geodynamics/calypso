@@ -78,7 +78,7 @@
 !
 !
       call alloc_nod_fdm_matrices                                       &
-     &   (sph_rj%nidx_rj(1), itwo, ione, ione, fdm_2nd)
+     &   (sph_rj%nidx_rj(1), ione, itwo, ione, ione, fdm_2nd)
 !
       allocate(mat_fdm(3,3,sph_rj%nidx_rj(1)))
       mat_fdm(1:3,1:3,1:sph_rj%nidx_rj(1)) = 0.0d0

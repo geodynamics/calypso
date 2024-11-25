@@ -17,9 +17,10 @@
 !!        integer (kind = kint), intent(in) :: id_file
 !!        type(element_data), intent(inout) :: ele_IO
 !!        integer (kind=kint), intent(inout) :: iend
-!!      subroutine read_element_info(id_file, ele_IO)
+!!      subroutine read_element_info(id_file, ele_IO, iend)
 !!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!        integer (kind=kint), intent(inout) :: iend
 !!      subroutine read_surface_4_element(id_file, sfed_IO)
 !!      subroutine read_edge_4_element(id_file, sfed_IO)
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
@@ -121,16 +122,19 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_element_info(id_file, ele_IO)
+      subroutine read_element_info(id_file, ele_IO, iend)
 !
       use set_nnod_4_ele_by_type
 !
       integer (kind = kint), intent(in) :: id_file
       type(element_data), intent(inout) :: ele_IO
+      integer (kind=kint), intent(inout) :: iend
 !
       integer (kind = kint) :: i
 !
 !
+       call read_number_of_element(id_file, ele_IO, iend)
+      if(iend .ne. 0) return
        call alloc_element_types(ele_IO)
 !
        read(id_file,*) (ele_IO%elmtyp(i),i=1,ele_IO%numele)

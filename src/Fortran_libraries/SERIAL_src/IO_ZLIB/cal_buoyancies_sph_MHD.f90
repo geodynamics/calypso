@@ -18,26 +18,26 @@
 !!        real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!
 !!      subroutine rot_self_dbl_buoyancy_sph_MHD(kr_in, kr_out,         &
-!!     &          coef_t_buo, is_t, coef_c_buo, is_c, it_res,           &
+!!     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,           &
 !!     &          nidx_rj, radius_1d_rj_r, nnod_rj, ntot_phys_rj, d_rj)
 !!      subroutine rot_r_cst_dbl_buoyancy_sph_MHD(kr_in, kr_out,        &
-!!     &          coef_t_buo, is_t, coef_c_buo, is_c, it_res,           &
+!!     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,           &
 !!     &          nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
 !!        integer(kind = kint), intent(in) :: kr_in, kr_out
 !!        integer(kind= kint), intent(in) :: is_t, is_c
-!!        integer(kind= kint), intent(in) :: it_res
+!!        integer(kind= kint), intent(in) :: is_buo
 !!        integer(kind = kint), intent(in) :: nidx_rj(2)
 !!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
 !!        real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
 !!        real(kind = kreal), intent(in) :: coef_t_buo, coef_c_buo
 !!        real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!      subroutine rot_self_buoyancy_sph_MHD(kr_in, kr_out, coef,       &
-!!     &          is_fld, it_res, nidx_rj, radius_1d_rj_r,              &
+!!     &          is_fld, is_buo, nidx_rj, radius_1d_rj_r,              &
 !!     &          nnod_rj, ntot_phys_rj, d_rj)
 !!      subroutine rot_r_const_buoyancy_sph_MHD(kr_in, kr_out, coef,    &
-!!     &          is_fld, it_res, nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
+!!     &          is_fld, is_buo, nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
 !!        integer(kind = kint), intent(in) :: kr_in, kr_out
-!!        integer(kind= kint), intent(in) :: is_fld, it_res
+!!        integer(kind= kint), intent(in) :: is_fld, is_buo
 !!        integer(kind = kint), intent(in) :: nidx_rj(2)
 !!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
 !!        real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
@@ -108,12 +108,12 @@
 !-----------------------------------------------------------------------
 !
       subroutine rot_self_dbl_buoyancy_sph_MHD(kr_in, kr_out,           &
-     &          coef_t_buo, is_t, coef_c_buo, is_c, it_res,             &
+     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,             &
      &          nidx_rj, radius_1d_rj_r, nnod_rj, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind= kint), intent(in) :: is_t, is_c
-      integer(kind= kint), intent(in) :: it_res
+      integer(kind= kint), intent(in) :: is_buo
       integer(kind = kint), intent(in) :: nidx_rj(2)
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
@@ -130,7 +130,9 @@
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod- j) / nidx_rj(2)
 !
-        d_rj(inod,it_res) =  ( coef_t_buo * d_rj(inod,is_t)             &
+        d_rj(inod,is_buo  ) = 0.0d0
+        d_rj(inod,is_buo+1) = 0.0d0
+        d_rj(inod,is_buo+2) = (coef_t_buo * d_rj(inod,is_t)             &
      &                       + coef_c_buo * d_rj(inod,is_c)  )          &
      &                      * radius_1d_rj_r(k)
       end do
@@ -141,12 +143,12 @@
 !-----------------------------------------------------------------------
 !
       subroutine rot_r_cst_dbl_buoyancy_sph_MHD(kr_in, kr_out,          &
-     &          coef_t_buo, is_t, coef_c_buo, is_c, it_res,             &
+     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,             &
      &          nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind= kint), intent(in) :: is_t, is_c
-      integer(kind= kint), intent(in) :: it_res
+      integer(kind= kint), intent(in) :: is_buo
       integer(kind = kint), intent(in) :: nidx_rj(2)
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real(kind = kreal), intent(in) :: coef_t_buo, coef_c_buo
@@ -162,8 +164,10 @@
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod- j) / nidx_rj(2)
 !
-        d_rj(inod,it_res) = coef_t_buo * d_rj(inod,is_t)                &
-     &                     + coef_c_buo * d_rj(inod,is_c)
+        d_rj(inod,is_buo  ) = 0.0d0
+        d_rj(inod,is_buo+1) = 0.0d0
+        d_rj(inod,is_buo+2) = coef_t_buo * d_rj(inod,is_t)              &
+     &                       + coef_c_buo * d_rj(inod,is_c)
       end do
 !$omp end parallel do
 !
@@ -173,11 +177,11 @@
 !-----------------------------------------------------------------------
 !
       subroutine rot_self_buoyancy_sph_MHD(kr_in, kr_out, coef,         &
-     &          is_fld, it_res, nidx_rj, radius_1d_rj_r,                &
+     &          is_fld, is_buo, nidx_rj, radius_1d_rj_r,                &
      &          nnod_rj, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in, kr_out
-      integer(kind= kint), intent(in) :: is_fld, it_res
+      integer(kind= kint), intent(in) :: is_fld, is_buo
       integer(kind = kint), intent(in) :: nidx_rj(2)
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
@@ -193,7 +197,10 @@
       do inod = ist, ied
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod- j) / nidx_rj(2)
-        d_rj(inod,it_res)                                               &
+!
+        d_rj(inod,is_buo  ) = 0.0d0
+        d_rj(inod,is_buo+1) = 0.0d0
+        d_rj(inod,is_buo+2)                                             &
      &          =  coef * d_rj(inod,is_fld) * radius_1d_rj_r(k)
       end do
 !$omp end parallel do
@@ -203,10 +210,10 @@
 !-----------------------------------------------------------------------
 !
       subroutine rot_r_const_buoyancy_sph_MHD(kr_in, kr_out, coef,      &
-     &          is_fld, it_res, nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
+     &          is_fld, is_buo, nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in, kr_out
-      integer(kind= kint), intent(in) :: is_fld, it_res
+      integer(kind= kint), intent(in) :: is_fld, is_buo
       integer(kind = kint), intent(in) :: nidx_rj(2)
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real(kind = kreal), intent(in) :: coef
@@ -221,7 +228,10 @@
       do inod = ist, ied
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod- j) / nidx_rj(2)
-        d_rj(inod,it_res) = coef * d_rj(inod,is_fld)
+!
+        d_rj(inod,is_buo  ) = 0.0d0
+        d_rj(inod,is_buo+1) = 0.0d0
+        d_rj(inod,is_buo+2) = coef * d_rj(inod,is_fld)
       end do
 !$omp end parallel do
 !
@@ -255,6 +265,8 @@
         k = 1 + (inod- j) / nidx_rj(2)
         d_rj(inod,is_buo) = coef * g_sph_rj(j,13)                       &
      &                     * d_rj(inod,is_fld) * radius_1d_rj_r(k)**3
+        d_rj(inod,is_buo+1) = 0.0d0
+        d_rj(inod,is_buo+2) = 0.0d0
       end do
 !$omp end parallel do
 !
@@ -287,6 +299,8 @@
         k = 1 + (inod- j) / nidx_rj(2)
         d_rj(inod,is_buo) = coef * g_sph_rj(j,13)                       &
      &                     * d_rj(inod,is_fld) * radius_1d_rj_r(k)**2
+        d_rj(inod,is_buo+1) = 0.0d0
+        d_rj(inod,is_buo+2) = 0.0d0
       end do
 !$omp end parallel do
 !

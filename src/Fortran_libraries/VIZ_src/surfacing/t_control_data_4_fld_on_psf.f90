@@ -37,7 +37,7 @@
 !!    begin field_on_isosurf
 !!      result_type      constant
 !!      result_value     0.7
-!!      array output_field   2
+!!      array output_field
 !!        output_field    velocity         vector   end
 !!        output_field    magnetic_field   radial   end
 !!      end array output_field

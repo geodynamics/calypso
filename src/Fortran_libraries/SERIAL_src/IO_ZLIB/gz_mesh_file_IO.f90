@@ -114,7 +114,14 @@
 !
       call open_rd_gzfile_a(FPz_msh, file_name, zbuf_m)
 !
-      call gz_read_num_node(FPz_msh, id_rank, mesh_IO, zbuf_m, ierr)
+!      write(*,*) 'gz_read_domain_info'
+      call gz_read_domain_info                                          &
+     &   (FPz_msh, id_rank, mesh_IO%nod_comm, zbuf_m, ierr)
+      if(ierr .gt. 0) go to 99
+!      write(*,*) 'gz_read_number_of_node'
+      call gz_read_number_of_node(FPz_msh, mesh_IO%node, zbuf_m)
+      
+  99  continue
       call close_gzfile_a(FPz_msh, zbuf_m)
 !
       end subroutine gz_read_node_size
@@ -138,8 +145,16 @@
 !
       call open_rd_gzfile_a(FPz_msh, file_name, zbuf_m)
 !
-      call gz_read_num_node_ele(FPz_msh, id_rank,                       &
-     &                          mesh_IO, zbuf_m, ierr)
+!      write(*,*) 'gz_read_domain_info'
+      call gz_read_domain_info                                          &
+     &   (FPz_msh, id_rank, mesh_IO%nod_comm, zbuf_m, ierr)
+      if(ierr .gt. 0) go to 99
+!
+      call gz_read_geometry_info(FPz_msh, mesh_IO%node, zbuf_m)
+!      write(*,*) 'gz_read_number_of_element'
+      call gz_read_number_of_element(FPz_msh, mesh_IO%ele, zbuf_m)
+
+  99  continue
       call close_gzfile_a(FPz_msh, zbuf_m)
 !
       end subroutine gz_read_geometry_size

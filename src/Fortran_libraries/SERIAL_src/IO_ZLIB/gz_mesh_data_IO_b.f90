@@ -16,8 +16,6 @@
 !!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
-!!      subroutine gz_read_num_node_b(FPz_f, id_rank, zbuf, mesh_IO)
-!!      subroutine gz_read_num_node_ele_b(FPz_f, id_rank, zbuf, mesh_IO)
 !!      subroutine gz_read_geometry_data_b                              &
 !!     &         (FPz_f, id_rank, zbuf, mesh_IO)
 !!      subroutine gz_read_mesh_groups_b(FPz_f, zbuf, mesh_group_IO)
@@ -101,55 +99,6 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine gz_read_num_node_b(FPz_f, id_rank, zbuf, mesh_IO)
-!
-      use gz_domain_data_IO_b
-      use gz_node_geometry_IO_b
-!
-      character, pointer, intent(in) :: FPz_f
-      integer, intent(in) :: id_rank
-!
-      type(buffer_4_gzip), intent(inout) :: zbuf
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call gz_read_domain_info_b(FPz_f, id_rank, zbuf, mesh_IO%nod_comm)
-      if(zbuf%ierr_zlib .ne. 0) return
-!
-      call gz_read_number_of_node_b(FPz_f, zbuf, mesh_IO%node)
-      if(zbuf%ierr_zlib .ne. 0) return
-!
-      end subroutine gz_read_num_node_b
-!
-!------------------------------------------------------------------
-!
-      subroutine gz_read_num_node_ele_b(FPz_f, id_rank, zbuf, mesh_IO)
-!
-      use gz_domain_data_IO_b
-      use gz_node_geometry_IO_b
-      use gz_element_connect_IO_b
-!
-      character, pointer, intent(in) :: FPz_f
-      integer, intent(in) :: id_rank
-!
-      type(buffer_4_gzip), intent(inout) :: zbuf
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call gz_read_num_node_b(FPz_f, id_rank, zbuf, mesh_IO)
-      if(zbuf%ierr_zlib .ne. 0) return
-      call gz_read_geometry_info_b(FPz_f, zbuf, mesh_IO%node)
-      if(zbuf%ierr_zlib .ne. 0) return
-!
-!  ----  read element data -------
-!
-      call gz_read_number_of_element_b(FPz_f, zbuf, mesh_IO%ele)
-      if(zbuf%ierr_zlib .ne. 0) return
-!
-      end subroutine gz_read_num_node_ele_b
-!
-!------------------------------------------------------------------
-!
       subroutine gz_read_geometry_data_b                                &
      &         (FPz_f, id_rank, zbuf, mesh_IO)
 !
@@ -164,7 +113,10 @@
       type(mesh_geometry), intent(inout) :: mesh_IO
 !
 !
-      call gz_read_num_node_ele_b(FPz_f, id_rank, zbuf, mesh_IO)
+      call gz_read_domain_info_b(FPz_f, id_rank, zbuf,                  &
+     &                           mesh_IO%nod_comm)
+      if(zbuf%ierr_zlib .ne. 0) return
+      call gz_read_geometry_info_b(FPz_f, zbuf, mesh_IO%node)
       if(zbuf%ierr_zlib .ne. 0) return
 !
 !  ----  read element data -------

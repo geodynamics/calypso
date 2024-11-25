@@ -510,6 +510,53 @@ begin MHD_control
         SGS_terms_ctl    gravity           end
       end array SGS_terms_ctl
     end SGS_control
+!
+    begin polytrope_ctl
+      density_variation_ctl    ON
+      density_file_name     'density_variation'
+!
+      bottom_density_ctl      0.53846   2.0
+      top_density_ctl         1.53846   1.0
+      polytrope_index_ctl     1.0
+!
+      array density_list_ctl
+        density_list_ctl      0.53846   1.2
+        density_list_ctl      1.03846   1.05
+        density_list_ctl      1.53846   1.0
+      end array density_list_ctl
+    end   polytrope_ctl
+!
+    begin viscosity_ctl
+      radial_variation_ctl      ON
+      variation_file_name    'viscous_variation'
+!
+      array diffusivity_list_ctl
+        diffusivity_list_ctl      0.53846   1.2
+        diffusivity_list_ctl      1.03846   1.05
+        diffusivity_list_ctl      1.53846   1.0
+      end array diffusivity_list_ctl
+    end   viscosity_ctl
+!
+    begin magnetic_diffusion_ctl
+      radial_variation_ctl      ON
+      variation_file_name    'viscous_variation'
+!
+      array diffusivity_list_ctl
+        diffusivity_list_ctl      0.53846   1.2
+        diffusivity_list_ctl      1.03846   1.05
+        diffusivity_list_ctl      1.53846   1.0
+      end array diffusivity_list_ctl
+    end   magnetic_diffusion_ctl
+!
+    begin thermal_diffusion_ctl
+      radial_variation_ctl      ON
+      variation_file_name    'viscous_variation'
+    end   thermal_diffusion_ctl
+!
+    begin composition_diffusion_ctl
+      radial_variation_ctl      ON
+      variation_file_name    'viscous_variation'
+    end   composition_diffusion_ctl
   end model
 !
 !

@@ -67,7 +67,6 @@
 !
       call gz_mpi_read_domain_info_b(IO_param, comm_IO)
 !
-      call gz_mpi_read_num_element_b(IO_param, ele_IO)
       call gz_mpi_read_ele_info_b(IO_param, ele_IO)
       call gz_mpi_read_surf_4_elem_b(IO_param, sfed_IO)
 !
@@ -111,7 +110,6 @@
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !
 !
-      call gz_mpi_read_number_of_node_b(IO_param, nod_IO)
       call gz_mpi_read_geometry_info_b(IO_param, nod_IO)
 !
       call gz_mpi_read_vect_in_ele_b(IO_param, nod_IO, sfed_IO)

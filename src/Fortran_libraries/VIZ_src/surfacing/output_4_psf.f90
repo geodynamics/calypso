@@ -33,7 +33,6 @@
 !
       use calypso_mpi
       use t_time_data
-      use t_time_data
       use t_ucd_data
       use t_file_IO_parameter
       use t_psf_patch_data

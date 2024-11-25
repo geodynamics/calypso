@@ -107,8 +107,10 @@
       bbuf_fld%id_binary = id_read_fld
       call open_read_binary_file(file_name, id_rank, bbuf_fld)
       if(bbuf_fld%ierr_bin .ne. 0) goto 99
-      call read_step_data_b                                             &
-     &   (bbuf_fld, t_IO, istack_merged, fld_IO%num_field_IO)
+      call read_step_data_b(bbuf_fld, t_IO)
+      if(bbuf_fld%ierr_bin .ne. 0) goto 99
+      call read_field_num_b                                             &
+     &   (bbuf_fld, istack_merged, fld_IO%num_field_IO)
       if(bbuf_fld%ierr_bin .ne. 0) goto 99
 !
       call read_mul_integer_b                                           &
@@ -202,8 +204,10 @@
       integer(kind = kint_gl) :: istack_merged(1)
 !
 !
-      call read_step_data_b                                             &
-     &   (bbuf, t_IO, istack_merged, fld_IO%num_field_IO)
+      call read_step_data_b(bbuf, t_IO)
+      if(bbuf%ierr_bin .ne. 0) return
+      call read_field_num_b                                             &
+     &   (bbuf, istack_merged, fld_IO%num_field_IO)
       fld_IO%nnod_IO = int(istack_merged(1), KIND(fld_IO%nnod_IO))
       if(bbuf%ierr_bin .ne. 0) return
 !

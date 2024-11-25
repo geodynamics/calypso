@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine sel_div_buoyancies_sph_MHD                           &
-!!     &         (iflag_4_gravity, iflag_4_composit_buo,                &
+!!     &         (flag_thermal_buoyancy, flag_comp_buoyancy,            &
 !!     &          sph_rj, ipol_base, ipol_grd, ipol_div_frc,            &
 !!     &          coef_buo, coef_comp_buo, sph_bc_U,                    &
 !!     &          ref_param_T, ref_param_C, rj_fld)
@@ -46,7 +46,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine sel_div_buoyancies_sph_MHD                             &
-     &         (iflag_4_gravity, iflag_4_composit_buo,                  &
+     &         (flag_thermal_buoyancy, flag_comp_buoyancy,              &
      &          sph_rj, ipol_base, ipol_grd, ipol_div_frc,              &
      &          coef_buo, coef_comp_buo, sph_bc_U,                      &
      &          ref_param_T, ref_param_C, rj_fld)
@@ -59,7 +59,7 @@
       use t_phys_data
       use t_boundary_params_sph_MHD
 !
-      logical, intent(in) :: iflag_4_gravity, iflag_4_composit_buo
+      logical, intent(in) :: flag_thermal_buoyancy, flag_comp_buoyancy
       real(kind = kreal), intent(in) :: coef_buo, coef_comp_buo
       type(reference_scalar_param), intent(in) :: ref_param_T
       type(reference_scalar_param), intent(in) :: ref_param_C
@@ -74,7 +74,7 @@
       integer(kind = kint) :: igrad_temp, igrad_comp
 !
 !
-      if(iflag_4_gravity) then
+      if(flag_thermal_buoyancy) then
         if(ref_param_T%flag_ref_field) then
           ipol_temp =  ipol_base%i_per_temp
           igrad_temp = ipol_grd%i_grad_per_t
@@ -84,7 +84,7 @@
         end if
       end if
 !
-      if(iflag_4_composit_buo) then
+      if(flag_comp_buoyancy) then
         if(ref_param_C%flag_ref_field) then
           ipol_comp =  ipol_base%i_per_light
           igrad_comp = ipol_grd%i_grad_per_c
@@ -94,7 +94,7 @@
         end if
       end if
 !
-      if(iflag_4_gravity .and. iflag_4_composit_buo) then
+      if(flag_thermal_buoyancy .and. flag_comp_buoyancy) then
         if (iflag_debug.ge.1) write(*,*)                                &
      &        'cal_div_double_buoyancy_sph_MHD', ipol_temp
         call cal_div_double_buoyancy_sph_MHD                            &
@@ -104,7 +104,7 @@
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      else if(iflag_4_gravity) then
+      else if(flag_thermal_buoyancy) then
         if (iflag_debug.ge.1)  write(*,*)                               &
      &    'cal_div_buoyancy_sph_MHD by pert. temperature'
         call cal_div_buoyancy_sph_MHD                                   &
@@ -113,7 +113,7 @@
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      else if(iflag_4_composit_buo) then
+      else if(flag_comp_buoyancy) then
         if (iflag_debug.ge.1)  write(*,*)                               &
      &      'cal_div_buoyancy_sph_MHD by composition'
         call cal_div_buoyancy_sph_MHD                                   &

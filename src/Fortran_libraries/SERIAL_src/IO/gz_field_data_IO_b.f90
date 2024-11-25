@@ -15,8 +15,9 @@
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
 !!      subroutine gz_read_step_data_b(FPz_f, zbuf, id_rank,            &
-!!     &          i_time_step_IO, time_IO, delta_t_IO,                  &
-!!     &          istack_merged, num_field)
+!!     &          i_time_step_IO, time_IO, delta_t_IO)
+!!      subroutine gz_read_num_field_b(FPz_f, zbuf,                     &
+!!     &                               istack_merged, num_field)
 !!      subroutine gz_read_field_data_b                                 &
 !!     &         (FPz_f, zbuf, nnod, num_field, ncomp, field_name, vect)
 !!        character, pointer, intent(in) :: FPz_f
@@ -109,8 +110,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine gz_read_step_data_b(FPz_f, zbuf, id_rank,              &
-     &          i_time_step_IO, time_IO, delta_t_IO,                    &
-     &          istack_merged, num_field)
+     &          i_time_step_IO, time_IO, delta_t_IO)
 !
       use m_error_IDs
 !
@@ -121,11 +121,7 @@
       integer(kind=kint), intent(inout) :: i_time_step_IO
       real(kind = kreal), intent(inout) :: time_IO, delta_t_IO
 !
-      integer(kind = kint_gl), intent(inout) :: istack_merged(1)
-      integer(kind = kint), intent(inout) :: num_field
-!
       integer(kind = kint) :: id_read_rank
-      integer(kind = kint_gl), parameter :: ione64 = 1
 !
 !
       call gz_read_one_integer_b(FPz_f, zbuf, id_read_rank)
@@ -144,13 +140,31 @@
       call gz_read_one_real_b(FPz_f, zbuf, delta_t_IO)
       if(zbuf%ierr_zlib .ne. 0) return
 !
+      end subroutine gz_read_step_data_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine gz_read_num_field_b(FPz_f, zbuf,                       &
+     &                               istack_merged, num_field)
+!
+      use m_error_IDs
+!
+      character, pointer, intent(in) :: FPz_f
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind = kint_gl), intent(inout) :: istack_merged(1)
+      integer(kind = kint), intent(inout) :: num_field
+!
+      integer(kind = kint_gl), parameter :: ione64 = 1
+!
+!
       call gz_read_mul_int8_b(FPz_f, zbuf, ione64, istack_merged(1))
       if(zbuf%ierr_zlib .ne. 0) return
 !
       call gz_read_one_integer_b(FPz_f, zbuf, num_field)
-      if(zbuf%ierr_zlib .ne. 0) return
 !
-      end subroutine gz_read_step_data_b
+      end subroutine gz_read_num_field_b
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

@@ -94,6 +94,7 @@
 !
       use cal_nonlinear_sph_MHD
       use sum_rotation_of_forces
+      use cal_self_buoyancies_sph
       use rot_self_buoyancies_sph
 !
       use m_work_time
@@ -109,10 +110,18 @@
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-!   ----  lead rotation of buoyancies
       if(SPH_model%MHD_prop%fl_prop%iflag_scheme                        &
      &                         .gt. id_no_evolution) then
-      if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
+!
+!   ----  lead buoyancies
+        call sel_buoyancies_sph_MHD                                     &
+     &     (SPH_MHD%sph%sph_rj, trans_p%leg, SPH_MHD%ipol%forces,       &
+     &      SPH_model%MHD_prop%fl_prop, SPH_model%sph_MHD_bc%sph_bc_U,  &
+     &      SPH_MHD%ipol%base%i_temp, SPH_MHD%ipol%base%i_light,        &
+     &      SPH_MHD%fld)
+!
+!   ----  lead rotation of buoyancies
+        if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
         call sel_rot_buoyancy_sph_MHD(SPH_MHD%sph%sph_rj,               &
      &      SPH_MHD%ipol%base, SPH_MHD%ipol%rot_forces,                 &
      &      SPH_model%MHD_prop%fl_prop, SPH_model%sph_MHD_bc%sph_bc_U,  &
@@ -143,9 +152,15 @@
       if(SPH_model%MHD_prop%fl_prop%iflag_scheme .eq. id_no_evolution)  &
      &      return
 !
-      if(iflag_debug .gt. 0) write(*,*) 'sum_forces_to_explicit'
-      call sum_forces_to_explicit(SPH_model%MHD_prop%fl_prop,           &
-     &    SPH_MHD%ipol%exp_work, SPH_MHD%ipol%rot_forces, SPH_MHD%fld)
+!        if(iflag_debug .gt. 0) write(*,*)                               &
+!     &       'sum_forces_to_explicit for forces'
+!        call sum_forces_to_explicit(SPH_model%MHD_prop%fl_prop,        &
+!     &      SPH_MHD%ipol%exp_work, SPH_MHD%ipol%forces, SPH_MHD%fld)
+        if(iflag_debug .gt. 0) write(*,*)                               &
+     &       'sum_forces_to_explicit for rotation of forces'
+        call sum_forces_to_explicit(SPH_model%MHD_prop%fl_prop,         &
+     &      SPH_MHD%ipol%exp_work, SPH_MHD%ipol%rot_forces,             &
+     &      SPH_MHD%fld)
 !
       end subroutine nonlinear
 !*
@@ -187,9 +202,9 @@
       if (iflag_debug.ge.1) write(*,*) 'sph_back_trans_4_MHD'
       call sph_back_trans_4_MHD                                         &
      &   (sph, comms_sph, MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,        &
-     &    omega_sph, trans_p, gt_cor, rj_fld, trns_MHD%b_trns,          &
-     &    trns_MHD%backward, WK_leg, WK_FFTs_MHD, cor_rlm,              &
-     &    SR_sig, SR_r)
+     &    omega_sph, trans_p, gt_cor, rj_fld,                           &
+     &    trns_MHD%b_trns, trns_MHD%f_trns, trns_MHD%backward,          &
+     &    WK_leg, WK_FFTs_MHD, cor_rlm, SR_sig, SR_r)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+9)
 !
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+10)
@@ -223,6 +238,7 @@
      &          rj_fld, SR_sig, SR_r)
 !
       use m_phys_constants
+      use cal_self_buoyancies_sph
       use rot_self_buoyancies_sph
       use sph_transforms_4_MHD
       use copy_nodal_fields
@@ -243,8 +259,15 @@
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
-!   ----  Rotation of buoyancies
+!
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
+!   ----  lead rotation of buoyancies
+        call sel_buoyancies_sph_MHD                                     &
+     &     (sph%sph_rj, trans_p%leg, ipol%forces,                       &
+     &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,                      &
+     &      ipol%base%i_temp, ipol%base%i_light, rj_fld)
+!
+!   ----  lead rotation of buoyancies
         if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
         call sel_rot_buoyancy_sph_MHD                                   &
      &     (sph%sph_rj, ipol%base, ipol%rot_forces,                     &
@@ -253,7 +276,7 @@
 !*
 !*  ----  copy velocity for coriolis term ------------------
       if(iflag_debug.eq.1) write(*,*) 'sph_transform_4_licv'
-      if(MHD_prop%fl_prop%iflag_4_coriolis) then
+      if(MHD_prop%fl_prop%flag_coriolis) then
         call sph_transform_4_licv                                       &
      &     (sph%sph_rlm, comms_sph%comm_rlm, comms_sph%comm_rj,         &
      &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, omega_sph, trans_p,  &
@@ -276,8 +299,12 @@
       call add_ref_advect_sph_MHD(sph%sph_rj, sph_MHD_bc, MHD_prop,     &
      &                            trans_p%leg, refs, ipol, rj_fld)
 !
-      call licv_forces_to_explicit(MHD_prop%fl_prop,                    &
-     &    ipol%exp_work, ipol%rot_forces, rj_fld)
+!
+!      call licv_forces_to_explicit(MHD_prop%fl_prop,                   &
+!     &    ipol%exp_work, ipol%forces, rj_fld)
+
+        call licv_forces_to_explicit(MHD_prop%fl_prop,                  &
+     &      ipol%exp_work, ipol%rot_forces, rj_fld)
 !
 !
       end subroutine licv_exp

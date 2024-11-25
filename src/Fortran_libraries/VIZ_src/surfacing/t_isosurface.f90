@@ -10,12 +10,14 @@
 !!@verbatim
 !!      subroutine ISOSURF_initialize(increment_iso, geofem,            &
 !!     &                              nod_fld, iso_ctls, iso)
+!!        type(elapsed_lables), intent(in) :: elps_ISO
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(isosurf_controls), intent(inout) :: iso_ctls
 !!        type(isosurface_module), intent(inout) :: iso
 !!        type(phys_data), intent(in) :: nod_fld
-!!      subroutine ISOSURF_visualize(istep_iso, time_d,                 &
+!!      subroutine ISOSURF_visualize(istep_iso, elps_ISO, time_d,       &
 !!     &          geofem, edge_comm, nod_fld, iso, SR_sig, SR_il)
+!!        type(elapsed_lables), intent(in) :: elps_ISO
 !!        type(time_data), intent(in) :: time_d
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(communication_table), intent(in) :: edge_comm
@@ -31,6 +33,7 @@
       module t_isosurface
 !
       use m_precision
+      use m_work_time
       use t_mesh_data
       use t_comm_table
       use t_phys_data
@@ -137,11 +140,9 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine ISOSURF_visualize(istep_iso, time_d,                   &
+      subroutine ISOSURF_visualize(istep_iso, elps_ISO, time_d,         &
      &          geofem, edge_comm, nod_fld, iso, SR_sig, SR_il)
 !
-      use m_work_time
-      use m_elapsed_labels_4_VIZ
       use m_geometry_constants
       use t_time_data
       use t_ucd_data
@@ -153,6 +154,7 @@
 !
       integer(kind = kint), intent(in) :: istep_iso
 !
+      type(elapsed_lables), intent(in) :: elps_ISO
       type(time_data), intent(in) :: time_d
       type(mesh_data), intent(in) :: geofem
       type(communication_table), intent(in) :: edge_comm
@@ -165,7 +167,8 @@
 !
       if (iso%num_iso.le.0 .or. istep_iso.le.0) return
 !
-      if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+1)
+      if(elps_ISO%flag_elapsed)                                         &
+     &         call start_elapsed_time(elps_ISO%ist_elapsed+1)
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_isosurfaces'
       call set_const_4_isosurfaces(iso%num_iso, geofem%mesh%node,       &
      &    nod_fld, iso%iso_def, iso%iso_list)
@@ -174,16 +177,20 @@
       call set_node_and_patch_iso                                       &
      &   (iso%num_iso, geofem%mesh, edge_comm, iso%iso_case_tbls,       &
      &    iso%iso_search, iso%iso_list, iso%iso_mesh, SR_sig, SR_il)
-      if(iflag_ISO_time) call end_elapsed_time(ist_elapsed_ISO+1)
+      if(elps_ISO%flag_elapsed)                                         &
+     &         call end_elapsed_time(elps_ISO%ist_elapsed+1)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_field_4_iso'
-      if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+2)
+      if(elps_ISO%flag_elapsed)                                         &
+     &         call start_elapsed_time(elps_ISO%ist_elapsed+2)
       call alloc_psf_field_data(iso%num_iso, iso%iso_mesh)
       call set_field_4_iso(iso%num_iso, geofem%mesh%edge, nod_fld,      &
      &    iso%iso_param, iso%iso_def, iso%iso_list, iso%iso_mesh)
-      if(iflag_ISO_time) call end_elapsed_time(ist_elapsed_ISO+2)
+      if(elps_ISO%flag_elapsed)                                         &
+     &         call end_elapsed_time(elps_ISO%ist_elapsed+2)
 !
-      if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+3)
+      if(elps_ISO%flag_elapsed)                                         &
+     &         call start_elapsed_time(elps_ISO%ist_elapsed+3)
       call output_isosurface                                            &
      &   (iso%num_iso, iso%iso_file_IO, istep_iso, time_d,              &
      &    iso%iso_mesh, iso%iso_time_IO, iso%iso_out)
@@ -191,7 +198,8 @@
       call dealloc_psf_field_data(iso%num_iso, iso%iso_mesh)
       call dealloc_psf_node_and_patch                                   &
      &   (iso%num_iso, iso%iso_list, iso%iso_mesh)
-      if(iflag_ISO_time) call end_elapsed_time(ist_elapsed_ISO+3)
+      if(elps_ISO%flag_elapsed)                                         &
+     &         call end_elapsed_time(elps_ISO%ist_elapsed+3)
 !
       end subroutine ISOSURF_visualize
 !

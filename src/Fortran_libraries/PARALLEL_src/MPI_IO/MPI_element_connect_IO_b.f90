@@ -131,6 +131,7 @@
       integer(kind = kint) :: i
 !
 !
+      call mpi_read_number_of_element_b(IO_param, ele_IO)
       call alloc_element_types(ele_IO)
 !
       num64 = ele_IO%numele

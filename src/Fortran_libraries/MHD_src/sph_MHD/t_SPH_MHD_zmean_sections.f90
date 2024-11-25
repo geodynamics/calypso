@@ -7,16 +7,18 @@
 !>@brief  Make zonal mean sections
 !!
 !!@verbatim
-!!      subroutine init_zonal_mean_sections(viz_step, geofem, edge_comm,&
-!!     &         nod_fld, zm_sects, zmeans, m_SR)
+!!     subroutine init_zonal_mean_sections(elps_SECT, viz_step,         &
+!!     &          geofem, edge_comm, nod_fld, zm_sects, zmeans, m_SR)
+!!        type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
 !!        type(VIZ_step_params), intent(in) :: viz_step
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(sph_dynamo_section_controls), intent(inout) :: zm_sects
 !!        type(sph_zonal_mean_sectioning), intent(inout) :: zmeans
 !!        type(mesh_SR), intent(inout) :: m_SR
-!!      subroutine SPH_MHD_zmean_sections(viz_step, time_d,             &
+!!      subroutine SPH_MHD_zmean_sections(elps_SECT, viz_step, time_d,  &
 !!     &          sph, geofem, WK, nod_fld, zmeans, m_SR)
+!!        type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
 !!        type(VIZ_step_params), intent(in) :: viz_step
 !!        type(time_data), intent(in) :: time_d
 !!        type(sph_grids), intent(in) :: sph
@@ -33,7 +35,6 @@
 !
       use m_machine_parameter
       use m_work_time
-      use m_elapsed_labels_4_VIZ
       use calypso_mpi
 !
       use t_time_data
@@ -45,6 +46,7 @@
       use t_cross_section
       use t_mesh_SR
       use t_VIZ_step_parameter
+      use t_elapsed_labels_4_SECTIONS
 !
       implicit  none
 !
@@ -64,11 +66,12 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_zonal_mean_sections(viz_step, geofem, edge_comm,  &
-     &         nod_fld, zm_sects, zmeans, m_SR)
+      subroutine init_zonal_mean_sections(elps_SECT, viz_step,          &
+     &          geofem, edge_comm, nod_fld, zm_sects, zmeans, m_SR)
 !
       use t_control_data_dynamo_sects
 !
+      type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
       type(VIZ_step_params), intent(in) :: viz_step
       type(mesh_data), intent(in) :: geofem
       type(communication_table), intent(in) :: edge_comm
@@ -79,25 +82,30 @@
       type(mesh_SR), intent(inout) :: m_SR
 !
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
+      if(elps_SECT%flag_elapsed_S)                                      &
+     &           call start_elapsed_time(elps_SECT%ist_elapsed_S+1)
       call SECTIONING_initialize                                        &
-     &   (viz_step%PSF_t%increment, geofem, edge_comm, nod_fld,         &
-     &    zm_sects%zm_psf_ctls, zmeans%zm_psf, m_SR%SR_sig, m_SR%SR_il)
-      call SECTIONING_initialize(viz_step%PSF_t%increment,              &
+     &   (viz_step%PSF_t%increment, elps_SECT%elps_PSF,                 &
+     &    geofem, edge_comm, nod_fld, zm_sects%zm_psf_ctls,             &
+     &    zmeans%zm_psf, m_SR%SR_sig, m_SR%SR_il)
+      call SECTIONING_initialize                                        &
+     &   (viz_step%PSF_t%increment, elps_SECT%elps_PSF,                 &
      &    geofem, edge_comm, nod_fld, zm_sects%zRMS_psf_ctls,           &
      &    zmeans%zrms_psf, m_SR%SR_sig, m_SR%SR_il)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
+      if(elps_SECT%flag_elapsed_S)                                      &
+     &           call end_elapsed_time(elps_SECT%ist_elapsed_S+1)
 !
       end subroutine init_zonal_mean_sections
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine SPH_MHD_zmean_sections(viz_step, time_d,               &
+      subroutine SPH_MHD_zmean_sections(elps_SECT, viz_step, time_d,    &
      &          sph, geofem, WK, nod_fld, zmeans, m_SR)
 !
       use FEM_analyzer_sph_MHD
       use nod_phys_send_recv
 !
+      type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
       type(VIZ_step_params), intent(in) :: viz_step
       type(sph_grids), intent(in) :: sph
 !
@@ -110,23 +118,24 @@
       type(mesh_SR), intent(inout) :: m_SR
 !
 !
-      call SPH_MHD_zonal_mean_section(viz_step, time_d, sph, geofem,    &
-     &    nod_fld, zmeans%zm_psf, m_SR)
-      call SPH_MHD_zonal_RMS_section(viz_step, time_d, sph, geofem, WK, &
-     &    nod_fld, zmeans%zrms_psf, m_SR)
+      call SPH_MHD_zonal_mean_section(elps_SECT, viz_step, time_d,      &
+     &    sph, geofem, nod_fld, zmeans%zm_psf, m_SR)
+      call SPH_MHD_zonal_RMS_section(elps_SECT, viz_step, time_d,       &
+     &    sph, geofem, WK, nod_fld, zmeans%zrms_psf, m_SR)
 !
       end subroutine SPH_MHD_zmean_sections
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine SPH_MHD_zonal_mean_section(viz_step, time_d,           &
-     &          sph, geofem, nod_fld, zm_psf, m_SR)
+      subroutine SPH_MHD_zonal_mean_section                             &
+     &         (elps_SECT, viz_step, time_d, sph, geofem, nod_fld,      &
+     &          zm_psf, m_SR)
 !
-      use m_elapsed_labels_4_VIZ
       use sph_rtp_zonal_rms_data
       use nod_phys_send_recv
 !
+      type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
       type(VIZ_step_params), intent(in) :: viz_step
       type(sph_grids), intent(in) :: sph
 !
@@ -149,25 +158,28 @@
      &                          m_SR%v_sol, m_SR%SR_sig, m_SR%SR_r)
 !
       if(zm_psf%num_psf .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
+        if(elps_SECT%flag_elapsed_S)                                    &
+     &           call start_elapsed_time(elps_SECT%ist_elapsed_S+2)
         if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize zmean'
         call SECTIONING_visualize                                       &
-     &   (viz_step%istep_psf, time_d, geofem, nod_fld, zm_psf)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
+     &     (viz_step%istep_psf, elps_SECT%elps_PSF,                     &
+     &      time_d, geofem, nod_fld, zm_psf)
+        if(elps_SECT%flag_elapsed_S)                                    &
+     &           call end_elapsed_time(elps_SECT%ist_elapsed_S+2)
       end if
 !
       end subroutine SPH_MHD_zonal_mean_section
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine SPH_MHD_zonal_RMS_section(viz_step, time_d, sph,       &
-     &          geofem, WK, nod_fld, zrms_psf, m_SR)
+      subroutine SPH_MHD_zonal_RMS_section(elps_SECT, viz_step, time_d, &
+     &          sph, geofem, WK, nod_fld, zrms_psf, m_SR)
 !
-      use m_elapsed_labels_4_VIZ
       use FEM_analyzer_sph_MHD
       use sph_rtp_zonal_rms_data
       use nod_phys_send_recv
 !
+      type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
       type(VIZ_step_params), intent(in) :: viz_step
       type(sph_grids), intent(in) :: sph
 !
@@ -192,11 +204,14 @@
      &                          m_SR%v_sol, m_SR%SR_sig, m_SR%SR_r)
 !
       if(zrms_psf%num_psf .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
+        if(elps_SECT%flag_elapsed_S)                                    &
+     &           call start_elapsed_time(elps_SECT%ist_elapsed_S+2)
         if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize RMS'
         call SECTIONING_visualize                                       &
-     &     (viz_step%istep_psf, time_d, geofem, nod_fld, zrms_psf)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
+     &     (viz_step%istep_psf, elps_SECT%elps_PSF,                     &
+     &      time_d, geofem, nod_fld, zrms_psf)
+        if(elps_SECT%flag_elapsed_S)                                    &
+     &           call end_elapsed_time(elps_SECT%ist_elapsed_S+2)
       end if
 !
       end subroutine SPH_MHD_zonal_RMS_section

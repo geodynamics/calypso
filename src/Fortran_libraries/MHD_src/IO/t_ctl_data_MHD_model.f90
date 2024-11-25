@@ -34,6 +34,8 @@
       use t_ctl_data_magnetic_scale
       use t_ctl_data_temp_model
       use t_ctl_data_dimless_numbers
+      use t_ctl_data_valuable_diffuse
+      use t_ctl_data_valuable_density
 !
       use skip_comment_f
 !
@@ -77,6 +79,18 @@
 !>        Structures for reference composition
         type(reference_temperature_ctl) :: refc_ctl
 !
+!>      Block for compositional diffusivity definision
+        type(val_density_ctl) :: polytrope_c
+!
+!>      Block for compositional diffusivity definision
+        type(val_diffuse_ctl) :: val_viscous_c
+!>      Block for compositional diffusivity definision
+        type(val_diffuse_ctl) :: val_mag_diffuse_c
+!>      Block for compositional diffusivity definision
+        type(val_diffuse_ctl) :: val_thermal_diffuse_c
+!>      Block for compositional diffusivity definision
+        type(val_diffuse_ctl) :: val_comp_diffuse_c
+!
         integer (kind=kint) :: i_model = 0
       end type mhd_model_control
 !
@@ -105,6 +119,14 @@
       call dealloc_coriolis_ctl(model_ctl%cor_ctl)
       call dealloc_magneto_ctl(model_ctl%mcv_ctl)
       call dealloc_magnetic_scale_ctl(model_ctl%bscale_ctl)
+!
+      call dealloc_val_density_ctl_data(model_ctl%polytrope_c)
+!
+      call dealloc_val_diffuse_ctl_data(model_ctl%val_viscous_c)
+      call dealloc_val_diffuse_ctl_data(model_ctl%val_mag_diffuse_c)
+      call dealloc_val_diffuse_ctl_data                                 &
+     &   (model_ctl%val_thermal_diffuse_c)
+      call dealloc_val_diffuse_ctl_data(model_ctl%val_comp_diffuse_c)
 !
       model_ctl%i_model = 0
 !

@@ -76,9 +76,8 @@
 !      write(id_file,'(a)') '!      (type and connection) '
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_element(id_file, ele_IO, ierr)
+      call read_element_info(id_file, ele_IO, ierr)
       if(ierr .ne. 0) return
-      call read_element_info(id_file, ele_IO)
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '!  2.2 surface id for each element'
@@ -87,8 +86,7 @@
 !      write(id_file,'(a)') '!'
 !
       call read_surface_4_element(id_file, sfed_IO)
-!
-!
+      if(ierr .ne. 0) return
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 3.import / export information '
@@ -159,9 +157,8 @@
 !      write(id_file,'(a)') '! 4.1 center of surface'
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_node(id_file, nod_IO, iend)
+      call read_geometry_info(id_file, nod_IO, iend)
       if(iend .ne. 0) return
-      call read_geometry_info(id_file, nod_IO)
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '!  4.2 normal vector of surface'

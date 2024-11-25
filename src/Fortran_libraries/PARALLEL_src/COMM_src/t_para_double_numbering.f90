@@ -18,9 +18,10 @@
 !!        type(node_ele_double_number), intent(inout) :: inod_dbl
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_int_buffer), intent(inout) :: SR_i
-!!      subroutine set_ele_double_numbering                             &
-!!     &         (ele, ele_comm, inod_dbl, iele_dbl, SR_sig, SR_i)
-!!        type(element_data), intent(in) :: ele
+!!      subroutine set_ele_double_numbering(numele, ie, ele_comm,       &
+!!     &          inod_dbl, iele_dbl, SR_sig, SR_i)
+!!        integer(kind = kint), intent(in) :: numele
+!!        integer(kind = kint), intent(in) :: ie(numele,1)
 !!        type(communication_table), intent(in) :: ele_comm
 !!        type(node_ele_double_number), intent(in) :: inod_dbl
 !!        type(node_ele_double_number), intent(inout) :: iele_dbl
@@ -126,8 +127,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_ele_double_numbering                               &
-     &         (ele, ele_comm, inod_dbl, iele_dbl, SR_sig, SR_i)
+      subroutine set_ele_double_numbering(numele, ie, ele_comm,         &
+     &          inod_dbl, iele_dbl, SR_sig, SR_i)
 
 !
       use t_solver_SR
@@ -136,7 +137,8 @@
       use t_comm_table
       use solver_SR_type
 !
-      type(element_data), intent(in) :: ele
+      integer(kind = kint), intent(in) :: numele
+      integer(kind = kint), intent(in) :: ie(numele,1)
       type(communication_table), intent(in) :: ele_comm
       type(node_ele_double_number), intent(in) :: inod_dbl
 !
@@ -148,13 +150,15 @@
       integer(kind = kint) :: iele
 !
 !$omp parallel do
-      do iele = 1, ele%numele
+      do iele = 1, numele
         iele_dbl%index(iele) = iele
-        iele_dbl%irank(iele) = inod_dbl%irank(ele%ie(iele,1))
+        iele_dbl%irank(iele) = my_rank
       end do
 !$omp end parallel do
 !
-      call SOLVER_SEND_RECV_int_type(ele%numele, ele_comm,              &
+      call SOLVER_SEND_RECV_int_type(numele, ele_comm,                  &
+     &                               SR_sig, SR_i, iele_dbl%irank(1))
+      call SOLVER_SEND_RECV_int_type(numele, ele_comm,                  &
      &                               SR_sig, SR_i, iele_dbl%index(1))
 !
       end subroutine set_ele_double_numbering

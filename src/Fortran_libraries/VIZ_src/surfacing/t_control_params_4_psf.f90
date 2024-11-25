@@ -130,9 +130,9 @@
       tmpchara = psf_def_c%section_method_ctl%charavalue
       if(ierr .gt. 0 .and. cmp_no_case(tmpchara, cflag_grp)) then
         psf_def%id_section_method = 0
-        call set_surf_grp_id_4_viz(sf_grp%num_grp, sf_grp%grp_name,     &
-     &      psf_def_c%psf_group_name_ctl%charavalue,                    &
-     &      psf_def%id_psf_group)
+        psf_def%id_psf_group                                            &
+     &       = set_surf_grp_id_4_viz(sf_grp%num_grp, sf_grp%grp_name,   &
+     &                         psf_def_c%psf_group_name_ctl%charavalue)
       else if(ierr .gt. 0) then
         write(e_message,'(a)') 'Set cross section mode'
         return

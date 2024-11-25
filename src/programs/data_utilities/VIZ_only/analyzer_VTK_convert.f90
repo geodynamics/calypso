@@ -17,6 +17,7 @@
       use t_FEM_mesh_field_4_viz
       use t_file_IO_parameter
       use t_vector_for_solver
+      use t_elapsed_labels_4_SECTIONS
       use FEM_analyzer_viz_surf
       use t_mesh_SR
 !
@@ -36,9 +37,13 @@
       type(mesh_SR) :: m_SR15
 !
 !>        Structure for VTK file output paramters
-        type(field_IO_params) :: vtk_file_IO5
+      type(field_IO_params) :: vtk_file_IO5
 !>          FEM field data to VTK
       type(ucd_data), save :: vtk_out5
+!
+!>          Elapsed time labels
+      logical, parameter :: flag_detailed1 = .TRUE.
+      type(elapsed_labels_4_SECTIONS), save :: elps_SECT1
 !
 !  ---------------------------------------------------------------------
 !
@@ -49,13 +54,12 @@
       subroutine init_analyzer_VTK_convert
 !
       use calypso_mpi
-      use m_elapsed_labels_4_VIZ
       use m_elapsed_labels_SEND_RECV
       use input_control_section_only
 !
 !
       call init_elapse_time_by_TOTAL
-      call elpsed_label_4_VIZ
+      call elpsed_label_4_SECT(flag_detailed1, elps_SECT1, elps1)
       call elpsed_label_field_send_recv
 !
 !     read controls
@@ -94,8 +98,8 @@
 !
 !  Generate field lines
         istep_ucd = istep_file_w_fix_dt(i_step, t_VIZ5%ucd_step)
-        call visualize_convert_vtk(i_step, istep_ucd, t_VIZ5%time_d,    &
-     &      vtk_file_IO5, vtk_out5)
+        call visualize_convert_vtk(i_step, istep_ucd, elps_SECT1,       &
+     &      t_VIZ5%time_d, vtk_file_IO5, vtk_out5)
       end do
 !
       if(iflag_TOT_time) call end_elapsed_time(ied_total_elapsed)

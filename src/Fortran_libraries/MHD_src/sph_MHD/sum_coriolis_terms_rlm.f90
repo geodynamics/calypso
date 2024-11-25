@@ -53,6 +53,7 @@
 !!     (wsr) = wsr(jc,1,j3)*dw*uhb
 !!     (wtr) = wtr(j3)*dw*utb
 !!
+!!  Horizontal componenet of the Coriolis term
 !!     (wsh) = wsh(jc,j3)*dw*urb/r**2
 !!            + whh(jc,j3)*w*uhb/r**2
 !!     (wth) = wth(j3)*dw*utb/r**2
@@ -85,6 +86,7 @@
 !
       use t_spheric_rlm_data
       use t_phys_address
+      use t_base_field_labels
       use t_poloidal_rotation
       use t_gaunt_coriolis_rlm
 !
@@ -124,7 +126,7 @@
 !
       if(sph_rlm%istep_rlm(1) .eq. 1) then
         call sum_coriolis_rlm_10                                        &
-     &     (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                 &
+     &     (b_trns%base, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,            &
      &      sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,              &
      &      omega_sph%ws_rlm, coef_cor, gt_cor%jgi_rlm, gt_cor%jei_rlm, &
      &      gt_cor%sw_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm,                &
@@ -133,7 +135,7 @@
      &      pol_cor_rlm, hrz_cor_rlm, tor_cor_rlm)
       else
         call sum_coriolis_lrm_10                                        &
-     &     (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                 &
+     &     (b_trns%base, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,            &
      &      sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,              &
      &      omega_sph%ws_rlm, coef_cor, gt_cor%jgi_rlm, gt_cor%jei_rlm, &
      &      gt_cor%sw_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm,                &
@@ -146,14 +148,14 @@
 !
 !   ------------------------------------------------------------------
 !
-      subroutine sum_coriolis_lrm_10(b_trns,                            &
+      subroutine sum_coriolis_lrm_10(t_base,                            &
      &          nnod_rlm, nidx_rlm, idx_gl_1d_rlm_j, a_r_1d_rlm_r,      &
      &          omega_rlm, coef_cor, jgi_cor_rlm, jei_cor_rlm,          &
      &          sw_rlm, sr_rlm, tr_rlm, sh_rlm, hh_rlm, th_rlm,         &
      &          NB, n_WR, irev_sr_rlm, WR,                              &
      &          pol_cor_rlm, hrz_cor_rlm, tor_cor_rlm)
 !
-      type(phys_address), intent(in) :: b_trns
+      type(base_field_address), intent(in) :: t_base
 !
       integer(kind = kint), intent(in) :: nnod_rlm
       integer(kind = kint), intent(in) :: nidx_rlm(2)
@@ -204,15 +206,15 @@
           ir_21 = irev_sr_rlm(i21) - 1
           ir_12 = irev_sr_rlm(i12) - 1
 !
-          sp_vr_l1 = WR(b_trns%base%i_velo +   NB*ir_12)
-          sp_vh_l1 = WR(b_trns%base%i_velo+1 + NB*ir_12)
-          sp_vt_k1 = WR(b_trns%base%i_velo+2 + NB*ir_11)
-          sp_vt_k2 = WR(b_trns%base%i_velo+2 + NB*ir_21)
-          sp_dvp_k1 = WR(b_trns%base%i_velo+1 + NB*ir_11)
-          sp_dvp_k2 = WR(b_trns%base%i_velo+1 + NB*ir_21)
-          sp_vt_l1 =  WR(b_trns%base%i_velo+2 +  NB*ir_12)
-          sp_vp_k1 =  WR(b_trns%base%i_velo +  NB*ir_11)
-          sp_vp_k2 =  WR(b_trns%base%i_velo +  NB*ir_21)
+          sp_vr_l1 = WR(t_base%i_velo +   NB*ir_12)
+          sp_vh_l1 = WR(t_base%i_velo+1 + NB*ir_12)
+          sp_vt_k1 = WR(t_base%i_velo+2 + NB*ir_11)
+          sp_vt_k2 = WR(t_base%i_velo+2 + NB*ir_21)
+          sp_dvp_k1 = WR(t_base%i_velo+1 + NB*ir_11)
+          sp_dvp_k2 = WR(t_base%i_velo+1 + NB*ir_21)
+          sp_vt_l1 =  WR(t_base%i_velo+2 +  NB*ir_12)
+          sp_vp_k1 =  WR(t_base%i_velo +  NB*ir_11)
+          sp_vp_k2 =  WR(t_base%i_velo +  NB*ir_21)
 !
           pol_cor_rlm(i_rlm)                                            &
      &     =  sr_rlm(1,j_rlm) * omega_rlm(k_rlm,1) * sp_vh_l1           &
@@ -257,7 +259,7 @@
 !     &                              jei_cor_rlm(j_rlm,1)
         i11 =  j11 + (k_rlm-1)*nidx_rlm(2)
         ir_11 = irev_sr_rlm(i11) - 1
-        sp_vt_k1 = WR(b_trns%base%i_velo+2 + NB*ir_11)
+        sp_vt_k1 = WR(t_base%i_velo+2 + NB*ir_11)
 !
         pol_cor_rlm(i_rlm)                                              &
      &     = -(two/three) * omega_rlm(k_rlm,1) * sp_vt_k1
@@ -269,14 +271,14 @@
 !*
 !*   ------------------------------------------------------------------
 !
-      subroutine sum_coriolis_rlm_10(b_trns,                            &
+      subroutine sum_coriolis_rlm_10(t_base,                            &
      &          nnod_rlm, nidx_rlm, idx_gl_1d_rlm_j, a_r_1d_rlm_r,      &
      &          omega_rlm, coef_cor, jgi_cor_rlm, jei_cor_rlm,          &
      &          sw_rlm, sr_rlm, tr_rlm, sh_rlm, hh_rlm, th_rlm,         &
      &          NB, n_WR, irev_sr_rlm, WR,                              &
      &          pol_cor_rlm, hrz_cor_rlm, tor_cor_rlm)
 !
-      type(phys_address), intent(in) :: b_trns
+      type(base_field_address), intent(in) :: t_base
 !
       integer(kind = kint), intent(in) :: nnod_rlm
       integer(kind = kint), intent(in) :: nidx_rlm(2)
@@ -327,15 +329,15 @@
           ir_21 = irev_sr_rlm(i21) - 1
           ir_12 = irev_sr_rlm(i12) - 1
 !
-          sp_vr_l1 = WR(b_trns%base%i_velo +   NB*ir_12)
-          sp_vh_l1 = WR(b_trns%base%i_velo+1 + NB*ir_12)
-          sp_vt_k1 = WR(b_trns%base%i_velo+2 + NB*ir_11)
-          sp_vt_k2 = WR(b_trns%base%i_velo+2 + NB*ir_21)
-          sp_dvp_k1 = WR(b_trns%base%i_velo+1 + NB*ir_11)
-          sp_dvp_k2 = WR(b_trns%base%i_velo+1 + NB*ir_21)
-          sp_vt_l1 =  WR(b_trns%base%i_velo+2 + NB*ir_12)
-          sp_vp_k1 =  WR(b_trns%base%i_velo +  NB*ir_11)
-          sp_vp_k2 =  WR(b_trns%base%i_velo +  NB*ir_21)
+          sp_vr_l1 = WR(t_base%i_velo +   NB*ir_12)
+          sp_vh_l1 = WR(t_base%i_velo+1 + NB*ir_12)
+          sp_vt_k1 = WR(t_base%i_velo+2 + NB*ir_11)
+          sp_vt_k2 = WR(t_base%i_velo+2 + NB*ir_21)
+          sp_dvp_k1 = WR(t_base%i_velo+1 + NB*ir_11)
+          sp_dvp_k2 = WR(t_base%i_velo+1 + NB*ir_21)
+          sp_vt_l1 =  WR(t_base%i_velo+2 + NB*ir_12)
+          sp_vp_k1 =  WR(t_base%i_velo +  NB*ir_11)
+          sp_vp_k2 =  WR(t_base%i_velo +  NB*ir_21)
 !
           pol_cor_rlm(i_rlm)                                            &
      &     =  sr_rlm(1,j_rlm) * omega_rlm(k_rlm,1) * sp_vh_l1           &
@@ -379,7 +381,7 @@
 !     &                              jei_cor_rlm(j_rlm,1)
           i11 = (j11-1)*nidx_rlm(1) + k_rlm
           ir_11 = irev_sr_rlm(i11) - 1
-          sp_vt_k1 = WR(b_trns%base%i_velo+2 + NB*ir_11)
+          sp_vt_k1 = WR(t_base%i_velo+2 + NB*ir_11)
 !
           pol_cor_rlm(i_rlm)                                            &
      &     =  -(two/three) * omega_rlm(k_rlm,1) * sp_vt_k1

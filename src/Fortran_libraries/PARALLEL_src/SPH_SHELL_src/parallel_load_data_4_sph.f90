@@ -35,6 +35,12 @@
 !!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!        type(sph_comm_tbl), intent(inout) :: comm_rj
 !!
+!!      subroutine set_radius_dat_sph_MHD                               &
+!!     &         (radial_rj_grp, sph_params, sph_rj)
+!!        type(group_data), intent(in) :: radial_rj_grp
+!!        type(sph_rj_grid), intent(inout) :: sph_rj
+!!        type(sph_shell_parameters), intent(inout) :: sph_params
+!!
 !!      subroutine dealloc_sph_modes(sph, comms_sph, sph_grps)
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
@@ -62,8 +68,6 @@
       implicit none
 !
       type(sph_file_data_type), save, private :: sph_file_l
-!
-      private :: set_radius_dat_sph_MHD
 !
 ! -----------------------------------------------------------------------
 !

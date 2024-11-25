@@ -130,7 +130,9 @@
       integer (kind = kint) :: i
 !
 !
+      call gz_mpi_read_num_element_b(IO_param, ele_IO)
       call alloc_element_types(ele_IO)
+
       num64 = ele_IO%numele
       call gz_mpi_read_int_vector_b                                     &
      &   (IO_param, num64, ele_IO%elmtyp)

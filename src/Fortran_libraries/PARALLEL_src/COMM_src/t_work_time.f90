@@ -33,6 +33,7 @@
 !
       integer(kind = kint), parameter, private :: id_timer_file = 13
 !
+!>      Structure of elapsed time data display
       type elapsed_time_data
 !>        Number of elapsed log items
         integer(kind = kint) :: num_elapsed

@@ -122,8 +122,10 @@
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
       call init_r_infos_sph_mhd_evo(SPH_model%bc_IO, SPH_MHD%groups,    &
-     &   SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph, SPH_WK%r_2nd,     &
-     &   SPH_model%omega_sph, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
+     &    SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph, SPH_WK%r_2nd,    &
+     &    SPH_WK%r_n2e_3rd, SPH_WK%r_e2n_1st,                           &
+     &    SPH_model%omega_sph, SPH_model%MHD_prop,                      &
+     &    SPH_model%radial_variation, SPH_model%sph_MHD_bc)
 !
       call alloc_schmidt_normalize(SPH_MHD%sph%sph_rlm%nidx_rlm(2),     &
      &    SPH_MHD%sph%sph_rj%nidx_rj(2), SPH_WK%trans_p%leg)

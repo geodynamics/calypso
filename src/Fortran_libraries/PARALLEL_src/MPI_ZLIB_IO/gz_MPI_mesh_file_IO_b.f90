@@ -118,7 +118,8 @@
 !
       call open_read_gz_mpi_file_b                                      &
      &   (file_name, num_pe, id_rank, IO_param)
-      call gz_mpi_read_num_node_b(IO_param, mesh_IO)
+      call gz_mpi_read_domain_info_b(IO_param, mesh_IO%nod_comm)
+      call gz_mpi_read_number_of_node_b(IO_param, mesh_IO%node)
       call close_mpi_file(IO_param)
 !
       end subroutine gz_mpi_read_node_size_b
@@ -143,7 +144,10 @@
 !
       call open_read_gz_mpi_file_b                                      &
      &   (file_name, num_pe, id_rank, IO_param)
-      call gz_mpi_read_num_node_ele_b(IO_param, mesh_IO)
+      call gz_mpi_read_domain_info_b(IO_param, mesh_IO%nod_comm)
+      call gz_mpi_read_geometry_info_b(IO_param, mesh_IO%node)
+!  ----  read element data -------
+      call gz_mpi_read_num_element_b(IO_param, mesh_IO%ele)
       call close_mpi_file(IO_param)
 !
       end subroutine gz_mpi_read_geometry_size_b

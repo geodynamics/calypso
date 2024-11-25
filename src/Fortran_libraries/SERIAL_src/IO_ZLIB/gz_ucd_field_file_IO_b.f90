@@ -103,8 +103,11 @@
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_step_data_b(FPz_udt, zbuf_fu,                        &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
-     &    istack_merged, ucd%num_field)
+     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt)
+      if(zbuf_fu%ierr_zlib .ne. 0) go to 99
+!
+      call gz_read_num_field_b(FPz_udt, zbuf_fu,                        &
+     &                         istack_merged, ucd%num_field)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_mul_integer_b                                        &
@@ -149,8 +152,11 @@
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_step_data_b(FPz_udt, zbuf_fu,                        &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
-     &    istack_merged, ucd%num_field)
+     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt)
+      if(zbuf_fu%ierr_zlib .ne. 0) go to 99
+!
+      call gz_read_num_field_b(FPz_udt, zbuf_fu,                        &
+     &                         istack_merged, ucd%num_field)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
       call allocate_ucd_phys_name(ucd)

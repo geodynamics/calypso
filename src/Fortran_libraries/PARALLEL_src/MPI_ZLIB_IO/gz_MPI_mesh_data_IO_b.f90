@@ -14,8 +14,6 @@
 !!        type(mesh_geometry), intent(in) :: mesh_IO
 !!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!
-!!      subroutine gz_mpi_read_num_node_b(IO_param, mesh_IO)
-!!      subroutine gz_mpi_read_num_node_ele_b(IO_param, mesh_IO)
 !!      subroutine gz_mpi_read_geometry_data_b(IO_param, mesh_IO)
 !!      subroutine gz_mpi_read_mesh_groups_b(IO_param, mesh_group_IO)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -85,7 +83,7 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine gz_mpi_read_num_node_b(IO_param, mesh_IO)
+      subroutine gz_mpi_read_geometry_data_b(IO_param, mesh_IO)
 !
       use m_error_IDs
 !
@@ -95,44 +93,11 @@
 !
       call gz_mpi_read_domain_info_b(IO_param, mesh_IO%nod_comm)
 !
-      call gz_mpi_read_number_of_node_b(IO_param, mesh_IO%node)
-!
-      end subroutine gz_mpi_read_num_node_b
-!
-!------------------------------------------------------------------
-!
-      subroutine gz_mpi_read_num_node_ele_b(IO_param, mesh_IO)
-!
-      use m_error_IDs
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call gz_mpi_read_num_node_b(IO_param, mesh_IO)
       call gz_mpi_read_geometry_info_b(IO_param, mesh_IO%node)
-!
 !  ----  read element data -------
-!
-      call gz_mpi_read_num_element_b(IO_param, mesh_IO%ele)
-!
-      end subroutine gz_mpi_read_num_node_ele_b
-!
-!------------------------------------------------------------------
-!
-      subroutine gz_mpi_read_geometry_data_b(IO_param, mesh_IO)
-!
-      use m_error_IDs
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call gz_mpi_read_num_node_ele_b(IO_param, mesh_IO)
       call gz_mpi_read_ele_info_b(IO_param, mesh_IO%ele)
 !
 ! ----  import & export 
-!
       call gz_mpi_read_import_data_b(IO_param, mesh_IO%nod_comm)
       call gz_mpi_read_export_data_b(IO_param, mesh_IO%nod_comm)
 !

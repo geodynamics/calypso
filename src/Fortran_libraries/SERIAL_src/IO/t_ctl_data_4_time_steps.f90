@@ -263,6 +263,11 @@
 !>   time interval to output boundary data
         type(read_real_item) :: delta_t_boundary_ctl
 !
+!>   time interval for field line
+        type(read_real_item) :: delta_t_tracer_output_ctl
+!>   Increment for field line
+        type(read_integer_item) :: i_step_tracer_output_ctl
+!
         integer (kind=kint) :: i_tstep =      0
       end type time_data_control
 !

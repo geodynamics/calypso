@@ -230,9 +230,9 @@
 !
       icou = 0
       do i = 1, nfield_psf
-          call set_field_on_psf_xyz(numnod, numedge, nnod_4_edge,       &
-     &          ie_edge, nnod_patch, num_phys, ntot_phys, istack_ncomp, &
-     &          d_nod, ifield_psf(i), ncomp_org(i), dat_tmp, psf_list)
+        call set_field_on_psf_xyz(numnod, numedge, nnod_4_edge,         &
+     &      ie_edge, nnod_patch, num_phys, ntot_phys, istack_ncomp,     &
+     &      d_nod, ifield_psf(i), ncomp_org(i), dat_tmp, psf_list)
 !
         call convert_comps_4_viz(nnod_patch, istack_n_smp,              &
      &      xyz_psf, rr_psf, ar_psf, ss_psf, as_psf,                    &

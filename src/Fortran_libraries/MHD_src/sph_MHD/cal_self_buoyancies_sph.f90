@@ -7,9 +7,12 @@
 !>@brief Evaluate divergence of buoyancy for pressure evaluation
 !!
 !!@verbatim
+!!      subroutine sel_field_address_for_buoyancies                     &
+!!     &         (ipol_base, ref_param_T, ref_param_C,                  &
+!!     &          ibuo_temp, ibuo_comp)
 !!      subroutine sel_buoyancies_sph_MHD                               &
-!!     &         (sph_rj, leg, ipol_base, ipol_frc,                     &
-!!     &          fl_prop, ref_param_T, ref_param_C, sph_bc_U, rj_fld)
+!!     &         (sph_rj, leg, ipol_frc, fl_prop, sph_bc_U,             &
+!!     &          ibuo_temp, ibuo_comp, rj_fld)
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(reference_scalar_param), intent(in) :: ref_param_T
@@ -40,143 +43,105 @@
 !
       implicit  none
 !
+      private :: sel_buoyancies_sph_rj
+!
 !-----------------------------------------------------------------------
 !
       contains
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_buoyancies_sph_MHD                                 &
-     &         (sph_rj, leg, ipol_base, ipol_frc,                       &
-     &          fl_prop, ref_param_T, ref_param_C, sph_bc_U, rj_fld)
+      subroutine sel_field_address_for_buoyancies                       &
+     &         (ipol_base, ref_param_T, ref_param_C,                    &
+     &          ibuo_temp, ibuo_comp)
 !
-      use adjust_reference_fields
-!
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(fluid_property), intent(in) :: fl_prop
       type(reference_scalar_param), intent(in) :: ref_param_T
       type(reference_scalar_param), intent(in) :: ref_param_C
-      type(sph_rj_grid), intent(in) ::  sph_rj
       type(base_field_address), intent(in) :: ipol_base
-      type(base_force_address), intent(in) :: ipol_frc
-      type(sph_boundary_type), intent(in) :: sph_bc_U
-      type(phys_data), intent(inout) :: rj_fld
 !
-      integer(kind = kint) :: ipol_temp,  ipol_comp
+      integer(kind = kint), intent(inout) :: ibuo_temp,  ibuo_comp
 !
 !
       if(ref_param_T%flag_ref_field) then
-        ipol_temp =  ipol_base%i_per_temp
+        ibuo_temp =  ipol_base%i_per_temp
       else
-        ipol_temp =  ipol_base%i_temp
+        ibuo_temp =  ipol_base%i_temp
       end if
 !
       if(ref_param_C%flag_ref_field) then
-        ipol_comp =  ipol_base%i_per_light
+        ibuo_comp =  ipol_base%i_per_light
       else
-        ipol_comp =  ipol_base%i_light
+        ibuo_comp =  ipol_base%i_light
       end if
 !
+      end subroutine sel_field_address_for_buoyancies
 !
-      if(fl_prop%i_grav .eq. iflag_radial_g) then
-        call sel_r_const_buoyancies_sph_MHD                             &
-     &     (sph_rj, leg, ipol_temp, ipol_comp, ipol_frc,                &
-     &      fl_prop, sph_bc_U, rj_fld)
-      else
-        call sel_self_buoyancies_sph_MHD                                &
-     &     (sph_rj, leg, ipol_temp, ipol_comp, ipol_frc,                &
-     &      fl_prop, sph_bc_U, rj_fld)
-      end if
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine sel_buoyancies_sph_MHD                                 &
+     &         (sph_rj, leg, ipol_frc, fl_prop, sph_bc_U,               &
+     &          ibuo_temp, ibuo_comp, rj_fld)
+!
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(legendre_4_sph_trans), intent(in) :: leg
+      type(fluid_property), intent(in) :: fl_prop
+      type(base_force_address), intent(in) :: ipol_frc
+      type(sph_boundary_type), intent(in) :: sph_bc_U
+      integer(kind = kint), intent(in) :: ibuo_temp,  ibuo_comp
+!
+      type(phys_data), intent(inout) :: rj_fld
+!
+!
+      call sel_buoyancies_sph_rj(fl_prop%i_grav, sph_rj, leg,           &
+     &    ibuo_temp, ipol_frc%i_buoyancy, fl_prop%coef_buo,             &
+     &    sph_bc_U, rj_fld)
+      call sel_buoyancies_sph_rj(fl_prop%i_grav, sph_rj, leg,           &
+     &    ibuo_comp, ipol_frc%i_comp_buo, fl_prop%coef_comp_buo,        &
+     &    sph_bc_U, rj_fld)
 !
       end subroutine sel_buoyancies_sph_MHD
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_self_buoyancies_sph_MHD                            &
-     &         (sph_rj, leg, ipol_temp, ipol_comp, ipol_frc,            &
-     &          fl_prop, sph_bc_U, rj_fld)
+      subroutine sel_buoyancies_sph_rj(i_grav, sph_rj, leg,             &
+     &          ipol_scalar, ipol_buo, coef_buo, sph_bc_U, rj_fld)
 !
       use cal_buoyancies_sph_MHD
       use adjust_reference_fields
 !
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(fluid_property), intent(in) :: fl_prop
+      integer(kind = kint), intent(in) :: i_grav
+      integer(kind = kint), intent(in) :: ipol_scalar, ipol_buo
       type(sph_rj_grid), intent(in) ::  sph_rj
-      integer(kind = kint), intent(in) :: ipol_temp, ipol_comp
-      type(base_force_address), intent(in) :: ipol_frc
+      type(legendre_4_sph_trans), intent(in) :: leg
       type(sph_boundary_type), intent(in) :: sph_bc_U
+      real(kind = kreal), intent(in) :: coef_buo
+!
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      if (ipol_temp * ipol_frc%i_buoyancy .gt. 0) then
-        if (iflag_debug.ge.1)  write(*,*)                               &
-     &    'cal_self_buoyancy_sph_MHD by pert. temperature'
-        call cal_self_buoyancy_sph_MHD                                  &
-     &     (sph_bc_U%kr_in, sph_bc_U%kr_out, leg%g_sph_rj,              &
-     &      fl_prop%coef_buo, ipol_temp, ipol_frc%i_buoyancy,           &
-     &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call delete_sphere_average                                      &
-     &     (ipol_frc%i_buoyancy, sph_rj, rj_fld)
-      end if
+      if (ipol_scalar * ipol_buo .le. 0) return
 !
-      if (ipol_comp * ipol_frc%i_comp_buo .gt. 0) then
-        if (iflag_debug.ge.1)  write(*,*)                               &
-     &      'cal_self_buoyancy_sph_MHD by composition'
-        call cal_self_buoyancy_sph_MHD(sph_bc_U%kr_in, sph_bc_U%kr_out, &
-     &      leg%g_sph_rj, fl_prop%coef_comp_buo,                        &
-     &      ipol_comp, ipol_frc%i_comp_buo,                             &
-     &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call delete_sphere_average                                      &
-     &     (ipol_frc%i_comp_buo, sph_rj, rj_fld)
-      end if
-!
-      end subroutine sel_self_buoyancies_sph_MHD
-!
-!-----------------------------------------------------------------------
-!
-      subroutine sel_r_const_buoyancies_sph_MHD                         &
-     &         (sph_rj, leg, ipol_temp, ipol_comp, ipol_frc,            &
-     &          fl_prop, sph_bc_U, rj_fld)
-!
-      use cal_buoyancies_sph_MHD
-      use adjust_reference_fields
-!
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(fluid_property), intent(in) :: fl_prop
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      integer(kind = kint), intent(in) :: ipol_temp, ipol_comp
-      type(base_force_address), intent(in) :: ipol_frc
-      type(sph_boundary_type), intent(in) :: sph_bc_U
-      type(phys_data), intent(inout) :: rj_fld
-!
-!
-      if (ipol_temp * ipol_frc%i_buoyancy .gt. 0) then
+      if(i_grav .eq. iflag_radial_g) then
         if (iflag_debug.ge.1)  write(*,*)                               &
      &    'cal_radial_buoyancy_sph_MHD by pert. temperature'
         call cal_radial_buoyancy_sph_MHD                                &
      &     (sph_bc_U%kr_in, sph_bc_U%kr_out, leg%g_sph_rj,              &
-     &      fl_prop%coef_buo, ipol_temp, ipol_frc%i_buoyancy,           &
+     &      coef_buo, ipol_scalar, ipol_buo,                            &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call delete_sphere_average                                      &
-     &     (ipol_frc%i_buoyancy, sph_rj, rj_fld)
-      end if
-!
-      if (ipol_comp * ipol_frc%i_comp_buo .gt. 0) then
+       else
         if (iflag_debug.ge.1)  write(*,*)                               &
-     &      'cal_radial_buoyancy_sph_MHD by composition'
-        call cal_radial_buoyancy_sph_MHD                                &
+     &    'cal_self_buoyancy_sph_MHD by pert. temperature'
+        call cal_self_buoyancy_sph_MHD                                  &
      &     (sph_bc_U%kr_in, sph_bc_U%kr_out, leg%g_sph_rj,              &
-     &      fl_prop%coef_comp_buo, ipol_comp, ipol_frc%i_comp_buo,      &
+     &      coef_buo, ipol_scalar, ipol_buo,                            &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call delete_sphere_average                                      &
-     &     (ipol_frc%i_comp_buo, sph_rj, rj_fld)
       end if
+      call delete_sphere_average(ipol_buo, sph_rj, rj_fld)
 !
-      end subroutine sel_r_const_buoyancies_sph_MHD
+      end subroutine sel_buoyancies_sph_rj
 !
 !-----------------------------------------------------------------------
 !

@@ -38,6 +38,7 @@
       private :: bcast_dimless_ctl, bcast_coef_term_ctl
       private :: bcast_thermal_ctl, bcast_momentum_ctl
       private :: bcast_induction_ctl
+      private :: bcast_val_density_ctl, bcast_val_diffuse_ctl
 !
 ! ----------------------------------------------------------------------
 !
@@ -72,8 +73,16 @@
       call bcast_coriolis_ctl(model_ctl%cor_ctl)
       call bcast_magneto_ctl(model_ctl%mcv_ctl)
       call bcast_magnetic_scale_ctl(model_ctl%bscale_ctl)
+!
       call bcast_ref_scalar_ctl(model_ctl%reft_ctl)
       call bcast_ref_scalar_ctl(model_ctl%refc_ctl)
+!
+      call bcast_val_density_ctl(model_ctl%polytrope_c)
+!
+      call bcast_val_diffuse_ctl(model_ctl%val_viscous_c)
+      call bcast_val_diffuse_ctl(model_ctl%val_mag_diffuse_c)
+      call bcast_val_diffuse_ctl(model_ctl%val_thermal_diffuse_c)
+      call bcast_val_diffuse_ctl(model_ctl%val_comp_diffuse_c)
 !
       call calypso_mpi_bcast_character                                  &
      &   (model_ctl%block_name, cast_long(kchara), 0)
@@ -199,6 +208,58 @@
       call calypso_mpi_bcast_one_int(induct_ctl%i_induct_ctl, 0)
 !
       end subroutine bcast_induction_ctl
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_val_density_ctl(polytrope_c)
+!
+      use t_ctl_data_valuable_density
+      use transfer_to_long_integers
+      use calypso_mpi_char
+      use calypso_mpi_int
+      use bcast_control_arrays
+!
+      type(val_density_ctl), intent(inout) :: polytrope_c
+!
+      call bcast_ctl_type_c1(polytrope_c%r_variation_ctl)
+      call bcast_ctl_type_c1(polytrope_c%variation_file_name)
+!
+      call bcast_ctl_type_r2(polytrope_c%bottom_density_ctl)
+      call bcast_ctl_type_r2(polytrope_c%top_density_ctl)
+      call bcast_ctl_type_r1(polytrope_c%polytrope_index_ctl)
+!
+      call bcast_ctl_array_r2(polytrope_c%density_list_ctl)
+!
+      call calypso_mpi_bcast_character                                  &
+     &   (polytrope_c%block_name, cast_long(kchara), 0)
+      call calypso_mpi_bcast_one_int(polytrope_c%i_val_density, 0)
+!
+      end subroutine bcast_val_density_ctl
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_val_diffuse_ctl(vdiffuse_ctl)
+!
+      use t_ctl_data_valuable_diffuse
+      use transfer_to_long_integers
+      use calypso_mpi_char
+      use calypso_mpi_int
+      use bcast_control_arrays
+!
+      type(val_diffuse_ctl), intent(inout) :: vdiffuse_ctl
+!
+      call bcast_ctl_type_c1(vdiffuse_ctl%r_variation_ctl)
+      call bcast_ctl_type_c1(vdiffuse_ctl%variation_file_name)
+!
+      call bcast_ctl_array_r2(vdiffuse_ctl%diffusivity_list_ctl)
+!
+      call calypso_mpi_bcast_character                                  &
+     &   (vdiffuse_ctl%block_name, cast_long(kchara), 0)
+      call calypso_mpi_bcast_one_int(vdiffuse_ctl%i_val_diffuse, 0)
+!
+      end subroutine bcast_val_diffuse_ctl
 !
 !   --------------------------------------------------------------------
 !

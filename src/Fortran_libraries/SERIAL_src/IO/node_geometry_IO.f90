@@ -18,7 +18,7 @@
 !!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
 !!      subroutine read_number_of_node(id_file, nod_IO, iend)
-!!      subroutine read_geometry_info(id_file, nod_IO)
+!!      subroutine read_geometry_info(id_file, nod_IO, iend)
 !!      subroutine read_scalar_in_element                               &
 !!     &         (id_file, nod_IO, sfed_IO, iend)
 !!      subroutine read_vector_in_element                               &
@@ -110,7 +110,7 @@
 !
       write(id_file,'(2i16)') nod_IO%numnod, nod_IO%internal_node
       do i = 1, nod_IO%numnod
-        write(id_file,'(1p3e23.15)') sfed_IO%ele_scalar(i)
+        write(id_file,'(1p3E25.15e3)') sfed_IO%ele_scalar(i)
       end do
 !
       end subroutine write_scalar_in_element
@@ -127,7 +127,7 @@
 !
       write(id_file,'(2i16)') nod_IO%numnod, nod_IO%internal_node
       do i = 1, nod_IO%numnod
-        write(id_file,'(1p3e23.15)') sfed_IO%ele_vector(i,1:3)
+        write(id_file,'(1p3E25.15e3)') sfed_IO%ele_vector(i,1:3)
       end do
 !
       end subroutine write_vector_in_element
@@ -153,14 +153,17 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_geometry_info(id_file, nod_IO)
+      subroutine read_geometry_info(id_file, nod_IO, iend)
 !
       integer (kind = kint), intent(in) :: id_file
       type(node_data), intent(inout) :: nod_IO
+      integer(kind = kint), intent(inout) :: iend
 !
       integer (kind = kint) :: i, k
 !
 !
+      call read_number_of_node(id_file, nod_IO, iend)
+      if(iend .ne. 0) return
       call alloc_node_geometry_base(nod_IO)
 !
       do i=1, nod_IO%numnod

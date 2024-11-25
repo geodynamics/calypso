@@ -17,8 +17,6 @@
 !!      character(len=kchara) function set_parallel_grd_file_name       &
 !!     &                    (file_prefix, itype_file, id_rank)
 !!
-!!      character(len=kchara) function set_single_ucd_file_name         &
-!!     &                    (file_prefix, itype_file, istep_ucd)
 !!      character(len=kchara) function                                  &
 !!     &          set_single_grd_file_name(file_prefix, itype_file)
 !!
@@ -197,47 +195,6 @@
       end function set_parallel_grd_file_name
 !
 !------------------------------------------------------------------
-!------------------------------------------------------------------
-!
-      character(len=kchara) function set_single_ucd_file_name           &
-     &                    (file_prefix, itype_file, istep_ucd)
-!
-      use set_parallel_file_name
-      use set_mesh_extensions
-      use set_ucd_extensions
-!
-      integer(kind=kint), intent(in) :: itype_file, istep_ucd
-      character(len=kchara), intent(in) :: file_prefix
-      character(len=kchara) :: fname_tmp, file_name
-!
-!
-      file_name = add_int_suffix(istep_ucd, file_prefix)
-!
-      if (    mod(itype_file,icent)/iten .eq. iflag_vtk/iten) then
-        fname_tmp = add_vtk_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
-        fname_tmp = add_vtd_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_ucd/iten) then
-        fname_tmp = add_ucd_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
-        fname_tmp = add_udt_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_ucd_bin/iten) then
-        fname_tmp = add_sfm_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
-        fname_tmp = add_sdt_extension(file_name)
-      else
-        fname_tmp = add_fld_extension(file_name)
-      end if
-!
-      if (   mod(itype_file,iten) .eq. iflag_gzip) then
-        file_name = add_gzip_extension(fname_tmp)
-      else
-        file_name = fname_tmp
-      end if
-      set_single_ucd_file_name = file_name
-!
-      end function set_single_ucd_file_name
-!
 !------------------------------------------------------------------
 !
       character(len=kchara) function                                    &

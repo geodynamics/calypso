@@ -48,7 +48,7 @@
 !
       subroutine elapsed_label_4_MHD
 !
-      integer(kind = kint), parameter :: num_append = 4
+      integer(kind = kint), parameter :: num_append = 6
 !
       call append_elapsed_times                                         &
      &   (num_append, ist_elapsed_MHD, ied_elapsed_MHD)
@@ -57,8 +57,9 @@
       elps1%labels(ist_elapsed_MHD+2) = 'Time evolution loop time   '
       elps1%labels(ist_elapsed_MHD+3) = 'Data IO time               '
       elps1%labels(ist_elapsed_MHD+4) = 'Visualizatio time          '
+      elps1%labels(ist_elapsed_MHD+5) = 'Particle tracing time      '
 !
-      elps1%labels(ist_elapsed_MHD+4) = 'Field data IO time         '
+      elps1%labels(ist_elapsed_MHD+6) = 'Field data IO time         '
 !
       iflag_MHD_time = .TRUE.
 !
@@ -96,12 +97,18 @@
 !
       subroutine elapsed_label_4_FEM_MHD
 !
-      integer(kind = kint), parameter :: num_append = 1
+      integer(kind = kint), parameter :: num_append = 7
 !
       call append_elapsed_times                                         &
      &   (num_append, ist_elapsed_FMHD, ied_elapsed_FMHD)
 !
-      elps1%labels(ist_elapsed_FMHD+ 1) = 'Linear solver time '
+      elps1%labels(ist_elapsed_FMHD+ 1) = 'Solver initialization time '
+      elps1%labels(ist_elapsed_FMHD+ 2) = 'Solver precondition time   '
+      elps1%labels(ist_elapsed_FMHD+ 3) = 'Solver main time           '
+      elps1%labels(ist_elapsed_FMHD+ 4) = 'Solver iteration time      '
+      elps1%labels(ist_elapsed_FMHD+ 5) = 'Solver communication time  '
+      elps1%labels(ist_elapsed_FMHD+ 6) = 'Solver CG iteration time   '
+      elps1%labels(ist_elapsed_FMHD+ 7) = 'Solver V-cycle time        '
 !
       iflag_FMHD_time = .TRUE.
 !

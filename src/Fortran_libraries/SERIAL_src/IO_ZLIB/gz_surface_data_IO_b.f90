@@ -77,8 +77,6 @@
       if(zbuf%ierr_zlib .ne. 0) return
 !
 !      textbuf = hd_surf_connect() // char(0)
-      call gz_read_number_of_element_b(FPz_f, zbuf, ele_IO)
-      if(zbuf%ierr_zlib .ne. 0) return
       call gz_read_element_info_b(FPz_f, zbuf, ele_IO)
       if(zbuf%ierr_zlib .ne. 0) return
 !
@@ -154,9 +152,6 @@
 !
 !
 !      textbuf = hd_surf_point() // char(0)
-      call gz_read_number_of_node_b(FPz_f, zbuf, nod_IO)
-      if(zbuf%ierr_zlib .ne. 0) return
-!
       call gz_read_geometry_info_b(FPz_f, zbuf, nod_IO)
       if(zbuf%ierr_zlib .ne. 0) return
 !

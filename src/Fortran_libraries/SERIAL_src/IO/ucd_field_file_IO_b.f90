@@ -105,8 +105,10 @@
       bbuf_ucd%id_binary = id_read_fld
       call open_read_binary_file(file_name, id_rank, bbuf_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
-      call read_step_data_b                                             &
-     &   (bbuf_ucd, t_IO, istack_merged, ucd%num_field)
+      call read_step_data_b(bbuf_ucd, t_IO)
+      if(bbuf_ucd%ierr_bin .ne. 0) go to 99
+      call read_field_num_b                                             &
+     &   (bbuf_ucd, istack_merged, ucd%num_field)
       ucd%nnod = istack_merged(1)
       if(bbuf_ucd%ierr_bin .ne. 0) go to 99
 !
@@ -148,8 +150,11 @@
       bbuf_ucd%id_binary = id_read_fld
       call open_read_binary_file(file_name, id_rank, bbuf_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
-      call read_step_data_b                                             &
-     &   (bbuf_ucd, t_IO, istack_merged, ucd%num_field)
+      call read_step_data_b(bbuf_ucd, t_IO)
+      ucd%nnod = istack_merged(1)
+      if(bbuf_ucd%ierr_bin .ne. 0) goto 99
+      call read_field_num_b                                             &
+     &   (bbuf_ucd, istack_merged, ucd%num_field)
       ucd%nnod = istack_merged(1)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
 !
@@ -197,8 +202,11 @@
       bbuf_ucd%id_binary = id_read_fld
       call open_read_binary_file(file_name, id_rank, bbuf_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
-      call read_step_data_b                                             &
-     &   (bbuf_ucd, t_IO, istack_merged, ucd%num_field)
+      call read_step_data_b(bbuf_ucd, t_IO)
+      ucd%nnod = istack_merged(1)
+      if(bbuf_ucd%ierr_bin .ne. 0) go to 99
+      call read_field_num_b                                             &
+     &   (bbuf_ucd, istack_merged, ucd%num_field)
       ucd%nnod = istack_merged(1)
       if(bbuf_ucd%ierr_bin .ne. 0) go to 99
 !

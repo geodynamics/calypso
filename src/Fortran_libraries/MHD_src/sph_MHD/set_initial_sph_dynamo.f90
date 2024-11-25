@@ -78,15 +78,14 @@
       if (iflag_restart .ne. i_rst_by_file) return
         if(iflag_debug .gt. 0) write(*,*) 'read_alloc_sph_restart_data'
         call read_alloc_sph_restart_data                                &
-     &     (MHD_files%fst_file_IO, MHD_step%init_d, rj_fld,             &
-     &      MHD_step%rst_step)
+     &     (MHD_files%fst_file_IO, MHD_step%init_d, MHD_step%time_d,    &
+     &      rj_fld, MHD_step%rst_step)
 !
         call extend_by_potential_with_j                                 &
      &     (sph%sph_rj, SPH_model%sph_MHD_bc%sph_bc_B,                  &
      &      ipol%base%i_magne, ipol%base%i_current, rj_fld)
 !
         if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
-        call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)
         call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
         call calypso_mpi_barrier
 !
@@ -116,8 +115,8 @@
       type(SPH_MHD_model_data), intent(in) :: SPH_model 
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
+      type(MHD_step_param), intent(in) :: MHD_step
 !
-      type(MHD_step_param), intent(inout) :: MHD_step
       type(phys_data), intent(inout) :: rj_fld
       type(field_IO), intent(inout) :: sph_fst_IO
 !
@@ -149,7 +148,6 @@
      &    ipol%base%i_magne, ipol%base%i_current, rj_fld)
 !
       if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
-      call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)
       call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
 !
       if (iflag_restart.ne.i_rst_by_file                                &

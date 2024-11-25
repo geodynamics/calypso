@@ -25,7 +25,7 @@
 !! ----------------------------------------------------------------------
 !!
 !!      subroutine alloc_nod_fdm_matrices                               &
-!!     &         (nri, num_order, n_minus, n_plus, fdmn_nod)
+!!     &         (nri, ist_order, num_order, n_minus, n_plus, fdmn_nod)
 !!      subroutine dealloc_nod_fdm_matrices(fdmn_nod)
 !!        integer(kind = kint), intent(in) :: nri, num_order
 !!        integer(kind = kint), intent(in) :: n_minus, n_plus
@@ -59,7 +59,9 @@
 !
 !>        Structure of FDM matrices
       type fdm_matrices
-!>        Coefficients to evaluate first radial derivative
+!>        Minimum order for derivative
+        integer(kind = kint) :: ist_order
+!>        Maximum order for derivative
         integer(kind = kint) :: n_order
 !>        Structure of FDM matrix
         type(fdm_matrix), allocatable :: fdm(:)
@@ -75,19 +77,20 @@
 ! -----------------------------------------------------------------------
 !
       subroutine alloc_nod_fdm_matrices                                 &
-     &         (nri, num_order, n_minus, n_plus, fdmn_nod)
+     &         (nri, ist_order, num_order, n_minus, n_plus, fdmn_nod)
 !
-      integer(kind = kint), intent(in) :: nri, num_order
+      integer(kind = kint), intent(in) :: nri, ist_order, num_order
       integer(kind = kint), intent(in) :: n_minus, n_plus
       type(fdm_matrices), intent(inout) :: fdmn_nod
 !
       integer(kind = kint) :: i
 !
 !
-      fdmn_nod%n_order = num_order
-      allocate( fdmn_nod%fdm(fdmn_nod%n_order) )
+      fdmn_nod%ist_order = ist_order
+      fdmn_nod%n_order =   num_order
+      allocate( fdmn_nod%fdm(ist_order:num_order) )
 !
-      do i = 1, fdmn_nod%n_order
+      do i = fdmn_nod%ist_order, fdmn_nod%n_order
         call alloc_fdm_matrix(nri, n_minus, n_plus, fdmn_nod%fdm(i))
       end do
 !
@@ -102,7 +105,7 @@
       integer(kind = kint) :: i
 !
 !
-      do i = 1, fdmn_nod%n_order
+      do i = fdmn_nod%ist_order, fdmn_nod%n_order
         call dealloc_fdm_matrix(fdmn_nod%fdm(i))
       end do
 !
@@ -122,7 +125,7 @@
       integer(kind = kint) :: i
 !
 !
-      do i = 1, fdmn_nod%n_order
+      do i = fdmn_nod%ist_order, fdmn_nod%n_order
         write(50,*) 'Matrix for differences: ', i
         call check_fdm_coef(nri, r, fdmn_nod%fdm(i))
       end do

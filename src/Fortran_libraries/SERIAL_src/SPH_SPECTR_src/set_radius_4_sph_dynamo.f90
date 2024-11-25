@@ -65,7 +65,7 @@
       real(kind = kreal), intent(inout) :: r_ele_rj(nri)
       real(kind = kreal), intent(inout) :: ar_ele_rj(nri,3)
       real(kind = kreal), intent(inout) :: R_earth(0:2)
-      real(kind = kreal), intent(inout) ::r_ICB, r_CMB
+      real(kind = kreal), intent(inout) :: r_ICB, r_CMB
 !
       integer(kind = kint) :: k, kk
 !
@@ -99,14 +99,14 @@
      &    r_ICB, r_CMB, radius_1d_rj_r, iflag_radial_grid)
 !
 !
-      do k = 1 ,nlayer_CMB
+      do k = 1, nri
         ar_1d_rj(k,1) = one / radius_1d_rj_r(k)
         ar_1d_rj(k,2) = ar_1d_rj(k,1)**2
         ar_1d_rj(k,3) = ar_1d_rj(k,1)**3
       end do
 !
       r_ele_rj(1) = half * radius_1d_rj_r(1)
-      do k = 2 ,nlayer_CMB
+      do k = 2, nri
         r_ele_rj(k) = half * (radius_1d_rj_r(k-1) + radius_1d_rj_r(k))
         ar_ele_rj(k,1) = one / r_ele_rj(k)
         ar_ele_rj(k,2) = ar_ele_rj(k,1)**2

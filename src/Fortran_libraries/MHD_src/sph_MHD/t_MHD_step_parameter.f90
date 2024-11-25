@@ -83,10 +83,10 @@
       call set_initial_field_id                                         &
      &   (mr_ctl%restart_flag_ctl, tctl, MHD_step%init_d%time)
 !
-        MHD_step%flex_p%iflag_flexible_step = iflag_fixed_step
+        MHD_step%time_d%flag_flex_step = .FALSE.
         if(tctl%flexible_step_ctl%iflag .gt. 0                          &
      &     .and. yes_flag(tctl%flexible_step_ctl%charavalue)) then
-          MHD_step%flex_p%iflag_flexible_step = iflag_flex_step
+          MHD_step%time_d%flag_flex_step = .TRUE.
         end if
 !
       if (tctl%dt_ctl%iflag .eq. 0) then
@@ -96,12 +96,9 @@
         MHD_step%init_d%dt = tctl%dt_ctl%realvalue
       end if
 !
-      call set_control_flex_time_steps                                  &
-     &   (tctl, MHD_step%init_d, MHD_step%flex_p)
-!
 !   parameters for time evolution
 !
-      if(MHD_step%flex_p%iflag_flexible_step .eq. iflag_flex_step) then
+      if(MHD_step%time_d%flag_flex_step) then
         if (iflag_debug .ge. iflag_routine_msg)                         &
      &    write(*,*) 'set_flex_time_step_controls'
         call set_flex_time_step_controls(tctl, MHD_step)
@@ -110,7 +107,12 @@
      &    write(*,*) 'set_fixed_time_step_controls'
         call set_fixed_time_step_controls(tctl, MHD_step)
       end if
+      MHD_step%init_d%flag_flex_step = MHD_step%time_d%flag_flex_step
 !
+      call set_control_flex_time_steps                                  &
+     &   (tctl, MHD_step%init_d, MHD_step%flex_p)
+!
+
       if (MHD_step%finish_d%i_end_step .eq. -1) then
         if (tctl%elapsed_time_ctl%iflag .eq. 0) then
           e_message                                                     &

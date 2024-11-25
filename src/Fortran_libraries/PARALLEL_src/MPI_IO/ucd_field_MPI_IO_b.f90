@@ -106,8 +106,9 @@
 !
       call open_read_mpi_file_b                                         &
      &   (file_name, num_pe, id_rank, IO_param)
-      call read_field_header_mpi_b                                      &
-     &   (num_pe, IO_param, t_IO, ucd%nnod, ucd%istack_merged_nod)
+      call read_field_time_mpi_b(num_pe, IO_param, t_IO)
+      call read_num_field_mpi_b                                         &
+     &   (num_pe, IO_param, ucd%nnod, ucd%istack_merged_nod)
       call mpi_read_one_inthead_b(IO_param, ucd%num_field)
 !
       call mpi_read_mul_inthead_b                                       &
@@ -147,8 +148,9 @@
 !
       call open_read_mpi_file_b                                         &
      &   (file_name, num_pe, id_rank, IO_param)
-      call read_field_header_mpi_b                                      &
-     &   (num_pe, IO_param, t_IO, ucd%nnod, ucd%istack_merged_nod)
+      call read_field_time_mpi_b(num_pe, IO_param, t_IO)
+      call read_num_field_mpi_b                                         &
+     &   (num_pe, IO_param, ucd%nnod, ucd%istack_merged_nod)
       call mpi_read_one_inthead_b(IO_param, ucd%num_field)
 !
       call allocate_ucd_phys_name(ucd)
@@ -196,8 +198,9 @@
      &    'read binary data by MPI-IO: ', trim(file_name)
       call open_read_mpi_file_b                                         &
      &   (file_name, num_pe, id_rank, IO_param)
-      call read_field_header_mpi_b                                      &
-     &   (num_pe, IO_param, t_IO, ucd%nnod, ucd%istack_merged_nod)
+      call read_field_time_mpi_b(num_pe, IO_param, t_IO)
+      call read_num_field_mpi_b                                         &
+     &   (num_pe, IO_param, ucd%nnod, ucd%istack_merged_nod)
       call mpi_read_one_inthead_b(IO_param, ucd%num_field)
 !
       call allocate_ucd_phys_name(ucd)

@@ -10,9 +10,8 @@
 !!
 !!@verbatim
 !!      subroutine init_r_infos_sph_mhd_evo(bc_IO, sph_grps, MHD_BC,    &
-!!     &          ipol, sph, r_2nd, omega_sph, MHD_prop, sph_MHD_bc)
-!!      subroutine init_r_infos_sph_mhd(bc_IO, sph_grps, MHD_BC, sph,   &
-!!     &                                MHD_prop, omega_sph, sph_MHD_bc)
+!!     &          ipol, sph, r_2nd, r_n2e_3rd, r_e2n_1st,               &
+!!     &          omega_sph, MHD_prop, radial_variation, sph_MHD_bc)
 !!      subroutine init_reference_fields(sph, ipol, r_2nd,              &
 !!     &          refs, rj_fld, MHD_prop, sph_MHD_bc)
 !!        type(boundary_spectra), intent(in) :: bc_IO
@@ -21,11 +20,17 @@
 !!        type(phys_address), intent(in) :: ipol
 !!        type(sph_grids), intent(in) :: sph
 !!        type(fdm_matrices), intent(inout) :: r_2nd
+!!        type(fdm_matrices), intent(inout) :: r_n2e_3rd
+!!        type(fdm_matrices), intent(inout) :: r_e2n_1st
 !!        type(sph_rotation), intent(inout) :: omega_sph
 !!        type(radial_reference_field), intent(inout) :: refs
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !!        type(phys_data), intent(inout) :: rj_fld
+!!
+!!      subroutine set_delta_r_4_sph_mhd(sph_params, sph_rj)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!@endverbatim
 !!
 !!@n @param r_hot        radius at highest temperature point
@@ -59,8 +64,6 @@
 !
       implicit none
 !
-      private :: set_delta_r_4_sph_mhd
-!
 !  -------------------------------------------------------------------
 !
       contains
@@ -68,10 +71,15 @@
 !  -------------------------------------------------------------------
 !
       subroutine init_r_infos_sph_mhd_evo(bc_IO, sph_grps, MHD_BC,      &
-     &          ipol, sph, r_2nd, omega_sph, MHD_prop, sph_MHD_bc)
+     &          ipol, sph, r_2nd, r_n2e_3rd, r_e2n_1st,                 &
+     &          omega_sph, MHD_prop, radial_variation, sph_MHD_bc)
 !
       use second_fdm_node_coefs
+      use third_fdm_node_to_ele
+      use first_fdm_ele_to_node
       use material_property
+      use init_sph_radius_variations
+      use set_bc_sph_mhd
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_group_data), intent(in) :: sph_grps
@@ -80,39 +88,12 @@
       type(sph_grids), intent(in) :: sph
 !
       type(fdm_matrices), intent(inout) :: r_2nd
+      type(fdm_matrices), intent(inout) :: r_n2e_3rd
+      type(fdm_matrices), intent(inout) :: r_e2n_1st
+!
       type(sph_rotation), intent(inout) :: omega_sph
       type(MHD_evolution_param), intent(inout) :: MHD_prop
-      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
-!
-!
-      call init_r_infos_sph_mhd(bc_IO, sph_grps, MHD_BC, sph, MHD_prop, &
-     &                          omega_sph, sph_MHD_bc)
-!
-      if (iflag_debug.gt.0) write(*,*) 'const_second_fdm_coefs'
-      call const_second_fdm_coefs(sph%sph_params, sph%sph_rj, r_2nd)
-!
-      if(iflag_debug.gt.0) write(*,*)' set_material_property'
-      call set_material_property                                        &
-     &   (sph%sph_params%radius_CMB, sph%sph_params%radius_ICB,         &
-     &    ipol, MHD_prop)
-!
-      end subroutine init_r_infos_sph_mhd_evo
-!
-!  -------------------------------------------------------------------
-!  -------------------------------------------------------------------
-!
-      subroutine init_r_infos_sph_mhd(bc_IO, sph_grps, MHD_BC, sph,     &
-     &                                MHD_prop, omega_sph, sph_MHD_bc)
-!
-      use set_bc_sph_mhd
-!
-      type(boundary_spectra), intent(in) :: bc_IO
-      type(sph_group_data), intent(in) :: sph_grps
-      type(MHD_BC_lists), intent(in) :: MHD_BC
-      type(sph_grids), intent(in) :: sph
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-!
-      type(sph_rotation), intent(inout) :: omega_sph
+      type(phys_data), intent(inout) :: radial_variation
       type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !
 !
@@ -120,19 +101,41 @@
       call set_delta_r_4_sph_mhd(sph%sph_params, sph%sph_rj)
 !
 !*  ----------  rotation of earth  ---------------
-!
-      if (iflag_debug .ge. iflag_routine_msg)                           &
+      if(iflag_debug .ge. iflag_routine_msg)                            &
      &                write(*,*) 'set_rot_earth_4_sph'
       call set_rot_earth_4_sph(sph%sph_rlm, sph%sph_rj,                 &
      &    MHD_prop%fl_prop, omega_sph)
+!
+!*  ---------- Coefficients of each term  -------
+      if(iflag_debug.gt.0) write(*,*)' set_material_property'
+      call set_material_property                                        &
+     &   (sph%sph_params%radius_CMB, sph%sph_params%radius_ICB,         &
+     &    ipol, MHD_prop)
+!
+!*  ---------- Finite differnce coefficients  ---------------
+      if (iflag_debug.gt.0) write(*,*) 'const_second_fdm_coefs'
+      call const_second_fdm_coefs(sph%sph_params, sph%sph_rj, r_2nd)
+!
+      if (iflag_debug.gt.0) write(*,*) 'const_first_fdm_ele_to_node'
+      call const_first_fdm_ele_to_node(sph%sph_rj, r_e2n_1st)
+      if (iflag_debug.gt.0) write(*,*) 'const_third_fdm_node_to_ele'
+      call const_third_fdm_node_to_ele(sph%sph_rj, r_n2e_3rd)
+!
+!*  ---------- Radial variations of density and diffusivities  -------
+      call init_radius_variations_sph_mhd(sph, r_2nd, MHD_prop,         &
+     &                                    radial_variation)
 !
 !*  ---------- boundary conditions  ---------------
       if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
       call s_set_bc_sph_mhd                                             &
      &   (bc_IO, sph%sph_params, sph%sph_rj, sph_grps%radial_rj_grp,    &
-     &    MHD_prop, MHD_BC, sph_MHD_bc)
+     &    MHD_prop, radial_variation, MHD_BC, sph_MHD_bc)
 !
-      end subroutine init_r_infos_sph_mhd
+      if(iflag_debug .ge. iflag_full_msg) then
+        call check_bc_sph_mhd(MHD_prop, sph_MHD_bc)
+      end if
+!
+      end subroutine init_r_infos_sph_mhd_evo
 !
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
@@ -181,14 +184,15 @@
       logical :: flag_write_ref
 !
 !
-      flag_write_ref = .FALSE.
       call init_reft_rj_data(sph%sph_rj, ipol, refs)
+!
       call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
       call load_sph_reference_fields(refs)
       call overwrite_sources_by_reference(sph%sph_rj, refs%iref_base,   &
      &    ipol%base, refs%ref_field, rj_fld)
 !
 !
+      flag_write_ref = .FALSE.
       call s_init_reference_scalar                                      &
      &   (MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%ht_prop, sph_MHD_bc%sph_bc_T,                 &

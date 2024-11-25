@@ -34,15 +34,7 @@
 !
       implicit  none
 !
-!>     Fixed time step flag
-      integer(kind=kint), parameter :: iflag_fixed_step = 0
-!>     Flexible time step flag
-      integer(kind=kint), parameter :: iflag_flex_step =  1
-!
-!
       type flexible_stepping_parameter
-!>        flag for time stepping
-        integer(kind=kint) :: iflag_flexible_step = iflag_fixed_step
 !>        Integer flag if time stepping is changed
         integer(kind= kint) :: iflag_flex_step_changed = id_turn_OFF
 !
@@ -149,7 +141,7 @@
       call cal_num_digit_real                                           &
      &     (init_d%dt, flex_p%dt_fact, flex_p%idt_digit)
 !
-      if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
+      if(init_d%flag_flex_step) then
         if (tctl%min_delta_t_ctl%iflag .eq. 0) then
           e_message = 'Set maximum delta t'
           call calypso_MPI_abort(ierr_evo, e_message)

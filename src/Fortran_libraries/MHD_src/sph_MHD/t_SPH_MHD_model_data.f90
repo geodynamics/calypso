@@ -16,6 +16,7 @@
       use m_precision
       use t_control_parameter
       use t_poloidal_rotation
+      use t_phys_data
       use t_radial_reference_field
       use t_boundary_data_sph_MHD
       use t_bc_data_list
@@ -41,6 +42,9 @@
         type(MHD_BC_lists) :: MHD_BC
 !>         Structures for boundary conditions
         type(boundary_spectra) :: bc_IO
+!
+!>        Radial variations
+        type(phys_data) :: radial_variation
       end type SPH_MHD_model_data
 !
       end module t_SPH_MHD_model_data

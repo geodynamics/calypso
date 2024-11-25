@@ -50,9 +50,8 @@
 !      write(id_file,'(a)') '! 3.1 center of element (position) '
 !      write(id_file,'(a)') '!'
 !
-      call read_number_of_node(id_file, nod_IO, iend)
+      call read_geometry_info(id_file, nod_IO, iend)
       if(iend .ne. 0) return
-      call read_geometry_info(id_file, nod_IO)
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '! 3.2 Volume of element '

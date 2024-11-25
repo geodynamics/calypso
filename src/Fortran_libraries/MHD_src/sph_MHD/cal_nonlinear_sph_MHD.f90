@@ -141,7 +141,7 @@
      &    trns_b_snap%ncomp, trns_b_snap%fld_pole,                      &
      &    trns_f_MHD%ncomp, trns_f_MHD%fld_pole)
 !
-      if(MHD_prop%fl_prop%iflag_4_coriolis) then
+      if(MHD_prop%fl_prop%flag_coriolis) then
         call cal_wz_coriolis_pole                                       &
      &     (sph_rtp%nnod_pole, MHD_prop%fl_prop%coef_cor,               &
      &      trns_b_snap%fld_pole(1,b_trns_base%i_velo),                 &

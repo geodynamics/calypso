@@ -38,9 +38,11 @@
 !!      delta_t_isosurface_ctl       1.0e-3
 !!      delta_t_map_projection_ctl   1.0e-3
 !!      delta_t_pvr_ctl              1.0e-2
-!!      delta_t_fline_ctl            1.0e-1    
 !!      delta_t_LIC_ctl              1.0e-1
-!!      delta_t_field_ctl            1.0e-3
+!!      delta_t_fline_ctl            1.0e-1    
+!!      delta_t_fline_ctl            1.0e-1    
+!!
+!!      delta_t_tracer_output        1.0e-3
 !!      delta_t_monitor_ctl          1.0e-4
 !!      delta_t_sgs_coefs_ctl        2.0e-5
 !!      delta_t_boundary_ctl         1.0e-4
@@ -139,6 +141,8 @@
      &      :: hd_delta_t_lic =            'delta_t_LIC_ctl'
       character(len=kchara), parameter, private                         &
      &      :: hd_delta_t_fline =          'delta_t_fline_ctl'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_delta_t_tracer =         'delta_t_tracer_output'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_delta_t_ucd =       'delta_t_field_ctl'
@@ -167,9 +171,11 @@
       character(len=kchara), parameter, private                         &
      &       :: hd_i_step_pvr =            'i_step_pvr_ctl'
       character(len=kchara), parameter, private                         &
+     &       :: hd_i_step_lic =            'i_step_LIC_ctl'
+      character(len=kchara), parameter, private                         &
      &       :: hd_i_step_fline =          'i_step_fline_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_i_step_lic =            'i_step_LIC_ctl'
+     &       :: hd_i_step_tracer =         'i_step_tracer_output'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_i_step_ucd =       'i_step_field_ctl'
@@ -248,10 +254,13 @@
 !
         call read_real_ctl_type(c_buf, hd_delta_t_pvr,                  &
      &      tctl%delta_t_pvr_ctl)
-        call read_real_ctl_type(c_buf, hd_delta_t_fline,                &
-     &      tctl%delta_t_fline_ctl)
         call read_real_ctl_type(c_buf, hd_delta_t_lic,                  &
      &      tctl%delta_t_lic_ctl)
+!
+        call read_real_ctl_type(c_buf, hd_delta_t_fline,                &
+     &      tctl%delta_t_fline_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_tracer,               &
+     &      tctl%delta_t_tracer_output_ctl)
 !
         call read_real_ctl_type(c_buf, hd_delta_t_ucd,                  &
      &      tctl%delta_t_field_ctl)
@@ -294,8 +303,11 @@
      &      tctl%i_step_pvr_ctl)
         call read_integer_ctl_type(c_buf, hd_i_step_lic,                &
      &      tctl%i_step_lic_ctl)
+!
         call read_integer_ctl_type(c_buf, hd_i_step_fline,              &
      &      tctl%i_step_fline_ctl)
+        call read_integer_ctl_type(c_buf, hd_i_step_tracer,             &
+     &      tctl%i_step_tracer_output_ctl)
 !
         call read_integer_ctl_type(c_buf, hd_i_step_ucd,                &
      &      tctl%i_step_ucd_ctl)
@@ -353,8 +365,9 @@
       maxlen = max(maxlen, len_trim(hd_delta_t_isosurf))
       maxlen = max(maxlen, len_trim(hd_delta_t_map_projection))
       maxlen = max(maxlen, len_trim(hd_delta_t_pvr))
-      maxlen = max(maxlen, len_trim(hd_delta_t_fline))
       maxlen = max(maxlen, len_trim(hd_delta_t_lic))
+      maxlen = max(maxlen, len_trim(hd_delta_t_fline))
+      maxlen = max(maxlen, len_trim(hd_delta_t_tracer))
 !
       maxlen = max(maxlen, len_trim(hd_delta_t_ucd))
       maxlen = max(maxlen, len_trim(hd_delta_t_monitor))
@@ -371,6 +384,7 @@
       maxlen = max(maxlen, len_trim(hd_i_step_psf))
       maxlen = max(maxlen, len_trim(hd_i_step_pvr))
       maxlen = max(maxlen, len_trim(hd_i_step_fline))
+      maxlen = max(maxlen, len_trim(hd_i_step_tracer))
       maxlen = max(maxlen, len_trim(hd_i_step_lic))
       maxlen = max(maxlen, len_trim(hd_i_step_ucd))
       maxlen = max(maxlen, len_trim(hd_i_step_monitor))
@@ -407,9 +421,13 @@
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    tctl%i_step_pvr_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
+     &    tctl%i_step_lic_ctl)
+!
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    tctl%i_step_fline_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    tctl%i_step_lic_ctl)
+     &    tctl%i_step_tracer_output_ctl)
+!
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    tctl%i_step_ucd_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
@@ -443,9 +461,12 @@
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    tctl%delta_t_pvr_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
+     &    tctl%delta_t_lic_ctl)
+!
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    tctl%delta_t_fline_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &    tctl%delta_t_lic_ctl)
+     &    tctl%delta_t_tracer_output_ctl)
 !
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
@@ -521,10 +542,13 @@
 !
         call init_real_ctl_item_label(hd_delta_t_pvr,                   &
      &      tctl%delta_t_pvr_ctl)
-        call init_real_ctl_item_label(hd_delta_t_fline,                 &
-     &      tctl%delta_t_fline_ctl)
         call init_real_ctl_item_label(hd_delta_t_lic,                   &
      &      tctl%delta_t_lic_ctl)
+!
+        call init_real_ctl_item_label(hd_delta_t_fline,                 &
+     &      tctl%delta_t_fline_ctl)
+        call init_real_ctl_item_label(hd_delta_t_tracer,                &
+     &      tctl%delta_t_tracer_output_ctl)
 !
         call init_real_ctl_item_label(hd_delta_t_ucd,                   &
      &      tctl%delta_t_field_ctl)
@@ -567,8 +591,11 @@
      &      tctl%i_step_pvr_ctl)
         call init_int_ctl_item_label(hd_i_step_lic,                     &
      &      tctl%i_step_lic_ctl)
+!
         call init_int_ctl_item_label(hd_i_step_fline,                   &
      &      tctl%i_step_fline_ctl)
+        call init_int_ctl_item_label(hd_i_step_tracer,                  &
+     &      tctl%i_step_tracer_output_ctl)
 !
         call init_int_ctl_item_label(hd_i_step_ucd,                     &
      &      tctl%i_step_ucd_ctl)

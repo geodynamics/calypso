@@ -14,9 +14,6 @@
 !!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
-!!      subroutine gz_read_num_node(FPz_f, id_rank, mesh_IO, zbuf, ierr)
-!!      subroutine gz_read_num_node_ele(FPz_f, id_rank,                 &
-!!     &                                mesh_IO, zbuf, ierr)
 !!      subroutine gz_read_geometry_data(FPz_f, id_rank,                &
 !!     &                                 mesh_IO, zbuf, ierr)
 !!      subroutine gz_read_mesh_groups(FPz_f, mesh_group_IO, zbuf)
@@ -79,7 +76,6 @@
 !
       zbuf%fixbuf(1) = hd_fem_node() // char(0)
       call gz_write_textbuf_no_lf(FPz_f, zbuf)
-!
       call gz_write_geometry_info(FPz_f, mesh_IO%node, zbuf)
 !
 !
@@ -176,50 +172,6 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine gz_read_num_node(FPz_f, id_rank, mesh_IO, zbuf, ierr)
-!
-      character, pointer, intent(in) :: FPz_f
-      integer, intent(in) :: id_rank
-!
-      type(mesh_geometry), intent(inout) :: mesh_IO
-      type(buffer_4_gzip), intent(inout) :: zbuf
-      integer(kind = kint), intent(inout) :: ierr
-!
-!
-!      write(*,*) 'gz_read_domain_info'
-       call gz_read_domain_info                                         &
-     &    (FPz_f, id_rank, mesh_IO%nod_comm, zbuf, ierr)
-!      write(*,*) 'gz_read_number_of_node'
-       call gz_read_number_of_node(FPz_f, mesh_IO%node, zbuf)
-!
-       end subroutine gz_read_num_node
-!
-!------------------------------------------------------------------
-!
-      subroutine gz_read_num_node_ele(FPz_f, id_rank,                   &
-     &                                mesh_IO, zbuf, ierr)
-!
-      character, pointer, intent(in) :: FPz_f
-      integer, intent(in) :: id_rank
-!
-      type(mesh_geometry), intent(inout) :: mesh_IO
-      type(buffer_4_gzip), intent(inout) :: zbuf
-      integer(kind = kint), intent(inout) :: ierr
-!
-!
-      call gz_read_num_node(FPz_f, id_rank, mesh_IO, zbuf, ierr)
-!      write(*,*) 'gz_read_geometry_info'
-      call gz_read_geometry_info(FPz_f, mesh_IO%node, zbuf)
-!
-!  ----  read element data -------
-!
-!      write(*,*) 'gz_read_number_of_element'
-      call gz_read_number_of_element(FPz_f, mesh_IO%ele, zbuf)
-!
-      end subroutine gz_read_num_node_ele
-!
-!------------------------------------------------------------------
-!
       subroutine gz_read_geometry_data(FPz_f, id_rank,                  &
      &                                 mesh_IO, zbuf, ierr)
 !
@@ -231,10 +183,17 @@
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      call gz_read_num_node_ele(FPz_f, id_rank, mesh_IO, zbuf, ierr)
+!      write(*,*) 'gz_read_domain_info'
+      call gz_read_domain_info                                          &
+     &   (FPz_f, id_rank, mesh_IO%nod_comm, zbuf, ierr)
+      if(ierr .gt. 0) return
+!
+      call gz_read_geometry_info(FPz_f, mesh_IO%node, zbuf)
 !
 !  ----  read element data -------
 !
+!      write(*,*) 'gz_read_number_of_element'
+      call gz_read_number_of_element(FPz_f, mesh_IO%ele, zbuf)
 !      write(*,*) 'gz_read_element_info'
       call gz_read_element_info(FPz_f, mesh_IO%ele, zbuf)
 !
@@ -286,8 +245,7 @@
 !
 !        write(*,*) 'gz_read_domain_info'
         call gz_read_domain_info(FPz_f, id_rank, comm_IO, zbuf, ierr)
-!        write(*,*) 'gz_read_number_of_node'
-        call gz_read_number_of_node(FPz_f, nod_IO, zbuf)
+
 !        write(*,*) 'gz_read_geometry_info'
         call gz_read_geometry_info(FPz_f, nod_IO, zbuf)
 !

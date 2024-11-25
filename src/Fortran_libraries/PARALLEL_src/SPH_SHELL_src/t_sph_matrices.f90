@@ -8,6 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine alloc_band_mat_sph(nband, sph_rj, smat)
+!!        integer(kind = kint), intent(in) :: nband
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(band_matrices_type), intent(inout) :: smat
+!!      subroutine alloc_band_matrices_type(nband, nri, jmax, smat)
+!!        integer(kind = kint), intent(in) :: nband, nri, jmax
+!!        type(band_matrices_type), intent(inout) :: smat
+!!
 !!      subroutine set_unit_on_diag(smat)
 !!      subroutine dealloc_band_mat_sph(smat)
 !!
@@ -75,9 +82,23 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(band_matrices_type), intent(inout) :: smat
 !
+      call alloc_band_matrices_type                                     &
+     &   (nband, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), smat)
 !
-      smat%n_vect =      sph_rj%nidx_rj(1)
-      smat%n_comp =      sph_rj%nidx_rj(2)
+      end subroutine alloc_band_mat_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine alloc_band_matrices_type(nband, nri, jmax, smat)
+!
+      use t_spheric_rj_data
+!
+      integer(kind = kint), intent(in) :: nband, nri, jmax
+      type(band_matrices_type), intent(inout) :: smat
+!
+!
+      smat%n_vect =      nri
+      smat%n_comp =      jmax
       smat%n_band =      nband
       smat%n_band_lu = 2*nband - 1
 !
@@ -92,7 +113,7 @@
       smat%det =   0.0d0
       smat%i_pivot =   0
 !
-      end subroutine alloc_band_mat_sph
+      end subroutine alloc_band_matrices_type
 !
 ! -----------------------------------------------------------------------
 !

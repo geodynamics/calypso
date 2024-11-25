@@ -728,12 +728,18 @@
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
 !
-      real (kind = kreal) :: rr, q
+      real (kind = kreal) :: rr, q, r_inside
       integer(kind = kint) :: inod, i_center
       integer :: jj, k
 !
 !
       if(ipol%base%i_heat_source .eq. izero) return
+!
+      if(i_center .gt. 0) then
+        r_inside = zero
+      else
+        r_inside = sph_bc_T%r_ICB(0)
+      end if
 !
 !$omp parallel do
       do inod = 1, nnod_rj(sph)
@@ -745,21 +751,22 @@
 !    Find address for l = m = 0
       jj =  find_local_sph_mode_address(sph, 0, 0)
 !
-      if (jj .gt. 0) then
-        q = (three / (sph_bc_T%r_CMB(0)**3 - sph_bc_T%r_ICB(0)**3))     &
-     &     * (-bcs_T%CMB_Sspec%S_BC(jj) * sph_bc_T%r_CMB(0)**2          &
-     &        - bcs_T%ICB_Sspec%S_BC(jj) * sph_bc_T%r_ICB(0)**2)
+      if (jj .le. 0) return
+      q = (three / (sph_bc_T%r_CMB(0)**3 - r_inside**3))                &
+     &   * (-bcs_T%CMB_Sspec%S_BC(jj) * sph_bc_T%r_CMB(0)**2            &
+     &      - bcs_T%ICB_Sspec%S_BC(jj) * r_inside**2)
 !
-        do k = sph_bc_T%kr_in, sph_bc_T%kr_out
-          inod = local_sph_data_address(sph, k, jj)
-          rr = radius_1d_rj_r(sph, k)
+      do k = sph_bc_T%kr_in, sph_bc_T%kr_out
+        inod = local_sph_data_address(sph, k, jj)
+        rr = radius_1d_rj_r(sph, k)
 !   Substitute initial heat source
-          rj_fld%d_fld(inod,ipol%base%i_heat_source)  = q
-        end do
-      end if
+        rj_fld%d_fld(inod,ipol%base%i_heat_source)  = q
+      end do
+!
 !    Center
       i_center = inod_rj_center(sph)
       if(i_center .gt. 0) then
+        jj =  find_local_sph_mode_address(sph, 0, 0)
         rj_fld%d_fld(i_center,ipol%base%i_heat_source) = q
       end if
 !

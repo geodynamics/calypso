@@ -14,8 +14,6 @@
 !!        type(mesh_geometry), intent(in) :: mesh_IO
 !!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!
-!!      subroutine gz_mpi_read_num_node(IO_param, mesh_IO)
-!!      subroutine gz_mpi_read_num_node_ele(IO_param, mesh_IO)
 !!      subroutine gz_mpi_read_geometry_data(IO_param, mesh_IO)
 !!      subroutine gz_mpi_read_mesh_groups(IO_param, mesh_group_IO)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -105,7 +103,7 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine gz_mpi_read_num_node(IO_param, mesh_IO)
+      subroutine gz_mpi_read_geometry_data(IO_param, mesh_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -115,38 +113,11 @@
       call gz_mpi_read_domain_info(IO_param, mesh_IO%nod_comm)
 !
       call gz_mpi_skip_header(IO_param, len(hd_fem_node()))
-      call gz_mpi_read_number_of_node(IO_param, mesh_IO%node)
-!
-      end subroutine gz_mpi_read_num_node
-!
-!------------------------------------------------------------------
-!
-      subroutine gz_mpi_read_num_node_ele(IO_param, mesh_IO)
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call gz_mpi_read_num_node(IO_param, mesh_IO)
       call gz_mpi_read_geometry_info(IO_param, mesh_IO%node)
 !
 !  ----  read element data -------
-!
       call gz_mpi_skip_header(IO_param, len(hd_fem_elem()))
       call gz_mpi_read_num_element(IO_param, mesh_IO%ele)
-!
-      end subroutine gz_mpi_read_num_node_ele
-!
-!------------------------------------------------------------------
-!
-      subroutine gz_mpi_read_geometry_data(IO_param, mesh_IO)
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call gz_mpi_read_num_node_ele(IO_param, mesh_IO)
-!
       call gz_mpi_read_element_info(IO_param, mesh_IO%ele)
 !
 ! ----  import & export

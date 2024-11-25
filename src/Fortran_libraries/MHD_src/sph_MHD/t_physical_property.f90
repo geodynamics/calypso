@@ -72,24 +72,24 @@
         real  (kind=kreal) :: coef_diffuse
 !
 !>        Force flag for Filtered inertia term
-        logical :: iflag_4_inertia = .TRUE.
+        logical :: flag_inertia =          .TRUE.
 !>        Force flag for Coriolis force
-        logical :: iflag_4_coriolis = .FALSE.
+        logical :: flag_coriolis =         .FALSE.
 !>        Force flag for Lorentz force
-        logical :: iflag_4_lorentz = .FALSE.
+        logical :: flag_lorentz =          .FALSE.
 !>        Force flag for thermal buoyancy
-        logical :: iflag_4_gravity = .FALSE.
+        logical :: flag_thermal_buoyancy = .FALSE.
 !>        Force flag for compositional buoyancy
-        logical :: iflag_4_composit_buo = .FALSE.
+        logical :: flag_comp_buoyancy =    .FALSE.
 !
 !>        Force flag for Filtered inertia term
-        logical :: iflag_4_filter_inertia = .FALSE.
+        logical :: flag_filter_inertia = .FALSE.
 !>        Force flag for Filtered Lorentz force
-        logical :: iflag_4_filter_lorentz = .FALSE.
+        logical :: flag_filter_lorentz =  .FALSE.
 !>        Force flag for filtered thermal buoyancy
-        logical :: iflag_4_filter_gravity =  .FALSE.
+        logical :: flag_filter_gravity =  .FALSE.
 !>        Force flag for filtered compositional buoyancy
-        logical :: iflag_4_filter_comp_buo = .FALSE.
+        logical :: flag_filter_comp_buo = .FALSE.
 !
 !>       coefficient for Coriolis force
         real  (kind=kreal) :: coef_cor = zero
@@ -100,6 +100,22 @@
 !>       coefficient for chemical buoyancy
         real  (kind=kreal) :: coef_comp_buo = zero
 !
+!>       Flag of radial valuable viscosity
+        logical :: flag_viscous_variation =     .FALSE.
+!>       Flag of radial valuable density
+        logical :: flag_ref_density_valiation = .FALSE.
+!
+!>       radial field index for density variation
+        integer(kind = kint) :: ir_rho =        izero
+!>       radial field index for density variation
+        integer(kind = kint) :: ir_drho_norm =  izero
+!>       radial field index for density variation
+        integer(kind = kint) :: ir_d2rho_norm = izero
+!>       radial field index for density variation
+        integer(kind = kint) :: ir_nu =         izero
+!>       radial field index for density variation
+        integer(kind = kint) :: ir_dnu_norm =   izero
+!
 !>       flag for gravity type
         integer (kind=kint) :: i_grav
 !>       gravity direction for constant gravity
@@ -108,7 +124,7 @@
         real (kind=kreal) :: sys_rot(3) = (/zero, zero, one/)
 !
 !>        Buoyancy model for FEM
-        integer(kind = kint) :: iflag_FEM_gravity = id_FORCE_ele_int
+        integer(kind = kint) :: iflag_FEM_gravity =  id_FORCE_ele_int
 !>        Coriolis force model for FEM
         integer(kind = kint) :: iflag_FEM_coriolis = id_FORCE_ele_int
 !>        Coriolis force model for FEM
@@ -143,6 +159,11 @@
 !>       coefficient for magnetic induction
         real  (kind=kreal) :: coef_induct
 !
+!>       radial field index for diffusivity variation
+        integer(kind = kint) :: ir_eta =        izero
+!>       radial field index for diffusivity variation
+        integer(kind = kint) :: ir_deta_norm =  izero
+!
 !>       Ratio of magnetic energy to kinetic energy scale
         real  (kind=kreal) :: me_to_ke_ratio
 !
@@ -175,6 +196,11 @@
         real(kind = kreal) :: coef_diffuse
 !>       coefficient for heat source term
         real(kind = kreal) :: coef_source = zero
+!
+!>       radial field index for diffusivity variation
+        integer(kind = kint) :: ir_kappa =        izero
+!>       radial field index for diffusivity variation
+        integer(kind = kint) :: ir_dkappa_norm =  izero
 !
 !>       coefficient for diffusion reduction for ICB
         real(kind = kreal) :: diffusie_reduction_ICB = one

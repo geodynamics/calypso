@@ -13,8 +13,8 @@
 !!        type(time_data), intent(in) :: t_IO
 !!        type(binary_IO_buffer), intent(inout) :: bbuf
 !!
-!!      subroutine read_step_data_b                                     &
-!!     &         (bbuf, t_IO, istack_merged, num_field)
+!!      subroutine read_step_data_b(bbuf, t_IO)
+!!      subroutine read_field_num_b(bbuf, istack_merged, num_field)
 !!      subroutine read_field_data_b                                    &
 !!     &         (bbuf, num_field, field_name, nnod64, ntot_comp, vect)
 !!        type(binary_IO_buffer), intent(inout) :: bbuf
@@ -98,14 +98,10 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_step_data_b                                       &
-     &         (bbuf, t_IO, istack_merged, num_field)
+      subroutine read_step_data_b(bbuf, t_IO)
 !
       type(binary_IO_buffer), intent(inout) :: bbuf
       type(time_data), intent(inout) :: t_IO
-!
-      integer(kind=kint_gl), intent(inout) :: istack_merged(1)
-      integer(kind=kint), intent(inout) :: num_field
 !
       integer(kind = kint) :: irank_read
       integer(kind = kint_gl), parameter :: ione64 = 1
@@ -118,14 +114,27 @@
       call read_one_real_b(bbuf, t_IO%time)
       if(bbuf%ierr_bin .ne. 0) return
       call read_one_real_b(bbuf, t_IO%dt)
-      if(bbuf%ierr_bin .ne. 0) return
+!
+      end subroutine read_step_data_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine read_field_num_b(bbuf, istack_merged, num_field)
+!
+      type(binary_IO_buffer), intent(inout) :: bbuf
+!
+      integer(kind=kint_gl), intent(inout) :: istack_merged(1)
+      integer(kind=kint), intent(inout) :: num_field
+!
+      integer(kind = kint_gl), parameter :: ione64 = 1
+!
 !
       call read_mul_int8_b(bbuf, ione64, istack_merged)
       if(bbuf%ierr_bin .ne. 0) return
 !
       call read_one_integer_b(bbuf, num_field)
 !
-      end subroutine read_step_data_b
+      end subroutine read_field_num_b
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

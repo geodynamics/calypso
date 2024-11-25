@@ -168,6 +168,8 @@
 !
       integer (kind = kint) :: i
 !
+      call gz_read_number_of_element_b(FPz_f, zbuf, ele_IO)
+      if(zbuf%ierr_zlib .ne. 0) return
 !
       call alloc_element_types(ele_IO)
       call gz_read_mul_integer_b                                        &
