@@ -76,6 +76,8 @@
 !
 !>        Structures of visualization controls
       type vis4_controls
+!>        Block name
+        character(len=kchara) :: block_name = 'visualizer'
 !>        Structures of setioning controls
         type(section_controls) :: psf_ctls
 !>        Structures of isosurface controls

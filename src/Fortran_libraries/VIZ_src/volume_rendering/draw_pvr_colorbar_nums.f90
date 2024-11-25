@@ -84,8 +84,8 @@
       integer(kind = kint), intent(inout) :: ist, jst, ied, jed
 !
 !
-      ist = 1.5 * isleeve_bar*iscale
-      ied = npix_img(1) - 1.5 * isleeve_bar*iscale
+      ist = 1.5 * isleeve_bar
+      ied = npix_img(1) - 1.5 * isleeve_bar
       jst = 16 + 12*iscale + 20
       jed = jst + BAR_WIDTH*iscale
 !

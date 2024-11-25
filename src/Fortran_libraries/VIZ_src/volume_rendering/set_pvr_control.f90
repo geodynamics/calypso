@@ -10,11 +10,13 @@
 !!     &         (num_pvr_ctl, pvr_ctl, cflag_update)
 !!        integer(kind = kint), intent(in) :: num_pvr_ctl
 !!        type(pvr_parameter_ctl), intent(inout) :: pvr_ctl(num_pvr_ctl)
-!!      subroutine s_set_pvr_controls(group, nod_fld,                   &
+!!      subroutine s_set_pvr_controls(group, nod_fld, tracer, fline,    &
 !!     &                              pvr_ctl_type, pvr_param)
 !!        integer(kind = kint), intent(in) :: num_pvr
 !!        type(mesh_groups), intent(in) :: group
 !!        type(phys_data), intent(in) :: nod_fld
+!!        type(tracer_module), intent(in) :: tracer
+!!        type(fieldline_module), intent(in) :: fline
 !!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl_type
 !!        type(PVR_control_params), intent(inout) :: pvr_param
 !!
@@ -65,11 +67,13 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_set_pvr_controls(group, nod_fld,                     &
+      subroutine s_set_pvr_controls(group, nod_fld, tracer, fline,      &
      &                              pvr_ctl_type, pvr_param)
 !
       use t_group_data
       use t_phys_data
+      use t_particle_trace
+      use t_fieldline
       use t_rendering_vr_image
       use t_geometries_in_pvr_screen
       use t_control_data_pvr_sections
@@ -80,6 +84,8 @@
 !
       type(mesh_groups), intent(in) :: group
       type(phys_data), intent(in) :: nod_fld
+      type(tracer_module), intent(in) :: tracer
+      type(fieldline_module), intent(in) :: fline
       type(pvr_parameter_ctl), intent(in) :: pvr_ctl_type
 !
       type(PVR_control_params), intent(inout) :: pvr_param
@@ -102,7 +108,7 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'set_control_pvr'
       call set_control_pvr(pvr_ctl_type, group%ele_grp, group%surf_grp, &
-     &    pvr_param%area_def, pvr_param%draw_param,                     &
+     &    tracer, fline, pvr_param%area_def, pvr_param%draw_param,      &
      &    pvr_param%color, pvr_param%colorbar)
 !
 !   set parameters for stereo views
@@ -204,6 +210,9 @@
       if(pvr_param%draw_param%num_isosurf .gt. 0) then
         call dealloc_pvr_isosurfaces(pvr_param%draw_param)
       end if
+!
+      call dealloc_pvr_tracer_param(pvr_param%draw_param%tracer_pvr_prm)
+      call dealloc_pvr_tracer_param(pvr_param%draw_param%fline_pvr_prm)
 !
       call dealloc_pvr_element_group(pvr_param%area_def)
       call dealloc_pvr_color_parameteres(pvr_param%color)

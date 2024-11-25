@@ -3,7 +3,7 @@
 #
 
 FIELDLINE_DIR = $$(VIZ_SRCDIR)/fieldline
-SOURCES = $(shell ls *.f90)
+SOURCES = $(shell ls *.f90 *.F90)
 MOD_FIELDLINE = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #

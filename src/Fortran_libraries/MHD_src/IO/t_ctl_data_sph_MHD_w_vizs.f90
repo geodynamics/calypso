@@ -46,7 +46,7 @@
       use t_ctl_data_node_monitor
       use t_ctl_data_gen_sph_shell
 !
-      use t_control_data_viz3
+      use t_control_data_viz4
       use t_control_data_dynamo_vizs
 !
       implicit none
@@ -57,7 +57,7 @@
 !>      Additional structures for spherical MHD dynamo with viz module
       type add_vizs_sph_mhd_ctl
 !>        Structures of visualization controls
-        type(vis3_controls) :: viz3_ctls
+        type(vis4_controls) :: viz4_ctls
 !>        Structures of zonal mean controls
         type(sph_dynamo_viz_controls) :: zm_ctls
       end type add_vizs_sph_mhd_ctl
@@ -105,6 +105,8 @@
       subroutine read_control_4_sph_MHD_w_vizs(file_name, MHD_ctl,      &
      &                                         add_VMHD_ctl, c_buf)
 !
+      use viz4_step_ctls_to_time_ctl
+!
       character(len=kchara), intent(in) :: file_name
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
       type(add_vizs_sph_mhd_ctl), intent(inout) :: add_VMHD_ctl
@@ -130,9 +132,9 @@
       c_buf%level = c_buf%level - 1
       if(c_buf%iend .gt. 0)  return
 !
-      call viz3_step_ctls_to_time_ctl(add_VMHD_ctl%viz3_ctls,           &
-     &                                MHD_ctl%smctl_ctl%tctl)
-      call add_fields_viz3_to_fld_ctl(add_VMHD_ctl%viz3_ctls,           &
+      call s_viz4_step_ctls_to_time_ctl(add_VMHD_ctl%viz4_ctls,         &
+     &                                  MHD_ctl%smctl_ctl%tctl)
+      call add_fields_viz4_to_fld_ctl(add_VMHD_ctl%viz4_ctls,           &
      &    MHD_ctl%model_ctl%fld_ctl%field_ctl)
 !
       end subroutine read_control_4_sph_MHD_w_vizs
@@ -174,7 +176,7 @@
       use ctl_data_platforms_IO
       use ctl_data_sph_monitor_IO
       use ctl_data_MHD_model_IO
-      use ctl_data_three_vizs_IO
+      use ctl_data_four_vizs_IO
       use ctl_file_gen_sph_shell_IO
 !
       integer(kind = kint), intent(in) :: id_control
@@ -211,8 +213,8 @@
         call read_sph_monitoring_ctl                                    &
      &     (id_control, hd_pick_sph, MHD_ctl%smonitor_ctl, c_buf)
 !
-        call s_read_viz3_controls                                       &
-     &     (id_control, hd_viz_ctl, add_VMHD_ctl%viz3_ctls, c_buf)
+        call s_read_viz4_controls                                       &
+     &     (id_control, hd_viz_ctl, add_VMHD_ctl%viz4_ctls, c_buf)
 !
         call read_dynamo_viz_control                                    &
      &     (id_control, hd_dynamo_viz_ctl, add_VMHD_ctl%zm_ctls, c_buf)
@@ -231,7 +233,7 @@
       use ctl_data_platforms_IO
       use ctl_data_sph_monitor_IO
       use ctl_data_MHD_model_IO
-      use ctl_data_three_vizs_IO
+      use ctl_data_four_vizs_IO
       use ctl_file_gen_sph_shell_IO
 !
       use write_control_elements
@@ -262,8 +264,8 @@
       call write_sph_monitoring_ctl                                     &
      &   (id_control, MHD_ctl%smonitor_ctl, level)
 !
-      call write_viz3_controls                                          &
-     &   (id_control, hd_viz_ctl, add_VMHD_ctl%viz3_ctls, level)
+      call write_viz4_controls                                          &
+     &   (id_control, add_VMHD_ctl%viz4_ctls, level)
 !
       call write_dynamo_viz_control                                     &
      &   (id_control, add_VMHD_ctl%zm_ctls, level)
@@ -280,7 +282,7 @@
       use ctl_data_platforms_IO
       use ctl_data_sph_monitor_IO
       use ctl_data_MHD_model_IO
-      use ctl_data_three_vizs_IO
+      use ctl_data_four_vizs_IO
       use ctl_file_gen_sph_shell_IO
 !
       character(len=kchara), intent(in) :: hd_block
@@ -298,7 +300,7 @@
       call init_sph_mhd_control_label(hd_control, MHD_ctl%smctl_ctl)
       call init_sph_monitoring_labels(hd_pick_sph,                      &
      &                                MHD_ctl%smonitor_ctl)
-      call init_viz3_ctl_label(hd_viz_ctl, add_VMHD_ctl%viz3_ctls)
+      call init_viz4_ctl_label(hd_viz_ctl, add_VMHD_ctl%viz4_ctls)
       call init_dynamo_viz_control(hd_dynamo_viz_ctl,                   &
      &                             add_VMHD_ctl%zm_ctls)
       call init_monitor_data_ctl_label(hd_monitor_data,                 &
@@ -314,7 +316,7 @@
       type(add_vizs_sph_mhd_ctl), intent(inout) :: add_VMHD_ctl
 !
 !
-      call dealloc_viz3_controls(add_VMHD_ctl%viz3_ctls)
+      call dealloc_viz4_controls(add_VMHD_ctl%viz4_ctls)
       call dealloc_dynamo_viz_control(add_VMHD_ctl%zm_ctls)
 !
       end subroutine dealloc_sph_mhd_ctl_w_vizs

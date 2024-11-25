@@ -37,6 +37,7 @@
 !
       use m_precision
       use m_constants
+      use t_ctl_param_tracer_render
 !
       implicit  none
 !
@@ -67,6 +68,11 @@
         integer(kind = kint), allocatable :: iflag_enhanse(:)
 !>    Opacity value for surface boundaries
         real(kind = kreal), allocatable :: enhansed_opacity(:)
+!
+!>  Structure for tracer rendering
+        type(tracer_render_param) :: tracer_pvr_prm
+!>  Structure for fiel line rendering
+        type(tracer_render_param) :: fline_pvr_prm
 !
 !>    Number of sections
         integer(kind = kint) :: num_sections

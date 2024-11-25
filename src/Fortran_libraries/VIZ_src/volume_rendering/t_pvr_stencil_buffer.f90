@@ -7,11 +7,12 @@
 !>@brief  Work structure to make stencil buffer
 !!
 !!@verbatim
-!!      subroutine const_pvr_stencil_buffer                             &
-!!     &         (pvr_rgb, pvr_start, pvr_stencil, SR_sig, SR_r, SR_i1)
+!!      subroutine const_pvr_stencil_buffer(elps_PVR, pvr_rgb,          &
+!!     &          pvr_start, pvr_stencil, SR_sig, SR_r, SR_i)
 !!      subroutine collect_rendering_image(pvr_start, num_pixel_actual, &
 !!     &          rgba_real_gl, pvr_stencil, SR_sig, SR_r)
 !!      subroutine dealloc_pvr_stencil_buffer(pvr_stencil)
+!!        type(elapsed_lables), intent(in) :: elps_PVR
 !!        type(pvr_ray_start_type), intent(in) :: pvr_start
 !!        type(pvr_image_type), intent(in) :: pvr_rgb
 !!        type(pvr_stencil_buffer), intent(inout) :: pvr_stencil
@@ -55,11 +56,13 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine const_pvr_stencil_buffer                               &
-     &         (pvr_rgb, pvr_start, pvr_stencil, SR_sig, SR_r, SR_i)
+      subroutine const_pvr_stencil_buffer(elps_PVR, pvr_rgb,            &
+     &          pvr_start, pvr_stencil, SR_sig, SR_r, SR_i)
 !
+      use m_work_time
       use set_pvr_stencil_buffer
 !
+      type(elapsed_lables), intent(in) :: elps_PVR
       type(pvr_image_type), intent(in) :: pvr_rgb
       type(pvr_ray_start_type), intent(in) :: pvr_start
 !
@@ -77,7 +80,7 @@
 !
       call s_set_pvr_stencil_buffer                                     &
      &   (pvr_rgb%irank_image_file, pvr_rgb%irank_end_composit,         &
-     &    pvr_rgb%num_pixel_xy, pvr_start, stencil_wk,                  &
+     &    pvr_rgb%num_pixel_xy, elps_PVR, pvr_start, stencil_wk,        &
      &    pvr_stencil%num_pixel_recv, pvr_stencil%img_output_tbl,       &
      &    pvr_stencil%img_composit_tbl, pvr_stencil%img_stack,          &
      &    SR_sig, SR_r, SR_i)

@@ -8,8 +8,10 @@
 !>@brief Structure for cross sectioning
 !!
 !!@verbatim
-!!      subroutine MAP_PROJECTION_initialize(increment_psf, geofem,     &
-!!     &          edge_comm, nod_fld, map_ctls, map, SR_sig, SR_il)
+!!      subroutine MAP_PROJECTION_initialize                            &
+!!     &         (increment_psf, elps_PSF, elps_MAP, geofem, edge_comm, &
+!!     &          nod_fld, map_ctls, map, SR_sig, SR_il)
+!!        type(elapsed_lables), intent(in) :: elps_PSF, elps_MAP
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(communication_table), intent(in) :: edge_comm
 !!        type(phys_data), intent(in) :: nod_fld
@@ -18,7 +20,9 @@
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!      subroutine MAP_PROJECTION_visualize                             &
-!!     &         (istep_psf, time_d, geofem, nod_fld, map, SR_sig)
+!!     &         (istep_psf, elps_PSF, elps_MAP, time_d,                &
+!!     &          geofem, nod_fld, map, SR_sig)
+!!        type(elapsed_lables), intent(in) :: elps_PSF, elps_MAP
 !!        type(time_data), intent(in) :: time_d
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
@@ -28,6 +32,7 @@
       module map_projection
 !
       use m_precision
+      use m_work_time
 !
       use calypso_mpi
       use t_map_projection
@@ -40,11 +45,10 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine MAP_PROJECTION_initialize(increment_psf, geofem,       &
-     &          edge_comm, nod_fld, map_ctls, map, SR_sig, SR_il)
+      subroutine MAP_PROJECTION_initialize                              &
+     &         (increment_psf, elps_PSF, elps_MAP, geofem, edge_comm,   &
+     &          nod_fld, map_ctls, map, SR_sig, SR_il)
 !
-      use m_work_time
-      use m_elapsed_labels_4_VIZ
       use m_geometry_constants
 !
       use calypso_mpi
@@ -56,6 +60,7 @@
       use multi_map_projections
 !
       integer(kind = kint), intent(in) :: increment_psf
+      type(elapsed_lables), intent(in) :: elps_PSF, elps_MAP
       type(mesh_data), intent(in) :: geofem
       type(communication_table), intent(in) :: edge_comm
       type(phys_data), intent(in) :: nod_fld
@@ -72,7 +77,8 @@
       if(increment_psf .le. 0) map%num_map = 0
       if(map%num_map .le. 0) return
 !
-      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+1)
+      if(elps_PSF%flag_elapsed)                                         &
+     &          call start_elapsed_time(elps_PSF%ist_elapsed+1)
       call init_psf_case_tables(map%psf_case_tbls)
 !
       if (iflag_debug.eq.1) write(*,*) 'alloc_map_rendering_module'
@@ -108,27 +114,28 @@
      &    map%map_grp_list, map%map_mesh, SR_sig, SR_il)
 !
       call alloc_psf_field_data(map%num_map, map%map_mesh)
+      if(elps_PSF%flag_elapsed)                                         &
+     &          call end_elapsed_time(elps_PSF%ist_elapsed+1)
 !
       if (iflag_debug.eq.1) write(*,*) 'output_section_mesh'
       call init_multi_map_projections                                   &
-     &   (map%num_map, map%view_param, map%map_mesh,                    &
+     &   (elps_MAP, map%num_map, map%view_param, map%map_mesh,          &
      &    map%map_psf_dat, map%map_data, map%map_rgb, SR_sig)
-      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+1)
 !
       end subroutine MAP_PROJECTION_initialize
 !
 !  ---------------------------------------------------------------------
 !
       subroutine MAP_PROJECTION_visualize                               &
-     &         (istep_psf, time_d, geofem, nod_fld, map, SR_sig)
+     &         (istep_psf, elps_PSF, elps_MAP, time_d,                  &
+     &          geofem, nod_fld, map, SR_sig)
 !
-      use m_work_time
-      use m_elapsed_labels_4_VIZ
       use set_fields_for_psf
       use set_ucd_data_to_type
       use multi_map_projections
 !
       integer(kind = kint), intent(in) :: istep_psf
+      type(elapsed_lables), intent(in) :: elps_PSF, elps_MAP
       type(time_data), intent(in) :: time_d
       type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(in) :: nod_fld
@@ -139,18 +146,18 @@
 !
       if(map%num_map.le.0 .or. istep_psf.le.0) return
 !
-      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+2)
+      if(elps_PSF%flag_elapsed)                                         &
+     &          call start_elapsed_time(elps_PSF%ist_elapsed+2)
       call set_field_4_psf(map%num_map, geofem%mesh%edge, nod_fld,      &
      &    map%map_def, map%map_param, map%map_list, map%map_grp_list,   &
      &    map%map_mesh)
-      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+2)
+      if(elps_PSF%flag_elapsed)                                         &
+     &          call end_elapsed_time(elps_PSF%ist_elapsed+2)
 !
-      if (iflag_debug.eq.1) write(*,*) 'output_section_data'
-      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
-      call s_multi_map_projections(map%num_map, istep_psf, time_d,      &
-     &    map%map_mesh, map%color_param, map%cbar_param,                &
+      if(iflag_debug.eq.1) write(*,*) 'output_section_data'
+      call s_multi_map_projections(map%num_map, istep_psf, elps_MAP,    &
+     &    time_d, map%map_mesh, map%color_param, map%cbar_param,        &
      &    map%map_psf_dat, map%map_data, map%map_rgb, SR_sig)
-      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
 !
       end subroutine MAP_PROJECTION_visualize
 !

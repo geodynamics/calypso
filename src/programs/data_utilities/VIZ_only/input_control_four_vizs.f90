@@ -1,5 +1,5 @@
-!>@file   input_control_three_vizs.f90
-!!@brief  module input_control_three_vizs
+!>@file   input_control_four_vizs.f90
+!!@brief  module input_control_four_vizs
 !!
 !!@author H. Matsui
 !!@date Programmed in July, 2006
@@ -7,27 +7,27 @@
 !>@brief Control data for visualization without repartitioning
 !!
 !!@verbatim
-!!      subroutine s_input_control_three_vizs                           &
-!!     &         (file_name, viz3_c, FEM_viz, t_viz_param)
-!!        character(len = kchara), intent(in) :: file_name
-!!        type(control_data_three_vizs), intent(inout) :: viz3_c
+!!      subroutine s_input_control_four_vizs                            &
+!!     &         (ctl_file_name, viz4_ctl, FEM_viz, t_viz_param)
+!!        character(len = kchara), intent(in) :: ctl_file_name
+!!        type(control_data_four_vizs), intent(inout) :: viz4_ctl
 !!        type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
 !!        type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !!
-!!      subroutine bcast_three_vizs_control_data(viz3_c)
-!!        type(control_data_three_vizs), intent(inout) :: viz3_c
-!!      subroutine set_ctl_params_three_vizs                            &
+!!      subroutine bcast_four_vizs_control_data(viz4_ctl)
+!!        type(control_data_four_vizs), intent(inout) :: viz4_ctl
+!!      subroutine set_ctl_params_four_vizs                             &
 !!     &         (pvr_vizs_c, FEM_viz, t_viz_param, ierr)
-!!        type(control_data_three_vizs), intent(in) :: pvr_vizs_c
+!!        type(control_data_four_vizs), intent(in) :: pvr_vizs_c
 !!        type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
 !!        type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !!@endverbatim
 !
-      module input_control_three_vizs
+      module input_control_four_vizs
 !
       use m_precision
       use m_machine_parameter
-      use t_control_data_three_vizs
+      use t_control_data_four_vizs
       use t_FEM_mesh_field_4_viz
       use t_VIZ_only_step_parameter
 !
@@ -35,12 +35,7 @@
 !
       implicit  none
 !
-!
-      integer(kind = kint), parameter :: viz_ctl_file_code = 11
-      character(len = kchara), parameter :: fname_viz_ctl = "ctl_viz"
-!
-      private :: bcast_three_vizs_control_data
-      private :: set_ctl_params_three_vizs
+      private :: bcast_four_vizs_control_data, set_ctl_params_four_vizs
 !
 !   --------------------------------------------------------------------
 !
@@ -48,13 +43,13 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_input_control_three_vizs                             &
-     &         (file_name, viz3_c, FEM_viz, t_viz_param)
+      subroutine s_input_control_four_vizs                              &
+     &         (ctl_file_name, viz4_ctl, FEM_viz, t_viz_param)
 !
       use t_read_control_elements
 !
-      character(len = kchara), intent(in) :: file_name
-      type(control_data_three_vizs), intent(inout) :: viz3_c
+      character(len = kchara), intent(in) :: ctl_file_name
+      type(control_data_four_vizs), intent(inout) :: viz4_ctl
       type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
       type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !
@@ -63,53 +58,54 @@
 !
 !
       c_buf1%level = 0
-!
-!       load control file
       if(my_rank .eq. 0) then
-        call read_control_file_three_vizs(file_name, viz3_c, c_buf1)
+        call read_control_file_four_vizs(ctl_file_name,                 &
+     &                                   viz4_ctl, c_buf1)
       end if
-      call bcast_three_vizs_control_data(viz3_c)
+      call bcast_four_vizs_control_data(viz4_ctl)
 !
       if(c_buf1%iend .gt. 0) then
-        call calypso_MPI_abort(c_buf1%iend, 'control file is broken')
+        call calypso_MPI_abort(viz4_ctl%i_viz_only_file,                &
+     &                             'control file is broken')
       end if
 !
 !       set control data
-      call set_ctl_params_three_vizs(viz3_c, FEM_viz,                   &
-     &                               t_viz_param, ierr)
+      call set_ctl_params_four_vizs(viz4_ctl, FEM_viz,                  &
+     &                              t_viz_param, ierr)
       if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
-      end subroutine s_input_control_three_vizs
+      end subroutine s_input_control_four_vizs
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_three_vizs_control_data(viz3_c)
+      subroutine bcast_four_vizs_control_data(viz4_ctl)
 !
       use calypso_mpi_int
       use bcast_4_platform_ctl
       use bcast_4_time_step_ctl
-      use bcast_ctl_data_viz3
+      use bcast_ctl_data_viz4
       use bcast_control_arrays
 !
-      type(control_data_three_vizs), intent(inout) :: viz3_c
+      type(control_data_four_vizs), intent(inout) :: viz4_ctl
 !
 !
-      call bcast_ctl_array_c3(viz3_c%viz_field_ctl)
-      call bcast_ctl_data_4_platform(viz3_c%viz_plt)
-      call bcast_ctl_data_4_time_step(viz3_c%t_viz_ctl)
+      call bcast_ctl_array_c3(viz4_ctl%viz_field_ctl)
+      call bcast_ctl_data_4_platform(viz4_ctl%viz_plt)
+      call bcast_ctl_data_4_time_step(viz4_ctl%t_viz_ctl)
 !
-      call bcast_viz3_controls(viz3_c%viz3_ctl)
+      call bcast_viz4_controls(viz4_ctl%viz4_ctl)
 !
-      call calypso_mpi_bcast_one_int(viz3_c%i_viz_only_file, 0)
+      call calypso_mpi_bcast_one_int(viz4_ctl%i_viz_only_file, 0)
 !
-      end subroutine bcast_three_vizs_control_data
+      end subroutine bcast_four_vizs_control_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine set_ctl_params_three_vizs                              &
+      subroutine set_ctl_params_four_vizs                               &
      &         (pvr_vizs_c, FEM_viz, t_viz_param, ierr)
 !
+      use t_control_data_four_vizs
       use t_VIZ_only_step_parameter
 !
       use m_file_format_switch
@@ -118,7 +114,7 @@
       use set_control_platform_data
       use parallel_ucd_IO_select
 !
-      type(control_data_three_vizs), intent(in) :: pvr_vizs_c
+      type(control_data_four_vizs), intent(in) :: pvr_vizs_c
 !
       type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
       type(time_step_param_w_viz), intent(inout) :: t_viz_param
@@ -139,8 +135,8 @@
      &   (pvr_vizs_c%t_viz_ctl, t_viz_param, ierr, e_message)
       call copy_delta_t(t_viz_param%init_d, t_viz_param%time_d)
 !
-      end subroutine set_ctl_params_three_vizs
+      end subroutine set_ctl_params_four_vizs
 !
 ! ----------------------------------------------------------------------
 !
-      end module input_control_three_vizs
+      end module input_control_four_vizs

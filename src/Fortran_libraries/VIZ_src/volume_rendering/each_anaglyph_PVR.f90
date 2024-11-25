@@ -7,16 +7,20 @@
 !>@brief Main module for each volume rendering
 !!
 !!@verbatim
-!!      subroutine each_PVR_anaglyph (istep_pvr, time,                  &
-!!     &          mesh, group, jacs, nod_fld, sf_grp_4_sf, field_pvr,   &
+!!      subroutine each_PVR_anaglyph                                    &
+!!     &         (istep_pvr, time, elps_PVR, mesh, group, jacs,         &
+!!     &          nod_fld, tracer, fline, sf_grp_4_sf, field_pvr,       &
 !!     &          pvr_param, pvr_proj, pvr_rgb, SR_sig, SR_r)
 !!      subroutine anaglyph_rendering_w_rotation(istep_pvr, time,       &
-!!     &          mesh, group, nod_fld, jacs, sf_grp_4_sf, field_pvr,   &
-!!     &          pvr_param, pvr_bound, pvr_proj, pvr_rgb,              &
-!!     &          SR_sig, SR_r, SR_i)
+!!     &          elps_PVR, mesh, group, jacs, nod_fld, tracer, fline,  &
+!!     &          sf_grp_4_sf, field_pvr, pvr_param, pvr_bound,         &
+!!     &          pvr_proj, pvr_rgb, SR_sig, SR_r, SR_i)
+!!        type(elapsed_lables), intent(in) :: elps_PVR
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(viz_area_parameter), intent(in) :: area_def
 !!        type(phys_data), intent(in) :: nod_fld
+!!        type(tracer_module), intent(in) :: tracer
+!!        type(fieldline_module), intent(in) :: fline
 !!        type(jacobians_type), intent(in) :: jacs
 !!        type(sf_grp_list_each_surf), intent(in) :: sf_grp_4_sf
 !!        type(pvr_field_data), intent(inout) :: field_pvr
@@ -42,6 +46,8 @@
       use t_mesh_data
       use t_phys_data
       use t_jacobians
+      use t_particle_trace
+      use t_fieldline
 !
       use t_surf_grp_list_each_surf
       use t_rendering_vr_image
@@ -67,8 +73,9 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine each_PVR_anaglyph (istep_pvr, time,                    &
-     &          mesh, group, jacs, nod_fld, sf_grp_4_sf, field_pvr,     &
+      subroutine each_PVR_anaglyph                                      &
+     &         (istep_pvr, time, elps_PVR, mesh, group, jacs,           &
+     &          nod_fld, tracer, fline, sf_grp_4_sf, field_pvr,         &
      &          pvr_param, pvr_proj, pvr_rgb, SR_sig, SR_r)
 !
       use cal_pvr_modelview_mat
@@ -77,9 +84,12 @@
       integer(kind = kint), intent(in) :: istep_pvr
       real(kind = kreal), intent(in) :: time
 !
+      type(elapsed_lables), intent(in) :: elps_PVR
       type(mesh_geometry), intent(in) :: mesh
       type(mesh_groups), intent(in) :: group
       type(phys_data), intent(in) :: nod_fld
+      type(tracer_module), intent(in) :: tracer
+      type(fieldline_module), intent(in) :: fline
       type(jacobians_type), intent(in) :: jacs
       type(sf_grp_list_each_surf), intent(in) :: sf_grp_4_sf
 !
@@ -102,13 +112,15 @@
 !
 !   Left eye
       call alloc_pvr_left_eye_image(pvr_rgb)
-      call rendering_with_fixed_view(istep_pvr, time, mesh, group,      &
+      call rendering_with_fixed_view                                    &
+     &   (istep_pvr, time, elps_PVR, mesh, group, tracer, fline,        &
      &    sf_grp_4_sf, field_pvr, pvr_param, pvr_proj(1), pvr_rgb,      &
      &    SR_sig, SR_r)
       call store_left_eye_image(pvr_rgb)
 !
 !   right eye
-      call rendering_with_fixed_view(istep_pvr, time, mesh, group,      &
+      call rendering_with_fixed_view                                    &
+     &   (istep_pvr, time, elps_PVR, mesh, group, tracer, fline,        &
      &    sf_grp_4_sf, field_pvr, pvr_param, pvr_proj(2), pvr_rgb,      &
      &    SR_sig, SR_r)
       call add_left_eye_image(pvr_rgb)
@@ -119,12 +131,11 @@
 !  ---------------------------------------------------------------------
 !
       subroutine anaglyph_rendering_w_rotation(istep_pvr, time,         &
-     &          mesh, group, nod_fld, jacs, sf_grp_4_sf, field_pvr,     &
-     &          pvr_param, pvr_bound, pvr_proj, pvr_rgb,                &
-     &          SR_sig, SR_r, SR_i)
+     &          elps_PVR, mesh, group, jacs, nod_fld, tracer, fline,    &
+     &          sf_grp_4_sf, field_pvr, pvr_param, pvr_bound,           &
+     &          pvr_proj, pvr_rgb, SR_sig, SR_r, SR_i)
 !
       use m_work_time
-      use m_elapsed_labels_4_VIZ
       use t_rotation_pvr_images
       use write_multi_PVR_image
       use set_PVR_view_and_image
@@ -135,9 +146,12 @@
       integer(kind = kint), intent(in) :: istep_pvr
       real(kind = kreal), intent(in) :: time
 !
+      type(elapsed_lables), intent(in) :: elps_PVR
       type(mesh_geometry), intent(in) :: mesh
       type(mesh_groups), intent(in) :: group
       type(phys_data), intent(in) :: nod_fld
+      type(tracer_module), intent(in) :: tracer
+      type(fieldline_module), intent(in) :: fline
       type(jacobians_type), intent(in) :: jacs
       type(sf_grp_list_each_surf), intent(in) :: sf_grp_4_sf
 !
@@ -173,30 +187,35 @@
 !    Left eye
         call rot_multi_view_projection_mats(ione, i_rot,                &
      &      pvr_param, pvr_proj(1)%screen)
-        call rendering_at_once(istep_pvr, time,                         &
-     &      mesh, group, sf_grp_4_sf, field_pvr, pvr_param, pvr_bound,  &
+        call rendering_at_once                                          &
+     &     (istep_pvr, time, elps_PVR, mesh, group, tracer, fline,      &
+     &      sf_grp_4_sf, field_pvr, pvr_param, pvr_bound,               &
      &      pvr_proj(1), pvr_rgb, SR_sig, SR_r, SR_i)
         call store_left_eye_image(pvr_rgb)
 !
 !    Right eye
         call rot_multi_view_projection_mats(itwo, i_rot,                &
      &      pvr_param, pvr_proj(2)%screen)
-        call rendering_at_once (istep_pvr, time,                        &
-     &      mesh, group, sf_grp_4_sf, field_pvr, pvr_param, pvr_bound,  &
+        call rendering_at_once                                          &
+     &     (istep_pvr, time, elps_PVR, mesh, group, tracer, fline,      &
+     &      sf_grp_4_sf, field_pvr, pvr_param, pvr_bound,               &
      &      pvr_proj(2), pvr_rgb, SR_sig, SR_r, SR_i)
         call add_left_eye_image(pvr_rgb)
         call copy_pvr_image_data(pvr_rgb, rot_imgs1%rot_pvr_rgb(i_rot))
       end do
       call dealloc_pvr_left_eye_image(pvr_rgb)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+1)
+      if(elps_PVR%flag_elapsed)                                         &
+     &          call end_elapsed_time(elps_PVR%ist_elapsed+1)
 !
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+2)
+      if(elps_PVR%flag_elapsed)                                         &
+     &          call start_elapsed_time(elps_PVR%ist_elapsed+2)
       call output_rotation_PVR_images(istep_pvr,                        &
      &    pvr_param%movie_def%num_frame, rot_imgs1%rot_pvr_rgb(1))
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+2)
-!
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+1)
       call dealloc_rot_pvr_image_arrays(pvr_param%movie_def, rot_imgs1)
+      if(elps_PVR%flag_elapsed)                                         &
+     &          call end_elapsed_time(elps_PVR%ist_elapsed+2)
+      if(elps_PVR%flag_elapsed)                                         &
+     &          call start_elapsed_time(elps_PVR%ist_elapsed+1)
 !
       end subroutine anaglyph_rendering_w_rotation
 !

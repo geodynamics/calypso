@@ -7,16 +7,18 @@
 !>@brief  Make zonal mean sections
 !!
 !!@verbatim
-!!      subroutine init_zonal_mean_vizs(viz_step, geofem, edge_comm,    &
-!!     &         nod_fld, zm_ctls, zmeans, m_SR)
+!!      subroutine init_zonal_mean_vizs(elps_VIZ, viz_step,             &
+!!     &          geofem, edge_comm, nod_fld, zm_ctls, zmeans, m_SR)
+!!        type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
 !!        type(VIZ_step_params), intent(in) :: viz_step
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
 !!        type(sph_zonal_mean_viz), intent(inout) :: zmeans
 !!        type(mesh_SR), intent(inout) :: m_SR
-!!      subroutine SPH_MHD_zmean_vizs(viz_step, time_d,                 &
+!!      subroutine SPH_MHD_zmean_vizs(elps_VIZ, viz_step, time_d,       &
 !!     &          sph, geofem, WK, nod_fld, zmeans, m_SR)
+!!        type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
 !!        type(VIZ_step_params), intent(in) :: viz_step
 !!        type(time_data), intent(in) :: time_d
 !!        type(sph_grids), intent(in) :: sph
@@ -28,6 +30,7 @@
 !!
 !!      subroutine SPH_MHD_zonal_mean_vizs(viz_step, time_d,            &
 !!     &          sph, geofem, nod_fld, zm_psf, m_SR)
+!!        type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
 !!        type(VIZ_step_params), intent(in) :: viz_step
 !!        type(time_data), intent(in) :: time_d
 !!        type(sph_grids), intent(in) :: sph
@@ -43,9 +46,9 @@
 !
       use m_machine_parameter
       use m_work_time
-      use m_elapsed_labels_4_VIZ
       use calypso_mpi
 !
+      use t_elapsed_labels_4_VIZ
       use t_time_data
       use t_comm_table
       use t_mesh_data
@@ -80,12 +83,13 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_zonal_mean_vizs(viz_step, geofem, edge_comm,      &
-     &          nod_fld, zm_ctls, zmeans, m_SR)
+      subroutine init_zonal_mean_vizs(elps_VIZ, viz_step,               &
+     &          geofem, edge_comm, nod_fld, zm_ctls, zmeans, m_SR)
 !
       use t_control_data_dynamo_vizs
       use map_projection
 !
+      type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
       type(VIZ_step_params), intent(in) :: viz_step
       type(mesh_data), intent(in) :: geofem
       type(communication_table), intent(in) :: edge_comm
@@ -96,35 +100,43 @@
       type(mesh_SR), intent(inout) :: m_SR
 !
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
+      if(elps_VIZ%flag_elapsed_V)                                       &
+     &           call start_elapsed_time(elps_VIZ%ist_elapsed_V+1)
       call SECTIONING_initialize                                        &
-     &   (viz_step%PSF_t%increment, geofem, edge_comm, nod_fld,         &
-     &    zm_ctls%zm_psf_ctls, zmeans%zm_psf, m_SR%SR_sig, m_SR%SR_il)
-      call SECTIONING_initialize(viz_step%PSF_t%increment,              &
+     &   (viz_step%PSF_t%increment, elps_VIZ%elps_PSF,                  &
+     &    geofem, edge_comm, nod_fld, zm_ctls%zm_psf_ctls,              &
+     &    zmeans%zm_psf, m_SR%SR_sig, m_SR%SR_il)
+      call SECTIONING_initialize                                        &
+     &   (viz_step%PSF_t%increment, elps_VIZ%elps_PSF,                  &
      &    geofem, edge_comm, nod_fld, zm_ctls%zRMS_psf_ctls,            &
      &    zmeans%zrms_psf, m_SR%SR_sig, m_SR%SR_il)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
+      if(elps_VIZ%flag_elapsed_V)                                       &
+     &           call end_elapsed_time(elps_VIZ%ist_elapsed_V+1)
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+5)
-      call MAP_PROJECTION_initialize                                    &
-     &   (viz_step%MAP_t%increment, geofem, edge_comm, nod_fld,         &
-     &    zm_ctls%zm_map_ctls, zmeans%zm_maps, m_SR%SR_sig, m_SR%SR_il)
-      call MAP_PROJECTION_initialize                                    &
-     &   (viz_step%MAP_t%increment, geofem, edge_comm, nod_fld,         &
-     &    zm_ctls%zRMS_map_ctls, zmeans%zRMS_maps,                      &
+      if(elps_VIZ%flag_elapsed_V)                                       &
+     &           call start_elapsed_time(elps_VIZ%ist_elapsed_V+5)
+      call MAP_PROJECTION_initialize(viz_step%MAP_t%increment,          &
+     &    elps_VIZ%elps_PSF, elps_VIZ%elps_MAP, geofem, edge_comm,      &
+     &    nod_fld, zm_ctls%zm_map_ctls, zmeans%zm_maps,                 &
      &    m_SR%SR_sig, m_SR%SR_il)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+5)
+      call MAP_PROJECTION_initialize(viz_step%MAP_t%increment,          &
+     &    elps_VIZ%elps_PSF, elps_VIZ%elps_MAP, geofem, edge_comm,      &
+     &     nod_fld, zm_ctls%zRMS_map_ctls, zmeans%zRMS_maps,            &
+     &    m_SR%SR_sig, m_SR%SR_il)
+      if(elps_VIZ%flag_elapsed_V)                                       &
+     &           call end_elapsed_time(elps_VIZ%ist_elapsed_V+5)
 !
       end subroutine init_zonal_mean_vizs
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine SPH_MHD_zmean_vizs(viz_step, time_d,                   &
+      subroutine SPH_MHD_zmean_vizs(elps_VIZ, viz_step, time_d,         &
      &          sph, geofem, WK, nod_fld, zmeans, m_SR)
 !
       use FEM_analyzer_sph_MHD
       use nod_phys_send_recv
 !
+      type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
       type(VIZ_step_params), intent(in) :: viz_step
       type(sph_grids), intent(in) :: sph
 !
@@ -137,24 +149,25 @@
       type(mesh_SR), intent(inout) :: m_SR
 !
 !
-      call SPH_MHD_zonal_mean_vizs(viz_step, time_d, sph, geofem,       &
-     &    nod_fld, zmeans%zm_psf, zmeans%zm_maps, m_SR)
-      call SPH_MHD_zonal_RMS_vizs(viz_step, time_d, sph, geofem, WK,    &
-     &    nod_fld, zmeans%zrms_psf, zmeans%zRMS_maps, m_SR)
+      call SPH_MHD_zonal_mean_vizs(elps_VIZ, viz_step, time_d,          &
+     &    sph, geofem, nod_fld, zmeans%zm_psf, zmeans%zm_maps, m_SR)
+      call SPH_MHD_zonal_RMS_vizs(elps_VIZ, viz_step, time_d,           &
+     &    sph, geofem, WK, nod_fld, zmeans%zrms_psf, zmeans%zRMS_maps,  &
+     &    m_SR)
 !
       end subroutine SPH_MHD_zmean_vizs
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine SPH_MHD_zonal_mean_vizs(viz_step, time_d,              &
+      subroutine SPH_MHD_zonal_mean_vizs(elps_VIZ, viz_step, time_d,    &
      &          sph, geofem, nod_fld, zm_psf, zm_maps, m_SR)
 !
-      use m_elapsed_labels_4_VIZ
       use sph_rtp_zonal_rms_data
       use nod_phys_send_recv
       use map_projection
 !
+      type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
       type(VIZ_step_params), intent(in) :: viz_step
       type(sph_grids), intent(in) :: sph
 !
@@ -178,34 +191,39 @@
      &                          m_SR%v_sol, m_SR%SR_sig, m_SR%SR_r)
 !
       if(zm_psf%num_psf .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call start_elapsed_time(elps_VIZ%ist_elapsed_V+2)
         if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize zmean'
         call SECTIONING_visualize                                       &
-     &   (viz_step%istep_psf, time_d, geofem, nod_fld, zm_psf)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
+     &     (viz_step%istep_psf, elps_VIZ%elps_PSF,                      &
+     &      time_d, geofem, nod_fld, zm_psf)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call end_elapsed_time(elps_VIZ%ist_elapsed_V+2)
       end if
 !
       if(zm_maps%num_map .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call start_elapsed_time(elps_VIZ%ist_elapsed_V+6)
         call MAP_PROJECTION_visualize                                   &
-     &     (viz_step%istep_map, time_d, geofem, nod_fld, zm_maps,       &
-     &      m_SR%SR_sig)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
+     &     (viz_step%istep_map, elps_VIZ%elps_PSF, elps_VIZ%elps_MAP,   &
+     &      time_d,geofem, nod_fld, zm_maps, m_SR%SR_sig)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call end_elapsed_time(elps_VIZ%ist_elapsed_V+6)
       end if
 !
       end subroutine SPH_MHD_zonal_mean_vizs
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine SPH_MHD_zonal_RMS_vizs(viz_step, time_d, sph,          &
-     &          geofem, WK, nod_fld, zrms_psf, zrms_maps, m_SR)
+      subroutine SPH_MHD_zonal_RMS_vizs(elps_VIZ, viz_step, time_d,     &
+     &          sph, geofem, WK, nod_fld, zrms_psf, zrms_maps, m_SR)
 !
-      use m_elapsed_labels_4_VIZ
       use FEM_analyzer_sph_MHD
       use sph_rtp_zonal_rms_data
       use nod_phys_send_recv
       use map_projection
 !
+      type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
       type(VIZ_step_params), intent(in) :: viz_step
       type(sph_grids), intent(in) :: sph
 !
@@ -231,19 +249,24 @@
      &                          m_SR%v_sol, m_SR%SR_sig, m_SR%SR_r)
 !
       if(zrms_psf%num_psf .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call start_elapsed_time(elps_VIZ%ist_elapsed_V+2)
         if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize RMS'
         call SECTIONING_visualize                                       &
-     &     (viz_step%istep_psf, time_d, geofem, nod_fld, zrms_psf)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
+     &     (viz_step%istep_psf, elps_VIZ%elps_PSF,                      &
+     &      time_d, geofem, nod_fld, zrms_psf)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call end_elapsed_time(elps_VIZ%ist_elapsed_V+2)
       end if
 !
       if(zrms_maps%num_map .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call start_elapsed_time(elps_VIZ%ist_elapsed_V+6)
         call MAP_PROJECTION_visualize                                   &
-     &     (viz_step%istep_map, time_d, geofem, nod_fld, zRMS_maps,     &
-     &      m_SR%SR_sig)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
+     &     (viz_step%istep_map, elps_VIZ%elps_PSF, elps_VIZ%elps_MAP,   &
+     &      time_d, geofem, nod_fld, zRMS_maps, m_SR%SR_sig)
+        if(elps_VIZ%flag_elapsed_V)                                     &
+     &           call end_elapsed_time(elps_VIZ%ist_elapsed_V+6)
       end if
 !
       end subroutine SPH_MHD_zonal_RMS_vizs

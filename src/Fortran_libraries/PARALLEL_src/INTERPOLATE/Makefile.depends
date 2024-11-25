@@ -1,0 +1,21 @@
+cal_position_and_grad.o: $(INTERPOLATE_DIR)/cal_position_and_grad.f90 m_precision.o m_constants.o m_geometry_constants.o cal_shape_function_3d.o interpolate_position_in_ele.o cal_shape_function_2d.o cal_shape_function_1d.o
+	$(F90) -c $(F90OPTFLAGS) $<
+interpolate_position_in_ele.o: $(INTERPOLATE_DIR)/interpolate_position_in_ele.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+interpolate_scalar_ele20.o: $(INTERPOLATE_DIR)/interpolate_scalar_ele20.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+interpolate_scalar_ele27.o: $(INTERPOLATE_DIR)/interpolate_scalar_ele27.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+interpolate_scalar_ele8.o: $(INTERPOLATE_DIR)/interpolate_scalar_ele8.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+modify_local_positions.o: $(INTERPOLATE_DIR)/modify_local_positions.f90 m_precision.o solver_33_array.o cal_position_and_grad.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sel_interpolate_scalar.o: $(INTERPOLATE_DIR)/sel_interpolate_scalar.f90 m_precision.o m_geometry_constants.o interpolate_scalar_ele8.o interpolate_scalar_ele20.o interpolate_scalar_ele27.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_find_interpolate_in_ele.o: $(INTERPOLATE_DIR)/t_find_interpolate_in_ele.f90 m_precision.o m_constants.o m_connect_hexa_2_tetra.o cal_local_position_by_tetra.o modify_local_positions.o solver_33_array.o t_geometry_data.o t_interpolate_coefs_dest.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_interpolate_coefs_dest.o: $(INTERPOLATE_DIR)/t_interpolate_coefs_dest.f90 m_precision.o t_interpolate_tbl_dest.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_interpolate_tbl_dest.o: $(INTERPOLATE_DIR)/t_interpolate_tbl_dest.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

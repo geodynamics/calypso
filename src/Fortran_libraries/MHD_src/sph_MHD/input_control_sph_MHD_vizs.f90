@@ -60,7 +60,7 @@
       use t_ctl_data_sph_MHD_w_vizs
       use t_read_control_elements
       use bcast_control_sph_MHD
-      use bcast_ctl_data_viz3
+      use bcast_ctl_data_viz4
       use bcast_dynamo_viz_control
 
 !
@@ -82,7 +82,7 @@
       end if
 !
       call bcast_sph_mhd_control_data(MHD_ctl)
-      call bcast_viz3_controls(add_VMHD_ctl%viz3_ctls)
+      call bcast_viz4_controls(add_VMHD_ctl%viz4_ctls)
       call s_bcast_dynamo_viz_control(add_VMHD_ctl%zm_ctls)
 !
       end subroutine load_control_4_sph_MHD_w_vizs
@@ -129,7 +129,7 @@
      &    MHD_ctl%model_ctl, MHD_ctl%smctl_ctl, MHD_ctl%psph_ctl,       &
      &    MHD_files, SPH_model%bc_IO, SPH_model%refs, MHD_step,         &
      &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
-     &    SPH_WK%trns_WK, SPH_MHD)
+     &    SPH_WK%trns_WK, SPH_MHD%sph_maker)
 !
       call s_set_control_SPH_MHD_w_viz                                  &
      &   (MHD_ctl%model_ctl, MHD_ctl%psph_ctl, MHD_ctl%smonitor_ctl,    &

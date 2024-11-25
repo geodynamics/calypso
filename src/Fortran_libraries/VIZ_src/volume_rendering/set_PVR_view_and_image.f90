@@ -7,12 +7,13 @@
 !>@brief Main module for each volume rendering
 !!
 !!@verbatim
-!!      subroutine single_PVR_view_matrices(mesh, pvr_rgb, pvr_param,   &
-!!     &                                    pvr_bound, pvr_proj, m_SR)
-!!      subroutine quilt_PVR_view_matrices(num_img, mesh,               &
+!!      subroutine single_PVR_view_matrices(elps_PVR, mesh,             &
 !!     &          pvr_rgb, pvr_param, pvr_bound, pvr_proj, m_SR)
-!!      subroutine anaglyph_PVR_view_matrices(mesh, pvr_rgb, pvr_param, &
-!!     &                                      pvr_bound, pvr_proj, m_SR)
+!!      subroutine quilt_PVR_view_matrices(num_img, elps_PVR, mesh,     &
+!!     &          pvr_rgb, pvr_param, pvr_bound, pvr_proj, m_SR)
+!!      subroutine anaglyph_PVR_view_matrices(elps_PVR, mesh,           &
+!!     &          pvr_rgb, pvr_param, pvr_bound, pvr_proj, m_SR)
+!!        type(elapsed_lables), intent(in) :: elps_PVR
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(pvr_image_type), intent(in) :: pvr_rgb
 !!        type(PVR_control_params), intent(in) :: pvr_param
@@ -37,6 +38,7 @@
       use m_constants
       use m_machine_parameter
       use m_geometry_constants
+      use m_work_time
 !
       use t_mesh_data
       use t_pvr_image_array
@@ -53,11 +55,12 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine single_PVR_view_matrices(mesh, pvr_rgb, pvr_param,     &
-     &                                    pvr_bound, pvr_proj, m_SR)
+      subroutine single_PVR_view_matrices(elps_PVR, mesh,               &
+     &          pvr_rgb, pvr_param, pvr_bound, pvr_proj, m_SR)
 !
       use rendering_vr_image
 !
+      type(elapsed_lables), intent(in) :: elps_PVR
       type(mesh_geometry), intent(in) :: mesh
       type(pvr_image_type), intent(in) :: pvr_rgb
       type(PVR_control_params), intent(in) :: pvr_param
@@ -69,19 +72,20 @@
 !
       call rotation_view_projection_mats(izero, pvr_param,              &
      &                                   pvr_proj%screen)
-      call set_fixed_view_and_image(mesh, pvr_param, pvr_rgb,           &
+      call set_fixed_view_and_image(elps_PVR, mesh, pvr_param, pvr_rgb, &
      &                              pvr_bound, pvr_proj, m_SR)
 !
       end subroutine single_PVR_view_matrices
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine quilt_PVR_view_matrices(num_img, mesh,                 &
+      subroutine quilt_PVR_view_matrices(num_img, elps_PVR, mesh,       &
      &          pvr_rgb, pvr_param, pvr_bound, pvr_proj, m_SR)
 !
       use rendering_vr_image
 !
       integer(kind = kint), intent(in) :: num_img
+      type(elapsed_lables), intent(in) :: elps_PVR
       type(mesh_geometry), intent(in) :: mesh
       type(pvr_image_type), intent(in) :: pvr_rgb(num_img)
       type(PVR_control_params), intent(in) :: pvr_param
@@ -96,19 +100,20 @@
       do i_img = 1, num_img
         call rot_multi_view_projection_mats(i_img, izero, pvr_param,    &
      &                                        pvr_proj(i_img)%screen)
-        call set_fixed_view_and_image(mesh, pvr_param, pvr_rgb(i_img),  &
-     &                                pvr_bound, pvr_proj(i_img), m_SR)
+        call set_fixed_view_and_image(elps_PVR, mesh, pvr_param,        &
+     &      pvr_rgb(i_img), pvr_bound, pvr_proj(i_img), m_SR)
       end do
 !
       end subroutine quilt_PVR_view_matrices
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine anaglyph_PVR_view_matrices(mesh, pvr_rgb, pvr_param,   &
-     &                                      pvr_bound, pvr_proj, m_SR)
+      subroutine anaglyph_PVR_view_matrices(elps_PVR, mesh,             &
+     &          pvr_rgb, pvr_param, pvr_bound, pvr_proj, m_SR)
 !
       use rendering_vr_image
 !
+      type(elapsed_lables), intent(in) :: elps_PVR
       type(mesh_geometry), intent(in) :: mesh
       type(pvr_image_type), intent(in) :: pvr_rgb
       type(PVR_control_params), intent(in) :: pvr_param
@@ -122,9 +127,9 @@
      &                                    pvr_proj(1)%screen)
       call rot_multi_view_projection_mats(itwo, izero, pvr_param,       &
      &                                    pvr_proj(2)%screen)
-      call set_fixed_view_and_image(mesh, pvr_param, pvr_rgb,           &
+      call set_fixed_view_and_image(elps_PVR, mesh, pvr_param, pvr_rgb, &
      &                              pvr_bound, pvr_proj(1), m_SR)
-      call set_fixed_view_and_image(mesh, pvr_param, pvr_rgb,           &
+      call set_fixed_view_and_image(elps_PVR, mesh, pvr_param, pvr_rgb, &
      &                              pvr_bound, pvr_proj(2), m_SR)
 !
       end subroutine anaglyph_PVR_view_matrices

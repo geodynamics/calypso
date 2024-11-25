@@ -261,7 +261,7 @@
         do i = ist_h, ied_h
           inod = i + (jst_h+j-1)*npix_img(1)
           dimage(1:4,inod) = one
-          inod = i + (jed_h+j+1)*npix_img(1)
+          inod = i + (jed_h+j  )*npix_img(1)
           dimage(1:4,inod) = one
         end do
       end do

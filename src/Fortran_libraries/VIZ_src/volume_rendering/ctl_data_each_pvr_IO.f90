@@ -153,6 +153,12 @@
      &             :: hd_pvr_sections = 'section_ctl'
       character(len=kchara), parameter, private                         &
      &             :: hd_pvr_isosurf =  'isosurface_ctl'
+!
+      character(len=kchara), parameter, private                         &
+     &             :: hd_pvr_flines =  'fieldline_ctl'
+      character(len=kchara), parameter, private                         &
+     &             :: hd_pvr_tracers =  'tracer_ctl'
+!
       character(len=kchara), parameter, private                         &
      &             :: hd_quilt_image =  'quilt_image_ctl'
       character(len=kchara), parameter, private                         &
@@ -209,6 +215,11 @@
      &                             pvr_ctl%pvr_scts_c, c_buf)
         call read_pvr_isosurfs_ctl(id_control, hd_pvr_isosurf,          &
      &                             pvr_ctl%pvr_isos_c, c_buf)
+!
+        call read_pvr_tracers_ctl(id_control, hd_pvr_flines,            &
+     &                            pvr_ctl%pvr_flines_c, c_buf)
+        call read_pvr_tracers_ctl(id_control, hd_pvr_tracers,           &
+     &                            pvr_ctl%pvr_tracers_c, c_buf)
 !
         call read_pvr_render_area_ctl(id_control, hd_plot_area,         &
      &                                pvr_ctl%render_area_c, c_buf)
@@ -348,13 +359,19 @@
      &    pvr_ctl%light, level)
 !
       call write_pvr_sections_ctl(id_control, hd_pvr_sections,          &
-     &    pvr_ctl%pvr_scts_c, level)
+     &                            pvr_ctl%pvr_scts_c, level)
       call write_pvr_isosurfs_ctl(id_control, hd_pvr_isosurf,           &
-     &    pvr_ctl%pvr_isos_c, level)
+     &                            pvr_ctl%pvr_isos_c, level)
+!
+      call write_pvr_tracers_ctl(id_control, hd_pvr_flines,             &
+     &                           pvr_ctl%pvr_flines_c, level)
+      call write_pvr_tracers_ctl(id_control, hd_pvr_tracers,            &
+     &                           pvr_ctl%pvr_tracers_c, level)
+!
       call write_quilt_image_ctl(id_control, hd_quilt_image,            &
-     &    pvr_ctl%quilt_c, level)
+     &                           pvr_ctl%quilt_c, level)
       call write_pvr_rotation_ctl(id_control, hd_snapshot_movie,        &
-     &    pvr_ctl%movie, level)
+     &                            pvr_ctl%movie, level)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_pvr_ctl
@@ -380,6 +397,8 @@
       call init_lighting_ctl_label(hd_pvr_lighting, pvr_ctl%light)
       call init_pvr_sections_ctl(hd_pvr_sections, pvr_ctl%pvr_scts_c)
       call init_pvr_isosurfs_ctl(hd_pvr_isosurf, pvr_ctl%pvr_isos_c)
+      call init_pvr_tracerss_ctl(hd_pvr_flines, pvr_ctl%pvr_flines_c)
+      call init_pvr_tracerss_ctl(hd_pvr_tracers, pvr_ctl%pvr_tracers_c)
       call init_quilt_image_ctl_label(hd_quilt_image, pvr_ctl%quilt_c)
       call init_pvr_rotation_ctl_label(hd_snapshot_movie,               &
      &                                 pvr_ctl%movie)

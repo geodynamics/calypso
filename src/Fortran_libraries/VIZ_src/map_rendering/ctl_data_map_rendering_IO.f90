@@ -289,8 +289,8 @@
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    map_c%isoline_comp_ctl)
 !
-      call write_map_section_ctl(id_control, hd_section_ctl,            &
-     &                           map_c%map_define_ctl, level)
+      call write_map_section_ctl(id_control, map_c%map_define_ctl,      &
+     &                           level)
 !
       call sel_write_ctl_modelview_file(id_control, hd_map_projection,  &
      &    map_c%fname_mat_ctl, map_c%mat, level)

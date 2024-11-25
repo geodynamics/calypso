@@ -7,8 +7,8 @@
 !>@brief Control data for four visualizations
 !!
 !!@verbatim
-!!      subroutine bcast_viz4_controls(viz_ctls)
-!!       type(vis4_controls), intent(inout) :: viz_ctls
+!!      subroutine bcast_viz4_controls(viz4_ctls)
+!!       type(vis4_controls), intent(inout) :: viz4_ctls
 !!@endverbatim
 !
       module bcast_ctl_data_viz4
@@ -25,45 +25,49 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine bcast_viz4_controls(viz_ctls)
+      subroutine bcast_viz4_controls(viz4_ctls)
 !
       use t_control_data_viz4
       use calypso_mpi_int
+      use calypso_mpi_char
       use bcast_control_arrays
       use bcast_section_control_data
       use bcast_maps_control_data
       use bcast_ctl_data_field_line
       use bcast_control_data_pvrs
+      use transfer_to_long_integers
 !
-      type(vis4_controls), intent(inout) :: viz_ctls
+      type(vis4_controls), intent(inout) :: viz4_ctls
 !
 !
-      call bcast_files_4_psf_ctl(viz_ctls%psf_ctls)
-      call bcast_files_4_iso_ctl(viz_ctls%iso_ctls)
-      call bcast_files_4_map_ctl(viz_ctls%map_ctls)
+      call bcast_files_4_psf_ctl(viz4_ctls%psf_ctls)
+      call bcast_files_4_iso_ctl(viz4_ctls%iso_ctls)
+      call bcast_files_4_map_ctl(viz4_ctls%map_ctls)
 !
-      call bcast_files_4_pvr_ctl(viz_ctls%pvr_ctls)
-      call bcast_files_4_fline_ctl(viz_ctls%fline_ctls)
+      call bcast_files_4_pvr_ctl(viz4_ctls%pvr_ctls)
+      call bcast_files_4_fline_ctl(viz4_ctls%fline_ctls)
 !
-      call bcast_ctl_type_r1(viz_ctls%delta_t_psf_v_ctl)
-      call bcast_ctl_type_r1(viz_ctls%delta_t_iso_v_ctl)
-      call bcast_ctl_type_r1(viz_ctls%delta_t_map_v_ctl)
+      call bcast_ctl_type_r1(viz4_ctls%delta_t_psf_v_ctl)
+      call bcast_ctl_type_r1(viz4_ctls%delta_t_iso_v_ctl)
+      call bcast_ctl_type_r1(viz4_ctls%delta_t_map_v_ctl)
 !
-      call bcast_ctl_type_r1(viz_ctls%delta_t_pvr_v_ctl)
-      call bcast_ctl_type_r1(viz_ctls%delta_t_fline_v_ctl)
-      call bcast_ctl_type_r1(viz_ctls%delta_t_ucd_v_ctl)
+      call bcast_ctl_type_r1(viz4_ctls%delta_t_pvr_v_ctl)
+      call bcast_ctl_type_r1(viz4_ctls%delta_t_fline_v_ctl)
+      call bcast_ctl_type_r1(viz4_ctls%delta_t_ucd_v_ctl)
 !
-      call bcast_ctl_type_i1(viz_ctls%i_step_psf_v_ctl)
-      call bcast_ctl_type_i1(viz_ctls%i_step_iso_v_ctl)
-      call bcast_ctl_type_i1(viz_ctls%i_step_map_v_ctl)
+      call bcast_ctl_type_i1(viz4_ctls%i_step_psf_v_ctl)
+      call bcast_ctl_type_i1(viz4_ctls%i_step_iso_v_ctl)
+      call bcast_ctl_type_i1(viz4_ctls%i_step_map_v_ctl)
 !
-      call bcast_ctl_type_i1(viz_ctls%i_step_pvr_v_ctl)
-      call bcast_ctl_type_i1(viz_ctls%i_step_fline_v_ctl)
-      call bcast_ctl_type_i1(viz_ctls%i_step_ucd_v_ctl)
+      call bcast_ctl_type_i1(viz4_ctls%i_step_pvr_v_ctl)
+      call bcast_ctl_type_i1(viz4_ctls%i_step_fline_v_ctl)
+      call bcast_ctl_type_i1(viz4_ctls%i_step_ucd_v_ctl)
 !
-      call bcast_ctl_type_c1(viz_ctls%output_field_file_fmt_ctl)
+      call bcast_ctl_type_c1(viz4_ctls%output_field_file_fmt_ctl)
 !
-      call calypso_mpi_bcast_one_int(viz_ctls%i_viz_control, 0)
+      call calypso_mpi_bcast_character                                  &
+     &   (viz4_ctls%block_name, cast_long(kchara), 0)
+      call calypso_mpi_bcast_one_int(viz4_ctls%i_viz_control, 0)
 !
       end subroutine bcast_viz4_controls
 !

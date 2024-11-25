@@ -9,9 +9,10 @@
 !!@verbatim
 !!      subroutine s_set_pvr_stencil_buffer                             &
 !!     &         (irank_image_file, irank_end_composit, num_pixel_xy,   &
-!!     &          pvr_start, stencil_wk,  num_pixel_recv,               &
+!!     &          elps_PVR, pvr_start, stencil_wk, num_pixel_recv,      &
 !!     &          img_output_tbl, img_composit_tbl, img_stack,          &
 !!     &          SR_sig, SR_r, SR_i)
+!!        type(elapsed_lables), intent(in) :: elps_PVR
 !!        type(pvr_ray_start_type), intent(in) :: pvr_start
 !!        type(stencil_buffer_work), intent(in)  :: stencil_wk
 !!        type(calypso_comm_table), intent(inout) :: img_output_tbl
@@ -27,7 +28,6 @@
       use m_precision
       use m_constants
       use m_machine_parameter
-      use m_elapsed_labels_4_VIZ
       use calypso_mpi
 !
       use t_calypso_comm_table
@@ -56,10 +56,11 @@
 !
       subroutine s_set_pvr_stencil_buffer                               &
      &         (irank_image_file, irank_end_composit, num_pixel_xy,     &
-     &          pvr_start, stencil_wk, num_pixel_recv,                  &
+     &          elps_PVR, pvr_start, stencil_wk, num_pixel_recv,        &
      &          img_output_tbl, img_composit_tbl, img_stack,            &
      &          SR_sig, SR_r, SR_i)
 !
+      use m_work_time
       use quicksort
       use calypso_SR_type
       use const_comm_tbl_img_composit
@@ -68,6 +69,7 @@
       integer(kind = kint), intent(in) :: irank_image_file
       integer(kind = kint), intent(in) :: irank_end_composit
       integer(kind = kint), intent(in) :: num_pixel_xy
+      type(elapsed_lables), intent(in) :: elps_PVR
       type(pvr_ray_start_type), intent(in) :: pvr_start
       type(stencil_buffer_work), intent(in)  :: stencil_wk
 !
@@ -88,11 +90,13 @@
 !
 !
 !      write(*,*) 's_const_comm_tbl_img_output'
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+8)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call start_elapsed_time(elps_PVR%ist_elapsed+8)
       call s_const_comm_tbl_img_output                                  &
      &   (stencil_wk, irank_image_file, num_pixel_xy,                   &
      &    img_stack%npixel_4_composit, num_pixel_recv, img_output_tbl)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+8)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call end_elapsed_time(elps_PVR%ist_elapsed+8)
 !
 !
 !      write(*,*) 'set_global_pixel_4_composit'
@@ -104,13 +108,15 @@
 !
 !
 !      write(*,*) 's_const_comm_tbl_img_composit'
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+9)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call start_elapsed_time(elps_PVR%ist_elapsed+9)
       call s_const_comm_tbl_img_composit                                &
      &   (irank_image_file, irank_end_composit,                         &
      &    num_pixel_xy, stencil_wk%irank_4_composit,                    &
      &    pvr_start%num_pvr_ray, pvr_start%id_pixel_start,              &
      &    img_composit_tbl)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+9)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call end_elapsed_time(elps_PVR%ist_elapsed+9)
 !
 !
       call alloc_depth_pixel_composit(pvr_start%num_pvr_ray,            &
@@ -121,19 +127,23 @@
      &      = - pvr_start%xx4_pvr_ray_start(3,1:pvr_start%num_pvr_ray)
 !$omp end parallel workshare
 !
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+10)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call start_elapsed_time(elps_PVR%ist_elapsed+10)
       call calypso_SR_type_int(0, img_composit_tbl,                     &
      &    pvr_start%num_pvr_ray, img_composit_tbl%ntot_import,          &
      &    pvr_start%id_pixel_start, img_stack%ipix_4_composit,          &
      &    SR_sig, SR_i)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+10)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call end_elapsed_time(elps_PVR%ist_elapsed+10)
 !
-      if(iflag_PVR_time) call start_elapsed_time(ist_elapsed_PVR+11)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call start_elapsed_time(elps_PVR%ist_elapsed+11)
       call calypso_SR_type_1(0, img_composit_tbl,                       &
      &   pvr_start%num_pvr_ray, img_composit_tbl%ntot_import,           &
      &   img_stack%depth_pvr_ray_start, img_stack%depth_pixel_composit, &
      &   SR_sig, SR_r)
-      if(iflag_PVR_time) call end_elapsed_time(ist_elapsed_PVR+11)
+      if(elps_PVR%flag_elapsed)                                         &
+     &       call end_elapsed_time(elps_PVR%ist_elapsed+11)
 !
       call alloc_pvr_image_stack_table(img_stack)
       call set_image_stacking_and_recv                                  &

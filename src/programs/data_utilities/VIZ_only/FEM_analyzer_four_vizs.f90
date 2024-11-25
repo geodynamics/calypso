@@ -7,8 +7,10 @@
 !>@brief Arrays for Field data IO for visualizers
 !!
 !!@verbatim
-!!      subroutine FEM_initialize_four_vizs(init_d, ucd_step, viz_step, &
-!!     &                                    FEM_viz, pvr, m_SR)
+!!      subroutine FEM_initialize_four_vizs                             &
+!!     &         (elps_VIZ, init_d, ucd_step, viz_step,                 &
+!!     &          FEM_viz, pvr, m_SR)
+!!        type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
 !!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(time_data), intent(in) :: init_d
 !!        type(VIZ_step_params), intent(inout) :: viz_step
@@ -49,9 +51,11 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine FEM_initialize_four_vizs(init_d, ucd_step, viz_step,   &
-     &                                    FEM_viz, pvr, m_SR)
+      subroutine FEM_initialize_four_vizs                               &
+     &         (elps_VIZ, init_d, ucd_step, viz_step,                   &
+     &          FEM_viz, pvr, m_SR)
 !
+      use t_elapsed_labels_4_VIZ
       use t_VIZ_mesh_field
       use mpi_load_mesh_data
       use nod_phys_send_recv
@@ -61,6 +65,7 @@
       use parallel_ucd_IO_select
       use FEM_to_VIZ_bridge
 !
+      type(elapsed_labels_4_VIZ), intent(in) :: elps_VIZ
       type(IO_step_param), intent(in) :: ucd_step
       type(time_data), intent(in) :: init_d
 !
@@ -100,7 +105,8 @@
 !     --------------------- init for fieldline and PVR
 !
       if(iflag_debug.gt.0) write(*,*) 'init_FEM_to_VIZ_bridge'
-      call init_FEM_to_VIZ_bridge(viz_step, FEM_viz%geofem, pvr, m_SR)
+      call init_FEM_to_VIZ_bridge(elps_VIZ, viz_step,                   &
+     &                            FEM_viz%geofem, pvr, m_SR)
       call calypso_mpi_barrier
 !
       end subroutine FEM_initialize_four_vizs

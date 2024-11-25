@@ -56,6 +56,9 @@
       call bcast_pvr_isosurfs_ctl(pvr%pvr_isos_c)
       call bcast_pvr_sections_ctl(pvr%pvr_scts_c)
 !
+      call bcast_pvr_tracers_ctl(pvr%pvr_flines_c)
+      call bcast_pvr_tracers_ctl(pvr%pvr_tracers_c)
+!
       call bcast_lighting_ctl(pvr%light)
       
       call calypso_mpi_bcast_character(pvr%cmap_cbar_c%block_name,      &

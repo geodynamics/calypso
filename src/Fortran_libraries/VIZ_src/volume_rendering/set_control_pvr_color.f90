@@ -88,30 +88,26 @@
 !
       i = 0
       if(light%light_position_ctl%num .gt. 0) then
-!$omp parallel do private(icou,i)
         do icou = 1, light%light_position_ctl%num
-          i = icou + 1
+          i = i + 1
           color_param%xyz_pvr_lights(1,i)                               &
-     &          = light%light_position_ctl%vec1(i)
+     &          = light%light_position_ctl%vec1(icou)
           color_param%xyz_pvr_lights(2,i)                               &
-     &          = light%light_position_ctl%vec2(i)
+     &          = light%light_position_ctl%vec2(icou)
           color_param%xyz_pvr_lights(3,i)                               &
-     &          = light%light_position_ctl%vec3(i)
+     &          = light%light_position_ctl%vec3(icou)
         end do
-!$omp end parallel do
       end if
       if(light%light_sph_posi_ctl%num .gt. 0) then
-!$omp parallel do private(icou,i,r,t,p)
         do icou = 1, light%light_sph_posi_ctl%num
-          i = icou + 1
-          r = light%light_sph_posi_ctl%vec1(i)
-          t = light%light_sph_posi_ctl%vec2(i) * atan(one) / 45.0
-          p = light%light_sph_posi_ctl%vec3(i) * atan(one) / 45.0
+          i = i + 1
+          r = light%light_sph_posi_ctl%vec1(icou)
+          t = light%light_sph_posi_ctl%vec2(icou) * atan(one) / 45.0
+          p = light%light_sph_posi_ctl%vec3(icou) * atan(one) / 45.0
           color_param%xyz_pvr_lights(1,i) = r * sin(t) * cos(p)
           color_param%xyz_pvr_lights(2,i) = r * sin(t) * sin(p)
           color_param%xyz_pvr_lights(3,i) = r * cos(t)
         end do
-!$omp end parallel do
       end if
 
       if(i .gt. 0) then

@@ -26,38 +26,53 @@
 !!    fline_file_prefix    'fline'
 !!    fline_output_format   ucd
 !!
-!!    field_line_field_ctl      magnetic_field   end
+!!    field_line_field_ctl      magnetic_field
 !!    coloring_field_ctl        magnetic_field   end
 !!    coloring_comp_ctl          radial   end
+!!    array output_field
+!!      output_field    velocity         vector
+!!      output_field    magnetic_field   radial
+!!    end array output_field
 !!
 !!    array chosen_ele_grp_ctl
 !!      chosen_ele_grp_ctl   outer_core   end
 !!    end array chosen_ele_grp_ctl
 !!
-!!  starting_type:    position_list, surface_list,  or surface_group
+!!    starting_type:    position_list, surface_list,
+!!                      spray_in_domain, or surface_group
 !!    line_direction_ctl        forward
 !!    max_line_stepping_ctl     1000
+!!    max_trace_length_ctl      20.0
+!!
+!!    communication_mode_ctl     send_recv
 !!    starting_type_ctl     position_list
 !!
-!!    start_surf_grp_ctl      icb_surf
+!!    seed_surface_grp_ctl      icb_surf
+!!    seed_element_grp_ctl      outer_core
 !!    num_fieldline_ctl       10
+!!
+!!    seed_reference_field_ctl           magnetic_field
+!!    seed_reference_component_ctl       radial
 !!
 !!    selection_type_ctl:    amplitude, area_size
 !!
-!!    array starting_point_ctl  10
-!!      starting_point_ctl  0.0  0.0  0.0
-!!    end array starting_point_ctl
+!!    begin seed_lists_ctl
+!!      array seed_point_ctl
+!!        seed_point_ctl  0.0  0.0  0.0
+!!      end array seed_point_ctl
 !!
-!!    array starting_gl_surface_id  10
-!!      starting_gl_surface_id  12  3
-!!    end array
+!!      array seed_geological_ctl
+!!        seed_geological_ctl  1.03    36.5    140.0
+!!      end array seed_geological_ctl
 !!
-!!     field type:
-!!     scalar, vector, sym_tensor, asym_tensor
-!!       spherical_vector,   spherical_sym_tensor
-!!       cylindrical_vector, cylindrical_sym_tensor
-!!       norm, 
+!!      array seed_spherical_ctl
+!!        seed_geological_ctl 0.75    -1.047    3.141592
+!!      end array seed_spherical_ctl
 !!
+!!      array starting_gl_surface_id  10
+!!        starting_gl_surface_id  12  3
+!!      end array
+!!    end seed_lists_ctl
 !!  end fieldline
 !!  ---------------------------------------------------------------------
 !!@endverbatim
@@ -72,7 +87,9 @@
       use t_control_array_integer
       use t_control_array_character
       use t_control_array_integer2
+      use t_control_array_real
       use t_control_array_real3
+      use t_fline_seeds_list_ctl
       use calypso_mpi
 !
       implicit  none
@@ -83,11 +100,18 @@
      &      :: hd_fline_output_format = 'fline_output_format'
 !
       character(len=kchara), parameter, private                         &
+     &      :: hd_fline_rst_prefix =   'tracer_restart_prefix'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_fline_rst_format =   'tracer_restart_format'
+!
+      character(len=kchara), parameter, private                         &
      &      :: hd_field_line_field =  'field_line_field_ctl'
       character(len=kchara), parameter, private                         &
      &      :: hd_coloring_field = 'coloring_field_ctl'
       character(len=kchara), parameter, private                         &
      &      :: hd_coloring_comp =  'coloring_comp_ctl'
+      character(len=kchara), parameter                                  &
+     &      :: hd_fline_result_field = 'output_field'
 !
       character(len=kchara), parameter, private                         &
      &      :: hd_fline_grp = 'chosen_ele_grp_ctl'
@@ -97,23 +121,41 @@
       character(len=kchara), parameter, private                         &
      &      :: hd_max_line_stepping = 'max_line_stepping_ctl'
       character(len=kchara), parameter, private                         &
-     &      :: hd_starting_type =  'starting_type_ctl'
+     &      :: hd_max_trace_length = 'max_trace_length_ctl'
       character(len=kchara), parameter, private                         &
-     &      :: hd_start_surf_grp = 'start_surf_grp_ctl'
+     &      :: hd_starting_type =  'starting_type_ctl'
+!
+      character(len=kchara), parameter, private                         &
+     &      :: hd_fline_comm_type =  'communication_mode_ctl'
+!
+      character(len=kchara), parameter, private                         &
+     &      :: hd_seed_surf_grp = 'seed_surface_grp_ctl'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_seed_ele_grp =  'seed_element_grp_ctl'
+!
+      character(len=kchara), parameter, private                         &
+     &      :: hd_seed_ref_field =  'seed_reference_field_ctl'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_seed_ref_comp =   'seed_reference_component_ctl'
+!
+      character(len=kchara), parameter, private                         &
+     &      :: hd_seed_file_prefix =   'seed_file_prefix_ctl'
+!
       character(len=kchara), parameter, private                         &
      &      :: hd_num_fieldline = 'num_fieldline_ctl'
       character(len=kchara), parameter, private                         &
      &      :: hd_selection_type = 'selection_type_ctl'
+!
       character(len=kchara), parameter, private                         &
-     &      :: hd_xx_start_point = 'starting_point_ctl'
-      character(len=kchara), parameter, private                         &
-     &      :: hd_start_global_surf = 'starting_gl_surface_id'
+     &      :: hd_seed_lists = 'seed_lists_ctl'
 !
 !   Deprecated labels
       character(len=kchara), parameter, private                         &
      &      :: hd_fline_file_head = 'fline_file_head'
       character(len=kchara), parameter, private                         &
      &      :: hd_fline_output_type = 'fline_output_type'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_start_surf_grp = 'start_surf_grp_ctl'
 !
 !  ---------------------------------------------------------------------
 !
@@ -141,35 +183,49 @@
         if(c_buf%iend .gt. 0) exit
         if(check_end_flag(c_buf, hd_block)) exit
 !
+        call read_fline_seeds_list_ctl(id_control, hd_seed_lists,       &
+     &                                 fln%seeds_ctl, c_buf)
 !
         call read_control_array_c1(id_control,                          &
      &      hd_fline_grp, fln%fline_area_grp_ctl, c_buf)
 !
-        call read_control_array_r3(id_control,                          &
-     &      hd_xx_start_point, fln%seed_point_ctl, c_buf)
-        call read_control_array_i2(id_control,                          &
-     &      hd_start_global_surf, fln%seed_surface_ctl, c_buf)
+        call read_control_array_c2(id_control,                          &
+     &      hd_fline_result_field, fln%fline_field_output_ctl, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_fline_file_prefix,           &
-     &      fln%fline_file_head_ctl)
-        call read_chara_ctl_type(c_buf, hd_fline_file_head,             &
-     &      fln%fline_file_head_ctl)
-!
+     &                           fln%fline_file_head_ctl)
         call read_chara_ctl_type(c_buf, hd_fline_output_format,         &
-     &      fln%fline_output_type_ctl)
-        call read_chara_ctl_type(c_buf, hd_fline_output_type,           &
-     &      fln%fline_output_type_ctl)
+     &                           fln%fline_output_type_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_fline_rst_prefix,            &
+     &                           fln%fline_rst_prefix_ctl)
+        call read_chara_ctl_type(c_buf, hd_fline_rst_format,            &
+     &                           fln%fline_rst_format_ctl)
 !
         call read_chara_ctl_type(c_buf, hd_field_line_field,            &
-     &      fln%fline_field_ctl )
+     &                           fln%fline_field_ctl)
         call read_chara_ctl_type(c_buf, hd_coloring_field,              &
-     &      fln%fline_color_field_ctl )
+     &                           fln%fline_color_field_ctl)
         call read_chara_ctl_type(c_buf, hd_coloring_comp,               &
-     &      fln%fline_color_comp_ctl )
+     &                           fln%fline_color_comp_ctl)
         call read_chara_ctl_type(c_buf, hd_starting_type,               &
-     &      fln%starting_type_ctl )
-        call read_chara_ctl_type(c_buf, hd_start_surf_grp,              &
-     &      fln%start_surf_grp_ctl )
+     &                           fln%starting_type_ctl)
+        call read_chara_ctl_type(c_buf, hd_fline_comm_type,             &
+     &                           fln%fline_comm_mode_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_seed_surf_grp,               &
+     &                           fln%seed_surf_grp_ctl)
+        call read_chara_ctl_type(c_buf, hd_seed_ele_grp,                &
+     &                           fln%seed_ele_grp_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_seed_ref_field,              &
+     &                           fln%seed_ref_field_ctl)
+        call read_chara_ctl_type(c_buf, hd_seed_ref_comp,               &
+     &                           fln%seed_ref_comp_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_seed_file_prefix,            &
+     &                           fln%seed_file_prefix_ctl)
+!
         call read_chara_ctl_type(c_buf, hd_selection_type,              &
      &      fln%selection_type_ctl )
         call read_chara_ctl_type(c_buf, hd_line_direction,              &
@@ -179,6 +235,17 @@
      &      fln%num_fieldline_ctl )
         call read_integer_ctl_type(c_buf, hd_max_line_stepping,         &
      &      fln%max_line_stepping_ctl)
+
+        call read_real_ctl_type(c_buf, hd_max_trace_length,             &
+     &      fln%max_trace_length_ctl)
+!
+! ---------------Deprecated items
+        call read_chara_ctl_type(c_buf, hd_start_surf_grp,              &
+     &                           fln%seed_surf_grp_ctl)
+        call read_chara_ctl_type(c_buf, hd_fline_file_head,             &
+     &      fln%fline_file_head_ctl)
+        call read_chara_ctl_type(c_buf, hd_fline_output_type,           &
+     &      fln%fline_output_type_ctl)
       end do
       fln%i_vr_fline_ctl = 1 
 !
@@ -205,13 +272,20 @@
 !
       maxlen = len_trim(hd_fline_file_prefix)
       maxlen = max(maxlen, len_trim(hd_fline_output_format))
+      maxlen = max(maxlen, len_trim(hd_fline_rst_prefix))
+      maxlen = max(maxlen, len_trim(hd_fline_rst_format))
       maxlen = max(maxlen, len_trim(hd_field_line_field))
       maxlen = max(maxlen, len_trim(hd_coloring_field))
       maxlen = max(maxlen, len_trim(hd_coloring_comp))
       maxlen = max(maxlen, len_trim(hd_line_direction))
       maxlen = max(maxlen, len_trim(hd_max_line_stepping))
       maxlen = max(maxlen, len_trim(hd_starting_type))
-      maxlen = max(maxlen, len_trim(hd_start_surf_grp))
+      maxlen = max(maxlen, len_trim(hd_fline_comm_type))
+      maxlen = max(maxlen, len_trim(hd_seed_surf_grp))
+      maxlen = max(maxlen, len_trim(hd_seed_ele_grp))
+      maxlen = max(maxlen, len_trim(hd_seed_ref_field))
+      maxlen = max(maxlen, len_trim(hd_seed_ref_comp))
+      maxlen = max(maxlen, len_trim(hd_seed_file_prefix))
       maxlen = max(maxlen, len_trim(hd_num_fieldline))
       maxlen = max(maxlen, len_trim(hd_selection_type))
 !
@@ -227,27 +301,43 @@
      &    fln%fline_color_field_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    fln%fline_color_comp_ctl)
+      call write_control_array_c2(id_control, level,                    &
+     &    fln%fline_field_output_ctl)
 !
       call write_control_array_c1(id_control, level,                    &
-     &    fln%fline_area_grp_ctl)
+     &                            fln%fline_area_grp_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    fln%line_direction_ctl)
+     &                          fln%line_direction_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    fln%max_line_stepping_ctl)
+     &                          fln%max_line_stepping_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &                          fln%max_trace_length_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    fln%starting_type_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    fln%start_surf_grp_ctl)
-      call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    fln%num_fieldline_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    fln%selection_type_ctl)
+     &                          fln%starting_type_ctl)
 !
-      call write_control_array_r3(id_control, level,                    &
-     &    fln%seed_point_ctl)
-      call write_control_array_i2 (id_control, level,                   &
-     &    fln%seed_surface_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          fln%fline_comm_mode_ctl)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          fln%seed_surf_grp_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          fln%seed_ele_grp_ctl)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          fln%seed_file_prefix_ctl)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          fln%seed_ref_field_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          fln%seed_ref_comp_ctl)
+!
+      call write_integer_ctl_type(id_control, level, maxlen,            &
+     &                            fln%num_fieldline_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                            fln%selection_type_ctl)
+!
+      call write_fline_seeds_list_ctl(id_control, fln%seeds_ctl, level)
 !
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
@@ -263,43 +353,66 @@
 !
       fln%block_name = hd_block
 !
+      call init_fline_seeds_list_ctl(hd_seed_lists, fln%seeds_ctl)
+!
         call init_chara_ctl_array_label                                 &
      &     (hd_fline_grp, fln%fline_area_grp_ctl)
 !
-        call init_r3_ctl_array_label                                    &
-     &     (hd_xx_start_point, fln%seed_point_ctl)
-        call init_int2_ctl_array_label                                  &
-     &     (hd_start_global_surf, fln%seed_surface_ctl)
+        call init_chara2_ctl_array_label                                &
+     &     (hd_fline_result_field, fln%fline_field_output_ctl)
 !
         call init_chara_ctl_item_label(hd_fline_file_prefix,            &
-     &      fln%fline_file_head_ctl)
-        call init_chara_ctl_item_label(hd_fline_file_head,              &
-     &      fln%fline_file_head_ctl)
-!
+     &                                 fln%fline_file_head_ctl)
         call init_chara_ctl_item_label(hd_fline_output_format,          &
-     &      fln%fline_output_type_ctl)
-        call init_chara_ctl_item_label(hd_fline_output_type,            &
-     &      fln%fline_output_type_ctl)
+     &                                 fln%fline_output_type_ctl)
+!
+        call init_chara_ctl_item_label(hd_fline_rst_prefix,             &
+     &                                 fln%fline_rst_prefix_ctl)
+        call init_chara_ctl_item_label(hd_fline_rst_format,             &
+     &                                 fln%fline_rst_format_ctl)
 !
         call init_chara_ctl_item_label(hd_field_line_field,             &
-     &      fln%fline_field_ctl )
+     &                                 fln%fline_field_ctl)
         call init_chara_ctl_item_label(hd_coloring_field,               &
-     &      fln%fline_color_field_ctl )
+     &                                 fln%fline_color_field_ctl)
         call init_chara_ctl_item_label(hd_coloring_comp,                &
-     &      fln%fline_color_comp_ctl )
+     &                                 fln%fline_color_comp_ctl)
         call init_chara_ctl_item_label(hd_starting_type,                &
-     &      fln%starting_type_ctl )
-        call init_chara_ctl_item_label(hd_start_surf_grp,               &
-     &      fln%start_surf_grp_ctl )
+     &                                 fln%starting_type_ctl)
+!
+        call init_chara_ctl_item_label(hd_fline_comm_type,              &
+     &                                 fln%fline_comm_mode_ctl)
+!
+        call init_chara_ctl_item_label(hd_seed_surf_grp,                &
+     &                                fln%seed_surf_grp_ctl)
+        call init_chara_ctl_item_label(hd_seed_ele_grp,                 &
+     &                                fln%seed_ele_grp_ctl)
+!
+        call init_chara_ctl_item_label(hd_seed_ref_field,               &
+     &                                fln%seed_ref_field_ctl)
+        call init_chara_ctl_item_label(hd_seed_ref_comp,                &
+     &                                fln%seed_ref_comp_ctl)
+!
+        call init_chara_ctl_item_label(hd_seed_file_prefix,             &
+     &                                fln%seed_file_prefix_ctl)
+!
         call init_chara_ctl_item_label(hd_selection_type,               &
-     &      fln%selection_type_ctl )
+     &                                 fln%selection_type_ctl)
         call init_chara_ctl_item_label(hd_line_direction,               &
-     &      fln%line_direction_ctl )
+     &                                 fln%line_direction_ctl)
 !
         call init_int_ctl_item_label(hd_num_fieldline,                  &
-     &      fln%num_fieldline_ctl )
+     &                               fln%num_fieldline_ctl)
         call init_int_ctl_item_label(hd_max_line_stepping,              &
-     &      fln%max_line_stepping_ctl)
+     &                               fln%max_line_stepping_ctl)
+        call init_real_ctl_item_label(hd_max_trace_length,              &
+     &                                fln%max_trace_length_ctl)
+!
+! ---------------Deprecated items
+        call init_chara_ctl_item_label(hd_fline_file_head,              &
+     &      fln%fline_file_head_ctl)
+        call init_chara_ctl_item_label(hd_fline_output_type,            &
+     &      fln%fline_output_type_ctl)
 !
       end subroutine init_field_line_ctl_label
 !

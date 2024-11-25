@@ -18,9 +18,9 @@ draw_xyz_plane_isolines.o: $(MAP_RENDERING_DIR)/draw_xyz_plane_isolines.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 map_patch_from_1patch.o: $(MAP_RENDERING_DIR)/map_patch_from_1patch.f90 m_precision.o m_constants.o m_phys_constants.o m_geometry_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-map_projection.o: $(MAP_RENDERING_DIR)/map_projection.f90 m_precision.o calypso_mpi.o t_map_projection.o m_work_time.o m_elapsed_labels_4_VIZ.o m_geometry_constants.o set_map_control.o search_ele_list_for_psf.o set_const_4_sections.o find_node_and_patch_psf.o set_fields_for_psf.o multi_map_projections.o set_ucd_data_to_type.o
+map_projection.o: $(MAP_RENDERING_DIR)/map_projection.f90 m_precision.o m_work_time.o calypso_mpi.o t_map_projection.o m_geometry_constants.o set_map_control.o search_ele_list_for_psf.o set_const_4_sections.o find_node_and_patch_psf.o set_fields_for_psf.o multi_map_projections.o set_ucd_data_to_type.o
 	$(F90) -c $(F90OPTFLAGS) $<
-multi_map_projections.o: $(MAP_RENDERING_DIR)/multi_map_projections.f90 calypso_mpi.o m_precision.o t_geometry_data.o t_phys_data.o t_solver_SR.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_map_rendering_data.o m_elapsed_labels_4_VIZ.o t_psf_patch_data.o t_psf_results.o t_pvr_image_array.o collect_psf_mesh_field.o xyz_plane_rendering.o write_PVR_image.o
+multi_map_projections.o: $(MAP_RENDERING_DIR)/multi_map_projections.f90 calypso_mpi.o m_precision.o t_geometry_data.o t_phys_data.o t_solver_SR.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_map_rendering_data.o m_work_time.o t_psf_patch_data.o t_psf_results.o t_pvr_image_array.o collect_psf_mesh_field.o xyz_plane_rendering.o write_PVR_image.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_map_control.o: $(MAP_RENDERING_DIR)/set_map_control.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_phys_data.o t_control_data_maps.o t_control_data_4_map.o t_control_params_4_psf.o t_psf_patch_data.o t_control_params_4_pvr.o t_pvr_colormap_parameter.o t_map_rendering_data.o t_pvr_image_array.o calypso_mpi.o t_read_control_elements.o set_field_comp_for_viz.o mpi_abort_by_missing_zlib.o set_psf_control.o m_error_IDs.o m_file_format_switch.o set_area_4_viz.o set_sections_file_ctl.o delete_data_files.o skip_comment_f.o set_pvr_modelview_matrix.o set_control_pvr_color.o t_control_array_character.o output_image_sel_4_png.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine s_set_iflag_for_used_ele                             &
 !!     &         (ele, ele_grp, ngrp_ele, id_ele_grp, iflag_used_ele)
-!!      subroutine set_iflag_for_used_ele_overlap(ele, ele_grp,         &
+!!      subroutine set_iflag_used_ele_w_overlap(ele, ele_grp,           &
 !!     &          ngrp_ele, id_ele_grp, iflag_used_ele)
 !!        type(element_data), intent(in) :: ele
 !!        type(group_data), intent(in) :: ele_grp
@@ -70,7 +70,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_iflag_for_used_ele_overlap(ele, ele_grp,           &
+      subroutine set_iflag_used_ele_w_overlap(ele, ele_grp,             &
      &          ngrp_ele, id_ele_grp, iflag_used_ele)
 !
       type(element_data), intent(in) :: ele
@@ -107,7 +107,7 @@
         end if
       end do
 !
-      end subroutine set_iflag_for_used_ele_overlap
+      end subroutine set_iflag_used_ele_w_overlap
 !
 !  ---------------------------------------------------------------------
 !

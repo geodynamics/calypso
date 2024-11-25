@@ -15,9 +15,8 @@
 !!        type(map_section_ctl), intent(inout) :: map_sect_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_map_section_ctl                                &
-!!     &         (id_control, hd_block, map_sect_ctl, level)
+!!     &         (id_control, map_sect_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
-!!        character(len=kchara), intent(in) :: hd_block
 !!        type(map_section_ctl), intent(inout) :: map_sect_ctl
 !!        integer(kind = kint), intent(inout) :: level
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -143,13 +142,12 @@
 !  ---------------------------------------------------------------------
 !
       subroutine write_map_section_ctl                                  &
-     &         (id_control, hd_block, map_sect_ctl, level)
+     &         (id_control, map_sect_ctl, level)
 !
       use ctl_file_section_def_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
       type(map_section_ctl), intent(in) :: map_sect_ctl
       integer(kind = kint), intent(inout) :: level
 !
@@ -167,7 +165,8 @@
       maxlen = max(maxlen,len_trim(hd_tcyl_inner))
       maxlen = max(maxlen,len_trim(hd_tcyl_outer))
 !
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+      level = write_begin_flag_for_ctl(id_control, level,               &
+     &                                 map_sect_ctl%block_name)
       call sel_write_ctl_pvr_section_def(id_control, hd_surface_define, &
      &    map_sect_ctl%fname_sect_ctl, map_sect_ctl%psf_def_c, level)
 !
@@ -190,7 +189,8 @@
      &    map_sect_ctl%tangent_cylinder_inner_ctl)
       call write_real_ctl_type(id_control, level, maxlen,               &
      &    map_sect_ctl%tangent_cylinder_outer_ctl)
-      level = write_end_flag_for_ctl(id_control, level, hd_block)
+      level = write_end_flag_for_ctl(id_control, level,                 &
+     &                               map_sect_ctl%block_name)
 !
       end subroutine write_map_section_ctl
 !

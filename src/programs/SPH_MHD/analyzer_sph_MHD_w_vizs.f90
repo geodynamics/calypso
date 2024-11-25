@@ -20,6 +20,7 @@
       use m_machine_parameter
       use m_work_time
       use m_elapsed_labels_4_MHD
+      use m_elapsed_labels_4_VIZ
       use m_elapsed_labels_SEND_RECV
       use t_spherical_MHD
       use t_sph_MHD_w_vizs
@@ -45,7 +46,7 @@
       use t_ctl_data_sph_MHD_w_vizs
       use t_SPH_mesh_field_data
       use t_SPH_MHD_zonal_mean_viz
-      use t_three_visualizers
+      use t_four_visualizers
       use input_control_sph_MHD
       use set_control_sph_mhd
       use set_control_4_SPH_to_FEM
@@ -68,6 +69,7 @@
       MHDMs%MHD_step%finish_d%started_time = MPI_WTIME()
       call init_elapse_time_by_TOTAL
       call set_sph_MHD_elapsed_label
+      call set_elpsed_label_4_VIZ(flag_detailed1, elps_VIZ1, elps1)
       call elpsed_label_field_send_recv
 !
 !   Load parameter file
@@ -87,7 +89,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize_sph_MHD'
       call FEM_initialize_sph_MHD(MHDMs%MHD_files, MHDMs%MHD_step,      &
      &    MVIZs%FEM_DAT, MHDMs%MHD_IO, MHDMs%m_SR)
-      call init_FEM_to_VIZ_bridge(MHDMs%MHD_step%viz_step,              &
+      call init_FEM_to_VIZ_bridge(elps_VIZ1, MHDMs%MHD_step%viz_step,   &
      &    MVIZs%FEM_DAT%geofem, MVIZs%VIZ_DAT, MHDMs%m_SR)
 !
 !        Initialize spherical transform dynamo
@@ -100,19 +102,21 @@
 !
 !        Initialize visualization
 !
-      if(iflag_debug .gt. 0) write(*,*) 'init_three_visualize'
-      call init_three_visualize(MHDMs%MHD_step%viz_step,                &
+      if(iflag_debug .gt. 0) write(*,*) 'init_four_visualize'
+      call init_four_visualize(elps_VIZ1, MHDMs%MHD_step%viz_step,      &
      &    MVIZs%FEM_DAT%geofem, MVIZs%FEM_DAT%field, MVIZs%VIZ_DAT,     &
-     &    add_VMHD_ctl1%viz3_ctls, MVIZs%VIZ3s, MHDMs%m_SR)
+     &    add_VMHD_ctl1%viz4_ctls, MVIZs%VIZ4s, MHDMs%m_SR)
+      call dealloc_viz4_controls(add_VMHD_ctl1%viz4_ctls)
 !
       call init_zonal_mean_vizs                                         &
-     &   (MHDMs%MHD_step%viz_step, MVIZs%FEM_DAT%geofem,                &
+     &   (elps_VIZ1, MHDMs%MHD_step%viz_step, MVIZs%FEM_DAT%geofem,     &
      &    MVIZs%VIZ_DAT%edge_comm, MVIZs%FEM_DAT%field,                 &
      &    add_VMHD_ctl1%zm_ctls, MVIZs%zmeans, MHDMs%m_SR)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
       call calypso_MPI_barrier
       call reset_elapse_4_init_sph_mhd
+      call reset_elapse_after_init_VIZ(elps_VIZ1, elps1)
 !
       end subroutine initialize_sph_mhd_w_vizs
 !
@@ -122,7 +126,7 @@
 !
       use t_time_data
       use t_SPH_MHD_zonal_mean_viz
-      use t_three_visualizers
+      use t_four_visualizers
       use SPH_analyzer_MHD
       use FEM_analyzer_sph_MHD
       use output_viz_file_control
@@ -134,14 +138,9 @@
 !
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+2)
 !
-!*  -----------  set initial step data --------------
-!*
-      call copy_time_step_data(MHDMs%MHD_step%init_d,                   &
-     &                         MHDMs%MHD_step%time_d)
-      iflag_finish = 0
-!*
 !*  -------  time evelution loop start -----------
 !*
+      iflag_finish = 0
       do
         call evolve_time_data(MHDMs%MHD_step%time_d)
 !
@@ -179,21 +178,21 @@
 !*
         if(iflag_vizs_w_fix_step(MHDMs%MHD_step%time_d%i_time_step,     &
      &                           MHDMs%MHD_step%viz_step)) then
-          if (iflag_debug.eq.1) write(*,*) 'visualize_surface', my_rank
+          if (iflag_debug.eq.1) write(*,*) 'visualize_four', my_rank
           if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+4)
           call istep_viz_w_fix_dt(MHDMs%MHD_step%time_d%i_time_step,    &
      &                            MHDMs%MHD_step%viz_step)
-          call visualize_three                                          &
-     &       (MHDMs%MHD_step%viz_step, MHDMs%MHD_step%time_d,           &
+          call visualize_four(elps_VIZ1,                                &
+     &        MHDMs%MHD_step%viz_step, MHDMs%MHD_step%time_d,           &
      &        MVIZs%FEM_DAT%geofem, MVIZs%FEM_DAT%field,                &
-     &        MVIZs%VIZ_DAT, MVIZs%VIZ3s, MHDMs%m_SR)
+     &        MVIZs%VIZ_DAT, MVIZs%VIZ4s, MHDMs%m_SR)
 !*
 !*  ----------- Zonal means --------------
 !*
           if(MHDMs%MHD_step%viz_step%istep_psf .ge. 0                   &
      &        .or. MHDMs%MHD_step%viz_step%istep_map .ge. 0) then
-            call SPH_MHD_zmean_vizs                                     &
-     &         (MHDMs%MHD_step%viz_step, MHDMs%MHD_step%time_d,         &
+            call SPH_MHD_zmean_vizs(elps_VIZ1,                          &
+     &          MHDMs%MHD_step%viz_step, MHDMs%MHD_step%time_d,         &
      &          MHDMs%SPH_MHD%sph, MVIZs%FEM_DAT%geofem,                &
      &          MHDMs%SPH_WK%trns_WK, MVIZs%FEM_DAT%field,              &
      &          MVIZs%zmeans, MHDMs%m_SR)

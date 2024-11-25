@@ -29,24 +29,40 @@
 !!      chosen_ele_grp_ctl   outer_core   end
 !!    end array chosen_ele_grp_ctl
 !!
-!!  starting_type:    position_list, surface_list,  or surface_group
+!!    starting_type:    position_list, surface_list,
+!!                      element_group, or surface_group
 !!    line_direction_ctl        forward
 !!    max_line_stepping_ctl     1000
+!!    max_trace_length_ctl      20.0
 !!    starting_type_ctl     position_list
 !!
-!!    start_surf_grp_ctl      icb_surf
+!!    seed_surface_grp_ctl      icb_surf
+!!    seed_element_grp_ctl      outer_core
 !!    num_fieldline_ctl       10
+!!
+!!    seed_reference_field_ctl           magnetic_field
+!!    seed_reference_component_ctl       radial
 !!
 !!    selection_type_ctl:    amplitude, area_size
 !!    selection_type_ctl     amplitude
 !!
-!!    array starting_point_ctl  10
-!!      starting_point_ctl  0.0  0.0  0.0
-!!    end array starting_point_ctl
+!!    begin seed_lists_ctl
+!!      array seed_point_ctl
+!!        seed_point_ctl  0.0  0.0  0.0
+!!      end array seed_point_ctl
 !!
-!!    array starting_gl_surface_id  10
-!!      starting_gl_surface_id  12  3
-!!    end array
+!!      array seed_geological_ctl
+!!        seed_geological_ctl  1.03    36.5    140.0
+!!      end array seed_geological_ctl
+!!
+!!      array seed_spherical_ctl
+!!        seed_geological_ctl 0.75    -1.047    3.141592
+!!      end array seed_spherical_ctl
+!!
+!!      array starting_gl_surface_id  10
+!!        starting_gl_surface_id  12  3
+!!      end array
+!!    end seed_lists_ctl
 !!
 !!     field type:
 !!     scalar, vector, sym_tensor, asym_tensor
@@ -55,8 +71,10 @@
 !!       norm, 
 !!
 !!    field_line_field_ctl      magnetic_field   end
-!!    coloring_field_ctl        magnetic_field   end
-!!    coloring_comp_ctl        radial   end
+!!    array output_field
+!!      output_field    velocity         vector
+!!      output_field    magnetic_field   radial
+!!    end array output_field
 !!
 !!  end fieldline
 !!  ---------------------------------------------------------------------
@@ -70,8 +88,9 @@
       use t_read_control_elements
       use t_control_array_integer
       use t_control_array_character
-      use t_control_array_integer2
-      use t_control_array_real3
+      use t_control_array_real
+      use t_control_array_character2
+      use t_fline_seeds_list_ctl
       use skip_comment_f
 !
       implicit  none
@@ -84,34 +103,40 @@
         type(read_character_item) :: fline_file_head_ctl
         type(read_character_item) :: fline_output_type_ctl
 !
+        type(read_character_item) :: fline_rst_prefix_ctl
+        type(read_character_item) :: fline_rst_format_ctl
+!
         type(read_character_item) :: fline_field_ctl
         type(read_character_item) :: fline_color_field_ctl
         type(read_character_item) :: fline_color_comp_ctl
+!>      Structure for list of output field
+!!@n      field_output_ctl%c1_tbl: Name of field
+!!@n      field_output_ctl%c2_tbl: Name of component
+        type(ctl_array_c2) :: fline_field_output_ctl
 !
 !>      Structure for element group to draw field line
 !!@n      fline_area_grp_ctl%c_tbl:  element group to draw field line
         type(ctl_array_chara) :: fline_area_grp_ctl
 !
+        type(read_character_item) :: fline_comm_mode_ctl
 !
         type(read_character_item) :: starting_type_ctl
         type(read_character_item) :: selection_type_ctl
         type(read_character_item) :: line_direction_ctl
 !
-        type(read_character_item) :: start_surf_grp_ctl
+        type(read_character_item) :: seed_surf_grp_ctl
+        type(read_character_item) :: seed_ele_grp_ctl
 !
         type(read_integer_item) :: num_fieldline_ctl
         type(read_integer_item) :: max_line_stepping_ctl
+        type(read_real_item) ::    max_trace_length_ctl
 !
-!>      Structure for seed points
-!!@n      seed_point_ctl%vec1:  X-component of seed points
-!!@n      seed_point_ctl%vec2:  Y-component of seed points
-!!@n      seed_point_ctl%vec3:  Z-component of seed points
-        type(ctl_array_r3) :: seed_point_ctl
+        type(read_character_item) :: seed_ref_field_ctl
+        type(read_character_item) :: seed_ref_comp_ctl
 !
-!>      Structure for seed points on center of the surfaces
-!!@n      seed_surface_ctl%int1:  element ID for seed points
-!!@n      seed_surface_ctl%int2:  Surface ID for seed points
-        type(ctl_array_i2) :: seed_surface_ctl
+        type(read_character_item) :: seed_file_prefix_ctl
+!
+        type(fline_seeds_list_ctl) :: seeds_ctl
 !
         integer (kind=kint) :: i_vr_fline_ctl = 0
       end type fline_ctl
@@ -127,8 +152,8 @@
       type(fline_ctl), intent(inout) :: fln
 !
 !
-      call dealloc_control_array_i2(fln%seed_surface_ctl)
-      call dealloc_control_array_r3(fln%seed_point_ctl)
+      call dealloc_fline_seeds_list_ctl(fln%seeds_ctl)
+!
       call dealloc_control_array_chara(fln%fline_area_grp_ctl)
 !
       call reset_fline_control_flags(fln)
@@ -143,24 +168,31 @@
       type(fline_ctl), intent(inout) :: fln
 !
 !
-      fln%fline_area_grp_ctl%num = 0
-      fln%seed_point_ctl%num =     0
-      fln%seed_surface_ctl%num =   0
+      call reset_fline_seeds_list_ctl(fln%seeds_ctl)
+      fln%fline_area_grp_ctl%num =  0
 !
       fln%fline_file_head_ctl%iflag = 0
       fln%fline_output_type_ctl%iflag = 0
 !
+      fln%fline_rst_prefix_ctl%iflag = 0
+      fln%fline_rst_format_ctl%iflag = 0
+!
       fln%num_fieldline_ctl%iflag  =     0
       fln%max_line_stepping_ctl%iflag  = 0
+      fln%max_trace_length_ctl%iflag  = 0
+      fln%fline_comm_mode_ctl%iflag =  0
       fln%starting_type_ctl%iflag =  0
       fln%selection_type_ctl%iflag = 0
-      fln%start_surf_grp_ctl%iflag = 0
+      fln%seed_surf_grp_ctl%iflag =  0
+      fln%seed_ele_grp_ctl%iflag =   0
+      fln%seed_ref_field_ctl%iflag = 0
+      fln%seed_ref_comp_ctl%iflag =  0
+      fln%seed_file_prefix_ctl%iflag =  0
 !
       fln%i_vr_fline_ctl = 0
 !
-      fln%fline_area_grp_ctl%icou = 0
-      fln%seed_point_ctl%icou =     0
-      fln%seed_surface_ctl%icou =   0
+      fln%fline_area_grp_ctl%icou =  0
+      fln%fline_field_output_ctl%icou = 0
 !
       fln%fline_color_field_ctl%iflag =   0
       fln%fline_color_comp_ctl%iflag =    0
@@ -182,12 +214,20 @@
       call copy_chara_ctl(org_fln%fline_output_type_ctl,                &
      &                    new_fln%fline_output_type_ctl)
 !
+      call copy_chara_ctl(org_fln%fline_rst_prefix_ctl,                 &
+     &                    new_fln%fline_rst_prefix_ctl)
+      call copy_chara_ctl(org_fln%fline_rst_format_ctl,                 &
+     &                    new_fln%fline_rst_format_ctl)
+!
       call copy_chara_ctl(org_fln%fline_field_ctl,                      &
      &                    new_fln%fline_field_ctl)
       call copy_chara_ctl(org_fln%fline_color_field_ctl,                &
      &                    new_fln%fline_color_field_ctl)
       call copy_chara_ctl(org_fln%fline_color_comp_ctl,                 &
      &                    new_fln%fline_color_comp_ctl)
+!
+      call copy_chara_ctl(org_fln%fline_comm_mode_ctl,                  &
+     &                    new_fln%fline_comm_mode_ctl)
 !
       call copy_chara_ctl(org_fln%starting_type_ctl,                    &
      &                    new_fln%starting_type_ctl)
@@ -196,20 +236,34 @@
       call copy_chara_ctl(org_fln%line_direction_ctl,                   &
      &                    new_fln%line_direction_ctl)
 !
-      call copy_chara_ctl(org_fln%start_surf_grp_ctl,                   &
-     &                    new_fln%start_surf_grp_ctl)
+      call copy_chara_ctl(org_fln%seed_surf_grp_ctl,                    &
+     &                    new_fln%seed_surf_grp_ctl)
+      call copy_chara_ctl(org_fln%seed_ele_grp_ctl,                     &
+     &                    new_fln%seed_ele_grp_ctl)
+!
+      call copy_chara_ctl(org_fln%seed_ref_field_ctl,                   &
+     &                    new_fln%seed_ref_field_ctl)
+      call copy_chara_ctl(org_fln%seed_ref_comp_ctl,                    &
+     &                    new_fln%seed_ref_comp_ctl)
+!
+      call copy_chara_ctl(org_fln%seed_file_prefix_ctl,                 &
+     &                    new_fln%seed_file_prefix_ctl)
 !
       call copy_integer_ctl(org_fln%num_fieldline_ctl,                  &
      &                      new_fln%num_fieldline_ctl)
       call copy_integer_ctl(org_fln%max_line_stepping_ctl,              &
      &                      new_fln%max_line_stepping_ctl)
+      call copy_real_ctl(org_fln%max_trace_length_ctl,                  &
+     &                   new_fln%max_trace_length_ctl)
 !
       call dup_control_array_c1(org_fln%fline_area_grp_ctl,             &
      &                          new_fln%fline_area_grp_ctl)
-      call dup_control_array_r3(org_fln%seed_point_ctl,                 &
-     &                          new_fln%seed_point_ctl)
-      call dup_control_array_i2(org_fln%seed_surface_ctl,               &
-     &                          new_fln%seed_surface_ctl)
+!
+      call dup_fline_seeds_list_ctl(org_fln%seeds_ctl,                  &
+     &                              new_fln%seeds_ctl)
+!
+      call dup_control_array_c2(org_fln%fline_field_output_ctl,         &
+     &                          new_fln%fline_field_output_ctl)
 !
       new_fln%block_name =      org_fln%block_name
       new_fln%i_vr_fline_ctl =  org_fln%i_vr_fline_ctl

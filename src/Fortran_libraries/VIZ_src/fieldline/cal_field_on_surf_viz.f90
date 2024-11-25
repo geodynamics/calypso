@@ -1,9 +1,12 @@
-!cal_field_on_surf_viz.f90
+!>@file  cal_field_on_surf_viz.f90
+!!       module cal_field_on_surf_viz
+!!
+!!@author H. Matsui
+!!@date   Programmed in Aug., 2011
 !
-!      module cal_field_on_surf_viz
-!
-!      Written by H. Matsui on Aug., 2011
-!
+!> @brief easy field evaluation on surface by linear interpolation
+!!
+!!@verbatim
 !!      subroutine element_ave_4_viz(nnod, nele, ie, v_nod, s_nod,      &
 !!     &          iele, v_ave, s_ave)
 !!
@@ -15,6 +18,11 @@
 !!     &           ie_surf, isurf, xi, s_nod, s_tgt)
 !!
 !!      subroutine cal_surf_field_value_2d(nd, xi, fd, ft)
+!!        integer(kind = kint), intent(in) :: nd
+!!        real(kind = kreal), intent(in) :: xi(2)
+!!        real(kind = kreal), intent(in) :: fd(nd,4)
+!!        real(kind = kreal), intent(inout) :: ft(nd)
+!!@endverbatim
 !
       module cal_field_on_surf_viz
 !
@@ -22,8 +30,6 @@
       use m_constants
 !
       implicit  none
-!
-      private :: cal_surf_field_value_2d
 !
 !  ---------------------------------------------------------------------
 !

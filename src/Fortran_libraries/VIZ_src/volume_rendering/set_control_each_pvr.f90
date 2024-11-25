@@ -11,10 +11,13 @@
 !!
 !!      subroutine set_control_field_4_pvr(field_ctl, comp_ctl,         &
 !!     &          num_nod_phys, phys_nod_name, fld_param, icheck_ncomp)
-!!      subroutine set_control_pvr(pvr_ctl, ele_grp, surf_grp, pvr_area,&
-!!     &          view_param, draw_param, color_param, cbar_param)
+!!      subroutine set_control_pvr                                      &
+!!     &         (pvr_ctl, ele_grp, surf_grp, tracer, fline,            &
+!!     &          pvr_area, draw_param, color_param, cbar_param)
 !!        type(group_data), intent(in) :: ele_grp
 !!        type(surface_group_data), intent(in) :: surf_grp
+!!        type(tracer_module), intent(in) :: tracer
+!!        type(fieldline_module), intent(in) :: fline
 !!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl
 !!        type(pvr_field_parameter), intent(inout) :: fld_param
 !!        type(pvr_view_parameter), intent(inout) :: view_param
@@ -106,13 +109,17 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_control_pvr(pvr_ctl, ele_grp, surf_grp, pvr_area,  &
-     &          draw_param, color_param, cbar_param)
+      subroutine set_control_pvr                                        &
+     &         (pvr_ctl, ele_grp, surf_grp, tracer, fline,              &
+     &          pvr_area, draw_param, color_param, cbar_param)
 !
       use t_group_data
+      use t_particle_trace
+      use t_fieldline
       use t_control_params_4_pvr
       use t_pvr_colormap_parameter
       use t_geometries_in_pvr_screen
+      use t_ctl_param_tracer_render
       use set_color_4_pvr
       use set_rgba_4_each_pixel
       use set_coefs_of_sections
@@ -121,6 +128,8 @@
 !
       type(group_data), intent(in) :: ele_grp
       type(surface_group_data), intent(in) :: surf_grp
+      type(tracer_module), intent(in) :: tracer
+      type(fieldline_module), intent(in) :: fline
       type(pvr_parameter_ctl), intent(in) :: pvr_ctl
 !
       type(rendering_parameter), intent(inout) :: draw_param
@@ -135,6 +144,13 @@
       call set_control_pvr_sections(pvr_ctl%pvr_scts_c, draw_param)
 !
       call set_control_pvr_isosurf(pvr_ctl%pvr_isos_c, draw_param)
+!
+      call set_control_pvr_tracer(tracer%num_trace, tracer%fln_prm,     &
+     &    pvr_ctl%pvr_tracers_c%num_pvr_tracer_ctl,                     &
+     &    pvr_ctl%pvr_tracers_c%pvr_trc_c, draw_param%tracer_pvr_prm)
+      call set_control_pvr_tracer(fline%num_fline, fline%fln_prm,       &
+     &    pvr_ctl%pvr_flines_c%num_pvr_tracer_ctl,                      &
+     &    pvr_ctl%pvr_flines_c%pvr_trc_c, draw_param%fline_pvr_prm)
 !
 !    set colormap setting
       call set_control_pvr_lighting(pvr_ctl%light, color_param)

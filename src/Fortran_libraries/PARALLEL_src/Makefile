@@ -11,6 +11,7 @@ SUBDIRS = \
 COMM_src        \
 MPI_IO          \
 MPI_ZLIB_IO     \
+INTERPOLATE     \
 SPH_SHELL_src   \
 CONST_SPH_GRID
 
@@ -56,9 +57,10 @@ lib_archve:
 mod_list:
 	@echo  MOD_PARALLEL= \\ >> $(MAKENAME)
 	@echo  \
-	'$$(MOD_COMM)'                          \
-	'$$(MOD_MPI_IO)    $$(MOD_MPI_ZLIB_IO)' \
-	'$$(MOD_COMM_SPH)  $$(MOD_SPH_GRID)'    >> $(MAKENAME)
+	'$$(MOD_COMM)'                            \
+	'$$(MOD_MPI_IO)      $$(MOD_MPI_ZLIB_IO)' \
+	'$$(MOD_COMM_SPH)    $$(MOD_SPH_GRID)'    \
+	'$$(MOD_INTERPOLATE)'  >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \

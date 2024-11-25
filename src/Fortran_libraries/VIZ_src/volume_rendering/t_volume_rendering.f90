@@ -6,9 +6,12 @@
 !>@brief Main routines for volume renderings
 !!
 !!@verbatim
-!!      subroutine set_from_PVR_control(geofem, nod_fld, pvr_ctls, pvr)
+!!      subroutine set_from_PVR_control(geofem, nod_fld, tracer, fline, &
+!!     &                                pvr_ctls, pvr)
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
+!!        type(tracer_module), intent(in) :: tracer
+!!        type(fieldline_module), intent(in) :: fline
 !!        type(volume_rendering_controls), intent(inout) :: pvr_ctls
 !!        type(volume_rendering_module), intent(inout) :: pvr
 !!      subroutine check_PVR_update                                     &
@@ -39,7 +42,6 @@
       use m_machine_parameter
       use m_geometry_constants
       use m_work_time
-      use m_elapsed_labels_4_VIZ
 !
       use t_mesh_data
       use t_phys_data
@@ -103,14 +105,19 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_from_PVR_control(geofem, nod_fld, pvr_ctls, pvr)
+      subroutine set_from_PVR_control(geofem, nod_fld, tracer, fline,   &
+     &                                pvr_ctls, pvr)
 !
+      use t_particle_trace
+      use t_fieldline
       use t_control_data_pvr_sections
       use set_pvr_control
       use rendering_and_image_nums
 !
       type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(in) :: nod_fld
+      type(tracer_module), intent(in) :: tracer
+      type(fieldline_module), intent(in) :: fline
       type(volume_rendering_controls), intent(inout) :: pvr_ctls
       type(volume_rendering_module), intent(inout) :: pvr
 !
@@ -145,7 +152,7 @@
 !
       do i_ctl = 1, pvr%num_pvr
         i_pvr = pvr%PVR_sort%ipvr_sorted(i_ctl)
-        call s_set_pvr_controls(geofem%group, nod_fld,                  &
+        call s_set_pvr_controls(geofem%group, nod_fld, tracer, fline,   &
      &      pvr_ctls%pvr_ctl_type(i_ctl), pvr%pvr_param(i_pvr))
       end do
 !

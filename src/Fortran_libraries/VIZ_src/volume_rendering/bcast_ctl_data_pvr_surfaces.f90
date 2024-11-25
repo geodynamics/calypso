@@ -13,6 +13,8 @@
 !!        type(pvr_isosurfs_ctl), intent(inout) :: pvr_isos_c
 !!      subroutine bcast_pvr_section_ctl(pvr_scts_c)
 !!        type(pvr_section_ctl), intent(inout) :: pvr_scts_c
+!!      subroutine bcast_pvr_tracers_ctl(pvr_trcs_c)
+!!        type(pvr_tracers_ctl), intent(inout) :: pvr_trcs_c
 !!@endverbatim
 !
       module bcast_ctl_data_pvr_surfaces
@@ -106,6 +108,36 @@
       end subroutine bcast_pvr_isosurfs_ctl
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine bcast_pvr_tracers_ctl(pvr_trcs_c)
+!
+      use t_control_data_pvr_tracers
+      use bcast_control_arrays
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
+!
+      type(pvr_tracers_ctl), intent(inout) :: pvr_trcs_c
+!
+      integer(kind = kint) :: i
+!
+!
+      call calypso_mpi_bcast_one_int(pvr_trcs_c%num_pvr_tracer_ctl, 0)
+      call calypso_mpi_bcast_character                                  &
+     &   (pvr_trcs_c%block_name, cast_long(kchara), 0)
+!
+      if(pvr_trcs_c%num_pvr_tracer_ctl .gt. 0 .and. my_rank.gt.0) then
+        call alloc_pvr_tracers_ctl(pvr_trcs_c)
+      end if
+      call calypso_mpi_barrier
+!
+      do i = 1, pvr_trcs_c%num_pvr_tracer_ctl
+        call bcast_pvr_tracer_ctl(pvr_trcs_c%pvr_trc_c(i))
+      end do
+!
+      end subroutine bcast_pvr_tracers_ctl
+!
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine bcast_pvr_section_ctl(pvr_sct_c)
@@ -154,6 +186,32 @@
       call bcast_ctl_type_r1(pvr_iso_ctl%opacity_ctl)
 !
       end subroutine bcast_pvr_isosurface_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine bcast_pvr_tracer_ctl(pvr_tracer_c)
+!
+      use t_ctl_data_pvr_tracer
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
+      use bcast_control_arrays
+!
+      type(pvr_tracer_ctl), intent(inout) :: pvr_tracer_c
+!
+!
+      call calypso_mpi_bcast_one_int(pvr_tracer_c%i_pvr_tracer_ctl, 0)
+      call calypso_mpi_bcast_character                                  &
+     &   (pvr_tracer_c%block_name, cast_long(kchara), 0)
+!
+      call bcast_ctl_type_c1(pvr_tracer_c%tracer_file_prefix)
+      call bcast_ctl_type_i1(pvr_tracer_c%render_increment_ctl)
+      call bcast_ctl_type_r1(pvr_tracer_c%render_radius_ctl)
+      call bcast_ctl_type_c1(pvr_tracer_c%color_mode_ctl)
+      call bcast_ctl_type_r3(pvr_tracer_c%rgb_color_ctl)
+      call bcast_ctl_type_r1(pvr_tracer_c%opacity_ctl)
+!
+      end subroutine bcast_pvr_tracer_ctl
 !
 !  ---------------------------------------------------------------------
 !
