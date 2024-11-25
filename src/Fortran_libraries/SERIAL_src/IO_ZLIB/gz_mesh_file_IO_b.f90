@@ -118,6 +118,8 @@
      &         (id_rank, file_name, mesh_IO, ierr)
 !
       use gzip_file_access
+      use gz_domain_data_IO_b
+      use gz_node_geometry_IO_b
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
@@ -132,7 +134,11 @@
       call open_rd_gzfile_b(FPz_msh, file_name, id_rank, zbuf_mesh)
       if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_num_node_b(FPz_msh, id_rank, zbuf_mesh, mesh_IO)
+      call gz_read_domain_info_b(FPz_msh, id_rank, zbuf_mesh,           &
+     &                           mesh_IO%nod_comm)
+      if(zbuf_mesh%ierr_zlib .ne. 0) return
+      call gz_read_number_of_node_b(FPz_msh, zbuf_mesh, mesh_IO%node)
+      if(zbuf_mesh%ierr_zlib .ne. 0) return
 !
   99  continue
       call close_gzfile_b(FPz_msh)
@@ -146,6 +152,9 @@
      &         (id_rank, file_name, mesh_IO, ierr)
 !
       use gzip_file_access
+      use gz_domain_data_IO_b
+      use gz_node_geometry_IO_b
+      use gz_element_connect_IO_b
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
@@ -160,8 +169,13 @@
       call open_rd_gzfile_b(FPz_msh, file_name, id_rank, zbuf_mesh)
       if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_num_node_ele_b(FPz_msh, id_rank,                     &
-     &                            zbuf_mesh, mesh_IO)
+      call gz_read_domain_info_b(FPz_msh, id_rank, zbuf_mesh,           &
+     &                           mesh_IO%nod_comm)
+      if(zbuf_mesh%ierr_zlib .ne. 0) return
+      call gz_read_geometry_info_b(FPz_msh, zbuf_mesh, mesh_IO%node)
+      if(zbuf_mesh%ierr_zlib .ne. 0) return
+      call gz_read_number_of_element_b(FPz_msh, zbuf_mesh, mesh_IO%ele)
+      if(zbuf_mesh%ierr_zlib .ne. 0) return
 !
   99  continue
       call close_gzfile_b(FPz_msh)

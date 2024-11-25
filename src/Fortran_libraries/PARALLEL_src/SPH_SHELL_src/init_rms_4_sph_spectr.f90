@@ -62,7 +62,7 @@
       integer(kind = kint) :: i, k
 !
 !
-      call set_all_layer_sph_spectr(sph_params, sph_rj, pwr)
+      call set_all_layer_sph_spectr(sph_rj, pwr)
       if(iflag_dipolarity .gt. 0) then
         call append_CMB_layer_f_dipolarity(sph_params, pwr)
       end if

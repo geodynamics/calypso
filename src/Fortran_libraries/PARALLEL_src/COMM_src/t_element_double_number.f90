@@ -199,7 +199,7 @@
 !
 !$omp parallel workshare
       iedge_dbl%irank(1:numedge) = -1
-      iedge_dbl%k_ref(1:numedge) =    0
+      iedge_dbl%k_ref(1:numedge) =  0
 !$omp end parallel workshare
 !
 !%omp parallel do private(iedge,ie_edge_one,nnod_same)

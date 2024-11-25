@@ -98,6 +98,7 @@
       &         (num_pe, id_rank, file_name, mesh_IO)
 !
        use MPI_domain_data_IO_b
+       use MPI_node_geometry_IO_b
        use MPI_mesh_data_IO_b
 !
       integer, intent(in) :: num_pe, id_rank
@@ -111,18 +112,21 @@
 !
       call open_read_mpi_file_b                                         &
      &   (file_name, num_pe, id_rank, IO_param)
-      call mpi_read_num_node_ele(IO_param, mesh_IO)
+      call mpi_read_domain_info_b(IO_param, mesh_IO%nod_comm)
+      call mpi_read_number_of_node_b(IO_param, mesh_IO%node)
       call close_mpi_file(IO_param)
 !
       end subroutine mpi_read_node_size_b
 !
 !------------------------------------------------------------------
 !
-       subroutine mpi_read_geometry_size_b                              &
-      &         (num_pe, id_rank, file_name, mesh_IO)
+      subroutine mpi_read_geometry_size_b                               &
+     &         (num_pe, id_rank, file_name, mesh_IO)
 !
-       use MPI_domain_data_IO_b
-       use MPI_mesh_data_IO_b
+      use MPI_domain_data_IO_b
+      use MPI_mesh_data_IO_b
+      use MPI_element_connect_IO_b
+      use MPI_node_geometry_IO_b
 !
       integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
@@ -135,7 +139,11 @@
 !
       call open_read_mpi_file_b                                         &
      &   (file_name, num_pe, id_rank, IO_param)
-      call mpi_read_num_node_ele_b(IO_param, mesh_IO)
+      call mpi_read_domain_info_b(IO_param, mesh_IO%nod_comm)
+      call mpi_read_geometry_info_b(IO_param, mesh_IO%node)
+!
+!  ----  read element data -------
+      call mpi_read_number_of_element_b(IO_param, mesh_IO%ele)
       call close_mpi_file(IO_param)
 !
       end subroutine mpi_read_geometry_size_b

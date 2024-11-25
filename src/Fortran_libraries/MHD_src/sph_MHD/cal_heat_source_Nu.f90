@@ -7,7 +7,6 @@
 !> @brief Evaluate Nusselt number without heat source
 !!
 !!@verbatim
-!
 !!      subroutine init_poisson_matrix_for_Nu                           &
 !!     &         (mat_name, sph, r_2nd, sc_prop, sph_bc_S, fdm2_center, &
 !!     &          band_s00_poisson_fixS, Nu_type)

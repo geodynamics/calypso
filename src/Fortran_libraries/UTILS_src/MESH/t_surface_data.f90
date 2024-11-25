@@ -9,6 +9,7 @@
 !!@verbatim
 !!      subroutine allocate_inod_in_surf(surf)
 !!      subroutine alloc_surface_connect(surf, nele)
+!!      subroutine alloc_global_surf_id(surf)
 !!      subroutine alloc_interior_surf(surf)
 !!      subroutine alloc_ext_surface(surf)
 !!      subroutine alloc_iso_surface(surf)
@@ -19,6 +20,8 @@
 !!
 !!      subroutine dealloc_inod_in_surf(surf)
 !!      subroutine dealloc_surface_connect(surf)
+!!      
+!!      subroutine dealloc_global_surf_id(surf)
 !!      subroutine dealloc_interior_surf(nele)
 !!      subroutine deallocate_ext_surface_type(surf)
 !!      subroutine deallocate_iso_surface_type(surf)
@@ -143,19 +146,29 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_interior_surf(surf)
+      subroutine alloc_global_surf_id(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
       allocate(surf%isurf_global(surf%numsurf))
-      allocate(surf%interior_surf(surf%numsurf))
-!
-      if (surf%numsurf.gt. 0) then
+      if (surf%numsurf .le. 0) return
 !$omp parallel workshare
-        surf%isurf_global =  0
-        surf%interior_surf = 0
+      surf%isurf_global(1:surf%numsurf) =  0
 !$omp end parallel workshare
-      end if
+!
+      end subroutine alloc_global_surf_id
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_interior_surf(surf)
+!
+      type(surface_data), intent(inout) :: surf
+!
+      allocate(surf%interior_surf(surf%numsurf))
+      if (surf%numsurf .le. 0) return
+!$omp parallel workshare
+      surf%interior_surf = 0
+!$omp end parallel workshare
 !
       end subroutine alloc_interior_surf
 !
@@ -272,12 +285,23 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine dealloc_global_surf_id(surf)
+!
+      type(surface_data), intent(inout) :: surf
+!
+      if(allocated(surf%isurf_global) .eqv. .FALSE.) return
+      deallocate(surf%isurf_global)
+!
+      end subroutine dealloc_global_surf_id
+!
+!  ---------------------------------------------------------------------
+!
       subroutine dealloc_interior_surf(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
       if(allocated(surf%interior_surf) .eqv. .FALSE.) return
-      deallocate(surf%isurf_global, surf%interior_surf)
+      deallocate(surf%interior_surf)
 !
       end subroutine dealloc_interior_surf
 !

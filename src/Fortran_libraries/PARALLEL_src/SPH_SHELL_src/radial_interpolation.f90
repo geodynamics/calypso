@@ -212,19 +212,23 @@
 !
       real (kind=kreal), intent(inout) :: d_r(nri_new,ncomp)
 !
-      integer(kind = kint) :: k, j, nd, i1, i2
+      integer(kind = kint) :: k, nd, i1, i2
 !
 !
 !$omp parallel private(nd)
       do nd = 1, ncomp
-!$omp do private(k,j,i1,i2)
+!$omp do private(k,i1,i2)
         do k = 1, nri_new
-          do j = 1, 1
+          if(k_old2new_in(k) .le. 0) then
+            d_r(k,nd) = d_IO(1,nd)
+          else if(k_old2new_out(k) .gt. n_rj_org) then
+            d_r(k,nd) = d_IO(n_rj_org,nd)
+          else
             i1 = k_old2new_in(k)
             i2 = k_old2new_out(k)
             d_r(k,nd) = coef_old2new_in(k) * d_IO(i1,nd)                &
      &                 + (one - coef_old2new_in(k)) * d_IO(i2,nd)
-          end do
+          end if
         end do
 !$omp end do nowait
       end do

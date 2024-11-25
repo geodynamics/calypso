@@ -30,8 +30,10 @@
         type(fdm_matrices) :: r_2nd
 !>          Structure of 4th order FDM matrices
         type(fdm_matrices) :: r_4th
-!>        Structure of 1st order FDM matrices on element
-        type(fdm_matrices) :: r_2nd_ele
+!>        Structure of 3rd order FDM matrices on element
+        type(fdm_matrices) :: r_n2e_3rd
+!>        Structure of 1st order FDM matrices from element
+        type(fdm_matrices) :: r_e2n_1st
 !
 !>        Structure of band matrices for dynamo simulation
         type(MHD_radial_matrices) :: MHD_mats

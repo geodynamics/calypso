@@ -209,7 +209,6 @@
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !
 !
-      call gz_mpi_read_number_of_node_b(IO_param, nod_IO)
       call gz_mpi_read_geometry_info_b(IO_param, nod_IO)
 !
       call gz_mpi_read_scl_in_ele_b(IO_param, nod_IO, sfed_IO)

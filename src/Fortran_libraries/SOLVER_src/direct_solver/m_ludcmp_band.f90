@@ -115,7 +115,8 @@
           aamax = max(aamax, abs(band_a(k,j)))
 !          aamax = max(aamax, abs(a(i,j)))
         end do
-        if (aamax.eq.0.0d0) pause 'singular matrix in ludcmp_band'
+        if (aamax.eq.0.0d0) write(*,*)                                  &
+     &                    '!!!!!!  singular matrix in ludcmp  !!!!!!'
         vv(i)=1.0d0 / aamax
         idx_org(i) = i
       end do

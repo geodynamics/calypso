@@ -103,7 +103,11 @@
 !
       call open_read_mpi_file                                           &
      &   (file_name, num_pe, id_rank, IO_param)
-      call gz_mpi_read_num_node(IO_param, mesh_IO)
+      call gz_mpi_skip_header(IO_param, len(hd_fem_para()))
+      call gz_mpi_read_domain_info(IO_param, mesh_IO%nod_comm)
+!
+      call gz_mpi_skip_header(IO_param, len(hd_fem_node()))
+      call gz_mpi_read_number_of_node(IO_param, mesh_IO%node)
       call close_mpi_file(IO_param)
 !
       end subroutine gz_mpi_read_node_size
@@ -123,7 +127,15 @@
 !
       call open_read_mpi_file                                           &
      &   (file_name, num_pe, id_rank, IO_param)
-      call gz_mpi_read_num_node_ele(IO_param, mesh_IO)
+
+      call gz_mpi_skip_header(IO_param, len(hd_fem_para()))
+      call gz_mpi_read_domain_info(IO_param, mesh_IO%nod_comm)
+!
+      call gz_mpi_skip_header(IO_param, len(hd_fem_node()))
+      call gz_mpi_read_geometry_info(IO_param, mesh_IO%node)
+!  ----  read element data -------
+      call gz_mpi_skip_header(IO_param, len(hd_fem_elem()))
+      call gz_mpi_read_num_element(IO_param, mesh_IO%ele)
       call close_mpi_file(IO_param)
 !
       end subroutine gz_mpi_read_geometry_size

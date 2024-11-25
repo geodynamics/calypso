@@ -24,9 +24,10 @@
 !!        type(ucd_data), intent(inout) :: vtk_out
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_int_buffer), intent(inout) :: SR_i
-!!      subroutine visualize_convert_vtk                                &
-!!     &         (i_step, istep_ucd, time_d, vtk_file_IO, vtk_out)
+!!      subroutine visualize_convert_vtk(i_step, istep_ucd, elps_SECT,  &
+!!     &                                 time_d, vtk_file_IO, vtk_out)
 !!        type(time_data), intent(in) :: time_d
+!!        type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
 !!        type(field_IO_params), intent(in) :: vtk_file_IO
 !!        type(ucd_data), intent(in) :: vtk_out
 !!@endverbatim
@@ -37,7 +38,6 @@
 !
       use m_machine_parameter
       use m_work_time
-      use m_elapsed_labels_4_VIZ
       use calypso_mpi
 !
       use t_VIZ_step_parameter
@@ -108,21 +108,25 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine visualize_convert_vtk                                  &
-     &         (i_step, istep_ucd, time_d, vtk_file_IO, vtk_out)
+      subroutine visualize_convert_vtk(i_step, istep_ucd, elps_SECT,    &
+     &                                 time_d, vtk_file_IO, vtk_out)
 !
+      use t_elapsed_labels_4_SECTIONS
       use parallel_ucd_IO_select
 !
       integer(kind = kint), intent(in) :: i_step, istep_ucd
+      type(elapsed_labels_4_SECTIONS), intent(in) :: elps_SECT
       type(time_data), intent(in) :: time_d
       type(field_IO_params), intent(in) :: vtk_file_IO
       type(ucd_data), intent(in) :: vtk_out
 !
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+13)
+      if(elps_SECT%flag_elapsed_S)                                      &
+     &           call start_elapsed_time(elps_SECT%ist_elapsed_S+5)
       call sel_write_parallel_ucd_file                                  &
      &   (istep_ucd, vtk_file_IO, time_d, vtk_out)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+13)
+      if(elps_SECT%flag_elapsed_S)                                      &
+     &           call end_elapsed_time(elps_SECT%ist_elapsed_S+5)
 !
       end subroutine visualize_convert_vtk
 !

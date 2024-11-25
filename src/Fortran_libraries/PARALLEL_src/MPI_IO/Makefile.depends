@@ -36,7 +36,7 @@ MPI_mesh_data_IO_b.o: $(MPI_IO_DIR)/MPI_mesh_data_IO_b.f90 m_precision.o m_const
 	$(F90) -c $(F90OPTFLAGS) $<
 MPI_mesh_file_IO.o: $(MPI_IO_DIR)/MPI_mesh_file_IO.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_calypso_mpi_IO_param.o MPI_ascii_data_IO.o MPI_mesh_data_IO.o mesh_data_IO.o groups_IO.o node_geometry_IO.o element_connect_IO.o m_fem_mesh_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-MPI_mesh_file_IO_b.o: $(MPI_IO_DIR)/MPI_mesh_file_IO_b.f90 m_precision.o m_machine_parameter.o m_calypso_mpi_IO.o t_mesh_data.o t_calypso_mpi_IO_param.o MPI_ascii_data_IO.o MPI_mesh_data_IO_b.o MPI_groups_IO_b.o MPI_domain_data_IO_b.o
+MPI_mesh_file_IO_b.o: $(MPI_IO_DIR)/MPI_mesh_file_IO_b.f90 m_precision.o m_machine_parameter.o m_calypso_mpi_IO.o t_mesh_data.o t_calypso_mpi_IO_param.o MPI_ascii_data_IO.o MPI_mesh_data_IO_b.o MPI_groups_IO_b.o MPI_domain_data_IO_b.o MPI_node_geometry_IO_b.o MPI_element_connect_IO_b.o
 	$(F90) -c $(F90OPTFLAGS) $<
 MPI_node_geometry_IO.o: $(MPI_IO_DIR)/MPI_node_geometry_IO.f90 m_precision.o m_phys_constants.o t_geometry_data.o t_read_mesh_data.o t_surf_edge_IO.o MPI_position_IO.o MPI_vectors_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine r_buoyancy_on_sphere                                 &
-!!     &         (iflag_4_gravity, iflag_4_composit_buo, kr, sph_rj,    &
+!!     &         (flag_thermal_buoyancy, flag_comp_buoyancy, kr, sph_rj,&
 !!     &          ipol_base, ipol_div_frc, coef_buo, coef_comp_buo,     &
 !!     &          ref_param_T, ref_param_C, rj_fld)
 !!        type(fluid_property), intent(in) :: fl_prop
@@ -43,7 +43,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine r_buoyancy_on_sphere                                   &
-     &         (iflag_4_gravity, iflag_4_composit_buo, kr, sph_rj,      &
+     &         (flag_thermal_buoyancy, flag_comp_buoyancy, kr, sph_rj,  &
      &          ipol_base, ipol_div_frc, coef_buo, coef_comp_buo,       &
      &          ref_param_T, ref_param_C, rj_fld)
 !
@@ -53,7 +53,7 @@
       use t_base_force_labels
       use t_phys_data
 !
-      logical, intent(in) :: iflag_4_gravity, iflag_4_composit_buo
+      logical, intent(in) :: flag_thermal_buoyancy, flag_comp_buoyancy
       real(kind = kreal), intent(in) :: coef_buo, coef_comp_buo
       integer(kind= kint), intent(in) :: kr
       type(reference_scalar_param), intent(in) :: ref_param_T
@@ -66,7 +66,7 @@
       integer(kind = kint) :: ipol_temp,  ipol_comp
 !
 !
-      if(iflag_4_gravity) then
+      if(flag_thermal_buoyancy) then
         if(ref_param_T%flag_ref_field) then
           ipol_temp =  ipol_base%i_per_temp
         else
@@ -74,7 +74,7 @@
         end if
       end if
 !
-      if(iflag_4_composit_buo) then
+      if(flag_comp_buoyancy) then
         if(ref_param_C%flag_ref_field) then
           ipol_comp =  ipol_base%i_per_light
         else
@@ -82,7 +82,7 @@
         end if
       end if
 !
-      if(iflag_4_gravity .and. iflag_4_composit_buo) then
+      if(flag_thermal_buoyancy .and. flag_comp_buoyancy) then
         if (iflag_debug.eq.1)                                           &
      &      write(*,*)'cal_r_double_buo_on_sphere', ipol_temp
         call cal_r_double_buo_on_sphere(kr, coef_buo, coef_comp_buo,    &
@@ -90,14 +90,14 @@
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      else if(iflag_4_gravity) then
+      else if(flag_thermal_buoyancy) then
         if (iflag_debug.eq.1) write(*,*) 'cal_r_buoyancy_on_sphere'
         call cal_r_buoyancy_on_sphere(kr, coef_buo,                     &
      &      ipol_temp, ipol_div_frc%i_buoyancy,                         &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      else if(iflag_4_composit_buo) then
+      else if(flag_comp_buoyancy) then
         if (iflag_debug.eq.1) write(*,*) 'cal_r_buoyancy_on_sphere'
         call cal_r_buoyancy_on_sphere(kr, coef_comp_buo,                &
      &      ipol_comp, ipol_div_frc%i_comp_buo,                         &

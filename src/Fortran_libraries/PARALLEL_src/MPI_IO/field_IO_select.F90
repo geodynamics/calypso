@@ -135,7 +135,7 @@
 !
       file_name = set_FEM_fld_file_name(file_IO%file_prefix,            &
      &           file_IO%iflag_format, my_rank, istep_fld)
-      call sel_write_step_field_file (file_name, file_IO, t_IO, fld_IO)
+      call sel_write_step_field_file(file_name, file_IO, t_IO, fld_IO)
 !
       end subroutine sel_write_step_FEM_field_file
 !

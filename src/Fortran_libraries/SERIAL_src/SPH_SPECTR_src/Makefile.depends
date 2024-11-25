@@ -24,6 +24,8 @@ count_num_sph_smp.o: $(SPH_SPECTR_DIR)/count_num_sph_smp.f90 m_precision.o m_con
 	$(F90) -c $(F90OPTFLAGS) $<
 extend_potential_field.o: $(SPH_SPECTR_DIR)/extend_potential_field.f90 m_precision.o m_constants.o t_spheric_rj_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
+first_fdm_ele_to_node.o: $(SPH_SPECTR_DIR)/first_fdm_ele_to_node.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_parameter.o t_fdm_coefs.o cal_inverse_small_matrix.o
+	$(F90) -c $(F90OPTFLAGS) $<
 half_chebyshev_radial_grid.o: $(SPH_SPECTR_DIR)/half_chebyshev_radial_grid.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 load_data_for_sph_IO.o: $(SPH_SPECTR_DIR)/load_data_for_sph_IO.f90 m_precision.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o copy_sph_comm_table_4_IO.o copy_sph_rtp_node_4_IO.o set_group_types_4_IO.o copy_sph_rj_mode_4_IO.o copy_sph_rtm_node_4_IO.o copy_sph_rlm_mode_4_IO.o
@@ -83,5 +85,7 @@ t_spheric_rlm_data.o: $(SPH_SPECTR_DIR)/t_spheric_rlm_data.f90 m_precision.o m_c
 t_spheric_rtm_data.o: $(SPH_SPECTR_DIR)/t_spheric_rtm_data.f90 m_precision.o m_constants.o m_spheric_constants.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_spheric_rtp_data.o: $(SPH_SPECTR_DIR)/t_spheric_rtp_data.f90 m_precision.o m_constants.o m_spheric_constants.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+third_fdm_node_to_ele.o: $(SPH_SPECTR_DIR)/third_fdm_node_to_ele.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_parameter.o t_fdm_coefs.o cal_inverse_small_matrix.o
 	$(F90) -c $(F90OPTFLAGS) $<
 

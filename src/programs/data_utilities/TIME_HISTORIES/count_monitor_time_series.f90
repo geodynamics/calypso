@@ -273,9 +273,9 @@
 !
       total_t = 1.0d-99
       do icou = 1, num_step-1
-!$omp parallel workshare
         total_t = total_t + (time(icou+1) - time(icou))                 &
      &                     * dble(imask(icou))
+!$omp parallel workshare
         ave_spec(1:num_comps) = ave_spec(1:num_comps)                   &
      &                         + half * (d_series(1:num_comps,icou)     &
      &                                 + d_series(1:num_comps,icou+1))  &

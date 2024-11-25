@@ -4,6 +4,11 @@
 !     programmed by H. Matsui
 !     modified by H. Matsui on Aug., 2007
 !
+!!      logical function iflag_viz_output                               &
+!!     &               (flag_flex_step, i_step_fix, time_d, IO_step)
+!!      integer(kind = kint) function viz_time_step                     &
+!!     &                  (flag_flex_step, i_step_fix, time_d, IO_step)
+!!
 !!      logical function lead_field_data_flag(i_step, MHD_step)
 !!        type(MHD_step_param), intent(in) :: MHD_step
 !!      logical function MHD_viz_routine_flag(flex_p, time_d, viz_step)
@@ -66,7 +71,7 @@
       type(VIZ_step_params), intent(inout) :: viz_step
 !
 !
-      if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
+      if(time_d%flag_flex_step) then
         MHD_viz_routine_flag = iflag_vizs_w_flex_step(time_d, viz_step)
       else
         MHD_viz_routine_flag                                            &
@@ -86,7 +91,7 @@
       type(VIZ_step_params), intent(inout) :: viz_step
 !
 !
-      if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
+      if(time_d%flag_flex_step) then
         call istep_viz_w_flex_dt(time_d, viz_step)
       else
         call istep_viz_w_fix_dt(flex_p%istep_max_dt, viz_step)
@@ -98,19 +103,19 @@
 !-----------------------------------------------------------------------
 !
       logical function iflag_viz_output                                 &
-     &               (iflag_flexible_step, i_step_fix, time_d, IO_step)
+     &               (flag_flex_step, i_step_fix, time_d, IO_step)
 !
       use t_time_data
       use t_flex_delta_t_parameter
 !
-      integer(kind = kint), intent(in) :: iflag_flexible_step
+      logical, intent(in) :: flag_flex_step
       integer(kind = kint), intent(in) :: i_step_fix
       type(time_data), intent(in) :: time_d
       type(IO_step_param), intent(in) :: IO_step
 !
 !
       iflag_viz_output = .FALSE.
-      if(iflag_flexible_step .eq. iflag_flex_step) then
+      if(flag_flex_step) then
         iflag_viz_output = iflag_viz_flex_step(time_d, IO_step)
       else
         iflag_viz_output = output_IO_flag(i_step_fix, IO_step)
@@ -121,18 +126,18 @@
 ! -----------------------------------------------------------------------
 !
       integer(kind = kint) function viz_time_step                       &
-     &              (iflag_flexible_step, i_step_fix, time_d, IO_step)
+     &                  (flag_flex_step, i_step_fix, time_d, IO_step)
 !
       use t_time_data
       use t_flex_delta_t_parameter
 !
-      integer(kind = kint), intent(in) :: iflag_flexible_step
+      logical, intent(in) :: flag_flex_step
       integer(kind = kint), intent(in) :: i_step_fix
       type(time_data), intent(in) :: time_d
       type(IO_step_param), intent(in) :: IO_step
 !
 !
-      if(iflag_flexible_step .eq. iflag_flex_step) then
+      if(flag_flex_step) then
         viz_time_step = istep_file_w_flex_dt(time_d, IO_step)
       else
         viz_time_step = istep_file_w_fix_dt(i_step_fix, IO_step)

@@ -16,7 +16,7 @@ const_kemoview_mesh.o: $(MESHDIR)/const_kemoview_mesh.f90 m_precision.o m_consta
 	$(F90) -c $(F90OPTFLAGS) $<
 const_merged_surf_4_group.o: $(MESHDIR)/const_merged_surf_4_group.f90 m_precision.o t_sum_hash.o t_mesh_data.o t_surface_data.o t_viewer_ele_grp_surface.o set_surface_hash.o mark_surf_hash.o set_surface_data.o const_surface_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-const_mesh_information.o: $(MESHDIR)/const_mesh_information.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_group_data.o t_group_connects.o t_surface_group_connect.o t_surface_group_normals.o t_surface_data.o t_edge_data.o t_element_group_table.o set_smp_4_group_types.o set_connects_4_surf_group.o set_surf_edge_mesh.o nod_and_ele_derived_info.o cal_mesh_position.o const_surface_data.o set_size_4_smp_types.o
+const_mesh_information.o: $(MESHDIR)/const_mesh_information.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_group_data.o t_group_connects.o t_surface_group_connect.o t_surface_group_normals.o t_surface_data.o t_edge_data.o t_element_group_table.o set_smp_4_group_types.o set_connects_4_surf_group.o set_surf_edge_mesh.o nod_and_ele_derived_info.o m_connect_hexa_2_tetra.o cal_mesh_position.o const_surface_data.o set_size_4_smp_types.o
 	$(F90) -c $(F90OPTFLAGS) $<
 const_node_list_4_viewer.o: $(MESHDIR)/const_node_list_4_viewer.f90 m_precision.o m_geometry_constants.o t_viewer_mesh.o t_viewer_group.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -43,6 +43,10 @@ find_node_4_group.o: $(MESHDIR)/find_node_4_group.f90 m_precision.o m_constants.
 load_element_mesh_data.o: $(MESHDIR)/load_element_mesh_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_mesh_data.o t_read_mesh_data.o t_file_IO_parameter.o set_surface_data_4_IO.o set_surface_data.o set_edge_data_4_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 load_mesh_data.o: $(MESHDIR)/load_mesh_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_file_IO_parameter.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_surface_data.o t_edge_data.o t_group_data.o mesh_IO_select.o set_nnod_4_ele_by_type.o cal_minmax_and_stacks.o set_element_data_4_IO.o copy_mesh_structures.o set_group_types_4_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_27quad_2_8x8linear.o: $(MESHDIR)/m_27quad_2_8x8linear.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_connect_hexa_2_tetra.o: $(MESHDIR)/m_connect_hexa_2_tetra.f90 m_precision.o m_27quad_2_8x8linear.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_geometry_constants.o: $(MESHDIR)/m_geometry_constants.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<

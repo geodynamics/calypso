@@ -30,6 +30,13 @@
 !
       implicit  none
 !
+!>      Structure of labels for elapsed time data
+      type elapsed_lables
+        logical :: flag_elapsed = .FALSE.
+        integer(kind = kint) :: ist_elapsed = 0
+        integer(kind = kint) :: ied_elapsed = 0
+      end type elapsed_lables
+!
 !
       integer(kind = kint) :: iflag_time_4_each_pe = 0
 !

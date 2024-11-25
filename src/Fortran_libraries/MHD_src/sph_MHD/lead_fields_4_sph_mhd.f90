@@ -128,11 +128,16 @@
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
+      integer(kind = kint) :: ibuo_temp,  ibuo_comp
 !
-      call sel_buoyancies_sph_MHD(SPH_MHD%sph%sph_rj, trans_p%leg,      &
-     &    SPH_MHD%ipol%base, SPH_MHD%ipol%forces,                       &
-     &    MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
-     &    sph_MHD_bc%sph_bc_U, SPH_MHD%fld)
+!
+      call sel_field_address_for_buoyancies(SPH_MHD%ipol%base,          &
+     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &
+     &    ibuo_temp, ibuo_comp)
+      call sel_buoyancies_sph_MHD                                       &
+     &   (SPH_MHD%sph%sph_rj, trans_p%leg, SPH_MHD%ipol%forces,         &
+     &    MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,                        &
+     &    ibuo_temp, ibuo_comp, SPH_MHD%fld)
 !
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
         call pressure_4_sph_mhd                                         &
@@ -147,14 +152,19 @@
      &    SPH_MHD%ipol%base, SPH_MHD%ipol%sym_fld,                      &
      &    SPH_MHD%ipol%asym_fld, SPH_MHD%fld)
 !
+      call sel_field_address_for_buoyancies(SPH_MHD%ipol%sym_fld,       &
+     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &
+     &    ibuo_temp, ibuo_comp)
       call sel_buoyancies_sph_MHD(SPH_MHD%sph%sph_rj, trans_p%leg,      &
-     &    SPH_MHD%ipol%sym_fld, SPH_MHD%ipol%forces_by_sym_asym,        &
-     &    MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
-     &    sph_MHD_bc%sph_bc_U, SPH_MHD%fld)
+     &    SPH_MHD%ipol%forces_by_sym_asym, MHD_prop%fl_prop,            &
+     &    sph_MHD_bc%sph_bc_U, ibuo_temp, ibuo_comp, SPH_MHD%fld)
+!
+      call sel_field_address_for_buoyancies(SPH_MHD%ipol%asym_fld,      &
+     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &
+     &    ibuo_temp, ibuo_comp)
       call sel_buoyancies_sph_MHD(SPH_MHD%sph%sph_rj, trans_p%leg,      &
-     &    SPH_MHD%ipol%asym_fld, SPH_MHD%ipol%forces_by_sym_sym,        &
-     &    MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
-     &    sph_MHD_bc%sph_bc_U, SPH_MHD%fld)
+     &    SPH_MHD%ipol%forces_by_sym_sym, MHD_prop%fl_prop,             &
+     &    sph_MHD_bc%sph_bc_U, ibuo_temp, ibuo_comp, SPH_MHD%fld)
 !
       call lead_fields_by_sph_trans(SPH_MHD%sph, SPH_MHD%comms,         &
      &    MHD_prop, trans_p, WK%trns_MHD, WK%trns_snap,                 &

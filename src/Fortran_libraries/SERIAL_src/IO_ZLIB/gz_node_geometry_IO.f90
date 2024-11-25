@@ -150,6 +150,7 @@
       integer (kind = kint) :: i, k
 !
 !
+      call gz_read_number_of_node(FPz_f, nod_IO, zbuf)
       call alloc_node_geometry_base(nod_IO)
 !
       do i=1, nod_IO%numnod

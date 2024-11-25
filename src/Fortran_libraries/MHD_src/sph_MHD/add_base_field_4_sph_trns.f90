@@ -62,7 +62,7 @@
 !
 !
 !   velocity flag
-!      if(       fl_prop%iflag_4_inertia .or. cd_prop%iflag_4_induction &
+!      if(       fl_prop%flag_inertia .or. cd_prop%iflag_4_induction    &
 !     &     .or. ht_prop%iflag_4_advection                              &
 !     &     .or. cp_prop%iflag_4_advection) then
         call add_field_4_sph_trns_by_pol(d_rj,                          &
@@ -70,26 +70,26 @@
      &      trns)
 !      end if
 !   vorticity flag
-!      if(fl_prop%iflag_4_inertia) then
+!      if(fl_prop%flag_inertia) then
         call add_field_4_sph_trns_by_pol(d_rj,                          &
      &      ipol_base%i_vort, iphys_base%i_vort, b_trns_base%i_vort,    &
      &      trns)
 !      end if
 !   magnetic field flag
-!      if(cd_prop%iflag_4_induction .or. fl_prop%iflag_4_lorentz) then
+!      if(cd_prop%iflag_4_induction .or. fl_prop%flag_lorentz) then
         call add_field_4_sph_trns_by_pol(d_rj,                          &
      &      ipol_base%i_magne, iphys_base%i_magne, b_trns_base%i_magne, &
      &      trns)
 !      end if
 !   current density flag
-!      if(fl_prop%iflag_4_lorentz) then
+!      if(fl_prop%flag_lorentz) then
         call add_field_4_sph_trns_by_pol(d_rj,                          &
      &      ipol_base%i_current, iphys_base%i_current,                  &
      &      b_trns_base%i_current, trns)
 !      end if
 !
 !    external magnetic field flag
-!      if(cd_prop%iflag_4_induction .or. fl_prop%iflag_4_lorentz) then
+!      if(cd_prop%iflag_4_induction .or. fl_prop%flag_lorentz) then
         call add_field_4_sph_trns_by_pol(d_rj,                          &
      &      ipol_base%i_back_B, iphys_base%i_back_B,                    &
      &      b_trns_base%i_back_B, trns)

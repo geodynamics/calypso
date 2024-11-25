@@ -16,8 +16,9 @@
 !!        type(field_IO), intent(in) :: sph_fst_IO
 !!
 !!      subroutine read_alloc_sph_restart_data                          &
-!!     &         (fst_file_IO, init_d, rj_fld, rst_step)
-!!        type(time_data), intent(inout) :: init_d
+!!     &         (fst_file_IO, init_d, time_d, rj_fld, rst_step)
+!!        type(time_data), intent(in) :: init_d
+!!        type(time_data), intent(inout) :: time_d
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(IO_step_param), intent(inout) :: rst_step
 !!
@@ -67,9 +68,6 @@
 !
       implicit  none
 !
-!
-      type(time_data), save, private :: sph_time_IO
-!
 ! -----------------------------------------------------------------------
 !
       contains
@@ -88,6 +86,7 @@
       type(IO_step_param), intent(in) :: rst_step
       type(field_IO), intent(inout) :: sph_fst_IO
 !
+      type(time_data) :: sph_time_IO
       integer(kind = kint) :: istep_rst
 !
 !
@@ -105,27 +104,29 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_alloc_sph_restart_data                            &
-     &         (fst_file_IO, init_d, rj_fld, rst_step)
+     &         (fst_file_IO, init_d, time_d, rj_fld, rst_step)
 !
       use set_sph_restart_IO
 !
       type(field_IO_params), intent(in) :: fst_file_IO
+      type(time_data), intent(in) :: init_d
 !
-      type(time_data), intent(inout) :: init_d
+      type(time_data), intent(inout) :: time_d
       type(phys_data), intent(inout) :: rj_fld
       type(IO_step_param), intent(inout) :: rst_step
 !
       integer(kind = kint) :: istep_rst
+      type(time_data) :: rst_file_time_IO
       type(field_IO) :: sph_fst_IO
 !
 !
       istep_rst = set_IO_step(init_d%i_time_step, rst_step)
 !
       call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
-     &    istep_rst, fst_file_IO, sph_time_IO, sph_fst_IO)
+     &    istep_rst, fst_file_IO, rst_file_time_IO, sph_fst_IO)
 !
       call set_sph_restart_from_IO(sph_fst_IO, rj_fld)
-      call copy_time_step_data(sph_time_IO, init_d)
+      call copy_time_step_data(rst_file_time_IO, time_d)
 !
       call dealloc_phys_data_IO(sph_fst_IO)
       call dealloc_phys_name_IO(sph_fst_IO)
@@ -179,15 +180,16 @@
       type(time_data), intent(inout) :: time_d
       type(sph_radial_interpolate), intent(inout) :: r_itp
 !
+      type(time_data) :: rst_file_time_IO
       type(field_IO) :: sph_fst_IO
       integer(kind = kint) :: istep_rst
 !
 !
       istep_rst = set_IO_step(i_step, rst_step)
       call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
-     &    istep_rst, fst_file_IO, sph_time_IO, sph_fst_IO)
+     &    istep_rst, fst_file_IO, rst_file_time_IO, sph_fst_IO)
 !
-      call copy_time_step_data(sph_time_IO, time_d)
+      call copy_time_step_data(rst_file_time_IO, time_d)
 !
       if(rj_file_param%iflag_IO .eq. 0) then
         if (iflag_debug.gt.0) write(*,*) 'set_sph_restart_from_IO'
@@ -218,6 +220,7 @@
       integer(kind = kint), intent(in) :: i_step
       type(IO_step_param), intent(in) :: ucd_step
 !
+      type(time_data) :: sph_time_IO
       type(field_IO) :: sph_out_IO
       integer(kind = kint) :: istep_udt
 !
@@ -268,15 +271,16 @@
       type(phys_data), intent(inout) :: rj_fld
       type(sph_radial_interpolate), intent(inout) :: r_itp
 !
+      type(time_data) :: rst_file_time_IO
       type(field_IO) :: sph_out_IO
       integer(kind = kint) :: istep_udt
 !
 !
       istep_udt = set_IO_step(i_step, ucd_step)
       call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
-     &    istep_udt, sph_file_IO, sph_time_IO, sph_out_IO)
+     &    istep_udt, sph_file_IO, rst_file_time_IO, sph_out_IO)
 !
-      call copy_time_step_data(sph_time_IO, time_d)
+      call copy_time_step_data(rst_file_time_IO, time_d)
 !
       if(rj_file_param%iflag_IO .eq. 0) then
         if (iflag_debug.gt.0) write(*,*) 'set_rj_phys_data_from_IO'

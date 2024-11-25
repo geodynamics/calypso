@@ -51,11 +51,13 @@
       implicit none
 !
       character(len=kchara), parameter, private                         &
-     &           :: vt_evo_name = 'toroidal_velocity_evolution'
+     &           :: vt_evo_name =  'toroidal_velocity_evolution'
       character(len=kchara), parameter, private                         &
-     &           :: wt_evo_name = 'toroidal_vorticity_evolution'
+     &           :: wt_evo_name =  'toroidal_vorticity_evolution'
       character(len=kchara), parameter, private                         &
-     &           :: vp_evo_name = 'poloidal_velocity_evolution'
+     &           :: vp_evo_name =  'poloidal_velocity_evolution'
+      character(len=kchara), parameter, private                         &
+     &           :: vsp_evo_name = 'velocity_pressure_evolution'
 !
       character(len=kchara), parameter, private                         &
      &           :: bp_evo_name = 'poloidal_magne_evolution'

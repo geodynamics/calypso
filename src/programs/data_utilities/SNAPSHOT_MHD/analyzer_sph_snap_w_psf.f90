@@ -23,6 +23,7 @@
       use m_machine_parameter
       use t_spherical_MHD
       use t_sph_MHD_w_psf
+      use t_elapsed_labels_4_SECTIONS
 !
       implicit none
 !
@@ -32,6 +33,10 @@
       type(spherical_MHD), save, private :: SNAPs
 !>      Structure for visualization in spherical MHD
       type(sph_MHD_w_psf), save, private :: MPSFs
+!
+!>          Elapsed time labels
+      logical, parameter :: flag_detailed1 = .TRUE.
+      type(elapsed_labels_4_SECTIONS), save :: elps_SECT1
 !
 ! ----------------------------------------------------------------------
 !
@@ -63,6 +68,7 @@
       total_start = MPI_WTIME()
       call init_elapse_time_by_TOTAL
       call set_sph_MHD_elapsed_label
+      call elpsed_label_4_SECT(flag_detailed1, elps_SECT1, elps1)
       call elpsed_label_field_send_recv
 !
 !   Load parameter file
@@ -82,7 +88,7 @@
       call FEM_initialize_sph_MHD(SNAPs%MHD_files, SNAPs%MHD_step,      &
      &    MPSFs%FEM_DAT, SNAPs%MHD_IO, SNAPs%m_SR)
       call init_FEM_to_PSF_bridge                                       &
-     &   (SNAPs%MHD_step%viz_step, MPSFs%FEM_DAT%geofem,                &
+     &   (elps_SECT1, SNAPs%MHD_step%viz_step, MPSFs%FEM_DAT%geofem,    &
      &    MPSFs%edge_comm, SNAPs%m_SR)
 !
 !        Initialize spherical transform dynamo
@@ -93,17 +99,18 @@
 !
 !        Initialize visualization
       if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
-      call init_visualize_surface(SNAPs%MHD_step%viz_step,              &
+      call init_visualize_surface(elps_SECT1, SNAPs%MHD_step%viz_step,  &
      &    MPSFs%FEM_DAT%geofem, MPSFs%edge_comm, MPSFs%FEM_DAT%field,   &
      &    add_SMHD_ctl1%surfacing_ctls, MPSFs%PSFs, SNAPs%m_SR)
       call init_zonal_mean_sections                                     &
-     &   (SNAPs%MHD_step%viz_step, MPSFs%FEM_DAT%geofem,                &
+     &   (elps_SECT1, SNAPs%MHD_step%viz_step, MPSFs%FEM_DAT%geofem,    &
      &    MPSFs%edge_comm, MPSFs%FEM_DAT%field, add_SMHD_ctl1%zm_sects, &
      &    MPSFs%zsectios, SNAPs%m_SR)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
       call calypso_MPI_barrier
       call reset_elapse_4_init_sph_mhd
+      call reset_elapse_after_init_SECT(elps_SECT1, elps1)
 !
       end subroutine initialize_sph_snap_w_psf
 !
@@ -165,16 +172,16 @@
           if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+4)
           call istep_viz_w_fix_dt(SNAPs%MHD_step%time_d%i_time_step,    &
      &                          SNAPs%MHD_step%viz_step)
-          call visualize_surface                                        &
-     &       (SNAPs%MHD_step%viz_step, SNAPs%MHD_step%time_d,           &
+          call visualize_surface(elps_SECT1,                            &
+     &        SNAPs%MHD_step%viz_step, SNAPs%MHD_step%time_d,           &
      &        MPSFs%FEM_DAT%geofem, MPSFs%edge_comm,                    &
      &        MPSFs%FEM_DAT%field, MPSFs%PSFs, SNAPs%m_SR)
 !*
 !*  ----------- Zonal means --------------
 !*
           if(SNAPs%MHD_step%viz_step%istep_psf .ge. 0) then
-            call SPH_MHD_zmean_sections                                 &
-     &         (SNAPs%MHD_step%viz_step, SNAPs%MHD_step%time_d,         &
+            call SPH_MHD_zmean_sections(elps_SECT1,                     &
+     &          SNAPs%MHD_step%viz_step, SNAPs%MHD_step%time_d,         &
      &          SNAPs%SPH_MHD%sph, MPSFs%FEM_DAT%geofem,                &
      &          SNAPs%SPH_WK%trns_WK, MPSFs%FEM_DAT%field,              &
      &          MPSFs%zsectios, SNAPs%m_SR)

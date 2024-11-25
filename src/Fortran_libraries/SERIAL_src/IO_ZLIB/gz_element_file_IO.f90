@@ -227,7 +227,6 @@
 !
 !      write(zbuf%fixbuf(1),'(a,a1)') '! 3.element information',        &
 !     &                                char(0)
-      call gz_read_number_of_node(FPz_f, nod_IO, zbuf)
       call gz_read_geometry_info(FPz_f, nod_IO, zbuf)
 !
 !      write(zbuf%fixbuf(1),'(a,a1)') '! 3.2 Volume of element ',       &

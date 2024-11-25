@@ -9,6 +9,7 @@ LIB_MHD_FILE= libcalypso_MHD.a
 
 SUBDIRS = \
 IO \
+radial_FDM \
 sph_MHD
 
 #
@@ -53,6 +54,7 @@ lib_archve:
 mod_list:
 	@echo MOD_MHD= \\ >> $(MAKENAME)
 	@echo '$$(MOD_MHD_IO)'       \\  >> $(MAKENAME)
+	@echo '$$(MOD_SPH_MHD_FDM)'  \\  >> $(MAKENAME)
 	@echo '$$(MOD_SPH_MHD)'      \\  >> $(MAKENAME)
 	@echo '$$(MOD_SPH_SNAPSHOT)' \\  >> $(MAKENAME)
 	@echo >> $(MAKENAME)

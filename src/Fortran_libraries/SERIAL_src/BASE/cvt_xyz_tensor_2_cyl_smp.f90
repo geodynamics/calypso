@@ -20,12 +20,11 @@
 !!     &          tensor, t_sp, xx, yy, s, a_s)
 !!      subroutine cal_sz_tensor_smp(np_smp, numnod, inod_smp_stack,    &
 !!     &          tensor, t_sz, xx, yy, s, a_s)
-!!      subroutine cal_pp_cyl_tensor_smp(np_smp, numnod, inod_smp_stack,&
-!!     &          tensor, t_pp, xx, yy, s, a_s)
-!!      subroutine cal_pz_tensor_smp(np_smp, numnod, inod_smp_stack,    &
-!!     &          tensor, t_pz, xx, yy, s, a_s)
-!!      subroutine cal_zz_tensor_smp(np_smp, numnod, inod_smp_stack,    &
-!!     &          tensor, t_zz)
+!!      subroutine cal_pp_cyl_tensor_smp(numnod, tensor, t_pp,          &
+!!     &                                 xx, yy, s, a_s)
+!!      subroutine cal_pz_tensor_smp(numnod, tensor, t_pz,              &
+!!     &                             xx, yy, s, a_s)
+!!      subroutine cal_zz_tensor_smp(numnod, tensor, t_zz)
 !!@endverbatim
 !!
 !!@n @param  np_smp   Number of SMP processes
@@ -331,11 +330,10 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_pp_cyl_tensor_smp(np_smp, numnod, inod_smp_stack,  &
-     &          tensor, t_pp, xx, yy, s, a_s)
+      subroutine cal_pp_cyl_tensor_smp(numnod, tensor, t_pp,            &
+     &                                 xx, yy, s, a_s)
 !
-       integer (kind = kint), intent(in) :: np_smp, numnod
-       integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
+       integer (kind = kint), intent(in) :: numnod
        real(kind=kreal), intent(in) :: tensor(numnod,6)
        real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
        real(kind=kreal), intent(in) :: s(numnod)
@@ -343,29 +341,24 @@
 !
        real(kind=kreal), intent(inout) :: t_pp(numnod)
 !
-       integer (kind = kint) :: ip, inod, ist, ied
+       integer (kind = kint) :: inod
        real(kind=kreal) :: txx, txy, tyy
 !
 !
-!$omp do private(inod,ist,ied,txx,txy,tyy)
-       do ip = 1, np_smp
-         ist = inod_smp_stack(ip-1) + 1
-         ied = inod_smp_stack(ip)
-         do inod = ist, ied
-           txx = tensor(inod,1)
-           txy = tensor(inod,2)
-           tyy = tensor(inod,4)
+!$omp do private(inod,txx,txy,tyy)
+       do inod = 1, numnod
+         txx = tensor(inod,1)
+         txy = tensor(inod,2)
+         tyy = tensor(inod,4)
 !
-           if ( s(inod).eq.0.0 ) then
-             t_pp(inod) = tyy
-           else
-             t_pp(inod) =     (  txx * yy(inod)*yy(inod)                &
-     &                     - two*txy * xx(inod)*yy(inod)                &
-     &                     +     tyy * xx(inod)*xx(inod) )              &
-     &                      * a_s(inod) * a_s(inod)
-           end if
-!
-        end do
+         if ( s(inod).eq.0.0 ) then
+           t_pp(inod) = tyy
+         else
+           t_pp(inod) =     (  txx * yy(inod)*yy(inod)                  &
+     &                   - two*txy * xx(inod)*yy(inod)                  &
+     &                   +     tyy * xx(inod)*xx(inod) )                &
+     &                    * a_s(inod) * a_s(inod)
+         end if
       end do
 !$omp end do nowait
 !
@@ -373,11 +366,10 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_pz_tensor_smp(np_smp, numnod, inod_smp_stack,      &
-     &          tensor, t_pz, xx, yy, s, a_s)
+      subroutine cal_pz_tensor_smp(numnod, tensor, t_pz,                &
+     &                             xx, yy, s, a_s)
 !
-       integer (kind = kint), intent(in) :: np_smp, numnod
-       integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
+       integer (kind = kint), intent(in) :: numnod
        real(kind=kreal), intent(in) :: tensor(numnod,6)
        real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
        real(kind=kreal), intent(in) :: s(numnod)
@@ -385,26 +377,21 @@
 !
        real(kind=kreal), intent(inout) :: t_pz(numnod)
 !
-       integer (kind = kint) :: ip, inod, ist, ied
+       integer (kind = kint) :: inod
        real(kind=kreal) :: txz, tyz
 !
 !
-!$omp do private(inod,ist,ied,txz,tyz)
-       do ip = 1, np_smp
-         ist = inod_smp_stack(ip-1) + 1
-         ied = inod_smp_stack(ip)
-         do inod = ist, ied
-           txz = tensor(inod,3)
-           tyz = tensor(inod,5)
+!$omp do private(inod,txz,tyz)
+       do inod = 1, numnod
+         txz = tensor(inod,3)
+         tyz = tensor(inod,5)
 !
-           if ( s(inod).eq.0.0 ) then
-             t_pz(inod) = tyz
-           else
-             t_pz(inod) =     ( -txz * yy(inod)                         &
-     &                         + tyz * xx(inod) ) * a_s(inod)
-           end if
-!
-        end do
+         if ( s(inod).eq.0.0 ) then
+           t_pz(inod) = tyz
+         else
+           t_pz(inod) =     ( -txz * yy(inod)                           &
+     &                       + tyz * xx(inod) ) * a_s(inod)
+         end if
       end do
 !$omp end do nowait
 !
@@ -412,27 +399,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_zz_tensor_smp(np_smp, numnod, inod_smp_stack,      &
-     &          tensor, t_zz)
+      subroutine cal_zz_tensor_smp(numnod, tensor, t_zz)
 !
-       integer (kind = kint), intent(in) :: np_smp, numnod
-       integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-       real(kind=kreal), intent(in) :: tensor(numnod,6)
+      integer (kind = kint), intent(in) :: numnod
+      real(kind=kreal), intent(in) :: tensor(numnod,6)
 !
-       real(kind=kreal), intent(inout) :: t_zz(numnod)
+      real(kind=kreal), intent(inout) :: t_zz(numnod)
 !
-       integer (kind = kint) :: ip, inod, ist, ied
-!
-!
-!$omp do private(inod,ist,ied)
-       do ip = 1, np_smp
-         ist = inod_smp_stack(ip-1) + 1
-         ied = inod_smp_stack(ip)
-         do inod = ist, ied
-           t_zz(inod) = tensor(inod,6)
-        end do
-      end do
-!$omp end do nowait
+!$omp workshare
+      t_zz(1:numnod) = tensor(1:numnod,6)
+!$omp end workshare nowait
 !
       end subroutine cal_zz_tensor_smp
 !

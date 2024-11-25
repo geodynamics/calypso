@@ -13,8 +13,6 @@
 !!        type(mesh_geometry), intent(in) :: mesh_IO
 !!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!
-!!      subroutine mpi_read_num_node(IO_param, mesh_IO)
-!!      subroutine mpi_read_num_node_ele(IO_param, mesh_IO)
 !!      subroutine mpi_read_geometry_data(IO_param, mesh_IO)
 !!      subroutine mpi_read_mesh_groups(IO_param, mesh_group_IO)
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
@@ -103,7 +101,7 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine mpi_read_num_node(IO_param, mesh_IO)
+      subroutine mpi_read_geometry_data(IO_param, mesh_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -111,39 +109,12 @@
 !
       call mpi_skip_read(IO_param, len(hd_fem_para()))
       call mpi_read_domain_info(IO_param, mesh_IO%nod_comm)
-!
+
       call mpi_skip_read(IO_param, len(hd_fem_node()))
-      call mpi_read_number_of_node(IO_param, mesh_IO%node)
-!
-      end subroutine mpi_read_num_node
-!
-!------------------------------------------------------------------
-!
-      subroutine mpi_read_num_node_ele(IO_param, mesh_IO)
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call mpi_read_num_node(IO_param, mesh_IO)
       call mpi_read_geometry_info(IO_param, mesh_IO%node)
 !
 !  ----  read element data -------
-!
       call mpi_skip_read(IO_param, len(hd_fem_elem()))
-      call mpi_read_num_element(IO_param, mesh_IO%ele)
-!
-      end subroutine mpi_read_num_node_ele
-!
-!------------------------------------------------------------------
-!
-      subroutine mpi_read_geometry_data(IO_param, mesh_IO)
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call mpi_read_num_node_ele(IO_param, mesh_IO)
       call mpi_read_element_info(IO_param, mesh_IO%ele)
 !
 ! ----  import & export

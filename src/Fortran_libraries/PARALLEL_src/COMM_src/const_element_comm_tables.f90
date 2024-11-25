@@ -334,8 +334,8 @@
 !
       call set_node_double_numbering(node, nod_comm, inod_dbl,          &
      &                               SR_sig, SR_i)
-      call set_ele_double_numbering(ele, ele_comm, inod_dbl, iele_dbl,  &
-     &                              SR_sig, SR_i)
+      call set_ele_double_numbering(ele%numele, ele%ie(1,1), ele_comm,  &
+     &                              inod_dbl, iele_dbl, SR_sig, SR_i)
 !
       end subroutine set_node_ele_double_address
 !

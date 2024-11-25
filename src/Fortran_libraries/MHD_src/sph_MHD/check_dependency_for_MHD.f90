@@ -147,17 +147,17 @@
 !
 !
       if(fl_prop%iflag_scheme .gt. id_no_evolution) then
-        if(fl_prop%iflag_4_gravity) then
+        if(fl_prop%flag_thermal_buoyancy) then
           msg = 'Buoyancy needs'
           call check_missing_field_w_msg(fld, msg, iphys_base%i_temp)
         end if
 !
-        if(fl_prop%iflag_4_composit_buo) then
+        if(fl_prop%flag_comp_buoyancy) then
           msg = 'Compositional buoyancy needs'
           call check_missing_field_w_msg(fld, msg, iphys_base%i_light)
         end if
 !
-        if(fl_prop%iflag_4_lorentz) then
+        if(fl_prop%flag_lorentz) then
           msg = 'Lorentz force needs'
           call check_missing_field_w_msg(fld, msg, iphys_base%i_magne)
         end if

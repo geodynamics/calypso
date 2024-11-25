@@ -7,12 +7,8 @@
 !> @brief Set parameters for forces from control data
 !!
 !!@verbatim
-!!      subroutine s_set_control_4_force                                &
-!!     &         (frc_ctl, g_ctl, cor_ctl, mcv_ctl, MHD_prop)
-!!        type(forces_control), intent(in) :: frc_ctl
-!!        type(gravity_control), intent(in) :: g_ctl
-!!        type(coriolis_control), intent(in) :: cor_ctl
-!!        type(magneto_convection_control), intent(in) :: mcv_ctl
+!!      subroutine s_set_control_4_force(model_ctl, MHD_prop)
+!!        type(mhd_model_control), intent(in) :: model_ctl
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!@endverbatim
 !
@@ -35,34 +31,27 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_force                                  &
-     &         (frc_ctl, g_ctl, cor_ctl, mcv_ctl, MHD_prop)
+      subroutine s_set_control_4_force(model_ctl, MHD_prop)
 !
       use t_control_parameter
-      use t_ctl_data_mhd_forces
-      use t_ctl_data_mhd_magne
-      use t_ctl_data_gravity
-      use t_ctl_data_coriolis_force
+      use t_ctl_data_MHD_model
       use skip_comment_f
 !
-      type(forces_control), intent(in) :: frc_ctl
-      type(gravity_control), intent(in) :: g_ctl
-      type(coriolis_control), intent(in) :: cor_ctl
-      type(magneto_convection_control), intent(in) :: mcv_ctl
-!
+      type(mhd_model_control), intent(in) :: model_ctl
       type(MHD_evolution_param), intent(inout) :: MHD_prop
 !
 !
-      call set_control_force_flags(frc_ctl, MHD_prop%fl_prop)
+      call set_control_force_flags(model_ctl%frc_ctl, MHD_prop%fl_prop)
 !
 !  direction of gravity
-      call set_control_4_gravity(g_ctl, MHD_prop%fl_prop)
+      call set_control_4_gravity(model_ctl%g_ctl, MHD_prop%fl_prop)
 !
 !  Set Corilis force settings
-      call set_control_4_Coriolis_force(cor_ctl, MHD_prop%fl_prop)
+      call set_control_4_Coriolis_force(model_ctl%cor_ctl,              &
+     &                                  MHD_prop%fl_prop)
 !
 !  setting for external mangnetic field
-      call set_control_4_induction(mcv_ctl, MHD_prop%cd_prop)
+      call set_control_4_induction(model_ctl%mcv_ctl, MHD_prop%cd_prop)
 !
       end subroutine s_set_control_4_force
 !
@@ -83,19 +72,19 @@
       character(len=kchara) :: tmpchara
 !
 !
-      fl_prop%iflag_4_inertia =         .TRUE.
-      fl_prop%iflag_4_gravity =         .FALSE.
-      fl_prop%iflag_4_coriolis =        .FALSE.
-      fl_prop%iflag_4_lorentz =         .FALSE.
-      fl_prop%iflag_4_composit_buo =    .FALSE.
+      fl_prop%flag_inertia =          .TRUE.
+      fl_prop%flag_thermal_buoyancy = .FALSE.
+      fl_prop%flag_coriolis =         .FALSE.
+      fl_prop%flag_lorentz =          .FALSE.
+      fl_prop%flag_comp_buoyancy =    .FALSE.
 !
-      fl_prop%iflag_4_filter_gravity =  .FALSE.
-      fl_prop%iflag_4_filter_comp_buo = .FALSE.
-      fl_prop%iflag_4_filter_lorentz =  .FALSE.
+      fl_prop%flag_filter_gravity =  .FALSE.
+      fl_prop%flag_filter_comp_buo = .FALSE.
+      fl_prop%flag_filter_lorentz =  .FALSE.
 !
       if (fl_prop%iflag_scheme .eq. id_no_evolution) then
         fl_prop%num_force = 0
-        fl_prop%iflag_4_inertia = .FALSE.
+        fl_prop%flag_inertia = .FALSE.
       else
         if (frc_ctl%force_names%icou .gt. 0) then
           fl_prop%num_force = frc_ctl%force_names%num
@@ -116,34 +105,34 @@
      &      .or. cmp_no_case(tmpchara, gravity_e1)                      &
      &      .or. cmp_no_case(tmpchara, gravity_e2)                      &
      &      .or. cmp_no_case(tmpchara, gravity_e5)                      &
-     &      ) fl_prop%iflag_4_gravity =  .TRUE.
+     &      ) fl_prop%flag_thermal_buoyancy =  .TRUE.
 !
           if(    cmp_no_case(tmpchara, comp_gravity_label)              &
      &      .or. cmp_no_case(tmpchara, comp_gravity_e1)                 &
      &      .or. cmp_no_case(tmpchara, comp_gravity_e5)                 &
      &      .or. cmp_no_case(tmpchara, comp_gravity_e6)                 &
-     &       ) fl_prop%iflag_4_composit_buo =  .TRUE.
+     &       ) fl_prop%flag_comp_buoyancy =  .TRUE.
 !
           if(     cmp_no_case(tmpchara, Filtered_gravity_label)         &
      &       .or. cmp_no_case(tmpchara, Filtered_gravity_e1)            &
-     &       ) fl_prop%iflag_4_filter_gravity =  .TRUE.
+     &       ) fl_prop%flag_filter_gravity =  .TRUE.
 !
           if(   cmp_no_case(tmpchara, Filtered_comp_gravity_label)      &
      &     .or. cmp_no_case(tmpchara, Filtered_comp_gravity_e1)         &
-     &       ) fl_prop%iflag_4_filter_comp_buo = .TRUE.
+     &       ) fl_prop%flag_filter_comp_buo = .TRUE.
 !
           if (cmp_no_case(tmpchara, coriolis_e1)                        &
-     &       ) fl_prop%iflag_4_coriolis = .TRUE.
+     &       ) fl_prop%flag_coriolis = .TRUE.
 !
           if(cmp_no_case(tmpchara, hd_filtered_inertia)) then
-            fl_prop%iflag_4_filter_inertia = .TRUE.
-            fl_prop%iflag_4_inertia = .FALSE.
+            fl_prop%flag_filter_inertia = .TRUE.
+            fl_prop%flag_inertia =        .FALSE.
           end if
 !
           if(cmp_no_case(tmpchara, lorentz_label)) then
-            fl_prop%iflag_4_lorentz = .TRUE.
+            fl_prop%flag_lorentz = .TRUE.
           else if(cmp_no_case(tmpchara, hd_filtered_Lorentz)) then
-            fl_prop%iflag_4_filter_lorentz = .TRUE.
+            fl_prop%flag_filter_lorentz = .TRUE.
           end if
 !
         end do
@@ -177,10 +166,10 @@
 !  direction of gravity
 !
       fl_prop%i_grav = iflag_no_gravity
-      if(     fl_prop%iflag_4_gravity                                   &
-     &   .or. fl_prop%iflag_4_composit_buo                              &
-     &   .or. fl_prop%iflag_4_filter_gravity                            &
-     &   .or. fl_prop%iflag_4_filter_comp_buo) then
+      if(     fl_prop%flag_thermal_buoyancy                             &
+     &   .or. fl_prop%flag_comp_buoyancy                                &
+     &   .or. fl_prop%flag_filter_gravity                               &
+     &   .or. fl_prop%flag_filter_comp_buo) then
         if(g_ctl%FEM_gravity_model%iflag .gt. 0                         &
      &    .and. cmp_no_case(g_ctl%FEM_gravity_model%charavalue,'node')  &
      &    .and. fl_prop%iflag_scheme .ne. id_Crank_nicolson_cmass) then
@@ -250,7 +239,7 @@
       fl_prop%sys_rot(1:2) = zero
       fl_prop%sys_rot(3) =   one
 !
-      if(fl_prop%iflag_4_coriolis .eqv. .FALSE.) return
+      if(fl_prop%flag_coriolis .eqv. .FALSE.) return
       if(cor_ctl%FEM_coriolis_model%iflag .gt. 0                        &
      &  .and. cmp_no_case(cor_ctl%FEM_coriolis_model%charavalue,'node') &
      &  .and. fl_prop%iflag_scheme .ne. id_Crank_nicolson_cmass) then
@@ -258,7 +247,7 @@
       end if
 !
       if(fl_prop%iflag_scheme .gt. id_Crank_nicolson                    &
-     &   .and. fl_prop%iflag_4_coriolis                                 &
+     &   .and. fl_prop%flag_coriolis                                    &
      &   .and. cor_ctl%FEM_coriolis_implicit%iflag .gt. 0               &
      &   .and. yes_flag(cor_ctl%FEM_coriolis_implicit%charavalue)) then
         fl_prop%iflag_coriolis_implicit = .TRUE.
@@ -276,8 +265,8 @@
       end if
 !
      if (iflag_debug .ge. iflag_routine_msg) then
-        write(*,*) 'iflag_4_coriolis', fl_prop%iflag_4_coriolis
-        if(fl_prop%iflag_4_coriolis) then
+        write(*,*) 'flag_coriolis', fl_prop%flag_coriolis
+        if(fl_prop%flag_coriolis) then
           write(*,'(a, 1p3E25.15e3)') 'rotation:', fl_prop%sys_rot(1:3)
         end if
       end if

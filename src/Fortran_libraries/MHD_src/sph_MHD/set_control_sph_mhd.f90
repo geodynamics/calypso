@@ -10,7 +10,7 @@
 !!      subroutine set_control_4_SPH_MHD                                &
 !!     &         (plt, org_plt, model_ctl, smctl_ctl, psph_ctl,         &
 !!     &          MHD_files, bc_IO, refs, MHD_step, MHD_prop, MHD_BC,   &
-!!     &          trans_p, WK, SPH_MHD)
+!!     &          trans_p, WK, sph_maker)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(platform_data_control), intent(in) :: org_plt
 !!        type(mhd_model_control), intent(in) :: model_ctl
@@ -29,7 +29,7 @@
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
-!!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+!!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !!      subroutine set_control_SPH_MHD_bcs                              &
 !!     &         (MHD_prop, nbc_ctl, sbc_ctl, MHD_BC)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -59,7 +59,7 @@
       use t_ctl_data_crust_filter
       use t_bc_data_list
       use t_flex_delta_t_data
-      use t_SPH_mesh_field_data
+      use t_sph_grid_maker_in_sim
       use t_radial_reference_field
       use t_field_on_circle
 !
@@ -71,21 +71,22 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_control_4_SPH_MHD                                  &
-     &         (plt, org_plt, model_ctl, smctl_ctl, psph_ctl,           &
-     &          MHD_files, bc_IO, refs, MHD_step, MHD_prop, MHD_BC,     &
-     &          trans_p, WK, SPH_MHD)
+      subroutine set_control_4_SPH_MHD(plt, org_plt,                    &
+     &          model_ctl, smctl_ctl, psph_ctl, MHD_files,              &
+     &          bc_IO, refs, MHD_step, MHD_prop, MHD_BC,                &
+     &          trans_p, WK, sph_maker)
 !
       use t_spheric_parameter
       use t_phys_data
       use t_rms_4_sph_spectr
-      use t_SPH_mesh_field_data
       use t_sph_trans_arrays_MHD
       use t_const_spherical_grid
       use t_sph_boundary_input_data
       use t_ctl_params_gen_sph_shell
       use t_sph_trans_arrays_MHD
       use t_coef_parameters_list
+      use t_ctl_param_val_density
+      use t_ctl_param_val_diffusion
 !
       use gen_sph_grids_modes
       use set_control_platform_item
@@ -113,7 +114,7 @@
       type(MHD_BC_lists), intent(inout) :: MHD_BC
       type(parameters_4_sph_trans), intent(inout) :: trans_p
       type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !
       integer(kind = kint) :: ierr
 !
@@ -138,13 +139,12 @@
 !
       call set_ctl_4_sph_grid_maker(nprocs, psph_ctl,                   &
      &    plt%sph_file_prefix, MHD_files%sph_file_param,                &
-     &    SPH_MHD%sph_maker, ierr)
+     &    sph_maker, ierr)
 !
 !   set forces
 !
       if (iflag_debug.gt.0) write(*,*) 's_set_control_4_force'
-      call s_set_control_4_force(model_ctl%frc_ctl, model_ctl%g_ctl,    &
-     &    model_ctl%cor_ctl, model_ctl%mcv_ctl, MHD_prop)
+      call s_set_control_4_force(model_ctl, MHD_prop)
 !
 !   set parameters for general information
 !
@@ -162,8 +162,12 @@
      &    MHD_prop%cp_prop, model_ctl%dless_ctl, model_ctl%eqs_ctl,     &
      &    MHD_prop%MHD_coef_list)
 !
+!   Set external magnetic field scale
       call set_coefs_4_magnetic_scale                                   &
      &   (model_ctl%bscale_ctl, MHD_prop%MHD_coef_list)
+!
+!   Set polytrope and valuable diffusivities
+      call set_ctl_SPH_val_diffusions(model_ctl, MHD_prop)
 !
 !   set boundary conditions
 !
@@ -239,6 +243,50 @@
      &    MHD_BC%magne_BC%nod_BC, MHD_BC%magne_BC%surf_BC)
 !
       end subroutine set_control_SPH_MHD_bcs
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_ctl_SPH_val_diffusions(model_ctl, MHD_prop)
+!
+      use t_ctl_param_val_density
+      use t_ctl_param_val_diffusion
+!
+      type(mhd_model_control), intent(in) :: model_ctl
+      type(MHD_evolution_param), intent(inout) :: MHD_prop
+!
+      integer(kind = kint) :: ierr
+!
+!   Set polytrope
+      call set_valuable_density_ctl                                     &
+     &   (my_rank, model_ctl%polytrope_c, MHD_prop%polytrope_param,     &
+     &    MHD_prop%flag_ref_density_valiation)
+      call check_polytrope_parameters(MHD_prop%polytrope_param)
+!
+!   Set valuable diffusivities
+      call set_valuable_diffusion_ctl                                   &
+     &   (my_rank, model_ctl%val_viscous_c,                             &
+     &    MHD_prop%val_viscous_param, MHD_prop%flag_viscous_variation)
+      call set_valuable_diffusion_ctl                                   &
+     &   (my_rank, model_ctl%val_mag_diffuse_c,                         &
+     &    MHD_prop%val_mag_diffuse_param,                               &
+     &    MHD_prop%flag_mag_diffuse_variation)
+      call set_valuable_diffusion_ctl                                   &
+     &   (my_rank, model_ctl%val_thermal_diffuse_c,                     &
+     &    MHD_prop%val_thermal_diffuse_param,                           &
+     &    MHD_prop%flag_term_diffuse_variation)
+      call set_valuable_diffusion_ctl                                   &
+     &   (my_rank, model_ctl%val_comp_diffuse_c,                        &
+     &    MHD_prop%val_comp_diffuse_param,                              &
+     &    MHD_prop%flag_comp_diffuse_variation)
+!
+      call check_val_diffuse_parameters(MHD_prop%val_viscous_param)
+      call check_val_diffuse_parameters(MHD_prop%val_mag_diffuse_param)
+      call check_val_diffuse_parameters                                 &
+     &   (MHD_prop%val_thermal_diffuse_param)
+      call check_val_diffuse_parameters                                 &
+     &   (MHD_prop%val_comp_diffuse_param)
+!
+      end subroutine set_ctl_SPH_val_diffusions
 !
 ! ----------------------------------------------------------------------
 !

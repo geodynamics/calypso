@@ -12,7 +12,7 @@
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_vol_mean_squares), intent(inout) :: v_pwr
-!!      subroutine set_all_layer_sph_spectr(sph_params, sph_rj, pwr)
+!!      subroutine set_all_layer_sph_spectr(sph_rj, pwr)
 !!      subroutine append_CMB_layer_f_dipolarity(sph_params, pwr)
 !!      subroutine set_layers_4_sph_spectr(sph_rj, pwr)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
@@ -115,9 +115,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_all_layer_sph_spectr(sph_params, sph_rj, pwr)
+      subroutine set_all_layer_sph_spectr(sph_rj, pwr)
 !
-      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
 !
       type(sph_mean_squares), intent(inout) :: pwr

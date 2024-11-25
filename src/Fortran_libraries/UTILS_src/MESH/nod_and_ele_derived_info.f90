@@ -18,7 +18,7 @@
 !!        type(mesh_geometry), intent(in) :: org_mesh
 !!        type(mesh_geometry), intent(inout) :: new_mesh
 !!
-!!      subroutine set_internal_element_flag(internal_node, numele, ie, &
+!!      subroutine easy_internal_element_flag(internal_node, numele, ie,&
 !!     &          internal_ele, interior_ele)
 !!        integer(kind = kint), intent(in) :: internal_node
 !!        integer(kind = kint), intent(in) :: numele
@@ -61,7 +61,7 @@
         if (iflag_debug.eq.1) write(*,*) 'set_center_of_element'
         call set_center_of_element(node, ele)
       end if
-      call set_internal_element_flag                                    &
+      call easy_internal_element_flag                                   &
      &   (node%internal_node, ele%numele, ele%ie(1,1),                  &
      &    ele%internal_ele, ele%interior_ele)
 !
@@ -112,7 +112,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_internal_element_flag(internal_node, numele, ie,   &
+      subroutine easy_internal_element_flag(internal_node, numele, ie,  &
      &          internal_ele, interior_ele)
 !
       integer(kind = kint), intent(in) :: internal_node
@@ -143,7 +143,7 @@
 !%omp end parallel do
       internal_ele = icou
 !
-      end subroutine set_internal_element_flag
+      end subroutine easy_internal_element_flag
 !
 ! ----------------------------------------------------------------------
 !

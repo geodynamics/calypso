@@ -4,7 +4,7 @@
 !!@author H. Matsui
 !!@date Programmed in Sep., 2007
 !
-!>@brief  Subroutine to construct coeeficient from dimansionless numbers
+!>@brief  Subroutine to construct coefficient from dimansionless numbers
 !!
 !!@verbatim
 !!      subroutine construct_coefficient                                &

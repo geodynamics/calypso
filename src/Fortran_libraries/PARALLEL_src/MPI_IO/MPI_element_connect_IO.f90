@@ -116,7 +116,8 @@
 !
       integer (kind = kint) :: i, num_tmp
 !
-!
+!  ----  read element data -------
+      call mpi_read_num_element(IO_param, ele_IO)
       call alloc_element_types(ele_IO)
 !
       call mpi_read_element_type                                        &

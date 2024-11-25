@@ -185,7 +185,6 @@
 !      write(id_file,'(a,a1)') '!  4.1. center of edge', char(0)
 !      write(id_file,'(a,a1)') '!', char(0)
 !
-      call gz_read_number_of_node(FPz_f, nod_IO, zbuf)
       call gz_read_geometry_info(FPz_f, nod_IO, zbuf)
 !
 !      write(id_file,'(a,a1)') '!', char(0)

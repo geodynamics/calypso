@@ -208,7 +208,6 @@
 !
 !
       call mpi_skip_read(IO_param, len(hd_ecomm_point()))
-      call mpi_read_number_of_node(IO_param, nod_IO)
       call mpi_read_geometry_info(IO_param, nod_IO)
 !
       call mpi_skip_read(IO_param, len(hd_ecomm_vol()))

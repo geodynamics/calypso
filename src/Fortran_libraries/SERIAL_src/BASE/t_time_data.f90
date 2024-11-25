@@ -35,6 +35,8 @@
 !
 !>      Structure for time data
       type time_data
+!>        flag for frexible time step
+        logical :: flag_flex_step = .FALSE.
 !>        Time step
         integer(kind = kint) :: i_time_step
 !>        Time                  @f$ t @f$
@@ -57,6 +59,8 @@
         real(kind=kreal) :: elapsed_local
 !>        Maximum elapsed time
         real(kind=kreal) :: elapsed_max
+!>
+        logical :: flag_terminate_by_elapsed = .FALSE.
       end type finish_data
 !
 ! -------------------------------------------------------------------

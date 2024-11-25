@@ -208,13 +208,13 @@
         call add_phys_name_ctl(perturbation_composition, field_ctl)
       end if
 !
-      if(fl_prop%iflag_4_coriolis)                                      &
+      if(fl_prop%flag_coriolis)                                         &
      &  call add_phys_name_ctl(Coriolis_force, field_ctl)
 !
       if(fl_prop%iflag_FEM_gravity .eq. id_FORCE_at_node) then
-        if(fl_prop%iflag_4_gravity)                                     &
+        if(fl_prop%flag_thermal_buoyancy)                               &
      &    call add_phys_name_ctl(buoyancy, field_ctl)
-        if(fl_prop%iflag_4_composit_buo)                                &
+        if(fl_prop%flag_comp_buoyancy)                                  &
      &    call add_phys_name_ctl(composite_buoyancy, field_ctl)
       end if
 !

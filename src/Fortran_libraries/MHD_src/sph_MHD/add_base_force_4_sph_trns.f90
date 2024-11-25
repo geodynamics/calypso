@@ -103,19 +103,19 @@
 !
 !   advection
 !      if(fl_prop%iflag_scheme .gt. id_no_evolution) then
-!        if(fl_prop%iflag_4_inertia) then
+!        if(fl_prop%flag_inertia) then
           call add_field_4_sph_trns_by_pol(d_rj,                        &
      &        ipol_frc%i_m_advect, iphys_frc%i_m_advect,                &
      &        f_trns_frc%i_m_advect, trns)
 !        end if
 !   Coriolis force
-!        if(fl_prop%iflag_4_coriolis) then
+!        if(fl_prop%flag_coriolis) then
           call add_field_4_sph_trns_by_pol(d_rj,                        &
      &        ipol_frc%i_coriolis, iphys_frc%i_coriolis,                &
      &        f_trns_frc%i_coriolis, trns)
 !        end if
 !   Lorentz force
-!        if(fl_prop%iflag_4_lorentz) then
+!        if(fl_prop%flag_lorentz) then
           call add_field_4_sph_trns_by_pol(d_rj,                        &
      &        ipol_frc%i_lorentz, iphys_frc%i_lorentz,                  &
      &        f_trns_frc%i_lorentz, trns)
@@ -189,7 +189,7 @@
 !
 !   rotation of Coriolis force
 !      if(fl_prop%iflag_scheme .gt. id_no_evolution                     &
-!     &      .and. fl_prop%iflag_4_coriolis) then
+!     &      .and. fl_prop%flag_coriolis) then
         call add_field_4_sph_trns_by_pol(d_rj,                          &
      &      ipol_rot_frc%i_Coriolis, iphys_rot_frc%i_Coriolis,          &
      &      f_trns_rot_frc%i_Coriolis, trns)

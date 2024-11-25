@@ -98,19 +98,19 @@
       nprocs_rj = nprocs_rj4
       my_rank_rj = my_rank_rj4
 !
-      if(i_debug .eq. 0) return
+!      if(i_debug .eq. 0) return
 !
-      write(*,'(a,6i16)') 'my_rank, RTP_COMM, np_rtp, rank_rtp',        &
-     &           my_rank, CALYPSO_RTP_COMM, nprocs_rtp, my_rank_rtp
-      write(*,'(a,6i16)') 'my_rank, RJ_COMM,  np_rj,  rank_rj ',        &
-     &          my_rank, CALYPSO_RJ_COMM, nprocs_rj, my_rank_rj
+!      write(*,'(a,6i16)') 'my_rank, RTP_COMM, np_rtp, rank_rtp',       &
+!     &           my_rank, CALYPSO_RTP_COMM, nprocs_rtp, my_rank_rtp
+!      write(*,'(a,6i16)') 'my_rank, RJ_COMM,  np_rj,  rank_rj ',       &
+!     &          my_rank, CALYPSO_RJ_COMM, nprocs_rj, my_rank_rj
 !
-      call MPI_ALLREDUCE(my_rank, isum_rtp, 1, CALYPSO_FOUR_INT,        &
-     &                   MPI_SUM, CALYPSO_RTP_COMM, ierr_MPI)
-      call MPI_ALLREDUCE(my_rank, isum_rj,  1, CALYPSO_FOUR_INT,        &
-     &                   MPI_SUM,  &
-     &     CALYPSO_RJ_COMM, ierr_MPI)
-      write(*,'(a,6i16)') 'SUM_test', my_rank, isum_rtp, isum_rj
+!      call MPI_ALLREDUCE(my_rank, isum_rtp, 1, CALYPSO_FOUR_INT,       &
+!     &                   MPI_SUM, CALYPSO_RTP_COMM, ierr_MPI)
+!      call MPI_ALLREDUCE(my_rank, isum_rj,  1, CALYPSO_FOUR_INT,       &
+!     &                   MPI_SUM,  &
+!     &     CALYPSO_RJ_COMM, ierr_MPI)
+!      write(*,'(a,6i16)') 'SUM_test', my_rank, isum_rtp, isum_rj
 !
       end subroutine split_rtp_comms
 !

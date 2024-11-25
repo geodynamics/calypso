@@ -245,9 +245,6 @@
 !     &                       char(0)
 !      write(textbuf,'(a,a1)') '!', char(0)
 !
-      call gz_read_number_of_node_b(FPz_f, zbuf, nod_IO)
-      if(zbuf%ierr_zlib .ne. 0) return
-!
       call gz_read_geometry_info_b(FPz_f, zbuf, nod_IO)
       if(zbuf%ierr_zlib .ne. 0) return
 !

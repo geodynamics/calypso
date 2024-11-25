@@ -42,6 +42,9 @@
 !>   number of nodes in linear edge
       integer(kind=kint), parameter :: num_linear_edge = 2
 !
+!>   number of nodes in linear edge
+      integer(kind=kint), parameter :: num_linear_point = 1
+!
 !>   number of surface in each element
       integer(kind=kint), parameter :: nsurf_4_ele =  6
 !>   number of edge in each element

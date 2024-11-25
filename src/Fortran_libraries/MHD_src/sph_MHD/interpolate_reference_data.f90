@@ -260,12 +260,12 @@
 !
       do j_fld = 1, radial_fld_IO%num_field_IO
         if(phys_name .eq. radial_fld_IO%fld_name(j_fld)) then
-          call set_org_radius_data_from_IO                            &
+          call set_org_radius_data_from_IO                              &
      &        (j_fld, radial_fld_IO, r_itp%n_rj_org, r_itp%d_rj_org)
-          call interpolate_radial_field                               &
-     &      (nri_new, r_itp%k_old2new_in, r_itp%k_old2new_out,        &
-     &       r_itp%coef_old2new_in, radial_fld_IO%num_comp_IO(j_fld), &
-     &       r_itp%n_rj_org, r_itp%d_rj_org(1,1), d_r(1,1))
+          call interpolate_radial_field                                 &
+     &       (nri_new, r_itp%k_old2new_in, r_itp%k_old2new_out,         &
+     &        r_itp%coef_old2new_in, radial_fld_IO%num_comp_IO(j_fld),  &
+     &        r_itp%n_rj_org, r_itp%d_rj_org(1,1), d_r(1,1))
           iflag_update(1:ncomp) = 1
           exit
         end if

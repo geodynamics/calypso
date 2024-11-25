@@ -13,8 +13,9 @@
 !!     &          i_time_step_IO, time_IO, delta_t_IO,                  &
 !!     &          nnod, num_field, ntot_comp, ncomp_field,              &
 !!     &          field_name, d_nod, istack_merged)
-!!      subroutine read_field_header_mpi_b                              &
-!!     &         (num_pe, IO_param_l, t_IO, nnod, istack_merged)
+!!      subroutine read_field_time_mpi_b(num_pe, IO_param_l, t_IO)
+!!      subroutine read_num_field_mpi_b                                 &
+!!     &         (num_pe, IO_param_l, nnod, istack_merged)
 !!@endverbatim
 !
       module field_block_MPI_IO_b
@@ -92,8 +93,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_field_header_mpi_b                                &
-     &         (num_pe, IO_param_l, t_IO, nnod, istack_merged)
+      subroutine read_field_time_mpi_b(num_pe, IO_param_l, t_IO)
 !
       use m_phys_constants
       use field_data_MPI_IO
@@ -103,8 +103,6 @@
       integer, intent(in) :: num_pe
       type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
       type(time_data), intent(inout) :: t_IO
-      integer(kind = kint_gl), intent(inout) ::  nnod
-      integer(kind = kint_gl), intent(inout) :: istack_merged(0:num_pe)
 !
 !
       call mpi_read_process_id_b(IO_param_l)
@@ -113,12 +111,30 @@
       call mpi_read_one_realhead_b(IO_param_l, t_IO%time)
       call mpi_read_one_realhead_b(IO_param_l, t_IO%dt)
 !
+      end subroutine read_field_time_mpi_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine read_num_field_mpi_b                                   &
+     &         (num_pe, IO_param_l, nnod, istack_merged)
+!
+      use m_phys_constants
+      use field_data_MPI_IO
+      use MPI_binary_head_IO
+      use transfer_to_long_integers
+!
+      integer, intent(in) :: num_pe
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
+      integer(kind = kint_gl), intent(inout) ::  nnod
+      integer(kind = kint_gl), intent(inout) :: istack_merged(0:num_pe)
+!
+!
       call mpi_read_i8stack_head_b                                      &
      &   (IO_param_l, cast_long(num_pe), istack_merged)
       call sync_field_header_mpi                                        &
      &   (num_pe, IO_param_l%id_rank, istack_merged, nnod)
 !
-      end subroutine read_field_header_mpi_b
+      end subroutine read_num_field_mpi_b
 !
 ! -----------------------------------------------------------------------
 !

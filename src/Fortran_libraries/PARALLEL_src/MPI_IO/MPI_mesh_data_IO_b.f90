@@ -17,8 +17,6 @@
 !!
 !!      subroutine mpi_read_geometry_data_b(IO_param, mesh_IO)
 !!      subroutine mpi_read_mesh_groups_b(IO_param, mesh_group_IO)
-!!      subroutine mpi_read_num_node_ele_b(IO_param, mesh_IO)
-!!      subroutine mpi_read_num_node_ele(IO_param, mesh_IO)
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!        type(mesh_groups), intent(inout) ::   mesh_group_IO
 !!@endverbatim
@@ -86,58 +84,21 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine mpi_read_num_node_ele(IO_param, mesh_IO)
+      subroutine mpi_read_geometry_data_b(IO_param, mesh_IO)
 !
       use m_error_IDs
       use MPI_domain_data_IO_b
       use MPI_node_geometry_IO_b
+      use MPI_element_connect_IO_b
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(mesh_geometry), intent(inout) :: mesh_IO
 !
 !
       call mpi_read_domain_info_b(IO_param, mesh_IO%nod_comm)
-      call mpi_read_number_of_node_b(IO_param, mesh_IO%node)
-!
-      end subroutine mpi_read_num_node_ele
-!
-!------------------------------------------------------------------
-!
-      subroutine mpi_read_num_node_ele_b(IO_param, mesh_IO)
-!
-      use m_error_IDs
-      use MPI_node_geometry_IO_b
-      use MPI_element_connect_IO_b
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call mpi_read_num_node_ele(IO_param, mesh_IO)
       call mpi_read_geometry_info_b(IO_param, mesh_IO%node)
 !
 !  ----  read element data -------
-!
-      call mpi_read_number_of_element_b(IO_param, mesh_IO%ele)
-!
-      end subroutine mpi_read_num_node_ele_b
-!
-!------------------------------------------------------------------
-!
-      subroutine mpi_read_geometry_data_b(IO_param, mesh_IO)
-!
-      use m_error_IDs
-      use MPI_domain_data_IO_b
-      use MPI_element_connect_IO_b
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
-!
-!
-      call mpi_read_num_node_ele_b(IO_param, mesh_IO)
-!
-!  ----  read element data -------
-!
       call mpi_read_element_info_b(IO_param, mesh_IO%ele)
 !
 ! ----  import & export 

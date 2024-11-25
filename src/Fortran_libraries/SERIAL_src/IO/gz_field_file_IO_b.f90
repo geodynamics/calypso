@@ -101,8 +101,11 @@
       if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_step_data_b(FPz_fld, zbuf_fld,                       &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
-     &    istack_merged, fld_IO%num_field_IO)
+     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
+!
+      call gz_read_num_field_b(FPz_fld, zbuf_fld,                       &
+     &                         istack_merged, fld_IO%num_field_IO)
       if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_mul_integer_b(FPz_fld, zbuf_fld,                     &
@@ -145,8 +148,11 @@
       if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_step_data_b(FPz_fld, zbuf_fld,                       &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
-     &    istack_merged, fld_IO%num_field_IO)
+     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
+!
+      call gz_read_num_field_b(FPz_fld, zbuf_fld,                       &
+     &                         istack_merged, fld_IO%num_field_IO)
       if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call alloc_phys_name_IO(fld_IO)
@@ -193,8 +199,11 @@
       if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_step_data_b(FPz_fld, zbuf_fld,                       &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
-     &    istack_merged, fld_IO%num_field_IO)
+     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
+!
+      call gz_read_num_field_b(FPz_fld, zbuf_fld,                       &
+     &                         istack_merged, fld_IO%num_field_IO)
       if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call alloc_phys_name_IO(fld_IO)

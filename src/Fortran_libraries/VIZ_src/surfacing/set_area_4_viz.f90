@@ -1,15 +1,20 @@
+!>@file   set_area_4_viz.f90
+!!@brief  module set_area_4_viz
+!!
+!!@author H. Matsui
+!!@date Programmed in May, 2006
 !
-!      module set_area_4_viz
+!> @brief Choose group IDs to use
+!!
+!!@verbatim
+!!      subroutine count_area_4_viz(num_mat, mat_name,                  &
+!!     &          num_area_grp, area_ele_grp, ngrp_area)
+!!      subroutine s_set_area_4_viz(num_mat, mat_name,                  &
+!!     &          num_area_grp, area_ele_grp, ngrp_area, id_ele_grp_psf)
 !
-!        programmed by H.Matsui on May, 2006
-!
-!      subroutine count_area_4_viz(num_mat, mat_name,                   &
-!     &          num_area_grp, area_ele_grp, ngrp_area)
-!      subroutine s_set_area_4_viz(num_mat, mat_name,                   &
-!     &          num_area_grp, area_ele_grp, ngrp_area, id_ele_grp_psf)
-!
-!      subroutine set_surf_grp_id_4_viz(num_surf, surf_name,            &
-!     &          chosen_surf_grp, id_surf_grp)
+!!      integer(kind = kint) function set_surf_grp_id_4_viz             &
+!!     &                          (num_surf, surf_name, chosen_surf_grp)
+!!@endverbatim
 !
       module set_area_4_viz
 !
@@ -94,26 +99,29 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine set_surf_grp_id_4_viz(num_surf, surf_name,             &
-     &          chosen_surf_grp, id_surf_grp)
+      integer(kind = kint) function set_surf_grp_id_4_viz               &
+     &                          (num_surf, surf_name, chosen_surf_grp)
 !
       integer(kind = kint), intent(in) :: num_surf
       character(len=kchara), intent(in) :: surf_name(num_surf)
 !
       character(len=kchara), intent(in) :: chosen_surf_grp
-      integer(kind = kint), intent(inout) :: id_surf_grp
 !
+      integer(kind = kint) :: id_surf_grp
       integer(kind = kint) :: id
 !
 !
+      id_surf_grp = 0
       do id = 1, num_surf
-        if ( chosen_surf_grp .eq. surf_name(id)) then
+        if(chosen_surf_grp .eq. surf_name(id)) then
           id_surf_grp = id
           exit
         end if
       end do
+      set_surf_grp_id_4_viz = id_surf_grp
+      return
 !
-      end subroutine set_surf_grp_id_4_viz
+      end function set_surf_grp_id_4_viz
 !
 !  ---------------------------------------------------------------------
 !

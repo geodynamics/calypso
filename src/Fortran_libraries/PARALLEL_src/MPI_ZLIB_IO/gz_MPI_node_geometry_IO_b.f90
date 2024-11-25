@@ -127,6 +127,7 @@
       integer(kind = kint_gl) :: num64
 !
 !
+      call gz_mpi_read_number_of_node_b(IO_param, nod_IO)
       call alloc_node_geometry_base(nod_IO)
 !
       num64 = nod_IO%numnod

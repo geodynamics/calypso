@@ -115,6 +115,7 @@
       type(node_data), intent(inout) :: nod_IO
 !
 !
+      call gz_mpi_read_number_of_node(IO_param, nod_IO)
       call alloc_node_geometry_base(nod_IO)
 !
       call gz_mpi_read_node_position                                    &

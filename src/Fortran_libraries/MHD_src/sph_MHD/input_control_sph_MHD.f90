@@ -167,7 +167,7 @@
      &    MHD_ctl%model_ctl, MHD_ctl%smctl_ctl, MHD_ctl%psph_ctl,       &
      &    MHD_files, SPH_model%bc_IO, SPH_model%refs, MHD_step,         &
      &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
-     &    SPH_WK%trns_WK, SPH_MHD)
+     &    SPH_WK%trns_WK, SPH_MHD%sph_maker)
 !
       call s_set_control_SPH_MHD_w_viz                                  &
      &   (MHD_ctl%model_ctl, MHD_ctl%psph_ctl, MHD_ctl%smonitor_ctl,    &
@@ -225,7 +225,7 @@
      &    MHD_ctl%model_ctl, MHD_ctl%smctl_ctl, MHD_ctl%psph_ctl,       &
      &    MHD_files, SPH_model%bc_IO, SPH_model%refs, MHD_step,         &
      &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
-     &    SPH_WK%trns_WK, SPH_MHD)
+     &    SPH_WK%trns_WK, SPH_MHD%sph_maker)
 !
       call s_set_control_SPH_MHD_noviz                                  &
      &   (MHD_ctl%model_ctl, MHD_ctl%smonitor_ctl, SPH_model%MHD_prop,  &
@@ -280,7 +280,7 @@
      &    MHD_ctl%smctl_ctl, MHD_ctl%psph_ctl,                          &
      &    MHD_files, SPH_model%bc_IO, SPH_model%refs, MHD_step,         &
      &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
-     &    SPH_WK%trns_WK, SPH_MHD)
+     &    SPH_WK%trns_WK, SPH_MHD%sph_maker)
 !
       call s_set_control_SPH_MHD_w_viz                                  &
      &   (MHD_ctl%model_ctl, MHD_ctl%psph_ctl, MHD_ctl%smonitor_ctl,    &

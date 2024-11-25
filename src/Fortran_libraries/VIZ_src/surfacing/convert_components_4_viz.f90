@@ -156,16 +156,15 @@
      &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
 !
         else if ( icomp_viz .eq. icomp_PP_cyl ) then
-          call cal_pp_cyl_tensor_smp(np_smp, nnod, istack_n_smp,        &
-     &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
+          call cal_pp_cyl_tensor_smp(nnod, dat_xyz(1,1), dat_viz(1,1),  &
+     &                               xx(1,1), xx(1,2), cyl_s, a_s)
 !
         else if ( icomp_viz .eq. icomp_PZ) then
-          call cal_pz_tensor_smp(np_smp, nnod, istack_n_smp,            &
-     &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
+          call cal_pz_tensor_smp(nnod, dat_xyz(1,1), dat_viz(1,1),      &
+     &                           xx(1,1), xx(1,2), cyl_s, a_s)
 !
         else if ( icomp_viz .eq. icomp_ZZ_cyl ) then
-          call cal_zz_tensor_smp(np_smp, nnod, istack_n_smp,            &
-     &        dat_xyz(1,1), dat_viz(1,1) )
+          call cal_zz_tensor_smp(nnod, dat_xyz(1,1), dat_viz(1,1) )
         end if
 !$omp end parallel
 !

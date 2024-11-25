@@ -32,6 +32,8 @@
       use t_phys_data
       use t_phys_address
       use t_radial_reference_field
+      use t_field_data_IO
+      use t_time_data
 !
       implicit  none
 !
@@ -161,7 +163,6 @@
       use calypso_mpi
       use calypso_mpi_int
       use calypso_mpi_real
-      use t_time_data
       use t_file_IO_parameter
       use field_file_IO
       use interpolate_reference_data

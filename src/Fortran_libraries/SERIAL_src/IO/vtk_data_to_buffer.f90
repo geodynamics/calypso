@@ -245,14 +245,16 @@
       integer(kind = kint), intent(in) :: nnod_ele
 !
 !
-      if (nnod_ele .eq. num_t_linear) then
+      if (nnod_ele .eq.      num_t_linear)     then
         vtk_cell_type = 12
-      else if (nnod_ele .eq. num_t_quad) then
+      else if (nnod_ele .eq. num_t_quad)       then
         vtk_cell_type = 25
-      else if (nnod_ele .eq. num_triangle) then
+      else if (nnod_ele .eq. num_triangle)     then
         vtk_cell_type = 5
-      else if (nnod_ele .eq. num_linear_edge) then
+      else if (nnod_ele .eq. num_linear_edge)  then
         vtk_cell_type = 3
+      else if (nnod_ele .eq. num_linear_point) then
+        vtk_cell_type = 1
       else
         vtk_cell_type = 12
       end if

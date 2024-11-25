@@ -135,7 +135,6 @@
 !
 !
       call gz_mpi_skip_header(IO_param, len(hd_surf_point()))
-      call gz_mpi_read_number_of_node(IO_param, nod_IO)
       call gz_mpi_read_geometry_info(IO_param, nod_IO)
 !
       call gz_mpi_skip_header(IO_param, len(hd_surf_norm()))

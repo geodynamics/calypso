@@ -66,7 +66,6 @@
 !
       call mpi_read_domain_info_b(IO_param, comm_IO)
 !
-      call mpi_read_number_of_element_b(IO_param, ele_IO)
       call mpi_read_element_info_b(IO_param, ele_IO)
       call mpi_read_surface_4_element_b(IO_param, sfed_IO)
       call mpi_read_edge_4_element_b(IO_param, sfed_IO)
@@ -105,12 +104,13 @@
 !
       subroutine mpi_read_edge_geometry_b(IO_param, nod_IO, sfed_IO)
 !
+      use MPI_node_geometry_IO_b
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(node_data), intent(inout) :: nod_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !
 !
-      call mpi_read_number_of_node_b(IO_param, nod_IO)
       call mpi_read_geometry_info_b(IO_param, nod_IO)
 !
       call mpi_read_vect_in_ele_b(IO_param, nod_IO, sfed_IO)
