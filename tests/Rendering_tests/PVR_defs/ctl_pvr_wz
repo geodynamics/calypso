@@ -21,7 +21,7 @@ begin volume_rendering   (BMP or PNG)
     end array surface_enhanse_ctl
   end  plot_area_ctl
 !
-  begin pvr_color_ctl
+  begin colormap_ctl
     colormap_mode_ctl       rainbow
 !
     data_mapping_ctl   Colormap_list
@@ -53,7 +53,7 @@ begin volume_rendering   (BMP or PNG)
 !
     range_min_ctl   -3000.0
     range_max_ctl    3000.0
-  end   pvr_color_ctl
+  end   colormap_ctl
 !
   begin colorbar_ctl
     colorbar_switch_ctl    On
