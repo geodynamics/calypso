@@ -84,6 +84,12 @@
 !
 !
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
+        if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_velo_sph'
+        call set_sph_bc_velo_sph(bc_IO, sph_rj, radial_rj_grp,          &
+     &      sph_params%radius_ICB, sph_params%radius_CMB,               &
+     &      MHD_BC%velo_BC%nod_BC, MHD_BC%velo_BC%surf_BC,              &
+     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
+!
         kst = sph_MHD_bc%sph_bc_U%kr_in
         ked = sph_MHD_bc%sph_bc_U%kr_out
         icomp = MHD_prop%fl_prop%ir_dnu_norm
@@ -94,13 +100,6 @@
           h_rho_in =  zero
           h_rho_out = zero
         end if
-!
-        if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_velo_sph'
-        call set_sph_bc_velo_sph(bc_IO, sph_rj, radial_rj_grp,          &
-     &      sph_params%radius_ICB, sph_params%radius_CMB,               &
-     &      MHD_BC%velo_BC%nod_BC, MHD_BC%velo_BC%surf_BC,              &
-     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
-!
 !
         call cal_fdm_coefs_4_BCs                                        &
      &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &

@@ -74,7 +74,10 @@
       call alloc_phys_data((sph%sph_rj%nidx_rj(1)+1), radial_variation)
 !
       call set_r_variation_data_address(MHD_prop, radial_variation)
-      call check_r_variation_data_list(MHD_prop, radial_variation)
+      
+      if(iflag_debug .gt. 0) then
+        call check_r_variation_data_list(MHD_prop, radial_variation)
+      end if
 !
       if(my_rank .eq. 0) then
         radial_variation%d_fld(1,1) = 0.0d0
