@@ -30,7 +30,7 @@ jobs:
           zlib1g zlib1g-dev libblas-dev libfftw3-dev libhdf5-openmpi-dev
 
         ./configure \
-          --enable-fftw3 \
+          --with-fftw3 \
           --with-hdf5 \
           --with-blas \
           --with-zlib \
@@ -61,7 +61,7 @@ jobs:
         mpif90 -v
         
         ./configure \
-          --enable-fftw3 \
+          --with-fftw3 \
           --with-hdf5 \
           --with-blas \
           --with-zlib \
