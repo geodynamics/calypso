@@ -21,7 +21,7 @@ env:
 jobs:
   Run-on-Ubuntu:
     name: test-compile on Ubuntu
-    runs-on: [ubuntu-20.04]
+    runs-on: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v2
     - name: build
@@ -48,15 +48,8 @@ jobs:
       run: |
         brew info gfortran
         brew info open-mpi
-        brew install gfortran
+        brew install gfortran open-mpi fftw hdf5-mpi
 
-        a=`which gfortran-11`; \
-        b=`dirname $a`; \
-        c=$b/gfortran; \
-        ln -s $a $c
-
-        brew install open-mpi fftw hdf5-mpi
-        
         mpicc -v
         mpif90 -v
         
