@@ -48,8 +48,15 @@ jobs:
       run: |
         brew info gfortran
         brew info open-mpi
-        brew install gfortran open-mpi fftw hdf5-mpi
+        brew install gfortran
 
+        a=`which gfortran-11`; \
+        b=`dirname $a`; \
+        c=$b/gfortran; \
+        ln -s $a $c
+
+        brew install open-mpi fftw hdf5-mpi
+        
         mpicc -v
         mpif90 -v
         
