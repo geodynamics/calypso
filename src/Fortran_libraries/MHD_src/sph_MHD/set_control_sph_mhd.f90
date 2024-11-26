@@ -260,7 +260,6 @@
       call set_valuable_density_ctl                                     &
      &   (my_rank, model_ctl%polytrope_c, MHD_prop%polytrope_param,     &
      &    MHD_prop%flag_ref_density_valiation)
-      call check_polytrope_parameters(MHD_prop%polytrope_param)
 !
 !   Set valuable diffusivities
       call set_valuable_diffusion_ctl                                   &
@@ -278,6 +277,9 @@
      &   (my_rank, model_ctl%val_comp_diffuse_c,                        &
      &    MHD_prop%val_comp_diffuse_param,                              &
      &    MHD_prop%flag_comp_diffuse_variation)
+!
+      if(iflag_debug .le. 0) return
+      call check_polytrope_parameters(MHD_prop%polytrope_param)
 !
       call check_val_diffuse_parameters(MHD_prop%val_viscous_param)
       call check_val_diffuse_parameters(MHD_prop%val_mag_diffuse_param)
