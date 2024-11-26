@@ -21,7 +21,7 @@ env:
 jobs:
   Run-on-Ubuntu:
     name: test-compile on Ubuntu
-    runs-on: [ubuntu-latest]
+    runs-on: [ubuntu-22.04]
     steps:
     - uses: actions/checkout@v2
     - name: build
