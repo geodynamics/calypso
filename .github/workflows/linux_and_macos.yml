@@ -50,7 +50,7 @@ jobs:
         brew info open-mpi
         brew install gfortran
 
-        a=`which gfortran-11`; \
+        a=`which gfortran-14`; \
         b=`dirname $a`; \
         c=$b/gfortran; \
         ln -s $a $c
