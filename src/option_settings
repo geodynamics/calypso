@@ -10,8 +10,7 @@ CC=icc FC=ifort F77=ifort CXX=icc AR=xiar MPICC=mpicc MPIFC=mpif90 \
 PKG_CONFIG=/usr/bin/pkg-config CFLAGS='-Os -Wall -g -xCORE-AVX2 -axMIC-AVX512' \
 FCFLAGS='-Os -xCORE-AVX2 -axMIC-AVX512 -warn all -g -nogen-interfaces'  \
 FFTW3_CFLAGS='$$(TACC_FFTW3_INC)' FFTW3_LIBS='-L$$(TACC_FFTW3_LIB) -lfftw3' \
---with-blas=-mkl=sequential --enable-fftw3 --enable-libpng --with-hdf5 \
---with-zlib=/usr/lib64 --without-pgplot --without-aquaterm \
+--with-blas=-mkl=sequential --enable-fftw3 --enable-libpng --with-hdf5 --with-zlib=/usr/lib64 \
 PKG_CONFIG_PATH='/usr/lib64/pkgconfig:/home/hmatsui/local/lib/pkgconfig'
 
 

@@ -38,9 +38,24 @@ AC_CONFIG_SRCDIR([src/programs/SPH_MHD/main_sph_MHD_w_psf.f90])
 # AC_CONFIG_HEADER([config.h])
 
 AC_ARG_WITH(fftw3,
-	[  --with-fftw3            Use fftw3 library],[USE_fftw3='yes'],[USE_fftw3='no'])
+[  --with-fftw3           Use fftw3 library
+   --without-fftw3 to disable fftw3 library],
+[if test "$withval" != no ; then
+  USE_fftw3='yes'
+ else
+  USE_fftw3='no'
+ fi],
+[USE_fftw3='no'])
+
 AC_ARG_WITH(libpng,
-	[  --with-libpng           Use libpng library],[USE_libpng='yes'],[USE_libpng='no'])
+[  --with-libpng           Use libpng library
+   --without-libpng to disable libpng library],
+[if test "$withval" != no ; then
+  USE_libpng='yes'
+ else
+  USE_libpng='no'
+ fi],
+[USE_libpng='no'])
 
 AC_MSG_RESULT(with-fftw3...   "${USE_fftw3}")
 AC_MSG_RESULT(enable-libpng..."${USE_libpng}")

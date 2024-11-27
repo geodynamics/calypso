@@ -1460,8 +1460,10 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-fftw3            Use fftw3 library
+  --with-fftw3           Use fftw3 library
+   --without-fftw3 to disable fftw3 library
   --with-libpng           Use libpng library
+   --without-libpng to disable libpng library
   --with-hdf5=yes/no/PATH full path of h5pcc for parallel HDF5 configuration
   --with-blas=<lib>       use BLAS library <lib>
   --with-zlib=DIR root directory path of zlib installation defaults to
@@ -4053,17 +4055,26 @@ fi
 # Check whether --with-fftw3 was given.
 if test ${with_fftw3+y}
 then :
-  withval=$with_fftw3; USE_fftw3='yes'
+  withval=$with_fftw3; if test "$withval" != no ; then
+  USE_fftw3='yes'
+ else
+  USE_fftw3='no'
+ fi
 else case e in #(
   e) USE_fftw3='no' ;;
 esac
 fi
 
 
+
 # Check whether --with-libpng was given.
 if test ${with_libpng+y}
 then :
-  withval=$with_libpng; USE_libpng='yes'
+  withval=$with_libpng; if test "$withval" != no ; then
+  USE_libpng='yes'
+ else
+  USE_libpng='no'
+ fi
 else case e in #(
   e) USE_libpng='no' ;;
 esac
