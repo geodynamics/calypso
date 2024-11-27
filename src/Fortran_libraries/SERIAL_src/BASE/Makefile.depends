@@ -1,3 +1,5 @@
+aitoff.o: $(BASEDIR)/aitoff.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
 append_phys_data.o: $(BASEDIR)/append_phys_data.f90 m_precision.o m_machine_parameter.o t_phys_data.o compare_indices.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_add_smp.o: $(BASEDIR)/cal_add_smp.f90 m_precision.o
@@ -80,6 +82,8 @@ primefac.o: $(BASEDIR)/primefac.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 quicksort.o: $(BASEDIR)/quicksort.f90 m_precision.o m_constants.o isort_with_int.o i8sort_with_int.o dsort_with_int.o
 	$(F90) -c $(F90OPTFLAGS) $<
+small_mat_mat_product.o: $(BASEDIR)/small_mat_mat_product.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
 solver_33_array.o: $(BASEDIR)/solver_33_array.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_group_data.o: $(BASEDIR)/t_group_data.f90 m_precision.o
@@ -89,5 +93,7 @@ t_phys_data.o: $(BASEDIR)/t_phys_data.f90 m_precision.o t_phys_address.o
 t_time_data.o: $(BASEDIR)/t_time_data.f90 m_precision.o m_constants.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
 transfer_to_long_integers.o: $(BASEDIR)/transfer_to_long_integers.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+transform_mat_operations.o: $(BASEDIR)/transform_mat_operations.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 
