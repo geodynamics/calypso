@@ -94,6 +94,8 @@ t_fline_seeds_surf_group.o: $(FIELDLINE_DIR)/t_fline_seeds_surf_group.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 t_local_fline.o: $(FIELDLINE_DIR)/t_local_fline.f90 m_precision.o m_constants.o t_ctl_params_viz_fields.o
 	$(F90) -c $(F90OPTFLAGS) $<
+t_parallel_surface_indices.o: $(FIELDLINE_DIR)/t_parallel_surface_indices.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_mesh_data.o t_comm_table.o t_mesh_SR.o t_para_double_numbering.o t_geometry_data.o t_surface_data.o reverse_SR_int.o solver_SR_type.o
+	$(F90) -c $(F90OPTFLAGS) $<
 t_particle_trace.o: $(FIELDLINE_DIR)/t_particle_trace.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o m_work_time.o t_time_data.o t_mesh_data.o t_phys_data.o t_parallel_surface_indices.o t_control_params_4_fline.o t_source_of_filed_line.o t_trace_data_send_recv.o t_broadcast_trace_data.o t_tracing_data.o t_local_fline.o t_ucd_data.o t_control_data_flines.o m_connect_hexa_2_tetra.o multi_tracer_fieldline.o multi_tracer_file_IO.o multi_trace_particle.o t_mesh_SR.o set_fields_for_fieldline.o trace_particle.o collect_fline_data.o parallel_ucd_IO_select.o set_fline_seeds_from_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_source_of_filed_line.o: $(FIELDLINE_DIR)/t_source_of_filed_line.f90 m_precision.o m_constants.o t_control_params_4_fline.o

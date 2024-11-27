@@ -1,3 +1,5 @@
+cal_local_position_by_tetra.o: $(INTERPOLATE_DIR)/cal_local_position_by_tetra.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
 cal_position_and_grad.o: $(INTERPOLATE_DIR)/cal_position_and_grad.f90 m_precision.o m_constants.o m_geometry_constants.o cal_shape_function_3d.o interpolate_position_in_ele.o cal_shape_function_2d.o cal_shape_function_1d.o
 	$(F90) -c $(F90OPTFLAGS) $<
 interpolate_position_in_ele.o: $(INTERPOLATE_DIR)/interpolate_position_in_ele.f90 m_precision.o
