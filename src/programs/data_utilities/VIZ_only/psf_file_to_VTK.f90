@@ -21,7 +21,7 @@
       character(len = kchara) :: file_ext, tmpchara
 !
       if(iargc_kemo() .lt. 5) then
-        write(*,*) 'section_to_vtk ',                                   &
+        write(*,*) 'section_to_VTK ',                                   &
      &    'FILE_PREFIX EXTENSION_WITH_GZ START_STEP END_STEP INCREMENT'
         stop
       end if
