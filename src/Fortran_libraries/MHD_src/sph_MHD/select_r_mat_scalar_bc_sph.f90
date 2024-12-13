@@ -44,7 +44,7 @@
       use t_sph_matrix
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
 !
       implicit none
 !
@@ -57,10 +57,11 @@
       subroutine sel_radial_mat_press_bc_sph(sph_rj, sph_bc_U,          &
      &          fdm2_center, g_sph_rj, r_coef, band_p_poisson)
 !
-      use set_sph_scalar_mat_bc
       use cal_inner_core_rotation
       use center_sph_matrices
       use set_radial_mat_sph
+      use set_sph_scalar_matrix_ICB
+      use set_sph_scalar_matrix_CMB
 !
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_rj_grid), intent(in) ::  sph_rj
@@ -104,7 +105,8 @@
      &          fdm2_center, g_sph_rj, r_coef, band_s_evo)
 !
       use center_sph_matrices
-      use set_sph_scalar_mat_bc
+      use set_sph_scalar_matrix_ICB
+      use set_sph_scalar_matrix_CMB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc
@@ -159,7 +161,8 @@
      &         (sph_rj, sph_bc, fdm2_center, r_coef, band_s00_poisson)
 !
       use center_sph_matrices
-      use set_sph_scalar_mat_bc
+      use set_sph_scalar_matrix_ICB
+      use set_sph_scalar_matrix_CMB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc
@@ -221,7 +224,8 @@
      &         (sph_rj, sph_bc, fdm2_center, band_s00_poisson)
 !
       use center_sph_matrices
-      use set_sph_scalar_mat_bc
+      use set_sph_scalar_matrix_ICB
+      use set_sph_scalar_matrix_CMB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc

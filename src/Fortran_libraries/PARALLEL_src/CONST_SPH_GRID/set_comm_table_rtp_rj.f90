@@ -400,8 +400,8 @@
           j_glb = sph_rlm_lc%idx_global_rlm(jnod,2)
           k_tmp = sph_lcx_rj%idx_local_rj_r(k_glb)
           j_tmp = sph_lcx_rj%idx_local_rj_j(j_glb)
-          comm_rj%item_sr(icou) =  1 + (k_tmp-1) * sph_rj%istep_rj(1)   &
-     &                               + (j_tmp-1) * sph_rj%istep_rj(2)
+          comm_rj%item_sr(icou) = (k_tmp-1) * sph_rj%nidx_rj(2)         &
+     &                            + j_tmp
         end do
 !
         call dealloc_sph_comm_item(comm_rlm_lc)

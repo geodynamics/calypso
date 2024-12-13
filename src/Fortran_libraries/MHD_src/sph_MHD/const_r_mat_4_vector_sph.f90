@@ -6,9 +6,8 @@
 !>@brief Construct matrix for time evolution of vector fields
 !!
 !!@verbatim
-!!      subroutine const_radial_mat_vort_2step                          &
-!!     &        (dt, sph_rj, r_2nd, fl_prop, sph_bc_U,                  &
-!!     &         fdm2_center, fdm2_free_ICB, fdm2_free_CMB, g_sph_rj,   &
+!!      subroutine const_radial_mat_vort_2step(dt, sph_rj, r_2nd,       &
+!!     &         fl_prop, sph_bc_U, bc_fdms_U, fdm2_center, g_sph_rj,   &
 !!     &         band_vs_poisson, band_vp_evo, band_vt_evo, band_wt_evo)
 !!      subroutine const_radial_mat_4_magne_sph                         &
 !!     &         (dt, sph_rj, r_2nd, cd_prop, sph_bc_B, fdm2_center,    &
@@ -19,9 +18,8 @@
 !!        type(conductive_property), intent(in) :: cd_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(sph_boundary_type), intent(in) :: sph_bc_B
+!!        type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
-!!        type(fdm2_free_slip), intent(in) :: fdm2_free_ICB
-!!        type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
 !!        type(band_matrices_type), intent(inout) :: band_vp_evo
 !!        type(band_matrices_type), intent(inout) :: band_vt_evo
 !!        type(band_matrices_type), intent(inout) :: band_wt_evo
@@ -44,7 +42,6 @@
       use t_sph_matrices
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
 !
       use set_radial_mat_sph
 !
@@ -70,13 +67,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_radial_mat_vort_2step                            &
-     &        (dt, sph_rj, r_2nd, fl_prop, sph_bc_U,                    &
-     &         fdm2_center, fdm2_free_ICB, fdm2_free_CMB, g_sph_rj,     &
+      subroutine const_radial_mat_vort_2step(dt, sph_rj, r_2nd,         &
+     &         fl_prop, sph_bc_U, bc_fdms_U, fdm2_center, g_sph_rj,     &
      &         band_vs_poisson, band_vp_evo, band_vt_evo, band_wt_evo)
 !
+      use t_coef_sph_velocity_BCs
+      use t_coef_fdm2_centre
+!
       use m_ludcmp_band
-      use set_sph_scalar_mat_bc
+      use set_sph_scalar_matrix_ICB
+      use set_sph_scalar_matrix_CMB
       use cal_inner_core_rotation
       use center_sph_matrices
       use mat_product_3band_mul
@@ -86,8 +86,8 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
+      type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
       type(fdm2_center_mat), intent(in) :: fdm2_center
-      type(fdm2_free_slip), intent(in) :: fdm2_free_ICB, fdm2_free_CMB
 !
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
       real(kind = kreal), intent(in) :: dt
@@ -171,11 +171,13 @@
         if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
           call add_fix_flux_icb_poisson_mat                             &
      &       (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,           &
-     &        sph_bc_U%kr_in, sph_bc_U%r_ICB, fdm2_free_ICB%dmat_vt,    &
+     &        sph_bc_U%kr_in, sph_bc_U%r_ICB,                           &
+     &        bc_fdms_U%fdm2_free_ICB%dmat_vt,                          &
      &        coef_dvt, band_vt_evo%mat)
           call add_fix_flux_icb_poisson_mat                             &
      &       (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,           &
-     &        sph_bc_U%kr_in, sph_bc_U%r_ICB, fdm2_free_ICB%dmat_vp,    &
+     &        sph_bc_U%kr_in, sph_bc_U%r_ICB,                           &
+     &        bc_fdms_U%fdm2_free_ICB%dmat_vp,                          &
      &        one, band_vs_poisson%mat)
 !      else if(sph_bc_U%iflag_icb .eq. iflag_evolve_field) then
 !      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_field) then
@@ -195,7 +197,7 @@
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call set_icore_viscous_matrix                                   &
-     &     (sph_bc_U%kr_in, sph_bc_U%fdm1_fix_fld_ICB,                  &
+     &     (sph_bc_U%kr_in, bc_fdms_U%fdm1_fix_fld_ICB,                 &
      &      dt, sph_rj, fl_prop, band_vt_evo)
       end if
 !
@@ -209,11 +211,13 @@
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call add_fix_flux_cmb_poisson_mat                               &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
-     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, fdm2_free_CMB%dmat_vt,     &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB,                            &
+     &      bc_fdms_U%fdm2_free_CMB%dmat_vt,                            &
      &      coef_dvt, band_vt_evo%mat)
         call add_fix_flux_cmb_poisson_mat                               &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
-     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, fdm2_free_CMB%dmat_vp,     &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB,                            &
+     &      bc_fdms_U%fdm2_free_CMB%dmat_vp,                            &
      &      one, band_vs_poisson%mat)
 !      else if(sph_bc_U%iflag_cmb .eq. iflag_evolve_field) then
 !      else if(sph_bc_U%iflag_cmb .eq. iflag_fixed_field) then
@@ -268,8 +272,9 @@
      &         (dt, sph_rj, r_2nd, cd_prop, sph_bc_B, fdm2_center,      &
      &          g_sph_rj, band_bp_evo, band_bt_evo)
 !
-      use set_sph_scalar_mat_bc
-      use set_sph_magne_mat_bc
+      use t_coef_fdm2_centre
+      use set_sph_scalar_matrix_ICB
+      use set_sph_scalar_matrix_CMB
       use center_sph_matrices
       use check_sph_radial_mat
 !

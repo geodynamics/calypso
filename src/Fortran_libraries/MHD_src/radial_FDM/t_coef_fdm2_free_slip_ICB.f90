@@ -1,11 +1,11 @@
-!>@file   coef_fdm2_free_ICB.f90
-!!@brief  module coef_fdm2_free_ICB
+!>@file   t_coef_fdm2_free_slip_ICB.f90
+!!@brief  module t_coef_fdm2_free_slip_ICB
 !!
 !!@author H. Matsui
 !!@date Programmed in Jan., 2010
 !
 !>@brief Matrix to evaluate poloidal velocity and toroidal vorticity
-!!       at CMB with free slip boundary
+!!       at ICB with free slip boundary
 !!
 !!@verbatim
 !!      subroutine cal_fdm2_ICB_free_vp(h_rho, r_from_ICB,              &
@@ -14,11 +14,12 @@
 !!     &                                fdm2_free_ICB)
 !!        real(kind = kreal), intent(in) :: h_rho
 !!        real(kind = kreal), intent(in) :: r_from_ICB(0:1)
-!!        type(fdm2_free_slip), intent(inout) :: fdm2_free_ICB
+!!        type(fdm2_ICB_free_slip), intent(inout) :: fdm2_free_ICB
 !!
-!!      subroutine check_coef_fdm_free_ICB(id_file, fdm2_free_ICB)
+!!      subroutine check_fdm2_coef_free_slip_ICB(id_file, fdm2_free_ICB)
 !!        integer(kind = kint), intent(in) :: id_file
-!!        type(fdm2_free_slip), intent(in) :: fdm2_free_ICB
+!!        type(fdm2_ICB_free_slip), intent(in) :: fdm2_free_ICB
+!!
 !!
 !!    Matrix to evaluate radial derivative of poloidal velocity
 !!    at ICB with free slip boundary
@@ -32,29 +33,67 @@
 !!      dfdr =    fdm2_free_ICB%dmat_vt( 0,2) * d_rj(ICB  )
 !!      d2fdr2 =  fdm2_free_ICB%dmat_vt( 0,3) * d_rj(ICB  )
 !!              + fdm2_free_ICB%dmat_vt( 1,3) * d_rj(ICB+1)
-!!
-!!    Taylor expansion of free slip boundary at CMB
-!!      dfdr =    mat_fdm_2(2,1) * d_rj(CMB  )
-!!              + mat_fdm_2(2,2)
-!!                 * (-2*dfdr(CMB) + r(CMB) * d2fdr2(CMB))
-!!              + mat_fdm_2(2,3) * d_rj(CMB-1)
-!!      d2fdr2 =  mat_fdm_2(3,1) * d_rj(CMB  )
-!!              + mat_fdm_2(3,2)
-!!                 * (-2*dfdr(CMB) + r(CMB) * d2fdr2(CMB))
-!!              + mat_fdm_2(3,3) * d_rj(CMB-1)
 !!@endverbatim
 !!
-!!@n @param r_from_ICB(0:3) radius to next points from ICB
-!
-      module coef_fdm2_free_ICB
+      module t_coef_fdm2_free_slip_ICB
 !
       use m_precision
       use m_constants
 !
-      use t_coef_fdm2_MHD_boundaries
+      implicit none
+!
+!>      Structure for FDM matrix of free slip boundary
+      type fdm2_ICB_free_slip
+!>        Matrix to evaluate radial derivative of poloidal velocity
+!!        with free slip boundary
+        real(kind = kreal) :: dmat_vp(-1:1,3)
+!>        Matrix to evaluate radial derivative of toroidal vorticity
+!!        with free slip boundary
+        real(kind = kreal) :: dmat_vt(-1:1,3)
+      end type fdm2_ICB_free_slip
+!
+! -----------------------------------------------------------------------
+!
+      contains
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_fdm2_coef_free_slip_ICB(id_file, fdm2_free_mat)
+!
+      integer(kind = kint), intent(in) :: id_file
+      type(fdm2_ICB_free_slip), intent(in) :: fdm2_free_mat
+!
+!
+      write(id_file,*) ' Free slip for ICB'
+      write(id_file,*) ' fdm2_free_mat%dmat_vp at ICB'
+      write(id_file,*) '     no delivative dmat_vp(0,1),  dmat_vp(1,1)'
+      write(id_file,'(1p9E25.15e3)') fdm2_free_mat%dmat_vp(0:1,1)
+      write(id_file,*) '  first delivative dmat_vp(0,2),  dmat_vp(1,2)'
+      write(id_file,'(1p9E25.15e3)') fdm2_free_mat%dmat_vp(0:1,2)
+      write(id_file,*) ' second delivative dmat_vp(0,3),  dmat_vp(1,3)'
+      write(id_file,'(1p9E25.15e3)') fdm2_free_mat%dmat_vp(0:1,3)
+!
+      write(id_file,*) ' fdm2_free_mat%dmat_vt at ICB'
+      write(id_file,*) '     no delivative dmat_vt(0,1),  dmat_vt(1,1)'
+      write(id_file,'(1p9E25.15e3)') fdm2_free_mat%dmat_vt(0:1,1)
+      write(id_file,*) '  first delivative dmat_vt(0,2),  dmat_vt(1,2)'
+      write(id_file,'(1p9E25.15e3)') fdm2_free_mat%dmat_vt(0:1,2)
+      write(id_file,*) ' second delivative dmat_vt(0,3),  dmat_vt(1,3)'
+      write(id_file,'(1p9E25.15e3)') fdm2_free_mat%dmat_vt(0:1,3)
+!
+      end subroutine check_fdm2_coef_free_slip_ICB
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine cal_fdm2_ICB_free_vp(h_rho, r_from_ICB,                &
+     &                                fdm2_free_ICB)
+!
       use cal_inverse_small_matrix
 !
-      implicit none
+      real(kind = kreal), intent(in) :: h_rho
+      real(kind = kreal), intent(in) :: r_from_ICB(0:1)
+      type(fdm2_ICB_free_slip), intent(inout) :: fdm2_free_ICB
 !
 !>      Work matrix to evaluate fdm2_free_ICB%dmat_vp(-1:1,3)
 !!@verbatim
@@ -64,30 +103,6 @@
 !!              + mat_fdm_ICB_free_vp(3,3) * d_rj(ICB+1)
 !!@endverbatim
       real(kind = kreal) :: mat_fdm_ICB_free_vp(3,3)
-!
-!>      Work matrix to evaluate fdm2_free_ICB%dmat_vt(-1:1,3)
-!!@verbatim
-!!      dfdr =    mat_fdm_ICB_free_vt(2,1) * d_rj(ICB  )
-!!              + mat_fdm_ICB_free_vt(2,3) * d_rj(ICB+1)
-!!      d2fdr2 =  mat_fdm_ICB_free_vt(3,1) * d_rj(ICB  )
-!!              + mat_fdm_ICB_free_vt(3,3) * d_rj(ICB+1)
-!!@endverbatim
-      real(kind = kreal) :: mat_fdm_ICB_free_vt(3,3)
-!
-      private :: mat_fdm_ICB_free_vp, mat_fdm_ICB_free_vt
-!
-! -----------------------------------------------------------------------
-!
-      contains
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_fdm2_ICB_free_vp(h_rho, r_from_ICB,                &
-     &                                fdm2_free_ICB)
-!
-      real(kind = kreal), intent(in) :: h_rho
-      real(kind = kreal), intent(in) :: r_from_ICB(0:1)
-      type(fdm2_free_slip), intent(inout) :: fdm2_free_ICB
 !
       integer(kind = kint) :: ierr
       real(kind = kreal) :: mat_taylor_3(3,3)
@@ -134,9 +149,20 @@
       subroutine cal_fdm2_ICB_free_vt(h_rho, r_from_ICB,                &
      &                                fdm2_free_ICB)
 !
+      use cal_inverse_small_matrix
+!
       real(kind = kreal), intent(in) :: h_rho
       real(kind = kreal), intent(in) :: r_from_ICB(0:1)
-      type(fdm2_free_slip), intent(inout) :: fdm2_free_ICB
+      type(fdm2_ICB_free_slip), intent(inout) :: fdm2_free_ICB
+!
+!>      Work matrix to evaluate fdm2_free_ICB%dmat_vt(-1:1,3)
+!!@verbatim
+!!      dfdr =    mat_fdm_ICB_free_vt(2,1) * d_rj(ICB  )
+!!              + mat_fdm_ICB_free_vt(2,3) * d_rj(ICB+1)
+!!      d2fdr2 =  mat_fdm_ICB_free_vt(3,1) * d_rj(ICB  )
+!!              + mat_fdm_ICB_free_vt(3,3) * d_rj(ICB+1)
+!!@endverbatim
+      real(kind = kreal) :: mat_fdm_ICB_free_vt(3,3)
 !
       integer(kind = kint) :: ierr
       real(kind = kreal) :: mat_taylor_3(3,3)
@@ -180,17 +206,4 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_coef_fdm_free_ICB(id_file, fdm2_free_ICB)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(fdm2_free_slip), intent(in) :: fdm2_free_ICB
-!
-!
-      write(id_file,*) ' Free slip for ICB'
-      call check_fdm_coef_free_slip_ICB(id_file, fdm2_free_ICB)
-!
-      end subroutine check_coef_fdm_free_ICB
-!
-! -----------------------------------------------------------------------
-!
-      end module coef_fdm2_free_ICB
+      end module t_coef_fdm2_free_slip_ICB

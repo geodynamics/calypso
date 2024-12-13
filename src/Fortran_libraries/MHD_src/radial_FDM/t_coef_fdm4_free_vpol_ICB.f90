@@ -7,7 +7,8 @@
 !>@brief Matrix to evaluate radial derivative for non-slip at ICB
 !!
 !!@verbatim
-!!      subroutine check_4th_ICB_free_vp_fdm(fdm4_free_ICB)
+!!      subroutine check_4th_ICB_free_vp_fdm(id_file, fdm4_free_ICB)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(fdm4_ICB_free_vpol), intent(in) :: fdm4_free_ICB
 !!      subroutine cal_fdm4_ICB0_free_vp(h_rho, r_from_ICB,             &
 !!     &                                 fdm4_free_ICB)
@@ -71,29 +72,30 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_4th_ICB_free_vp_fdm(fdm4_free_ICB)
+      subroutine check_4th_ICB_free_vp_fdm(id_file, fdm4_free_ICB)
 !
+      integer(kind = kint), intent(in) :: id_file
       type(fdm4_ICB_free_vpol), intent(in) :: fdm4_free_ICB
 !
 !
-      write(50,*) ' free slip boundary at ICB'
-      write(50,*) ' fdm4_free_ICB%dmat_vp0'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp0(0:2,2)
-      write(50,*) 'matrix for d2fdr2'
-      write(50,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp0(0:2,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp0(0:2,4)
+      write(id_file,*) ' free slip boundary at ICB'
+      write(id_file,*) ' fdm4_free_ICB%dmat_vp0'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp0(0:2,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp0(0:2,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp0(0:2,4)
 !
-      write(50,*) ' fdm4_free_ICB%dmat_vp1'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,2)
-      write(50,*) 'matrix for d2fdr2'
-      write(50,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,4)
-      write(50,*) 'matrix for d4fdr4'
-      write(50,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,5)
+      write(id_file,*) ' fdm4_free_ICB%dmat_vp1'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,4)
+      write(id_file,*) 'matrix for d4fdr4'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_ICB%dmat_vp1(-1:2,5)
 !
       end subroutine check_4th_ICB_free_vp_fdm
 !
@@ -102,6 +104,8 @@
 !
       subroutine cal_fdm4_ICB0_free_vp(h_rho, r_from_ICB,               &
      &                                 fdm4_free_ICB)
+!
+      use cal_inverse_small_matrix
 !
       real(kind = kreal), intent(in) :: h_rho
       real(kind = kreal), intent(in) :: r_from_ICB(0:2)
@@ -173,6 +177,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_fdm4_ICB1_free_vp(r_from_ICB, fdm4_free_ICB)
+!
+      use cal_inverse_small_matrix
 !
       real(kind = kreal), intent(in) :: r_from_ICB(0:3)
       type(fdm4_ICB_free_vpol), intent(inout) :: fdm4_free_ICB

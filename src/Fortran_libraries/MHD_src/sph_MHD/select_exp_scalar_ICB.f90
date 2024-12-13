@@ -68,7 +68,7 @@
       use t_spheric_rj_data
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
 !
       implicit none
 !
@@ -82,7 +82,8 @@
      &          coef_f, coef_d, diffuse_reduction, dt, coef_imp,        &
      &          is_field, n_point, ntot_phys_rj, d_rj)
 !
-      use set_scalar_boundary_sph
+      use sph_exp_fixed_flux_ICB
+      use set_fixed_scalar_sph
       use cal_sph_exp_center
 !
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -102,7 +103,7 @@
       if(sph_bc%iflag_icb .eq. iflag_sph_fill_center) return
       if(sph_bc%iflag_icb .eq. iflag_fixed_field                        &
      &  .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
-        call set_fixed_scalar_sph(sph_rj%nidx_rj(2),                    &
+        call s_set_fixed_scalar_sph(sph_rj%nidx_rj(2),                  &
      &      sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
      &      ione, sph_bc%kr_in, is_field,                               &
      &      ICB_Sspec%S_BC, ICB_Sspec%S_CTR,                            &
@@ -136,8 +137,8 @@
      &         (sph_rj, sph_bc, ICB_Sspec, fdm2_center, g_sph_rj,       &
      &          is_fld, is_grad, n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_fixed_flux
+      use sph_exp_fix_scalar_ICB
+      use sph_exp_fixed_flux_ICB
       use cal_sph_exp_rotation
       use cal_sph_exp_center
 !
@@ -206,8 +207,8 @@
      &          g_sph_rj, coef_diffuse, is_fld, is_diffuse,             &
      &          n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_fixed_flux
+      use sph_exp_fix_scalar_ICB
+      use sph_exp_fixed_flux_ICB
       use cal_sph_exp_center_diffuse2
 !
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -263,8 +264,8 @@
      &         (sph_rj, sph_bc, ICB_Sspec, fdm2_center, g_sph_rj,       &
      &          is_flux, is_advect, n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_fixed_flux
+      use sph_exp_fix_scalar_ICB
+      use sph_exp_fixed_flux_ICB
       use cal_sph_exp_center
       use cal_sph_exp_center_diffuse2
 !

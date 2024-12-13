@@ -65,7 +65,6 @@
       use t_spheric_rj_data
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
-      use t_coef_fdm2_MHD_boundaries
 !
       implicit none
 !
@@ -79,7 +78,8 @@
      &          coef_f, coef_d, dt, coef_imp, is_field,                 &
      &          n_point, ntot_phys_rj, d_rj)
 !
-      use set_scalar_boundary_sph
+      use sph_exp_fixed_flux_CMB
+      use set_fixed_scalar_sph
       use cal_sph_exp_center
 !
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -97,7 +97,7 @@
 !   Set RHS vector for CMB
       if (sph_bc%iflag_cmb .eq. iflag_fixed_field                       &
      &  .or. sph_bc%iflag_cmb .eq. iflag_evolve_field) then
-        call set_fixed_scalar_sph(sph_rj%nidx_rj(2),                    &
+        call s_set_fixed_scalar_sph(sph_rj%nidx_rj(2),                  &
      &      sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
      &      sph_bc%kr_out, sph_rj%nidx_rj(1), is_field,                 &
      &      CMB_Sspec%S_BC, CMB_Sspec%S_CTR,                            &
@@ -125,8 +125,8 @@
      &         (sph_rj, sph_bc, CMB_Sspec, g_sph_rj,                    &
      &          is_fld, is_grad, n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_fixed_flux
+      use sph_exp_fix_scalar_CMB
+      use sph_exp_fixed_flux_CMB
       use cal_sph_exp_rotation
 !
       type(sph_boundary_type), intent(in) :: sph_bc
@@ -174,8 +174,8 @@
      &         (sph_rj, sph_bc, CMB_Sspec, g_sph_rj, coef_diffuse,      &
      &          is_fld, is_diffuse, n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_fixed_flux
+      use sph_exp_fix_scalar_CMB
+      use sph_exp_fixed_flux_CMB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc
@@ -214,8 +214,8 @@
      &         (sph_rj, sph_bc, CMB_Sspec, g_sph_rj,                    &
      &          is_flux, is_advect, n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_fixed_flux
+      use sph_exp_fix_scalar_CMB
+      use sph_exp_fixed_flux_CMB
 !
       type(sph_boundary_type), intent(in) :: sph_bc
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -306,9 +306,9 @@
      &      .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
           grad_r(kr) = BC0_CMB
         else
-          grad_r(kr) =  sph_bc%fdm2_fix_fld_CMB(2,2) * d_r(kr-2)        &
-     &                + sph_bc%fdm2_fix_fld_CMB(1,2) * d_r(kr-1)        &
-     &                + sph_bc%fdm2_fix_fld_CMB(0,2) * d_r(kr  )
+          grad_r(kr) =  sph_bc%fdm2_fix_fld_CMB(-2,2) * d_r(kr-2)       &
+     &                + sph_bc%fdm2_fix_fld_CMB(-1,2) * d_r(kr-1)       &
+     &                + sph_bc%fdm2_fix_fld_CMB( 0,2) * d_r(kr  )
           write(*,*) 'Given condition:   ',  BC0_CMB
           write(*,*) 'Numerical solution:',  grad_r(kr)
         end if
@@ -316,9 +316,9 @@
 !      else if(sph_bc%iflag_cmb .eq. iflag_fixed_field                  &
 !     &   .or. sph_bc%iflag_cmb .eq. iflag_evolve_field) then
       else
-        grad_r(kr) =  sph_bc%fdm2_fix_fld_CMB(2,2) * d_r(kr-2)          &
-     &               + sph_bc%fdm2_fix_fld_CMB(1,2) * d_r(kr-1)         &
-     &               + sph_bc%fdm2_fix_fld_CMB(0,2) * BC0_CMB
+        grad_r(kr) =  sph_bc%fdm2_fix_fld_CMB(-2,2) * d_r(kr-2)         &
+     &              + sph_bc%fdm2_fix_fld_CMB(-1,2) * d_r(kr-1)         &
+     &              + sph_bc%fdm2_fix_fld_CMB( 0,2) * BC0_CMB
       end if
 !
       end subroutine sel_CMB_radial_grad_1d_scalar
@@ -338,9 +338,9 @@
       integer(kind = kint) :: kr
 !
       kr = sph_bc%kr_out
-      grad_r(kr) =  sph_bc%fdm2_fix_fld_CMB(2,2) * d_r(kr-2)            &
-     &            + sph_bc%fdm2_fix_fld_CMB(1,2) * d_r(kr-1)            &
-     &            + sph_bc%fdm2_fix_fld_CMB(0,2) * d_r(kr  )
+      grad_r(kr) =  sph_bc%fdm2_fix_fld_CMB(-2,2) * d_r(kr-2)           &
+     &            + sph_bc%fdm2_fix_fld_CMB(-1,2) * d_r(kr-1)           &
+     &            + sph_bc%fdm2_fix_fld_CMB( 0,2) * d_r(kr  )
 
       end subroutine fix_CMB_radial_grad_1d_scalar
 !

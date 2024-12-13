@@ -26,7 +26,7 @@
 !!        type(sph_shell_parameters), intent(inout) :: sph_param
 !!
 !!      subroutine count_interval_4_each_dir(numdir, nnod, idx_global,  &
-!!     &         istep)
+!!     &                                     istep)
 !!        integer(kind = kint), intent(in) :: numdir, nnod
 !!        integer(kind = kint), intent(in) :: idx_global(nnod,numdir)
 !!        integer(kind = kint), intent(inout) :: istep(numdir)
@@ -199,7 +199,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine count_interval_4_each_dir(numdir, nnod, idx_global,    &
-     &         istep)
+     &                                     istep)
 !
       use calypso_mpi_int
 !

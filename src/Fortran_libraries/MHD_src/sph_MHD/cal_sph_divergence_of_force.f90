@@ -48,7 +48,6 @@
       use t_schmidt_poly_on_rtm
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
 !
       implicit none
 !

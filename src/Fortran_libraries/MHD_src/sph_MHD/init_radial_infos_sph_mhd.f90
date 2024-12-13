@@ -126,13 +126,13 @@
      &                                    radial_variation)
 !
 !*  ---------- boundary conditions  ---------------
-      if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
-      call s_set_bc_sph_mhd                                             &
+      if(iflag_debug.gt.0) write(*,*) 'set_fdm_matrices_sph_mhd'
+      call set_fdm_matrices_sph_mhd                                     &
      &   (bc_IO, sph%sph_params, sph%sph_rj, sph_grps%radial_rj_grp,    &
      &    MHD_prop, radial_variation, MHD_BC, sph_MHD_bc)
 !
       if(iflag_debug .ge. iflag_full_msg) then
-        call check_bc_sph_mhd(MHD_prop, sph_MHD_bc)
+        call check_bc_sph_mhd(50, sph%sph_rj, MHD_prop, sph_MHD_bc)
       end if
 !
       end subroutine init_r_infos_sph_mhd_evo

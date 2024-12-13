@@ -113,12 +113,11 @@
 !
       if(sph_rj%idx_rj_degree_zero .eq. 0) return
 !
-      iCMB = 1 + (sph_params%nlayer_CMB-1) * sph_rj%istep_rj(1)         &
-     &         + (sph_rj%idx_rj_degree_zero-1) * sph_rj%istep_rj(2)
+      iCMB = (sph_params%nlayer_CMB-1) * sph_rj%nidx_rj(2)              &
+     &       + sph_rj%idx_rj_degree_zero
 !$omp parallel do private(kr,inod)
       do kr = 1, sph_rj%nidx_rj(1)
-        inod = 1 + (kr-1) * sph_rj%istep_rj(1)                          &
-     &           + (sph_rj%idx_rj_degree_zero-1) * sph_rj%istep_rj(2)
+        inod = (kr-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_zero
         d_rj_part(inod) = d_rj_part(inod) - d_scalar(iCMB)
       end do
 !$omp end parallel do
@@ -143,8 +142,7 @@
 !
 !$omp parallel do private(kr,inod)
       do kr = 1, sph_rj%nidx_rj(1)
-        inod = 1 + (kr-1) * sph_rj%istep_rj(1)                          &
-     &           + (sph_rj%idx_rj_degree_zero-1) * sph_rj%istep_rj(2)
+        inod = (kr-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_zero
         d_rj_part(inod) = 0.0d0
       end do
 !$omp end parallel do
@@ -172,8 +170,7 @@
 !
 !$omp parallel do private(kr,inod)
       do kr = 1, sph_rj%nidx_rj(1)
-        inod = 1 + (kr-1) * sph_rj%istep_rj(1)                          &
-     &           + (sph_rj%idx_rj_degree_one(0)-1) * sph_rj%istep_rj(2)
+        inod = (kr-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_one(0)
         d_rj_part(inod,2) = d_vect(inod,1)
         d_rj_part(inod,3) = d_vect(inod,2)
       end do
@@ -202,8 +199,7 @@
 !
 !$omp parallel do private(kr,inod)
       do kr = 1, sph_rj%nidx_rj(1)
-        inod = 1 + (kr-1) * sph_rj%istep_rj(1)                          &
-     &           + (sph_rj%idx_rj_degree_one(0)-1) * sph_rj%istep_rj(2)
+        inod = (kr-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_one(0)
         d_rj_part(inod,3) = d_vect(inod,3)
       end do
 !$omp end parallel do

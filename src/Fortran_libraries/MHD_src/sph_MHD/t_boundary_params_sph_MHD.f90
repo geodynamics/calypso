@@ -9,8 +9,11 @@
 !!
 !!@verbatim
 !!      subroutine cal_fdm_coefs_4_BCs(nri, radius, sph_bc)
-!!      subroutine check_fdm_coefs_4_BC2(label, sph_bc)
 !!        type(sph_boundary_type), intent(inout) :: sph_bc
+!!      subroutine check_fdm_coefs_4_BC2(id_file, label, sph_bc)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        character(len=kchara), intent(in) :: label
+!!        type(sph_boundary_type), intent(in) :: sph_bc
 !!@endverbatim
 !!
 !!@n @param jmax    number of modes for spherical harmonics @f$L*(L+2)@f$
@@ -86,16 +89,9 @@
 !>        Matrix to evaluate field at ICB with fixed radial derivative
         real(kind = kreal) :: fdm2_fix_dr_ICB(-1:1,3)
 !>        Matrix to evaluate radial derivative at CMB with fixed field
-        real(kind = kreal) :: fdm2_fix_fld_CMB(0:2,3)
+        real(kind = kreal) :: fdm2_fix_fld_CMB(-2:0,3)
 !>        Matrix to evaluate field at CMB with fixed radial derivative
         real(kind = kreal) :: fdm2_fix_dr_CMB(-1:1,3)
-!
-!>        Matrix to evaluate radial derivative at ICB with fixed field
-!!        with first order accuracy
-        real(kind = kreal) :: fdm1_fix_fld_ICB(0:1,2)
-!>        Matrix to evaluate radial derivative at CMB with fixed field
-!!        with first order accuracy
-        real(kind = kreal) :: fdm1_fix_fld_CMB(0:1,2)
       end type sph_boundary_type
 !
 ! -----------------------------------------------------------------------
@@ -106,74 +102,44 @@
 !
       subroutine cal_fdm_coefs_4_BCs(nri, radius, sph_bc)
 !
-      use cal_fdm_coefs_4_boundaries
+      use t_coef_fdm2_scalar_ICB
+      use t_coef_fdm2_scalar_CMB
 !
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: radius(nri)
       type(sph_boundary_type), intent(inout) :: sph_bc
 !
 !
-      call cal_fdm1_coef_fix_fld_ICB(radius(sph_bc%kr_in),              &
-     &     sph_bc%fdm1_fix_fld_ICB)
-!
       call cal_fdm2_coef_fix_fld_ICB(radius(sph_bc%kr_in),              &
-     &     sph_bc%fdm2_fix_fld_ICB)
+     &    sph_bc%fdm2_fix_fld_ICB)
       call cal_fdm2_coef_fix_df_ICB(radius(sph_bc%kr_in),               &
-     &     sph_bc%fdm2_fix_dr_ICB)
-!
-!
-      call cal_fdm1_coef_fix_fld_CMB(radius(sph_bc%kr_out-1),           &
-     &     sph_bc%fdm1_fix_fld_CMB)
+     &    sph_bc%fdm2_fix_dr_ICB)
 !
       call cal_fdm2_coef_fix_fld_CMB(radius(sph_bc%kr_out-2),           &
-     &     sph_bc%fdm2_fix_fld_CMB)
+     &    sph_bc%fdm2_fix_fld_CMB)
       call cal_fdm2_coef_fix_df_CMB(radius(sph_bc%kr_out-1),            &
-     &     sph_bc%fdm2_fix_dr_CMB)
+     &    sph_bc%fdm2_fix_dr_CMB)
 !
       end subroutine cal_fdm_coefs_4_BCs
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_fdm_coefs_4_BC2(label, sph_bc)
+      subroutine check_fdm_coefs_4_BC2(id_file, label, sph_bc)
 !
+      use t_coef_fdm2_scalar_ICB
+      use t_coef_fdm2_scalar_CMB
+!
+      integer(kind = kint), intent(in) :: id_file
       character(len=kchara), intent(in) :: label
       type(sph_boundary_type), intent(in) :: sph_bc
 !
 !
-      write(50,*) ' Boundary condition matrix for ', trim(label)
+      write(id_file,*) ' Boundary condition matrix for ', trim(label)
 !
-      write(50,*) ' fdm1_fix_fld_ICB'
-      write(50,*) ' mat_fdm21,  mat_fdm22'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm1_fix_fld_ICB(0:1,2)
-!
-      write(50,*) ' fdm2_fix_fld_ICB'
-      write(50,*) ' mat_fdm21,  mat_fdm22,  mat_fdm23'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_fld_ICB(0:2,2)
-      write(50,*) ' mat_fdm31,  mat_fdm32,  mat_fdm33'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_fld_ICB(0:2,3)
-!
-      write(50,*) ' fdm2_fix_dr_ICB'
-      write(50,*) ' mat_fdm21,  mat_fdm22,  mat_fdm23'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_dr_ICB(-1:1,2)
-      write(50,*) ' mat_fdm31,  mat_fdm32,  mat_fdm33'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_dr_ICB(-1:1,3)
-!
-!
-      write(50,*) ' fdm1_fix_fld_CMB'
-      write(50,*) ' mat_fdm21,  mat_fdm22'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm1_fix_fld_CMB(0:1,2)
-!
-      write(50,*) ' fdm2_fix_fld_CMB'
-      write(50,*) ' mat_fdm21,  mat_fdm22,  mat_fdm23'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_fld_CMB(0:2,2)
-      write(50,*) ' mat_fdm31,  mat_fdm32,  mat_fdm33'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_fld_CMB(0:2,3)
-!
-      write(50,*) ' fdm2_fix_dr_CMB'
-      write(50,*) ' mat_fdm11,  mat_fdm12,  mat_fdm13'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_dr_CMB(-1:1,1)
-      write(50,*) ' mat_fdm31,  mat_fdm32,  mat_fdm33'
-      write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_dr_CMB(-1:1,3)
+      call check_fdm2_coefs_ICB(id_file, sph_bc%fdm2_fix_fld_ICB,       &
+     &                                   sph_bc%fdm2_fix_dr_ICB)
+      call check_fdm2_coefs_CMB(id_file, sph_bc%fdm2_fix_fld_CMB,       &
+     &                          sph_bc%fdm2_fix_dr_CMB)
 !
       end subroutine check_fdm_coefs_4_BC2
 !

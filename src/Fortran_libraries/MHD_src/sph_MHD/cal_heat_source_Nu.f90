@@ -65,7 +65,7 @@
      &          band_s00_poisson_fixS, Nu_type)
 !
       use t_fdm_coefs
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
       use const_r_mat_4_scalar_sph
 !
       character(len=kchara), intent(in) :: mat_name
@@ -96,7 +96,7 @@
      &          fdm2_center, band_s00_poisson_fixS, rj_fld, Nu_type)
 !
       use t_fdm_coefs
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
       use const_radial_references
 !
       integer(kind = kint), intent(in) :: is_scalar, is_source
@@ -186,7 +186,7 @@
      &          sph_rj, r_2nd, sc_prop, sph_bc_S, sph_bc_U, bcs_S,      &
      &          fdm2_center, rj_fld, band_s00_poisson_fixS, Nu_type)
 !
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
       use const_radial_references
       use set_parallel_file_name
 !

@@ -133,13 +133,13 @@
 !$omp end parallel workshare
 !
       call copy_ext_magne_comp_to_rj(sph_rj%idx_rj_degree_one( 1),      &
-     &    sph_rj%nnod_rj, sph_rj%nidx_rj(1), sph_rj%istep_rj(1),        &
+     &    sph_rj%nnod_rj, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),         &
      &    ext_bsx, ext_b_rj)
       call copy_ext_magne_comp_to_rj(sph_rj%idx_rj_degree_one(-1),      &
-     &    sph_rj%nnod_rj, sph_rj%nidx_rj(1), sph_rj%istep_rj(1),        &
+     &    sph_rj%nnod_rj, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),         &
      &    ext_bsy, ext_b_rj)
       call copy_ext_magne_comp_to_rj(sph_rj%idx_rj_degree_one( 0),      &
-     &    sph_rj%nnod_rj, sph_rj%nidx_rj(1), sph_rj%istep_rj(1),        &
+     &    sph_rj%nnod_rj, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),         &
      &    ext_bsz, ext_b_rj)
 !
       end subroutine copy_external_magne_to_rj
@@ -147,11 +147,10 @@
 !  -------------------------------------------------------------------
 !
       subroutine copy_ext_magne_comp_to_rj(idx_rj_degree_one, nnod_rj,  &
-     &          nri, istep_rj, ext_bs, ext_b_rj)
+     &                                     nri, jmax, ext_bs, ext_b_rj)
 !
       integer(kind = kint), intent(in) :: idx_rj_degree_one
-      integer(kind = kint), intent(in) :: nnod_rj, nri
-      integer(kind = kint), intent(in) :: istep_rj(2)
+      integer(kind = kint), intent(in) :: nnod_rj, nri, jmax
       real(kind = kreal), intent(in) :: ext_bs(nri,3)
 !
       real(kind = kreal), intent(inout) :: ext_b_rj(nnod_rj,3)
@@ -162,8 +161,7 @@
       if(idx_rj_degree_one .le. 0) return
 !$omp parallel do private(kr,inod)
       do kr = 1, nri
-        inod = 1 + (kr-1) * istep_rj(1)                                 &
-     &           + (idx_rj_degree_one- 1) * istep_rj(2) 
+        inod = idx_rj_degree_one + (kr-1) * jmax
         ext_b_rj(inod,1) = ext_bs(kr,1)
         ext_b_rj(inod,2) = ext_bs(kr,2)
         ext_b_rj(inod,3) = ext_bs(kr,3)

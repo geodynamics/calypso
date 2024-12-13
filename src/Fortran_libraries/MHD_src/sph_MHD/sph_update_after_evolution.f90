@@ -8,8 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine update_after_vorticity_sph(sph_rj, r_2nd, fl_prop,   &
-!!     &          sph_bc_U, fdm2_free_ICB, fdm2_free_CMB, leg,          &
-!!     &          ipol, rj_fld)
+!!     &          sph_bc_U, bc_fdms_U, leg, ipol, rj_fld)
 !!      subroutine update_after_magne_sph(sph_rj, r_2nd,                &
 !!     &          cd_prop, sph_bc_B, leg, ipol, rj_fld)
 !!      subroutine update_after_heat_sph(sph_rj, r_2nd, ht_prop,        &
@@ -23,8 +22,7 @@
 !!        type(scalar_property), intent(in) :: ht_prop
 !!        type(scalar_property), intent(in) :: cp_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
-!!        type(fdm2_free_slip), intent(in) :: fdm2_free_ICB
-!!        type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
+!!        type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
 !!        type(sph_boundary_type), intent(in) :: sph_bc_B
 !!        type(sph_boundary_type), intent(in) :: sph_bc_T
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_T
@@ -55,7 +53,7 @@
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_radial_matrices_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
       use t_work_4_sph_trans
 !
       implicit none
@@ -67,17 +65,18 @@
 ! -----------------------------------------------------------------------
 !
       subroutine update_after_vorticity_sph(sph_rj, r_2nd, fl_prop,     &
-     &          sph_bc_U, fdm2_free_ICB, fdm2_free_CMB, leg,            &
-     &          ipol, rj_fld)
+     &          sph_bc_U, bc_fdms_U, leg, ipol, rj_fld)
 !
+      use t_coef_sph_velocity_BCs
+      use t_coef_fdm2_free_slip_ICB
+      use t_coef_fdm2_free_slip_CMB
       use cal_inner_core_rotation
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
-      type(fdm2_free_slip), intent(in) :: fdm2_free_ICB
-      type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
+      type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
       type(legendre_4_sph_trans), intent(in) :: leg
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -95,8 +94,7 @@
       if(ipol%diffusion%i_v_diffuse .gt. 0) then
         if(iflag_debug.gt.0) write(*,*) 'const_sph_viscous_by_vort2'
         call const_sph_viscous_by_vort2(sph_rj, r_2nd,                  &
-     &      sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,                     &
-     &      leg%g_sph_rj, fl_prop%coef_diffuse,                         &
+     &      sph_bc_U, bc_fdms_U, leg%g_sph_rj, fl_prop%coef_diffuse,    &
      &      ipol%base%i_velo, ipol%base%i_vort,                         &
      &      ipol%diffusion%i_v_diffuse, rj_fld)
       end if
@@ -108,8 +106,7 @@
       if(ipol%diffusion%i_w_diffuse .gt. 0) then
         if(iflag_debug.gt.0) write(*,*)'const_sph_vorticirty_diffusion'
         call const_sph_vorticirty_diffusion(sph_rj, r_2nd,              &
-     &      sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,                     &
-     &      leg%g_sph_rj, fl_prop%coef_diffuse,                         &
+     &      sph_bc_U, bc_fdms_U, leg%g_sph_rj, fl_prop%coef_diffuse,    &
      &      ipol%base%i_vort, ipol%diffusion%i_w_diffuse, rj_fld)
       end if
 !

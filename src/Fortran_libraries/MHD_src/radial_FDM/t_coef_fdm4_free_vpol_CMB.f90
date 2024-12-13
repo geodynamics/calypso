@@ -7,10 +7,13 @@
 !>@brief Matrix to evaluate radial derivative for non-slip at ICB
 !!
 !!@verbatim
-!!      subroutine check_4th_CMB_free_vp_fdm(fdm4_free_vp_CMB)
+!!      subroutine check_4th_CMB_free_vp_fdm(id_file, fdm4_free_vp_CMB)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(fdm4_CMB_free_vpol), intent(in) :: fdm4_free_vp_CMB
-!!      subroutine cal_fdm4_CMB0_free_vp(r_from_CMB, fdm4_free_vp_CMB)
+!!      subroutine cal_fdm4_CMB0_free_vp(h_rho, r_from_CMB,             &
+!!     &                                 fdm4_free_vp_CMB)
 !!      subroutine cal_fdm4_CMB1_free_vp(r_from_CMB, fdm4_free_vp_CMB)
+!!        real(kind = kreal), intent(in) :: h_rho
 !!        real(kind = kreal), intent(in) :: r_from_CMB(-3:0)
 !!        type(fdm4_CMB_free_vpol), intent(inout) :: fdm4_free_vp_CMB
 !!
@@ -67,38 +70,41 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_4th_CMB_free_vp_fdm(fdm4_free_vp_CMB)
+      subroutine check_4th_CMB_free_vp_fdm(id_file, fdm4_free_vp_CMB)
 !
+      integer(kind = kint), intent(in) :: id_file
       type(fdm4_CMB_free_vpol), intent(in) :: fdm4_free_vp_CMB
 !
 !
-      write(50,*) ' free slip boundary'
-      write(50,*) ' fdm4_free_vp_CMB%dmat_vp0'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp0(-2:0,2)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp0(-2:0,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp0(-2:0,4)
+      write(id_file,*) ' free slip boundary'
+      write(id_file,*) ' fdm4_free_vp_CMB%dmat_vp0'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp0(-2:0,2)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp0(-2:0,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp0(-2:0,4)
 !
-      write(50,*) ' fdm4_free_vp_CMB%dmat_vp1'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,2)
-      write(50,*) 'matrix for d2fdr2'
-      write(50,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,4)
-      write(50,*) 'matrix for d4fdr4'
-      write(50,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,5)
+      write(id_file,*) ' fdm4_free_vp_CMB%dmat_vp1'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,4)
+      write(id_file,*) 'matrix for d4fdr4'
+      write(id_file,'(1p9E25.15e3)') fdm4_free_vp_CMB%dmat_vp1(-2:1,5)
 !
       end subroutine check_4th_CMB_free_vp_fdm
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_fdm4_CMB0_free_vp(r_from_CMB, fdm4_free_vp_CMB)
+      subroutine cal_fdm4_CMB0_free_vp(h_rho, r_from_CMB,               &
+     &                                 fdm4_free_vp_CMB)
 !
       use cal_inverse_small_matrix
 !
+      real(kind = kreal), intent(in) :: h_rho
       real(kind = kreal), intent(in) :: r_from_CMB(-3:0)
       type(fdm4_CMB_free_vpol), intent(inout) :: fdm4_free_vp_CMB
 !
@@ -133,20 +139,20 @@
       mat_taylor_4(1,3) = zero
       mat_taylor_4(1,4) = zero
 !
-      mat_taylor_4(2,1) =  one
-      mat_taylor_4(2,2) =  -r0
-      mat_taylor_4(2,3) =  half * r0*r0
+      mat_taylor_4(2,1) =  zero
+      mat_taylor_4(2,2) =  -(two / r0 + h_rho)
+      mat_taylor_4(2,3) =  one
       mat_taylor_4(2,4) =  zero
 !
       mat_taylor_4(3,1) =  one
       mat_taylor_4(3,2) = -dr_n1
       mat_taylor_4(3,3) =  dr_n1*dr_n1 / two
-      mat_taylor_4(3,4) = -dr_n1**3 / six
+      mat_taylor_4(3,4) = -(one/six) * dr_n1**3
 !
       mat_taylor_4(4,1) =  one
       mat_taylor_4(4,2) = -dr_n2
-      mat_taylor_4(4,3) =  dr_n2*dr_n2 / two
-      mat_taylor_4(4,4) = -dr_n2**3 / six
+      mat_taylor_4(4,3) =  half * dr_n2*dr_n2
+      mat_taylor_4(4,4) = -(one/six) * dr_n2**3
 !
       call cal_inverse_44_matrix(mat_taylor_4,                          &
      &    mat_fdm4_CMB_free_vp, ierr)

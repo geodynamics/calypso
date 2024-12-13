@@ -13,7 +13,9 @@
 !!      subroutine cal_fdm4_ICB1_nonslip_vp(r_from_ICB, fdm4_noslip_ICB)
 !!        real(kind = kreal), intent(in) :: r_from_ICB(0:3)
 !!        type(fdm4_ICB_zero_vpol), intent(inout) :: fdm4_noslip_ICB
-!!      subroutine check_4th_ICB_nonslip_vp_fdm(fdm4_noslip_ICB)
+!!      subroutine check_4th_ICB_nonslip_vp_fdm(id_file,                &
+!!     &                                        fdm4_noslip_ICB)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(fdm4_ICB_zero_vpol), intent(in) :: fdm4_noslip_ICB
 !!
 !!   Matrix for poloidal velocity with non-slip boundary at ICB
@@ -224,29 +226,31 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_4th_ICB_nonslip_vp_fdm(fdm4_noslip_ICB)
+      subroutine check_4th_ICB_nonslip_vp_fdm(id_file,                  &
+     &                                        fdm4_noslip_ICB)
 !
+      integer(kind = kint), intent(in) :: id_file
       type(fdm4_ICB_zero_vpol), intent(in) :: fdm4_noslip_ICB
 !
 !
-      write(50,*) ' non slip boundary'
-      write(50,*) ' fdm4_noslip_ICB%dmat_vp0'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp0(0:2,2)
-      write(50,*) 'matrix for d2fdr2'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp0(0:2,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp0(0:2,4)
+      write(id_file,*) ' non slip boundary'
+      write(id_file,*) ' fdm4_noslip_ICB%dmat_vp0'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp0(0:2,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp0(0:2,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp0(0:2,4)
 !
-      write(50,*) ' fdm4_noslip_ICB%dmat_vp1'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,2)
-      write(50,*) 'matrix for d2fdr2'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,4)
-      write(50,*) 'matrix for d4fdr4'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,5)
+      write(id_file,*) ' fdm4_noslip_ICB%dmat_vp1'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,4)
+      write(id_file,*) 'matrix for d4fdr4'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_ICB%dmat_vp1(-1:2,5)
 !
       end subroutine check_4th_ICB_nonslip_vp_fdm
 !

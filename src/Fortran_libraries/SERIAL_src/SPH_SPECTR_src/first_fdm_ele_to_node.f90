@@ -88,9 +88,9 @@
       deallocate(mat_fdm)
 !
       if(iflag_debug .gt. 0) then
-          write(*,*) 'check First order FDM from element'
+        write(50,*) 'check First order FDM from element'
         call check_fdm_coefs                                            &
-     &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, fdm_1st_nod)
+     &     (50, sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, fdm_1st_nod)
       end if
 !
       end subroutine const_first_fdm_ele_to_node

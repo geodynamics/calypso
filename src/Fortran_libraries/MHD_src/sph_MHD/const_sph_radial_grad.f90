@@ -46,7 +46,7 @@
       use t_boundary_data_sph_MHD
       use t_boundary_sph_spectr
       use t_boundary_params_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
 !
       use cal_sph_exp_1st_diff
 !
@@ -62,7 +62,6 @@
      &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center, g_sph_rj,    &
      &          is_fld, is_grad, rj_fld)
 !
-      use t_coef_fdm2_MHD_boundaries
       use select_exp_scalar_ICB
       use select_exp_scalar_CMB
 !
@@ -102,7 +101,8 @@
       subroutine const_sph_gradient_no_bc(sph_rj, r_2nd, sph_bc,        &
      &          g_sph_rj, is_fld, is_grad, rj_fld)
 !
-      use cal_sph_exp_nod_none_bc
+      use sph_exp_no_condition_ICB
+      use sph_exp_no_condition_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd

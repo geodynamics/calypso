@@ -8,17 +8,24 @@
 !!
 !!@verbatim
 !!      subroutine const_sph_viscous_diffusion                          &
-!!     &         (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,&
-!!     &          g_sph_rj, coef_diffuse, is_velo, is_viscous, rj_fld)
+!!     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, g_sph_rj,         &
+!!     &          coef_diffuse, is_velo, is_viscous, rj_fld)
 !!        Address for input:    is_velo, is_velo+2
 !!        Address for solution: is_viscous, is_viscous+2, is_viscous+1
 !!      subroutine const_sph_vorticirty_diffusion                       &
-!!     &         (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,&
-!!     &          g_sph_rj, coef_diffuse, is_vort, is_w_diffuse, rj_fld)
-!!     &          is_vort, is_w_diffuse, rj_fld)
-!!        Address for input:    is_vort, is_vort+2
-!!        Address for solution: is_w_diffuse, is_w_diffuse+2,
-!!                              is_w_diffuse+1
+!!     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, g_sph_rj,         &
+!!     &          coef_diffuse, is_vort, is_w_diffuse, rj_fld)
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(sph_boundary_type), intent(in) :: sph_bc_U
+!!        type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
+!!        integer(kind = kint), intent(in) :: is_vort, is_w_diffuse
+!!        real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
+!!        real(kind = kreal), intent(in) :: coef_diffuse
+!!        type(phys_data), intent(inout) :: rj_fld
+!!          Address for input:    is_vort, is_vort+2
+!!          Address for solution: is_w_diffuse, is_w_diffuse+2,
+!!                                is_w_diffuse+1
 !!
 !!      subroutine const_sph_magnetic_diffusion(sph_rj, r_2nd, sph_bc_B,&
 !!     &          g_sph_rj, coef_diffuse, is_magne, is_ohmic, rj_fld)
@@ -72,7 +79,9 @@
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
+      use t_coef_fdm2_free_slip_ICB
+      use t_coef_fdm2_free_slip_CMB
 !
       use cal_sph_exp_diffusion
 !
@@ -85,18 +94,18 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_sph_viscous_diffusion                            &
-     &         (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,  &
-     &          g_sph_rj, coef_diffuse, is_velo, is_viscous, rj_fld)
+     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, g_sph_rj,           &
+     &          coef_diffuse, is_velo, is_viscous, rj_fld)
 !
+      use t_coef_sph_velocity_BCs
       use cal_sph_exp_1st_diff
-      use cal_sph_exp_fixed_scalar
       use select_exp_velocity_ICB
       use select_exp_velocity_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(sph_boundary_type), intent(in) :: sph_bc_U
-      type(fdm2_free_slip), intent(in) :: fdm2_free_ICB, fdm2_free_CMB
+      type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
 !
       integer(kind = kint), intent(in) :: is_velo, is_viscous
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
@@ -114,10 +123,12 @@
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call sel_ICB_sph_viscous_diffusion(sph_rj, r_2nd, sph_bc_U,       &
-     &    fdm2_free_ICB, g_sph_rj, coef_diffuse, is_velo, is_viscous,   &
+     &    bc_fdms_U%fdm2_free_ICB, bc_fdms_U%fdm1_fix_fld_ICB,          &
+     &    g_sph_rj, coef_diffuse, is_velo, is_viscous,                  &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      call sel_CMB_sph_viscous_diffusion(sph_rj, sph_bc_U,              &
-     &    fdm2_free_CMB, g_sph_rj, coef_diffuse, is_velo, is_viscous,   &
+      call sel_CMB_sph_viscous_diffusion                                &
+     &   (sph_rj, sph_bc_U, bc_fdms_U%fdm2_free_CMB,                    &
+     &    g_sph_rj, coef_diffuse, is_velo, is_viscous,                  &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_sph_viscous_diffusion
@@ -125,9 +136,10 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_sph_vorticirty_diffusion                         &
-     &         (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,  &
-     &          g_sph_rj, coef_diffuse, is_vort, is_w_diffuse, rj_fld)
+     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, g_sph_rj,           &
+     &          coef_diffuse, is_vort, is_w_diffuse, rj_fld)
 !
+      use t_coef_sph_velocity_BCs
       use cal_sph_exp_1st_diff
       use select_exp_velocity_ICB
       use select_exp_velocity_CMB
@@ -135,7 +147,7 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(sph_boundary_type), intent(in) :: sph_bc_U
-      type(fdm2_free_slip), intent(in) :: fdm2_free_ICB, fdm2_free_CMB
+      type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
 !
       integer(kind = kint), intent(in) :: is_vort, is_w_diffuse
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
@@ -153,10 +165,12 @@
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call sel_ICB_sph_vort_diffusion(sph_rj, r_2nd, sph_bc_U,          &
-     &    fdm2_free_ICB, g_sph_rj, coef_diffuse, is_vort, is_w_diffuse, &
+     &    bc_fdms_U%fdm2_free_ICB, bc_fdms_U%fdm1_fix_fld_ICB,          &
+     &    g_sph_rj, coef_diffuse, is_vort, is_w_diffuse,                &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      call sel_CMB_sph_vort_diffusion(sph_rj, sph_bc_U,                 &
-     &    fdm2_free_CMB, g_sph_rj, coef_diffuse, is_vort, is_w_diffuse, &
+      call sel_CMB_sph_vort_diffusion                                   &
+     &   (sph_rj, sph_bc_U, bc_fdms_U%fdm2_free_CMB, g_sph_rj,          &
+     &    coef_diffuse, is_vort, is_w_diffuse,                          &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_sph_vorticirty_diffusion
@@ -204,7 +218,6 @@
      &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center,              &
      &          g_sph_rj, coef_diffuse, is_fld, is_diffuse, rj_fld)
 !
-      use t_coef_fdm2_MHD_boundaries
       use select_exp_scalar_ICB
       use select_exp_scalar_CMB
 !

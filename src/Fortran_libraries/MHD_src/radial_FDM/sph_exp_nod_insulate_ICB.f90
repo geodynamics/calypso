@@ -1,5 +1,5 @@
-!>@file   cal_sph_exp_nod_icb_ins.f90
-!!@brief  module cal_sph_exp_nod_icb_ins
+!>@file   sph_exp_nod_insulate_ICB.f90
+!!@brief  module sph_exp_nod_insulate_ICB
 !!
 !!@author H. Matsui
 !!@date Programmed in Jan., 2010
@@ -43,7 +43,7 @@
 !!@n @param ntot_phys_rj   Total number of components
 !!@n @param d_rj           Spectrum data
 !
-      module cal_sph_exp_nod_icb_ins
+      module sph_exp_nod_insulate_ICB
 !
       use m_precision
       use m_constants
@@ -250,4 +250,4 @@
 !
 ! -----------------------------------------------------------------------
 !
-      end module cal_sph_exp_nod_icb_ins
+      end module sph_exp_nod_insulate_ICB

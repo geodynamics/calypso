@@ -72,9 +72,9 @@
       type(fdm3_n2e_CMB_free_vpol), intent(in) :: fdm3e_free_CMB
 !
 !
-      write(id_file,*) ' free slip at CMB'
+      write(id_file,*) ' free slip at CMB element'
       write(id_file,*) ' fdm3e_free_CMB%dmat_vp0'
-      write(id_file,*) 'matrix for Interpolation'
+      write(id_file,*) 'matrix for Interpolation to element'
       write(id_file,'(1p9E25.15e3)') fdm3e_free_CMB%dmat_vp0(-2:1,1)
       write(id_file,*) 'matrix for dfdr'
       write(id_file,'(1p9E25.15e3)') fdm3e_free_CMB%dmat_vp0(-2:1,2)
@@ -90,7 +90,6 @@
       subroutine cal_fdm3e_CMB_free_hdiv_vp                             &
      &         (dmat_vp_free_CMB, fdm3e_vp0_CMB, fdm3e_free_CMB)
 !
-      use t_coef_fdm2_MHD_boundaries
       use t_coef_fdm3_n2e_zero_vp_CMB
 !
       real(kind = kreal), intent(in) :: dmat_vp_free_CMB(-1:1,3)

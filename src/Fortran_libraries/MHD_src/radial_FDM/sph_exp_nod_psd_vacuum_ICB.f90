@@ -1,5 +1,5 @@
-!>@file   cal_sph_exp_nod_icb_qvac.f90
-!!@brief  module cal_sph_exp_nod_icb_qvac
+!>@file   sph_exp_nod_psd_vacuum_ICB.f90
+!!@brief  module sph_exp_nod_psd_vacuum_ICB
 !!
 !!@author H. Matsui
 !!@date Programmed in Jan., 2010
@@ -41,7 +41,7 @@
 !!@n @param ntot_phys_rj   Total number of components
 !!@n @param d_rj           Spectrum data
 !
-      module cal_sph_exp_nod_icb_qvac
+      module sph_exp_nod_psd_vacuum_ICB
 !
       use m_precision
       use m_constants
@@ -232,4 +232,4 @@
 !
 ! -----------------------------------------------------------------------
 !
-      end module cal_sph_exp_nod_icb_qvac
+      end module sph_exp_nod_psd_vacuum_ICB

@@ -98,9 +98,9 @@
       deallocate(mat_fdm)
 !
       if(iflag_debug .gt. 0) then
-          write(*,*) 'check Third order FDM on element'
+          write(50,*) 'check Third order FDM on element'
         call check_fdm_coefs                                            &
-     &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, fdm_3rd_ele)
+     &     (50,sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, fdm_3rd_ele)
       end if
 !
       end subroutine const_third_fdm_node_to_ele

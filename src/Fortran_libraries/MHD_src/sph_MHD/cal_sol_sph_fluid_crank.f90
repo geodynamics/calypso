@@ -7,13 +7,19 @@
 !>@brief  Update each field for MHD dynamo model
 !!
 !!@verbatim
-!!      subroutine cal_sol_velo_by_vort_sph_crank(sph_rj, r_2nd,        &
-!!     &          sph_bc_U, bcs_U, fdm2_free_ICB, fdm2_free_CMB,        &
+!!      subroutine cal_sol_velo_by_vort_sph_crank                       &
+!!     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, bcs_U,            &
 !!     &          band_vp_evo, band_vt_evo, ipol, rj_fld)
-!!        Input address:    ipol%base%i_vort, ipol%base%i_vort+2
-!!        Solution address: ipol%base%i_velo, ipol%base%i_velo+2
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
-!!        type(sph_scalar_boundary_data), intent(in) :: bcs_U
+!!        type(sph_vector_boundary_data), intent(in) :: bcs_U
+!!        type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
+!!        type(band_matrices_type), intent(in) :: band_vp_evo, band_vt_evo
+!!        type(phys_address), intent(in) :: ipol
+!!        type(phys_data), intent(inout) :: rj_fld
+!!          Input address:    ipol%base%i_vort, ipol%base%i_vort+2
+!!          Solution address: ipol%base%i_velo, ipol%base%i_velo+2
 !!
 !!      subroutine cal_sol_pressure_by_div_v                            &
 !!     &         (sph_rj, sph_bc_U, band_p_poisson, ipol, rj_fld)
@@ -59,7 +65,7 @@
       use t_sph_matrices
       use t_boundary_sph_spectr
       use t_boundary_data_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
 !
       use set_reference_sph_mhd
       use lubksb_357band_mul
@@ -72,10 +78,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sol_velo_by_vort_sph_crank(sph_rj, r_2nd,          &
-     &          sph_bc_U, bcs_U, fdm2_free_ICB, fdm2_free_CMB,          &
+      subroutine cal_sol_velo_by_vort_sph_crank                         &
+     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, bcs_U,              &
      &          band_vp_evo, band_vt_evo, ipol, rj_fld)
 !
+      use t_coef_sph_velocity_BCs
       use copy_field_smp
       use solve_sph_fluid_crank
       use set_reference_sph_mhd
@@ -87,7 +94,7 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_vector_boundary_data), intent(in) :: bcs_U
-      type(fdm2_free_slip), intent(in) :: fdm2_free_ICB, fdm2_free_CMB
+      type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
       type(band_matrices_type), intent(in) :: band_vp_evo, band_vt_evo
       type(phys_address), intent(in) :: ipol
 !
@@ -108,10 +115,10 @@
      &    sph_rj%nidx_rj, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call sel_ICB_grad_poloidal_moment(sph_rj, r_2nd, sph_bc_U,        &
-     &    bcs_U%ICB_Vspec, fdm2_free_ICB, ipol%base%i_velo,             &
+     &    bcs_U%ICB_Vspec, bc_fdms_U%fdm2_free_ICB, ipol%base%i_velo,   &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call sel_CMB_grad_poloidal_moment(sph_rj, sph_bc_U,               &
-     &    bcs_U%CMB_Vspec, fdm2_free_CMB, ipol%base%i_velo,             &
+     &    bcs_U%CMB_Vspec, bc_fdms_U%fdm2_free_CMB, ipol%base%i_velo,   &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
 !

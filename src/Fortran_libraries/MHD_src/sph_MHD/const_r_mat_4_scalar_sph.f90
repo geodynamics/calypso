@@ -50,7 +50,7 @@
       use t_sph_center_matrix
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
 !
       implicit none
 !
@@ -65,7 +65,6 @@
      &          g_sph_rj, band_p_poisson)
 !
       use m_ludcmp_3band
-      use set_sph_scalar_mat_bc
       use cal_inner_core_rotation
       use center_sph_matrices
       use mat_product_3band_mul
@@ -128,7 +127,6 @@
       use m_ludcmp_3band
       use center_sph_matrices
       use set_radial_mat_sph
-      use set_sph_scalar_mat_bc
       use select_r_mat_scalar_bc_sph
       use check_sph_radial_mat
 !
