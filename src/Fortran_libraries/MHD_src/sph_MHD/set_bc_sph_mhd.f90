@@ -93,9 +93,7 @@
      &      MHD_BC%velo_BC%nod_BC, MHD_BC%velo_BC%surf_BC,              &
      &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
 !
-        call cal_fdm_coefs_4_BCs                                        &
-     &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
-     &      sph_MHD_bc%sph_bc_U)
+        call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_U)
 !
         call density_diff_at_boundaries                                 &
      &     (MHD_prop%fl_prop, radial_variation, sph_MHD_bc%sph_bc_U,    &
@@ -110,9 +108,7 @@
         call set_sph_bc_temp_sph(bc_IO, sph_rj, radial_rj_grp,          &
      &      MHD_BC%temp_BC%nod_BC, MHD_BC%temp_BC%surf_BC,              &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T)
-        call cal_fdm_coefs_4_BCs                                        &
-     &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
-     &      sph_MHD_bc%sph_bc_T)
+        call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_T)
       end if
 !
       if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
@@ -121,9 +117,7 @@
      &      CTR_nod_grp_name, CTR_sf_grp_name,                          &
      &      MHD_BC%magne_BC%nod_BC, MHD_BC%magne_BC%surf_BC,            &
      &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%bcs_B)
-        call cal_fdm_coefs_4_BCs                                        &
-     &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
-     &      sph_MHD_bc%sph_bc_B)
+        call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_B)
       end if
 !
       if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
@@ -131,9 +125,7 @@
         call set_sph_bc_composition_sph(bc_IO, sph_rj, radial_rj_grp,   &
      &      MHD_BC%light_BC%nod_BC, MHD_BC%light_BC%surf_BC,            &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C)
-        call cal_fdm_coefs_4_BCs                                        &
-     &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
-     &      sph_MHD_bc%sph_bc_C)
+        call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_C)
       end if
 !
 !      Set FDM matrices for Center

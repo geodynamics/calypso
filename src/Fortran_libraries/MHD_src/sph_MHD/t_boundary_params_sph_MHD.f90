@@ -8,7 +8,8 @@
 !!
 !!
 !!@verbatim
-!!      subroutine cal_fdm_coefs_4_BCs(nri, radius, sph_bc)
+!!      subroutine cal_fdm_coefs_4_BCs(sph_rj, sph_bc)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_boundary_type), intent(inout) :: sph_bc
 !!      subroutine check_fdm_coefs_4_BC2(id_file, label, sph_bc)
 !!        integer(kind = kint), intent(in) :: id_file
@@ -100,25 +101,29 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_fdm_coefs_4_BCs(nri, radius, sph_bc)
+      subroutine cal_fdm_coefs_4_BCs(sph_rj, sph_bc)
 !
+      use t_spheric_rj_data
       use t_coef_fdm2_scalar_ICB
       use t_coef_fdm2_scalar_CMB
 !
-      integer(kind = kint), intent(in) :: nri
-      real(kind = kreal), intent(in) :: radius(nri)
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(inout) :: sph_bc
 !
+      integer(kind = kint) :: kr_st
 !
-      call cal_fdm2_coef_fix_fld_ICB(radius(sph_bc%kr_in),              &
-     &    sph_bc%fdm2_fix_fld_ICB)
-      call cal_fdm2_coef_fix_df_ICB(radius(sph_bc%kr_in),               &
-     &    sph_bc%fdm2_fix_dr_ICB)
+      kr_st = sph_bc%kr_in
+      call cal_fdm2_coef_fix_fld_ICB(sph_rj%radius_1d_rj_r(kr_st),      &
+     &                               sph_bc%fdm2_fix_fld_ICB)
+      call cal_fdm2_coef_fix_df_ICB(sph_rj%radius_1d_rj_r(kr_st),       &
+     &                              sph_bc%fdm2_fix_dr_ICB)
 !
-      call cal_fdm2_coef_fix_fld_CMB(radius(sph_bc%kr_out-2),           &
-     &    sph_bc%fdm2_fix_fld_CMB)
-      call cal_fdm2_coef_fix_df_CMB(radius(sph_bc%kr_out-1),            &
-     &    sph_bc%fdm2_fix_dr_CMB)
+      kr_st = sph_bc%kr_out-2
+      call cal_fdm2_coef_fix_fld_CMB(sph_rj%radius_1d_rj_r(kr_st),      &
+     &                               sph_bc%fdm2_fix_fld_CMB)
+      kr_st = sph_bc%kr_out-1
+      call cal_fdm2_coef_fix_df_CMB(sph_rj%radius_1d_rj_r(kr_st),       &
+     &                              sph_bc%fdm2_fix_dr_CMB)
 !
       end subroutine cal_fdm_coefs_4_BCs
 !

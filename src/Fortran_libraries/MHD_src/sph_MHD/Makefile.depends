@@ -288,7 +288,7 @@ t_addresses_sph_transform.o: $(MHD_SPH_DIR)/t_addresses_sph_transform.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 t_boundary_data_sph_MHD.o: $(MHD_SPH_DIR)/t_boundary_data_sph_MHD.f90 m_precision.o t_boundary_params_sph_MHD.o t_boundary_sph_spectr.o t_coef_sph_velocity_BCs.o t_coef_fdm2_centre.o t_coef_fdm4_vpol_centre.o t_spheric_parameter.o t_control_parameter.o t_time_data.o set_evoluved_boundaries.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_boundary_params_sph_MHD.o: $(MHD_SPH_DIR)/t_boundary_params_sph_MHD.f90 m_precision.o t_coef_fdm2_scalar_ICB.o t_coef_fdm2_scalar_CMB.o
+t_boundary_params_sph_MHD.o: $(MHD_SPH_DIR)/t_boundary_params_sph_MHD.f90 m_precision.o t_spheric_rj_data.o t_coef_fdm2_scalar_ICB.o t_coef_fdm2_scalar_CMB.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_boundary_sph_spectr.o: $(MHD_SPH_DIR)/t_boundary_sph_spectr.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
