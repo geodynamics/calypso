@@ -12,8 +12,10 @@
 !!
 !!      subroutine allocate_press_vpol_mat_sph(sph_rj, sph_MHD_mat)
 !!      subroutine check_velocity_matrices_sph                          &
-!!     &         (id_rank, sph_rj, sph_MHD_mat)
-!!        type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
+!!     &         (id_file, sph_rj, sph_MHD_mat)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(MHD_radial_matrices), intent(in) :: sph_MHD_mat
 !!@endverbatim
 !!
       module t_radial_matrices_sph_MHD
@@ -38,7 +40,7 @@
 !>        Structure of band matrices for pressure poisson
         type(band_matrices_type) :: band_p_poisson
 !
-!>        Structure of band matrices for poloidal velocity
+!>        Structure of band matrices for poloidal velocity and pressure
         type(band_matrices_type) :: band_vsp_evo
 !
 !>        Structure of band matrices for poloidal magnetic field
@@ -143,11 +145,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine check_velocity_matrices_sph                            &
-     &         (id_rank, sph_rj, sph_MHD_mat)
+     &         (id_file, sph_rj, sph_MHD_mat)
 !
       use check_sph_radial_mat
 !
-      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: id_file
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_radial_matrices), intent(in) :: sph_MHD_mat
 !
@@ -161,11 +163,11 @@
       end do
 !
       call check_radial_7band_mat                                       &
-     &   (id_rank, (2*sph_rj%nidx_rj(1)), sph_rj%nidx_rj(2),            &
+     &   (id_file, (2*sph_rj%nidx_rj(1)), sph_rj%nidx_rj(2),            &
      &    sph_rj%idx_gl_1d_rj_j, rr, sph_MHD_mat%band_vsp_evo%mat)
 !
       call check_radial_band_mat                                        &
-     &   (id_rank, sph_rj, sph_MHD_mat%band_vt_evo)
+     &   (id_file, sph_rj, sph_MHD_mat%band_vt_evo)
 !
       end subroutine check_velocity_matrices_sph
 !

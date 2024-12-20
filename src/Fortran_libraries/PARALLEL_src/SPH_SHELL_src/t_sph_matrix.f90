@@ -220,15 +220,19 @@
 !
 !
       if(smat%n_band .eq. ithree) then
-        call check_single_radial_3band_mat(id_rank, smat%n_vect,        &
+        call check_single_radial_3band_mat((50+id_rank), smat%n_vect,   &
      &      sph_rj%radius_1d_rj_r, smat%mat)
 !
       else if(smat%n_band .eq. ifive) then
-        call check_single_radial_5band_mat(id_rank, smat%n_vect,        &
+        call check_single_radial_5band_mat((50+id_rank), smat%n_vect,   &
      &      sph_rj%radius_1d_rj_r, smat%mat)
 !
       else if(smat%n_band .eq. iseven) then
-        call check_single_radial_7band_mat(id_rank, smat%n_vect,        &
+        call check_single_radial_7band_mat((50+id_rank), smat%n_vect,   &
+     &      sph_rj%radius_1d_rj_r, smat%mat)
+!
+      else if(smat%n_band .eq. inine) then
+        call check_single_radial_9band_mat((50+id_rank), smat%n_vect,   &
      &      sph_rj%radius_1d_rj_r, smat%mat)
       end if
 !

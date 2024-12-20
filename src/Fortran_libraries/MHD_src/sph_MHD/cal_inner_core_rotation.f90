@@ -74,7 +74,7 @@
       implicit  none
 !
       private :: int_icore_tor_lorentz_l1, cal_icore_viscous_drag_l1
-      private :: set_rotate_icb_vt_sph_mat, set_inner_core_rot_l1
+      private :: set_inner_core_rot_l1
 !
 ! ----------------------------------------------------------------------
 !

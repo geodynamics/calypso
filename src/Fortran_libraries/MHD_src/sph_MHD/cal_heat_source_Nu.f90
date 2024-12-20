@@ -83,7 +83,7 @@
       if(Nu_type%iflag_Nusselt .eq. iflag_no_source_Nu) return
         call alloc_Nu_radial_reference(sph%sph_rj, Nu_type)
         call const_r_mat00_scalar_sph                                   &
-     &     (mat_name, sc_prop%diffusie_reduction_ICB,                   &
+     &     (my_rank+50, mat_name, sc_prop%diffusie_reduction_ICB,       &
      &      sph%sph_params, sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,   &
      &      band_s00_poisson_fixS)
 !

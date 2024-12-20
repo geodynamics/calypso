@@ -149,7 +149,7 @@ use t_coef_fdm2_centre
      &      poisson_mat%n_vect, poisson_mat%n_comp, poisson_mat%mat,    &
      &      band_s00_poisson)
       end if
-      call check_center_band_matrix(6, sph_rj, band_s00_poisson)
+      call check_center_band_matrix(50+my_rank, sph_rj, band_s00_poisson)
 !
       end subroutine const_rmat_poisson00_sph
 !
@@ -201,7 +201,7 @@ use t_coef_fdm2_centre
       call ludcmp_3band_ctr(band_p00_poisson)
 !
       if(i_debug .ne. iflag_full_msg) return
-      call check_center_band_matrix(my_rank, sph_rj, band_p00_poisson)
+      call check_center_band_matrix(50+my_rank, sph_rj, band_p00_poisson)
 !
       end subroutine const_rmat_press00_sph
 !
@@ -250,7 +250,7 @@ use t_coef_fdm2_centre
       call ludcmp_3band_ctr(band_s00_evo)
 !
       if(i_debug .ne. iflag_full_msg) return
-      call check_center_band_matrix(my_rank, sph_rj, band_s00_evo)
+      call check_center_band_matrix(50+my_rank, sph_rj, band_s00_evo)
 !
       end subroutine const_rmat_scalar00_sph
 !
@@ -277,7 +277,7 @@ use t_coef_fdm2_centre
       call ludcmp_3band_ctr(band_s00_poisson)
 !
       if(i_debug .ne. iflag_full_msg) return
-      call check_center_band_matrix(my_rank, sph_rj, band_s00_poisson)
+      call check_center_band_matrix(50+my_rank, sph_rj, band_s00_poisson)
 !
       end subroutine copy_radial_mat_scalar00_sph
 !

@@ -19,12 +19,13 @@
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!
-!!      subroutine const_r_mat00_scalar_sph                             &
-!!     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj, &
-!!     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
-!!      subroutine const_r_mat00_poisson_fixS                           &
-!!     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj, &
-!!     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
+!!      subroutine const_r_mat00_scalar_sph(id_file, mat_name,          &
+!!     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,    &
+!!     &          sph_bc, fdm2_center, band_s00_poisson)
+!!      subroutine const_r_mat00_poisson_fixS(id_file, mat_name,        &
+!!     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,    &
+!!     &          sph_bc, fdm2_center, band_s00_poisson)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -70,7 +71,6 @@
       use mat_product_3band_mul
       use set_radial_mat_sph
       use select_r_mat_scalar_bc_sph
-      use check_sph_radial_mat
 !
       type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
@@ -86,6 +86,7 @@
       real(kind = kreal), allocatable :: r_coef(:)
 !
 !
+      write(band_p_poisson%mat_name,'(a)') 'pressure_poisson'
       coef_p = - fl_prop%coef_press
 !
       allocate(r_coef(sph_rj%nidx_rj(1)))
@@ -110,11 +111,6 @@
       call ludcmp_3band_mul_t                                           &
      &   (np_smp, sph_rj%istack_rj_j_smp, band_p_poisson)
 !
-      if(i_debug .eq. iflag_full_msg) then
-        write(band_p_poisson%mat_name,'(a)') 'pressure_poisson'
-        call check_radial_band_mat(my_rank, sph_rj, band_p_poisson)
-      end if
-!
       end subroutine const_radial_mat_4_press_sph
 !
 ! -----------------------------------------------------------------------
@@ -128,7 +124,6 @@
       use center_sph_matrices
       use set_radial_mat_sph
       use select_r_mat_scalar_bc_sph
-      use check_sph_radial_mat
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -189,23 +184,20 @@
       call ludcmp_3band_mul_t                                           &
      &   (np_smp, sph_rj%istack_rj_j_smp, band_s_evo)
 !
-      if(i_debug .eq. iflag_full_msg) then
-        call check_radial_band_mat(my_rank, sph_rj, band_s_evo)
-      end if
-!
       end subroutine const_radial_mat_4_scalar_sph
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_r_mat00_scalar_sph                               &
-     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj,   &
-     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
+      subroutine const_r_mat00_scalar_sph(id_file, mat_name,            &
+     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,      &
+     &          sph_bc, fdm2_center, band_s00_poisson)
 !
       use m_ludcmp_3band
       use set_radial_mat_sph
       use select_r_mat_scalar_bc_sph
       use check_sph_radial_mat
 !
+      integer(kind = kint), intent(in) :: id_file
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -264,22 +256,24 @@
       call ludcmp_3band_ctr(band_s00_poisson)
 !
       if(i_debug .eq. iflag_full_msg) then
-        call check_center_band_matrix(my_rank, sph_rj, band_s00_poisson)
+        call check_center_band_matrix(id_file, sph_rj,                  &
+     &                                 band_s00_poisson)
       end if
 !
       end subroutine const_r_mat00_scalar_sph
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_r_mat00_poisson_fixS                             &
-     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj,   &
-     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
+      subroutine const_r_mat00_poisson_fixS(id_file, mat_name,          &
+     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,      &
+     &          sph_bc, fdm2_center, band_s00_poisson)
 !
       use m_ludcmp_3band
       use set_radial_mat_sph
       use select_r_mat_scalar_bc_sph
       use check_sph_radial_mat
 !
+      integer(kind = kint), intent(in) :: id_file
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -329,7 +323,8 @@
       call ludcmp_3band_ctr(band_s00_poisson)
 !
       if(i_debug .eq. iflag_full_msg) then
-        call check_center_band_matrix(my_rank, sph_rj, band_s00_poisson)
+        call check_center_band_matrix(id_file, sph_rj,                  &
+     &                                band_s00_poisson)
       end if
 !
       end subroutine const_r_mat00_poisson_fixS

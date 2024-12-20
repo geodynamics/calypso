@@ -118,7 +118,7 @@
       else if(ref_param%iflag_reference                                 &
      &                             .eq. id_numerical_solution) then
         call const_r_mat00_scalar_sph                                   &
-     &     (mat_name, sc_prop%diffusie_reduction_ICB,                   &
+     &     ((my_rank+50), mat_name, sc_prop%diffusie_reduction_ICB,     &
      &      sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,           &
      &      band_s00_poisson)
         file_name = add_dat_extension(mat_name)

@@ -111,12 +111,12 @@
         open(id_file,file='ave_press_test.txt')
         write(id_file,*) 'Matrix for average pressure'
         call check_single_radial_3band_mat                              &
-     &     (id_offset, sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,        &
+     &     (id_file, sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,          &
      &      band_p_poisson%mat(1:band_p_poisson%n_band,                 &
      &                         1:band_p_poisson%n_vect,j))
         write(id_file,*) 'LU decomposition for average pressure'
         call check_single_radial_5band_mat                              &
-     &     (id_offset, sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,        &
+     &     (id_file, sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,          &
      &      band_p_poisson%lu(1:band_p_poisson%n_band_lu,               &
      &                        1:band_p_poisson%n_vect,j))
         write(id_file,*) 'RHS for average pressure'
@@ -192,7 +192,7 @@
 !      j = find_local_sph_address(sph_rj, 0,0)
 !      if(j.gt.0) then
 !        write(*,*) 'matrix'
-!        call check_single_radial_3band_mat(my_rank, sph_rj%nidx_rj(1), &
+!        call check_single_radial_3band_mat(6, sph_rj%nidx_rj(1),       &
 !     &      sph_rj%radius_1d_rj_r, band_s_evo%mat(1,1,j))
 !      end if
 !
@@ -210,7 +210,7 @@
       if(sph_rj%inod_rj_center .eq. 0) return
 !
 !      write(50+my_rank,*) 'matrix for l=m=0'
-!      call check_single_radial_3band_mat(my_rank, sph_rj%nidx_rj(1),   &
+!      call check_single_radial_3band_mat(6, sph_rj%nidx_rj(1),         &
 !     &    sph_rj%radius_1d_rj_r, band_s00_evo%mat)
 !
       call lubksb_3band_ctr(band_s00_evo, sol_00)

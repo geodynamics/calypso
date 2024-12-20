@@ -1,3 +1,9 @@
+center_sph_matrices.o: $(MHD_FDM_DIR)/center_sph_matrices.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+select_sph_r_mat_magne_BC.o: $(MHD_FDM_DIR)/select_sph_r_mat_magne_BC.f90 m_precision.o m_constants.o m_machine_parameter.o m_ludcmp_3band.o t_physical_property.o t_spheric_rj_data.o t_sph_matrices.o t_boundary_params_sph_MHD.o t_coef_fdm2_centre.o set_radial_mat_sph.o set_sph_scalar_matrix_ICB.o center_sph_matrices.o set_sph_scalar_matrix_CMB.o
+	$(F90) -c $(F90OPTFLAGS) $<
+select_sph_r_mat_vort_BC.o: $(MHD_FDM_DIR)/select_sph_r_mat_vort_BC.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o m_ludcmp_3band.o t_physical_property.o t_spheric_rj_data.o t_sph_matrices.o t_boundary_params_sph_MHD.o t_coef_sph_velocity_BCs.o t_coef_fdm2_centre.o set_radial_mat_sph.o set_sph_scalar_matrix_ICB.o center_sph_matrices.o set_sph_scalar_matrix_CMB.o
+	$(F90) -c $(F90OPTFLAGS) $<
 set_sph_scalar_matrix_CMB.o: $(MHD_FDM_DIR)/set_sph_scalar_matrix_CMB.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_sph_scalar_matrix_ICB.o: $(MHD_FDM_DIR)/set_sph_scalar_matrix_ICB.f90 m_precision.o m_constants.o
