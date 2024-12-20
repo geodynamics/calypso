@@ -21,6 +21,7 @@
 !
       use m_precision
 !
+      integer(kind = kint), parameter :: igrid_error = -999
       integer(kind = kint), parameter :: igrid_half_Chebyshev = 3
       integer(kind = kint), parameter :: igrid_Chebyshev =      2
       integer(kind = kint), parameter :: igrid_non_equidist =   1

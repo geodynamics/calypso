@@ -67,25 +67,6 @@
       end do
 !
 !$omp parallel workshare
-      sph_rj%idx_gl_1d_rj_r(1:sph_rj%nidx_rj(1))                        &
-     &       = sph_IO%idx_gl_1(1:sph_rj%nidx_rj(1))
-!
-      sph_rj%radius_1d_rj_r(1:sph_rj%nidx_rj(1))                        &
-     &       = sph_IO%r_gl_1(1:sph_rj%nidx_rj(1))
-      sph_rj%a_r_1d_rj_r(1:sph_rj%nidx_rj(1))                           &
-     &       = one / sph_rj%radius_1d_rj_r(1:sph_rj%nidx_rj(1))
-!
-      sph_rj%ar_1d_rj(1:sph_rj%nidx_rj(1),1)                            &
-     &       = sph_rj%a_r_1d_rj_r(1:sph_rj%nidx_rj(1))
-      sph_rj%ar_1d_rj(1:sph_rj%nidx_rj(1),2)                            &
-     &       = sph_rj%ar_1d_rj(1:sph_rj%nidx_rj(1),1)                   &
-     &        * sph_rj%a_r_1d_rj_r(1:sph_rj%nidx_rj(1))
-      sph_rj%ar_1d_rj(1:sph_rj%nidx_rj(1),3)                            &
-     &       = sph_rj%ar_1d_rj(1:sph_rj%nidx_rj(1),2)                   &
-     &        * sph_rj%a_r_1d_rj_r(1:sph_rj%nidx_rj(1))
-!$omp end parallel workshare
-!
-!$omp parallel workshare
       sph_rj%idx_gl_1d_rj_j(1:sph_rj%nidx_rj(2),1)                      &
      &       = sph_IO%idx_gl_2(1:sph_rj%nidx_rj(2),1)
       sph_rj%idx_gl_1d_rj_j(1:sph_rj%nidx_rj(2),2)                      &
@@ -93,6 +74,16 @@
       sph_rj%idx_gl_1d_rj_j(1:sph_rj%nidx_rj(2),3)                      &
      &      = sph_IO%idx_gl_2(1:sph_rj%nidx_rj(2),3)
 !$omp end parallel workshare
+!
+!$omp parallel workshare
+      sph_rj%idx_gl_1d_rj_r(1:sph_rj%nidx_rj(1))                        &
+     &       = sph_IO%idx_gl_1(1:sph_rj%nidx_rj(1))
+!
+      sph_rj%radius_1d_rj_r(1:sph_rj%nidx_rj(1))                        &
+     &       = sph_IO%r_gl_1(1:sph_rj%nidx_rj(1))
+!$omp end parallel workshare
+!
+      call set_sph_one_over_radius_rj(sph_rj)
 !
       end subroutine copy_sph_node_4_rj_from_IO
 !

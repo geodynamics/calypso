@@ -13,15 +13,19 @@
 !!      subroutine set_radius_dat_4_sph_dynamo                          &
 !!     &         (nri, radius_1d_rj_r, radial_rj_grp, iflag_radial_grid,&
 !!     &          nlayer_ICB, nlayer_CMB, nlayer_2_center,              &
-!!     &          ar_1d_rj, r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
+!!     &          r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
 !!        type(group_data), intent(in) :: radial_rj_grp
-!!***********************************************************************
-!!*
-!!*       ar_1d_rj(k,1)   : 1 / r
-!!*       ar_1d_rj(k,2)   : 1 / r**2
-!!*       ar_1d_rj(k,3)   : 1 / r**3
-!!*
-!!***********************************************************************
+!!        integer(kind = kint), intent(in) :: nri
+!!        real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
+!!
+!!        integer(kind = kint), intent(inout) :: iflag_radial_grid
+!!        integer(kind = kint), intent(inout) :: nlayer_ICB
+!!        integer(kind = kint), intent(inout) :: nlayer_CMB
+!!        integer(kind = kint), intent(inout) :: nlayer_2_center
+!!        real(kind = kreal), intent(inout) :: r_ele_rj(nri)
+!!        real(kind = kreal), intent(inout) :: ar_ele_rj(nri,3)
+!!        real(kind = kreal), intent(inout) :: R_earth(0:2)
+!!        real(kind = kreal), intent(inout) :: r_ICB, r_CMB
 !!@endverbatim
 !
 !
@@ -47,7 +51,7 @@
       subroutine set_radius_dat_4_sph_dynamo                            &
      &         (nri, radius_1d_rj_r, radial_rj_grp, iflag_radial_grid,  &
      &          nlayer_ICB, nlayer_CMB, nlayer_2_center,                &
-     &          ar_1d_rj, r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
+     &          r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
 !
       use set_radial_grid_sph_shell
       use skip_comment_f
@@ -61,7 +65,6 @@
       integer(kind = kint), intent(inout) :: nlayer_ICB
       integer(kind = kint), intent(inout) :: nlayer_CMB
       integer(kind = kint), intent(inout) :: nlayer_2_center
-      real(kind = kreal), intent(inout) :: ar_1d_rj(nri,3)
       real(kind = kreal), intent(inout) :: r_ele_rj(nri)
       real(kind = kreal), intent(inout) :: ar_ele_rj(nri,3)
       real(kind = kreal), intent(inout) :: R_earth(0:2)
@@ -97,13 +100,8 @@
 !
       call set_radial_distance_flag(nri, nlayer_ICB, nlayer_CMB,        &
      &    r_ICB, r_CMB, radius_1d_rj_r, iflag_radial_grid)
+      if(iflag_radial_grid .eq. igrid_error) return
 !
-!
-      do k = 1, nri
-        ar_1d_rj(k,1) = one / radius_1d_rj_r(k)
-        ar_1d_rj(k,2) = ar_1d_rj(k,1)**2
-        ar_1d_rj(k,3) = ar_1d_rj(k,1)**3
-      end do
 !
       r_ele_rj(1) = half * radius_1d_rj_r(1)
       do k = 2, nri

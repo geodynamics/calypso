@@ -115,7 +115,7 @@
      &   (sph%sph_rtm%nidx_rtm, sph%sph_rlm%nidx_rlm, idx_trns)
 !
       call radial_4_sph_trans                                           &
-     &   (sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
+     &   (sph%sph_rtp, sph%sph_rtm, sph%sph_rlm)
       call set_mdx_rlm_rtm(sph%sph_params%l_truncation,                 &
      &    sph%sph_rtm%nidx_rtm, sph%sph_rlm%nidx_rlm,                   &
      &    sph%sph_rtm%idx_gl_1d_rtm_m, sph%sph_rlm%idx_gl_1d_rlm_j,     &

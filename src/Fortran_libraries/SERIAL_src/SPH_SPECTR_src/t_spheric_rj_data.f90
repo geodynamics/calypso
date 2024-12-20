@@ -17,6 +17,8 @@
 !!      subroutine dealloc_rj_param_smp(sph_rj)
 !!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!
+!!      subroutine set_sph_one_over_radius_rj(sph_rj)
+!!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!      subroutine copy_spheric_rj_data                                 &
 !!     &         (ltr_org, rj_org, ltr_new, rj_new)
 !!        type(sph_rj_grid), intent(in) :: rj_org
@@ -227,6 +229,27 @@
       end subroutine dealloc_rj_param_smp
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_sph_one_over_radius_rj(sph_rj)
+!
+      type(sph_rj_grid), intent(inout) :: sph_rj
+!
+      integer(kind = kint) :: i
+!
+!$omp parallel do private(i)
+      do i = 1, sph_rj%nidx_rj(1)
+        sph_rj%a_r_1d_rj_r(i) = one / sph_rj%radius_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,1) = sph_rj%a_r_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,2) = sph_rj%ar_1d_rj(i,1)                     &
+     &                        * sph_rj%a_r_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,3) = sph_rj%ar_1d_rj(i,2)                     &
+     &                        * sph_rj%a_r_1d_rj_r(i)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_sph_one_over_radius_rj
+!
 ! -----------------------------------------------------------------------
 !
       subroutine copy_spheric_rj_data                                   &

@@ -114,24 +114,32 @@
 !
       real(kind = kreal), allocatable :: r_eq(:), r_ch(:), r_hch(:)
 !
+      if(num_layer .le. 0) then
+        iflag_rgrid = igrid_error
+        return
+      end if
 !
       allocate( r_eq(num_layer) )
       allocate( r_ch(num_layer) )
       allocate( r_hch(num_layer) )
 !
-      call set_equi_distance_shell(num_layer, nlayer_ICB, nlayer_CMB,   &
-     &    r_ICB, r_CMB, r_eq)
+      r_eq(1:num_layer) =  0.0d0
+      r_ch(1:num_layer) =  0.0d0
+      r_hch(1:num_layer) = 0.0d0
+!
+      call set_equi_distance_shell(num_layer, nlayer_ICB,               &
+     &                             nlayer_CMB, r_ICB, r_CMB, r_eq)
       call set_chebyshev_distance_shell(num_layer, nlayer_ICB,          &
-     &    nlayer_CMB, r_ICB, r_CMB, r_ch)
+     &                                  nlayer_CMB, r_ICB, r_CMB, r_ch)
       call half_chebyshev_distance_shell(num_layer, nlayer_CMB,         &
-     &    r_CMB, r_hch)
+     &                                   r_CMB, r_hch)
 !
 !
-      diff_eq_max =  abs( r_grid(1) - r_eq(1)) /  r_eq(1)
-      diff_ch_max =  abs( r_grid(1) - r_ch(1)) /  r_ch(1)
-      diff_hch_max = abs( r_grid(1) - r_hch(1)) / r_hch(1)
+      diff_eq_max =  0.0d0
+      diff_ch_max =  0.0d0
+      diff_hch_max = 0.0d0
 !
-      do k = 2, num_layer
+      do k = 1, num_layer
         diff = abs( r_grid(k) - r_eq(k)) / r_eq(k)
         diff_eq_max = max(diff_eq_max,diff)
 !

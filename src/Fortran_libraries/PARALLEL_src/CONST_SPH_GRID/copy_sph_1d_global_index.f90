@@ -200,16 +200,7 @@
         sph_rj%radius_1d_rj_r(i) = s3d_radius%radius_1d_gl(j)
       end do
 !
-!$omp parallel do private(i)
-      do i = 1, sph_rj%nidx_rj(1)
-        sph_rj%a_r_1d_rj_r(i) = one / sph_rj%radius_1d_rj_r(i)
-        sph_rj%ar_1d_rj(i,1) = sph_rj%a_r_1d_rj_r(i)
-        sph_rj%ar_1d_rj(i,2) = sph_rj%ar_1d_rj(i,1)                     &
-     &                        * sph_rj%a_r_1d_rj_r(i)
-        sph_rj%ar_1d_rj(i,3) = sph_rj%ar_1d_rj(i,2)                     &
-     &                        * sph_rj%a_r_1d_rj_r(i)
-      end do
-!$omp end parallel do
+      call set_sph_one_over_radius_rj(sph_rj)
 !
       end subroutine copy_sph_1d_gl_idx_rj
 !
