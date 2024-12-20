@@ -8,9 +8,9 @@
 !>@brief  Set radial variations for densityuy and diffusivities
 !!
 !!@verbatim
-!!      subroutine init_radius_variations_sph_mhd(sph, r_2nd, MHD_prop, &
-!!     &                                          radial_variation)
-!!        type(sph_grids), intent(in) :: sph
+!!      subroutine init_radius_variations_sph_mhd                       &
+!!     &         (sph_rj, r_2nd, MHD_prop, radial_variation)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(phys_data), intent(inout) :: radial_variation
@@ -22,7 +22,7 @@
       use m_precision
       use m_constants
       use t_control_parameter
-      use t_spheric_parameter
+      use t_spheric_rj_data
       use t_phys_data
       use t_sph_radial_interpolate
       use t_field_data_IO
@@ -45,8 +45,8 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine init_radius_variations_sph_mhd(sph, r_2nd, MHD_prop,   &
-     &                                          radial_variation)
+      subroutine init_radius_variations_sph_mhd                         &
+     &         (sph_rj, r_2nd, MHD_prop, radial_variation)
 !
       use calypso_mpi_real
       use transfer_to_long_integers
@@ -54,7 +54,7 @@
       use m_base_field_labels
       use m_diffusion_term_labels
 !
-      type(sph_grids), intent(in) :: sph
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
 
       type(MHD_evolution_param), intent(inout) :: MHD_prop
@@ -71,7 +71,7 @@
       radial_variation%num_phys_viz =  radial_variation%num_phys
       radial_variation%ntot_phys =     radial_variation%num_phys
       call alloc_phys_name(radial_variation)
-      call alloc_phys_data((sph%sph_rj%nidx_rj(1)+1), radial_variation)
+      call alloc_phys_data((sph_rj%nidx_rj(1)+1), radial_variation)
 !
       call set_r_variation_data_address(MHD_prop, radial_variation)
       
@@ -81,30 +81,30 @@
 !
       if(my_rank .eq. 0) then
         radial_variation%d_fld(1,1) = 0.0d0
-        do k = 1, sph%sph_rj%nidx_rj(1)
-          radial_variation%d_fld(k+1,1) = sph%sph_rj%radius_1d_rj_r(k)
+        do k = 1, sph_rj%nidx_rj(1)
+          radial_variation%d_fld(k+1,1) = sph_rj%radius_1d_rj_r(k)
         end do
 !
         call set_sph_radial_density(my_rank, radius_name,               &
      &      density%name, MHD_prop%fl_prop%ir_rho,                      &
-     &      sph%sph_rj, r_2nd, MHD_prop%polytrope_param,                &
+     &      sph_rj, r_2nd, MHD_prop%polytrope_param,                    &
      &      radial_variation, r_itp, fld_IO)
         call set_sph_radial_diffusivity(my_rank, radius_name,           &
      &      kinetic_viscosity%name, MHD_prop%fl_prop%ir_nu,             &
-     &      sph%sph_rj, r_2nd, MHD_prop%val_viscous_param,              &
+     &      sph_rj, r_2nd, MHD_prop%val_viscous_param,                  &
      &      radial_variation, r_itp, fld_IO)
 !
         call set_sph_radial_diffusivity(my_rank, radius_name,           &
      &      magnetic_diffusivity%name, MHD_prop%cd_prop%ir_eta,         &
-     &      sph%sph_rj, r_2nd, MHD_prop%val_mag_diffuse_param,          &
+     &      sph_rj, r_2nd, MHD_prop%val_mag_diffuse_param,              &
      &      radial_variation, r_itp, fld_IO)
         call set_sph_radial_diffusivity(my_rank, radius_name,           &
      &      thermal_diffusivity%name, MHD_prop%ht_prop%ir_kappa,        &
-     &      sph%sph_rj, r_2nd, MHD_prop%val_thermal_diffuse_param,      &
+     &      sph_rj, r_2nd, MHD_prop%val_thermal_diffuse_param,          &
      &      radial_variation, r_itp, fld_IO)
         call set_sph_radial_diffusivity(my_rank, radius_name,           &
      &      chemical_diffusivity%name, MHD_prop%cp_prop%ir_kappa,       &
-     &      sph%sph_rj, r_2nd, MHD_prop%val_comp_diffuse_param,         &
+     &      sph_rj, r_2nd, MHD_prop%val_comp_diffuse_param,             &
      &      radial_variation, r_itp, fld_IO)
       end if
 !

@@ -7,8 +7,10 @@
 !>@brief  data at mid-depth of the shell at equator for dynamo benchmark
 !!
 !!@verbatim
-!!      subroutine init_mid_equator_point_global(sph, cdat)
-!!        type(sph_grids), intent(in) :: sph
+!!      subroutine init_mid_equator_point_global(sph_params, sph_rj,    &
+!!     &                                         cdat)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_address), intent(in) :: ipol
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!
@@ -46,21 +48,24 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine init_mid_equator_point_global(sph, cdat)
+      subroutine init_mid_equator_point_global(sph_params, sph_rj,      &
+     &                                         cdat)
 !
       use t_spheric_parameter
+      use t_spheric_rj_data
 !
-      type(sph_grids), intent(in) :: sph
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(circle_fld_maker), intent(inout) :: cdat
 !
       integer(kind = kint) :: kr_ICB, kr_CMB
       real(kind = kreal) :: r_MID
 !
 !
-      kr_ICB = sph%sph_params%nlayer_ICB
-      kr_CMB = sph%sph_params%nlayer_CMB
-      r_MID = half * (sph%sph_rj%radius_1d_rj_r(kr_ICB)                 &
-     &              + sph%sph_rj%radius_1d_rj_r(kr_CMB))
+      kr_ICB = sph_params%nlayer_ICB
+      kr_CMB = sph_params%nlayer_CMB
+      r_MID = half * (sph_rj%radius_1d_rj_r(kr_ICB)                     &
+     &              + sph_rj%radius_1d_rj_r(kr_CMB))
 !
       cdat%circle%s_circle = r_MID
       cdat%circle%z_circle = zero

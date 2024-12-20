@@ -187,11 +187,6 @@
 !     &       write(*,*) 'Baka!', my_rank, i, sph_rj%idx_gl_1d_rj_r(i)
 !        end do
 !      end if
-
-      do i = 1, sph_rj%nidx_rj(1)
-        j = sph_rj%idx_gl_1d_rj_r(i)
-        sph_rj%radius_1d_rj_r(i) = s3d_radius%radius_1d_gl(j)
-      end do
 !
       do i = 1, sph_rj%nidx_rj(2)
         j = i - 1 + sph_rj%ist_rj(2)
@@ -199,6 +194,22 @@
         sph_rj%idx_gl_1d_rj_j(i,2) = sph_gl1d%idx_global_rj_j(j,2)
         sph_rj%idx_gl_1d_rj_j(i,3) = sph_gl1d%idx_global_rj_j(j,3)
       end do
+!
+      do i = 1, sph_rj%nidx_rj(1)
+        j = sph_rj%idx_gl_1d_rj_r(i)
+        sph_rj%radius_1d_rj_r(i) = s3d_radius%radius_1d_gl(j)
+      end do
+!
+!$omp parallel do private(i)
+      do i = 1, sph_rj%nidx_rj(1)
+        sph_rj%a_r_1d_rj_r(i) = one / sph_rj%radius_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,1) = sph_rj%a_r_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,2) = sph_rj%ar_1d_rj(i,1)                     &
+     &                        * sph_rj%a_r_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,3) = sph_rj%ar_1d_rj(i,2)                     &
+     &                        * sph_rj%a_r_1d_rj_r(i)
+      end do
+!$omp end parallel do
 !
       end subroutine copy_sph_1d_gl_idx_rj
 !

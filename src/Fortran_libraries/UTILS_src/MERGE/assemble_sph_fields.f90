@@ -61,7 +61,7 @@
 !
 !
       do ip = 1, org_sph_array%num_pe
-        call share_sph_rj_data(ip, org_sph_array%sph(ip))
+        call share_sph_rj_data(ip, org_sph_array%sph(ip)%sph_rj)
       end do
 !
       end subroutine share_org_sph_rj_data

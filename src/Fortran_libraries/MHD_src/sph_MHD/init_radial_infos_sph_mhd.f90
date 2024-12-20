@@ -122,7 +122,7 @@
       call const_third_fdm_node_to_ele(sph%sph_rj, r_n2e_3rd)
 !
 !*  ---------- Radial variations of density and diffusivities  -------
-      call init_radius_variations_sph_mhd(sph, r_2nd, MHD_prop,         &
+      call init_radius_variations_sph_mhd(sph%sph_rj, r_2nd, MHD_prop,  &
      &                                    radial_variation)
 !
 !*  ---------- boundary conditions  ---------------
