@@ -12,11 +12,41 @@
 !!      subroutine set_sp_rlm_sym_mat_rin(nnod_rlm, nidx_rlm,           &
 !!     &          istep_rlm, idx_gl_1d_rlm_j, a_r_1d_rlm_r, g_sph_rlm,  &
 !!     &          jst, n_jk_e, n_jk_o, ncomp_recv, nvector, nscalar,    &
-!!     &          irev_sr_rlm, n_WR, WR,  pol_e, tor_e, pol_o, tor_o)
+!!     &          irev_sr_rlm, n_WR, WR, pol_e, tor_e, pol_o, tor_o)
+!!        integer(kind = kint), intent(in) :: nnod_rlm
+!!        integer(kind = kint), intent(in) :: nidx_rlm(2)
+!!        integer(kind = kint), intent(in) :: istep_rlm(2)
+!!        integer(kind = kint), intent(in)                              &
+!!     &                      :: idx_gl_1d_rlm_j(nidx_rlm(2),3)
+!!        real(kind = kreal), intent(in) :: a_r_1d_rlm_r(nidx_rlm(1))
+!!        real(kind = kreal), intent(in) :: g_sph_rlm(nidx_rlm(2),17)
+!!        integer(kind = kint), intent(in) :: jst, n_jk_e, n_jk_o
+!!        integer(kind = kint), intent(in) :: ncomp_recv
+!!        integer(kind = kint), intent(in) :: n_WR
+!!        integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
+!!        real (kind=kreal), intent(in):: WR(n_WR)
+!!        integer(kind = kint), intent(in) :: nvector, nscalar
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: pol_e(3*nvector+nscalar,nidx_rlm(1),n_jk_e)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: tor_e(2*nvector,nidx_rlm(1),n_jk_e)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: pol_o(3*nvector+nscalar,nidx_rlm(1),n_jk_o)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: tor_o(2*nvector,nidx_rlm(1),n_jk_o)
 !!      subroutine set_sp_rlm_sym_mat_rout(nnod_rlm, nidx_rlm,          &
 !!     &          istep_rlm, idx_gl_1d_rlm_j, a_r_1d_rlm_r, g_sph_rlm,  &
 !!     &          jst, n_jk_e, n_jk_o, ncomp_recv, nvector, nscalar,    &
-!!     &          irev_sr_rlm, n_WR, WR,  pol_e, tor_e, pol_o, tor_o)
+!!     &          irev_sr_rlm, n_WR, WR, pol_e, tor_e, pol_o, tor_o)
+!!        integer(kind = kint), intent(in) :: nvector, nscalar
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: pol_e(n_jk_e,nidx_rlm(1),3*nvector+nscalar)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: tor_e(n_jk_e,nidx_rlm(1),2*nvector)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: pol_o(n_jk_o,nidx_rlm(1),3*nvector+nscalar)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &           :: tor_o(n_jk_o,nidx_rlm(1),2*nvector)
 !!@endverbatim
 !!
       module set_sp_rlm_sym_mat_tsmp
@@ -44,7 +74,8 @@
       integer(kind = kint), intent(in) :: nnod_rlm
       integer(kind = kint), intent(in) :: nidx_rlm(2)
       integer(kind = kint), intent(in) :: istep_rlm(2)
-      integer(kind = kint), intent(in) :: idx_gl_1d_rlm_j(nidx_rlm(2),3)
+      integer(kind = kint), intent(in)                                  &
+     &                      :: idx_gl_1d_rlm_j(nidx_rlm(2),3)
       real(kind = kreal), intent(in) :: a_r_1d_rlm_r(nidx_rlm(1))
       real(kind = kreal), intent(in) :: g_sph_rlm(nidx_rlm(2),17)
 !
@@ -161,7 +192,8 @@
       integer(kind = kint), intent(in) :: nnod_rlm
       integer(kind = kint), intent(in) :: nidx_rlm(2)
       integer(kind = kint), intent(in) :: istep_rlm(2)
-      integer(kind = kint), intent(in) :: idx_gl_1d_rlm_j(nidx_rlm(2),3)
+      integer(kind = kint), intent(in)                                  &
+     &                      :: idx_gl_1d_rlm_j(nidx_rlm(2),3)
       real(kind = kreal), intent(in) :: a_r_1d_rlm_r(nidx_rlm(1))
       real(kind = kreal), intent(in) :: g_sph_rlm(nidx_rlm(2),17)
 !

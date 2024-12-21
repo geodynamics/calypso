@@ -80,7 +80,7 @@
 !>        1d radius data for @f$ f(r,l,m) @f$
         real(kind = kreal), allocatable :: radius_1d_rlm_r(:)
 !>        1 / radius_1d_rlm_r
-        real(kind = kreal), allocatable :: a_r_1d_rlm_r(:)
+        real(kind = kreal), allocatable :: ar_1d_rlm(:)
       end type sph_rlm_grid
 !
 ! -----------------------------------------------------------------------
@@ -112,7 +112,7 @@
       num = sph_rlm%nidx_rlm(1)
       allocate(sph_rlm%idx_gl_1d_rlm_r(num))
       allocate(sph_rlm%radius_1d_rlm_r(num))
-      allocate(sph_rlm%a_r_1d_rlm_r(num))
+      allocate(sph_rlm%ar_1d_rlm(num))
       num = sph_rlm%nidx_rlm(2)
       allocate(sph_rlm%idx_gl_1d_rlm_j(num,3))
 !
@@ -120,7 +120,7 @@
       if(sph_rlm%nidx_rlm(1) .gt. 0) then
         sph_rlm%idx_gl_1d_rlm_r = 0
         sph_rlm%radius_1d_rlm_r = 0.0d0
-        sph_rlm%a_r_1d_rlm_r    = 0.0d0
+        sph_rlm%ar_1d_rlm =       0.0d0
       end if
 !
       end subroutine alloc_sph_1d_index_rlm
@@ -164,8 +164,7 @@
       type(sph_rlm_grid), intent(inout) :: sph_rlm
 !
 !
-      deallocate(sph_rlm%radius_1d_rlm_r)
-      deallocate(sph_rlm%a_r_1d_rlm_r   )
+      deallocate(sph_rlm%radius_1d_rlm_r, sph_rlm%ar_1d_rlm)
       deallocate(sph_rlm%idx_gl_1d_rlm_r)
       deallocate(sph_rlm%idx_gl_1d_rlm_j)
 !
@@ -194,7 +193,7 @@
 !
 !$omp parallel do private(i)
       do i = 1, sph_rlm%nidx_rlm(1)
-        sph_rlm%a_r_1d_rlm_r(i) = one / sph_rlm%radius_1d_rlm_r(i)
+        sph_rlm%ar_1d_rlm(i) = one / sph_rlm%radius_1d_rlm_r(i)
       end do
 !$omp end parallel do
 !

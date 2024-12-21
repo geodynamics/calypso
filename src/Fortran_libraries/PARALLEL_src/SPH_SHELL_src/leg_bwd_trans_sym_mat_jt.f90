@@ -102,7 +102,7 @@
         if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+9)
         call set_sp_rlm_sym_mat_rin                                     &
      &     (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,      &
-     &      sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r, g_sph_rlm,   &
+     &      sph_rlm%idx_gl_1d_rlm_j, sph_rlm%ar_1d_rlm, g_sph_rlm,      &
      &      jst, WK_l_tsp%n_jk_e(mp_rlm),  WK_l_tsp%n_jk_o(mp_rlm),     &
      &      ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WR, WR,        &
      &      WK_l_tsp%Smat(1)%pol_e(1), WK_l_tsp%Smat(1)%tor_e(1),       &

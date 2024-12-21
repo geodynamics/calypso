@@ -122,13 +122,13 @@
 !
       if(sph_rlm%istep_rlm(1) .eq. 1) then
         call sum_rot_coriolis_rlm_10(b_trns%base,                       &
-     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
+     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%ar_1d_rlm,        &
      &    leg%g_sph_rlm, omega_sph%ws_rlm, coef_cor,                    &
      &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
      &    NB, n_WR, irev_sr_rlm, WR, d_rotp_cor_rlm, d_rott_cor_rlm)
       else
         call sum_rot_coriolis_lrm_10(b_trns%base,                       &
-     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
+     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%ar_1d_rlm,        &
      &    leg%g_sph_rlm, omega_sph%ws_rlm, coef_cor,                    &
      &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
      &    NB, n_WR, irev_sr_rlm, WR, d_rotp_cor_rlm, d_rott_cor_rlm)
