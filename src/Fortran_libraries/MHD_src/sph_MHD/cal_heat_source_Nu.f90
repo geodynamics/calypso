@@ -157,21 +157,21 @@
      &          + (sph_bc_U%kr_in-1) * sph_rj%nidx_rj(2)
       temp_ICB = rj_fld%d_fld(inod_ICB,is_scalar)
 !      dTdr_ICB = half*rj_fld%d_fld(inod_ICB,is_grad_s)                 &
-!     &           * a_r_1d_rj_r(sph_bc_U%kr_in)**2
+!     &           * sph_rj%ar_1d_rj(sph_bc_U%kr_in,2)
 !
       inod_CMB = sph_rj%idx_rj_degree_zero                              &
      &          + (sph_bc_U%kr_out-1) * sph_rj%nidx_rj(2)
       temp_CMB = rj_fld%d_fld(inod_CMB,is_scalar)
 !      dTdr_CMB = half*rj_fld%d_fld(inod_CMB,is_grad_s)                 &
-!     &          * a_r_1d_rj_r(sph_bc_U%kr_out)**2
+!     &          * sph_rj%ar_1d_rj(sph_bc_U%kr_out,2)
 !
       c1 = (Nu_type%r_CMB_Nu*temp_CMB - Nu_type%r_ICB_Nu*temp_ICB)      &
      &    / ( Nu_type%r_CMB_Nu - Nu_type%r_ICB_Nu )
       c2 =  Nu_type%r_CMB_Nu * Nu_type%r_ICB_Nu * (temp_ICB - temp_CMB) &
      &    / ( Nu_type%r_CMB_Nu - Nu_type%r_ICB_Nu )
 !
-!      dTdr_diff_ICB = - c2 * a_r_1d_rj_r(sph_bc_U%kr_in)**2
-!      dTdr_diff_CMB = - c2 * a_r_1d_rj_r(sph_bc_U%kr_out)**2
+!      dTdr_diff_ICB = - c2 * sph_rj%ar_1d_rj(sph_bc_U%kr_in, 2)
+!      dTdr_diff_CMB = - c2 * sph_rj%ar_1d_rj(sph_bc_U%kr_out,2)
 !      Nu_type%Nu_ICB = dTdr_ICB / dTdr_diff_ICB
 !      Nu_type%Nu_CMB = dTdr_CMB / dTdr_diff_CMB
 !
@@ -231,7 +231,7 @@
         Nu_type%Nu_ICB = -1.0d0
       else
         Nu_type%Nu_ICB =   half*rj_fld%d_fld(inod_ICB,is_grad_s)        &
-     &                    * sph_rj%a_r_1d_rj_r(sph_bc_U%kr_in)**2       &
+     &                    * sph_rj%ar_1d_rj(sph_bc_U%kr_in,1)**2        &
      &                    / Nu_type%ref_global(sph_bc_U%kr_in,1)
       end if
 !
@@ -239,7 +239,7 @@
         Nu_type%Nu_CMB = -1.0d0
       else
         Nu_type%Nu_CMB =   half*rj_fld%d_fld(inod_CMB,is_grad_s)        &
-     &                    * sph_rj%a_r_1d_rj_r(sph_bc_U%kr_out)**2      &
+     &                    * sph_rj%ar_1d_rj(sph_bc_U%kr_out,1)**2       &
      &                    / Nu_type%ref_global(sph_bc_U%kr_out,1)
       end if
 !

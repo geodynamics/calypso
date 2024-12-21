@@ -77,11 +77,11 @@
           call degree_zero_vector_mean_square                           &
      &       (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                     &
      &        sph_rj%idx_rj_degree_zero, sph_rj%inod_rj_center,         &
-     &        sph_rj%a_r_1d_rj_r, n_point, d_rj, rms_sph_r(0,1))
+     &        sph_rj%ar_1d_rj(1,1), n_point, d_rj, rms_sph_r(0,1))
         else
           call one_mode_vector_mean_square                              &
      &       (j, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                  &
-     &        sph_rj%a_r_1d_rj_r, g_sph_rj(j,3), g_sph_rj(j,12),        &
+     &        sph_rj%ar_1d_rj(1,1), g_sph_rj(j,3), g_sph_rj(j,12),      &
      &        n_point, d_rj(1,icomp_rj), rms_sph_r(0,1))
         end if
 !
@@ -122,7 +122,7 @@
       else if(ncomp_rj .eq. n_vector) then
         call each_vector_sph_spec(sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), &
      &      sph_rj%idx_rj_degree_zero, sph_rj%inod_rj_center,           &
-     &      sph_rj%a_r_1d_rj_r, g_sph_rj, n_point,                      &
+     &      sph_rj%ar_1d_rj(1,1), g_sph_rj, n_point,                    &
      &      d_rj(1,icomp1_rj), d_rj(1,icomp2_rj), rms_sph_rj(0,1,1))
       end if
 !

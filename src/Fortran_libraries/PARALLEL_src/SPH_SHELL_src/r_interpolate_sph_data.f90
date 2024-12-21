@@ -228,11 +228,11 @@
       if (ipol%base%i_magne .gt. 0) then
         call ext_outside_potential(r_itp%kr_target_outside,             &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
      &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
         call ext_inside_potential(r_itp%kr_target_inside,               &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
      &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
       end if
 !
@@ -278,11 +278,11 @@
       if (ipol%base%i_magne .gt. 0) then
         call ext_outside_potential(r_itp%kr_target_outside,             &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
      &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
         call ext_inside_potential(r_itp%kr_target_inside,               &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
      &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
       end if
 !

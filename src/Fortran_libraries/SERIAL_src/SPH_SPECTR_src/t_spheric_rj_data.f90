@@ -108,9 +108,6 @@
 !>        1d radius data for @f$ f(r,j) @f$
         real(kind = kreal), allocatable :: radius_1d_rj_r(:)
 !>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
-        real(kind = kreal), allocatable :: a_r_1d_rj_r(:)
-!
-!>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
 !!@n       see set_radius_func_cheby or set_radius_func_cheby
         real(kind = kreal), allocatable :: ar_1d_rj(:,:)
 !
@@ -146,7 +143,6 @@
       num = sph_rj%nidx_rj(1)
       allocate(sph_rj%idx_gl_1d_rj_r(num))
       allocate(sph_rj%radius_1d_rj_r(num))
-      allocate(sph_rj%a_r_1d_rj_r(num))
 !
       allocate(sph_rj%ar_1d_rj(num,3))
       allocate(sph_rj%r_ele_rj(num))
@@ -162,7 +158,6 @@
       if(sph_rj%nidx_rj(1) .gt. 0) then
         sph_rj%idx_gl_1d_rj_r = 0
         sph_rj%radius_1d_rj_r = 0.0d0
-        sph_rj%a_r_1d_rj_r = 0.0d0
 !
         sph_rj%ar_1d_rj = 0.0d0
         sph_rj%r_ele_rj = 0.0d0
@@ -210,7 +205,7 @@
       type(sph_rj_grid), intent(inout) :: sph_rj
 !
 !
-      deallocate(sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r)
+      deallocate(sph_rj%radius_1d_rj_r)
       deallocate(sph_rj%ar_1d_rj, sph_rj%r_ele_rj, sph_rj%ar_ele_rj)
       deallocate(sph_rj%idx_gl_1d_rj_r, sph_rj%idx_gl_1d_rj_j)
 !
@@ -239,12 +234,11 @@
 !
 !$omp parallel do private(i)
       do i = 1, sph_rj%nidx_rj(1)
-        sph_rj%a_r_1d_rj_r(i) = one / sph_rj%radius_1d_rj_r(i)
-        sph_rj%ar_1d_rj(i,1) = sph_rj%a_r_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,1) = one / sph_rj%radius_1d_rj_r(i)
         sph_rj%ar_1d_rj(i,2) = sph_rj%ar_1d_rj(i,1)                     &
-     &                        * sph_rj%a_r_1d_rj_r(i)
+     &                        * sph_rj%ar_1d_rj(i,1)
         sph_rj%ar_1d_rj(i,3) = sph_rj%ar_1d_rj(i,2)                     &
-     &                        * sph_rj%a_r_1d_rj_r(i)
+     &                        * sph_rj%ar_1d_rj(i,1)
       end do
 !$omp end parallel do
 !
@@ -286,23 +280,6 @@
 !$omp end parallel
 !
 !$omp parallel workshare
-      rj_new%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))                        &
-     &       = rj_org%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))
-      rj_new%radius_1d_rj_r(1:rj_new%nidx_rj(1))                        &
-     &       = rj_org%radius_1d_rj_r(1:rj_new%nidx_rj(1))
-      rj_new%a_r_1d_rj_r(1:rj_new%nidx_rj(1))                           &
-     &       = rj_org%a_r_1d_rj_r(1:rj_new%nidx_rj(1))
-!
-      rj_new%ar_1d_rj(1:rj_new%nidx_rj(1),1)                            &
-     &       = rj_new%a_r_1d_rj_r(1:rj_new%nidx_rj(1))
-      rj_new%ar_1d_rj(1:rj_new%nidx_rj(1),2)                            &
-     &       = rj_new%ar_1d_rj(1:rj_new%nidx_rj(1),1)                   &
-     &        * rj_new%a_r_1d_rj_r(1:rj_new%nidx_rj(1))
-      rj_new%ar_1d_rj(1:rj_new%nidx_rj(1),3)                            &
-     &       = rj_new%ar_1d_rj(1:rj_new%nidx_rj(1),2)                   &
-     &        * rj_new%a_r_1d_rj_r(1:rj_new%nidx_rj(1))
-!$omp end parallel workshare
-!$omp parallel workshare
       rj_new%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),1)                      &
      &       = rj_org%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),1)
       rj_new%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),2)                      &
@@ -310,6 +287,15 @@
       rj_new%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),3)                      &
      &      = rj_org%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),3)
 !$omp end parallel workshare
+!
+!$omp parallel workshare
+      rj_new%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))                        &
+     &       = rj_org%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))
+      rj_new%radius_1d_rj_r(1:rj_new%nidx_rj(1))                        &
+     &       = rj_org%radius_1d_rj_r(1:rj_new%nidx_rj(1))
+!$omp end parallel workshare
+!
+      call set_sph_one_over_radius_rj(rj_new)
 !
 !      call dealloc_sph_1d_index_rj(rj_org)
 !      call dealloc_spheric_param_rj(rj_org)

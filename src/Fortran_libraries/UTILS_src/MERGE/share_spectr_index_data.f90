@@ -78,9 +78,6 @@
       call calypso_mpi_bcast_int(sph_rj%idx_gl_1d_rj_j,                 &
      &    cast_long(3*sph_rj%nidx_rj(2)), irank_org)
 !
-!      write(*,*) 'calypso_mpi_bcast_real a_r_1d_rj_r', ip_org
-      call calypso_mpi_bcast_real(sph_rj%a_r_1d_rj_r,                   &
-     &    cast_long(sph_rj%nidx_rj(1)), irank_org)
 !      write(*,*) 'calypso_mpi_bcast_real ar_1d_rj', ip_org
       call calypso_mpi_bcast_real(sph_rj%ar_1d_rj,                      &
      &    cast_long(3*sph_rj%nidx_rj(1)), irank_org)

@@ -347,7 +347,7 @@
 !
         do k = kr_out, sph_rj%nidx_rj(1)
           inod = j + (k-1) * sph_rj%nidx_rj(2)
-          ratio = r_gauss * sph_rj%a_r_1d_rj_r(k)
+          ratio = r_gauss * sph_rj%ar_1d_rj(k,1)
 !
           d_rj(inod,1  ) =  al*w_gauss(j_gl) * ratio**l_gl * r_gauss
           d_rj(inod,2) = - w_gauss(j_gl) * ratio**(l_gl+1)

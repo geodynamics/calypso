@@ -193,7 +193,7 @@
       end do
 !$omp end parallel do
 !
-      call set_sph_one_over_radius_rj(sph_rj)
+      call set_sph_one_over_radius_rj(org_sph%sph_rj)
 !
       end subroutine copy_rayleigh_radial_data
 !

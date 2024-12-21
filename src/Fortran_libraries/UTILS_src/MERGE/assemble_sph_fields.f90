@@ -208,13 +208,13 @@
       if(kr_outer_domain .lt. sph_rj%nidx_rj(1)) then
         call ext_outside_potential(kr_outer_domain,                     &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
      &      sph_rj%nnod_rj, d_rj(1,is_magne))
       end if
       if(kr_inner_domain .gt. 1) then
         call ext_inside_potential(kr_inner_domain,                      &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
      &      sph_rj%nnod_rj, d_rj(1,is_magne))
       end if
 !
@@ -236,9 +236,9 @@
 !
       if(kr_inner_domain .le. 1) return
       call ext_inside_scalar(kr_inner_domain,                           &
-     &                       sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,     &
-     &                       sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r, &
-     &                       sph_rj%nnod_rj, d_rj(1,is_field))
+     &                     sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,       &
+     &                     sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1), &
+     &                     sph_rj%nnod_rj, d_rj(1,is_field))
 !
       end subroutine extend_inner_core_scl_type
 !
