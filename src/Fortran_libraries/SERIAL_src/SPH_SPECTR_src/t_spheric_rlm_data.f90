@@ -17,6 +17,8 @@
 !!      subroutine dealloc_rlm_param_smp(sph_rlm)
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!
+!!      subroutine set_sph_one_over_radius_rlm(sph_rlm)
+!!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!      subroutine copy_spheric_rlm_data                                &
 !!     &         (ltr_org, rlm_org, ltr_new, rlm_new)
 !!        type(sph_rlm_grid), intent(in) :: rlm_org
@@ -182,6 +184,22 @@
       end subroutine dealloc_rlm_param_smp
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_sph_one_over_radius_rlm(sph_rlm)
+!
+      type(sph_rlm_grid), intent(inout) :: sph_rlm
+!
+      integer(kind = kint) :: i
+!
+!$omp parallel do private(i)
+      do i = 1, sph_rlm%nidx_rlm(1)
+        sph_rlm%a_r_1d_rlm_r(i) = one / sph_rlm%radius_1d_rlm_r(i)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_sph_one_over_radius_rlm
+!
 ! ----------------------------------------------------------------------
 !
       subroutine copy_spheric_rlm_data                                  &
@@ -213,16 +231,23 @@
      &      = rlm_org%idx_global_rlm(1:rlm_new%nnod_rlm,i)
       end do
 !
-      rlm_new%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
-     &       =   rlm_org%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))
-      rlm_new%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
-     &       =   rlm_org%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))
+!$omp parallel workshare
       rlm_new%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),1)                  &
      &       = rlm_org%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),1)
       rlm_new%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),2)                  &
      &       = rlm_org%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),2)
       rlm_new%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),3)                  &
      &       = rlm_org%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),3)
+!$omp end parallel workshare
+!
+!$omp parallel workshare
+      rlm_new%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
+     &       =   rlm_org%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))
+      rlm_new%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
+     &       =   rlm_org%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))
+!$omp end parallel workshare
+!
+      call set_sph_one_over_radius_rlm(rlm_new)
 !
 !      call dealloc_sph_1d_index_rlm(rlm_org)
 !      call dealloc_spheric_param_rlm(rlm_org)

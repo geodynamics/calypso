@@ -255,7 +255,7 @@
       real(kind=kreal), intent(inout) :: d_r(nri_new,ncomp)
       integer(kind = kint), intent(inout) :: iflag_update(ncomp)
 !
-      integer(kind = kint) :: j_fld, jst
+      integer(kind = kint) :: j_fld
 !
 !
       do j_fld = 1, radial_fld_IO%num_field_IO

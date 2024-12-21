@@ -133,21 +133,29 @@
       integer(kind = kint) :: i, j
 !
 !
+!$omp parallel do private(i,j)
       do i = 1, sph_rlm%nidx_rlm(1)
         j = i - 1 + sph_rlm%ist_rlm(1)
         sph_rlm%idx_gl_1d_rlm_r(i) = sph_gl1d%idx_global_rlm_r(j)
       end do
+!$omp end parallel do
+!$omp parallel do private(i,j)
       do i = 1, sph_rlm%nidx_rlm(1)
         j = sph_rlm%idx_gl_1d_rlm_r(i)
         sph_rlm%radius_1d_rlm_r(i) = s3d_radius%radius_1d_gl(j)
       end do
+!$omp end parallel do
 !
+      call set_sph_one_over_radius_rlm(sph_rlm)
+!
+!$omp parallel do private(i,j)
       do i = 1, sph_rlm%nidx_rlm(2)
         j = i - 1 + sph_rlm%ist_rlm(2)
         sph_rlm%idx_gl_1d_rlm_j(i,1) = sph_gl1d%idx_global_rlm_j(j,1)
         sph_rlm%idx_gl_1d_rlm_j(i,2) = sph_gl1d%idx_global_rlm_j(j,2)
         sph_rlm%idx_gl_1d_rlm_j(i,3) = sph_gl1d%idx_global_rlm_j(j,3)
       end do
+!$omp end parallel do
 !
       end subroutine copy_sph_1d_gl_idx_rlm
 !
