@@ -23,9 +23,6 @@
 !!     &         (nidx_rtm, idx_gl_1d_mphi, mn_rlm)
 !!      subroutine set_sin_theta_rtm                                    &
 !!     &         (nth_rtm, g_colat_rtm, asin_theta_1d_rtm)
-!!      subroutine radial_4_sph_trans(sph_rtp, sph_rtm)
-!!        type(sph_rtp_grid), intent(inout) :: sph_rtp
-!!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!@endverbatim
 !
       module set_params_sph_trans
@@ -239,23 +236,6 @@
 !$omp end parallel do
 !
       end subroutine set_sin_theta_rtp
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine radial_4_sph_trans(sph_rtp)
-!
-      use t_spheric_parameter
-!
-      type(sph_rtp_grid), intent(inout) :: sph_rtp
-!
-!
-!$omp parallel workshare
-      sph_rtp%a_r_1d_rtp_r(1:sph_rtp%nidx_rtp(1))                       &
-     &      = one / sph_rtp%radius_1d_rtp_r(1:sph_rtp%nidx_rtp(1))
-!$omp end parallel workshare
-!
-      end subroutine radial_4_sph_trans
 !
 ! -----------------------------------------------------------------------
 !

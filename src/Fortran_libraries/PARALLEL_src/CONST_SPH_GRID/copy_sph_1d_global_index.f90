@@ -73,6 +73,7 @@
         j = sph_rtp%idx_gl_1d_rtp_r(i)
         sph_rtp%radius_1d_rtp_r(i) = s3d_radius%radius_1d_gl(j)
       end do
+      call set_sph_one_over_radius_rtp(sph_rtp)
 !
       do i = 1, sph_rtp%nidx_rtp(2)
         j = i - 1 + sph_rtp%ist_rtp(2)
