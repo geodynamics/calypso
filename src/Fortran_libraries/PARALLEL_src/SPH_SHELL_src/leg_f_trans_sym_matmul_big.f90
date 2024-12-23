@@ -66,7 +66,7 @@
      &          n_WR, n_WS, WR, WS, WK_l_bsm)
 !
       use set_vr_rtm_leg_matmul_big
-      use set_sp_rlm_leg_matmul_big
+      use cal_sp_rlm_sym_matmul_big
 !
       integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm
