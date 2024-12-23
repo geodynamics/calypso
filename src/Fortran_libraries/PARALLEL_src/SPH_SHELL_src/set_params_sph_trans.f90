@@ -243,19 +243,16 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine radial_4_sph_trans(sph_rtp, sph_rtm)
+      subroutine radial_4_sph_trans(sph_rtp)
 !
       use t_spheric_parameter
 !
       type(sph_rtp_grid), intent(inout) :: sph_rtp
-      type(sph_rtm_grid), intent(inout) :: sph_rtm
 !
 !
 !$omp parallel workshare
       sph_rtp%a_r_1d_rtp_r(1:sph_rtp%nidx_rtp(1))                       &
      &      = one / sph_rtp%radius_1d_rtp_r(1:sph_rtp%nidx_rtp(1))
-      sph_rtm%a_r_1d_rtm_r(1:sph_rtm%nidx_rtm(1))                       &
-     &      = one / sph_rtm%radius_1d_rtm_r(1:sph_rtm%nidx_rtm(1))
 !$omp end parallel workshare
 !
       end subroutine radial_4_sph_trans

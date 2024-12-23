@@ -153,7 +153,7 @@
      &    (ncomp, nvector, sph_rtm%ist_rtm_order_zero,                  &
      &     sph_rtm%ist_rtm_order_1s, sph_rtm%ist_rtm_order_1c,          &
      &     sph_rlm%nnod_rlm, sph_rtp%nnod_pole,                         &
-     &     sph_rtm%idx_gl_1d_rtm_r(1), sph_rtm%a_r_1d_rtm_r(1),         &
+     &     sph_rtm%idx_gl_1d_rtm_r(1), sph_rtm%ar_1d_rtm(1),            &
      &     comm_rlm%irev_sr, n_WR, WR, v_pl_local)
         call schmidt_b_trans_center_scalar                              &
      &     (ncomp, nvector, nscalar, sph_rtp%nnod_pole, v_pl_local)

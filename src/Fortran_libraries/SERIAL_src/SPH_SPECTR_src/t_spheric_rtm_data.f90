@@ -17,6 +17,8 @@
 !!      subroutine dealloc_rtm_param_smp(sph_rtm)
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!
+!!      subroutine set_sph_one_over_radius_rtm(sph_rtm)
+!!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!      subroutine copy_spheric_rtm_data                                &
 !!     &         (ltr_org, rtm_org, ltr_new, rtm_new)
 !!      type(sph_rtm_grid), intent(in) :: rtm_org
@@ -92,7 +94,7 @@
 !>        1d radius data for @f$ f(r,\theta,m) @f$
         real(kind = kreal), allocatable :: radius_1d_rtm_r(:)
 !>        1 / radius_1d_rtm_r
-        real(kind = kreal), allocatable :: a_r_1d_rtm_r(:)
+        real(kind = kreal), allocatable :: ar_1d_rtm(:)
       end type sph_rtm_grid
 !
 ! -----------------------------------------------------------------------
@@ -121,7 +123,7 @@
       num = sph_rtm%nidx_rtm(1)
       allocate(sph_rtm%idx_gl_1d_rtm_r(num))
       allocate(sph_rtm%radius_1d_rtm_r(num))
-      allocate(sph_rtm%a_r_1d_rtm_r(num))
+      allocate(sph_rtm%ar_1d_rtm(num))
       num = sph_rtm%nidx_rtm(2)
       allocate(sph_rtm%idx_gl_1d_rtm_t(num))
       num = sph_rtm%nidx_rtm(3)
@@ -132,7 +134,7 @@
       if(sph_rtm%nidx_rtm(1) .gt. 0) then
         sph_rtm%idx_gl_1d_rtm_r = 0
         sph_rtm%radius_1d_rtm_r = 0.0d0
-        sph_rtm%a_r_1d_rtm_r = 0.0d0
+        sph_rtm%ar_1d_rtm = 0.0d0
       end if
 !
       end subroutine alloc_sph_1d_index_rtm
@@ -182,8 +184,7 @@
       type(sph_rtm_grid), intent(inout) :: sph_rtm
 !
 !
-      deallocate(sph_rtm%radius_1d_rtm_r)
-      deallocate(sph_rtm%a_r_1d_rtm_r)
+      deallocate(sph_rtm%radius_1d_rtm_r, sph_rtm%ar_1d_rtm)
       deallocate(sph_rtm%idx_gl_1d_rtm_r)
       deallocate(sph_rtm%idx_gl_1d_rtm_t)
       deallocate(sph_rtm%idx_gl_1d_rtm_m)
@@ -205,6 +206,22 @@
       end subroutine dealloc_rtm_param_smp
 !
 ! -----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine set_sph_one_over_radius_rtm(sph_rtm)
+!
+      type(sph_rtm_grid), intent(inout) :: sph_rtm
+!
+      integer(kind = kint) :: i
+!
+!$omp parallel do private(i)
+      do i = 1, sph_rtm%nidx_rtm(1)
+        sph_rtm%ar_1d_rtm(i) = one / sph_rtm%radius_1d_rtm_r(i)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_sph_one_over_radius_rtm
+!
 ! ----------------------------------------------------------------------
 !
       subroutine copy_spheric_rtm_data                                  &

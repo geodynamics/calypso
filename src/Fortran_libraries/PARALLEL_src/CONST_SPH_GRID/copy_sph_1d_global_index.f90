@@ -107,6 +107,7 @@
         j = sph_rtm%idx_gl_1d_rtm_r(i)
         sph_rtm%radius_1d_rtm_r(i) = s3d_radius%radius_1d_gl(j)
       end do
+      call set_sph_one_over_radius_rtm(sph_rtm)
 !
       do i = 1, sph_rtm%nidx_rtm(2)
         j = i - 1 + sph_rtm%ist_rtm(2)
@@ -145,7 +146,6 @@
         sph_rlm%radius_1d_rlm_r(i) = s3d_radius%radius_1d_gl(j)
       end do
 !$omp end parallel do
-!
       call set_sph_one_over_radius_rlm(sph_rlm)
 !
 !$omp parallel do private(i,j)
@@ -207,7 +207,6 @@
         j = sph_rj%idx_gl_1d_rj_r(i)
         sph_rj%radius_1d_rj_r(i) = s3d_radius%radius_1d_gl(j)
       end do
-!
       call set_sph_one_over_radius_rj(sph_rj)
 !
       end subroutine copy_sph_1d_gl_idx_rj
