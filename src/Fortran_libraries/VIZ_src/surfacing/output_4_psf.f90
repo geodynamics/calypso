@@ -151,6 +151,8 @@
         call link_field_data_to_ucd                                     &
      &     (iso_mesh(i_iso)%field, iso_out(i_iso))
       end do
+      write(*,*) my_rank, 'iso_out%nnod', iso_out(1:num_iso)%nnod
+      write(*,*) my_rank, 'iso_out%nele', iso_out(1:num_iso)%nele
 !
       do i_iso = 1, num_iso
         call sel_write_parallel_ucd_file                                &

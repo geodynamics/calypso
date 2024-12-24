@@ -116,6 +116,7 @@
 !
 !   set reference temperature (l = m = 0)
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
+        jj = find_local_sph_address(sph_rj, 0, 0)
         do k = 1, nlayer_ICB-1
           inod = local_sph_node_address(sph_rj, k, jj)
           temp_rj(inod) = 1.0d0

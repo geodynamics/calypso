@@ -140,7 +140,7 @@ set_legendre_matrices.o: $(SPH_COMMDIR)/set_legendre_matrices.f90 m_precision.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 set_loaded_data_4_sph.o: $(SPH_COMMDIR)/set_loaded_data_4_sph.f90 m_precision.o m_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o calypso_mpi.o calypso_mpi_int.o m_machine_parameter.o count_num_sph_smp.o set_special_sph_lm_flags.o set_from_recv_buf_rev.o m_spheric_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_params_sph_trans.o: $(SPH_COMMDIR)/set_params_sph_trans.f90 m_precision.o m_constants.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_schmidt_poly_on_rtm.o calypso_mpi.o t_spheric_parameter.o
+set_params_sph_trans.o: $(SPH_COMMDIR)/set_params_sph_trans.f90 m_precision.o m_constants.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_schmidt_poly_on_rtm.o calypso_mpi.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_sp_rlm_for_leg_vecprod.o: $(SPH_COMMDIR)/set_sp_rlm_for_leg_vecprod.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
