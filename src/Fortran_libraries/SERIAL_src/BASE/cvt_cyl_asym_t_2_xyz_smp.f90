@@ -74,7 +74,7 @@
        real(kind=kreal) :: tsp, tzs, tpz
 !
 !
-!$omp do private(inod,ist,ied,tsp,tzs,tpz)
+!$omp parallel do private(inod,ist,ied,tsp,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -99,7 +99,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_xyz_asym_t_by_cyl_smp
 !
@@ -121,7 +121,7 @@
        real(kind=kreal) :: tsp, tzs, tpz
 !
 !
-!$omp do private(inod,ist,ied,tsp,tzs,tpz)
+!$omp parallel do private(inod,ist,ied,tsp,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -146,7 +146,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine overwrite_xyz_asym_t_by_cyl_smp
 !
@@ -165,7 +165,7 @@
        integer (kind = kint) :: ip, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -173,7 +173,7 @@
            v_xy(inod) =   t_cyl(inod,1)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_xy_asym_t_by_cyl_smp
 !
@@ -195,7 +195,7 @@
        real(kind=kreal) :: tzs, tpz
 !
 !
-!$omp do private(inod,ist,ied,tzs,tpz)
+!$omp parallel do private(inod,ist,ied,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -212,7 +212,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_zx_asym_t_by_cyl_smp
 !
@@ -234,7 +234,7 @@
        real(kind=kreal) :: tzs, tpz
 !
 !
-!$omp do private(inod,ist,ied,tzs,tpz)
+!$omp parallel do private(inod,ist,ied,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -251,7 +251,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_yz_asym_t_by_cyl_smp
 !

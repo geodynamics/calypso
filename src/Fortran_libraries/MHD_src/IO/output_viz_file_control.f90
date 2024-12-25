@@ -1,9 +1,12 @@
+!>@file   output_viz_file_control
+!!@brief  module output_viz_file_control
+!!
+!!@author H. Matsui
+!!@date    programmed by H.Matsui in Aug., 2007
 !
-!     module output_viz_file_control
-!
-!     programmed by H. Matsui
-!     modified by H. Matsui on Aug., 2007
-!
+!>@brief Check visualization output flags
+!!
+!!@verbatim
 !!      logical function iflag_viz_output                               &
 !!     &               (flag_flex_step, i_step_fix, time_d, IO_step)
 !!      integer(kind = kint) function viz_time_step                     &
@@ -16,6 +19,7 @@
 !!        type(time_data), intent(in) :: time_d
 !!        type(flexible_stepping_parameter), intent(in) :: flex_p
 !!        type(VIZ_step_params), intent(inout) :: viz_step
+!!@endverbatim
 !
       module output_viz_file_control
 !

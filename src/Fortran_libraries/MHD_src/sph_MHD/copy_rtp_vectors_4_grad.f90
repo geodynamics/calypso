@@ -132,10 +132,8 @@
       real(kind = kreal), intent(inout) :: d_sph(sph_rtp%nnod_rtp)
 !
 !
-!$omp parallel
       call copy_scalar_from_trans_smp(sph_rtp%nnod_rtp, ione,           &
      &    sph_rtp%nnod_rtp, v_rtp, d_sph)
-!$omp end parallel
 !
       end subroutine sel_scalar_from_trans
 !

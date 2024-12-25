@@ -44,9 +44,9 @@
        real(kind=kreal), intent(inout) :: copied(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        copied(1:nnod) = scalar(1:nnod)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_nod_scalar_smp
 !
@@ -59,11 +59,11 @@
        real(kind=kreal), intent(inout) :: copied(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        copied(1:nnod,1) = vector(1:nnod,1)
        copied(1:nnod,2) = vector(1:nnod,2)
        copied(1:nnod,3) = vector(1:nnod,3)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_nod_vector_smp
 !
@@ -76,14 +76,14 @@
        real(kind=kreal), intent(inout) :: copied(nnod,6)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        copied(1:nnod,1) = tensor(1:nnod,1)
        copied(1:nnod,2) = tensor(1:nnod,2)
        copied(1:nnod,3) = tensor(1:nnod,3)
        copied(1:nnod,4) = tensor(1:nnod,4)
        copied(1:nnod,5) = tensor(1:nnod,5)
        copied(1:nnod,6) = tensor(1:nnod,6)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_nod_sym_tensor_smp
 !
@@ -96,9 +96,9 @@
        real(kind=kreal), intent(inout) :: copied(nnod,ntot_comp)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        copied(1:nnod,1:ntot_comp) = vector(1:nnod,1:ntot_comp)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_all_field_smp
 !
@@ -112,9 +112,9 @@
        integer (kind = kint), intent(inout) :: int_copied(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        int_copied(1:nnod) = int_scalar(1:nnod)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_nod_integer_smp
 !

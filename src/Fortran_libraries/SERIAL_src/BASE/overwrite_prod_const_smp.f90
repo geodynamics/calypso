@@ -57,7 +57,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -67,7 +67,7 @@
           prod(inod) =  prod(inod)*coef
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_coef_prod_scalar_smp
 !
@@ -85,7 +85,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -97,7 +97,7 @@
           prod(inod,3) =  coef*prod(inod,3)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_coef_prod_vect_smp
 !
@@ -115,7 +115,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -130,7 +130,7 @@
           prod(inod,6) =  coef*prod(inod,6)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_coef_prod_tensor_smp
 !
@@ -151,7 +151,7 @@
       real (kind=kreal) :: v(3)
 !
 !
-!$omp do private(inod,ist,ied,v)
+!$omp parallel do private(inod,ist,ied,v)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -166,7 +166,7 @@
           prod(inod,3) = (c_vec(1)*v(2) - c_vec(2)*v(1)) * coef
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_vect_prod_cvec_coef_smp
 !
@@ -185,7 +185,7 @@
       real (kind=kreal) :: v(3)
 !
 !
-!$omp do private(inod,ist,ied,v)
+!$omp parallel do private(inod,ist,ied,v)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -200,7 +200,7 @@
           prod(inod,3) = c_vec(1)*v(2) - c_vec(2)*v(1)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_vect_prod_cvec_smp
 !

@@ -180,12 +180,10 @@
       real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
 !
       if(fs_trns_eflux%i_ujb .gt. 0) then
-!$omp parallel
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      frc_rtp(1,f_trns_frc%i_lorentz),                            &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
      &      flx_rtp(1,fs_trns_eflux%i_ujb) )
-!$omp end parallel
       end if
 !
       end subroutine cal_work_of_lorentz_on_node
@@ -212,12 +210,10 @@
       real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
 !
       if(fs_trns_eflux%i_m_advect_work .gt. 0) then
-!$omp parallel
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      frc_rtp(1,f_trns_frc%i_m_advect),                           &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
      &      flx_rtp(1,fs_trns_eflux%i_m_advect_work) )
-!$omp end parallel
       end if
 !
       end subroutine cal_work_of_inertia_on_node
@@ -245,12 +241,10 @@
       real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
 !
       if(fs_trns_eflux%i_me_gen .gt. 0) then
-!$omp parallel
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      frc_rtp(1,ipol_frc%i_induction),                            &
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
      &      flx_rtp(1,fs_trns_eflux%i_me_gen) )
-!$omp end parallel
       end if
 !
       end subroutine cal_ene_flux_by_induct_on_node

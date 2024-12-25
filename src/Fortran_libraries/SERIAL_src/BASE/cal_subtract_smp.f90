@@ -52,9 +52,9 @@
       real (kind=kreal), intent(inout) :: sol(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       sol(1:nnod) = source(1:nnod) - subt(1:nnod)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtract_scalars_smp
 !
@@ -67,11 +67,11 @@
       real (kind=kreal), intent(inout) :: sol(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       sol(1:nnod,1) = source(1:nnod,1) - subt(1:nnod,1)
       sol(1:nnod,2) = source(1:nnod,2) - subt(1:nnod,2)
       sol(1:nnod,3) = source(1:nnod,3) - subt(1:nnod,3)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtract_vectors_smp
 !
@@ -84,14 +84,14 @@
       real (kind=kreal), intent(inout) :: sol(nnod,6)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       sol(1:nnod,1) = source(1:nnod,1) - subt(1:nnod,1)
       sol(1:nnod,2) = source(1:nnod,2) - subt(1:nnod,2)
       sol(1:nnod,3) = source(1:nnod,3) - subt(1:nnod,3)
       sol(1:nnod,4) = source(1:nnod,4) - subt(1:nnod,4)
       sol(1:nnod,5) = source(1:nnod,5) - subt(1:nnod,5)
       sol(1:nnod,6) = source(1:nnod,6) - subt(1:nnod,6)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtract_tensors_smp
 !
@@ -108,9 +108,9 @@
        real(kind=kreal), intent(inout) :: dest(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        dest(1:nnod) = scalar(1:nnod) - const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtruct_const_4_scalar_smp
 !
@@ -125,11 +125,11 @@
        real(kind=kreal), intent(inout) :: dest(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        dest(1:nnod,1) = vector(1:nnod,1) - const
        dest(1:nnod,2) = vector(1:nnod,2) - const
        dest(1:nnod,3) = vector(1:nnod,3) - const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtruct_const_4_vect_smp
 !
@@ -145,14 +145,14 @@
        real(kind=kreal), intent(inout) :: dest(nnod,6)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        dest(1:nnod,1) = tensor(1:nnod,1) - const
        dest(1:nnod,2) = tensor(1:nnod,2) - const
        dest(1:nnod,3) = tensor(1:nnod,3) - const
        dest(1:nnod,4) = tensor(1:nnod,4) - const
        dest(1:nnod,5) = tensor(1:nnod,5) - const
        dest(1:nnod,6) = tensor(1:nnod,6) - const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtruct_const_4_tensor_smp
 !
@@ -167,9 +167,9 @@
        real(kind=kreal), intent(inout) :: scalar(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        scalar(1:nnod) = scalar(1:nnod) - const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtruct_const_4_scalar_smp_ow
 !
@@ -183,11 +183,11 @@
        real(kind=kreal), intent(inout) :: vector(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
        vector(1:nnod,1) = vector(1:nnod,1) - const
        vector(1:nnod,2) = vector(1:nnod,2) - const
        vector(1:nnod,3) = vector(1:nnod,3) - const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtruct_const_4_vect_smp_ow
 !
@@ -201,14 +201,14 @@
       real(kind=kreal), intent(inout) :: tensor(nnod,6)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       tensor(1:nnod,1) = tensor(1:nnod,1) - const
       tensor(1:nnod,2) = tensor(1:nnod,2) - const
       tensor(1:nnod,3) = tensor(1:nnod,3) - const
       tensor(1:nnod,4) = tensor(1:nnod,4) - const
       tensor(1:nnod,5) = tensor(1:nnod,5) - const
       tensor(1:nnod,6) = tensor(1:nnod,6) - const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtruct_const_4_tensor_smp_ow
 !
@@ -222,11 +222,11 @@
 !
       real (kind=kreal), intent(inout) :: vector(nnod,3)
 !
-!$omp workshare
+!$omp parallel workshare
       vector(1:nnod,1) = vector(1:nnod,1) - const(1)
       vector(1:nnod,2) = vector(1:nnod,2) - const(2)
       vector(1:nnod,3) = vector(1:nnod,3) - const(3)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subt_const_to_vector_smp_ow
 !
@@ -239,14 +239,14 @@
 !
       real (kind=kreal), intent(inout) :: tensor(nnod,6)
 !
-!$omp workshare
+!$omp parallel workshare
       tensor(1:nnod,1) = tensor(1:nnod,1) - const(1)
       tensor(1:nnod,2) = tensor(1:nnod,2) - const(2)
       tensor(1:nnod,3) = tensor(1:nnod,3) - const(3)
       tensor(1:nnod,4) = tensor(1:nnod,4) - const(4)
       tensor(1:nnod,5) = tensor(1:nnod,5) - const(5)
       tensor(1:nnod,6) = tensor(1:nnod,6) - const(6)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subt_const_to_tensor_smp_ow
 !

@@ -221,7 +221,7 @@
       integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
 !
 !
-!$omp do private(mphi,l_rtp,kr,k_gl,inod)
+!$omp parallel do private(mphi,l_rtp,kr,k_gl,inod)
       do mphi = 1, sph_rtp%nidx_rtp(3)
         do l_rtp = 1, sph_rtp%nidx_rtp(2)
           do kr = 1, sph_rtp%nidx_rtp(1)
@@ -234,7 +234,7 @@
           end do
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine subtract_sph_ave_coriolis_rtp
 !
@@ -252,7 +252,7 @@
       integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
 !
 !
-!$omp do private(mphi,l_rtp,kr,k_gl,inod)
+!$omp parallel do private(mphi,l_rtp,kr,k_gl,inod)
       do l_rtp = 1, sph_rtp%nidx_rtp(2)
         do kr = 1, sph_rtp%nidx_rtp(1)
           k_gl = sph_rtp%idx_gl_1d_rtp_r(kr)
@@ -265,7 +265,7 @@
           end do
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine subtract_sph_ave_coriolis_prt
 !

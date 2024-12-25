@@ -101,14 +101,12 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-!$omp parallel
       call copy_nod_scalar_smp(rj_fld%n_point,                          &
      &    rj_fld%d_fld(1,ipol%base%i_vort+2),                           &
      &    rj_fld%d_fld(1,ipol%base%i_velo  ))
       call copy_nod_scalar_smp(rj_fld%n_point,                          &
      &    rj_fld%d_fld(1,ipol%base%i_vort  ),                           &
      &    rj_fld%d_fld(1,ipol%base%i_velo+2))
-!$omp end parallel
 !
       call delete_zero_degree_vect                                      &
      &   (ipol%base%i_velo, sph_rj%idx_rj_degree_zero, rj_fld%n_point,  &

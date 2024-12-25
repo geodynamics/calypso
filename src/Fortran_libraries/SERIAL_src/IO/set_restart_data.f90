@@ -189,9 +189,9 @@
       real(kind = kreal), intent(inout) :: dat_IO(nnod_IO,ntot_comp_IO)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       dat_IO(1:nnod,1:ntot_comp) = d_nod(1:nnod,1:ntot_comp)
-!$omp end workshare
+!$omp end parallel workshare
 !
       end subroutine simple_copy_fld_dat_to_rst_IO
 !

@@ -229,14 +229,14 @@
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       d_rj(1:nnod_rj,is_exp  ) = d_rj(1:nnod_rj,is_exp  )               &
      &                        - d_rj(1:nnod_rj,is_inertia  )
       d_rj(1:nnod_rj,is_exp+1) = d_rj(1:nnod_rj,is_exp+1)               &
      &                        - d_rj(1:nnod_rj,is_inertia+1)
       d_rj(1:nnod_rj,is_exp+2) = d_rj(1:nnod_rj,is_exp+2)               &
      &                        - d_rj(1:nnod_rj,is_inertia+2)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine subtract_advection_to_force
 !
@@ -250,14 +250,14 @@
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       d_rj(1:nnod_rj,is_exp  ) = d_rj(1:nnod_rj,is_exp  )               &
      &                       + d_rj(1:nnod_rj,is_force  )
       d_rj(1:nnod_rj,is_exp+1) = d_rj(1:nnod_rj,is_exp+1)               &
      &                       + d_rj(1:nnod_rj,is_force+1)
       d_rj(1:nnod_rj,is_exp+2) = d_rj(1:nnod_rj,is_exp+2)               &
      &                       + d_rj(1:nnod_rj,is_force+2)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine add_each_force_to_forces
 !

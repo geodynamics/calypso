@@ -85,7 +85,7 @@
        real(kind=kreal) :: trt, tpr, ttp
 !
 !
-!$omp do private(inod,ist,ied,trt,tpr,ttp)
+!$omp parallel do private(inod,ist,ied,trt,tpr,ttp)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -123,7 +123,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_xyz_asym_t_by_sph_smp
 !
@@ -148,7 +148,7 @@
        real(kind=kreal) :: trt, tpr, ttp
 !
 !
-!$omp do private(inod,ist,ied,trt,tpr,ttp)
+!$omp parallel do private(inod,ist,ied,trt,tpr,ttp)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -186,7 +186,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine overwrite_xyz_asym_t_by_sph_smp
 !
@@ -210,7 +210,7 @@
        real(kind=kreal) :: trt, tpr, ttp
 !
 !
-!$omp do private(inod,ist,ied,trt,tpr,ttp)
+!$omp parallel do private(inod,ist,ied,trt,tpr,ttp)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -231,7 +231,7 @@
            end if
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_xy_asym_t_by_sph_smp
 !
@@ -257,7 +257,7 @@
        real(kind=kreal) :: trt, tpr, ttp
 !
 !
-!$omp do private(inod,ist,ied,trt,tpr,ttp)
+!$omp parallel do private(inod,ist,ied,trt,tpr,ttp)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -273,15 +273,15 @@
            else if ( s(inod).eq.0.0 .and. zz(inod) .lt. 0) then
              v_zx(inod) =  trt
            else
-             v_zx(inod) =   (  trt * xx(inod)* r(inod)                &
-     &                       + tpr * yy(inod)*zz(inod)                &
-     &                       + ttp * yy(inod)* s(inod) )              &
+             v_zx(inod) =   (  trt * xx(inod)* r(inod)                  &
+     &                       + tpr * yy(inod)*zz(inod)                  &
+     &                       + ttp * yy(inod)* s(inod) )                &
      &                     * a_r(inod) * a_s(inod)
            end if
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_zx_asym_t_by_sph_smp
 !
@@ -307,7 +307,7 @@
        real(kind=kreal) :: trt, tpr, ttp
 !
 !
-!$omp do private(inod,ist,ied,trt,tpr,ttp)
+!$omp parallel do private(inod,ist,ied,trt,tpr,ttp)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -323,15 +323,15 @@
            else if ( s(inod).eq.0.0 .and. zz(inod) .lt. 0) then
              v_yz(inod) = -tpr
            else
-             v_yz(inod) =   ( -trt * yy(inod)* r(inod)                &
-     &                       + tpr * xx(inod)*zz(inod)                &
-     &                       + ttp * xx(inod)* s(inod) )              &
+             v_yz(inod) =   ( -trt * yy(inod)* r(inod)                  &
+     &                       + tpr * xx(inod)*zz(inod)                  &
+     &                       + ttp * xx(inod)* s(inod) )                &
      &                     * a_r(inod) * a_s(inod)
            end if
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_yz_asym_t_by_sph_smp
 !

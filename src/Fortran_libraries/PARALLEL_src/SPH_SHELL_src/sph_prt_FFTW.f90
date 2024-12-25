@@ -202,9 +202,7 @@
 !
       ntot = sph_rtp%nnod_rtp * ncomp_fwd
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+4)
-!$omp parallel
       call copy_nod_scalar_smp(ntot, X_rtp(1,1), FFTW_f%X(1))
-!$omp end parallel
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+4)
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+5)
@@ -278,9 +276,7 @@
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+3)
       ntot = sph_rtp%nnod_rtp * ncomp_bwd
-!$omp parallel
       call copy_nod_scalar_smp(ntot, FFTW_f%X(1), X_rtp(1,1))
-!$omp end parallel
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+3)
 !
       end subroutine prt_back_FFTW_from_recv

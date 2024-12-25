@@ -204,6 +204,7 @@
 !$omp end workshare nowait
         end do
 !$omp end parallel
+!
         if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+16)
 !
         if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+17)

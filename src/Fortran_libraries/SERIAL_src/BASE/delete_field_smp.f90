@@ -104,9 +104,9 @@
       integer(kind = kint), intent(in) :: ist, ied, numnod
       real(kind = kreal), intent(inout) :: scalar(numnod)
 !
-!$omp workshare
+!$omp parallel workshare
           scalar(ist:ied) = const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine constant_scalar_smp
 !
@@ -119,11 +119,11 @@
       real(kind = kreal), intent(inout) :: vector(numnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       vector(ist:ied,1) = const
       vector(ist:ied,2) = const
       vector(ist:ied,3) = const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine constant_vector_smp
 !
@@ -137,14 +137,14 @@
       real(kind = kreal), intent(inout) :: tensor(numnod,6)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       tensor(ist:ied,1) = const
       tensor(ist:ied,2) = const
       tensor(ist:ied,3) = const
       tensor(ist:ied,4) = const
       tensor(ist:ied,5) = const
       tensor(ist:ied,6) = const
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine constant_sym_tensor_smp
 !
@@ -161,11 +161,13 @@
       integer (kind=kint) :: nd
 !
 !
+!$omp parallel
       do nd = 1, numdir
 !$omp workshare
           vector(ist:ied,nd) = const
 !$omp end workshare nowait
       end do
+!$omp end parallel
 !
       end subroutine constant_arb_vect_smp
 !

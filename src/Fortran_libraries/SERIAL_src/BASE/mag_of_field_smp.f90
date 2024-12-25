@@ -67,13 +67,13 @@
 !
        integer (kind = kint) :: inod
 !
-!$omp do private(inod)
+!$omp parallel do private(inod)
        do inod = 1, nnod
          d_mag(inod) = sqrt( d_fld(inod,1)*d_fld(inod,1)                &
      &                     + d_fld(inod,2)*d_fld(inod,2)                &
      &                     + d_fld(inod,3)*d_fld(inod,3) )
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_vector_magnitude
 !
@@ -87,7 +87,7 @@
 !
        integer (kind = kint) :: inod
 !
-!$omp do private(inod)
+!$omp parallel do private(inod)
       do inod = 1, nnod
          d_mag(inod) = sqrt(   d_fld(inod,1)*d_fld(inod,1)              &
      &                   + two*d_fld(inod,2)*d_fld(inod,2)              &
@@ -96,7 +96,7 @@
      &                   + two*d_fld(inod,5)*d_fld(inod,5)              &
      &                   +     d_fld(inod,6)*d_fld(inod,6) )
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_sym_tensor_magnitude
 !
@@ -110,13 +110,13 @@
 !
        integer (kind = kint) :: inod
 !
-!$omp do private(inod)
+!$omp parallel do private(inod)
       do inod = 1, nnod
         d_mag(inod) = two*sqrt( d_fld(inod,1)*d_fld(inod,1)             &
      &                        + d_fld(inod,2)*d_fld(inod,2)             &   
      &                        + d_fld(inod,3)*d_fld(inod,3) )
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_asym_tensor_magnitude
 !
@@ -133,6 +133,7 @@
        integer (kind = kint) :: inod
 !
 !
+!$omp parallel
 !$omp do private(inod)
       do inod = 1, nnod
          d_len(inod) = d_rot(inod,1)**2 + d_rot(inod,2)**2              &
@@ -149,7 +150,8 @@
           d_len(inod) = sqrt(d_len(inod))
         end if
       end do
-!$omp end do nowait
+!$omp end do
+!$omp end parallel
 !
       end subroutine cal_len_scale_by_rot_smp
 !
@@ -166,7 +168,7 @@
       integer (kind = kint) :: inod
 !
 !
-!$omp do private(inod)
+!$omp parallel do private(inod)
       do inod = 1, nnod
         if(d_fld(inod) .eq. zero) then
           d_len(inod) = zero
@@ -175,7 +177,7 @@
           d_len(inod) = sqrt(d_len(inod))
         end if
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_len_scale_by_diffuse_smp
 !

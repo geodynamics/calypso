@@ -60,13 +60,13 @@
 !
       integer(kind = kint) :: inod
 !
-!$omp do private(inod)
+!$omp parallel do private(inod)
       do inod = 1, nnod
         e_field(inod,1) = coef_d * current(inod,1) - uxb(inod,1)
         e_field(inod,2) = coef_d * current(inod,2) - uxb(inod,2)
         e_field(inod,3) = coef_d * current(inod,3) - uxb(inod,3)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_electric_field_smp
 !
@@ -84,7 +84,7 @@
       integer(kind = kint) :: inod
       real (kind=kreal) :: e_fld(3)
 !
-!$omp do private(inod,e_fld)
+!$omp parallel do private(inod,e_fld)
       do inod = 1, nnod
         e_fld(1) = coef_d * current(inod,1) - uxb(inod,1)
         e_fld(2) = coef_d * current(inod,2) - uxb(inod,2)
@@ -97,7 +97,7 @@
         poynting(inod,3)                                                &
      &         = e_fld(1)*b_field(inod,2) - e_fld(2)*b_field(inod,1)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_poynting_flux_smp
 !
@@ -119,7 +119,7 @@
 !
       integer(kind = kint) :: inod, lt, kr, lnod
 !
-!$omp do private(inod,kr,lnod,lt)
+!$omp parallel do private(inod,kr,lnod,lt)
       do inod = 1, nnod
         kr =   ione + mod( (inod-ione),nri)
         lnod = ione + (inod - kr) / nri
@@ -146,7 +146,7 @@
      &                          * cot_theta_1d_rtp(lt) )                &
      &                         * a_r_1d_rtp_r(kr)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_rtp_magnetic_streach
 !
@@ -164,7 +164,7 @@
 !
       integer(kind = kint) :: inod
 !
-!$omp do private(inod)
+!$omp parallel do private(inod)
       do inod = 1, nnod
         magne_streach(inod,1) =  grad_ux(inod,1)*b_field(inod,1)        &
      &                         + grad_ux(inod,2)*b_field(inod,2)        &
@@ -176,7 +176,7 @@
      &                         + grad_uz(inod,2)*b_field(inod,2)        &
      &                         + grad_uz(inod,3)*b_field(inod,3)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_xyz_magnetic_streach
 !
@@ -198,7 +198,8 @@
 !
       integer(kind = kint) :: inod, lt, kr, lnod
 !
-!$omp do private(inod,kr,lnod,lt)
+!
+!$omp parallel do private(inod,kr,lnod,lt)
       do inod = 1, nnod
         kr =   ione + mod( (inod-ione),nri)
         lnod = ione + (inod - kr) / nri
@@ -231,7 +232,7 @@
      &                         + grad_uz(inod,2)*b_field(inod,2)
 !         magne_streach(inod,3) = grad_uz(inod,3)*b_field(inod,3)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_rtp_magnetic_streach_tmp
 !

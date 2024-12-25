@@ -66,7 +66,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp do private(inod,vr,vt,vp)
+!$omp parallel do private(inod,vr,vt,vp)
         do inod = 1, numnod
           vr = v_sph(inod,1)
           vt = v_sph(inod,2)
@@ -84,7 +84,7 @@
      &                   - vt * sin( theta(inod) ) )
 !
          end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cvt_sph_vect_2_xyz_smp
 !
@@ -104,7 +104,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp do private(inod,vr,vt,vp)
+!$omp parallel do private(inod,vr,vt,vp)
         do inod = 1, numnod
           vr = vect(inod,1)
           vt = vect(inod,2)
@@ -122,7 +122,7 @@
      &                   - vt * sin( theta(inod) ) )
 !
          end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine overwrite_sph_vect_2_xyz_smp
 !
@@ -141,7 +141,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp do private(inod,vr,vt,vp)
+!$omp parallel do private(inod,vr,vt,vp)
         do inod = 1, numnod
           vr = v_sph(inod,1)
           vt = v_sph(inod,2)
@@ -151,7 +151,7 @@
      &                + vt * cos(theta(inod))*cos(phi(inod))            &
      &                - vp * sin(phi(inod))   )
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_sph_2_x_comp_smp
 !
@@ -168,7 +168,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp do private(inod,vr,vt,vp)
+!$omp parallel do private(inod,vr,vt,vp)
         do inod = 1, numnod
           vr = v_sph(inod,1)
           vt = v_sph(inod,2)
@@ -178,7 +178,7 @@
      &                + vt * cos(theta(inod))*sin(phi(inod))            &
      &                + vp * cos(phi(inod) ))
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_sph_2_y_comp_smp
 !
@@ -195,7 +195,7 @@
        real(kind=kreal) :: vr, vt
 !
 !
-!$omp do private(inod,vr,vt)
+!$omp parallel do private(inod,vr,vt)
         do inod = 1, numnod
           vr = v_sph(inod,1)
           vt = v_sph(inod,2)
@@ -203,7 +203,7 @@
           v_z(inod) = ( vr * cos( theta(inod) )                         &
      &                - vt * sin( theta(inod) ) )
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_sph_2_z_comp_smp
 !
