@@ -83,43 +83,6 @@ $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 	mkdir -p $(BUILDDIR)/utilities
 	$(F90_LOCAL) $< -o $@
 
-depends: $(MAKE_MOD_DEP)
-	@echo "# Construct dependencies"; \
-	cd $(MHDDIR) ; \
-		$(GMAKE) \
-		GMAKE="$(GMAKE)" \
-		MAKEDIR="$(MAKEDIR)" \
-		BUILDDIR="$(BUILDDIR)" \
-		INSTDIR="$(INSTDIR)" \
-		MHDDIR="$(MHDDIR)" \
-		MPICHDIR="$(MPICHDIR)" \
-		MPICHLIBDIR="$(MPICHLIBDIR)" \
-		MPILIBS="$(MPILIBS)" \
-		MPICHBINDIR="$(MPICHBINDIR)" \
-		MPICHINCDIR="$(MPICHINCDIR)" \
-		MPIRUN="$(MPIRUN)" \
-		BLAS_LIBS="$(BLAS_LIBS)" \
-		ZLIB_CFLAGS="$(ZLIB_CFLAGS)"   \
-		ZLIB_LIBS="$(ZLIB_LIBS)"       \
-		FFTW3_CFLAGS="$(FFTW3_CFLAGS)" \
-		FFTW3_LIBS="$(FFTW3_LIBS)" \
-		HDF5_FFLAGS="$(HDF5_FFLAGS)" \
-		HDF5_LDFLAGS="$(HDF5_LDFLAGS)" \
-		HDF5_FLIBS="$(HDF5_FLIBS)" \
-		OPTFLAGS="$(OPTFLAGS)" \
-		F90OPTFLAGS="$(F90OPTFLAGS)" \
-		OPENMP_FCFLAGS="$(OPENMP_FCFLAGS)" \
-		OPENMP_CFLAGS="$(OPENMP_CFLAGS)" \
-		F90LIB="$(F90LIB)" \
-		MPIF90="$(MPIF90)" \
-		MPICC="$(MPICC)"   \
-		CC="$(CC)" \
-		AR="$(AR)" \
-		RANLIB="$(RANLIB)" \
-		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
-		XL_FORTRAN="$(XL_FORTRAN)" \
-		depends
-
 makemake: $(MAKE_MOD_DEP)
 	echo "# Construct Makefile"; \
 	cd $(MHDDIR) ; \
