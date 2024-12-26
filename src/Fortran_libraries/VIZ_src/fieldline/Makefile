@@ -31,8 +31,6 @@ mod_list:
 	@echo  $(MOD_FIELDLINE) >> $(MAKENAME)
 	@echo  >> $(MAKENAME)
 
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(FIELDLINE_DIR)' $(SOURCES)
 

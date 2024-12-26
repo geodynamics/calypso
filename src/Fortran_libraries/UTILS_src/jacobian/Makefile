@@ -21,9 +21,6 @@ mod_list:
 	@echo MOD_JACOBI=  \\ >> $(MAKENAME)
 	@echo $(MOD_JACOBI) >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(JACOBIDIR)' $(SOURCES)
 

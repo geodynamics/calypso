@@ -30,9 +30,6 @@ mod_list:
 	@echo  $(MOD_MAP) >> $(MAKENAME)
 	@echo   >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(MAP_RENDERING_DIR)' $(SOURCES)
 

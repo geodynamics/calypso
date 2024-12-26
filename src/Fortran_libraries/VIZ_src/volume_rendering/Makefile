@@ -31,8 +31,6 @@ mod_list:
 	@echo  $(MOD_PVR) >> $(MAKENAME)
 	@echo  >> $(MAKENAME)
 
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(PVR_DIR)' $(SOURCES)
 

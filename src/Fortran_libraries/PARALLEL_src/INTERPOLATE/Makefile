@@ -23,8 +23,6 @@ mod_list:
 	@echo  $(MOD_INTERPOLATE) >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(INTERPOLATE_DIR)' $(SOURCES)
 
