@@ -7,7 +7,9 @@
 !>@brief Matrix to evaluate radial derivative for non-slip at CMB
 !!
 !!@verbatim
-!!      subroutine check_4th_CMB_nonslip_vp_fdm(fdm4_noslip_CMB)
+!!      subroutine check_4th_CMB_nonslip_vp_fdm(id_file,                &
+!!     &                                        fdm4_noslip_CMB)
+!!        integer(kind = kint), intent(in) :: id_file
 !!        type(fdm4_CMB_zero_vpol), intent(in) :: fdm4_noslip_CMB
 !!      subroutine cal_fdm4_CMB0_nonslip_vp(r_from_CMB, fdm4_noslip_CMB)
 !!      subroutine cal_fdm4_CMB1_nonslip_vp(r_from_CMB, fdm4_noslip_CMB)
@@ -63,35 +65,39 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_4th_CMB_nonslip_vp_fdm(fdm4_noslip_CMB)
+      subroutine check_4th_CMB_nonslip_vp_fdm(id_file,                  &
+     &                                        fdm4_noslip_CMB)
 !
+      integer(kind = kint), intent(in) :: id_file
       type(fdm4_CMB_zero_vpol), intent(in) :: fdm4_noslip_CMB
 !
 !
-      write(50,*) ' zero poloidal at CMB'
-      write(50,*) ' fdm4_noslip_CMB%dmat_vp0'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp0(-2:0,2)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp0(-2:0,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp0(-2:0,4)
+      write(id_file,*) ' zero poloidal at CMB'
+      write(id_file,*) ' fdm4_noslip_CMB%dmat_vp0'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp0(-2:0,2)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp0(-2:0,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp0(-2:0,4)
 !
-      write(50,*) ' fdm4_noslip_CMB%dmat_vp1'
-      write(50,*) 'matrix for dfdr'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,2)
-      write(50,*) 'matrix for d2fdr2'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,3)
-      write(50,*) 'matrix for d3fdr3'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,4)
-      write(50,*) 'matrix for d4fdr4'
-      write(50,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,5)
+      write(id_file,*) ' fdm4_noslip_CMB%dmat_vp1'
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,4)
+      write(id_file,*) 'matrix for d4fdr4'
+      write(id_file,'(1p9E25.15e3)') fdm4_noslip_CMB%dmat_vp1(-2:1,5)
 !
       end subroutine check_4th_CMB_nonslip_vp_fdm
 !
 ! -----------------------------------------------------------------------
 !
       subroutine cal_fdm4_CMB0_nonslip_vp(r_from_CMB, fdm4_noslip_CMB)
+!
+      use cal_inverse_small_matrix
 !
       real(kind = kreal), intent(in) :: r_from_CMB(-3:0)
       type(fdm4_CMB_zero_vpol), intent(inout) :: fdm4_noslip_CMB
@@ -161,6 +167,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_fdm4_CMB1_nonslip_vp(r_from_CMB, fdm4_noslip_CMB)
+!
+      use cal_inverse_small_matrix
 !
       real(kind = kreal), intent(in) :: r_from_CMB(-3:0)
       type(fdm4_CMB_zero_vpol), intent(inout) :: fdm4_noslip_CMB

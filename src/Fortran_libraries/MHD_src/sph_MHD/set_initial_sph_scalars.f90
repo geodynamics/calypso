@@ -64,10 +64,11 @@
 !$omp end parallel do
 !
 !   set reference temperature (l = m = 0)
-      if (sph_rj%idx_rj_degree_zero .gt. 0) then
+      if(sph_rj%idx_rj_degree_zero .gt. 0) then
+        jj = sph_rj%idx_rj_degree_zero
         if (ref_param%iflag_reference .eq. id_sphere_ref_temp) then
           do k = 1, sph_rj%nidx_rj(1)
-            inod = sph_rj%idx_rj_degree_zero + (k-1) * sph_rj%nidx_rj(2)
+            inod = local_sph_node_address(sph_rj, k, jj)
             temp_rj(inod) = reftemp_j(k)
           end do
         else
@@ -76,8 +77,7 @@
             temp_rj(inod) = 1.0d0
           end do
           do k = nlayer_ICB, nlayer_CMB
-            inod = sph_rj%idx_rj_degree_zero                            &
-     &            + (k-1) * sph_rj%nidx_rj(2)
+            inod = local_sph_node_address(sph_rj, k, jj)
             temp_rj(inod)                                               &
      &           = (sph_rj%ar_1d_rj(k,1) * 20.d0/13.0d0 - 1.0d0 )       &
      &            * 7.0d0 / 13.0d0
@@ -116,6 +116,7 @@
 !
 !   set reference temperature (l = m = 0)
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
+        jj = find_local_sph_address(sph_rj, 0, 0)
         do k = 1, nlayer_ICB-1
           inod = local_sph_node_address(sph_rj, k, jj)
           temp_rj(inod) = 1.0d0
@@ -192,7 +193,7 @@
 !
       real(kind=kreal), intent(inout) :: temp_rj(sph_rj%nnod_rj)
 !
-      integer :: k, jj
+      integer :: k
       integer( kind = kint) :: inod, j
       real (kind = kreal) :: pi, xr, shell
 !

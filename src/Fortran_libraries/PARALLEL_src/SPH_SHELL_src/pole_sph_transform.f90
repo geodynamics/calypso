@@ -138,7 +138,7 @@
      &   sph_rlm%nnod_rlm, sph_rlm%nidx_rlm(1), sph_rlm%nidx_rlm(2),    &
      &   sph_rtp%nnod_pole, sph_rlm%istep_rlm,                          &
      &   sph_rtp%nidx_global_rtp, sph_rlm%idx_gl_1d_rlm_r,              &
-     &   sph_rlm%a_r_1d_rlm_r, comm_rlm%irev_sr,                        &
+     &   sph_rlm%ar_1d_rlm, comm_rlm%irev_sr,                           &
      &   leg%g_sph_rlm, leg%P_pole_rtm, leg%dPdt_pole_rtm,              &
      &    n_WR, WR, v_pl_local)
       call schmidt_b_trans_pole_scalar(ncomp, nvector, nscalar,         &
@@ -153,7 +153,7 @@
      &    (ncomp, nvector, sph_rtm%ist_rtm_order_zero,                  &
      &     sph_rtm%ist_rtm_order_1s, sph_rtm%ist_rtm_order_1c,          &
      &     sph_rlm%nnod_rlm, sph_rtp%nnod_pole,                         &
-     &     sph_rtm%idx_gl_1d_rtm_r(1), sph_rtm%a_r_1d_rtm_r(1),         &
+     &     sph_rtm%idx_gl_1d_rtm_r(1), sph_rtm%ar_1d_rtm(1),            &
      &     comm_rlm%irev_sr, n_WR, WR, v_pl_local)
         call schmidt_b_trans_center_scalar                              &
      &     (ncomp, nvector, nscalar, sph_rtp%nnod_pole, v_pl_local)

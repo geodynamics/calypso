@@ -138,12 +138,12 @@
 !      Extend potential field
       call ext_outside_potential(sph_bc_B%kr_out,                       &
      &    sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                        &
-     &    sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                    &
+     &    sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                  &
      &    rj_fld%n_point, rj_fld%d_fld(1,is_magne))
       if(sph_bc_B%iflag_icb .eq. iflag_sph_insulator) then
         call ext_inside_potential(sph_bc_B%kr_in,                       &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
      &      rj_fld%n_point, rj_fld%d_fld(1,is_magne))
       end if
 !
@@ -167,13 +167,14 @@
 !      Extend potential field
       call ext_outside_potential_with_j                                 &
      &   (sph_bc_B%kr_out, sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,       &
-     &    sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r, rj_fld%n_point,    &
+     &    sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1), rj_fld%n_point,  &
      &    rj_fld%d_fld(1,is_magne), rj_fld%d_fld(1,is_current))
       if(sph_bc_B%iflag_icb .eq. iflag_sph_insulator) then
         call ext_inside_potential_with_j                                &
      &     (sph_bc_B%kr_in, sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,      &
-     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r, rj_fld%n_point,  &
-     &      rj_fld%d_fld(1,is_magne), rj_fld%d_fld(1,is_current))
+     &      sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj(1,1),                &
+     &      rj_fld%n_point, rj_fld%d_fld(1,is_magne),                   &
+     &      rj_fld%d_fld(1,is_current))
       end if
 !
       end subroutine extend_by_potential_with_j

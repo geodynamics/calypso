@@ -77,8 +77,7 @@
       if (sph_rj%idx_rj_degree_zero .gt. 0) then
 !$omp parallel do private(k,inod)
         do k = 1, sph_rj%nidx_rj(1)
-          inod = 1 + (k-1)*sph_rj%istep_rj(1)                           &
-     &             + (sph_rj%idx_rj_degree_zero-1) * sph_rj%istep_rj(2)
+          inod = (k-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_zero
           scalar_rj(inod) = scalar_rj(inod) - reference_r(k)
           grad_rj(inod,1) = grad_rj(inod,1)                             &
      &                 - two*refgrad_r(k) * sph_rj%radius_1d_rj_r(k)**2
@@ -134,8 +133,7 @@
       if (sph_rj%idx_rj_degree_zero .gt. 0) then
 !$omp parallel do private(k,inod)
         do k = 1, sph_rj%nidx_rj(1)
-          inod = 1 + (k-1)*sph_rj%istep_rj(1)                           &
-     &             + (sph_rj%idx_rj_degree_zero-1) * sph_rj%istep_rj(2)
+          inod = (k-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_zero
           scalar_rj(inod) = scalar_rj(inod) + reference_r(k)
           grad_rj(inod,1) = grad_pert_rj(inod,1)                        &
      &                 + two*refgrad_r(k) * sph_rj%radius_1d_rj_r(k)**2
@@ -166,8 +164,7 @@
       if (sph_rj%idx_rj_degree_zero .gt. 0) then
 !$omp parallel do private(k,inod)
         do k = 1, sph_rj%nidx_rj(1)
-          inod = 1 + (k-1)*sph_rj%istep_rj(1)                           &
-     &             + (sph_rj%idx_rj_degree_zero-1) * sph_rj%istep_rj(2)
+          inod = (k-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_zero
           source_rj(inod) = 0.0d0
         end do
 !$omp end parallel do
@@ -195,8 +192,7 @@
       if (sph_rj%idx_rj_degree_zero .gt. 0) then
 !$omp parallel do private(k,inod)
         do k = 1, sph_rj%nidx_rj(1)
-          inod = 1 + (k-1)*sph_rj%istep_rj(1)                           &
-     &             + (sph_rj%idx_rj_degree_zero-1) * sph_rj%istep_rj(2)
+          inod = (k-1) * sph_rj%nidx_rj(2) + sph_rj%idx_rj_degree_zero
           source_rj(inod) = ref_source_r(k)
         end do
 !$omp end parallel do

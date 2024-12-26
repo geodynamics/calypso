@@ -58,9 +58,7 @@
 !
       if(my_rank .eq. 0) then
         call sph_radial_interpolation_coef                              &
-     &     (org_sph%sph_rj%nidx_rj(1), org_sph%sph_rj%radius_1d_rj_r,   &
-     &      new_sph%sph_rj%nidx_rj(1), new_sph%sph_rj%radius_1d_rj_r,   &
-     &      r_itp)
+     &     (org_sph%sph_rj, new_sph%sph_rj, r_itp)
       end if
       call calypso_mpi_bcast_one_int                                    &
      &   (new_sph%sph_rj%nidx_rj(1), 0)
@@ -152,31 +150,33 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_radial_interpolation_coef                          &
-     &         (nri_org, r_org, nri_new, r_new, r_itp)
+      subroutine sph_radial_interpolation_coef(org_rj, new_rj, r_itp)
 !
+      use t_spheric_rj_data
       use radial_interpolation
 !
-      integer(kind = kint), intent(in) :: nri_org, nri_new
-      real(kind = kreal), intent(in) :: r_org(nri_org)
-      real(kind = kreal), intent(in) :: r_new(nri_org)
+      type(sph_rj_grid), intent(in) :: org_rj, new_rj
+!
       type(sph_radial_interpolate), intent(inout) :: r_itp
 !
 !
-      r_itp%flag_same_rgrid                                             &
-     &    = check_sph_same_radial_grid(nri_org, r_org, nri_new, r_new)
+      r_itp%flag_same_rgrid = check_sph_same_radial_grid                &
+     &                       (org_rj%nidx_rj(1), org_rj%radius_1d_rj_r, &
+     &                        new_rj%nidx_rj(1), new_rj%radius_1d_rj_r)
       if(r_itp%flag_same_rgrid) return
 !
-      call alloc_radial_interpolate(nri_new, r_itp)
+      call alloc_radial_interpolate(new_rj%nidx_rj(1), r_itp)
 !
       call cal_radial_interpolation_coef                                &
-     &   (nri_org, r_org, nri_new, r_new,                               &
+     &   (org_rj%nidx_rj(1), org_rj%radius_1d_rj_r,                     &
+     &    new_rj%nidx_rj(1), new_rj%radius_1d_rj_r,                     &
      &    r_itp%kr_inner_source, r_itp%kr_outer_source,                 &
      &    r_itp%k_old2new_in, r_itp%k_old2new_out,                      &
      &    r_itp%coef_old2new_in)
 !
       call check_sph_radial_interpolate                                 &
-     &   (nri_org, r_org, nri_new, r_new, r_itp)
+     &   (org_rj%nidx_rj(1), org_rj%radius_1d_rj_r,                     &
+     &    new_rj%nidx_rj(1), new_rj%radius_1d_rj_r, r_itp)
 !
       end subroutine sph_radial_interpolation_coef
 !

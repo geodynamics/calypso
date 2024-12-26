@@ -85,7 +85,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp do private(inod,vx,vy,vz)
+!$omp parallel do private(inod,vx,vy,vz)
          do inod = 1, numnod
            vx = vect(inod,1)
            vy = vect(inod,2)
@@ -112,7 +112,7 @@
           end if
 !
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cvt_vector_2_sph_smp
 !
@@ -133,7 +133,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp do private(inod,vx,vy,vz)
+!$omp parallel do private(inod,vx,vy,vz)
          do inod = 1, numnod
            vx = vect(inod,1)
            vy = vect(inod,2)
@@ -160,7 +160,7 @@
           end if
 !
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine overwrite_vector_2_sph_smp
 !
@@ -183,7 +183,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp do private(inod,vx,vy,vz)
+!$omp parallel do private(inod,vx,vy,vz)
          do inod = 1, numnod
            vx = vect(inod,1)
            vy = vect(inod,2)
@@ -197,7 +197,7 @@
            end if
 !
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_radial_comp_smp
 !
@@ -219,7 +219,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp do private(inod,vx,vy,vz)
+!$omp parallel do private(inod,vx,vy,vz)
          do inod = 1, numnod
            vx = vect(inod,1)
            vy = vect(inod,2)
@@ -237,7 +237,7 @@
           end if
 !
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_theta_comp_smp
 !
@@ -256,7 +256,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp do private(inod,vx,vy,vz)
+!$omp parallel do private(inod,vx,vy,vz)
          do inod = 1, numnod
            vx = vect(inod,1)
            vy = vect(inod,2)
@@ -269,7 +269,7 @@
            end if
 !
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_phi_comp_smp
 !

@@ -39,7 +39,7 @@
 !!          type(sph_rj_grid), intent(in) :: sph_rj
 !!          type(sph_boundary_type), intent(in) :: sph_bc_U
 !!          type(sph_vector_BC_coef), intent(in) :: CMB_Uspec
-!!          type(fdm2_free_slip), intent(in) :: fdm2_free_ICB
+!!          type(fdm2_CMB_free_slip), intent(in) :: fdm2_free_CMB
 !!          type(fdm_matrices), intent(in) :: r_2nd
 !!@endverbatim
 !!
@@ -53,11 +53,7 @@
       use t_boundary_data_sph_MHD
       use t_boundary_sph_spectr
       use t_boundary_params_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
-!
-      use set_sph_exp_rigid_CMB
-      use set_sph_exp_free_CMB
-      use set_sph_exp_fix_vector_CMB
+      use t_coef_fdm2_free_slip_CMB
 !
       implicit none
 !
@@ -71,10 +67,14 @@
      &         (sph_rj, sph_bc_U, CMB_Uspec, fdm2_free_CMB, g_sph_rj,   &
      &          is_velo, is_vort, n_point, ntot_phys_rj, d_rj)
 !
+      use sph_exp_fix_vector_CMB
+      use sph_exp_rigid_CMB
+      use sph_exp_free_slip_CMB
+!
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_vector_BC_coef), intent(in) :: CMB_Uspec
-      type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
+      type(fdm2_CMB_free_slip), intent(in) :: fdm2_free_CMB
 !
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: is_velo, is_vort
@@ -114,10 +114,14 @@
      &         (sph_rj, sph_bc_U, CMB_Uspec, fdm2_free_CMB,             &
      &          is_fld, n_point, ntot_phys_rj, d_rj)
 !
+      use sph_exp_fix_vector_CMB
+      use sph_exp_rigid_CMB
+      use sph_exp_free_slip_CMB
+!
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_vector_BC_coef), intent(in) :: CMB_Uspec
-      type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
+      type(fdm2_CMB_free_slip), intent(in) :: fdm2_free_CMB
 !
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: is_fld
@@ -150,9 +154,13 @@
      &         (sph_rj, sph_bc_U, fdm2_free_CMB, g_sph_rj,              &
      &          is_fld, is_rot, n_point, ntot_phys_rj, d_rj)
 !
+      use sph_exp_fix_vector_CMB
+      use sph_exp_rigid_CMB
+      use sph_exp_free_slip_CMB
+!
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
+      type(fdm2_CMB_free_slip), intent(in) :: fdm2_free_CMB
 !
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: is_fld, is_rot
@@ -189,11 +197,14 @@
      &          fdm2_free_CMB, g_sph_rj, coef_diffuse,                  &
      &          is_velo, is_viscous, n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
+      use sph_exp_fix_scalar_CMB
+      use sph_exp_fix_vector_CMB
+      use sph_exp_rigid_CMB
+      use sph_exp_free_slip_CMB
 !
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
+      type(fdm2_CMB_free_slip), intent(in) :: fdm2_free_CMB
 !
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: is_velo
@@ -242,11 +253,14 @@
      &          fdm2_free_CMB, g_sph_rj, coef_diffuse,                  &
      &          is_vort, is_w_diffuse, n_point, ntot_phys_rj, d_rj)
 !
-      use cal_sph_exp_fixed_scalar
+      use sph_exp_fix_scalar_CMB
+      use sph_exp_fix_vector_CMB
+      use sph_exp_rigid_CMB
+      use sph_exp_free_slip_CMB
 !
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(fdm2_free_slip), intent(in) :: fdm2_free_CMB
+      type(fdm2_CMB_free_slip), intent(in) :: fdm2_free_CMB
 !
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: is_vort
@@ -258,12 +272,6 @@
 !
       integer(kind = kint) :: ids_w_diffuse
 !
-!
-      ids_w_diffuse = is_w_diffuse + 1
-!
-      call cal_dsdr_sph_no_bc_in_2(sph_rj%nidx_rj(2), sph_bc_U%kr_in,   &
-     &    sph_bc_U%fdm2_fix_fld_ICB, is_w_diffuse, ids_w_diffuse,       &
-     &    n_point, ntot_phys_rj, d_rj)
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_w_diffuse2                            &
@@ -282,6 +290,7 @@
      &      n_point, ntot_phys_rj, d_rj)
       end if
 !
+      ids_w_diffuse = is_w_diffuse + 1
       call cal_dsdr_sph_no_bc_out_2(sph_rj%nidx_rj(2), sph_bc_U%kr_out, &
      &    sph_bc_U%fdm2_fix_fld_CMB, is_w_diffuse, ids_w_diffuse,       &
      &    n_point, ntot_phys_rj, d_rj)

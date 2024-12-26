@@ -254,8 +254,6 @@
       type(mhd_model_control), intent(in) :: model_ctl
       type(MHD_evolution_param), intent(inout) :: MHD_prop
 !
-      integer(kind = kint) :: ierr
-!
 !   Set polytrope
       call set_valuable_density_ctl                                     &
      &   (my_rank, model_ctl%polytrope_c, MHD_prop%polytrope_param,     &

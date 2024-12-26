@@ -65,7 +65,7 @@
      &          band_s00_poisson_fixS, Nu_type)
 !
       use t_fdm_coefs
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
       use const_r_mat_4_scalar_sph
 !
       character(len=kchara), intent(in) :: mat_name
@@ -83,7 +83,7 @@
       if(Nu_type%iflag_Nusselt .eq. iflag_no_source_Nu) return
         call alloc_Nu_radial_reference(sph%sph_rj, Nu_type)
         call const_r_mat00_scalar_sph                                   &
-     &     (mat_name, sc_prop%diffusie_reduction_ICB,                   &
+     &     (my_rank+50, mat_name, sc_prop%diffusie_reduction_ICB,       &
      &      sph%sph_params, sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,   &
      &      band_s00_poisson_fixS)
 !
@@ -96,7 +96,7 @@
      &          fdm2_center, band_s00_poisson_fixS, rj_fld, Nu_type)
 !
       use t_fdm_coefs
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
       use const_radial_references
 !
       integer(kind = kint), intent(in) :: is_scalar, is_source
@@ -157,21 +157,21 @@
      &          + (sph_bc_U%kr_in-1) * sph_rj%nidx_rj(2)
       temp_ICB = rj_fld%d_fld(inod_ICB,is_scalar)
 !      dTdr_ICB = half*rj_fld%d_fld(inod_ICB,is_grad_s)                 &
-!     &           * a_r_1d_rj_r(sph_bc_U%kr_in)**2
+!     &           * sph_rj%ar_1d_rj(sph_bc_U%kr_in,2)
 !
       inod_CMB = sph_rj%idx_rj_degree_zero                              &
      &          + (sph_bc_U%kr_out-1) * sph_rj%nidx_rj(2)
       temp_CMB = rj_fld%d_fld(inod_CMB,is_scalar)
 !      dTdr_CMB = half*rj_fld%d_fld(inod_CMB,is_grad_s)                 &
-!     &          * a_r_1d_rj_r(sph_bc_U%kr_out)**2
+!     &          * sph_rj%ar_1d_rj(sph_bc_U%kr_out,2)
 !
       c1 = (Nu_type%r_CMB_Nu*temp_CMB - Nu_type%r_ICB_Nu*temp_ICB)      &
      &    / ( Nu_type%r_CMB_Nu - Nu_type%r_ICB_Nu )
       c2 =  Nu_type%r_CMB_Nu * Nu_type%r_ICB_Nu * (temp_ICB - temp_CMB) &
      &    / ( Nu_type%r_CMB_Nu - Nu_type%r_ICB_Nu )
 !
-!      dTdr_diff_ICB = - c2 * a_r_1d_rj_r(sph_bc_U%kr_in)**2
-!      dTdr_diff_CMB = - c2 * a_r_1d_rj_r(sph_bc_U%kr_out)**2
+!      dTdr_diff_ICB = - c2 * sph_rj%ar_1d_rj(sph_bc_U%kr_in, 2)
+!      dTdr_diff_CMB = - c2 * sph_rj%ar_1d_rj(sph_bc_U%kr_out,2)
 !      Nu_type%Nu_ICB = dTdr_ICB / dTdr_diff_ICB
 !      Nu_type%Nu_CMB = dTdr_CMB / dTdr_diff_CMB
 !
@@ -186,7 +186,7 @@
      &          sph_rj, r_2nd, sc_prop, sph_bc_S, sph_bc_U, bcs_S,      &
      &          fdm2_center, rj_fld, band_s00_poisson_fixS, Nu_type)
 !
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
       use const_radial_references
       use set_parallel_file_name
 !
@@ -231,7 +231,7 @@
         Nu_type%Nu_ICB = -1.0d0
       else
         Nu_type%Nu_ICB =   half*rj_fld%d_fld(inod_ICB,is_grad_s)        &
-     &                    * sph_rj%a_r_1d_rj_r(sph_bc_U%kr_in)**2       &
+     &                    * sph_rj%ar_1d_rj(sph_bc_U%kr_in,1)**2        &
      &                    / Nu_type%ref_global(sph_bc_U%kr_in,1)
       end if
 !
@@ -239,7 +239,7 @@
         Nu_type%Nu_CMB = -1.0d0
       else
         Nu_type%Nu_CMB =   half*rj_fld%d_fld(inod_CMB,is_grad_s)        &
-     &                    * sph_rj%a_r_1d_rj_r(sph_bc_U%kr_out)**2      &
+     &                    * sph_rj%ar_1d_rj(sph_bc_U%kr_out,1)**2       &
      &                    / Nu_type%ref_global(sph_bc_U%kr_out,1)
       end if
 !

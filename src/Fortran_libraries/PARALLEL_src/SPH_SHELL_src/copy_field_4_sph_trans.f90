@@ -45,12 +45,14 @@
       integer(kind = kint) :: m_sym, mst
 !
 !
+!$omp parallel
       do m_sym = 1, m_folding
         mst = (m_sym-1) * nnod_rtp
 !$omp workshare
         d_sph(1+mst:nnod_rtp+mst) = v_rtp(1:nnod_rtp)
 !$omp end workshare
       end do
+!$omp end parallel
 !
       end subroutine copy_scalar_from_trans_smp
 !
@@ -66,6 +68,7 @@
       integer(kind = kint) :: m_sym, mst
 !
 !
+!$omp parallel
       do m_sym = 1, m_folding
         mst = (m_sym-1) * nnod_rtp
 !$omp workshare
@@ -74,6 +77,7 @@
         d_sph(1+mst:nnod_rtp+mst,3) = v_rtp(1:nnod_rtp,3)
 !$omp end workshare
       end do
+!$omp end parallel
 !
       end subroutine copy_vector_from_trans_smp
 !
@@ -89,6 +93,7 @@
       integer(kind = kint) :: m_sym, mst
 !
 !
+!$omp parallel
       do m_sym = 1, m_folding
         mst = (m_sym-1) * nnod_rtp
 !$omp workshare
@@ -100,6 +105,7 @@
         d_sph(1+mst:nnod_rtp+mst,6) = v_rtp(1:nnod_rtp,6)
 !$omp end workshare
       end do
+!$omp end parallel
 !
       end subroutine copy_tensor_from_trans_smp
 !
@@ -114,9 +120,9 @@
       real(kind = kreal), intent(inout) :: v_rtp(nnod_rtp)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       v_rtp(1:nnod_rtp) = d_sph(1:nnod_rtp)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_scalar_to_trans_smp
 !
@@ -130,11 +136,11 @@
       real(kind = kreal), intent(inout) :: v_rtp(nnod_rtp,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       v_rtp(1:nnod_rtp,1) = d_sph(1:nnod_rtp,1)
       v_rtp(1:nnod_rtp,2) = d_sph(1:nnod_rtp,2)
       v_rtp(1:nnod_rtp,3) = d_sph(1:nnod_rtp,3)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_vector_to_trans_smp
 !
@@ -148,14 +154,14 @@
       real(kind = kreal), intent(inout) :: v_rtp(nnod_rtp,6)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       v_rtp(1:nnod_rtp,1) = d_sph(1:nnod_rtp,1)
       v_rtp(1:nnod_rtp,2) = d_sph(1:nnod_rtp,2)
       v_rtp(1:nnod_rtp,3) = d_sph(1:nnod_rtp,3)
       v_rtp(1:nnod_rtp,4) = d_sph(1:nnod_rtp,4)
       v_rtp(1:nnod_rtp,5) = d_sph(1:nnod_rtp,5)
       v_rtp(1:nnod_rtp,6) = d_sph(1:nnod_rtp,6)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine copy_tensor_to_trans_smp
 !

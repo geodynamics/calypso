@@ -169,12 +169,9 @@
 !
 !
       if (ncomp_org .eq. 1) then
-!$omp parallel
         call copy_nod_scalar_smp(nnod, d_nod(1,ist_field), c_ref_iso)
-!$omp end parallel
 !
       else if (ncomp_org .eq. 3) then
-!$omp parallel
         if (i_comp.eq.0) then
           call cal_vector_magnitude(nnod, d_nod(1,ist_field),           &
      &                              c_ref_iso)
@@ -196,30 +193,20 @@
           call cal_cylinder_r_comp_smp(nnod, d_nod(1,ist_field),        &
      &        c_ref_iso, xx(1,1), xx(1,2), s_radius, a_s)
         end if
-!$omp end parallel
 !
       else if (ncomp_org .eq. 6) then
         if (i_comp.eq.0) then
-!
-!$omp parallel
           call cal_sym_tensor_magnitude(nnod, d_nod(1,ist_field),       &
      &                                  c_ref_iso)
-!$omp end parallel
 !
         else if (i_comp.ge.1 .and. i_comp.le.6) then
-!
           ic = ist_field+i_comp-1
-!$omp parallel
           call copy_nod_scalar_smp(nnod, d_nod(1,ic), c_ref_iso)
-!$omp end parallel
-!
         end if
       end if
 !
-!$omp parallel
       call subtruct_const_4_scalar_smp_ow                               &
      &   (nnod, c_ref_iso, iso_def%isosurf_value)
-!$omp end parallel
 !
       end subroutine set_constant_4_iso
 !

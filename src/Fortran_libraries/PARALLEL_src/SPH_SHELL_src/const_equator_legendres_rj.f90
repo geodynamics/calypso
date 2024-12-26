@@ -87,7 +87,7 @@
       real(kind = kreal), allocatable :: Ps_eq(:)
       real(kind = kreal), allocatable :: dPsdt_eq(:)
 !
-      integer(kind = kint) :: i, j
+      integer(kind = kint) :: j
 !
       allocate( P_eq(sph_rlm%nidx_rlm(2)) )
       allocate( dPdt_eq(sph_rlm%nidx_rlm(2)) )
@@ -137,11 +137,10 @@
       call sel_sph_rj_vector_from_recv(trans_p%iflag_SPH_recv, ithree,  &
      &   ione, ione, comms_sph%comm_rj, SR_r%n_WR, SR_r%WR(1), Pvec_rj)
 !
-!$omp parallel do private(j,i)
+!$omp parallel do private(j)
       do j = 1, sph_rj%nidx_rj(2)
-        i = 1 +(j-1) * sph_rj%istep_rj(2)
-        P_circ(j) =    Pvec_rj%d_fld(i,1)
-        dPdt_circ(j) = Pvec_rj%d_fld(i,2)
+        P_circ(j) =    Pvec_rj%d_fld(j,1)
+        dPdt_circ(j) = Pvec_rj%d_fld(j,2)
       end do
 !$omp end parallel do
       call dealloc_phys_data(Pvec_rj)

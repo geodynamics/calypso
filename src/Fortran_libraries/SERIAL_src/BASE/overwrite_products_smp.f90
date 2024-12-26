@@ -63,7 +63,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -73,7 +73,7 @@
           prod(inod) =  scalar1(inod)*prod(inod)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_scalar_prod_no_coef_smp
 !
@@ -92,7 +92,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -102,7 +102,7 @@
           prod(inod) =  scalar1(inod)*prod(inod)*coef
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_scalar_prod_w_coef_smp
 !
@@ -121,7 +121,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -133,7 +133,7 @@
           prod(inod,3) = prod(inod,3)*scalar(inod)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_vec_scalar_prod_smp
 !
@@ -152,7 +152,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -164,7 +164,7 @@
           prod(inod,3) = prod(inod,3)*scalar(inod) * coef
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_vec_scalar_coef_smp
 !
@@ -183,7 +183,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -198,7 +198,7 @@
           prod(inod,6) = prod(inod,6)*scalar(inod)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_tensor_scalar_prod_smp
 !
@@ -217,7 +217,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -232,7 +232,7 @@
           prod(inod,6) = prod(inod,6)*scalar(inod) * coef
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_tensor_scalar_coef_smp
 !
@@ -252,7 +252,7 @@
       real(kind = kreal) :: v(3)
 !
 !
-!$omp do private(inod,ist,ied,v)
+!$omp parallel do private(inod,ist,ied,v)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -273,7 +273,7 @@
      &                  + tensor(inod,6) * v(3)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_tensor_vec_no_coef_smp
 !
@@ -292,7 +292,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -304,7 +304,7 @@
           prod(inod,3) = vect1(inod,3) * prod(inod,3)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_vector_vector_prod_smp
 !
@@ -322,7 +322,7 @@
       integer (kind=kint) :: iproc, inod, ist, ied
 !
 !
-!$omp do private(inod,ist,ied)
+!$omp parallel do private(inod,ist,ied)
       do iproc = 1, np_smp
         ist = inod_smp_stack(iproc-1)+1
         ied = inod_smp_stack(iproc)
@@ -337,7 +337,7 @@
           prod(inod,6) = tensor1(inod,6) * prod(inod,6)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine ovwrt_tensor_tensor_prod_smp
 !

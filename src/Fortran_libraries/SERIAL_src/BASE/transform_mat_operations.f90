@@ -348,7 +348,7 @@
       integer(kind = kint) :: i
 !
 !
-!$omp do
+!$omp parallel do
       do i = 1, N
         S(1,1,i) = A(1,1,i) * B(1,1,i) + A(1,2,i) * B(2,1,i)            &
      &            + A(1,3,i) * B(3,1,i) + A(1,4,i) * B(4,1,i)
@@ -386,7 +386,7 @@
         S(4,4,i) = A(4,1,i) * B(1,4,i) + A(4,2,i) * B(2,4,i)            &
      &            + A(4,3,i) * B(3,4,i) + A(4,4,i) * B(4,4,i)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine  cal_matmat44_multi_smp
 !
@@ -400,7 +400,7 @@
       integer(kind = kint) :: i
 !
 !
-!$omp do
+!$omp parallel do
       do i = 1, N
         S(1,1,i) = A(1,1,i) * B(1,1) + A(1,2,i) * B(2,1)                &
      &            + A(1,3,i) * B(3,1) + A(1,4,i) * B(4,1)
@@ -438,7 +438,7 @@
         S(4,4,i) = A(4,1,i) * B(1,4) + A(4,2,i) * B(2,4)                &
      &            + A(4,3,i) * B(3,4) + A(4,4,i) * B(4,4)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine  cal_matcmat44_multi_smp
 !
@@ -452,7 +452,7 @@
       integer(kind = kint) :: i
 !
 !
-!$omp do
+!$omp parallel do
       do i = 1, N
         S(1,1,i) = A(1,1) * B(1,1,i) + A(1,2) * B(2,1,i)                &
      &            + A(1,3) * B(3,1,i) + A(1,4) * B(4,1,i)
@@ -490,7 +490,7 @@
         S(4,4,i) = A(4,1) * B(1,4,i) + A(4,2) * B(2,4,i)                &
      &            + A(4,3) * B(3,4,i) + A(4,4) * B(4,4,i)
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine  cal_cmatmat44_multi_smp
 !

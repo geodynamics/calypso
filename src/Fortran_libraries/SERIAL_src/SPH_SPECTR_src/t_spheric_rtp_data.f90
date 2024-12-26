@@ -21,6 +21,8 @@
 !!      subroutine dealloc_theta_4_rtp(sph_rtp)
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
 !!
+!!      subroutine set_sph_one_over_radius_rtp(sph_rtp)
+!!        type(sph_rtp_grid), intent(inout) :: sph_rtp
 !!      subroutine copy_spheric_rtp_data                                &
 !!     &         (ltr_org, rtp_org, ltr_new, rtp_new)
 !!        type(sph_rtp_grid), intent(inout) :: rtp_org
@@ -96,7 +98,7 @@
 !>        1d radius data for @f$ f(r,\theta,\phi) @f$
         real(kind = kreal), allocatable :: radius_1d_rtp_r(:)
 !>        1 / radius_1d_rtp_r
-        real(kind = kreal), allocatable :: a_r_1d_rtp_r(:)
+        real(kind = kreal), allocatable :: ar_1d_rtp(:)
 !
 !>      @f$ \sin \theta @f$ in sapherical grid (one-dimentional)
         real(kind = kreal), allocatable :: sin_theta_1d_rtp(:)
@@ -131,7 +133,7 @@
       num = sph_rtp%nidx_rtp(1)
       allocate(sph_rtp%idx_gl_1d_rtp_r(num))
       allocate(sph_rtp%radius_1d_rtp_r(num))
-      allocate(sph_rtp%a_r_1d_rtp_r(num))
+      allocate(sph_rtp%ar_1d_rtp(num))
       num = sph_rtp%nidx_rtp(2)
       allocate(sph_rtp%idx_gl_1d_rtp_t(num))
       num = sph_rtp%nidx_rtp(3)
@@ -142,7 +144,7 @@
       if(sph_rtp%nidx_rtp(1) .gt. 0) then
         sph_rtp%idx_gl_1d_rtp_r = 0
         sph_rtp%radius_1d_rtp_r = 0.0d0
-        sph_rtp%a_r_1d_rtp_r = 0.0d0
+        sph_rtp%ar_1d_rtp = 0.0d0
       end if
 !
       end subroutine alloc_sph_1d_index_rtp
@@ -224,8 +226,7 @@
 !
       type(sph_rtp_grid), intent(inout) :: sph_rtp
 !
-      deallocate(sph_rtp%radius_1d_rtp_r)
-      deallocate(sph_rtp%a_r_1d_rtp_r)
+      deallocate(sph_rtp%radius_1d_rtp_r, sph_rtp%ar_1d_rtp)
       deallocate(sph_rtp%idx_gl_1d_rtp_r)
       deallocate(sph_rtp%idx_gl_1d_rtp_t)
       deallocate(sph_rtp%idx_gl_1d_rtp_p)
@@ -271,6 +272,22 @@
       end subroutine dealloc_theta_4_rtp
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine set_sph_one_over_radius_rtp(sph_rtp)
+!
+      type(sph_rtp_grid), intent(inout) :: sph_rtp
+!
+      integer(kind = kint) :: i
+!
+!$omp parallel do private(i)
+      do i = 1, sph_rtp%nidx_rtp(1)
+        sph_rtp%ar_1d_rtp(i) = one / sph_rtp%radius_1d_rtp_r(i)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_sph_one_over_radius_rtp
+!
 ! ----------------------------------------------------------------------
 !
       subroutine copy_spheric_rtp_data                                  &

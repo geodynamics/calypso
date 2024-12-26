@@ -38,7 +38,7 @@
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
-      use t_coef_fdm2_MHD_boundaries
+      use t_coef_fdm2_centre
 !
       implicit none
 !
@@ -89,7 +89,8 @@
      &          g_sph_rj, is_fld, is_div, rj_fld)
 !
       use cal_sph_exp_rotation
-      use cal_sph_exp_nod_none_bc
+      use sph_exp_no_condition_ICB
+      use sph_exp_no_condition_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd

@@ -21,6 +21,9 @@
 !!        type(band_matrix_type), intent(inout) :: smat
 !!
 !!      subroutine check_center_band_matrix(id_rank, sph_rj, smat)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(band_matrix_type), intent(in) :: smat
 !!@endverbatim
 !
       module t_sph_center_matrix
@@ -183,18 +186,18 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine check_center_band_matrix(id_rank, sph_rj, smat)
+      subroutine check_center_band_matrix(id_file, sph_rj, smat)
 !
       use t_spheric_rj_data
       use check_sph_radial_mat
 !
-      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: id_file
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(band_matrix_type), intent(in) :: smat
 !
 !
-      write(50+id_rank,'(a)')  'Matrix for ', trim(smat%mat_name)
-      call check_radial_3band_mat_w_ctr(id_rank, smat%n_vect,           &
+      write(id_file,'(a)')  'Matrix for ', trim(smat%mat_name)
+      call check_radial_3band_mat_w_ctr(id_file, smat%n_vect,           &
      &    sph_rj%radius_1d_rj_r, smat%mat)
 !
       end subroutine check_center_band_matrix

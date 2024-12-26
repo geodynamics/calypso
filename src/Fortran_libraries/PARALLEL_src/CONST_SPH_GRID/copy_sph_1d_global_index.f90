@@ -73,6 +73,7 @@
         j = sph_rtp%idx_gl_1d_rtp_r(i)
         sph_rtp%radius_1d_rtp_r(i) = s3d_radius%radius_1d_gl(j)
       end do
+      call set_sph_one_over_radius_rtp(sph_rtp)
 !
       do i = 1, sph_rtp%nidx_rtp(2)
         j = i - 1 + sph_rtp%ist_rtp(2)
@@ -107,6 +108,7 @@
         j = sph_rtm%idx_gl_1d_rtm_r(i)
         sph_rtm%radius_1d_rtm_r(i) = s3d_radius%radius_1d_gl(j)
       end do
+      call set_sph_one_over_radius_rtm(sph_rtm)
 !
       do i = 1, sph_rtm%nidx_rtm(2)
         j = i - 1 + sph_rtm%ist_rtm(2)
@@ -133,21 +135,28 @@
       integer(kind = kint) :: i, j
 !
 !
+!$omp parallel do private(i,j)
       do i = 1, sph_rlm%nidx_rlm(1)
         j = i - 1 + sph_rlm%ist_rlm(1)
         sph_rlm%idx_gl_1d_rlm_r(i) = sph_gl1d%idx_global_rlm_r(j)
       end do
+!$omp end parallel do
+!$omp parallel do private(i,j)
       do i = 1, sph_rlm%nidx_rlm(1)
         j = sph_rlm%idx_gl_1d_rlm_r(i)
         sph_rlm%radius_1d_rlm_r(i) = s3d_radius%radius_1d_gl(j)
       end do
+!$omp end parallel do
+      call set_sph_one_over_radius_rlm(sph_rlm)
 !
+!$omp parallel do private(i,j)
       do i = 1, sph_rlm%nidx_rlm(2)
         j = i - 1 + sph_rlm%ist_rlm(2)
         sph_rlm%idx_gl_1d_rlm_j(i,1) = sph_gl1d%idx_global_rlm_j(j,1)
         sph_rlm%idx_gl_1d_rlm_j(i,2) = sph_gl1d%idx_global_rlm_j(j,2)
         sph_rlm%idx_gl_1d_rlm_j(i,3) = sph_gl1d%idx_global_rlm_j(j,3)
       end do
+!$omp end parallel do
 !
       end subroutine copy_sph_1d_gl_idx_rlm
 !
@@ -187,11 +196,6 @@
 !     &       write(*,*) 'Baka!', my_rank, i, sph_rj%idx_gl_1d_rj_r(i)
 !        end do
 !      end if
-
-      do i = 1, sph_rj%nidx_rj(1)
-        j = sph_rj%idx_gl_1d_rj_r(i)
-        sph_rj%radius_1d_rj_r(i) = s3d_radius%radius_1d_gl(j)
-      end do
 !
       do i = 1, sph_rj%nidx_rj(2)
         j = i - 1 + sph_rj%ist_rj(2)
@@ -199,6 +203,12 @@
         sph_rj%idx_gl_1d_rj_j(i,2) = sph_gl1d%idx_global_rj_j(j,2)
         sph_rj%idx_gl_1d_rj_j(i,3) = sph_gl1d%idx_global_rj_j(j,3)
       end do
+!
+      do i = 1, sph_rj%nidx_rj(1)
+        j = sph_rj%idx_gl_1d_rj_r(i)
+        sph_rj%radius_1d_rj_r(i) = s3d_radius%radius_1d_gl(j)
+      end do
+      call set_sph_one_over_radius_rj(sph_rj)
 !
       end subroutine copy_sph_1d_gl_idx_rj
 !

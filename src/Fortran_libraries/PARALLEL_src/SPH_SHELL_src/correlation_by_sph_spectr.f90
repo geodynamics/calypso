@@ -69,7 +69,7 @@
         call correlate_each_vector_sph_spec                             &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &
      &      sph_rj%idx_rj_degree_zero, sph_rj%inod_rj_center,           &
-     &      sph_rj%a_r_1d_rj_r, g_sph_rj, sph_rj%nnod_rj,               &
+     &      sph_rj%ar_1d_rj(1,1), g_sph_rj, sph_rj%nnod_rj,             &
      &      d1_rj(1,icomp1_rj), d2_rj(1,icomp2_rj), x_sph_rj(0,1,1))
       end if
 !

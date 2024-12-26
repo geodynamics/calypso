@@ -17,6 +17,8 @@
 !!      subroutine dealloc_rlm_param_smp(sph_rlm)
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!
+!!      subroutine set_sph_one_over_radius_rlm(sph_rlm)
+!!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!      subroutine copy_spheric_rlm_data                                &
 !!     &         (ltr_org, rlm_org, ltr_new, rlm_new)
 !!        type(sph_rlm_grid), intent(in) :: rlm_org
@@ -78,7 +80,7 @@
 !>        1d radius data for @f$ f(r,l,m) @f$
         real(kind = kreal), allocatable :: radius_1d_rlm_r(:)
 !>        1 / radius_1d_rlm_r
-        real(kind = kreal), allocatable :: a_r_1d_rlm_r(:)
+        real(kind = kreal), allocatable :: ar_1d_rlm(:)
       end type sph_rlm_grid
 !
 ! -----------------------------------------------------------------------
@@ -110,7 +112,7 @@
       num = sph_rlm%nidx_rlm(1)
       allocate(sph_rlm%idx_gl_1d_rlm_r(num))
       allocate(sph_rlm%radius_1d_rlm_r(num))
-      allocate(sph_rlm%a_r_1d_rlm_r(num))
+      allocate(sph_rlm%ar_1d_rlm(num))
       num = sph_rlm%nidx_rlm(2)
       allocate(sph_rlm%idx_gl_1d_rlm_j(num,3))
 !
@@ -118,7 +120,7 @@
       if(sph_rlm%nidx_rlm(1) .gt. 0) then
         sph_rlm%idx_gl_1d_rlm_r = 0
         sph_rlm%radius_1d_rlm_r = 0.0d0
-        sph_rlm%a_r_1d_rlm_r    = 0.0d0
+        sph_rlm%ar_1d_rlm =       0.0d0
       end if
 !
       end subroutine alloc_sph_1d_index_rlm
@@ -162,8 +164,7 @@
       type(sph_rlm_grid), intent(inout) :: sph_rlm
 !
 !
-      deallocate(sph_rlm%radius_1d_rlm_r)
-      deallocate(sph_rlm%a_r_1d_rlm_r   )
+      deallocate(sph_rlm%radius_1d_rlm_r, sph_rlm%ar_1d_rlm)
       deallocate(sph_rlm%idx_gl_1d_rlm_r)
       deallocate(sph_rlm%idx_gl_1d_rlm_j)
 !
@@ -182,6 +183,22 @@
       end subroutine dealloc_rlm_param_smp
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_sph_one_over_radius_rlm(sph_rlm)
+!
+      type(sph_rlm_grid), intent(inout) :: sph_rlm
+!
+      integer(kind = kint) :: i
+!
+!$omp parallel do private(i)
+      do i = 1, sph_rlm%nidx_rlm(1)
+        sph_rlm%ar_1d_rlm(i) = one / sph_rlm%radius_1d_rlm_r(i)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_sph_one_over_radius_rlm
+!
 ! ----------------------------------------------------------------------
 !
       subroutine copy_spheric_rlm_data                                  &
@@ -213,16 +230,23 @@
      &      = rlm_org%idx_global_rlm(1:rlm_new%nnod_rlm,i)
       end do
 !
-      rlm_new%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
-     &       =   rlm_org%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))
-      rlm_new%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
-     &       =   rlm_org%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))
+!$omp parallel workshare
       rlm_new%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),1)                  &
      &       = rlm_org%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),1)
       rlm_new%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),2)                  &
      &       = rlm_org%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),2)
       rlm_new%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),3)                  &
      &       = rlm_org%idx_gl_1d_rlm_j(1:rlm_new%nidx_rlm(2),3)
+!$omp end parallel workshare
+!
+!$omp parallel workshare
+      rlm_new%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
+     &       =   rlm_org%radius_1d_rlm_r(1:rlm_new%nidx_rlm(1))
+      rlm_new%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))                    &
+     &       =   rlm_org%idx_gl_1d_rlm_r(1:rlm_new%nidx_rlm(1))
+!$omp end parallel workshare
+!
+      call set_sph_one_over_radius_rlm(rlm_new)
 !
 !      call dealloc_sph_1d_index_rlm(rlm_org)
 !      call dealloc_spheric_param_rlm(rlm_org)

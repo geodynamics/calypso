@@ -54,7 +54,6 @@
       real(kind = kreal), intent(inout) :: dat_viz(nnod,ncomp_viz)
 !
 !
-!$omp parallel
         if (icomp_viz .eq. icomp_NORM) then
           if( ncomp_org .eq. ncomp_SCALAR) then
             call copy_nod_scalar_smp(nnod, dat_xyz(1,1), dat_viz(1,1))
@@ -91,7 +90,6 @@
           call cal_cyl_tensor_smp(np_smp, nnod, istack_n_smp,           &
      &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
 !
-!
         else if (icomp_viz.ge.icomp_XX                                  &
      &           .and. icomp_viz.le.icomp_ZZ) then
           call copy_nod_scalar_smp                                      &
@@ -111,7 +109,6 @@
         else if (icomp_viz .eq. icomp_CYLINDER_R) then
           call cal_cylinder_r_comp_smp(nnod, dat_xyz(1,1),              &
      &        dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
-!
 !
         else if ( icomp_viz .eq. icomp_RR ) then
           call cal_rr_tensor_smp(np_smp, nnod, istack_n_smp,            &
@@ -142,7 +139,6 @@
           call cal_pp_tensor_smp(np_smp, nnod, istack_n_smp,            &
      &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
 !
-!
         else if ( icomp_viz .eq. icomp_SS ) then
           call cal_ss_tensor_smp(np_smp, nnod, istack_n_smp,            &
      &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
@@ -150,7 +146,6 @@
         else if ( icomp_viz .eq. icomp_SP ) then
           call cal_sp_tensor_smp(np_smp, nnod, istack_n_smp,            &
      &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
-!
         else if ( icomp_viz .eq. icomp_SZ ) then
           call cal_sz_tensor_smp(np_smp, nnod, istack_n_smp,            &
      &        dat_xyz(1,1), dat_viz(1,1), xx(1,1), xx(1,2), cyl_s, a_s)
@@ -158,15 +153,12 @@
         else if ( icomp_viz .eq. icomp_PP_cyl ) then
           call cal_pp_cyl_tensor_smp(nnod, dat_xyz(1,1), dat_viz(1,1),  &
      &                               xx(1,1), xx(1,2), cyl_s, a_s)
-!
         else if ( icomp_viz .eq. icomp_PZ) then
           call cal_pz_tensor_smp(nnod, dat_xyz(1,1), dat_viz(1,1),      &
      &                           xx(1,1), xx(1,2), cyl_s, a_s)
-!
         else if ( icomp_viz .eq. icomp_ZZ_cyl ) then
           call cal_zz_tensor_smp(nnod, dat_xyz(1,1), dat_viz(1,1) )
         end if
-!$omp end parallel
 !
       end subroutine convert_comps_4_viz
 !
@@ -193,7 +185,6 @@
       real(kind = kreal), intent(inout) :: dat_viz(nnod)
 !
 !
-!$omp parallel
 !        if (icomp_viz .eq. icomp_NORM) then
 !          call cal_vector_magnitude(nnod, xx(1,1), dat_viz(1))
 !
@@ -216,7 +207,6 @@
           call cal_cylinder_r_comp_smp(nnod,  xx(1,1), dat_viz(1),      &
      &                                 xx(1,1), xx(1,2), cyl_s, a_s)
         end if
-!$omp end parallel
 !
       end subroutine convert_position_4_viz
 !

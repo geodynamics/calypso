@@ -77,9 +77,11 @@
 !
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !
+      integer(kind = kint) :: id_file
 !
+      id_file = 50 + my_rank
       call const_radial_matrices_sph                                    &
-     &   (dt, sph%sph_params, sph%sph_rj, r_2nd,                        &
+     &   (id_file, dt, sph%sph_params, sph%sph_rj, r_2nd,               &
      &    MHD_prop, sph_MHD_bc, leg%g_sph_rj, sph_MHD_mat)
 !
       call const_radial_mat_sph_w_center                                &
@@ -104,6 +106,9 @@
 !
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !
+      integer(kind = kint) :: id_file
+!
+      id_file = 50 + my_rank
 !
       if(MHD_prop%fl_prop%iflag_scheme .lt. id_Crank_nicolson) return
       if(iflag_debug .gt. 0)                                            &
@@ -112,6 +117,10 @@
      &   (sph_rj, r_2nd, MHD_prop%fl_prop,                              &
      &    sph_MHD_bc%sph_bc_U, sph_MHD_bc%fdm2_center,                  &
      &    leg%g_sph_rj, sph_MHD_mat%band_p_poisson)
+      if(i_debug .eq. iflag_full_msg) then
+        call check_radial_band_mat(id_file, sph_rj,                     &
+     &                             sph_MHD_mat%band_p_poisson)
+      end if
 !
       if(sph_rj%inod_rj_center .eq. 0) return
 !
@@ -125,12 +134,15 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_radial_matrices_sph(dt, sph_params, sph_rj,      &
-     &          r_2nd, MHD_prop, sph_MHD_bc, g_sph_rj, sph_MHD_mat)
+      subroutine const_radial_matrices_sph                              &
+     &         (id_file, dt, sph_params, sph_rj, r_2nd, MHD_prop,       &
+     &          sph_MHD_bc, g_sph_rj, sph_MHD_mat)
 !
       use const_r_mat_4_scalar_sph
       use const_r_mat_4_vector_sph
+      use const_r_mat_4_magnetic_sph
 !
+      integer(kind = kint), intent(in) :: id_file
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -145,17 +157,47 @@
 !
       if(MHD_prop%fl_prop%iflag_scheme .ge. id_Crank_nicolson) then
         if(iflag_debug .gt. 0)                                          &
+     &          write(*,*) 'const_radial_mat_toroidal_flow'
+        call const_radial_mat_toroidal_flow                             &
+     &     (dt, sph_rj, r_2nd, MHD_prop%fl_prop,                        &
+     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U,                  &
+     &      sph_MHD_bc%fdm2_center, g_sph_rj, sph_MHD_mat%band_vt_evo)
+        if(iflag_debug .gt. 0)                                          &
      &          write(*,*) 'const_radial_mat_vort_2step'
         call const_radial_mat_vort_2step                                &
-     &     (dt, sph_rj, r_2nd, MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,   &
-     &      sph_MHD_bc%fdm2_center, sph_MHD_bc%fdm2_free_ICB,           &
-     &      sph_MHD_bc%fdm2_free_CMB, g_sph_rj,                         &
+     &     (dt, sph_rj, r_2nd, MHD_prop%fl_prop,                        &
+     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U,                  &
+     &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
      &      sph_MHD_mat%band_vs_poisson, sph_MHD_mat%band_vp_evo,       &
-     &      sph_MHD_mat%band_vt_evo, sph_MHD_mat%band_wt_evo)
+     &      sph_MHD_mat%band_wt_evo)
+!
+        if(iflag_debug .gt. 0)                                          &
+     &          write(*,*) 'const_radial_mat_4_press_sph'
         call const_radial_mat_4_press_sph                               &
      &     (sph_rj, r_2nd, MHD_prop%fl_prop,                            &
      &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%fdm2_center,                &
      &      g_sph_rj, sph_MHD_mat%band_p_poisson)
+!
+        if(i_debug .eq. iflag_full_msg) then
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_wt_evo)
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_vp_evo)
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_vt_evo)
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_p_poisson)
+        end if
+!
+!        do j = 1, sph_rj%nidx_rj(2)
+!          do k = 1, sph_rj%nidx_rj(1)
+!          sph_MHD_mat%band_vp_evo%det(j)                               &
+!     &                = sph_MHD_mat%band_vp_evo%det(j)                 &
+!     &                  * sph_MHD_mat%band_vp_evo%lu(5,k,j)
+!          end do
+!          write(my_rank+60,*) 'det vp', j,                             &
+!                           &    sph_MHD_mat%band_vp_evo%det(j)
+!        end do
       end if
 !
       if(MHD_prop%cd_prop%iflag_Bevo_scheme                             &
@@ -164,6 +206,13 @@
      &     (dt, sph_rj, r_2nd, MHD_prop%cd_prop,                        &
      &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%fdm2_center,                &
      &      g_sph_rj, sph_MHD_mat%band_bp_evo, sph_MHD_mat%band_bt_evo)
+!
+        if(i_debug .eq. iflag_full_msg) then
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_bp_evo)
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_bt_evo)
+        end if
       end if
 !
       if(MHD_prop%ht_prop%iflag_scheme .ge. id_Crank_nicolson) then
@@ -172,6 +221,10 @@
      &      sph_params, sph_rj, r_2nd, MHD_prop%ht_prop,                &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
      &      g_sph_rj, sph_MHD_mat%band_temp_evo)
+        if(i_debug .eq. iflag_full_msg) then
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_temp_evo)
+        end if
       end if
 !
       if(MHD_prop%cp_prop%iflag_scheme .ge. id_Crank_nicolson) then
@@ -180,6 +233,10 @@
      &      sph_params, sph_rj, r_2nd, MHD_prop%cp_prop,                &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
      &      g_sph_rj, sph_MHD_mat%band_comp_evo)
+        if(i_debug .eq. iflag_full_msg) then
+          call check_radial_band_mat(id_file, sph_rj,                   &
+     &                               sph_MHD_mat%band_comp_evo)
+        end if
       end if
 !
       end subroutine const_radial_matrices_sph

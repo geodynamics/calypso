@@ -91,12 +91,9 @@
       real(kind = kreal), intent(inout) :: d_tmp(numnod,6)
 !
 !
-!$omp parallel
       call cvt_vector_2_sph_smp(numnod, d_nod(1,i_field), d_tmp(1,1),   &
      &    xx(1,1), xx(1,2), xx(1,3), radius, s_cylinder,                &
      &    a_radius, a_s_cylinder)
-!$omp end parallel
-!
       call copy_vector_2_vector_fld(ione, numnod, isix, d_tmp,          &
      &                              i_rtp, nnod_rtp, ntot_rtp, d_rtp)
 !
@@ -134,10 +131,8 @@
       call fill_rest_vector_field(i_field, nnod_rtp, ntot_phys, d_nod,  &
      &    ione, numnod, internal_node, isix, d_tmp)
 !
-!$omp parallel
       call cvt_sph_vect_2_xyz_smp(numnod,                               &
      &    d_nod(1,i_field), d_tmp(1,1), colatitude, longitude)
-!$omp end parallel
 !
       end subroutine cvt_sph_vec_to_nod_vec
 !
@@ -171,11 +166,9 @@
       real(kind = kreal), intent(inout) :: d_tmp(numnod,6)
 !
 !
-!$omp parallel
       call cal_sph_tensor_smp(np_smp, numnod, inod_smp_stack,           &
      &    d_nod(1,i_field), d_tmp(1,1), xx(1,1), xx(1,2), xx(1,3),      &
      &    radius, s_cylinder, a_radius, a_s_cylinder)
-!$omp end parallel
 !
       call copy_tensor_2_tensor_fld(ione, numnod, isix, d_tmp,          &
      &                              i_rtp, nnod_rtp, ntot_rtp, d_rtp)
@@ -217,12 +210,10 @@
       call fill_rest_tensor_field(i_field, nnod_rtp, ntot_phys, d_nod,  &
      &    ione, numnod, internal_node, isix, d_tmp)
 !
-!$omp parallel
       call cal_xyz_tensor_by_sph_smp(np_smp, numnod,                    &
      &          inod_smp_stack, d_tmp(1,1), d_nod(1,i_field),           &
      &          xx(1,1), xx(1,2), xx(1,3), radius, s_cylinder,          &
      &          a_radius, a_s_cylinder)
-!$omp end parallel
 !
       end subroutine cvt_sph_tsr_to_nod_tsr
 !

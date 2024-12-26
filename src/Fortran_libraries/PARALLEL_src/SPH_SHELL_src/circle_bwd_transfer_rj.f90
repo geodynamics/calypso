@@ -120,10 +120,8 @@
       c_in =  circle%coef_gl_rcirc_in
       c_out = circle%coef_gl_rcirc_out
       do j = 1, sph_rj%nidx_rj(2)
-        i_in =  1 + (circle%kr_gl_rcirc_in-1 ) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
-        i_out = 1 + (circle%kr_gl_rcirc_out-1) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
+        i_in =  j + (circle%kr_gl_rcirc_in- 1) * sph_rj%nidx_rj(2)
+        i_out = j + (circle%kr_gl_rcirc_out-1) * sph_rj%nidx_rj(2)
         m = sph_rj%idx_gl_1d_rj_j(j,3)
         d_mid = (c_in*d_rj(i_in) + c_out*d_rj(i_out)) 
         scl_circ(m) = scl_circ(m) + P_circ(j) * d_mid
@@ -160,10 +158,8 @@
       c_out = circle%coef_gl_rcirc_out
       asin_t = one / sin(circle%colat_circle)
       do j = 1, sph_rj%nidx_rj(2)
-        i_in =  1 + (circle%kr_gl_rcirc_in-1 ) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
-        i_out = 1 + (circle%kr_gl_rcirc_out-1) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
+        i_in =  j + (circle%kr_gl_rcirc_in- 1) * sph_rj%nidx_rj(2)
+        i_out = j + (circle%kr_gl_rcirc_out-1) * sph_rj%nidx_rj(2)
         l = sph_rj%idx_gl_1d_rj_j(j,2)
         m = sph_rj%idx_gl_1d_rj_j(j,3)
         g3 = dble(l * (l+1))
@@ -177,10 +173,8 @@
       end do
 !
       do j = 1, sph_rj%nidx_rj(2)
-        i_in =  1 + (circle%kr_gl_rcirc_in-1 ) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
-        i_out = 1 + (circle%kr_gl_rcirc_out-1) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
+        i_in =  j + (circle%kr_gl_rcirc_in- 1) * sph_rj%nidx_rj(2)
+        i_out = j + (circle%kr_gl_rcirc_out-1) * sph_rj%nidx_rj(2)
         l = sph_rj%idx_gl_1d_rj_j(j,2)
         m = sph_rj%idx_gl_1d_rj_j(j,3)
         dydp_circ = - dble(m) * asin_t * P_circ(j)
@@ -230,10 +224,8 @@
       asin_t = one / sin(circle%colat_circle)
       cos_t =  cos(circle%colat_circle)
       do j = 1, sph_rj%nidx_rj(2)
-        i_in =  1 + (circle%kr_gl_rcirc_in-1 ) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
-        i_out = 1 + (circle%kr_gl_rcirc_out-1) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
+        i_in =  j + (circle%kr_gl_rcirc_in-1 ) * sph_rj%nidx_rj(2)
+        i_out = j + (circle%kr_gl_rcirc_out-1) * sph_rj%nidx_rj(2)
         l = sph_rj%idx_gl_1d_rj_j(j,2)
         m = sph_rj%idx_gl_1d_rj_j(j,3)
         g3 = dble(l * (l+1))
@@ -266,10 +258,8 @@
       end do
 !
       do j = 1, sph_rj%nidx_rj(2)
-        i_in =  1 + (circle%kr_gl_rcirc_in-1 ) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
-        i_out = 1 + (circle%kr_gl_rcirc_out-1) * sph_rj%istep_rj(1)     &
-     &            + (j-1) * sph_rj%istep_rj(2)
+        i_in =  j + (circle%kr_gl_rcirc_in-1 ) * sph_rj%nidx_rj(2)
+        i_out = j + (circle%kr_gl_rcirc_out-1) * sph_rj%nidx_rj(2)
         l = sph_rj%idx_gl_1d_rj_j(j,2)
         m = sph_rj%idx_gl_1d_rj_j(j,3)
         g3 = dble(l * (l+1))

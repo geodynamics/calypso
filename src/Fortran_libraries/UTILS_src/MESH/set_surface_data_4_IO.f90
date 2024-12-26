@@ -66,6 +66,7 @@
         ele_IO%elmtyp(1:surf%numsurf) = 223
       end if
 !
+!$omp parallel
 !$omp workshare
       ele_IO%nodelm(1:surf%numsurf) = surf%nnod_4_surf
       ele_IO%iele_global(1:surf%numsurf)                                &
@@ -80,6 +81,7 @@
       sfed_IO%isf_for_ele(1:nele,1:nsurf_4_ele)                         &
      &        = surf%isf_4_ele(1:nele,1:nsurf_4_ele)
 !$omp end workshare
+!$omp end parallel
 !
       end subroutine copy_surf_connect_to_IO
 !
@@ -136,6 +138,7 @@
 !
       call alloc_surface_connect(surf, nele)
 !
+!$omp parallel
 !$omp workshare
       surf%ie_surf(1:surf%numsurf,1:surf%nnod_4_surf)                   &
      &        = ele_IO%ie(1:surf%numsurf,1:surf%nnod_4_surf)
@@ -145,6 +148,7 @@
       surf%isf_4_ele(1:nele,1:nsurf_4_ele)                              &
      &        = sfed_IO%isf_for_ele(1:nele,1:nsurf_4_ele)
 !$omp end workshare
+!$omp end parallel
 !
       end subroutine copy_surf_connect_from_IO
 !

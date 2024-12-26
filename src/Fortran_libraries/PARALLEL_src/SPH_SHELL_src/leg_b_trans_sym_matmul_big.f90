@@ -117,7 +117,7 @@
           WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
           call set_sp_rlm_vec_sym_matmul_big                            &
      &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,    &
-     &        sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r, g_sph_rlm, &
+     &        sph_rlm%idx_gl_1d_rlm_j, sph_rlm%ar_1d_rlm, g_sph_rlm,    &
      &        kst(ip), nkr(ip), jst(ip), n_jk_e(ip), n_jk_o(ip),        &
      &        ncomp, nvector, comm_rlm%irev_sr, n_WR, WR,               &
      &        WK_l_bsm%pol_e(1,ip), WK_l_bsm%tor_e(1,ip),               &

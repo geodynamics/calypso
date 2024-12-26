@@ -169,10 +169,8 @@
 !
       do nd = 1, ncomp_fwd
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+4)
-!$omp parallel
         call copy_nod_scalar_smp                                        &
      &     (sph_rtp%nnod_rtp, X_rtp(1,nd), fftpack_d%X(1))
-!$omp end parallel
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+4)
 !
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+5)
@@ -245,10 +243,8 @@
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+2)
 !
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+3)
-!$omp parallel
         call copy_nod_scalar_smp                                        &
      &     (sph_rtp%nnod_rtp, fftpack_d%X(1), X_rtp(1,nd))
-!$omp end parallel
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+3)
       end do
 !

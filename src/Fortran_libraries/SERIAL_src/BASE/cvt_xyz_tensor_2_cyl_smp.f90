@@ -83,7 +83,7 @@
        real(kind=kreal) :: txx, txy, txz, tyy, tyz, tzz
 !
 !
-!$omp do private(inod,ist,ied,txx,txy,txz,tyy,tyz,tzz)
+!$omp parallel do private(inod,ist,ied,txx,txy,txz,tyy,tyz,tzz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -130,7 +130,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_cyl_tensor_smp
 !
@@ -152,7 +152,7 @@
        real(kind=kreal) :: txx, txy, txz, tyy, tyz, tzz
 !
 !
-!$omp do private(inod,ist,ied,txx,txy,txz,tyy,tyz,tzz)
+!$omp parallel do private(inod,ist,ied,txx,txy,txz,tyy,tyz,tzz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -199,7 +199,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine overwrite_cyl_tensor_smp
 !
@@ -222,7 +222,7 @@
        real(kind=kreal) :: txx, txy, tyy
 !
 !
-!$omp do private(inod,ist,ied,txx,txy,tyy)
+!$omp parallel do private(inod,ist,ied,txx,txy,tyy)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -242,7 +242,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_ss_tensor_smp
 !
@@ -264,7 +264,7 @@
        real(kind=kreal) :: txx, txy, tyy
 !
 !
-!$omp do private(inod,ist,ied,txx,txy,tyy)
+!$omp parallel do private(inod,ist,ied,txx,txy,tyy)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -285,7 +285,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_sp_tensor_smp
 !
@@ -307,7 +307,7 @@
        real(kind=kreal) :: txz, tyz
 !
 !
-!$omp do private(inod,ist,ied,txz,tyz)
+!$omp parallel do private(inod,ist,ied,txz,tyz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -324,7 +324,7 @@
 !
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_sz_tensor_smp
 !
@@ -345,7 +345,7 @@
        real(kind=kreal) :: txx, txy, tyy
 !
 !
-!$omp do private(inod,txx,txy,tyy)
+!$omp parallel do private(inod,txx,txy,tyy)
        do inod = 1, numnod
          txx = tensor(inod,1)
          txy = tensor(inod,2)
@@ -360,7 +360,7 @@
      &                    * a_s(inod) * a_s(inod)
          end if
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_pp_cyl_tensor_smp
 !
@@ -381,7 +381,7 @@
        real(kind=kreal) :: txz, tyz
 !
 !
-!$omp do private(inod,txz,tyz)
+!$omp parallel do private(inod,txz,tyz)
        do inod = 1, numnod
          txz = tensor(inod,3)
          tyz = tensor(inod,5)
@@ -393,7 +393,7 @@
      &                       + tyz * xx(inod) ) * a_s(inod)
          end if
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_pz_tensor_smp
 !
@@ -406,9 +406,9 @@
 !
       real(kind=kreal), intent(inout) :: t_zz(numnod)
 !
-!$omp workshare
+!$omp parallel workshare
       t_zz(1:numnod) = tensor(1:numnod,6)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_zz_tensor_smp
 !

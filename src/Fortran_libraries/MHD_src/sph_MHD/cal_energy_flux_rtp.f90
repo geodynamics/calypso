@@ -144,7 +144,6 @@
 !
       real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
 !
-!$omp parallel
       if(fs_trns_eflux%i_ujb .gt. 0) then
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      frc_rtp(1,f_trns_frc%i_lorentz),                            &
@@ -165,7 +164,6 @@
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
      &      flx_rtp(1,fs_trns_eflux%i_me_gen))
       end if
-!$omp end parallel
 !
       end subroutine cal_energy_fluxes_on_node
 !
@@ -193,7 +191,6 @@
       type(spherical_transform_data), intent(inout) :: trns_f_eflux
 !
 !
-!$omp parallel
       if(fe_trns_prod%i_electric .gt. 0) then
         call cal_electric_field_smp                                     &
      &     (sph_rtp%nnod_rtp, cd_prop%coef_diffuse,                     &
@@ -214,7 +211,7 @@
       if(fe_trns_frc%i_mag_stretch .gt. 0) then
         call cal_rtp_magnetic_streach                                   &
      &     (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp(1), sph_rtp%nidx_rtp(2), &
-     &      sph_rtp%a_r_1d_rtp_r, sph_rtp%cot_theta_1d_rtp,             &
+     &      sph_rtp%ar_1d_rtp, sph_rtp%cot_theta_1d_rtp,                &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_magne),                &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),                 &
      &      trns_b_difv%fld_rtp(1,bs_trns_diff_v%i_grad_vx),            &
@@ -222,7 +219,6 @@
      &      trns_b_difv%fld_rtp(1,bs_trns_diff_v%i_grad_vz),            &
      &      trns_f_eflux%fld_rtp(1,fe_trns_frc%i_mag_stretch))
       end if
-!$omp end parallel
 !
       end subroutine cal_magnetic_fluxes_rtp
 !
@@ -249,7 +245,6 @@
       type(spherical_transform_data), intent(inout) :: trns_f_eflux
 !
 !
-!$omp parallel
       if(fe_trns_prod%i_electric .gt. 0) then
         call cal_electric_field_smp                                     &
      &     (sph_rtp%nnod_pole, cd_prop%coef_diffuse,                    &
@@ -275,7 +270,6 @@
      &      trns_b_difv%fld_pole(1,bs_trns_diff_v%i_grad_vz),           &
      &      trns_f_eflux%fld_pole(1,fe_trns_frc%i_mag_stretch))
       end if
-!$omp end parallel
 !
       end subroutine cal_magnetic_fluxes_pole
 !

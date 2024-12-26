@@ -31,7 +31,11 @@
 !!        integer(kind = kint), intent(in) :: n_minus, n_plus
 !!        type(fdm_matrices), intent(inout) :: fdmn_nod
 !!
-!!      subroutine check_fdm_coefs(nri, r, fdmn_nod)
+!!      subroutine check_fdm_coefs(id_file, nri, r, fdmn_nod)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        integer(kind = kint), intent(in) :: nri
+!!        real(kind = kreal), intent(in) :: r(nri)
+!!        type(fdm_matrices), intent(in) :: fdmn_nod
 !!@endverbatim
 !!
 !!@n @param nri    number of radial grid points
@@ -116,8 +120,9 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_fdm_coefs(nri, r, fdmn_nod)
+      subroutine check_fdm_coefs(id_file, nri, r, fdmn_nod)
 !
+      integer(kind = kint), intent(in) :: id_file
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: r(nri)
       type(fdm_matrices), intent(in) :: fdmn_nod
@@ -126,8 +131,8 @@
 !
 !
       do i = fdmn_nod%ist_order, fdmn_nod%n_order
-        write(50,*) 'Matrix for differences: ', i
-        call check_fdm_coef(nri, r, fdmn_nod%fdm(i))
+        write(id_file,*) 'Matrix for differences: ', i
+        call check_fdm_coef(id_file, nri, r, fdmn_nod%fdm(i))
       end do
 !
       end subroutine check_fdm_coefs
@@ -163,17 +168,18 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_fdm_coef(nri, r, fdm)
+      subroutine check_fdm_coef(id_file, nri, r, fdm)
 !
+      integer(kind = kint), intent(in) :: id_file
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: r(nri)
       type(fdm_matrix), intent(in) :: fdm
 !
       integer(kind = kint) :: kr
 !
-      write(50,*) 'kr, r, coefficients'
+      write(id_file,*) 'kr, r, coefficients'
       do kr = 1, nri
-        write(50,'(i5,1p40e20.12)')                                     &
+        write(id_file,'(i5,1p40e20.12)')                                &
      &       kr, r(kr), fdm%dmat(kr,-fdm%n_minus:fdm%n_plus)
       end do
 !

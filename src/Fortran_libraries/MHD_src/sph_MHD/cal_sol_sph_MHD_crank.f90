@@ -47,7 +47,6 @@
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_radial_matrices_sph_MHD
-      use t_coef_fdm2_MHD_boundaries
       use t_work_4_sph_trans
 !
       implicit none
@@ -89,15 +88,13 @@
 !         Solution: ipol%base%i_velo to ipol%base%i_velo+2
         if (iflag_debug .gt. 0)                                         &
      &       write(*,*) 'cal_sol_velo_by_vort_sph_crank'
-        call cal_sol_velo_by_vort_sph_crank                             &
-     &     (sph_rj, r_2nd, sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U,       &
-     &      sph_MHD_bc%fdm2_free_ICB, sph_MHD_bc%fdm2_free_CMB,         &
-     &      sph_MHD_mat%band_vp_evo, sph_MHD_mat%band_vt_evo,           &
-     &      ipol, rj_fld)
-        call const_grad_vp_and_vorticity                                &
-     &     (sph_rj, r_2nd, sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U,       &
-     &      sph_MHD_bc%fdm2_free_ICB, sph_MHD_bc%fdm2_free_CMB,         &
-     &      leg%g_sph_rj, ipol%base%i_velo, ipol%base%i_vort, rj_fld)
+        call cal_sol_velo_by_vort_sph_crank(sph_rj, r_2nd,              &
+     &     sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U, sph_MHD_bc%bcs_U, &
+     &     sph_MHD_mat%band_vp_evo, sph_MHD_mat%band_vt_evo,            &
+     &     ipol, rj_fld)
+        call const_grad_vp_and_vorticity(sph_rj, r_2nd,                 &
+     &     sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U, sph_MHD_bc%bcs_U, &
+     &     leg%g_sph_rj, ipol%base%i_velo, ipol%base%i_vort, rj_fld)
       end if
 !
 !  Input: ipol%base%i_temp,  Solution: ipol%base%i_temp
@@ -138,8 +135,7 @@
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
         call update_after_vorticity_sph                                 &
      &     (sph_rj, r_2nd, MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,       &
-     &      sph_MHD_bc%fdm2_free_ICB, sph_MHD_bc%fdm2_free_CMB,         &
-     &      leg, ipol, rj_fld)
+     &      sph_MHD_bc%bc_fdms_U, leg, ipol, rj_fld)
       end if
 !
       if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
@@ -179,18 +175,16 @@
 !
 !
       if(ipol%base%i_vort .gt. 0) then
-        call const_grad_vp_and_vorticity                                &
-     &     (sph_rj, r_2nd, sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U,       &
-     &      sph_MHD_bc%fdm2_free_ICB, sph_MHD_bc%fdm2_free_CMB,         &
-     &      leg%g_sph_rj, ipol%base%i_velo, ipol%base%i_vort, rj_fld)
+        call const_grad_vp_and_vorticity(sph_rj, r_2nd,                 &
+     &     sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U, sph_MHD_bc%bcs_U, &
+     &     leg%g_sph_rj, ipol%base%i_velo, ipol%base%i_vort, rj_fld)
       end if
 !
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug.gt.0) write(*,*) 'update_after_vorticity_sph'
         call update_after_vorticity_sph                                 &
      &     (sph_rj, r_2nd, MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,       &
-     &      sph_MHD_bc%fdm2_free_ICB, sph_MHD_bc%fdm2_free_CMB,         &
-     &      leg, ipol, rj_fld)
+     &      sph_MHD_bc%bc_fdms_U, leg, ipol, rj_fld)
       end if
 !
       if(iflag_debug.gt.0) write(*,*) 'update_after_heat_sph'

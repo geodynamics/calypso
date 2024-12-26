@@ -7,6 +7,10 @@
 !>@brief Matrix to evaluate radial derivative for next of center
 !!
 !!@verbatim
+!!      subroutine check_fdm4_vpol_centre(id_file, fdm4_center)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        type(fdm4_centre_vpol), intent(in) :: fdm4_center
+!!
 !!      subroutine cal_coef_fdm4_vpol_centre(r, fdm4, fdm4_center)
 !!        real(kind = kreal), intent(in) :: r(4)
 !!        type(fdm_matrix), intent(in) :: fdm4(4)
@@ -77,6 +81,41 @@
 ! -----------------------------------------------------------------------
 !
       contains
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_fdm4_vpol_centre(id_file, fdm4_center)
+!
+      integer(kind = kint), intent(in) :: id_file
+      type(fdm4_centre_vpol), intent(in) :: fdm4_center
+!
+!
+      write(id_file,*) ' 4-th order FDM matrices around center'
+      write(id_file,*) ' fdm4_center%dmat_vp1'
+      write(id_file,*) 'matrix for Interpolation to element'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,1)
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,4)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,5)
+!
+      write(id_file,*) ' fdm4_center%dmat_vp2'
+      write(id_file,*) 'matrix for Interpolation to element'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,1)
+      write(id_file,*) 'matrix for dfdr'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,2)
+      write(id_file,*) 'matrix for d2fdr2'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,3)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,4)
+      write(id_file,*) 'matrix for d3fdr3'
+      write(id_file,'(1p9E25.15e3)') fdm4_center%dmat_vp1(-2:2,5)
+!
+      end subroutine check_fdm4_vpol_centre
 !
 ! -----------------------------------------------------------------------
 !

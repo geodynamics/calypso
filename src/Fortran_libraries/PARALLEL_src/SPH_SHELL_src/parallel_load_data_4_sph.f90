@@ -300,6 +300,7 @@
       subroutine set_radius_dat_sph_MHD                                 &
      &         (radial_rj_grp, sph_params, sph_rj)
 !
+      use m_spheric_constants
       use set_radius_4_sph_dynamo
 !
       type(group_data), intent(in) :: radial_rj_grp
@@ -315,9 +316,13 @@
      &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, radial_rj_grp,      &
      &    sph_params%iflag_radial_grid, sph_params%nlayer_ICB,          &
      &    sph_params%nlayer_CMB, sph_params%nlayer_2_center,            &
-     &    sph_rj%ar_1d_rj, sph_rj%r_ele_rj, sph_rj%ar_ele_rj,           &
+     &    sph_rj%r_ele_rj, sph_rj%ar_ele_rj,                            &
      &    sph_params%radius_ICB, sph_params%radius_CMB,                 &
      &    sph_params%R_earth)
+      if(sph_params%iflag_radial_grid .eq. igrid_error) then
+        call calypso_mpi_abort(ierr_sph,                                &
+     &     'Numbedr of radial layers are 0 or negative!')
+      end if
 !
       end subroutine set_radius_dat_sph_MHD
 !

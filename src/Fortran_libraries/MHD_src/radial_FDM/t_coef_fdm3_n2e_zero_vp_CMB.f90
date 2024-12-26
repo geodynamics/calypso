@@ -70,7 +70,7 @@
 !
       write(id_file,*) ' zero poloidal at CMB'
       write(id_file,*) ' fdm3e_vp0_CMB%dmat_vp0'
-      write(id_file,*) 'matrix for Interpolation'
+      write(id_file,*) 'matrix for Interpolation to element'
       write(id_file,'(1p9E25.15e3)') fdm3e_vp0_CMB%dmat_vp0(-2:1,1)
       write(id_file,*) 'matrix for dfdr'
       write(id_file,'(1p9E25.15e3)') fdm3e_vp0_CMB%dmat_vp0(-2:1,2)

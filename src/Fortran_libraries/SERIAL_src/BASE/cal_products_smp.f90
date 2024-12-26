@@ -88,9 +88,9 @@
       real (kind=kreal), intent(inout) :: prod(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod) =  scalar1(1:nnod)*scalar2(1:nnod)*coef
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_scalar_prod_w_coef_smp
 !
@@ -105,9 +105,9 @@
       real (kind=kreal), intent(inout) :: prod(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod) =  scalar1(1:nnod)*scalar2(1:nnod)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_scalar_prod_no_coef_smp
 !
@@ -124,11 +124,11 @@
       real (kind=kreal), intent(inout) :: prod(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod) = (vect1(1:nnod,1)*vect2(1:nnod,1)                   &
      &              + vect1(1:nnod,2)*vect2(1:nnod,2)                   &
      &              + vect1(1:nnod,3)*vect2(1:nnod,3)) * coef
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_dot_prod_w_coef_smp
 !
@@ -142,11 +142,11 @@
       real (kind=kreal), intent(inout) :: prod(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod) =  vect1(1:nnod,1)*vect2(1:nnod,1)                   &
      &            + vect1(1:nnod,2)*vect2(1:nnod,2)                     &
      &            + vect1(1:nnod,3)*vect2(1:nnod,3)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_dot_prod_no_coef_smp
 !
@@ -163,14 +163,14 @@
       real (kind=kreal), intent(inout) :: prod(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod,1) = (vect1(1:nnod,2)*vect2(1:nnod,3)                 &
      &              - vect1(1:nnod,3)*vect2(1:nnod,2) ) * coef
       prod(1:nnod,2) = (vect1(1:nnod,3)*vect2(1:nnod,1)                 &
      &              - vect1(1:nnod,1)*vect2(1:nnod,3) ) * coef
       prod(1:nnod,3) = (vect1(1:nnod,1)*vect2(1:nnod,2)                 &
      &              - vect1(1:nnod,2)*vect2(1:nnod,1) ) * coef
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_cross_prod_w_coef_smp
 !
@@ -186,7 +186,7 @@
       real (kind=kreal), intent(inout) :: prod(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod,1) = prod(1:nnod,1)                                   &
      &              + (vect1(1:nnod,2)*vect2(1:nnod,3)                  &
      &               - vect1(1:nnod,3)*vect2(1:nnod,2) ) * coef
@@ -196,7 +196,7 @@
       prod(1:nnod,3) = prod(1:nnod,3)                                   &
      &              + (vect1(1:nnod,1)*vect2(1:nnod,2)                  &
      &               - vect1(1:nnod,2)*vect2(1:nnod,1) ) * coef
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine add_cross_prod_w_coef_smp
 !
@@ -211,14 +211,14 @@
       real (kind=kreal), intent(inout) :: prod(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod,1) = (vect1(1:nnod,2)*vect2(1:nnod,3)                 &
      &                - vect1(1:nnod,3)*vect2(1:nnod,2) )
       prod(1:nnod,2) = (vect1(1:nnod,3)*vect2(1:nnod,1)                 &
      &                - vect1(1:nnod,1)*vect2(1:nnod,3) )
       prod(1:nnod,3) = (vect1(1:nnod,1)*vect2(1:nnod,2)                 &
      &                - vect1(1:nnod,2)*vect2(1:nnod,1) )
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_cross_prod_no_coef_smp
 !
@@ -234,11 +234,11 @@
       real (kind=kreal), intent(inout) :: prod(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod,1) = vect1(1:nnod,1)*scalar(1:nnod)
       prod(1:nnod,2) = vect1(1:nnod,2)*scalar(1:nnod)
       prod(1:nnod,3) = vect1(1:nnod,3)*scalar(1:nnod)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_vec_scalar_prod_no_coef_smp
 !
@@ -254,11 +254,11 @@
       real (kind=kreal), intent(inout) :: prod(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
           prod(1:nnod,1) = vect1(1:nnod,1)*scalar(1:nnod) * coef
           prod(1:nnod,2) = vect1(1:nnod,2)*scalar(1:nnod) * coef
           prod(1:nnod,3) = vect1(1:nnod,3)*scalar(1:nnod) * coef
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_vec_scalar_prod_w_coef_smp
 !
@@ -273,7 +273,7 @@
       real (kind=kreal), intent(inout) :: prod(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod,1) =  tensor(1:nnod,1) * vector(1:nnod,1)             &
      &                + tensor(1:nnod,2) * vector(1:nnod,2)             &
      &                + tensor(1:nnod,3) * vector(1:nnod,3)
@@ -283,7 +283,7 @@
       prod(1:nnod,3) =  tensor(1:nnod,3) * vector(1:nnod,1)             &
      &                + tensor(1:nnod,5) * vector(1:nnod,2)             &
      &                + tensor(1:nnod,6) * vector(1:nnod,3)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine cal_tensor_vec_prod_no_coef_smp
 !
@@ -298,12 +298,12 @@
 !
       real (kind=kreal), intent(inout) :: prod(nnod)
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod) = scalar(1:nnod)                                     &
      &               * sqrt(vector(1:nnod,1)*vector(1:nnod,1)           &
      &                    + vector(1:nnod,2)*vector(1:nnod,2)           &
      &                    + vector(1:nnod,3)*vector(1:nnod,3))
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
        end subroutine cal_scalar_mag_vector_prod_smp
 !
@@ -319,7 +319,7 @@
       real (kind=kreal), intent(inout) :: prod(nnod)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod) = vect1(1:nnod,1)                                    &
      &                * ( vect2(1:nnod,2)*vect3(1:nnod,3)               &
      &                  - vect2(1:nnod,3)*vect3(1:nnod,2) )             &
@@ -331,7 +331,7 @@
      &                  - vect2(1:nnod,2)*vect3(1:nnod,1) )
 !
       prod(1:nnod) =  coef * prod(1:nnod)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
 !
       end subroutine cal_tri_product_w_coef_smp
@@ -347,11 +347,11 @@
       real (kind=kreal), intent(inout) :: prod(nnod,3)
 !
 !
-!$omp workshare
+!$omp parallel workshare
           prod(1:nnod,1) = vect1(1:nnod,1) * vect2(1:nnod,1)
           prod(1:nnod,2) = vect1(1:nnod,2) * vect2(1:nnod,2)
           prod(1:nnod,3) = vect1(1:nnod,3) * vect2(1:nnod,3)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine vector_vector_prod_smp
 !
@@ -365,14 +365,14 @@
       real (kind=kreal), intent(inout) :: prod(nnod,6)
 !
 !
-!$omp workshare
+!$omp parallel workshare
       prod(1:nnod,1) = tensor1(1:nnod,1) * tensor2(1:nnod,1)
       prod(1:nnod,2) = tensor1(1:nnod,2) * tensor2(1:nnod,2)
       prod(1:nnod,3) = tensor1(1:nnod,3) * tensor2(1:nnod,3)
       prod(1:nnod,4) = tensor1(1:nnod,4) * tensor2(1:nnod,4)
       prod(1:nnod,5) = tensor1(1:nnod,5) * tensor2(1:nnod,5)
       prod(1:nnod,6) = tensor1(1:nnod,6) * tensor2(1:nnod,6)
-!$omp end workshare nowait
+!$omp end parallel workshare
 !
       end subroutine tensor_tensor_prod_smp
 !

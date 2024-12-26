@@ -115,7 +115,6 @@
       real(kind = kreal), intent(inout) :: fhls_rtp(nnod,ntot_comp_hls)
 !
 !
-!$omp parallel
       if(fe_trns_prod%i_k_heli .gt. 0) then
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
@@ -134,7 +133,6 @@
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
      &      fhls_rtp(1,fe_trns_prod%i_x_heli))
       end if
-!$omp end parallel
 !
       end subroutine cal_helicity_on_node
 !
@@ -156,7 +154,6 @@
       real(kind = kreal), intent(inout) :: fmag_rtp(nnod,ntot_comp_fmg)
 !
 !
-!$omp parallel
       if(fe_trns_prod%i_square_v .gt. 0) then
         call vector_vector_prod_smp(nnod,                               &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
@@ -199,7 +196,6 @@
      &      fld_rtp(1,bs_trns_base%i_light),                            &
      &      fmag_rtp(1,fe_trns_prod%i_square_c))
       end if
-!$omp end parallel
 !
       end subroutine cal_square_vector_on_node
 !
@@ -222,7 +218,6 @@
       type(spherical_transform_data), intent(inout) :: trns_f_eflux
 !
 !
-!$omp parallel
       if(fe_trns_prod%i_velo_scale .gt. 0) then
         call cal_len_scale_by_rot_smp(sph_rtp%nnod_rtp,                 &
      &      trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),                 &
@@ -247,7 +242,6 @@
      &      trns_b_eflux%fld_rtp(1,bs_trns_dif%i_c_diffuse),            &
      &      trns_f_eflux%fld_rtp(1,fe_trns_prod%i_comp_scale))
       end if
-!$omp end parallel
 !
       end subroutine cal_lengh_scale_rtp
 !

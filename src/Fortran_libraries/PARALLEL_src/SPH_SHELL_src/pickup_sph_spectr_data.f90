@@ -164,10 +164,8 @@
       j =     picked%idx_out(inum,4)
       k_in =  picked%id_radius(knum,1)
       k_out = picked%id_radius(knum,2)
-      i_in =  1 + (k_in-1) * sph_rj%istep_rj(1)                         &
-     &          + (j-1) *    sph_rj%istep_rj(2)
-      i_out =  1 + (k_out-1) * sph_rj%istep_rj(1)                       &
-     &           + (j-1) *      sph_rj%istep_rj(2)
+      i_in =  j + (k_in- 1) * sph_rj%nidx_rj(2)
+      i_out = j + (k_out-1) * sph_rj%nidx_rj(2)
 !
 !$omp parallel do private(j_fld,i_fld,ncomp,icou,jcou,nd)
       do j_fld = 1, picked%num_field_rj

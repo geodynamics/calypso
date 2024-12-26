@@ -60,7 +60,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp do private(inod,vs,vp)
+!$omp parallel do private(inod,vs,vp)
         do inod = 1, numnod
           vs = v_cyl(inod,1)
           vp = v_cyl(inod,2)
@@ -72,7 +72,7 @@
           vect(inod,3) = v_cyl(inod,3)
 !
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cvt_cyl_vect_2_xyz_smp
 !
@@ -90,7 +90,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp do private(inod,vs,vp)
+!$omp parallel do private(inod,vs,vp)
         do inod = 1, numnod
           vs = vect(inod,1)
           vp = vect(inod,2)
@@ -100,7 +100,7 @@
           vect(inod,2) = ( vs * sin( phi(inod) )                        &
      &                   + vp * cos( phi(inod) ) )
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine overwrite_cyl_vect_2_xyz_smp
 !
@@ -118,7 +118,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp do private(inod,vs,vp)
+!$omp parallel do private(inod,vs,vp)
         do inod = 1, numnod
           vs = v_cyl(inod,1)
           vp = v_cyl(inod,2)
@@ -126,7 +126,7 @@
           v_x(inod) = ( vs * cos( phi(inod) )                           &
      &                - vp * sin( phi(inod) ) )
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cvt_cyl_vect_2_x_comp_smp
 !
@@ -143,7 +143,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp do private(inod,vs,vp)
+!$omp parallel do private(inod,vs,vp)
         do inod = 1, numnod
           vs = v_cyl(inod,1)
           vp = v_cyl(inod,2)
@@ -151,7 +151,7 @@
           v_y(inod) = ( vs * sin( phi(inod) )                           &
      &                + vp * cos( phi(inod) ) )
         end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cvt_cyl_vect_2_y_comp_smp
 !

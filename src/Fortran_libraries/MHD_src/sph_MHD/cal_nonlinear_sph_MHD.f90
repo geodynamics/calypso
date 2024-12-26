@@ -168,7 +168,6 @@
 !
       real(kind = kreal), intent(inout) :: frc_rtp(nnod,ntot_comp_frc)
 !
-!$omp parallel
       if(f_trns_frc%i_m_advect .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
      &     (nnod, MHD_prop%fl_prop%coef_velo,                           &
@@ -226,7 +225,6 @@
      &      fld_rtp(1,b_trns_base%i_light),                             &
      &      frc_rtp(1,f_trns_frc%i_c_flux) )
       end if
-!$omp end parallel
 !
       end subroutine nonlinear_terms_on_node
 !
@@ -249,7 +247,7 @@
 !
       real(kind = kreal), intent(inout) :: frc_rtp(nnod,ntot_comp_frc)
 !
-!$omp parallel
+!
       if(f_trns_frc%i_m_advect .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
      &     (nnod, MHD_prop%fl_prop%coef_velo,                           &
@@ -307,7 +305,6 @@
      &      fld_rtp(1,b_trns_base_2%i_light),                           &
      &      frc_rtp(1,f_trns_frc%i_c_flux) )
       end if
-!$omp end parallel
 !
       end subroutine nonlinear_terms_on_node_w_sym
 !

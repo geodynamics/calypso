@@ -56,10 +56,9 @@ mod_list:
 
 
 module:
-	@cat Makefile.depends >> $(MAKENAME)
 
 depends:
-	@$(MAKE_MOD_DEP) Makefile.depends '$$(RAYLEIGH_LINK_DIR)' $(SOURCES)
+	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(RAYLEIGH_LINK_DIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *~ *.mod *.diag *.L

@@ -7,31 +7,34 @@
 !>@brief  Structure for indexing table of speherical harmonic oefficients
 !!
 !!@verbatim
-!!      subroutine alloc_spheric_param_rj(rj)
-!!      subroutine alloc_sph_1d_index_rj(rj)
-!!      subroutine alloc_rj_param_smp(rj)
-!!        type(sph_rj_grid), intent(inout) :: rj
+!!      subroutine alloc_spheric_param_rj(sph_rj)
+!!      subroutine alloc_sph_1d_index_rj(sph_rj)
+!!      subroutine alloc_rj_param_smp(sph_rj)
+!!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!
-!!      subroutine dealloc_spheric_param_rj(rj)
-!!      subroutine dealloc_sph_1d_index_rj(rj)
-!!      subroutine dealloc_rj_param_smp(rj)
-!!        type(sph_rj_grid), intent(inout) :: rj
+!!      subroutine dealloc_spheric_param_rj(sph_rj)
+!!      subroutine dealloc_sph_1d_index_rj(sph_rj)
+!!      subroutine dealloc_rj_param_smp(sph_rj)
+!!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!
+!!      subroutine set_sph_one_over_radius_rj(sph_rj)
+!!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!      subroutine copy_spheric_rj_data                                 &
 !!     &         (ltr_org, rj_org, ltr_new, rj_new)
 !!        type(sph_rj_grid), intent(in) :: rj_org
 !!        type(sph_rj_grid), intent(inout) :: rj_new
 !!
-!!      subroutine check_spheric_param_rj(id_rank, rj)
+!!      subroutine check_spheric_param_rj(id_rank, sph_rj)
 !!        integer, intent(in) :: id_rank
-!!        type(sph_rj_grid), intent(in) :: rj
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!
-!!      integer(kind = kint) function find_local_sph_address(rj, l, m)
-!!        type(sph_rj_grid), intent(in) :: rj
+!!      integer(kind = kint) function find_local_sph_address(sph_rj,    &
+!!                                                           l, m)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        integer(kind = 4), intent(in) :: l, m
 !!      integer(kind = kint) function local_sph_node_address            &
-!!     &                            (rj, kr, j_lc)
-!!        type(sph_rj_grid), intent(in) :: rj
+!!     &                            (sph_rj, kr, j_lc)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!@endverbatim
 !!
 !!@n @param  id_rank     Running rank ID
@@ -105,9 +108,6 @@
 !>        1d radius data for @f$ f(r,j) @f$
         real(kind = kreal), allocatable :: radius_1d_rj_r(:)
 !>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
-        real(kind = kreal), allocatable :: a_r_1d_rj_r(:)
-!
-!>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
 !!@n       see set_radius_func_cheby or set_radius_func_cheby
         real(kind = kreal), allocatable :: ar_1d_rj(:,:)
 !
@@ -123,109 +123,127 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_spheric_param_rj(rj)
+      subroutine alloc_spheric_param_rj(sph_rj)
 !
-      type(sph_rj_grid), intent(inout) :: rj
+      type(sph_rj_grid), intent(inout) :: sph_rj
 !
-      allocate(rj%idx_global_rj(rj%nnod_rj,2))
+      allocate(sph_rj%idx_global_rj(sph_rj%nnod_rj,2))
 !
-      if(rj%nnod_rj .gt. 0) rj%idx_global_rj =  0
+      if(sph_rj%nnod_rj .gt. 0) sph_rj%idx_global_rj =  0
 !
       end subroutine alloc_spheric_param_rj
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine alloc_sph_1d_index_rj(rj)
+      subroutine alloc_sph_1d_index_rj(sph_rj)
 !
-      type(sph_rj_grid), intent(inout) :: rj
+      type(sph_rj_grid), intent(inout) :: sph_rj
       integer(kind = kint) :: num
 !
-      num = rj%nidx_rj(1)
-      allocate(rj%idx_gl_1d_rj_r(num))
-      allocate(rj%radius_1d_rj_r(num))
-      allocate(rj%a_r_1d_rj_r(num))
+      num = sph_rj%nidx_rj(1)
+      allocate(sph_rj%idx_gl_1d_rj_r(num))
+      allocate(sph_rj%radius_1d_rj_r(num))
 !
-      allocate(rj%ar_1d_rj(num,3))
-      allocate(rj%r_ele_rj(num))
-      allocate(rj%ar_ele_rj(num,3))
+      allocate(sph_rj%ar_1d_rj(num,3))
+      allocate(sph_rj%r_ele_rj(num))
+      allocate(sph_rj%ar_ele_rj(num,3))
 !
-      num = rj%nidx_rj(2)
-      allocate(rj%idx_gl_1d_rj_j(num,3))
+      num = sph_rj%nidx_rj(2)
+      allocate(sph_rj%idx_gl_1d_rj_j(num,3))
 !
-      rj%idx_rj_degree_zero = 0
-      rj%idx_rj_degree_one(-1:1) = 0
+      sph_rj%idx_rj_degree_zero = 0
+      sph_rj%idx_rj_degree_one(-1:1) = 0
 !
-      if(rj%nidx_rj(2) .gt. 0) rj%idx_gl_1d_rj_j = 0
-      if(rj%nidx_rj(1) .gt. 0) then
-        rj%idx_gl_1d_rj_r = 0
-        rj%radius_1d_rj_r = 0.0d0
-        rj%a_r_1d_rj_r = 0.0d0
+      if(sph_rj%nidx_rj(2) .gt. 0) sph_rj%idx_gl_1d_rj_j = 0
+      if(sph_rj%nidx_rj(1) .gt. 0) then
+        sph_rj%idx_gl_1d_rj_r = 0
+        sph_rj%radius_1d_rj_r = 0.0d0
 !
-        rj%ar_1d_rj = 0.0d0
-        rj%r_ele_rj = 0.0d0
-        rj%ar_ele_rj = 0.0d0
+        sph_rj%ar_1d_rj = 0.0d0
+        sph_rj%r_ele_rj = 0.0d0
+        sph_rj%ar_ele_rj = 0.0d0
       end if
 !
       end subroutine alloc_sph_1d_index_rj
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine alloc_rj_param_smp(rj)
+      subroutine alloc_rj_param_smp(sph_rj)
 !
       use m_machine_parameter
 !
-      type(sph_rj_grid), intent(inout) :: rj
+      type(sph_rj_grid), intent(inout) :: sph_rj
 !
 !
-      allocate(rj%istack_inod_rj_smp(0:np_smp))
+      allocate(sph_rj%istack_inod_rj_smp(0:np_smp))
 !
-      allocate(rj%istack_rj_kr_smp(0:np_smp))
-      allocate(rj%istack_rj_j_smp(0:np_smp))
+      allocate(sph_rj%istack_rj_kr_smp(0:np_smp))
+      allocate(sph_rj%istack_rj_j_smp(0:np_smp))
 !
-      rj%istack_inod_rj_smp = 0
+      sph_rj%istack_inod_rj_smp = 0
 !
-      rj%istack_rj_kr_smp =  0
-      rj%istack_rj_j_smp =  0
+      sph_rj%istack_rj_kr_smp =  0
+      sph_rj%istack_rj_j_smp =  0
 !
       end subroutine alloc_rj_param_smp
 !
 ! -----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_spheric_param_rj(rj)
+      subroutine dealloc_spheric_param_rj(sph_rj)
 !
-      type(sph_rj_grid), intent(inout) :: rj
+      type(sph_rj_grid), intent(inout) :: sph_rj
 !
-      deallocate(rj%idx_global_rj)
+      deallocate(sph_rj%idx_global_rj)
 !
       end subroutine dealloc_spheric_param_rj
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_sph_1d_index_rj(rj)
+      subroutine dealloc_sph_1d_index_rj(sph_rj)
 !
-      type(sph_rj_grid), intent(inout) :: rj
+      type(sph_rj_grid), intent(inout) :: sph_rj
 !
 !
-      deallocate(rj%radius_1d_rj_r, rj%a_r_1d_rj_r)
-      deallocate(rj%ar_1d_rj, rj%r_ele_rj, rj%ar_ele_rj)
-      deallocate(rj%idx_gl_1d_rj_r, rj%idx_gl_1d_rj_j)
+      deallocate(sph_rj%radius_1d_rj_r)
+      deallocate(sph_rj%ar_1d_rj, sph_rj%r_ele_rj, sph_rj%ar_ele_rj)
+      deallocate(sph_rj%idx_gl_1d_rj_r, sph_rj%idx_gl_1d_rj_j)
 !
       end subroutine dealloc_sph_1d_index_rj
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_rj_param_smp(rj)
+      subroutine dealloc_rj_param_smp(sph_rj)
 !
-      type(sph_rj_grid), intent(inout) :: rj
+      type(sph_rj_grid), intent(inout) :: sph_rj
 !
 !
-      deallocate(rj%istack_inod_rj_smp)
-      deallocate(rj%istack_rj_kr_smp, rj%istack_rj_j_smp)
+      deallocate(sph_rj%istack_inod_rj_smp)
+      deallocate(sph_rj%istack_rj_kr_smp, sph_rj%istack_rj_j_smp)
 !
       end subroutine dealloc_rj_param_smp
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_sph_one_over_radius_rj(sph_rj)
+!
+      type(sph_rj_grid), intent(inout) :: sph_rj
+!
+      integer(kind = kint) :: i
+!
+!$omp parallel do private(i)
+      do i = 1, sph_rj%nidx_rj(1)
+        sph_rj%ar_1d_rj(i,1) = one / sph_rj%radius_1d_rj_r(i)
+        sph_rj%ar_1d_rj(i,2) = sph_rj%ar_1d_rj(i,1)                     &
+     &                        * sph_rj%ar_1d_rj(i,1)
+        sph_rj%ar_1d_rj(i,3) = sph_rj%ar_1d_rj(i,2)                     &
+     &                        * sph_rj%ar_1d_rj(i,1)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_sph_one_over_radius_rj
+!
 ! -----------------------------------------------------------------------
 !
       subroutine copy_spheric_rj_data                                   &
@@ -252,21 +270,32 @@
       call alloc_spheric_param_rj(rj_new)
       call alloc_sph_1d_index_rj(rj_new)
 !
+!$omp parallel
       do i = 1, itwo
+!$omp workshare
         rj_new%idx_global_rj(1:rj_new%nnod_rj,i)                        &
      &       = rj_org%idx_global_rj(1:rj_new%nnod_rj,i)
+!$omp end workshare
       end do
+!$omp end parallel
 !
-      rj_new%radius_1d_rj_r(1:rj_new%nidx_rj(1))                        &
-     &       = rj_org%radius_1d_rj_r(1:rj_new%nidx_rj(1))
-      rj_new%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))                        &
-     &       = rj_org%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))
+!$omp parallel workshare
       rj_new%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),1)                      &
      &       = rj_org%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),1)
       rj_new%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),2)                      &
      &       = rj_org%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),2)
       rj_new%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),3)                      &
      &      = rj_org%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),3)
+!$omp end parallel workshare
+!
+!$omp parallel workshare
+      rj_new%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))                        &
+     &       = rj_org%idx_gl_1d_rj_r(1:rj_new%nidx_rj(1))
+      rj_new%radius_1d_rj_r(1:rj_new%nidx_rj(1))                        &
+     &       = rj_org%radius_1d_rj_r(1:rj_new%nidx_rj(1))
+!$omp end parallel workshare
+!
+      call set_sph_one_over_radius_rj(rj_new)
 !
 !      call dealloc_sph_1d_index_rj(rj_org)
 !      call dealloc_spheric_param_rj(rj_org)
@@ -276,20 +305,20 @@
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_spheric_param_rj(id_rank, rj)
+      subroutine check_spheric_param_rj(id_rank, sph_rj)
 !
       integer, intent(in) :: id_rank
-      type(sph_rj_grid), intent(in) :: rj
+      type(sph_rj_grid), intent(in) :: sph_rj
       integer(kind = kint) :: i
 !
 !
-      write(id_rank+50,*) 'irank_sph_rj ',  rj%irank_sph_rj(1:2)
-      write(id_rank+50,*) 'nidx_rj  ',  rj%nidx_rj(1:2)
-      write(id_rank+50,*) 'nnod_rj ',  rj%nnod_rj
+      write(id_rank+50,*) 'irank_sph_rj ',  sph_rj%irank_sph_rj(1:2)
+      write(id_rank+50,*) 'nidx_rj  ',  sph_rj%nidx_rj(1:2)
+      write(id_rank+50,*) 'nnod_rj ',  sph_rj%nnod_rj
 !
       write(id_rank+50,*) 'i, idx_global_rj(r,j)'
-      do i = 1, rj%nnod_rj
-        write(id_rank+50,*) i, rj%idx_global_rj(i,1:2)
+      do i = 1, sph_rj%nnod_rj
+        write(id_rank+50,*) i, sph_rj%idx_global_rj(i,1:2)
       end do
 !
       end subroutine check_spheric_param_rj
@@ -297,18 +326,18 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      integer(kind = kint) function find_local_sph_address(rj, l, m)
+      integer(kind = kint) function find_local_sph_address(sph_rj, l, m)
 !
-      type(sph_rj_grid), intent(in) :: rj
+      type(sph_rj_grid), intent(in) :: sph_rj
       integer, intent(in) :: l, m
 !
       integer(kind = kint) :: j
 !
 !
       find_local_sph_address = 0
-      do j = 1, rj%nidx_rj(2)
-        if (   rj%idx_gl_1d_rj_j(j,2) .eq. l                            &
-     &   .and. rj%idx_gl_1d_rj_j(j,3) .eq. m) then
+      do j = 1, sph_rj%nidx_rj(2)
+        if (   sph_rj%idx_gl_1d_rj_j(j,2) .eq. l                        &
+     &   .and. sph_rj%idx_gl_1d_rj_j(j,3) .eq. m) then
           find_local_sph_address = j
           return
         end if
@@ -318,14 +347,14 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function local_sph_node_address              &
-     &                            (rj, kr, j_lc)
+      integer(kind = kint) function local_sph_node_address(sph_rj,      &
+     &                                                     kr, j_lc)
 !
-      type(sph_rj_grid), intent(in) :: rj
+      type(sph_rj_grid), intent(in) :: sph_rj
       integer, intent(in) :: kr, j_lc
 !
 !
-      local_sph_node_address = j_lc + (kr-1)*rj%nidx_rj(2)
+      local_sph_node_address = j_lc + (kr-1)*sph_rj%nidx_rj(2)
 !
       end function local_sph_node_address
 !

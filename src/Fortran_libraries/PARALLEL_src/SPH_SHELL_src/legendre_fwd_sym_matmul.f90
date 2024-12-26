@@ -78,7 +78,7 @@
      &          n_WR, n_WS, WR, WS, WK_l_sml)
 !
       use set_vr_rtm_leg_sym_matmul
-      use set_sp_rlm_leg_sym_matmul
+      use cal_sp_rlm_sym_matmul
 !
       integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -218,7 +218,7 @@
      &          g_sph_rlm, weight_rtm, n_WR, n_WS, WR, WS, WK_l_sml)
 !
       use set_vr_rtm_leg_sym_matmul
-      use set_sp_rlm_leg_sym_matmul
+      use cal_sp_rlm_sym_matmul
 !
       integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm

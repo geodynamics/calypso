@@ -112,7 +112,7 @@
             je = 1 + jst
             jo = 1 + jst + (nj_rlm+1) / 2
             do k_rlm = kst, ked
-              a1r_1d_rlm_r = sph_rlm%a_r_1d_rlm_r(k_rlm)
+              a1r_1d_rlm_r = sph_rlm%ar_1d_rlm(k_rlm)
               a2r_1d_rlm_r = a1r_1d_rlm_r**2
               do ll = 1, nl_rtm
                 lp_rtm =  ll + lst
@@ -185,7 +185,7 @@
             je = 1 + jst
             jo = 1 + jst + (nj_rlm+1) / 2
             do k_rlm = kst, ked
-              a1r_1d_rlm_r = sph_rlm%a_r_1d_rlm_r(k_rlm)
+              a1r_1d_rlm_r = sph_rlm%ar_1d_rlm(k_rlm)
               a2r_1d_rlm_r = a1r_1d_rlm_r**2
 !
               ip_rtpm = 1 + (lp_rtm-1) * sph_rtm%istep_rtm(2)           &

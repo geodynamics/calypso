@@ -355,8 +355,7 @@
      &     'local_id, global_r, global_j, global_r, global_l, global_m'
       do kr = 1, sph%sph_rj%nidx_rj(1)
         do j = 1, sph%sph_rj%nidx_rj(2)
-          inod = 1 + (kr-1) * sph%sph_rj%istep_rj(1)                    &
-     &             + (j-1) *  sph%sph_rj%istep_rj(2)
+          inod = j + (kr-1) * sph%sph_rj%nidx_rj(2)
           if(      idx_rj_recieve(inod,1) .lt. 0                        &
      &        .or. idx_rj_recieve(inod,2) .lt. 0) then
               write(id_file,'(4i16,6i5)') inod,                         &

@@ -7,7 +7,7 @@ VIZ_PLUG_DIR = $$(DATA_UTILS_DIR)/VIZ_only
 TARGET_FOUR_VIZS =   utilities/four_vizualizations
 TARGET_PSF =         utilities/sectioning
 TARGET_VTK_CONVERT = utilities/field_to_VTK
-TARGET_PSF_2_VTK =   utilities/section_to_vtk
+TARGET_PSF_2_VTK =   utilities/section_to_VTK
 
 SOURCES = $(shell ls *.f90)
 
@@ -105,7 +105,6 @@ mod_list:
 
 
 module:
-	@cat Makefile.depends >> $(MAKENAME)
 
 depends:
-	@$(MAKE_MOD_DEP) Makefile.depends '$$(VIZ_PLUG_DIR)' $(SOURCES)
+	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(VIZ_PLUG_DIR)' $(SOURCES)

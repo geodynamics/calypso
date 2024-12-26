@@ -10,10 +10,9 @@
 !!      subroutine elapsed_label_4_ele_comm_tbl
 !!
 !!      subroutine const_comm_table_by_connenct                         &
-!!     &         (txt, numele, nnod_4_ele, ie, x_ele, node, nod_comm,   &
+!!     &         (numele, nnod_4_ele, ie, x_ele, nod_comm,              &
 !!     &          inod_dbl, iele_dbl, neib_e, sum_list,                 &
 !!     &          e_comm, fail_tbl, SR_sig)
-!!        type(node_data), intent(in) :: node
 !!        type(element_around_node), intent(in) :: neib_e
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(node_ele_double_number), intent(in) :: inod_dbl
@@ -100,7 +99,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine const_comm_table_by_connenct                           &
-     &         (txt, numele, nnod_4_ele, ie, x_ele, node, nod_comm,     &
+     &         (numele, nnod_4_ele, ie, x_ele, nod_comm,                &
      &          inod_dbl, iele_dbl, neib_e, sum_list,                   &
      &          e_comm, fail_tbl, SR_sig)
 !
@@ -108,12 +107,10 @@
       use const_global_element_ids
       use set_element_comm_table
 !
-      character(len=kchara), intent(in) :: txt
       integer(kind = kint), intent(in) :: numele, nnod_4_ele
       integer(kind = kint), intent(in) :: ie(numele, nnod_4_ele)
       real(kind = kreal), intent(in)  :: x_ele(numele,3)
 !
-      type(node_data), intent(in) :: node
       type(element_around_node), intent(in) :: neib_e
       type(communication_table), intent(in) :: nod_comm
       type(node_ele_double_number), intent(in) :: inod_dbl

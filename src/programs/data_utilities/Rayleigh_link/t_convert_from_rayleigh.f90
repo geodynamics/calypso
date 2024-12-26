@@ -185,10 +185,15 @@
       org_sph%sph_rj%nidx_rj(1) = ra_rst%nri_org
       org_sph%sph_rj%nidx_rj(2) = 1
       call alloc_sph_1d_index_rj(org_sph%sph_rj)
+!
+!$omp parallel do private(k,kr)
       do k = 1, org_sph%sph_rj%nidx_rj(1)
         kr = ra_rst%nri_org-k+1
         org_sph%sph_rj%radius_1d_rj_r(k) = ra_rst%r_org(kr)
       end do
+!$omp end parallel do
+!
+      call set_sph_one_over_radius_rj(org_sph%sph_rj)
 !
       end subroutine copy_rayleigh_radial_data
 !

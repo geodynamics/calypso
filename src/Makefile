@@ -106,6 +106,7 @@ fluid:
 		fluid
 
 depends:
+	rm -f $(MAKEDIR)/Makefile.depends
 	@for dir in $(SUBDIRS) ; do \
 		( \
 		echo 'Construct dependencies'; \
@@ -301,6 +302,8 @@ makemake:
 	@echo '#' >> $(MAKENAME)
 	@echo '# Rules for routines' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
+	@cat $(MAKENAME).depends >> $(MAKENAME)
+	@rm -f $(MAKEDIR)/Makefile.depends
 	@for dir in $(SUBDIRS) ; do \
 		( \
 		echo 'generate compile commands for ' $$dir ; \

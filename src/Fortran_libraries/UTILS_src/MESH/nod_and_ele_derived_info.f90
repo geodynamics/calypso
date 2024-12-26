@@ -129,18 +129,18 @@
       interior_ele(1:numele) = 0
 !$omp end parallel workshare
 !
-!%omp parallel do private(iele)
+!$omp parallel do private(iele)
       do iele = 1, numele
         if(ie(iele,1) .le. internal_node) interior_ele(iele) = 1
       end do
-!%omp end parallel do
+!$omp end parallel do
 !
       icou = 0
-!%omp parallel do private(iele) reduction(+:icou)
+!$omp parallel do private(iele) reduction(+:icou)
       do iele = 1, numele
         icou = icou + interior_ele(iele)
       end do
-!%omp end parallel do
+!$omp end parallel do
       internal_ele = icou
 !
       end subroutine easy_internal_element_flag
