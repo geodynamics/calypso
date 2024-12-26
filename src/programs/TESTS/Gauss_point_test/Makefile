@@ -61,10 +61,9 @@ mod_list:
 
 
 module:
-	@cat Makefile.depends >> $(MAKENAME)
 
 depends:
-	@$(MAKE_MOD_DEP) Makefile.depends '$$(GAUSS_TEST_DIR)' $(SOURCES)
+	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(GAUSS_TEST_DIR)' $(SOURCES)
 
 
 clean:

@@ -346,8 +346,8 @@
       ntot = 1
       call alloc_mod_list
 !
-      open(id_makefile, file = fname_makefile)
-!      open(id_makefile, file = fname_makefile, position='append')
+!      open(id_makefile, file = fname_makefile)
+      open(id_makefile, file = fname_makefile, position='append')
 !
       do i = 1, num_file
         call make_module_dependency(dirname, filenames(i))

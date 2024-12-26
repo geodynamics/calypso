@@ -31,10 +31,9 @@ mod_list:
 
 
 module:
-	@cat Makefile.depends >> $(MAKENAME)
 
 depends:
-	@$(MAKE_MOD_DEP) Makefile.depends '$$(SPH_GRID_SRCDIR)' $(SOURCES)
+	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(SPH_GRID_SRCDIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *.mod $(EXE) $(LIB) *~

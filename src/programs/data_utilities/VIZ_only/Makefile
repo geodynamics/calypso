@@ -85,7 +85,6 @@ mod_list:
 
 
 module:
-	@cat Makefile.depends >> $(MAKENAME)
 
 depends:
-	@$(MAKE_MOD_DEP) Makefile.depends '$$(VIZ_PLUG_DIR)' $(SOURCES)
+	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(VIZ_PLUG_DIR)' $(SOURCES)
