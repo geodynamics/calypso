@@ -108,7 +108,7 @@
       subroutine check_exit_in_double_number(surf, para_surf,           &
      &                                       isurf_org, isurf_org_dbl)
 !
-      use t_parallel_surface_indices
+      use t_paralell_surface_indices
 !
       type(surface_data), intent(in) :: surf
       type(paralell_surface_indices), intent(in) :: para_surf

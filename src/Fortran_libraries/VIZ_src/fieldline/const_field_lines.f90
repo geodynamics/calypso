@@ -37,7 +37,7 @@
       use t_control_params_4_fline
       use t_comm_table
       use t_phys_data
-      use t_parallel_surface_indices
+      use t_paralell_surface_indices
       use t_local_fline
       use t_next_node_ele_4_node
       use t_trace_data_send_recv

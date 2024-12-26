@@ -53,7 +53,7 @@
       use t_time_data
       use t_mesh_data
       use t_phys_data
-      use t_parallel_surface_indices
+      use t_paralell_surface_indices
       use t_control_params_4_fline
       use t_source_of_filed_line
       use t_trace_data_send_recv

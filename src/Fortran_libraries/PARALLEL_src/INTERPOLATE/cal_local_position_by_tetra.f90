@@ -1,10 +1,18 @@
-!
-!     module cal_local_position_by_tetra
-!
-!     Written by H. Matsui on Aug., 2006
-!
-!      subroutine s_cal_local_position_by_tetra(nnod_4_ele_l, xi,       &
-!     &          coefs_by_tet)
+!>@file   cal_local_position_by_tetra.f90
+!!@brief  module cal_local_position_by_tetra
+!!
+!!@author H. Matsui
+!!@date Programmed in Aug. 2006
+!!
+!>@brief  find position in local coordinate in each element
+!!
+!!@verbatim
+!!      subroutine s_cal_local_position_by_tetra(nnod_4_ele_l, xi,      &
+!!     &          coefs_by_tet)
+!!        integer(kind = kint), intent(in) :: nnod_4_ele_l
+!!        real(kind = kreal), intent(in) ::   coefs_by_tet(nnod_4_ele_l)
+!!        real(kind = kreal), intent(inout) :: xi(3)
+!!@endverbatim
 !
       module cal_local_position_by_tetra
 !

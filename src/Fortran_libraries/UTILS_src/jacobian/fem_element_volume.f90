@@ -69,9 +69,9 @@
       integer (kind=kint) :: istart, iend
 !
 !
-!$omp workshare
+!$omp parallel workshare
       volume_ele(1:numele) = 0.0d0
-!$omp end workshare
+!$omp end parallel workshare
 !
 !$omp parallel do private(iele,ii,ix,istart,iend) 
        do ip = 1, np_smp

@@ -114,7 +114,6 @@
       type(pvr_bounds_surf_ctl), intent(inout) :: pvr_bound
 !
 !
-!$omp parallel
       call range_on_screen_pvr_domains                                  &
      &   (node, surf, modelview_mat, projection_mat,                    &
      &    pvr_bound%num_pvr_surf, pvr_bound%item_pvr_surf,              &
@@ -125,7 +124,6 @@
      &   (n_pvr_pixel, pvr_bound%num_pvr_surf,                          &
      &    pvr_bound%screen_xrng, pvr_bound%screen_yrng,                 &
      &    pvr_bound%isurf_xrng,  pvr_bound%jsurf_yrng)
-!$omp end parallel
 !
       call s_ordering_pvr_sf_domain_grp(pvr_bound)
 !
@@ -236,7 +234,8 @@
       real(kind = kreal) :: xx4_model_sf(4,num_linear_sf,nsurf_4_ele)
 !
 !
-!$omp do private (inum,iele,k1,isurf,xx4_model_sf,x1,x2,x3,x4,w)
+!$omp parallel do                                                       &
+!$omp& private(inum,iele,k1,isurf,xx4_model_sf,x1,x2,x3,x4,w)
       do inum = 1, num_pvr_surf
         iele = item_pvr_surf_domain(1,inum)
         k1 =   item_pvr_surf_domain(2,inum)
@@ -263,7 +262,7 @@
         screen_zrng_pvr_domain(1,inum) = min(x1(3),x2(3),x3(3),x4(3))
         screen_zrng_pvr_domain(2,inum) = max(x1(3),x2(3),x3(3),x4(3))
       end do
-!$omp end do
+!$omp end parallel do
 !
       end subroutine range_on_screen_pvr_domains
 !
@@ -289,7 +288,7 @@
       integer(kind = kint) :: inum
 !
 !
-!$omp do private (inum)
+!$omp parallel do private (inum)
         do inum = 1, num_pvr_surf
           isurf_xrng_pvr_domain(1,inum)                                 &
      &          = nint( (screen_xrng_pvr_domain(1,inum) + one)          &
@@ -322,7 +321,7 @@
           jsurf_yrng_pvr_domain(2,inum)                                 &
      &       = min(jsurf_yrng_pvr_domain(2,inum),n_pvr_pixel(2))
       end do
-!$omp end do
+!$omp end parallel do
 !
       end subroutine range_on_pixel_pvr_domains
 !

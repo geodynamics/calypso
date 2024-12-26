@@ -88,7 +88,6 @@
      &          org_node, org_ele, jele, itp_ele_work, xi, ierr_inter)
 !
       use m_connect_hexa_2_tetra
-!      use t_ctl_params_4_gen_table
       use cal_local_position_by_tetra
       use modify_local_positions
       use solver_33_array

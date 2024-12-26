@@ -39,7 +39,7 @@
 !
       use t_geometry_data
       use t_surface_data
-      use t_parallel_surface_indices
+      use t_paralell_surface_indices
       use t_phys_data
       use t_ctl_params_viz_fields
 !

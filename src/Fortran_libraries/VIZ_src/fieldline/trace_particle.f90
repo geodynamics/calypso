@@ -35,7 +35,7 @@
       use t_time_data
       use t_mesh_data
       use t_phys_data
-      use t_parallel_surface_indices
+      use t_paralell_surface_indices
       use t_tracing_data
       use t_control_params_4_fline
       use t_source_of_filed_line
@@ -135,10 +135,8 @@
         if(nline .le. 0) exit
       end do
 !
-!$omp parallel
       call copy_nod_vector_smp(nod_fld%n_point,                        &
      &    nod_fld%d_fld(1,fln_prm%iphys_4_fline), v_prev)
-!$omp end parallel
 !
       end subroutine s_trace_particle
 !
