@@ -24,8 +24,5 @@ mod_list:
 	@echo  $(MOD_MHD_IO) >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(MHD_IO_DIR)' $(SOURCES)

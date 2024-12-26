@@ -59,9 +59,6 @@ mod_list:
 	@echo  $(MOD_CMP_GAUSS_TEST)      >> $(MAKENAME)
 	@echo   >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(GAUSS_TEST_DIR)' $(SOURCES)
 

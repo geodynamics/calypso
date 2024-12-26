@@ -30,9 +30,6 @@ mod_list:
 	@echo  $(MOD_SURFACING) >> $(MAKENAME)
 	@echo   >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(PSF_SECTION_DIR)' $(SOURCES)
 

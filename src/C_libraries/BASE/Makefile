@@ -29,11 +29,8 @@ mod_list:
 	@echo  $(OBJ_BASE_C)   >> $(MAKENAME)
 	@echo   >> $(MAKENAME)
 
-
-module:
-
 depends:
-	@echo 'Construct dependencies in C_libraries/BASE'
+	@echo 'Construct compile list in C_libraries/BASE'
 	@echo '#' > $(MAKENAME).tmp
 	@for sources in $(SRC_BASE_C) ; do \
 		( \

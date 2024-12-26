@@ -25,8 +25,6 @@ mod_list:
 	@echo  '#'  >> $(MAKENAME)
 
 
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(BASEDIR)' $(SOURCES)
 

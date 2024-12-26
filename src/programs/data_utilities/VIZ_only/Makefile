@@ -83,8 +83,5 @@ mod_list:
 	@echo  $(MOD_PSF_2_VTK)          >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(VIZ_PLUG_DIR)' $(SOURCES)

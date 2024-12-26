@@ -54,9 +54,6 @@ mod_list:
 	@echo  $(MOD_CVT_RAYLEIGH_SPH)   >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(RAYLEIGH_LINK_DIR)' $(SOURCES)
 

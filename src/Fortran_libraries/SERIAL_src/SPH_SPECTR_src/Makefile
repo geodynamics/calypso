@@ -23,9 +23,6 @@ mod_list:
 	@echo  $(MOD_SPH_SPECTR) >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(SPH_SPECTR_DIR)' $(SOURCES)
 

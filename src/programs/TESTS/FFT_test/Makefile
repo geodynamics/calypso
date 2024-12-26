@@ -144,9 +144,6 @@ mod_list:
 	@echo  MOD_CMPR_FFT_TEST=      \\  >> $(MAKENAME)
 	@echo  $(MOD_CMPR_FFT_TEST)        >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(FFT_TEST_DIR)' $(SOURCES)
 

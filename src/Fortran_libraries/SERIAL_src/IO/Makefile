@@ -22,8 +22,6 @@ mod_list:
 	@echo  MOD_IO=  \\ >> $(MAKENAME)
 	@echo  $(MOD_IO)   >> $(MAKENAME)
 
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(IO_DIR)' $(SOURCES)
 

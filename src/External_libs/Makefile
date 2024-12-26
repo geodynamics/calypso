@@ -61,20 +61,6 @@ mod_list:
 		) \
 	done
 
-
-module:
-	@for dir in $(SUBDIRS) ; do \
-		( \
-		echo 'generate compile commands for ' $$dir ; \
-		cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)' \
-		module; \
-		) \
-	done
-
 depends:
 	@for dir in $(SUBDIRS) ; do \
 		( \

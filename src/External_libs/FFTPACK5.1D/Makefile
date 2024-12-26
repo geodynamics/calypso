@@ -45,7 +45,5 @@ depends:
 	@echo '$(MOD_FFTPACK): $$(FFTPACK_DIR)/$(SRC_FFTPACK)' >> $(MAKENAME).depends
 	@echo '	' '$$(F90) -c $$(FFTPACKFLAG) $$<' >> $(MAKENAME).depends
 
-module:
-
 clean:
 	rm -f *.o *.mod *~ *.par *.diag *.a

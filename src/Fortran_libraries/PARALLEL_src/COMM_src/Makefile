@@ -24,9 +24,6 @@ mod_list:
 	@echo  $(MOD_COMM) >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(COMMDIR)' $(SOURCES)
 
