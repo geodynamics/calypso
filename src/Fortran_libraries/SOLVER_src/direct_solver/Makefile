@@ -24,9 +24,6 @@ mod_list:
 	@echo $(MOD_SOLVER_LU) >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(SOLVER_LU_DIR)' $(SOURCES)
 

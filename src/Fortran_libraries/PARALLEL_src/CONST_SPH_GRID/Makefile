@@ -29,9 +29,6 @@ mod_list:
 	@echo  $(MOD_SPH_GRID)   >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(SPH_GRID_SRCDIR)' $(SOURCES)
 

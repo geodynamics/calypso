@@ -62,9 +62,6 @@ mod_list:
 	@echo  $(MOD_SPH_ADD_INIT) >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(INIT_SPECTR_DIR)' $(SOURCES)
 

@@ -60,9 +60,6 @@ mod_list:
 	@echo  $(MOD_CMP_SPH_RST)   >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(MERGE_SRCDIR)' $(SOURCES)
 

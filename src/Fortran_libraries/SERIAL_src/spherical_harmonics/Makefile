@@ -23,9 +23,6 @@ mod_list:
 	@echo $(MOD_SPH) >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(SPH_DIR)' $(SOURCES)
 

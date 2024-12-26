@@ -25,9 +25,6 @@ mod_list:
 	@echo $(MOD_FFT_WRAP) >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(FFT_WRAP_DIR)' $(SOURCES)
 

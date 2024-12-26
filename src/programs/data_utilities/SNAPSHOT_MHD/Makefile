@@ -73,9 +73,6 @@ mod_list:
 	@echo  $(MOD_CONTROL_MHD_CHECK) >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(SPH_SNAP_MAINDIR)' $(SOURCES)
 

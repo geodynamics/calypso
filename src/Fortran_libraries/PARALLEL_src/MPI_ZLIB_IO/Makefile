@@ -24,9 +24,6 @@ mod_list:
 	@echo  $(MOD_MPI_ZLIB_IO) >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(MPI_ZLIB_IO_DIR)' $(SOURCES)
 

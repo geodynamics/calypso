@@ -44,9 +44,6 @@ mod_list:
 	@echo  $(MOD_COMPARE_PSF)      >> $(MAKENAME)
 	@echo   >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(COMPARISON_DIR)' $(SOURCES)
 

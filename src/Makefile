@@ -95,21 +95,13 @@ DEPFLAGS= -MM -w -DDEPENDENCY_CHECK
 	$(F90) -o $@ @<
 
 
-
-all: fluid
-
-fluid:
-	echo "# Compiling start"; \
-		cd work;  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		fluid
+all: makemake
 
 depends:
 	rm -f $(MAKEDIR)/Makefile.depends
 	@for dir in $(SUBDIRS) ; do \
 		( \
-		echo 'Construct dependencies'; \
+		echo 'Construct compile list'; \
 		cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
@@ -131,8 +123,20 @@ makemake:
 	mkdir -p $(BUILDDIR)
 	mkdir -p $(BUILDDIR)/utilities
 	mkdir -p $(BUILDDIR)/tests
-	echo '#' > $(MAKENAME)
-	@echo # create module list
+	
+	echo "# create module list"
+	$(GMAKE) \
+	GMAKE='$(GMAKE)' \
+	MHDDIR='$(MHDDIR)' \
+	MAKEDIR='$(MAKEDIR)' \
+	MAKENAME='$(MAKENAME)' \
+	CC="$(CC)"   \
+	MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
+	DEPFLAGS='$(DEPFLAGS)' \
+	OPTFLAGS='$(OPTFLAGS)' \
+	C_INCLUDE='$(C_INCLUDE)' \
+	depends
+	
 	echo '#' > $(MAKENAME)
 	echo '# Makefile for Kemono Dynamo simulation' >> $(MAKENAME)
 	echo '#' >> $(MAKENAME)
@@ -298,23 +302,12 @@ makemake:
 		 ) \
 	done
 	@echo '' >> $(MAKENAME)
-	@echo 'create objects construct list...'
+	@echo 'Append compile list...'
 	@echo '#' >> $(MAKENAME)
 	@echo '# Rules for routines' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
-	@cat $(MAKENAME).depends >> $(MAKENAME)
-	@rm -f $(MAKEDIR)/Makefile.depends
-	@for dir in $(SUBDIRS) ; do \
-		( \
-		echo 'generate compile commands for ' $$dir ; \
-		cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)' \
-		module; \
-		) \
-	done
+	cat $(MAKENAME).depends >> $(MAKENAME)
+	rm -f $(MAKEDIR)/Makefile.depends
 	@echo '#' >> $(MAKENAME)
 	@echo '# Rules for install' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)

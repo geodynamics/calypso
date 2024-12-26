@@ -22,9 +22,6 @@ mod_list:
 	@echo  MOD_ZLIB_IO=  \\ >> $(MAKENAME)
 	@echo  $(MOD_ZLIB_IO)   >> $(MAKENAME)
 
-
-module:
-
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(ZLIB_IO_DIR)' $(SOURCES)
 
