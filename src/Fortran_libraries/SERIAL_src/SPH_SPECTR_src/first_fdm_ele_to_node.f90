@@ -7,7 +7,9 @@
 !>@brief  First order FDM from element to node
 !!
 !!@verbatim
-!!      subroutine const_first_fdm_ele_to_node(sph_rj, fdm_1st_nod)
+!!      subroutine const_first_fdm_ele_to_node(id_check, sph_rj,        &
+!!     &                                       fdm_1st_nod)
+!!        integer(kind = kint), intent(in) :: id_check
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(inout) :: fdm_1st_nod
 !!      subroutine cal_first_fdm_ele_to_node(i_th, kr_in, kr_out,       &
@@ -65,8 +67,10 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine const_first_fdm_ele_to_node(sph_rj, fdm_1st_nod)
+      subroutine const_first_fdm_ele_to_node(id_check, sph_rj,          &
+     &                                       fdm_1st_nod)
 !
+      integer(kind = kint), intent(in) :: id_check
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
       type(fdm_matrices), intent(inout) :: fdm_1st_nod
@@ -88,9 +92,9 @@
       deallocate(mat_fdm)
 !
       if(iflag_debug .gt. 0) then
-        write(50,*) 'check First order FDM from element'
-        call check_fdm_coefs                                            &
-     &     (50, sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, fdm_1st_nod)
+        write(id_check,*) 'check First order FDM from element'
+        call check_fdm_coefs(id_check, sph_rj%nidx_rj(1),               &
+     &                       sph_rj%radius_1d_rj_r, fdm_1st_nod)
       end if
 !
       end subroutine const_first_fdm_ele_to_node
