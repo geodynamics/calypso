@@ -158,8 +158,8 @@
 !
 !
       do k = 1, sph_rj%nidx_rj(1)
-        rr(k) = sph_rj%radius_1d_rj_r(k)
-        rr(sph_rj%nidx_rj(1)+k) = sph_rj%radius_1d_rj_r(k)
+        rr(2*k-1) = sph_rj%radius_1d_rj_r(k)
+        rr(2*k) =   sph_rj%radius_1d_rj_r(k)
       end do
 !
       call check_radial_7band_mat                                       &

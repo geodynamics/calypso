@@ -7,7 +7,9 @@
 !>@brief  Second order FDM on nodes
 !!
 !!@verbatim
-!!      subroutine const_second_fdm_coefs(sph_params, sph_rj, fdm_2nd)
+!!      subroutine const_second_fdm_coefs(id_check, sph_params, sph_rj, &
+!!     &                                  fdm_2nd)
+!!        integer(kind = kint), intent(in) :: id_check
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(inout) :: fdm_2nd
@@ -65,10 +67,12 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine const_second_fdm_coefs(sph_params, sph_rj, fdm_2nd)
+      subroutine const_second_fdm_coefs(id_check, sph_params, sph_rj,   &
+     &                                  fdm_2nd)
 !
       use set_radius_func_noequi
 !
+      integer(kind = kint), intent(in) :: id_check
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
@@ -91,9 +95,9 @@
       deallocate(mat_fdm)
 !
       if(iflag_debug .gt. 0) then
-        write(50,*) 'check Second order FDM'
-        call check_fdm_coefs                                            &
-     &     (50,sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, fdm_2nd)
+        write(id_check,*) 'check Second order FDM'
+        call check_fdm_coefs(id_check,sph_rj%nidx_rj(1),                &
+     &                       sph_rj%radius_1d_rj_r, fdm_2nd)
       end if
 !
       end subroutine const_second_fdm_coefs
