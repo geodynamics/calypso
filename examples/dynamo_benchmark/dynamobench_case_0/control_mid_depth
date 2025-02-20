@@ -1,0 +1,34 @@
+!!!!!!!!! Control parameters for mid-depth of the spherical shell
+      file  cross_section_ctl  'control_mid_depth'
+!
+!!!!!!!!! Control parameters for euqatorial plane
+begin cross_section_ctl
+  section_file_prefix    'sections/mid_depth'
+  psf_output_type        'VTK'
+!
+  begin surface_define
+    section_method    sphere
+!
+    array center_position
+      center_position  x   0.0
+      center_position  y   0.0
+      center_position  z   0.0
+    end array center_position
+!
+    radius             1.0384
+!
+    array section_area_ctl
+      section_area_ctl   all
+    end array section_area_ctl
+  end surface_define
+!
+  begin output_field_define
+    array output_field
+      output_field  temperature           scalar
+      output_field  velocity              vector
+      output_field  velocity              radial     
+      output_field  velocity              phi   
+      output_field  vorticity             z
+    end array output_field
+  end output_field_define
+end cross_section_ctl
