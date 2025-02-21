@@ -6,14 +6,15 @@
  Here is the input files for the dynamo benchmark case 0.
 This example consists of the following files and directories
 
-control_MHD:         control file for simulation
-control_snapshot:    control file for data analysis
-control_mid_depth:   control file for sectioning at mid-depth of the shell
+control_MHD:         Control file for simulation
+control_snapshot:    Control file for data analysis
+control_mid_depth:   Control file for sectioning at mid-depth of the shell
 
-sph_lm31r48c_4:     Directory for spherical harmonics index table
-rst_4:              Directory for restart files
-field:              Directory for field data files
-monitor:            Directory for time series data files
+sph_lm31r48c_4:      Directory for spherical harmonics index table
+rst_4:               Directory for restart files
+field:               Directory for field data files
+monitor:             Directory for time series data files
+sections:            Directory for field cross-section data files
 
 This example run with 4 MPI processes. The simulation procedure is the following
 
@@ -28,7 +29,7 @@ This example run with 4 MPI processes. The simulation procedure is the following
       rst_ctl                dynamo_benchmark_0
    to
       rst_ctl                start_from_rst_file
-   And, start simulation again by 2.
+   And, start simulation again by procedure 1.
    
    In the continuous runs, The time series data defined in "sph_monitor_ctl" block will be appended if time series data files are exist.
    
@@ -51,7 +52,7 @@ This example run with 4 MPI processes. The simulation procedure is the following
 The following data is written in each column.
     t_step: Time step
     time:   Time
-    KE_total: Total kinetic energy in the shell
+    KE_total: Average kinetic energy in the shell
     v_phi:    $\phi$-component of the velocity at the requested point. (Average of the four requested points)
    temperature: Temperature at the requested point. (Average of the four requested points)
    Average_drift_vr: Drift frequency obtained by the position of the requested points (Average of the four requested points)
