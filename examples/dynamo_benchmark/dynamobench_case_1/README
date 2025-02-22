@@ -45,14 +45,11 @@ The parallelization information and initial field is built in the beginning of p
 3. The following data is written:
     field/out.#.vtk.gz:  Visualization data for whole domain with gzipped VTK format
     rst_4/rst.#.fst.gz:  Restart data with gzipped ASCII data merged over MPI processes
-    sections/equator.#.vtk: Visualization data for equatorial plane with gzipped VTK format
+    sections/equator.#.vtk.gz: Visualization data for equatorial plane with gzipped VTK format
     sections/mid_depth.#.vtk: Visualization data for mid-depth of the fluid shell with VTK format
-    sections/CMB.#.vtk: Visualization data for equatorial plane with gzipped VTK format
-    sections/cylinder_s055.#.vtk: Visualization data for equatorial plane with gzipped VTK format
-    sections/section_z03.#.vtk: Visualization data for equatorial plane with gzipped VTK format
-    sections/CMB.#.vtk: Visualization data for equatorial plane with gzipped VTK format
-    sections/CMB.#.vtk: Visualization data for equatorial plane with gzipped VTK format
-    sections/CMB.#.vtk: Visualization data for equatorial plane with gzipped VTK format
+    sections/CMB.#.vtk.gz: Visualization data for equatorial plane with gzipped VTK format
+    sections/cylinder_s055.#.sdt: Visualization data for cylinder at s = 0.55 plane with bindary data format
+    sections/section_z03.#.sdt.gz: Visualization data for the plane at z = 0.3 with gzipped bindary data format
 
     monitor/sph_ave_volume.dat:    Time series of volume average of fields.
     monitor/sph_pwr_volume_s.dat:  Time series of mean square of fields.
@@ -85,4 +82,9 @@ The following data is written in each column.
    omega_vp44: Drift frequency obtained by l = |m| = 4 components of the poloidal velocity at the mid-depth.
    omega_vt54: Drift frequency obtained by l = 5 and |m| = 4 components of the toroidal velocity at the mid-depth.
 
-
+5. Data conversion for cross sections.
+ Cross section data for the cylinder at s = 0.55 and the plane at z = 0.3 are saved by the (gzipped) bindary format. The program "field_to_VTK" in "bin/utilities" folder can convert these data into VTK format. "field_to_VTK" is a serial program, so it can start by 
+ 
+[dynamobench_case_1]$ [CALYPSO_DIR]/bin/utilities/field_to_VTK
+ 
+ 
