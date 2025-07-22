@@ -13,7 +13,7 @@
 !!
 !!      subroutine cal_coef_fdm4_vpol_centre(r, fdm4, fdm4_center)
 !!        real(kind = kreal), intent(in) :: r(4)
-!!        type(fdm_matrix), intent(in) :: fdm4(4)
+!!        type(fdm_matrices), intent(in) :: r_fdm4
 !!        type(fdm4_centre_vpol), intent(inout) :: fdm4_center
 !!
 !!   Matrix for poloidal vector at inner most node
@@ -119,13 +119,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_coef_fdm4_vpol_centre(r, fdm4, fdm4_center)
+      subroutine cal_coef_fdm4_vpol_centre(r, r_fdm4, fdm4_center)
 !
       use t_fdm_coefs
       use cal_inverse_small_matrix
 !
       real(kind = kreal), intent(in) :: r(4)
-      type(fdm_matrix), intent(in) :: fdm4(4)
+      type(fdm_matrices), intent(in) :: r_fdm4
 !
       type(fdm4_centre_vpol), intent(inout) :: fdm4_center
 !
@@ -144,7 +144,7 @@
       fdm4_center%dmat_vp2(0,   1) = one
 !$omp parallel do private(i)
       do i = 1, 4
-        fdm4_center%dmat_vp2(-2:2,i+1) = fdm4(i)%dmat(2,-2:2)
+        fdm4_center%dmat_vp2(-2:2,i+1) = r_fdm4%dmat(-2:2,2,i)
       end do
 !$omp end parallel do
 !

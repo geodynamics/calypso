@@ -78,10 +78,9 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine sum_exp2_sph_viscous_CTR1(kr, nnod_rj, jmax,           &
+      subroutine sum_exp2_sph_viscous_CTR1(nnod_rj, jmax,               &
      &          d_vpol, mat2_viscous_CTR1, d_viscous_p)
 !
-      integer(kind = kint), intent(in) :: kr
       integer(kind = kint), intent(in) :: nnod_rj, jmax
       real(kind = kreal), intent(in) :: d_vpol(nnod_rj)
       real(kind = kreal), intent(in) :: mat2_viscous_CTR1(jmax,0:1)
@@ -93,7 +92,7 @@
 !
 !$omp parallel do private(j,i_p1,inod)
       do j = 1, jmax
-        inod = j + (kr-1) * jmax
+        inod = j
 !        i_n1 = inod - jmax
         i_p1 = inod + jmax
 !

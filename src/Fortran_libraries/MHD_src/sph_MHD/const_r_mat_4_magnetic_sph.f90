@@ -102,11 +102,11 @@
       call add_vector_poisson_mat_sph                                   &
      &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
      &    g_sph_rj, sph_bc_B%kr_in, sph_bc_B%kr_out,                    &
-     &    coef_dbt, r_2nd%fdm(2)%dmat, band_bp_evo%mat)
+     &    coef_dbt, r_2nd%dmat(-1,1,2), band_bp_evo%mat)
       call add_vector_poisson_mat_sph                                   &
      &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
      &    g_sph_rj, sph_bc_B%kr_in, sph_bc_B%kr_out,                    &
-     &    coef_dbt, r_2nd%fdm(2)%dmat, band_bt_evo%mat)
+     &    coef_dbt, r_2nd%dmat(-1,1,2), band_bt_evo%mat)
 !
 !  Matrices at ICB or center
       call sel_sph_r_mat_pol_magnetic_ICB(sph_rj, sph_bc_B,             &

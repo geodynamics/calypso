@@ -61,8 +61,6 @@
       use m_error_IDs
       use input_control_const_shell
 !
-      integer(kind = kint) :: ierr = 0
-!
 ! 
       call init_elapse_time_by_TOTAL
       call elpsed_label_gen_sph_grid

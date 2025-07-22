@@ -266,7 +266,7 @@
      &                           bc_fdms_U%fdm4_free_vp_CMB)
 !
       call cal_coef_fdm4_vpol_centre(sph_rj%radius_1d_rj_r(1),          &
-     &    fdm_4th%fdm, bc_fdms_U%fdm4_CTR)
+     &                               fdm_4th, bc_fdms_U%fdm4_CTR)
 !
       end subroutine set_boundary_sph_4th_fdm
 !

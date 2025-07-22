@@ -46,7 +46,7 @@
       type(binary_IO_buffer) :: bbuf_emesh
       private :: id_read_ele, id_write_ele, bbuf_emesh
 !
-      private :: read_element_geometry_b, write_element_geometry_b
+!      private :: read_element_geometry_b, write_element_geometry_b
 !
 !------------------------------------------------------------------
 !
@@ -237,43 +237,43 @@
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
-!
-      subroutine read_element_geometry_b(bbuf, nod_IO, sfed_IO)
-!
-      use node_geometry_IO_b
-!
-      type(binary_IO_buffer), intent(inout) :: bbuf
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
-!
-      call read_number_of_node_b(bbuf, nod_IO)
-      if(bbuf%ierr_bin .gt. 0) return
-!
-      call read_geometry_info_b(bbuf, nod_IO)
-      if(bbuf%ierr_bin .ne. 0) return
-!
-      call read_scalar_in_element_b(bbuf, nod_IO, sfed_IO)
-!
-      end subroutine read_element_geometry_b
-!
+!!
+!      subroutine read_element_geometry_b(bbuf, nod_IO, sfed_IO)
+!!
+!      use node_geometry_IO_b
+!!
+!      type(binary_IO_buffer), intent(inout) :: bbuf
+!      type(node_data), intent(inout) :: nod_IO
+!      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!
+!!
+!      call read_number_of_node_b(bbuf, nod_IO)
+!      if(bbuf%ierr_bin .gt. 0) return
+!!
+!      call read_geometry_info_b(bbuf, nod_IO)
+!      if(bbuf%ierr_bin .ne. 0) return
+!!
+!      call read_scalar_in_element_b(bbuf, nod_IO, sfed_IO)
+!!
+!      end subroutine read_element_geometry_b
+!!
 !------------------------------------------------------------------
-!
-      subroutine write_element_geometry_b(nod_IO, sfed_IO, bbuf)
-!
-      use node_geometry_IO_b
-!
-      type(node_data), intent(in) :: nod_IO
-      type(surf_edge_IO_data), intent(in) :: sfed_IO
-      type(binary_IO_buffer), intent(inout) :: bbuf
-!
-!
-      call write_geometry_info_b(nod_IO, bbuf)
-      if(bbuf%ierr_bin .ne. 0) return
-      call write_scalar_in_element_b( nod_IO, sfed_IO, bbuf)
-!
-      end subroutine write_element_geometry_b
-!
+!!
+!      subroutine write_element_geometry_b(nod_IO, sfed_IO, bbuf)
+!!
+!      use node_geometry_IO_b
+!!
+!      type(node_data), intent(in) :: nod_IO
+!      type(surf_edge_IO_data), intent(in) :: sfed_IO
+!      type(binary_IO_buffer), intent(inout) :: bbuf
+!!
+!!
+!      call write_geometry_info_b(nod_IO, bbuf)
+!      if(bbuf%ierr_bin .ne. 0) return
+!      call write_scalar_in_element_b( nod_IO, sfed_IO, bbuf)
+!!
+!      end subroutine write_element_geometry_b
+!!
 !------------------------------------------------------------------
 !
       end module element_file_IO_b

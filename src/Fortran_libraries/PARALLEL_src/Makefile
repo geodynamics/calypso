@@ -59,6 +59,7 @@ mod_list:
 	'$$(MOD_COMM)'                          \
 	'$$(MOD_MPI_IO)    $$(MOD_MPI_ZLIB_IO)' \
 	'$$(MOD_COMM_SPH)  $$(MOD_SPH_GRID)'    >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \

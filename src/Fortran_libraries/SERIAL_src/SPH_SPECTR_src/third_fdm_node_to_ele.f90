@@ -27,20 +27,18 @@
 !!       d_ele(k) = half *(d_nod(k-1) + d_nod(k))
 !!
 !!    derivatives on node by element field
-!!      dfdr_ele(k) =    fdm_3rd_ele%fdm(1)%dmat(k,-2) * d_nod(k-2)
-!!                     + fdm_3rd_ele%fdm(1)%dmat(k,-1) * d_nod(k-1)
-!!                     + fdm_3rd_ele%fdm(1)%dmat(k, 0) * d_nod(k  )
-!!                     + fdm_3rd_ele%fdm(1)%dmat(k, 1) * d_nod(k+1)
-!!      d2fdr2_ele(k) =  fdm_3rd_ele%fdm(2)%dmat(k,-2) * d_nod(k-2)
-!!                     + fdm_3rd_ele%fdm(2)%dmat(k,-1) * d_nod(k-1)
-!!                     + fdm_3rd_ele%fdm(2)%dmat(k, 0) * d_nod(k  )
-!!                     + fdm_3rd_ele%fdm(2)%dmat(k, 1) * d_nod(k+1)
-!!      d3fdr3_ele(k) =  fdm_3rd_ele%fdm(3)%dmat(k,-2) * d_nod(k-2)
-!!                     + fdm_3rd_ele%fdm(3)%dmat(k,-1) * d_nod(k-1)
-!!                     + fdm_3rd_ele%fdm(3)%dmat(k, 0) * d_nod(k  )
-!!                     + fdm_3rd_ele%fdm(3)%dmat(k, 1) * d_nod(k+1)
-!!
-!!    fdm_3rd_ele%fdm(1)%dmat = d1nod_mat_fdm_2e
+!!      dfdr_ele(k) =    fdm_3rd_ele%dmat(-2,k,1) * d_nod(k-2)
+!!                     + fdm_3rd_ele%dmat(-1,k,1) * d_nod(k-1)
+!!                     + fdm_3rd_ele%dmat( 0,k,1) * d_nod(k  )
+!!                     + fdm_3rd_ele%dmat( 1,k,1) * d_nod(k+1)
+!!      d2fdr2_ele(k) =  fdm_3rd_ele%dmat(-2,k,2) * d_nod(k-2)
+!!                     + fdm_3rd_ele%dmat(-1,k,2) * d_nod(k-1)
+!!                     + fdm_3rd_ele%dmat( 0,k,2) * d_nod(k  )
+!!                     + fdm_3rd_ele%dmat( 1,k,2) * d_nod(k+1)
+!!      d3fdr3_ele(k) =  fdm_3rd_ele%dmat(-2,k,3) * d_nod(k-2)
+!!                     + fdm_3rd_ele%dmat(-1,k,3) * d_nod(k-1)
+!!                     + fdm_3rd_ele%dmat( 0,k,3) * d_nod(k  )
+!!                     + fdm_3rd_ele%dmat( 1,k,3) * d_nod(k+1)
 !!
 !! ----------------------------------------------------------------------
 !!      Work array to obtain 1d FDM
@@ -69,7 +67,6 @@
       implicit none
 !
       private :: set_third_fdm_node_to_ele, copy_third_fdm_node_to_ele
-      private :: cal_sph_vect_dxr_ele
 !
 !  -------------------------------------------------------------------
 !
@@ -97,8 +94,8 @@
       call set_third_fdm_node_to_ele                                    &
      &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, mat_fdm)
 !
-      call copy_third_fdm_node_to_ele                                   &
-     &   (sph_rj%nidx_rj(1), mat_fdm, fdm_3rd_ele%fdm)
+      call copy_third_fdm_node_to_ele(sph_rj%nidx_rj(1), mat_fdm,       &
+     &                                fdm_3rd_ele)
       deallocate(mat_fdm)
 !
       if(iflag_debug .gt. 0) then
@@ -108,24 +105,6 @@
       end if
 !
       end subroutine const_third_fdm_node_to_ele
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_third_fdm_node_to_ele(i_th, kr_in, kr_out,         &
-     &          sph_rj, fdm_3rd_ele, d_rj, dele_dr)
-!
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      integer(kind = kint), intent(in) :: i_th, kr_in, kr_out
-      real(kind = kreal), intent(in) :: d_rj(sph_rj%nnod_rj)
-      type(fdm_matrices), intent(in) :: fdm_3rd_ele
-!
-      real(kind = kreal), intent(inout) :: dele_dr(sph_rj%nnod_rj)
-!
-!
-      call cal_sph_vect_dxr_ele(kr_in, kr_out, sph_rj,                  &
-     &    fdm_3rd_ele%fdm(i_th), d_rj, dele_dr)
-!
-      end subroutine cal_third_fdm_node_to_ele
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -192,11 +171,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_third_fdm_node_to_ele(nri, mat_fdm, fdm)
+      subroutine copy_third_fdm_node_to_ele(nri, mat_fdm, r_fdm)
 !
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: mat_fdm(4,4,nri)
-      type(fdm_matrix), intent(inout) :: fdm(0:3)
+      type(fdm_matrices), intent(inout) :: r_fdm
 !
       integer(kind= kint) :: i, k
 !
@@ -204,10 +183,10 @@
 !$omp parallel do private (i,k)
       do i = 0, 3
         do k = 1, nri-1
-          fdm(i)%dmat(k,-2) = mat_fdm(i+1,1,k)
-          fdm(i)%dmat(k,-1) = mat_fdm(i+1,2,k)
-          fdm(i)%dmat(k, 0) = mat_fdm(i+1,3,k)
-          fdm(i)%dmat(k, 1) = mat_fdm(i+1,4,k)
+          r_fdm%dmat(-2,k,i) = mat_fdm(i+1,1,k)
+          r_fdm%dmat(-1,k,i) = mat_fdm(i+1,2,k)
+          r_fdm%dmat( 0,k,i) = mat_fdm(i+1,3,k)
+          r_fdm%dmat( 1,k,i) = mat_fdm(i+1,4,k)
         end do
       end do
 !$omp end parallel do
@@ -217,12 +196,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sph_vect_dxr_ele(kr_in, kr_out, sph_rj,            &
-     &                                fdm, d_rj, dele_dr)
+      subroutine cal_third_fdm_node_to_ele(i_th, kr_in, kr_out,         &
+     &          sph_rj, fdm_3rd_ele, d_rj, dele_dr)
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
-      type(fdm_matrix), intent(in) :: fdm
-      integer(kind = kint), intent(in) :: kr_in, kr_out
+      type(fdm_matrices), intent(in) :: fdm_3rd_ele
+      integer(kind = kint), intent(in) :: i_th, kr_in, kr_out
       real(kind = kreal), intent(in) :: d_rj(sph_rj%nnod_rj)
 !
       real(kind = kreal), intent(inout) :: dele_dr(sph_rj%nnod_rj)
@@ -241,14 +220,14 @@
         j = mod((inod-1),sph_rj%nidx_rj(2)) + 1
         k = 1 + (inod- j) / sph_rj%nidx_rj(2)
 !
-        dele_dr(inod) =  fdm%dmat(k,-2) * d_rj(i_n2)                    &
-     &                 + fdm%dmat(k,-1) * d_rj(i_n1)                    &
-     &                 + fdm%dmat(k, 0) * d_rj(inod)                    &
-     &                 + fdm%dmat(k, 1) * d_rj(i_p1)
+        dele_dr(inod) =  fdm_3rd_ele%dmat(-2,k,i_th) * d_rj(i_n2)       &
+     &                 + fdm_3rd_ele%dmat(-1,k,i_th) * d_rj(i_n1)       &
+     &                 + fdm_3rd_ele%dmat( 0,k,i_th) * d_rj(inod)       &
+     &                 + fdm_3rd_ele%dmat( 1,k,i_th) * d_rj(i_p1)
       end do
 !$omp end parallel do
 !
-      end subroutine cal_sph_vect_dxr_ele
+      end subroutine cal_third_fdm_node_to_ele
 !
 ! -----------------------------------------------------------------------
 !
