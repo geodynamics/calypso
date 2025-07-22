@@ -296,12 +296,19 @@ The following library files are also made in {\tt work} directory.
 \end{description}
 %
 
+\subsubsection{Test}
+After compile, you can test the simulation program and some tools by using
+\begin{verbatim}
+% make test
+\end{verbatim}
+command. The make commands perform 
+
 \subsubsection{Clean}
-The object and fortran module files in {\tt work} directory is deleted by typing
+The object and fortran module files in {\tt work} directory is deleted by using
 \begin{verbatim}
 % make clean
 \end{verbatim}
-This command deletes files with the extension {\tt .o}, {\tt .mod}, {\tt .par}, {\tt .diag}, and {\tt ~}.
+This command deletes files with the extension {\tt .o}, {\tt .mod}, {\tt .par}, {\tt .diag}, and backup files with " \~\ " at the end of file name. Executable files in the {\tt bin} directory are not deleted.
 
 \subsubsection{Distclean}
 To revert the files and directory to the original package, use make distclean as
