@@ -109,7 +109,6 @@
      &          i_smp_stack, num_grp, ntot_grp, istack_grp, iele_grp,   &
      &          nnod_grp, find_WK)
 !
-      use calypso_mpi
       use find_node_4_each_group
 !
       integer(kind = kint), intent(in) :: np_smp, numele, nnod_4_ele
@@ -146,7 +145,6 @@
         end do
       end do
 !$omp end parallel do
-      call calypso_mpi_barrier
 !
       end subroutine count_nod_4_grp_smp
 !

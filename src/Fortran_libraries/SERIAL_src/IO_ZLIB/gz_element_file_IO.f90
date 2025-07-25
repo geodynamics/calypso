@@ -136,6 +136,7 @@
      &         (id_rank, file_name, ele_mesh_IO)
 !
       use skip_gz_comment
+      use gzip_file_access
       use gz_comm_table_IO
       use m_fem_mesh_labels
 !

@@ -158,7 +158,7 @@
       zbuf%fixbuf(1) = hd_edge_import() // char(0)
       call gz_write_textbuf_no_lf(FPz_f, zbuf)
 !
-      call s(FPz_f, comm_IO, zbuf)
+      call gz_write_import_data(FPz_f, comm_IO, zbuf)
 !
       zbuf%fixbuf(1) = hd_edge_export() // char(0)
       call gz_write_textbuf_no_lf(FPz_f, zbuf)
