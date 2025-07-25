@@ -49,7 +49,6 @@ jobs:
       run: |
         brew info gfortran
         brew info open-mpi
-        brew install gfortran
 
         a=`which gfortran-14`; \
         b=`dirname $a`; \
