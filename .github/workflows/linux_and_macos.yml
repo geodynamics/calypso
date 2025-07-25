@@ -50,12 +50,12 @@ jobs:
         brew info gfortran
         brew info open-mpi
 
-        a=`which gfortran-14`; \
+        a=`which gfortran-15`; \
         b=`dirname $a`; \
         c=$b/gfortran; \
         ln -s $a $c
 
-        brew install open-mpi fftw hdf5-mpi
+        brew install gfortran open-mpi fftw hdf5-mpi
         
         mpicc -v
         mpif90 -v
