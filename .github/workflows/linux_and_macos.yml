@@ -42,11 +42,12 @@ jobs:
 
   Run-on-Mac:
     name: test-compile on Mac
-    runs-on: [macos-14]
+    runs-on: [macos-15]
     steps:
     - uses: actions/checkout@v2
     - name: build
       run: |
+        brew install gfortran open-mpi fftw hdf5-mpi
         brew info gfortran
         brew info open-mpi
 
@@ -54,8 +55,6 @@ jobs:
         b=`dirname $a`; \
         c=$b/gfortran; \
         ln -s $a $c
-
-        brew install gfortran open-mpi fftw hdf5-mpi
         
         mpicc -v
         mpif90 -v
