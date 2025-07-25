@@ -51,10 +51,10 @@ jobs:
         brew info gfortran
         brew info open-mpi
 
-        a=`which gfortran-15`; \
-        b=`dirname $a`; \
-        c=$b/gfortran; \
-        ln -s $a $c
+#        a=`which gfortran-15`; \
+#        b=`dirname $a`; \
+#        c=$b/gfortran; \
+#        ln -s $a $c
         
         mpicc -v
         mpif90 -v
