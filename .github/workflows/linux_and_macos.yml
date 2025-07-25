@@ -27,7 +27,7 @@ jobs:
     - name: build
       run: |
         sudo apt update
-        sudo apt install pkg-config git gfortran libopenmpi-dev \
+        sudo apt install pkg-config git libopenmpi-dev \
           zlib1g zlib1g-dev libblas-dev libfftw3-dev libhdf5-openmpi-dev
 
         ./configure \
