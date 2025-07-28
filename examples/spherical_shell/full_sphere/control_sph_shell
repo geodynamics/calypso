@@ -1,0 +1,11 @@
+begin MHD_control
+  begin data_files_def
+    debug_flag_ctl             'Off'
+    num_subdomain_ctl    6
+    sph_file_prefix            'sph_lm47r63c_full_6/in'
+!
+    sph_file_fmt_ctl           'ascii'
+  end data_files_def
+!
+  file spherical_shell_ctl  'control_resolution'
+end MHD_control
