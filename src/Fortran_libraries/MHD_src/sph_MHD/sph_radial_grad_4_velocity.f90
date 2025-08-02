@@ -115,7 +115,7 @@
 !
       call cal_sph_diff_pol_and_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out,   &
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                    &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, is_velo, is_vort,       &
+     &    r_2nd%dmat(-1,1,1), r_2nd%dmat(-1,1,2), is_velo, is_vort,     &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_grad_vp_and_vorticity
@@ -147,7 +147,7 @@
      &    is_fld, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call cal_sph_diff_poloidal2(sph_bc_U%kr_in, sph_bc_U%kr_out,      &
-     &    sph_rj%nidx_rj, r_2nd%fdm(1)%dmat, is_fld,                    &
+     &    sph_rj%nidx_rj, r_2nd%dmat(-1,1,1), is_fld,                   &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_grad_poloidal_moment
@@ -171,7 +171,7 @@
 !
       call cal_sph_nod_gradient_2(sph_bc_U%kr_in, sph_bc_U%kr_out,      &
      &    is_press, is_grad, sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,     &
-     &    g_sph_rj, r_2nd%fdm(1)%dmat,                                  &
+     &    g_sph_rj, r_2nd%dmat(-1,1,1),                                 &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call normalize_sph_average_grad(is_grad,                          &
      &    sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj,                    &

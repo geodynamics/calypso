@@ -97,7 +97,7 @@
       if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
         call sph_center_fld_and_curl                                    &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
-     &      g_sph_rj, r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,             &
+     &      g_sph_rj, r_2nd%dmat( 0,1,1), r_2nd%dmat( 0,1,2),           &
      &      is_velo, is_vort, n_point, ntot_phys_rj, d_rj)
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_v_and_w                               &
@@ -162,7 +162,7 @@
 !
       if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
         call cal_dsdr_sph_center_2                                      &
-     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%fdm(1)%dmat,    &
+     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%dmat( 0,1,1),   &
      &      is_fld, n_point, ntot_phys_rj, d_rj)
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_vpol2                                 &
@@ -214,7 +214,7 @@
       if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
         call cal_sph_nod_center_rot2                                    &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
-     &      g_sph_rj, r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,             &
+     &      g_sph_rj, r_2nd%dmat(-1,1,1), r_2nd%dmat(-1,1,2),           &
      &      is_fld, is_rot, n_point, ntot_phys_rj, d_rj)
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_rot2(sph_rj%nidx_rj(2), g_sph_rj,     &
@@ -271,10 +271,10 @@
       if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
         call cal_sph_nod_center_diffuse2                                &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
-     &      g_sph_rj, r_2nd%fdm(2)%dmat, coef_diffuse,                  &
+     &      g_sph_rj, r_2nd%dmat(0,1,2), coef_diffuse,                  &
      &      is_velo, is_viscous, n_point, ntot_phys_rj, d_rj)
         call cal_dsdr_sph_center_2                                      &
-     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%fdm(1)%dmat,    &
+     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%dmat( 0,1,1),   &
      &      is_viscous, n_point, ntot_phys_rj, d_rj)
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_diffuse2                              &
@@ -349,10 +349,10 @@
       if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
         call cal_sph_nod_center_diffuse2                                &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
-     &      g_sph_rj, r_2nd%fdm(2)%dmat, coef_diffuse,                  &
+     &      g_sph_rj, r_2nd%dmat(0,1,2), coef_diffuse,                  &
      &      is_vort, is_w_diffuse, n_point, ntot_phys_rj, d_rj)
         call cal_dsdr_sph_center_2                                      &
-     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%fdm(1)%dmat,    &
+     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%dmat( 0,1,1),   &
      &      is_w_diffuse, n_point, ntot_phys_rj, d_rj)
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_w_diffuse2                            &

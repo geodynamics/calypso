@@ -105,8 +105,8 @@
      &                               sph_rj%nidx_rj(1), ref_local(0,0))
 !
         call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,       &
-     &                            sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat, &
-     &                            ref_local(0,0), ref_local(0,1))
+     &                           sph_rj%nidx_rj(1), r_2nd%dmat(-1,1,1), &
+     &                           ref_local(0,0), ref_local(0,1))
 !
         call sel_ICB_radial_grad_1d_scalar                              &
      &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center,               &
@@ -190,7 +190,7 @@
      &      sph_rj%nidx_rj(1), reftemp_local(0,0))
 !
         call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,       &
-     &      sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat,                       &
+     &      sph_rj%nidx_rj(1), r_2nd%dmat(-1,1,1),                      &
      &      reftemp_local(0,0), reftemp_local(0,1))
 !
         call fix_ICB_radial_grad_1d_scalar(sph_rj, sph_bc, fdm2_center, &
@@ -232,8 +232,8 @@
      &                             sph_rj%nidx_rj(1), reftemp_r(0))
 !
       call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,         &
-     &                            sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat, &
-     &                            reftemp_r(0), refgrad_r(0))
+     &                           sph_rj%nidx_rj(1), r_2nd%dmat(-1,1,1), &
+     &                           reftemp_r(0), refgrad_r(0))
 !
       call sel_ICB_radial_grad_1d_scalar                                &
      &   (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center,                 &

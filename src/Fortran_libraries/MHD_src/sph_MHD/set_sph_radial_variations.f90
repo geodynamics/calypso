@@ -110,7 +110,7 @@
      &      radial_variation%d_fld(1,ir_density+1), r_itp)
 !
         call cal_sph_nod_gradient_1d(ione, sph_rj%nidx_rj(1),           &
-     &      sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat,                       &
+     &      sph_rj%nidx_rj(1), r_2nd%dmat(-1,1,1),                      &
      &      radial_variation%d_fld(2,ir_density+1),                     &
      &      radial_variation%d_fld(2,ir_density+2))
         radial_variation%d_fld(2,ir_density+1) = zero
@@ -305,8 +305,9 @@
       call dealloc_radial_interpolate(r_itp)
       call dealloc_org_radius_interpolate(r_itp)
 !
-      call cal_sph_nod_gradient_1d(ione, sph_rj%nidx_rj(1),             &
-     &    sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat, val_r(2), dval_norm(2))
+      call cal_sph_nod_gradient_1d                                      &
+     &   (ione, sph_rj%nidx_rj(1), sph_rj%nidx_rj(1),                   &
+     &    r_2nd%dmat(-1,1,1), val_r(2), dval_norm(2))
 !
 !$omp parallel workshare
       dval_norm(2:n_point-1) = dval_norm(2:n_point-1)                   &

@@ -102,7 +102,7 @@
       call add_scalar_poisson_mat_sph                                   &
      &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
      &    g_sph_rj, sph_bc_U%kr_in, sph_bc_U%kr_out, r_coef(1),         &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_p_poisson%mat)
+     &    r_2nd%dmat(-1,1,1), r_2nd%dmat(-1,1,2), band_p_poisson%mat)
 !
       call sel_radial_mat_press_bc_sph(sph_rj, sph_bc_U, fdm2_center,   &
      &    g_sph_rj, r_coef, band_p_poisson)
@@ -175,7 +175,7 @@
       call add_scalar_poisson_mat_sph                                   &
      &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
      &    g_sph_rj, sph_bc%kr_in, sph_bc%kr_out, r_coef(1),             &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s_evo%mat)
+     &    r_2nd%dmat(-1,1,1), r_2nd%dmat(-1,1,2), band_s_evo%mat)
 !
       call sel_radial_mat_scalar_bc_sph(sph_rj, sph_bc, fdm2_center,    &
      &    g_sph_rj, r_coef, band_s_evo)
@@ -234,7 +234,7 @@
       call add_scalar_poisson00_mat_sph                                 &
      &   (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                           &
      &    sph_bc%kr_in, sph_bc%kr_out, r_coef(1),                       &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
+     &    r_2nd%dmat(-1,1,1), r_2nd%dmat(-1,1,2), band_s00_poisson%mat)
 !
       call sel_radial_mat00_scalar_bc_sph                               &
      &   (sph_rj, sph_bc, fdm2_center, r_coef, band_s00_poisson)
@@ -311,7 +311,7 @@
       call add_scalar_poisson00_mat_sph                                 &
      &   (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                           &
      &    sph_bc%kr_in, sph_bc%kr_out, r_coef(1),                       &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
+     &    r_2nd%dmat(-1,1,1), r_2nd%dmat(-1,1,2), band_s00_poisson%mat)
 !
       call sel_r_mat_poisson_fixBC_sph                                  &
      &   (sph_rj, sph_bc, fdm2_center, band_s00_poisson)
