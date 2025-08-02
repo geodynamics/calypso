@@ -3,8 +3,8 @@
 !!
 !!@author H. Matsui and H. Okuda
 !!@date Programmed by H. Okuda in 2000
-!!@n    Mmodified by H. Matsui in 2001
-!!@n    Mmodified by H. Matsui in Aug., 2007
+!!@n    Modified by H. Matsui in 2001
+!!@n    Modified by H. Matsui in Aug., 2007
 !
 !> @brief set boundary conditions for temperature from control data
 !!

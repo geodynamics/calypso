@@ -154,8 +154,8 @@
             lp_rtm = WK_l_otf%lst_rtm(ip) + lt
             ln_rtm = sph_rtm%nidx_rtm(2) - lp_rtm + 1
             call leg_fwd_trans_1latitude(lp_rtm, ln_rtm, jst, mm,       &
-     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
-     &          iflag_matmul, ncomp, nvector, nscalar,                  &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm),                        &
+     &          nkrs, nkrt, ncomp, nvector, nscalar,                    &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
      &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
      &          WK_l_otf%Fmat(ip), WK_l_otf%Pjt_mat(ip),                &
@@ -165,9 +165,9 @@
 !   Equator (if necessary)
           if(WK_l_otf%nle_rtm(ip) .gt. WK_l_otf%nlo_rtm(ip)) then
             lp_rtm = WK_l_otf%lst_rtm(ip) + WK_l_otf%nle_rtm(ip)
-            call leg_fwd_trans_at_equator(lp_rtm, jst, mm,              &
-     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
-     &          iflag_matmul, ncomp, nvector, nscalar,                  &
+            call leg_fwd_trans_at_equator                               &
+     &         (lp_rtm, jst, mm, mp_rlm, idx_trns%mn_rlm(mp_rlm),       &
+     &          nkrs, nkrt, ncomp, nvector, nscalar,                    &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
      &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
      &          WK_l_otf%Fmat(ip), WK_l_otf%Pjt_mat(ip),                &
@@ -470,11 +470,10 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine leg_fwd_trans_1latitude                                &
-     &         (lp_rtm, ln_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,    &
-     &          iflag_matmul, ncomp, nvector, nscalar,                  &
+      subroutine leg_fwd_trans_1latitude(lp_rtm, ln_rtm, jst, mm,       &
+     &          mp_rlm, mn_rlm, nkrs, nkrt, ncomp, nvector, nscalar,    &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
-     &           n_jk_e, n_jk_o, Fmat, Pjt_mat, Smat, wk_plm)
+     &          n_jk_e, n_jk_o, Fmat, Pjt_mat, Smat, wk_plm)
 !
       use t_schmidt_poly_on_rtm
       use t_set_legendre_4_sph_trans
@@ -487,7 +486,6 @@
       integer(kind = kint), intent(in) :: mm, jst
       integer(kind = kint), intent(in) :: nkrs, nkrt
 !
-      integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_comm_tbl), intent(in) :: comm_rtm
@@ -546,9 +544,9 @@
 !
       subroutine leg_fwd_trans_at_equator                               &
      &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
-     &          iflag_matmul, ncomp, nvector, nscalar,                  &
-     &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
-     &          n_jk_e, n_jk_o, Fmat, Pjt_mat, Smat, wk_plm)
+     &          ncomp, nvector, nscalar, sph_rtm, sph_rlm, comm_rtm,    &
+     &          leg, n_WR, WR, n_jk_e, n_jk_o, Fmat, Pjt_mat, Smat,     &
+     &          wk_plm)
 !
       use t_schmidt_poly_on_rtm
       use t_set_legendre_4_sph_trans
@@ -561,7 +559,6 @@
       integer(kind = kint), intent(in) :: mm, jst
       integer(kind = kint), intent(in) :: nkrs, nkrt
 !
-      integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_comm_tbl), intent(in) :: comm_rtm

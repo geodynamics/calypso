@@ -84,7 +84,7 @@ mod_list:
 	'$$(MOD_CORE)     $$(MOD_MHD)'        \
 	'$$(MOD_PARALLEL) $$(MOD_SOLVERS)'    \
 	'$$(MOD_VIZ)      $$(MOD_KEMO_UTILS)' >> $(MAKENAME)
-	@echo   >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \

@@ -132,7 +132,6 @@
       use t_control_data_4_psf_def
       use t_control_data_4_fld_on_psf
       use t_control_data_4_psf
-      use calypso_mpi
 !
       implicit  none
 !

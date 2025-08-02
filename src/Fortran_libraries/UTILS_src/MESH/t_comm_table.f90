@@ -34,7 +34,7 @@
 !!        type(communication_table), intent(inout) :: comm_tbl
 !!
 !!      subroutine unlink_dest_comm_tbl_type(comm_tbl)
-!!        type(interpolate_table), intent(inout) :: comm_tbl
+!!        type(communication_table), intent(inout) :: comm_tbl
 !!
 !!      subroutine compare_comm_table_stacks                            &
 !!     &         (id_rank, org_comm, new_comm)

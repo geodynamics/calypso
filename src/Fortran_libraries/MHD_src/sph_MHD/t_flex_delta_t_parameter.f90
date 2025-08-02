@@ -26,7 +26,6 @@
       use m_precision
       use m_constants
       use m_error_IDs
-      use calypso_mpi
 !
       use t_time_data
       use t_IO_step_parameter
@@ -76,6 +75,8 @@
 !
       subroutine set_flex_time_step_params(tctl, flex_p,                &
      &          init_d, finish_d, rst_step)
+!
+      use calypso_mpi
 !
       type(time_data_control), intent(in) :: tctl
       type(time_data), intent(inout) :: init_d
@@ -131,6 +132,7 @@
 !
       subroutine set_control_flex_time_steps(tctl, init_d, flex_p)
 !
+      use calypso_mpi
       use cal_num_digits
 !
       type(time_data_control), intent(in) :: tctl

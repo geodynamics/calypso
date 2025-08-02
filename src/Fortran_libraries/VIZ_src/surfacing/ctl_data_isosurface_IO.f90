@@ -82,7 +82,6 @@
       use t_control_array_character
       use t_control_data_4_iso_def
       use t_control_data_4_fld_on_psf
-      use calypso_mpi
 !
       implicit  none
 !

@@ -84,7 +84,6 @@
       subroutine infleate_1word(ilength, word, zbuf)
 !
       use field_data_IO
-      use field_data_MPI_IO
       use gzip_infleate
 !
       integer, intent(inout) :: ilength

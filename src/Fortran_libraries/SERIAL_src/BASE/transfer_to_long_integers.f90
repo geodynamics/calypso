@@ -49,7 +49,7 @@
 !
       integer(kind = kint_gl) function cast_long(i_in)
 !
-      integer(kind = kint), intent(in) :: i_in
+      integer(kind = kint_4b), intent(in) :: i_in
 !
       cast_long = i_in
 !
