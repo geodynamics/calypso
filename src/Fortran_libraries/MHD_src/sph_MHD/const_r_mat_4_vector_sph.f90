@@ -47,13 +47,15 @@
       implicit none
 !
       character(len=kchara), parameter, private                         &
-     &           :: vt_evo_name =  'toroidal_velocity_evolution'
+     &           :: vt_evo_name =    'toroidal_velocity_evolution'
       character(len=kchara), parameter, private                         &
-     &           :: wt_evo_name =  'toroidal_vorticity_evolution'
+     &           :: wt_evo_name =    'toroidal_vorticity_evolution'
       character(len=kchara), parameter, private                         &
-     &           :: vp_evo_name =  'poloidal_velocity_evolution'
+     &           :: wt_poison_name = 'toroidal_vorticity_Poisson'
       character(len=kchara), parameter, private                         &
-     &           :: vsp_evo_name = 'velocity_pressure_evolution'
+     &           :: vp_evo_name =    'poloidal_velocity_evolution'
+      character(len=kchara), parameter, private                         &
+     &           :: vsp_evo_name =   'velocity_pressure_evolution'
 !
 ! -----------------------------------------------------------------------
 !
@@ -65,10 +67,12 @@
      &          fl_prop, sph_bc_U, bc_fdms_U, fdm2_center, g_sph_rj,    &
      &          band_vs_poisson, band_vp_evo, band_wt_evo)
 !
+      use calypso_mpi
       use m_ludcmp_band
       use select_sph_r_mat_vort_BC
       use center_sph_matrices
       use mat_product_3band_mul
+      use mat_product_3band_mul_bc
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -88,6 +92,7 @@
       real(kind = kreal) :: coef_dvt
 !
 !
+      band_vs_poisson%mat_name = wt_poison_name
       band_wt_evo%mat_name = wt_evo_name
       band_vp_evo%mat_name = vp_evo_name
 !
@@ -130,11 +135,20 @@
       call sel_sph_r_mat_vort_2step_CMB(sph_rj, sph_bc_U, bc_fdms_U,    &
      &    g_sph_rj, coef_dvt, band_vs_poisson, band_wt_evo)
 !
-!
       call cal_mat_product_3band_mul                                    &
      &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                         &
      &    sph_bc_U%kr_in, sph_bc_U%kr_out, band_wt_evo%mat,             &
      &    band_vs_poisson%mat, band_vp_evo%mat)
+      call cal_vp_evo_mat_product_bc                                    &
+     &   (sph_bc_U, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),               &
+     &    band_wt_evo%mat, band_vs_poisson%mat, band_vp_evo%mat)
+!
+!      call check_specific_radial_band_mat(my_rank, (100+my_rank), 2, 0,&
+!     &                                     sph_rj, band_vs_poisson)
+!      call check_specific_radial_band_mat(my_rank, (200+my_rank), 2, 0,&
+!     &                                     sph_rj, band_wt_evo)
+!      call check_specific_radial_band_mat(my_rank, (300+my_rank), 2, 0,&
+!     &                                     sph_rj, band_vp_evo)
 !
       call ludcmp_5band_mul_t                                           &
      &   (np_smp, sph_rj%istack_rj_j_smp, band_vp_evo)

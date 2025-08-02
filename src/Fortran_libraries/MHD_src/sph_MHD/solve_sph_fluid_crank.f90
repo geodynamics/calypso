@@ -93,7 +93,7 @@
       subroutine solve_pressure_by_div_v(sph_rj, band_p_poisson,        &
      &          is_press, n_point, ntot_phys_rj, d_rj)
 !
-      use check_sph_radial_mat
+      use check_single_radial_mat
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(band_matrices_type), intent(in) :: band_p_poisson
