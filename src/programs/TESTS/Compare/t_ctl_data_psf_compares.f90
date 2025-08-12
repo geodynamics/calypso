@@ -126,6 +126,7 @@
 !
           call write_multi_ctl_file_message                             &
      &       (hd_block, psf_compares%num_psf_cmp, c_buf%level)
+          write(*,*)
           call read_ctl_data_psf_compare(id_control, hd_block,          &
      &        psf_compares%psf_cmp_ctls(psf_compares%num_psf_cmp),      &
      &        c_buf)

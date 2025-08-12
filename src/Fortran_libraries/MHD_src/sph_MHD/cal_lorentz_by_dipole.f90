@@ -82,6 +82,8 @@
       real(kind = kreal), intent(inout) :: frc_rtp(nnod,ntot_comp_flx)
 !
       if(fs_trns_prod%i_dipole_Lorentz .gt. 0) then
+! 
+      if(iflag_debug.gt.0) write(*,*) 'cal_dot_prod_no_coef_smp for dipole lorentz'
         call cal_cross_prod_w_coef_smp(nnod, fl_prop%coef_lor,          &
      &      fld_rtp(1,bs_trns_prod%i_dipole_J),                         &
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
@@ -89,6 +91,8 @@
       end if
 !
       if(fs_trns_prod%i_dipole_ujb .gt. 0) then
+! 
+        if(iflag_debug.gt.0) write(*,*) 'cal_dot_prod_no_coef_smp for dipole ujb'
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      frc_rtp(1,fs_trns_prod%i_dipole_Lorentz),                   &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &

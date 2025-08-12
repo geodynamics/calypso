@@ -45,6 +45,7 @@
 !
       use m_precision
       use m_machine_parameter
+      use calypso_mpi
 !
       use t_control_data_surfacings
       use t_control_data_sections

@@ -93,7 +93,7 @@
 !
       call cal_sph_diff_pol_and_rot2(sph_bc_B%kr_in, sph_bc_B%kr_out,   &
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                    &
-     &    r_2nd%dmat(-1,1,1), r_2nd%dmat(-1,1,2), is_magne, is_current, &
+     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, is_magne, is_current,   &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
 !      Extend potential field
@@ -132,7 +132,7 @@
 !
 !
       call cal_sph_diff_poloidal2(sph_bc_B%kr_in, sph_bc_B%kr_out,      &
-     &    sph_rj%nidx_rj, r_2nd%dmat(-1,1,1), is_magne,                 &
+     &    sph_rj%nidx_rj, r_2nd%fdm(1)%dmat, is_magne,                  &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
 !      Extend potential field

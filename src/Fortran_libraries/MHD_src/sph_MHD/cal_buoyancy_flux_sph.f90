@@ -121,7 +121,6 @@
       type(spherical_transform_data), intent(inout) :: trns_f_eflux
 !
 !
-!$omp parallel
       if(fs_trns_eflux%i_buo_gen .gt. 0) then
         if(ref_param_T%flag_ref_field) then
           call pole_sph_buoyancy_flux                                   &
@@ -157,7 +156,6 @@
      &        trns_f_eflux%fld_pole(1,fs_trns_eflux%i_c_buo_gen) )
         end if
       end if
-!$omp end parallel
 !
       end subroutine pole_buoyancy_flux_rtp
 !
@@ -189,6 +187,7 @@
         d_pole(inod)                                                    &
      &     = -coef*t_pole(inod)*v_pole(inod,3)*radius(kr)
       end do
+!$omp end parallel do
 !
       d_pole(2*nidx_rtp_r+1) = zero
 !

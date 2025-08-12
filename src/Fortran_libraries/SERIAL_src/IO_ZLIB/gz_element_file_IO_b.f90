@@ -39,7 +39,7 @@
       use t_read_mesh_data
       use t_buffer_4_gzip
       use set_mesh_file_names
-      use gz_binary_IO
+      use binary_IO
 !
       implicit none
 !

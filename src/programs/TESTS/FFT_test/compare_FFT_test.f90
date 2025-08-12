@@ -9,6 +9,9 @@
 !
       implicit none
 !
+      integer(kind = kint) :: iflag
+!
+!
       type(fft_test_data) :: ftst_1, ftst_2
       character(len=kchara) :: file_name_1, file_name_2
 !
@@ -21,9 +24,11 @@
       call read_alloc_fft_test_data(file_name_1, ftst_1)
       call read_alloc_fft_test_data(file_name_2, ftst_2)
 !
-      if(compare_FFT_tests(ftst_1, ftst_2) .eq. 0) then
+      iflag = compare_FFT_tests(ftst_1, ftst_2)
+      if(iflag .eq. 0) then
         write(*,*) 'Data in two files have consistency.'
       end if
+      write(*,'(i1)') iflag
 !
       call dealloc_fft_test_data(ftst_1)
       call dealloc_fft_test_data(ftst_2)

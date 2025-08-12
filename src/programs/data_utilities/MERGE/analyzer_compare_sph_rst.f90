@@ -131,6 +131,7 @@
 !
       integer(kind = kint) :: istep, istep_in, istep_out
       integer(kind = kint) :: iflag, iflag_gl
+      character(len=kchara) :: charaint
 !
 !
 !     ---------------------
@@ -186,7 +187,13 @@
       call dealloc_spectr_data_4_assemble(sph_asbl_s)
 !
       call calypso_MPI_barrier
-      if (iflag_debug.eq.1) write(*,*) 'exit evolution'
+!
+      if(my_rank .eq. 0) then
+        open(999,file='flag.txt')
+        write(charaint,*) iflag_gl
+        write(999,'(a)') trim(ADJUSTL(charaint))
+        close(999)
+      end if
 !
       end subroutine analyze_compare_sph_restart
 !

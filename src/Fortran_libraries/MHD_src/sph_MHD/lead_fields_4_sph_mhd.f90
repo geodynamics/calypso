@@ -287,6 +287,7 @@
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
       end if
 !
+      if(iflag_debug.gt.0) write(*,*) 's_cal_lorentz_by_dipole'
       call s_cal_lorentz_by_dipole(sph%sph_rtp, MHD_prop%fl_prop,       &
      &    trns_snap%b_trns, trns_snap%f_trns, trns_snap%backward,       &
      &    trns_snap%forward)

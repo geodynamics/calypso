@@ -48,6 +48,9 @@
       real(kind = kreal), allocatable :: spectr_IN2(:)
       integer(kind = kint) :: icomp, icomp2
 !
+      integer(kind = kint) :: iflag_gl = 0
+      character(len = kchara) :: charaint
+!
 !
       if(iargc_kemo() .le. 1) then
         write(*,*) 'sph_ene_check ',                                    &
@@ -113,11 +116,19 @@
      &   (FPz_f2, id_file2, flag_gzip2, zbuf2)
 !
       if(error) then
-        write(*,*) 'time sequence data does not match'
-        stop 'Check failed'
+        write(*,*) 'Time sequence data file ', trim(fname_rms_ref),     &
+     &            ' and ', trim(fhead_rms_vol), ' does not match.'
+        iflag_gl = 1
+      else
+        iflag_gl = 0
       end if
 !
-      stop 'Check finished'
+      open(999,file='flag.txt')
+      write(charaint,*) iflag_gl
+      write(999,'(a)') trim(ADJUSTL(charaint))
+      close(999)
+!
+      stop
 !
 !   --------------------------------------------------------------------
 !

@@ -38,6 +38,7 @@
      &         (np_read, i_time_step_IO, time_IO, delta_t_IO, bbuf)
 !
       use binary_IO
+      use read_psf_binary_data
 !
       integer, intent(inout) :: np_read
       integer(kind=kint), intent(inout) :: i_time_step_IO
@@ -57,7 +58,7 @@
       subroutine read_psf_bin_field_data(np_read, ucd_b, bbuf)
 !
       use binary_IO
-      use psf_binary_data_IO
+      use read_psf_binary_data
 !
       integer, intent(in) :: np_read
       type(ucd_data), intent(inout) :: ucd_b
@@ -87,7 +88,7 @@
       subroutine read_alloc_psf_bin_field_data(np_read, ucd_b, bbuf)
 !
       use binary_IO
-      use psf_binary_data_IO
+      use read_psf_binary_data
 !
       integer, intent(in) :: np_read
       type(ucd_data), intent(inout) :: ucd_b
@@ -114,8 +115,7 @@
       subroutine read_psf_bin_grid_data(np_read, ucd_b, bbuf)
 !
       use binary_IO
-      use psf_binary_data_IO
-      use psf_binary_mesh_IO
+      use read_psf_binary_data
 !
       integer, intent(in) :: np_read
       type(ucd_data), intent(inout) :: ucd_b
@@ -147,8 +147,7 @@
       subroutine read_alloc_psf_bin_grid_data(np_read, ucd_b, bbuf)
 !
       use binary_IO
-      use psf_binary_data_IO
-      use psf_binary_mesh_IO
+      use read_psf_binary_data
 !
       integer, intent(in) :: np_read
       type(ucd_data), intent(inout) :: ucd_b

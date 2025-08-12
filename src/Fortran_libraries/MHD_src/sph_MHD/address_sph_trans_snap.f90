@@ -116,6 +116,7 @@
      &   (d_rj, ipol%fld_cmp, iphys%fld_cmp, b_trns%fld_cmp,            &
      &    trns_back)
 !
+      if(iflag_debug.gt.0) write(*,*) 'add_flux_prods_sph_trns_snap backward'
       call add_flux_prods_sph_trns_snap                                 &
      &   (d_rj, ipol%prod_fld, iphys%prod_fld, b_trns%prod_fld,         &
      &    trns_back)
@@ -186,6 +187,14 @@
       call add_field_comps_sph_trns_snap                                &
      &   (d_rj, ipol%fld_cmp, iphys%fld_cmp, f_trns%fld_cmp,            &
      &    trns_fwd)
+! 
+! call to add adress for dipole ujb
+      if(iflag_debug.gt.0) write(*,*) 'add_flux_prods_sph_trns_snap foward'
+      call add_flux_prods_sph_trns_snap                                 &
+     &   (d_rj, ipol%prod_fld, iphys%prod_fld, f_trns%prod_fld,         &
+     &    trns_fwd)
+! 
+!      
       trns_fwd%num_scalar = trns_fwd%nfield - trns_fwd%num_vector
       trns_fwd%num_tensor = 0
 !

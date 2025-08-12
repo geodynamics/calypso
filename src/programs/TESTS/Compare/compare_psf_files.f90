@@ -19,6 +19,7 @@
       type(psf_compare_param), allocatable, save:: psf_cmp1(:)
 !
       integer(kind = kint) :: i, icount_error, icou_error
+      character(len = kchara) :: charaint
 !
 !
       call read_ctl_file_psf_compares(0, psf_cmp_list1)
@@ -39,5 +40,10 @@
         icount_error = icount_error + icou_error
       end do
       deallocate(psf_cmp1)
+!
+      open(999,file='flag.txt')
+      write(charaint,*) icount_error
+      write(999,'(a)') trim(ADJUSTL(charaint))
+      close(999)
 !
       end program compare_psf_files

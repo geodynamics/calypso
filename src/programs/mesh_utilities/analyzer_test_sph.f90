@@ -94,6 +94,7 @@
 !
       character(len=kchara) :: fname_tmp, file_name
       integer(kind = kint) :: itype, iflag_gl, iflag_sum, iflag(7)
+      character(len=kchara) :: charaint
       integer(kind = kint), parameter :: NB = 8
 !
 !
@@ -157,13 +158,19 @@
       call calypso_mpi_allreduce_one_int(iflag_sum, iflag_gl, MPI_SUM)
 !
       if(iflag_gl .eq. 0) then
+        call delete_file_by_f(file_name)
         if(my_rank .eq. 0) write(*,'(3a)')                              &
      &         char(10), '---- No communication error ----', char(10)
-        call delete_file_by_f(file_name)
       end if
-
 !
-      if (iflag_debug.eq.1) write(*,*) 'exit analyze_test_sph'
+      call calypso_mpi_barrier()
+!
+      if(my_rank .eq. 0) then
+        open(999,file='flag.txt')
+        write(charaint,*) iflag_gl
+        write(999,'(a)') trim(ADJUSTL(charaint))
+        close(999)
+      end if
 !
       end subroutine analyze_test_sph
 !

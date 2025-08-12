@@ -263,6 +263,7 @@
      &         (iflag_blank, nnod, ndir, vector, zbuf)
 !
       use field_data_IO
+      use field_data_MPI_IO
       use data_IO_to_textline
       use gzip_infleate
 !

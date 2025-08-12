@@ -67,7 +67,6 @@
 !
       subroutine s_set_control_4_time_steps(mr_ctl, tctl, MHD_step)
 !
-      use calypso_mpi
       use t_ctl_data_mhd_evo_scheme
       use t_ctl_data_mhd_restart
       use m_initial_field_control
@@ -143,7 +142,6 @@
 !
       subroutine set_fixed_time_step_controls(tctl, MHD_step)
 !
-      use calypso_mpi
       use set_time_step_params
 !
       type(time_data_control), intent(in) :: tctl
