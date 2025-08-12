@@ -221,7 +221,7 @@
       phi_prev(1:4) = phi_zero(1:4)
 !
       ave_drift = quad * (drift(1) + drift(2) + drift(3) + drift(4))
-      do nd = 1, 7
+      do nd = 1, d_circle%ntot_phys
         d_zero(0,nd) = quad * (d_zero(1,nd) + d_zero(2,nd)              &
      &                       + d_zero(3,nd) + d_zero(4,nd))
       end do

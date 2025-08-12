@@ -85,16 +85,23 @@
 !
       if(bench%ipwr_ocore .gt. 0) then
         irank_copy = pwr%v_spectr(bench%ipwr_ocore)%irank_m
-        if(my_rank .eq. irank_copy)  then
-          call copy_kin_energy_4_dbench(bench%ipwr_ocore, pwr,          &
+        if(ipol%base%i_velo .gt. 0) then
+          if(my_rank .eq. irank_copy) then
+            call copy_kin_energy_4_dbench(bench%ipwr_ocore, pwr,        &
      &                                  bench%KE_bench)
-          call copy_mag_energy_4_dbench(bench%ipwr_ocore, pwr,          &
-     &                                  bench%ME_bench)
+          end if
+          call calypso_mpi_bcast_real(bench%KE_bench,                   &
+     &                                cast_long(ithree), irank_copy)
         end if
-        call calypso_mpi_bcast_real(bench%KE_bench, cast_long(ithree),  &
-     &                              irank_copy)
-        call calypso_mpi_bcast_real(bench%ME_bench, cast_long(ithree),  &
-     &                              irank_copy)
+!
+        if(ipol%base%i_magne .gt. 0) then
+          if(my_rank .eq. irank_copy) then
+            call copy_mag_energy_4_dbench(bench%ipwr_ocore, pwr,        &
+     &                                    bench%ME_bench)
+          end if
+          call calypso_mpi_bcast_real(bench%ME_bench,                   &
+     &                                cast_long(ithree), irank_copy)
+        end if
       end if
 !
       if(sph_MHD_bc%sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
