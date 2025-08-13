@@ -30,11 +30,8 @@ FFT_test \
 Communication_check \
 restart_assemble \
 \
-Dynamobench_case1 \
-Dynamobench_case2 \
-Dynamobench_case2_cont \
-snapshot_test \
-heterogineous_temp
+Dynamo_Benchmark \
+Models
 
 #
 #  -------------------------------------------------------------------------
@@ -44,22 +41,18 @@ heterogineous_temp
 all: test
 
 test: 
-	@for dir in $(SUBDIRS) ; do \
+	for dir in $(SUBDIRS) ; do \
 	echo "# Test in $${dir} directory..."; \
 		( cd $${dir}; \
+		pwd; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
 		BUILDDIR="$(BUILDDIR)" \
 		TESTDIR="$(TESTDIR)" \
 		MHDDIR="$(MHDDIR)" \
 		MPIRUN="$(MPIRUN)" \
-		TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
-		TARGET_CHECK_SPH_GRID="$(TARGET_CHECK_SPH_GRID)" \
-		TARGET_TEST_SPH_GRID="$(TARGET_TEST_SPH_GRID)" \
-		TARGET_NEWSPH="$(TARGET_NEWSPH)" \
-		TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test)\
-	done; \
+	done
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
 sym_test: 
