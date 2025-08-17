@@ -28,13 +28,11 @@ test:
 		echo 'Failed volume average data check'; \
 		exit 1;\
 	fi
-	
 	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_s   monitor/sph_pwr_volume_s  >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed volume mean square data check'; \
 		exit 1;\
 	fi
-	
 	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_m0  monitor/sph_pwr_volume_m0 >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed axisymmetric mean square data check'; \

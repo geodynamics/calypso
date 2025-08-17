@@ -8,7 +8,7 @@
 temperature
 ICB
     3
-  0  0   1.000E+00
+  0  0   0.000E+00
   1  1   2.000E-01
   2  2   3.000E-01
 #
@@ -16,7 +16,7 @@ ICB
 heat_flux
 CMB
    2
-  0  0    -0.9E+0
+  0  0    -2.0E+0
   1  -1    5.0E-1
 #
 #    Fixed composition flux at ICB
