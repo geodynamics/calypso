@@ -65,19 +65,30 @@
 !
       call sel_open_check_gz_stream_file(FPz_f1, id_file1,              &
      &   fname_rms_vol, flag_gzip1, flag_miss1, file_name, zbuf1)
+      if(flag_miss1) then
+        write(*,*) 'Data file ', trim(fname_rms_vol), ' is missing.'
+        error = .TRUE.
+        go to 99
+      end if
       call read_sph_volume_mean_head(FPz_f1, id_file1, flag_gzip1,      &
      &                               sph_lbl_IN1, sph_IN1, zbuf1)
 !
       call sel_open_check_gz_stream_file(FPz_f2, id_file2,              &
      &   fname_rms_ref, flag_gzip2, flag_miss2, file_name, zbuf2)
+      if(flag_miss2) then
+        write(*,*) 'Data file ', trim(fname_rms_ref), ' is missing.'
+        error = .TRUE.
+        go to 99
+      end if
       call read_sph_volume_mean_head(FPz_f2, id_file2, flag_gzip2,      &
      &                               sph_lbl_IN2, sph_IN2, zbuf2)
 !
       error = .not. cmp_sph_volume_monitor_heads                        &
      &            (sph_lbl_IN1, sph_IN1, sph_lbl_IN2, sph_IN2)
       if(error) then
-        write(*,*) 'time sequence data header does not match'
-        stop 'Check failed'
+        write(*,*) 'Time sequence data header does not match.'
+        write(*,*) 'Check failed'
+        go to 99
       end if
 !
       allocate(spectr_IN1(sph_IN1%ntot_sph_spec))
@@ -91,9 +102,11 @@
      &      sph_IN2%ntot_sph_spec, sph_IN2%i_step, sph_IN2%time,        &
      &      spectr_IN2(1), zbuf2, ierr2)
         if(ierr1*ierr2 .gt. 0) exit
+!
         if(ierr1+ierr1 .gt. 0 .and. ierr1*ierr2 .eq. 0) then
+          write(*,*) 'Read fails in either file'
           error = .TRUE.
-          exit
+          go to 99
         end if
 !
         error = .FALSE.
@@ -105,7 +118,7 @@
      &           trim(sph_IN1%ene_sph_spec_name(icomp2)),               &
      &           ': ', spectr_IN1(icomp), spectr_IN2(icomp), diff
             error = .TRUE.
-            exit
+            go to 99
           end if
         end do
       end do
@@ -115,6 +128,7 @@
       call sel_close_read_gz_stream_file                                &
      &   (FPz_f2, id_file2, flag_gzip2, zbuf2)
 !
+  99  continue
       if(error) then
         write(*,*) 'Time sequence data file ', trim(fname_rms_ref),     &
      &            ' and ', trim(fhead_rms_vol), ' does not match.'

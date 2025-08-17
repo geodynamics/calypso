@@ -24,11 +24,13 @@
 !!        surface_file_prefix    'reference/iso_w10n'
 !!        surface_file_format            VTK_GZ
 !!      end second_file_ctl
+!!
 !!      i_step_surface_ctl      10
+!!    difference_limit_ctl    1.0e-9
 !!    end compare_surface_file
-!
+!!
 !!    ...
-!
+!!
 !!    begin compare_surface_file
 !!      ...
 !!    end compare_surface_file

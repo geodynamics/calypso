@@ -7,15 +7,21 @@
 !>@brief Compare FEM mesh structures
 !!
 !!@verbatim
-!!      subroutine compare_mesh_type(id_rank, nod_comm, node, ele, mesh)
+!!      subroutine compare_mesh_type(id_rank, nod_comm, node, ele, mesh,&
+!!     &                             diff_limit, diff_max, ierror_count)
+!!        real(kind = kreal), intent(in) :: diff_limit
 !!        type(mesh_geometry),    intent(inout) :: mesh
 !!        type(communication_table), intent(inout) :: nod_comm
 !!        type(node_data), intent(inout) ::           node
 !!        type(element_data), intent(inout) ::        ele
+!!        integer(kind = kint), intent(inout) :: ierror_count
+!!        real(kind = kreal), intent(inout) :: diff_max
 !!      subroutine compare_node_position                                &
-!!     &         (id_rank, org_node, new_node, icount_error)
+!!     &         (id_rank, org_node, new_node, diff_max, icount_error)
 !!        type(node_data), intent(in) :: org_node
 !!        type(node_data), intent(in) :: new_node
+!!        real(kind = kreal), intent(in) :: diff_limit
+!!        real(kind = kreal), intent(inout) :: diff_max
 !!        integer(kind = kint), intent(inout) :: icount_error
 !!      subroutine compare_ele_connect                                  &
 !!     &         (id_rank, org_ele, new_ele, icount_error)
@@ -42,23 +48,28 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine compare_mesh_type(id_rank, nod_comm, node, ele, mesh)
+      subroutine compare_mesh_type(id_rank, nod_comm, node, ele, mesh,  &
+     &                             diff_limit, diff_max, ierror_count)
 !
       use t_comm_table
       use t_geometry_data
       use t_mesh_data
 !
       integer, intent(in) :: id_rank
+      real(kind = kreal), intent(in) :: diff_limit
       type(mesh_geometry),    intent(inout) :: mesh
       type(communication_table), intent(inout) :: nod_comm
       type(node_data), intent(inout) ::           node
       type(element_data), intent(inout) ::        ele
 !
-      integer(kind = kint) :: ierror_count, icou_error
+      integer(kind = kint), intent(inout) :: ierror_count
+      real(kind = kreal), intent(inout) :: diff_max
+!
+      integer(kind = kint) :: icou_error
 !
 !
-      call compare_node_position(id_rank, node, mesh%node,              &
-     &                           ierror_count)
+      call compare_node_position(id_rank, node, mesh%node, diff_limit,  &
+     &                           diff_max, ierror_count)
       call compare_ele_connect(id_rank, ele, mesh%ele, icou_error)
       ierror_count = ierror_count + icou_error
       call compare_node_comm_types                                      &
@@ -70,8 +81,8 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine compare_node_position                                  &
-     &         (id_rank, org_node, new_node, icount_error)
+      subroutine compare_node_position(id_rank, org_node, new_node,     &
+     &          diff_limit, diff_max, icount_error)
 !
       use t_geometry_data
       use m_phys_constants
@@ -80,6 +91,9 @@
       integer, intent(in) :: id_rank
       type(node_data), intent(in) :: org_node
       type(node_data), intent(in) :: new_node
+      real(kind = kreal), intent(in) :: diff_limit
+!
+      real(kind = kreal), intent(inout) :: diff_max
       integer(kind = kint), intent(inout) :: icount_error
 !
       character(len=kchara), parameter :: field_name = 'position'
@@ -104,8 +118,10 @@
      &      ':  ', org_node%internal_node, new_node%internal_node
         icount_error = icount_error + 1
       end if
+!
       call compare_field_vector(org_node%numnod, n_vector, field_name,  &
-     &    org_node%xx(1,1), new_node%xx(1,1), icou_error)
+     &    org_node%xx(1,1), new_node%xx(1,1), diff_limit,               &
+     &    diff_max, icou_error)
       icount_error = icount_error + icou_error
 !
       end subroutine compare_node_position

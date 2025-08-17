@@ -258,9 +258,9 @@
 !
       call alloc_circle_transform(leg_circ)
 !
-      leg_circ%r_circle                                                &
+      leg_circ%r_circle                                                 &
      &      = sqrt(circle%s_circle**2 + circle%z_circle**2)
-      leg_circ%theta_circle                                            &
+      leg_circ%theta_circle                                             &
      &      = acos(circle%z_circle / leg_circ%r_circle)
 !
       leg_circ%ar_circle = one / leg_circ%r_circle

@@ -26,6 +26,7 @@
 !!    end second_file_ctl
 !!
 !!    i_step_surface_ctl      10
+!!    difference_limit_ctl    1.0e-9
 !!  end compare_surface_file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -38,6 +39,7 @@
       use t_read_control_elements
       use t_control_array_character
       use t_control_array_integer
+      use t_control_array_real
 !
       implicit  none
 !
@@ -65,8 +67,10 @@
 !>   Putput field file format
         type(psf_file_control) :: second_psf
 !
-!>   Increment for field data output
+!>   section data step
         type(read_integer_item) :: i_step_surface_ctl
+!>   Upper limit of data error
+        type(read_real_item) :: diff_limit_ctl
 !
         integer (kind=kint) :: i_psf_compare_control = 0
       end type psf_compare_control
@@ -79,7 +83,9 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_second_file = 'second_file_ctl'
       character(len=kchara), parameter, private                         &
-     &             :: hd_step_surface = 'i_step_surface_ctl'
+     &             :: hd_step_surface =   'i_step_surface_ctl'
+      character(len=kchara), parameter, private                         &
+     &             :: hd_diff_limit_ctl = 'difference_limit_ctl'
 !
       character(len=kchara), parameter, private                         &
      &             :: hd_surface_file_prefix = 'surface_file_prefix'
@@ -153,6 +159,8 @@
 !
         call read_integer_ctl_type(c_buf, hd_step_surface,              &
      &      psf_cmp_ctl%i_step_surface_ctl)
+        call read_real_ctl_type(c_buf, hd_diff_limit_ctl,               &
+     &      psf_cmp_ctl%diff_limit_ctl)
       end do
       psf_cmp_ctl%i_psf_compare_control = 1
 !
@@ -168,6 +176,7 @@
       call reset_ctl_data_psf_file(psf_cmp_ctl%first_psf)
       call reset_ctl_data_psf_file(psf_cmp_ctl%second_psf)
       psf_cmp_ctl%i_step_surface_ctl%iflag =   0
+      psf_cmp_ctl%diff_limit_ctl%iflag =       0
 !
       psf_cmp_ctl%i_psf_compare_control =      0
 !
@@ -187,6 +196,8 @@
      &                            new_psf_cmp%second_psf)
       call copy_integer_ctl(org_psf_cmp%i_step_surface_ctl,             &
      &                      new_psf_cmp%i_step_surface_ctl)
+      call copy_real_ctl(org_psf_cmp%diff_limit_ctl,                    &
+     &                   new_psf_cmp%diff_limit_ctl)
 !
       new_psf_cmp%i_psf_compare_control                                 &
      &      = org_psf_cmp%i_psf_compare_control

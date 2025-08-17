@@ -13,12 +13,6 @@
 !!     &                         np_ucd, t_IO, psf_dat)
 !!
 !!      subroutine dealloc_psf_results(psf_nod, psf_ele, psf_phys)
-!!
-!!      integer(kind = kint) function compare_psf_data                  &
-!!     &                   (istep, psf1_file_param, psf2_file_param)
-!!        integer(kind = kint), intent(in) :: istep
-!!        type(field_IO_params), intent(in) :: psf1_file_param
-!!        type(field_IO_params), intent(in) :: psf2_file_param
 !!@endverbatim
 !
       module t_psf_results
