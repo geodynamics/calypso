@@ -138,8 +138,7 @@
 !
             diff = compare_data(picked_IO1%radius(ipick),               &
      &                          picked_IO2%radius(ipick))
-            if(picked_IO1%radius(ipick)                                 &
-                .ne. picked_IO2%radius(ipick)) then
+            if(abs(diff) .gt. 1.d-9) then
               write(*,*) 'Error in radius',                             &
      &                     picked_IO1%radius(ipick),                    &
      &                     picked_IO2%radius(ipick), diff
