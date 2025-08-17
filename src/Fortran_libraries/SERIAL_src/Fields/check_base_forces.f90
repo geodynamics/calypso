@@ -169,11 +169,11 @@
         call add_phys_name_ctl(induction_tensor, field_ctl)
 !
       if(check_field_list_ctl(div_heat_flux, field_ctl))                &
-        call add_phys_name_ctl(div_pert_heat_flux, field_ctl)
-      if(check_field_list_ctl(pert_heat_flux, field_ctl))               &
-        call add_phys_name_ctl(div_composition_flux, field_ctl)
-      if(check_field_list_ctl(composite_flux, field_ctl))               &
-        call add_phys_name_ctl(induction_tensor, field_ctl)
+        call add_phys_name_ctl(heat_flux, field_ctl)
+      if(check_field_list_ctl(div_pert_heat_flux, field_ctl))           &
+        call add_phys_name_ctl(pert_heat_flux, field_ctl)
+      if(check_field_list_ctl(div_composition_flux, field_ctl))         &
+        call add_phys_name_ctl(composite_flux, field_ctl)
       if(check_field_list_ctl(div_pert_composition_flux, field_ctl))    &
         call add_phys_name_ctl(pert_comp_flux, field_ctl)
 !
