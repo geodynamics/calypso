@@ -7,13 +7,14 @@ SHELL           = /bin/sh
 #  directories of Kemo's Dynamo toolkit
 #
 SRCDIR = /Users/matsui/src_kemo
+BUILDDIR= $(SRCDIR)/bin
 #
 MPIRUN = mpirun
-TARGET_SPH_MHD =       $(SRCDIR)/bin/sph_mhd
-TARGET_SPH_SNAP =      $(SRCDIR)/bin/sph_snapshot
-TARGET_SPH_ENE_CHECK = $(SRCDIR)/bin/tests/sph_ene_check
-TARGET_COMPARE_PSF =   $(SRCDIR)/bin/tests/compare_psf
-TARGET_PSF_2_VTK =     $(SRCDIR)/bin/utilities/section_to_VTK
+TARGET_SPH_MHD =       $(BUILDDIR)/sph_mhd
+TARGET_SPH_SNAP =      $(BUILDDIR)/sph_snapshot
+TARGET_SPH_ENE_CHECK = $(BUILDDIR)/tests/sph_ene_check
+TARGET_COMPARE_PSF =   $(BUILDDIR)/tests/compare_psf
+TARGET_PSF_2_VTK =     $(BUILDDIR)/utilities/section_to_VTK
 #
 #  -------------------------------------------------------------------------
 #

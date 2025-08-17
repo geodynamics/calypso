@@ -7,12 +7,19 @@ SHELL           = /bin/sh
 #  directories of Kemo's Dynamo toolkit
 #
 SRCDIR = /Users/matsui/src_kemo
+BUILDDIR= $(SRCDIR)/bin
+#
+GMAKE = make
+
+TARGET_GEN_SPH_GRID =    $(BUILDDIR)/utilities/gen_sph_grids
+TARGET_CHECK_SPH_GRID =  $(BUILDDIR)/tests/check_sph_grids
+TARGET_TEST_SPH_GRID =   $(BUILDDIR)/tests/check_sph_comms
 #
 NP = 6
 MPIRUN= mpirun
-MPI_GEN =   $(MPIRUN) -np $(NP) $(SRCDIR)/bin/utilities/gen_sph_grids
-MPI_CHECK = $(MPIRUN) -np $(NP) $(SRCDIR)/bin/tests/check_sph_grids
-MPI_TEST =  $(MPIRUN) -np $(NP) $(SRCDIR)/bin/tests/check_sph_comms
+MPI_GEN =   $(MPIRUN) -np $(NP) $(TARGET_GEN_SPH_GRID)
+MPI_CHECK = $(MPIRUN) -np $(NP) $(TARGET_CHECK_SPH_GRID)
+MPI_TEST =  $(MPIRUN) -np $(NP) $(TARGET_TEST_SPH_GRID)
 #
 #
 #  -------------------------------------------------------------------------

@@ -12,15 +12,6 @@ MHDDIR =  $(SRCDIR)/MHD
 BUILDDIR= $(SRCDIR)/bin
 TESTDIR=  $(SRCDIR)/tests
 #
-# MPI settings
-#
-MPICHDIR =    
-MPICHLIBDIR = $(MPICHDIR)/lib
-MPICHBINDIR = $(MPICHDIR)/bin
-MPICHINCDIR = 
-MPILIBS =      
-#
-#
 #  -------------------------------------------------------------------------
 #
 SUBDIRS = \

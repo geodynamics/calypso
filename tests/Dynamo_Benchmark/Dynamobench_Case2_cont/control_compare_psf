@@ -8,7 +8,9 @@ array compare_surface_file
       surface_file_prefix    'sections/CMB'
       surface_file_format            vtk_gz
     end second_file_ctl
+!
     i_step_surface_ctl        1502
+    difference_limit_ctl    1.0e-9
   end compare_surface_file
 !
   begin compare_surface_file
@@ -20,7 +22,9 @@ array compare_surface_file
       surface_file_prefix    'sections/equator'
       surface_file_format            vtk
     end second_file_ctl
-    i_step_surface_ctl      1502
+!
+    i_step_surface_ctl        1502
+    difference_limit_ctl    1.0e-9
   end compare_surface_file
 !
   begin compare_surface_file
@@ -32,7 +36,9 @@ array compare_surface_file
       surface_file_prefix    'sections/cylinder_s055'
       surface_file_format            vtd_gz
     end second_file_ctl
-    i_step_surface_ctl      1502
+!
+    i_step_surface_ctl        1502
+    difference_limit_ctl    1.0e-7
   end compare_surface_file
 !
   begin compare_surface_file
@@ -44,7 +50,9 @@ array compare_surface_file
       surface_file_prefix    'sections/zonal_mean'
       surface_file_format            binary_gz
     end second_file_ctl
-    i_step_surface_ctl      1502
+!
+    i_step_surface_ctl        1502
+    difference_limit_ctl    1.0e-7
   end compare_surface_file
 !
   begin compare_surface_file
@@ -56,7 +64,9 @@ array compare_surface_file
       surface_file_prefix    'reference/temp0_7'
       surface_file_format            vtk_gz
     end second_file_ctl
-    i_step_surface_ctl      1502
+!
+    i_step_surface_ctl        1502
+    difference_limit_ctl    1.0e-6
   end compare_surface_file
 end array compare_surface_file
 !

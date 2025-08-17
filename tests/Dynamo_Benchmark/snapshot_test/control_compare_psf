@@ -8,7 +8,9 @@ array compare_surface_file
       surface_file_prefix    '../Dynamobench_Case2/sections/psf_cmb'
       surface_file_format            VTK
     end second_file_ctl
+!
     i_step_surface_ctl      1
+    difference_limit_ctl    1.0e-9
   end compare_surface_file
 !
   begin compare_surface_file
@@ -20,7 +22,9 @@ array compare_surface_file
       surface_file_prefix    '../Dynamobench_Case2/sections/psf_eq'
       surface_file_format            VTK
     end second_file_ctl
+!
     i_step_surface_ctl      1
+    difference_limit_ctl    1.0e-9
   end compare_surface_file
 !
   begin compare_surface_file
@@ -32,7 +36,9 @@ array compare_surface_file
       surface_file_prefix    '../Dynamobench_Case2/sections/psf_z0.3'
       surface_file_format            VTK
     end second_file_ctl
+!
     i_step_surface_ctl      1
+    difference_limit_ctl    1.0e-9
   end compare_surface_file
 !
   begin compare_surface_file
@@ -44,7 +50,9 @@ array compare_surface_file
       surface_file_prefix    '../Dynamobench_Case2/isosurfaces/iso_T0.6'
       surface_file_format            VTK
     end second_file_ctl
-    i_step_surface_ctl      3
+!
+    i_step_surface_ctl      1
+    difference_limit_ctl    1.0e-6
   end compare_surface_file
 !
   begin compare_surface_file
@@ -56,7 +64,9 @@ array compare_surface_file
       surface_file_prefix    '../Dynamobench_Case2/isosurfaces/iso_w10n'
       surface_file_format            VTK
     end second_file_ctl
-    i_step_surface_ctl      3
+!
+    i_step_surface_ctl      1
+    difference_limit_ctl    1.0e-6
   end compare_surface_file
 !
   begin compare_surface_file
@@ -68,6 +78,8 @@ array compare_surface_file
       surface_file_prefix    '../Dynamobench_Case2/isosurfaces/iso_w10p'
       surface_file_format            VTK
     end second_file_ctl
+!
     i_step_surface_ctl      3
+    difference_limit_ctl    1.0e-6
   end compare_surface_file
 end array compare_surface_file

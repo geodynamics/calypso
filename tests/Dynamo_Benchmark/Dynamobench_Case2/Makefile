@@ -20,23 +20,24 @@ test:
 	
 	$(MPIRUN) -np 4 $(TARGET_SPH_MHD)
 	
-	echo 'Compare with reference mean square data'
-	$(TARGET_SPH_ENE_CHECK)  reference/dynamobench       monitor/dynamobench       > log.txt
+	@sync
+	@echo 'Compare with reference mean square data'
+	$(TARGET_SPH_ENE_CHECK)  reference/dynamobench       monitor/dynamobench       >  log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed dynamo benchmark data check'; \
 		exit 1;\
 	fi
-	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_s  monitor/sph_pwr_volume_s  > log.txt
+	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_s  monitor/sph_pwr_volume_s  >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed dynamo benchmark data check'; \
 		exit 1;\
 	fi
-	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_m0 monitor/sph_pwr_volume_m0 > log.txt
+	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_m0 monitor/sph_pwr_volume_m0 >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed dynamo benchmark data check'; \
 		exit 1;\
 	fi
-	$(TARGET_SPH_ENE_CHECK)  reference/gauss_coefs_Re    monitor/gauss_coefs_Re    > log.txt
+	$(TARGET_SPH_ENE_CHECK)  reference/gauss_coefs_Re    monitor/gauss_coefs_Re    >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed dynamo benchmark data check'; \
 		exit 1;\

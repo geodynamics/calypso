@@ -7,30 +7,34 @@ SHELL           = /bin/sh
 #  directories of Kemo's Dynamo toolkit
 #
 SRCDIR = /Users/matsui/src_kemo
-#
 BUILDDIR= $(SRCDIR)/bin
 #
+TARGET_FFTPACK_TEST =  $(BUILDDIR)/tests/test_FFTPACK
+TARGET_FFW3_F_TEST =   $(BUILDDIR)/tests/test_FFTW3_f
+TARGET_SGL_FFW3_TEST = $(BUILDDIR)/tests/test_single_FFTW3
+TARGET_CMPR_FFT_TEST = $(BUILDDIR)/tests/compare_fft_test
 
 all: test
 
 test: 
-	rm -f *.dat
-	$(BUILDDIR)/tests/test_FFTPACK
-	$(BUILDDIR)/tests/compare_fft_test < compare_FFTPACK.txt > log.txt
+	make clean
+	
+	$(TARGET_FFTPACK_TEST)
+	$(TARGET_CMPR_FFT_TEST) < compare_FFTPACK.txt > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed Gauss points check'; \
 		exit 1;\
 	fi
 	
-	$(BUILDDIR)/tests/test_FFTW3_f
-	$(BUILDDIR)/tests/compare_fft_test < compare_FFTW3.txt > log.txt
+	$(TARGET_FFW3_F_TEST)
+	$(TARGET_CMPR_FFT_TEST) < compare_FFTW3.txt > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed FFTW3 check'; \
 		exit 1;\
 	fi
 	
-	$(BUILDDIR)/tests/test_single_FFTW3
-	$(BUILDDIR)/tests/compare_fft_test < compare_single_FFTW3.txt > log.txt
+	$(TARGET_SGL_FFW3_TEST)
+	$(TARGET_CMPR_FFT_TEST) < compare_single_FFTW3.txt > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed single FFTW3 check'; \
 		exit 1;\

@@ -7,16 +7,17 @@ SHELL           = /bin/sh
 #  directories of Kemo's Dynamo toolkit
 #
 SRCDIR = /Users/matsui/src_kemo
-#
-MHDDIR =  $(SRCDIR)/MHD
 BUILDDIR= $(SRCDIR)/bin
+
+TARGET_GAUSS_TEST =     $(BUILDDIR)/tests/gauss_points
+TARGET_CMP_GAUSS_TEST = $(BUILDDIR)/tests/compare_gauss_points
 
 all: test
 
 test: 
-	rm -f *.dat log.txt
-	$(BUILDDIR)/tests/gauss_points < input.txt
-	$(BUILDDIR)/tests/compare_gauss_points < compare.txt > log.txt
+	make clean
+	$(TARGET_GAUSS_TEST) < input.txt
+	$(TARGET_CMP_GAUSS_TEST) < compare.txt > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed Gauss points check'; \
 		exit 1;\
@@ -24,6 +25,6 @@ test:
 	echo 'Gauss points check finished'
 
 clean:
-	rm -f *.dat
+	rm -f *.dat log.txt
 
 distclean: clean

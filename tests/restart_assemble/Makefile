@@ -7,13 +7,14 @@ SHELL           = /bin/sh
 #  directories of Kemo's Dynamo toolkit
 #
 SRCDIR = /Users/matsui/src_kemo
+BUILDDIR= $(SRCDIR)/bin
 #
 # Command settings
 #
 MPIRUN= mpirun   
-TARGET_GEN_SPH_GRID= $(SRCDIR)/bin/utilities/gen_sph_grids
-TARGET_NEWSPH= $(SRCDIR)/bin/utilities/assemble_sph
-TARGET_CMP_SPH_RST=  $(SRCDIR)/bin/tests/compare_sph_restart
+TARGET_GEN_SPH_GRID= $(BUILDDIR)/utilities/gen_sph_grids
+TARGET_NEWSPH=       $(BUILDDIR)/utilities/assemble_sph
+TARGET_CMP_SPH_RST=  $(BUILDDIR)/tests/compare_sph_restart
 #
 #  -------------------------------------------------------------------------
 #
