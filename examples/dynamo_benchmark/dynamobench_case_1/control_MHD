@@ -266,8 +266,8 @@ begin MHD_control
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-!      rst_ctl                dynamo_benchmark_1
-      rst_ctl                start_from_rst_file
+      rst_ctl                dynamo_benchmark_1
+!      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
 !!!!!!   method for time evolution
@@ -285,10 +285,14 @@ begin MHD_control
 begin sph_monitor_ctl
     volume_average_prefix        'monitor/sph_ave_volume'
     volume_pwr_spectr_prefix     'monitor/sph_pwr_volume'
-    nusselt_number_prefix        'monitor/Nusselt'
+    volume_pwr_spectr_format     'ASCII'
+!
+	nusselt_number_prefix        'monitor/Nusselt'
+    nusselt_number_format        'gzip'
 !
     begin layered_spectrum_ctl
       layered_pwr_spectr_prefix    'monitor/sph_pwr_layer'
+      layered_pwr_spectr_format    'gzip'
 !
        array spectr_layer_ctl
          spectr_layer_ctl  1
@@ -299,6 +303,7 @@ begin sph_monitor_ctl
 !
     begin pickup_spectr_ctl
       picked_sph_prefix     'monitor/picked_mode'
+      picked_sph_format     'gzip'
 !
       array pick_layer_ctl
         pick_layer_ctl    8
@@ -320,17 +325,27 @@ begin sph_monitor_ctl
       end array pick_gauss_coef_degree_ctl
     end gauss_coefficient_ctl
 !
+    begin sph_dipolarity_ctl
+      dipolarity_file_prefix        'monitor/dipolarity'
+      dipolarity_file_format        'gzip'
+
+      array dipolarity_truncation_ctl
+        dipolarity_truncation_ctl     13
+      end array dipolarity_truncation_ctl
+    end sph_dipolarity_ctl
+!
     begin dynamo_benchmark_data_ctl
       dynamo_benchmark_file_prefix     'monitor/dynamobench'
-      dynamo_benchmark_file_format     'gzip'
+      dynamo_benchmark_file_format     'ASCII'
       nphi_mid_eq_ctl                   512
     end dynamo_benchmark_data_ctl
   end sph_monitor_ctl
 !
   begin visual_control
     array cross_section_ctl
-      file  cross_section_ctl   control_psf_CMB
-      file  cross_section_ctl   control_psf_eq 
+      file  cross_section_ctl   control_mid_depth
+      file  cross_section_ctl   control_CMB
+      file  cross_section_ctl   control_equator 
       file  cross_section_ctl   control_psf_z0.3
       file  cross_section_ctl   control_psf_s0.55
     end array cross_section_ctl
@@ -340,7 +355,7 @@ begin sph_monitor_ctl
     end array isosurface_ctl
   end  visual_control
 !
-  begin dynamo vizs control
-    file zonal mean section ctl  control_psf_zm
-  end dynamo vizs control
+  begin dynamo_vizs_control
+    file zonal_mean_section_ctl  control_zonal_mean
+  end dynamo_vizs_control
 end MHD_control

@@ -3,6 +3,7 @@
 !
 begin cross_section_ctl
   section_file_prefix    'sections/equator'
+  psf_output_type         VTK_gz
 !
   begin surface_define
     section_method    equation
