@@ -92,11 +92,11 @@ begin MHD_control
 !
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available forces
-!     gravity, Coriolis, Lorentz
+!     Thermal_buoyancy, Coriolis, Lorentz
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin forces_define
-      array force_ctl      3
-        force_ctl   gravity
+      array force_ctl
+        force_ctl   Thermal_buoyancy
         force_ctl   Coriolis
         force_ctl   Lorentz
       end array force_ctl
@@ -110,7 +110,7 @@ begin MHD_control
 !     Taylor_number, Ekman_number
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
-      array dimless_ctl 4 
+      array dimless_ctl
         dimless_ctl  Prandtl_number                   1.0e-0
         dimless_ctl  modified_Rayleigh_number         1.0E+2
         dimless_ctl  Ekman_number                     1.0e-3

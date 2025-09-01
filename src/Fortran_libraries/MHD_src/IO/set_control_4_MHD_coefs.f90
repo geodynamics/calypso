@@ -150,7 +150,7 @@
         coefs_buoyancy%num = 0
       else
         if (mom_ctl%coef_4_termal_buo%icou .eq. 0) then
-          e_message = 'Set coefficients for buoyancy'
+          e_message = 'Set coefficients for thermal buoyancy'
           call calypso_MPI_abort(ierr_dless, e_message)
         else
           coefs_buoyancy%num = mom_ctl%coef_4_termal_buo%num

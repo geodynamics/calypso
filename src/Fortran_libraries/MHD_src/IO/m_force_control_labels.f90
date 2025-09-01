@@ -27,7 +27,7 @@
 !!     Coriolis_force       (Coriolis)
 !!     Lorentz_force        (Lorentz)
 !!
-!!     buoyancy             (Thermal_buoyancy, Thermal_gravity, gravity)
+!!     Thermal_buoyancy        (buoyancy, Thermal_gravity, gravity)
 !!     Compositional_buoyancy  (composite_buoyancy, composite_gravity
 !!                              compositional_gravity)
 !!

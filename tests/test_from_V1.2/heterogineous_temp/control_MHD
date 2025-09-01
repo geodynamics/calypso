@@ -85,7 +85,7 @@ begin MHD_control
 !
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available forces
-!     gravity, Coriolis, Lorentz
+!     Thermal_buoyancy, Coriolis, Lorentz
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin forces_define
       array force_ctl      0

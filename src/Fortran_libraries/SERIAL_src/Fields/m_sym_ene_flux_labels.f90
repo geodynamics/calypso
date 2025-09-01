@@ -48,73 +48,79 @@
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: mns_us_d_ws_x_ua            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = '-us_d_ws_x_ua',                &
-        &                math = '$ u_{i} (e_{ijk}'                         &
-        &                     //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
+      type(field_def), parameter :: mns_us_d_ws_x_ua                    &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = '-us_d_ws_x_ua',                           &
+     &                math = '$ u_{i} (e_{ijk}'                         &
+     &                    //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: mns_us_d_wa_x_us            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = '-us_d_wa_x_us',                &
-        &                math = '$ u_{i} (e_{ijk}'                         &
-        &                     //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
+      type(field_def), parameter :: mns_us_d_wa_x_us                    &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = '-us_d_wa_x_us',                           &
+     &                math = '$ u_{i} (e_{ijk}'                         &
+     &                    //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: mns_ua_d_ws_x_us            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = '-ua_d_ws_x_us',                &
-        &                math = '$ u_{i} (e_{ijk}'                         &
-        &                     //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
+      type(field_def), parameter :: mns_ua_d_ws_x_us                    &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = '-ua_d_ws_x_us',                           &
+     &                math = '$ u_{i} (e_{ijk}'                         &
+     &                    //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: mns_ua_d_wa_x_ua            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = '-ua_d_wa_x_ua',                &
-        &                math = '$ u_{i} (e_{ijk}'                         &
-        &                     //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
+      type(field_def), parameter :: mns_ua_d_wa_x_ua                    &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = '-ua_d_wa_x_ua',                           &
+     &                math = '$ u_{i} (e_{ijk}'                         &
+     &                    //  ' \tilde{\omega}_{j} \tilde{u}_{k})$')
 !
 !>        Field label of work of Lorentz force
 !!         @f$ u_{symi} (e_{ijk} \tilde{J}_{symj} \tilde{B}_{asymk}) @f$
-        type(field_def), parameter :: us_d_js_x_ba            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'us_d_js_x_ba',                &
-        &         math = '$ u_{symi} (e_{ijk} \tilde{J}_{symj} \tilde{B}_{asymk})$')
+      type(field_def), parameter :: us_d_js_x_ba                        &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'us_d_js_x_ba',                            &
+     &                math = '$ u_{symi} (e_{ijk}'                      &
+     &                  // '  \tilde{J}_{symj} \tilde{B}_{asymk})$')
 !>        Field label of work of Lorentz force
 !!         @f$ u_{symi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{symk}) @f$
-        type(field_def), parameter :: us_d_ja_x_bs            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'us_d_ja_x_bs',                &
-        &         math = '$ u_{symi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{symk})$')
+      type(field_def), parameter :: us_d_ja_x_bs                        &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'us_d_ja_x_bs',                            &
+     &                math = '$ u_{symi} (e_{ijk}'                      &
+     &                  //' \tilde{J}_{asymj} \tilde{B}_{symk})$')
 !>        Field label of work of Lorentz force
 !!         @f$ u_{asymi} (e_{ijk} \tilde{J}_{symj} \tilde{B}_{symk}) @f$
-        type(field_def), parameter :: ua_d_js_x_bs            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'ua_d_js_x_bs',                &
-        &         math = '$ u_{asymi} (e_{ijk} \tilde{J}_{symj} \tilde{B}_{symk})$')
+      type(field_def), parameter :: ua_d_js_x_bs                        &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'ua_d_js_x_bs',                            &
+     &                math = '$ u_{asymi} (e_{ijk}'                     &
+     &                  // ' \tilde{J}_{symj} \tilde{B}_{symk})$')
 !>        Field label of work of Lorentz force
 !!         @f$ u_{asymi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{asymk}) @f$
-        type(field_def), parameter :: ua_d_ja_x_ba            &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'ua_d_ja_x_ba',                &
-        &         math = '$ u_{asymi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{asymk})$')
-! 
+      type(field_def), parameter :: ua_d_ja_x_ba                        &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'ua_d_ja_x_ba',                            &
+     &                math = '$ u_{asymi} (e_{ijk}'                     &
+     &                  // ' \tilde{J}_{asymj} \tilde{B}_{asymk})$')
+!
 !>        Field label for sym buoyancy flux
 !!         @f$ -u_{symi} \alpha_{T} g_{i} \tilde{T}_{sym} @f$
-        type(field_def), parameter :: sym_buoyancy_flux              &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'sym_buoyancy_flux',                  &
-        &                math = '$ u_{asymi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{symk})$')
+      type(field_def), parameter :: sym_buoyancy_flux                   &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'sym_buoyancy_flux',                       &
+     &                math = '$ u_{asymi} (e_{ijk}'                     &
+     &                  // ' \tilde{J}_{asymj} \tilde{B}_{symk})$')
 !>        Field label for asym buoyancy flux
 !!         @f$ -u_{asymi} \alpha_{T} g_{i} \tilde{T}_{asym} @f$
-        type(field_def), parameter :: asym_buoyancy_flux              &
-        &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'asym_buoyancy_flux',                  &
-        &                math = '$ -u_{asymi} \alpha_{T} g_{i} \tilde{T}_{asym} $')
+      type(field_def), parameter :: asym_buoyancy_flux                  &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'asym_buoyancy_flux',                      &
+     &                math = '$ -u_{asymi} \alpha_{T}'                  &
+     &                      // ' g_{i} \tilde{T}_{asym} $')
 !
 ! ----------------------------------------------------------------------
 !

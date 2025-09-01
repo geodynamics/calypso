@@ -148,23 +148,23 @@
 !
       if(fl_prop%iflag_scheme .gt. id_no_evolution) then
         if(fl_prop%flag_thermal_buoyancy) then
-          msg = 'Buoyancy needs'
+          msg = 'Thermal buoyancy is required'
           call check_missing_field_w_msg(fld, msg, iphys_base%i_temp)
         end if
 !
         if(fl_prop%flag_comp_buoyancy) then
-          msg = 'Compositional buoyancy needs'
+          msg = 'Compositional buoyancy is required'
           call check_missing_field_w_msg(fld, msg, iphys_base%i_light)
         end if
 !
         if(fl_prop%flag_lorentz) then
-          msg = 'Lorentz force needs'
+          msg = 'Lorentz force is required'
           call check_missing_field_w_msg(fld, msg, iphys_base%i_magne)
         end if
       end if
 !
       if(cd_prop%iflag_magneto_cv .eq. id_turn_ON) then
-        msg = 'Magnetoconvection needs'
+        msg = 'Magnetoconvection is required'
         call check_missing_field_w_msg(fld, msg, iphys_base%i_back_B)
       end if
 !

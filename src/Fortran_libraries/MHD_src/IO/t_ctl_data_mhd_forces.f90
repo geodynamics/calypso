@@ -25,10 +25,10 @@
 !!    begin forces_define
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  available forces
-!!     gravity, Coriolis, Lorentz, Compositional_buoyancy
+!!     Thermal_buoyancy, Coriolis, Lorentz, Compositional_buoyancy
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!      array force_ctl
-!!        force_ctl   gravity
+!!        force_ctl   Thermal_buoyancy
 !!        force_ctl   Coriolis
 !!        force_ctl   Lorentz
 !!        force_ctl   Compositional_buoyancy

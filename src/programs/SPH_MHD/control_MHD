@@ -259,11 +259,11 @@ begin MHD_control
 !
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available forces
-!     gravity, Coriolis, Lorentz
+!     Thermal_buoyancy, Coriolis, Lorentz
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin forces_define
       array force_ctl
-        force_ctl   gravity
+        force_ctl   Thermal_buoyancy
         force_ctl   Coriolis
         force_ctl   Lorentz
         force_ctl   Compositional_buoyancy
@@ -504,11 +504,11 @@ begin MHD_control
       end array sph_filter_ctl
 !
       array SGS_terms_ctl
-        SGS_terms_ctl    heat              end
-        SGS_terms_ctl    inertia           end
-        SGS_terms_ctl    Lorentz           end
-        SGS_terms_ctl    induction         end
-        SGS_terms_ctl    gravity           end
+        SGS_terms_ctl    heat
+        SGS_terms_ctl    inertia
+        SGS_terms_ctl    Lorentz
+        SGS_terms_ctl    induction
+        SGS_terms_ctl    Thermal_buoyancy
       end array SGS_terms_ctl
     end SGS_control
 !
