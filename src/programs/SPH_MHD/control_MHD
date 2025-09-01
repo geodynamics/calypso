@@ -266,7 +266,7 @@ begin MHD_control
         force_ctl   gravity
         force_ctl   Coriolis
         force_ctl   Lorentz
-        force_ctl   Composite_gravity
+        force_ctl   Compositional_buoyancy
       end array force_ctl
     end forces_define
 !

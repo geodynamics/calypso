@@ -143,7 +143,11 @@ clean:
 	done; \
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
+testclean:
+	@echo "# cleaning tests directory..."
+	@cd $(TESTDIR); $(GMAKE) clean
+
 distclean:
 	echo "# Back to initial package"; \
+	make testclean
 	rm -fr $(MAKEDIR) $(BUILDDIR) Makefile config.log
-	cd $(TESTDIR) ;  make distclean

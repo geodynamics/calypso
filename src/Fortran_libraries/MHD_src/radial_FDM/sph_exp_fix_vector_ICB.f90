@@ -112,7 +112,7 @@
 !
 !
 !$omp parallel do private(k,j,inod)
-      do k = 1, Vp_ICB(nidx_rj(2))
+      do k = 1, int(Vp_ICB(nidx_rj(2)))
         do j = 1, nidx_rj(2)
           if(k .gt. int(Vp_ICB(j))) cycle
 !

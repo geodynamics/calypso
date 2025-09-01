@@ -28,8 +28,8 @@
 !!     Lorentz_force        (Lorentz)
 !!
 !!     buoyancy             (Thermal_buoyancy, Thermal_gravity, gravity)
-!!     composite_buoyancy   (Compositional_buoyancy, composite_gravity
-!!                           compositional_gravity)
+!!     Compositional_buoyancy  (composite_buoyancy, composite_gravity
+!!                              compositional_gravity)
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
