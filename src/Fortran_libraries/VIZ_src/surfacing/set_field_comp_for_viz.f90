@@ -7,8 +7,9 @@
 !>@brief set field components for visualizartions
 !!
 !!@verbatim
-!!      subroutine check_field_4_viz(num_nod_phys, phys_nod_name,       &
-!!     &          n_field_ctl, field_name, num_field, num_field_vis)
+!!      integer(kind = kint) function count_field_4_viz                 &
+!!     &                            (num_nod_phys, phys_nod_name,       &
+!!     &                             n_field_ctl, field_name)
 !!      subroutine set_components_4_viz(num_nod_phys, phys_nod_name,    &
 !!     &          n_field_ctl, field_name, comp_name, num_field,        &
 !!     &          ifield, icomp, ncomp, ncomp_org, rst_name)
@@ -30,31 +31,37 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine check_field_4_viz(num_nod_phys, phys_nod_name,         &
-     &          n_field_ctl, field_name, num_field, num_field_vis)
+      integer(kind = kint) function count_field_4_viz                   &
+     &                            (num_nod_phys, phys_nod_name,         &
+     &                             n_field_ctl, field_name)
 !
       integer(kind = kint), intent(in) :: num_nod_phys, n_field_ctl
 !
       character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
       character(len=kchara), intent(in) :: field_name(n_field_ctl)
 !
-      integer(kind = kint), intent(inout) :: num_field, num_field_vis
-!
-      integer(kind = kint) :: i, id
+      integer(kind = kint) :: i, id, i_find, num_field
 !
 !
       num_field = 0
       do i = 1, n_field_ctl
+        i_find = 0
         do id = 1, num_nod_phys
-          if ( field_name(i) .eq. phys_nod_name(id) ) then
-            num_field = num_field + 1
+          if(field_name(i) .eq. phys_nod_name(id)) then
+            i_find = 1
             exit
           end if
         end do
+        if(i_find .eq. 0) then
+          num_field = -i
+          exit
+        else
+          num_field = num_field + i_find
+        end if
       end do
-      num_field_vis = num_field
+      count_field_4_viz = num_field
 !
-      end subroutine check_field_4_viz
+      end function count_field_4_viz
 !
 !  ---------------------------------------------------------------------
 !
@@ -84,7 +91,7 @@
       icou = 0
       do i = 1, n_field_ctl
         do id = 1, num_nod_phys
-          if ( field_name(i) .eq. phys_nod_name(id) ) then
+          if(field_name(i) .eq. phys_nod_name(id)) then
 !
             icou = icou + 1
             ifield(icou) = id
@@ -122,8 +129,9 @@
       integer(kind = kint) :: id
 !
 !
+      ncomp = -1
       do id = 1, num_nod_phys
-        if ( field_name .eq. phys_nod_name(id) ) then
+        if(field_name .eq. phys_nod_name(id)) then
           ifield = id
 !
           call s_set_components_flags(comp_name, field_name,            &

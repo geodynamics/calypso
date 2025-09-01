@@ -7,14 +7,13 @@
 !!
 !!@verbatim
 !!      subroutine const_radial_mat_4_magne_sph                         &
-!!     &         (dt, sph_rj, r_2nd, cd_prop, sph_bc_B, fdm2_center,    &
-!!     &          g_sph_rj, band_bp_evo, band_bt_evo)
+!!     &         (dt, sph_rj, r_2nd, cd_prop, sph_bc_B, bcs_B,          &
+!!     &          fdm2_center, g_sph_rj, band_bp_evo, band_bt_evo)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(conductive_property), intent(in) :: cd_prop
-!!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(sph_boundary_type), intent(in) :: sph_bc_B
-!!        type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
+!!        type(sph_vector_boundary_data), intent(in) :: bcs_B
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(band_matrices_type), intent(inout) :: band_bp_evo
 !!        type(band_matrices_type), intent(inout) :: band_bt_evo
@@ -34,6 +33,7 @@
       use t_sph_matrices
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
+      use t_boundary_sph_spectr
       use t_coef_fdm2_centre
 !
       use set_radial_mat_sph
@@ -52,8 +52,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_radial_mat_4_magne_sph                           &
-     &         (dt, sph_rj, r_2nd, cd_prop, sph_bc_B, fdm2_center,      &
-     &          g_sph_rj, band_bp_evo, band_bt_evo)
+     &         (dt, sph_rj, r_2nd, cd_prop, sph_bc_B, bcs_B,            &
+     &          fdm2_center, g_sph_rj, band_bp_evo, band_bt_evo)
 !
       use select_sph_r_mat_magne_BC
       use set_sph_scalar_matrix_CMB
@@ -63,6 +63,7 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(conductive_property), intent(in) :: cd_prop
       type(sph_boundary_type), intent(in) :: sph_bc_B
+      type(sph_vector_boundary_data), intent(in) :: bcs_B
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
@@ -109,9 +110,9 @@
      &    coef_dbt, r_2nd%fdm(2)%dmat, band_bt_evo%mat)
 !
 !  Matrices at ICB or center
-      call sel_sph_r_mat_pol_magnetic_ICB(sph_rj, sph_bc_B,             &
+      call sel_sph_r_mat_pol_magnetic_ICB(sph_rj, sph_bc_B, bcs_B,      &
      &    fdm2_center, g_sph_rj, coef_dbt, band_bp_evo)
-      call sel_sph_r_mat_tor_magnetic_ICB(sph_rj, sph_bc_B,             &
+      call sel_sph_r_mat_tor_magnetic_ICB(sph_rj, sph_bc_B, bcs_B,      &
      &    fdm2_center, g_sph_rj, coef_dbt, band_bt_evo)
 !
 !  Matrices at CMB

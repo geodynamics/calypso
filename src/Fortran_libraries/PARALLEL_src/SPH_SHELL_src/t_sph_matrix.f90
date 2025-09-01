@@ -212,7 +212,7 @@
       subroutine check_radial_band_matrix(id_rank, sph_rj, smat)
 !
       use t_spheric_rj_data
-      use check_sph_radial_mat
+      use check_single_radial_mat
 !
       integer, intent(in) :: id_rank
       type(sph_rj_grid), intent(in) ::  sph_rj

@@ -153,8 +153,10 @@
         return
       end if
 !
-      call count_control_4_field_on_psf                                 &
-     &   (psf_c%fld_on_psf_c, num_nod_phys, phys_nod_name, psf_fld)
+      call count_control_4_field_on_psf(psf_c%fld_on_psf_c,             &
+     &    num_nod_phys, phys_nod_name, psf_fld, ierr)
+      if(ierr .gt. 0) return
+!
       call count_control_4_psf_define                                   &
      &   (psf_c%psf_def_c, ele_grp, psf_param, ierr)
 !

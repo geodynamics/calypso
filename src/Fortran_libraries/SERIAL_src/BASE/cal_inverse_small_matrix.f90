@@ -279,7 +279,7 @@
       call cal_det_nn_matrix(nsize, a, det)
       if ( abs(det) .lt. eps ) then
        
-       write(*,*) 'nxn matrix is singular'
+      write(*,*) 'nxn matrix is singular'
         ierr = 1
         return
       else

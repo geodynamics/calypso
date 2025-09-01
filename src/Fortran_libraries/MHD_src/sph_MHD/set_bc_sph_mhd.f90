@@ -88,7 +88,8 @@
 !
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_velo_sph'
-        call set_sph_bc_velo_sph(bc_IO, sph_rj, radial_rj_grp,          &
+        call set_sph_bc_velo_sph                                        &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      sph_params%radius_ICB, sph_params%radius_CMB,               &
      &      MHD_BC%velo_BC%nod_BC, MHD_BC%velo_BC%surf_BC,              &
      &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
@@ -105,7 +106,8 @@
 !
       if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_temp_sph'
-        call set_sph_bc_temp_sph(bc_IO, sph_rj, radial_rj_grp,          &
+        call set_sph_bc_temp_sph                                        &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      MHD_BC%temp_BC%nod_BC, MHD_BC%temp_BC%surf_BC,              &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T)
         call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_T)
@@ -113,8 +115,8 @@
 !
       if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 's_set_sph_bc_magne_sph'
-        call s_set_sph_bc_magne_sph(bc_IO, sph_rj, radial_rj_grp,       &
-     &      CTR_nod_grp_name, CTR_sf_grp_name,                          &
+        call s_set_sph_bc_magne_sph                                     &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      MHD_BC%magne_BC%nod_BC, MHD_BC%magne_BC%surf_BC,            &
      &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%bcs_B)
         call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_B)
@@ -122,7 +124,8 @@
 !
       if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_composition_sph'
-        call set_sph_bc_composition_sph(bc_IO, sph_rj, radial_rj_grp,   &
+        call set_sph_bc_composition_sph                                 &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      MHD_BC%light_BC%nod_BC, MHD_BC%light_BC%surf_BC,            &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C)
         call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_C)

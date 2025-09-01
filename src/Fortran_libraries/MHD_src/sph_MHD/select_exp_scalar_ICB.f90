@@ -85,6 +85,7 @@
       use sph_exp_fixed_flux_ICB
       use set_fixed_scalar_sph
       use cal_sph_exp_center
+      use sph_exp_fix_vector_ICB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc
@@ -98,6 +99,12 @@
 !
       real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
+!
+      if(sph_bc%iflag_icb .eq. iflag_sph_filter_center) then
+        call set_sph_filter_vect_to_center                              &
+     &     (sph_rj%nidx_rj, ICB_Sspec%S_BC, is_field,                   &
+     &      n_point, ntot_phys_rj, d_rj)
+      end if
 !
 !   Set RHS vector for ICB
       if(sph_bc%iflag_icb .eq. iflag_sph_fill_center) return

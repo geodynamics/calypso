@@ -11,6 +11,8 @@
 !!     &         (nidx_rj, idx_rj, radius_rj, kr_in, r_ICB,             &
 !!     &          Vp_ICB, Vd_ICB, Vt_ICB, is_fld,                       &
 !!     &          n_point, ntot_phys_rj, d_rj)
+!!      subroutine set_sph_filter_vect_to_center(nidx_rj, Vp_ICB,       &
+!!     &          is_fld, n_point, ntot_phys_rj, d_rj)
 !!
 !!      subroutine cal_sph_nod_icb_fixed_rot2(jmax, g_sph_rj,           &
 !!     &          kr_in, r_ICB, fdm2_fix_fld_ICB, fdm2_fix_dr_ICB,      &
@@ -93,6 +95,35 @@
 !$omp end parallel do
 !
       end subroutine cal_sph_nod_icb_rigid_vect
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_sph_filter_vect_to_center(nidx_rj, Vp_ICB,         &
+     &          is_fld, n_point, ntot_phys_rj, d_rj)
+!
+      integer(kind = kint), intent(in) :: nidx_rj(2)
+      integer(kind = kint), intent(in) :: is_fld
+      real(kind = kreal), intent(in) :: Vp_ICB(nidx_rj(2))
+!
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
+      real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
+!
+      integer(kind = kint) :: inod, j, k
+!
+!
+!$omp parallel do private(k,j,inod)
+      do k = 1, Vp_ICB(nidx_rj(2))
+        do j = 1, nidx_rj(2)
+          if(k .gt. int(Vp_ICB(j))) cycle
+!
+          inod = j + (k-1) * nidx_rj(2)
+          d_rj(inod,is_fld  ) = zero
+          d_rj(inod,is_fld+2) = zero
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine set_sph_filter_vect_to_center
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

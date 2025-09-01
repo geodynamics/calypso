@@ -105,6 +105,7 @@
 !
 !
       call bcast_ctl_type_r1(mgd_ctl%magnetic_ratio_ctl)
+      call bcast_ctl_type_r1(mgd_ctl%delta_to_compare_ctl)
 !
       call calypso_mpi_bcast_one_int(mgd_ctl%i_newrst_magne, 0)
 !

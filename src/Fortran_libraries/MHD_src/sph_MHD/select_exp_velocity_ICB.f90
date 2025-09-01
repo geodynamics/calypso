@@ -94,7 +94,14 @@
       real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
 !
-      if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
+      if(sph_bc_U%iflag_icb .eq. iflag_sph_filter_center) then
+        call set_sph_filter_vect_to_center                              &
+     &     (sph_rj%nidx_rj, ICB_Uspec%Vp_BC, is_velo,                   &
+     &      n_point, ntot_phys_rj, d_rj)
+      end if
+!
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
         call sph_center_fld_and_curl                                    &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
      &      g_sph_rj, r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,             &
@@ -160,7 +167,15 @@
       real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
 !
-      if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
+!
+      if(sph_bc_U%iflag_icb .eq. iflag_sph_filter_center) then
+        call set_sph_filter_vect_to_center                              &
+     &     (sph_rj%nidx_rj, ICB_Uspec%Vp_BC, is_fld,                    &
+     &      n_point, ntot_phys_rj, d_rj)
+      end if
+!
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
         call cal_dsdr_sph_center_2                                      &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%fdm(1)%dmat,    &
      &      is_fld, n_point, ntot_phys_rj, d_rj)
@@ -211,7 +226,8 @@
       real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
 !
-      if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
         call cal_sph_nod_center_rot2                                    &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
      &      g_sph_rj, r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,             &
@@ -268,7 +284,8 @@
       integer(kind = kint) :: it_velo, it_viscous, ids_viscous
 !
 !
-      if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
         call cal_sph_nod_center_diffuse2                                &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
      &      g_sph_rj, r_2nd%fdm(2)%dmat, coef_diffuse,                  &
@@ -346,7 +363,8 @@
       integer(kind = kint) :: ids_w_diffuse
 !
 !
-      if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
         call cal_sph_nod_center_diffuse2                                &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj(1,2), &
      &      g_sph_rj, r_2nd%fdm(2)%dmat, coef_diffuse,                  &

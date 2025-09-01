@@ -161,7 +161,7 @@ use t_coef_fdm2_centre
      &           n_vect, n_comp, p_poisson_mat, band_p00_poisson)
 !
       use m_ludcmp_3band
-      use center_sph_matrices
+      use sph_zero_degree_matrices
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fluid_property), intent(in) :: fl_prop
@@ -187,7 +187,8 @@ use t_coef_fdm2_centre
       &   band_p00_poisson%mat)
 !
 !      write(*,*) 'add_scalar_poisson_mat_fill_ctr'
-      if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
         call add_scalar_poisson_mat_fill_ctr                            &
      &     (sph_rj%nidx_rj(1), sph_bc_U%r_ICB,                          &
      &      fdm2_center%dmat_fix_dr, fdm2_center%dmat_fix_fld,          &
@@ -213,7 +214,7 @@ use t_coef_fdm2_centre
 !
       use m_ludcmp_3band
       use t_boundary_params_sph_MHD
-      use center_sph_matrices
+      use sph_zero_degree_matrices
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm2_center_mat), intent(in) :: fdm2_center
@@ -235,7 +236,8 @@ use t_coef_fdm2_centre
       call copy_to_band3_mat_w_center(sph_rj%nidx_rj(1), coef_advect,   &
      &   evo_mat(1,1,sph_rj%idx_rj_degree_zero), band_s00_evo%mat)
 !
-      if     (iflag_icb .eq. iflag_sph_fill_center) then
+      if(     (iflag_icb .eq. iflag_sph_fill_center)                    &
+     &   .or. (iflag_icb .eq. iflag_sph_filter_center)) then
         call add_scalar_poisson_mat_fill_ctr(sph_rj%nidx_rj(1), r_ICB,  &
      &      fdm2_center%dmat_fix_dr, fdm2_center%dmat_fix_fld,          &
      &      coef, band_s00_evo%mat)
@@ -260,7 +262,7 @@ use t_coef_fdm2_centre
      &         (sph_rj, n_vect, n_comp, evo_mat, band_s00_poisson)
 !
       use m_ludcmp_3band
-      use center_sph_matrices
+      use sph_zero_degree_matrices
 !
       type(sph_rj_grid), intent(in) :: sph_rj
 !

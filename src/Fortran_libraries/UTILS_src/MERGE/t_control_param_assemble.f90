@@ -21,6 +21,10 @@
 !!        type(platform_data_control), intent(in) :: assemble_plt
 !!        type(read_real_item), intent(in)  :: magnetic_ratio_ctl
 !!        type(control_param_assemble), intent(inout) :: asbl_param
+!!      real(kind = kreal) function error_threshold_2_compare           &
+!!     &                          (delta_to_compare_ctl)
+!!        type(read_real_item), intent(in)  :: delta_to_compare_ctl
+!!        real(kind = kreal) :: delta = TINY
 !
       module t_control_param_assemble
 !
@@ -260,6 +264,24 @@
       end if
 !
       end subroutine set_magnetic_ratio_4_assemble
+!
+! -----------------------------------------------------------------------
+!
+      real(kind = kreal) function error_threshold_2_compare             &
+     &                          (delta_to_compare_ctl)
+!
+      use t_control_array_real
+!
+      type(read_real_item), intent(in)  :: delta_to_compare_ctl
+      real(kind = kreal) :: delta = TINY
+!
+!
+      if(delta_to_compare_ctl%iflag .gt. 0) then
+        delta = delta_to_compare_ctl%realvalue
+      end if
+      error_threshold_2_compare = delta
+!
+      end function error_threshold_2_compare
 !
 ! -----------------------------------------------------------------------
 !

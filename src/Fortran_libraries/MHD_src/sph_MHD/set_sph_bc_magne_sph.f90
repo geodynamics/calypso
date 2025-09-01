@@ -7,11 +7,9 @@
 !>@brief Set boundary conditions for MHD dynamo simulation
 !!
 !!@verbatim
-!!      subroutine s_set_sph_bc_magne_sph(bc_IO, sph_rj, radial_rj_grp, &
-!!     &       CTR_nod_grp_name, CTR_sf_grp_name, magne_nod, magne_surf,&
-!!     &       sph_bc_B, bcs_B)
-!!        character(len=kchara), intent(in) :: CTR_nod_grp_name
-!!        character(len=kchara), intent(in) :: CTR_sf_grp_name
+!!      subroutine s_set_sph_bc_magne_sph(bc_IO, sph_params, sph_rj,    &
+!!     &          radial_rj_grp, magne_nod, magne_surf, sph_bc_B, bcs_B)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(group_data), intent(in) :: radial_rj_grp
 !!        type(boundary_condition_list), intent(in) :: magne_nod
@@ -31,10 +29,10 @@
       use t_control_parameter
       use t_physical_property
       use t_spheric_parameter
+      use t_spheric_rj_data
       use t_group_data
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
-      use t_spheric_rj_data
       use t_bc_data_list
       use t_sph_boundary_input_data
 !
@@ -46,16 +44,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_sph_bc_magne_sph(bc_IO, sph_rj, radial_rj_grp,   &
-     &        CTR_nod_grp_name, CTR_sf_grp_name, magne_nod, magne_surf, &
-     &        sph_bc_B, bcs_B)
+      subroutine s_set_sph_bc_magne_sph(bc_IO, sph_params, sph_rj,      &
+     &          radial_rj_grp, magne_nod, magne_surf, sph_bc_B, bcs_B)
 !
       use m_base_field_labels
-      use set_bc_sph_scalars
-      use set_sph_bc_data_by_file
 !
-      character(len=kchara), intent(in) :: CTR_nod_grp_name
-      character(len=kchara), intent(in) :: CTR_sf_grp_name
+      use set_sph_homogenious_BCs
+      use set_sph_bc_data_by_file
+      use set_filter_BC_to_center
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(group_data), intent(in) :: radial_rj_grp
       type(boundary_condition_list), intent(in) :: magne_nod
@@ -82,9 +80,13 @@
         if(sph_bc_B%icb_grp_name .eq. CTR_sf_grp_name) then
           if(magne_surf%ibc_type(i) .eq. iflag_sph_2_center) then
             sph_bc_B%iflag_icb =  iflag_sph_fill_center
-          else if(magne_surf%ibc_type(i) .eq. iflag_sph_clip_center)    &
-     &        then
+          else if(magne_surf%ibc_type(i) .eq. iflag_fix_center) then
             sph_bc_B%iflag_icb =  iflag_sph_fix_center
+          else if(magne_surf%ibc_type(i) .eq. iflag_filter_center) then
+            sph_bc_B%iflag_icb =  iflag_sph_filter_center
+            call sph_vector_filter_to_center                            &
+     &         (sph_params%l_truncation, sph_rj,                        &
+     &          magne_surf%bc_magnitude(i), bcs_B%ICB_Vspec)
           end if
 !
         else if(magne_surf%ibc_type(i) .eq. iflag_pseudo_vacuum) then
@@ -94,9 +96,13 @@
         if(sph_bc_B%icb_grp_name .eq. CTR_nod_grp_name) then
           if(magne_nod%ibc_type(i) .eq. iflag_sph_2_center) then
             sph_bc_B%iflag_icb =  iflag_sph_fill_center
-          else if(magne_nod%ibc_type(i) .eq. iflag_sph_clip_center)     &
-     &        then
+          else if(magne_nod%ibc_type(i) .eq. iflag_fix_center) then
             sph_bc_B%iflag_icb =  iflag_sph_fix_center
+          else if(magne_nod%ibc_type(i) .eq. iflag_filter_center) then
+            sph_bc_B%iflag_icb =  iflag_sph_filter_center
+            call sph_vector_filter_to_center                            &
+     &         (sph_params%l_truncation, sph_rj,                        &
+     &          magne_nod%bc_magnitude(i), bcs_B%ICB_Vspec)
           end if
 !
         else if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then

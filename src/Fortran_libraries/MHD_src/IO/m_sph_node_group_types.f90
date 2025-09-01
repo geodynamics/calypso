@@ -84,11 +84,14 @@
 !
 !>      control name to filling to center
       character(len = kchara), parameter, private                       &
-     &               :: fill_sph_center = 'sph_to_center'
-!>      control name to filling to center
+     &               :: fill_sph_center =   'sph_to_center'
+!>      control name to fix at center
       character(len = kchara), parameter, private                       &
-     &               :: fix_sph_center = 'fix_at_center'
-!
+     &               :: fix_sph_center =    'fix_at_center'
+!>      control name to apply filter toward center
+      character(len = kchara), parameter, private                       &
+     &               :: filter_sph_center = 'filter_to_center'
+
 !>      control name for fixed flux by control
       character(len = kchara), parameter, private                       &
      &               :: flux_bc = 'fixed_flux'
@@ -166,7 +169,9 @@
       if      (cmp_no_case(bc_type_ctl, fill_sph_center)) then
         ibc_type = iflag_sph_2_center
       else if (cmp_no_case(bc_type_ctl, fix_sph_center)) then
-        ibc_type = iflag_sph_clip_center
+        ibc_type = iflag_fix_center
+      else if (cmp_no_case(bc_type_ctl, filter_sph_center)) then
+        ibc_type = iflag_filter_center
       end if
 !
       end subroutine set_bc_group_types_sph_center
@@ -315,8 +320,9 @@
       use t_control_array_character
       type(ctl_array_chara), intent(inout) :: array_c
 !
-      call append_c_to_ctl_array(fill_sph_center, array_c)
-      call append_c_to_ctl_array(fix_sph_center, array_c)
+      call append_c_to_ctl_array(fill_sph_center,   array_c)
+      call append_c_to_ctl_array(fix_sph_center,    array_c)
+      call append_c_to_ctl_array(filter_sph_center, array_c)
 !
       end subroutine add_bc_group_types_sph_center
 !

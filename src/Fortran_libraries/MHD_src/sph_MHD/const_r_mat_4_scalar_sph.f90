@@ -11,12 +11,13 @@
 !!     &          g_sph_rj, band_p_poisson)
 !!      subroutine const_radial_mat_4_scalar_sph(mat_name, coef_advect, &
 !!     &          dt, sph_params, sph_rj, r_2nd, property,              &
-!!     &          sph_bc, fdm2_center, g_sph_rj, band_s_evo)
+!!     &          sph_bc, bcs_S, fdm2_center, g_sph_rj, band_s_evo)
 !!        type(scalar_property), intent(in) :: property
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
+!!        type(sph_scalar_boundary_data) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!
 !!      subroutine const_r_mat00_scalar_sph(id_file, mat_name,          &
@@ -51,6 +52,7 @@
       use t_sph_center_matrix
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
+      use t_boundary_sph_spectr
       use t_coef_fdm2_centre
 !
       implicit none
@@ -118,7 +120,7 @@
 !
       subroutine const_radial_mat_4_scalar_sph(mat_name, coef_advect,   &
      &          dt, sph_params, sph_rj, r_2nd, property,                &
-     &          sph_bc, fdm2_center, g_sph_rj, band_s_evo)
+     &          sph_bc, bcs_S, fdm2_center, g_sph_rj, band_s_evo)
 !
       use m_ludcmp_3band
       use center_sph_matrices
@@ -130,6 +132,7 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(scalar_property), intent(in) :: property
       type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_scalar_boundary_data) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
@@ -177,8 +180,8 @@
      &    g_sph_rj, sph_bc%kr_in, sph_bc%kr_out, r_coef(1),             &
      &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s_evo%mat)
 !
-      call sel_radial_mat_scalar_bc_sph(sph_rj, sph_bc, fdm2_center,    &
-     &    g_sph_rj, r_coef, band_s_evo)
+      call sel_radial_mat_scalar_bc_sph(sph_rj, sph_bc, bcs_S,          &
+     &    fdm2_center, g_sph_rj, r_coef, band_s_evo)
       deallocate(r_coef)
 !
       call ludcmp_3band_mul_t                                           &

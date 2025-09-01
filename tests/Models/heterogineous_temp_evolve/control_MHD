@@ -135,7 +135,8 @@ begin MHD_control
 !     coef_4_t_diffuse_ctl:   coefficients for thermal diffusion
 !     coef_4_v_diffuse_ctl:   coefficients for viscous diffusion
 !     coef_4_m_diffuse_ctl:   coefficients for magnetic diffusion
-!     coef_4_buoyancy_ctl:    coefficients for buoyancy
+!     coef_4_thermal_buoyancy_ctl:
+!                             coefficients for thermal buoyancy
 !     coef_4_Coriolis_ctl:    coefficients for Coriolis force
 !     coef_4_Lorentz_ctl:     coefficients for Lorantz force
 !     coef_4_composit_buoyancy_ctl: 

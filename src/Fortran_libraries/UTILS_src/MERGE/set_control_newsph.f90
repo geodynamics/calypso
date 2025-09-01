@@ -98,6 +98,8 @@
       integer(kind = kint) :: ierr
 !
 !
+      call turn_off_debug_flag_by_ctl(my_rank, mgd_ctl%source_plt)
+!
       if (mgd_ctl%source_plt%ndomain_ctl%iflag .gt. 0) then
         sph_asbl%np_sph_org                                             &
      &      = int(mgd_ctl%source_plt%ndomain_ctl%intvalue)

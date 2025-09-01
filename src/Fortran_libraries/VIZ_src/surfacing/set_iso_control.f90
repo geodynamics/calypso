@@ -151,7 +151,7 @@
 !
       call count_control_4_field_on_iso                                 &
      &   (iso_c%fld_on_iso_c, num_nod_phys, phys_nod_name,              &
-     &    iso_fld, iso_def)
+     &    iso_fld, iso_def, ierr)
 !
       end subroutine count_control_4_iso
 !

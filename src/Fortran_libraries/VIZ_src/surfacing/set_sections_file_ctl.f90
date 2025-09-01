@@ -6,8 +6,8 @@
 !>@brief  Parameters for for cross sections
 !!
 !!@verbatim
-!!      subroutine count_control_4_field_on_psf                         &
-!!     &         (fld_on_psf_c, num_nod_phys, phys_nod_name, psf_fld)
+!!      subroutine count_control_4_field_on_psf(fld_on_psf_c,           &
+!!     &          num_nod_phys, phys_nod_name, psf_fld, ierr)
 !!      subroutine set_control_4_field_on_psf                           &
 !!     &         (fld_on_psf_c, num_nod_phys, phys_nod_name,            &
 !!     &          psf_fld, psf_param)
@@ -33,6 +33,7 @@
       module set_sections_file_ctl
 !
       use m_precision
+      use m_machine_parameter
 !
       implicit  none
 !
@@ -42,9 +43,10 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine count_control_4_field_on_psf                           &
-     &         (fld_on_psf_c, num_nod_phys, phys_nod_name, psf_fld)
+      subroutine count_control_4_field_on_psf(fld_on_psf_c,             &
+     &          num_nod_phys, phys_nod_name, psf_fld, ierr)
 !
+      use m_error_IDs
       use t_control_data_4_fld_on_psf
       use t_phys_data
       use t_psf_patch_data
@@ -56,12 +58,25 @@
       type(field_on_psf_ctl), intent(in) :: fld_on_psf_c
 !
       type(phys_data), intent(inout) :: psf_fld
+      integer(kind = kint), intent(inout) :: ierr
+!
+      integer(kind = kint) :: i_fld
 !
 !
-      call check_field_4_viz(num_nod_phys, phys_nod_name,               &
-     &    fld_on_psf_c%field_output_ctl%num,                            &
-     &    fld_on_psf_c%field_output_ctl%c1_tbl,                         &
-     &    psf_fld%num_phys, psf_fld%num_phys_viz)
+      psf_fld%num_phys                                                  &
+     &   = count_field_4_viz(num_nod_phys, phys_nod_name,               &
+     &                       fld_on_psf_c%field_output_ctl%num,         &
+     &                       fld_on_psf_c%field_output_ctl%c1_tbl)
+      psf_fld%num_phys_viz = psf_fld%num_phys
+!
+      ierr = 0
+      if(psf_fld%num_phys .le. 0) then
+        i_fld = - psf_fld%num_phys
+        write(e_message,*) 'Field ',                                    &
+     &        trim(fld_on_psf_c%field_output_ctl%c1_tbl(i_fld)),        &
+     &       ' is not in the field list.'
+        ierr = ierr_VIZ
+      end if
 !
       end subroutine count_control_4_field_on_psf
 !

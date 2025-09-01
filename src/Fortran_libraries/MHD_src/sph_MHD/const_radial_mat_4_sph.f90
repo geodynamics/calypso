@@ -160,14 +160,15 @@
      &          write(*,*) 'const_radial_mat_toroidal_flow'
         call const_radial_mat_toroidal_flow                             &
      &     (dt, sph_rj, r_2nd, MHD_prop%fl_prop,                        &
-     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U,                  &
-     &      sph_MHD_bc%fdm2_center, g_sph_rj, sph_MHD_mat%band_vt_evo)
+     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U,                      &
+     &      sph_MHD_bc%bc_fdms_U, sph_MHD_bc%fdm2_center,               &
+     &      g_sph_rj, sph_MHD_mat%band_vt_evo)
         if(iflag_debug .gt. 0)                                          &
      &          write(*,*) 'const_radial_mat_vort_2step'
         call const_radial_mat_vort_2step                                &
      &     (dt, sph_rj, r_2nd, MHD_prop%fl_prop,                        &
-     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U,                  &
-     &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
+     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U,                      &
+     &      sph_MHD_bc%bc_fdms_U, sph_MHD_bc%fdm2_center, g_sph_rj,     &
      &      sph_MHD_mat%band_vs_poisson, sph_MHD_mat%band_vp_evo,       &
      &      sph_MHD_mat%band_wt_evo)
 !
@@ -203,8 +204,8 @@
       if(MHD_prop%cd_prop%iflag_Bevo_scheme                             &
      &                      .ge. id_Crank_nicolson) then
         call const_radial_mat_4_magne_sph                               &
-     &     (dt, sph_rj, r_2nd, MHD_prop%cd_prop,                        &
-     &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%fdm2_center,                &
+     &     (dt, sph_rj, r_2nd, MHD_prop%cd_prop, sph_MHD_bc%sph_bc_B,   &
+     &      sph_MHD_bc%bcs_B, sph_MHD_bc%fdm2_center,                   &
      &      g_sph_rj, sph_MHD_mat%band_bp_evo, sph_MHD_mat%band_bt_evo)
 !
         if(i_debug .eq. iflag_full_msg) then
@@ -219,8 +220,9 @@
         call const_radial_mat_4_scalar_sph                              &
      &     (temp_evo_name, MHD_prop%ht_prop%coef_advect, dt,            &
      &      sph_params, sph_rj, r_2nd, MHD_prop%ht_prop,                &
-     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
-     &      g_sph_rj, sph_MHD_mat%band_temp_evo)
+     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                      &
+     &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
+     &      sph_MHD_mat%band_temp_evo)
         if(i_debug .eq. iflag_full_msg) then
           call check_radial_band_mat(id_file, sph_rj,                   &
      &                               sph_MHD_mat%band_temp_evo)
@@ -231,8 +233,9 @@
         call const_radial_mat_4_scalar_sph                              &
      &     (comp_evo_name, MHD_prop%cp_prop%coef_advect, dt,            &
      &      sph_params, sph_rj, r_2nd, MHD_prop%cp_prop,                &
-     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
-     &      g_sph_rj, sph_MHD_mat%band_comp_evo)
+     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                      &
+     &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
+     &      sph_MHD_mat%band_comp_evo)
         if(i_debug .eq. iflag_full_msg) then
           call check_radial_band_mat(id_file, sph_rj,                   &
      &                               sph_MHD_mat%band_comp_evo)

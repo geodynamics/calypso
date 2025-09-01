@@ -20,20 +20,21 @@ all: test
 
 test: 
 	make clean
+	cd rst_4; ln -nsf ../../Dynamobench_Case2/rst_4/rst.* ./
 	
 	$(MPIRUN) -np 4 $(TARGET_SPH_SNAP)
 	
-	echo 'Convert section data'
+	@echo 'Convert section data'
 	$(TARGET_PSF_2_VTK)  'sections/psf_eq'    'sdt'     2  3  1
 	$(TARGET_PSF_2_VTK)  'sections/psf_z0.3'  'sdt.gz'  2  3  1
 	gunzip -f sections/zm_y0.*.vtk.gz
 	
-	echo 'Convert isosurface data'
+	@echo 'Convert isosurface data'
 	$(TARGET_PSF_2_VTK)  'isosurfaces/iso_w10n' 'sfm.gz'  2  3  1
 	$(TARGET_PSF_2_VTK)  'isosurfaces/iso_w10p' 'sfm'     2  3  1
 	gunzip -f isosurfaces/iso_T0.6.*.vtk.gz
 	
-	echo 'Compare sections and isosurfaces data'
+	@echo 'Compare sections and isosurfaces data'
 	$(TARGET_COMPARE_PSF)
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed surfaceing module data output'; \
@@ -43,6 +44,7 @@ test:
 
 clean:
 	rm -f *.dat *.txt
+	rm -f rst_4/rst.*
 	rm -f sections/psf_* sections/zm_*
 	rm -f isosurfaces/iso_*
 	rm -f monitor/*.dat monitor/*.dat.gz

@@ -7,8 +7,10 @@
 !>@brief Set boundary conditions flags for velocity
 !!
 !!@verbatim
-!!      subroutine set_sph_bc_velo_sph(bc_IO, sph_rj, radial_rj_grp,    &
+!!      subroutine set_sph_bc_velo_sph                                  &
+!!     &         (bc_IO, sph_params, sph_rj, radial_rj_grp,             &
 !!     &          r_ICB, r_CMB, velo_nod, torque_surf, sph_bc_U, bcs_U)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(group_data), intent(in) :: radial_rj_grp
 !!        type(boundary_condition_list), intent(in) :: velo_nod
@@ -25,6 +27,8 @@
       use m_constants
       use m_machine_parameter
       use m_boundary_condition_IDs
+      use t_spheric_parameter
+      use t_spheric_rj_data
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
@@ -40,14 +44,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_sph_bc_velo_sph(bc_IO, sph_rj, radial_rj_grp,      &
+      subroutine set_sph_bc_velo_sph                                    &
+     &         (bc_IO, sph_params, sph_rj, radial_rj_grp,               &
      &          r_ICB, r_CMB, velo_nod, torque_surf, sph_bc_U, bcs_U)
 !
-      use t_spheric_rj_data
       use t_group_data
       use t_bc_data_list
-      use set_bc_sph_scalars
+      use set_sph_homogenious_BCs
 !
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(group_data), intent(in) :: radial_rj_grp
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
@@ -70,11 +75,13 @@
 !
       i = abs(igrp_icb)
       if(igrp_icb .lt. 0) then
-        call set_sph_velo_ICB_flag(sph_rj, bc_IO, r_ICB,                &
-     &     torque_surf%ibc_type(i), torque_surf%bc_magnitude(i),        &
-     &     sph_bc_U, bcs_U%ICB_Vspec, bcs_U%ICB_Vevo)
+        call set_sph_velo_ICB_flag                                      &
+     &     (sph_params%l_truncation, sph_rj, bc_IO, r_ICB,              &
+     &      torque_surf%ibc_type(i), torque_surf%bc_magnitude(i),       &
+     &      sph_bc_U, bcs_U%ICB_Vspec, bcs_U%ICB_Vevo)
       else
-        call set_sph_velo_ICB_flag(sph_rj, bc_IO, r_ICB,                &
+        call set_sph_velo_ICB_flag                                      &
+     &     (sph_params%l_truncation, sph_rj, bc_IO, r_ICB,              &
      &      velo_nod%ibc_type(i), velo_nod%bc_magnitude(i),             &
      &      sph_bc_U, bcs_U%ICB_Vspec, bcs_U%ICB_Vevo)
       end if
@@ -95,12 +102,15 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_sph_velo_ICB_flag(sph_rj, bc_IO, r_ICB, ibc_type,  &
-     &          bc_mag, sph_bc_U, ICB_Uspec, ICB_Uevo)
+      subroutine set_sph_velo_ICB_flag                                  &
+     &         (l_truncation, sph_rj, bc_IO, r_ICB, ibc_type, bc_mag,   &
+     &          sph_bc_U, ICB_Uspec, ICB_Uevo)
 !
       use m_base_field_labels
       use set_sph_bc_data_by_file
+      use set_filter_BC_to_center
 !
+      integer(kind = kint), intent(in) :: l_truncation
       type(sph_rj_grid), intent(in) :: sph_rj
       type(boundary_spectra), intent(in) :: bc_IO
       real(kind = kreal), intent(in) :: r_ICB
@@ -111,7 +121,7 @@
       type(sph_vector_BC_coef), intent(inout) :: ICB_Uspec
       type(sph_vector_BC_evo), intent(inout) :: ICB_Uevo
 !
-      integer(kind = kint) :: j
+      integer(kind = kint) :: j, l
 !
 !
       if      (ibc_type .eq. iflag_free_sph) then
@@ -122,12 +132,21 @@
         sph_bc_U%iflag_icb = iflag_rotatable_ic
       else if (ibc_type .eq. iflag_sph_2_center) then
         sph_bc_U%iflag_icb = iflag_sph_fill_center
-      else if (ibc_type .eq. iflag_sph_clip_center) then
+      else if (ibc_type .eq. iflag_fix_center) then
         sph_bc_U%iflag_icb = iflag_sph_fix_center
+      else if (ibc_type .eq. iflag_filter_center) then
+        sph_bc_U%iflag_icb = iflag_sph_filter_center
+        call sph_vector_filter_to_center(l_truncation, sph_rj,          &
+     &                                   bc_mag, ICB_Uspec)
+!
+!        do j = 1, sph_rj%nidx_rj(2)
+!          l = sph_rj%idx_gl_1d_rj_j(j,2)
+!          write(*,*) j, l, 'ICB_Uspec%Vp_BC(j)', ICB_Uspec%Vp_BC(j)
+!        end do
 !
       else if (ibc_type .eq. (iflag_bc_rot+1)) then
         sph_bc_U%iflag_icb = iflag_fixed_field
-        if(sph_rj%idx_rj_degree_one( 1) .gt.0 ) then
+        if(sph_rj%idx_rj_degree_one( 1) .gt. 0) then
           j = sph_rj%idx_rj_degree_one( 1)
           ICB_Uspec%Vt_BC(j) = r_ICB*r_ICB * bc_mag
         end if

@@ -18,7 +18,7 @@
 !!        integer(kind = kint), intent(inout) :: ierr
 !!      subroutine count_control_4_field_on_iso                         &
 !!     &         (fld_on_iso_c, num_nod_phys, phys_nod_name,            &
-!!     &          iso_fld, iso_def)
+!!     &          iso_fld, iso_def, ierr)
 !!      subroutine set_control_4_field_on_iso                           &
 !!     &         (fld_on_iso_c, num_nod_phys, phys_nod_name,            &
 !!     &          iso_fld, iso_param, iso_def)
@@ -34,6 +34,8 @@
       module t_control_params_4_iso
 !
       use m_precision
+      use m_machine_parameter
+      use m_error_IDs
 !
       implicit  none
 !
@@ -91,7 +93,8 @@
      &    iso_def_c%isosurf_comp_ctl%charavalue,                        &
      &    iso_def%id_isosurf_data, iso_def%id_isosurf_comp,             &
      &    ncomp, ncomp_org, tmpchara)
-      if (ncomp .gt. 1) ierr = 1
+      if(ncomp .gt. 1) ierr =  1
+      if(ncomp .lt. 0) ierr = ncomp
 !
       iso_def%isosurf_value = iso_def_c%isosurf_value_ctl%realvalue
 !
@@ -101,7 +104,7 @@
 !
       subroutine count_control_4_field_on_iso                           &
      &         (fld_on_iso_c, num_nod_phys, phys_nod_name,              &
-     &          iso_fld, iso_def)
+     &          iso_fld, iso_def, ierr)
 !
       use m_file_format_switch
       use m_section_coef_flags
@@ -122,8 +125,10 @@
 !
       type(phys_data), intent(inout) :: iso_fld
       type(isosurface_define), intent(inout) :: iso_def
+      integer(kind = kint), intent(inout) :: ierr
 !
       character(len=kchara) :: tmpchara
+      integer(kind = kint) :: i_fld
 !
 !
       if(       fld_on_iso_c%field_output_ctl%num .gt. 0                &
@@ -147,10 +152,19 @@
         iso_fld%num_phys =     ione
         iso_fld%num_phys_viz = ione
       else if (iso_def%id_iso_result_type .eq. iflag_field_iso) then
-        call check_field_4_viz(num_nod_phys, phys_nod_name,             &
-     &      fld_on_iso_c%field_output_ctl%num,                          &
-     &      fld_on_iso_c%field_output_ctl%c1_tbl,                       &
-     &      iso_fld%num_phys, iso_fld%num_phys_viz)
+        iso_fld%num_phys                                                &
+     &     = count_field_4_viz(num_nod_phys, phys_nod_name,             &
+     &                         fld_on_iso_c%field_output_ctl%num,       &
+     &                         fld_on_iso_c%field_output_ctl%c1_tbl)
+        iso_fld%num_phys_viz = iso_fld%num_phys
+      end if
+!
+      if(iso_fld%num_phys .le. 0) then
+        i_fld = - iso_fld%num_phys
+        write(e_message,*) 'Field ',                                    &
+     &        trim(fld_on_iso_c%field_output_ctl%c1_tbl(i_fld)),        &
+     &       ' is not in the field list.'
+        ierr = ierr_VIZ
       end if
 !
       end subroutine count_control_4_field_on_iso

@@ -31,6 +31,7 @@
       character(len = kchara) :: fhead_rms_vol, fname_rms_vol
       character(len = kchara) :: fhead_rms_ref, fname_rms_ref
 !
+      character(len = kchara), parameter :: exclude = 'pressure'
 !
       integer(kind = kint), parameter :: id_file1 = 34, id_file2 = 36
       character, pointer :: FPz_f1, FPz_f2
@@ -46,10 +47,16 @@
       real(kind = kreal) :: diff
       real(kind = kreal), allocatable :: spectr_IN1(:)
       real(kind = kreal), allocatable :: spectr_IN2(:)
-      integer(kind = kint) :: icomp, icomp2
+      integer(kind = kint) :: icou
+      integer(kind = kint) :: icomp1, icomp2
 !
       integer(kind = kint) :: iflag_gl = 0
       character(len = kchara) :: charaint
+!
+      integer(kind = kint) :: num_compare
+      integer(kind = kint), allocatable :: id_comp(:,:)
+      character(len = kchara), allocatable :: cmp_name(:)
+
 !
 !
       if(iargc_kemo() .le. 1) then
@@ -91,9 +98,25 @@
         go to 99
       end if
 !
+!      write(*,*) 'sph_IN1%ene_sph_spec_name', sph_IN1%num_labels,       &
+!     &          sph_IN1%ntot_sph_spec
+!      do icomp1 = 1, sph_IN1%num_labels
+!        write(*,*) icomp1, trim(sph_IN1%ene_sph_spec_name(icomp1))
+!      end do
+!      write(*,*) 'sph_IN2%ene_sph_spec_name', sph_IN2%num_labels        &
+!     &          sph_IN2%ntot_sph_spec
+!      do icomp1 = 1, sph_IN2%num_labels
+!        write(*,*) icomp1, trim(sph_IN2%ene_sph_spec_name(icomp1))
+!      end do
+!
+      num_compare = count_compare_table(sph_IN1, sph_IN2, exclude)
+      allocate(cmp_name(num_compare))
+      allocate(id_comp(num_compare,2))
+      call set_compare_table(sph_IN1, sph_IN2, exclude,                 &
+     &                       num_compare, id_comp, cmp_name)
+!
       allocate(spectr_IN1(sph_IN1%ntot_sph_spec))
       allocate(spectr_IN2(sph_IN2%ntot_sph_spec))
-!
       do
         call gz_read_volume_pwr_sph(FPz_f1, id_file1, flag_gzip1,       &
      &      sph_IN1%ntot_sph_spec, sph_IN1%i_step, sph_IN1%time,        &
@@ -110,13 +133,14 @@
         end if
 !
         error = .FALSE.
-        do icomp = 1, sph_IN1%ntot_sph_spec
-          diff = compare_data(spectr_IN1(icomp), spectr_IN2(icomp))
+        do icou = 1, num_compare
+          icomp1 = id_comp(icou,1)
+          icomp2 = id_comp(icou,2)
+          diff = compare_data(spectr_IN1(icomp1), spectr_IN2(icomp2))
           if(abs(diff) .gt. 1.d-9) then
-            icomp2 = icomp + sph_IN1%num_time_labels
-            write(*,*) 'Large error in ',                               &
-     &           trim(sph_IN1%ene_sph_spec_name(icomp2)),               &
-     &           ': ', spectr_IN1(icomp), spectr_IN2(icomp), diff
+            write(*,*) 'Large error in ', trim(cmp_name(icou)),         &
+     &           ' at step ', sph_IN1%i_step,                           &
+     &           ': ', spectr_IN1(icomp1), spectr_IN2(icomp2), diff
             error = .TRUE.
             go to 99
           end if
@@ -147,6 +171,69 @@
 !   --------------------------------------------------------------------
 !
       contains
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      integer(kind = kint) function                                     &
+     &            count_compare_table(sph_IN, sph_OUT, exclude)
+!
+      type(read_sph_spectr_data) :: sph_IN, sph_OUT
+      character(len = kchara), intent(in) :: exclude
+!
+      integer(kind = kint) :: ist, icou
+      integer(kind = kint) :: icomp1, icomp2
+!
+      icou = 0
+      ist = sph_IN%num_time_labels
+      do icomp1 = 1, sph_IN%ntot_sph_spec
+        if(trim(sph_IN%ene_sph_spec_name(icomp1+ist))                   &
+     &                                  .eq. trim(exclude)) cycle
+        do icomp2 = 1, sph_OUT%ntot_sph_spec
+          if(sph_IN%ene_sph_spec_name(icomp1+ist)                       &
+     &       .eq. sph_OUT%ene_sph_spec_name(icomp2+ist)) then
+            icou = icou + 1
+            exit
+          end if
+        end do
+      end do
+      count_compare_table = icou
+!
+      end function count_compare_table
+!
+!   --------------------------------------------------------------------
+!
+      subroutine set_compare_table(sph_IN, sph_OUT, exclude,            &
+     &                             num_compare, id_comp, cmp_name)
+!
+      type(read_sph_spectr_data) :: sph_IN, sph_OUT
+      character(len = kchara), intent(in) :: exclude
+!
+      integer(kind = kint) :: num_compare
+      integer(kind = kint) :: id_comp(num_compare,2)
+      character(len = kchara) :: cmp_name(num_compare)
+!
+      integer(kind = kint) :: ist, icou
+      integer(kind = kint) :: icomp1, icomp2
+!
+      icou = 0
+      ist = sph_IN%num_time_labels
+      do icomp1 = 1, sph_IN%ntot_sph_spec
+        if(trim(sph_IN%ene_sph_spec_name(icomp1+ist))                   &
+     &                                  .eq. trim(exclude)) cycle
+        do icomp2 = 1, sph_OUT%ntot_sph_spec
+          if(sph_IN%ene_sph_spec_name(icomp1+ist)                       &
+     &       .eq. sph_OUT%ene_sph_spec_name(icomp2+ist)) then
+            icou = icou + 1
+            cmp_name(icou) = sph_IN%ene_sph_spec_name(icomp1+ist)
+            id_comp(icou,1) = icomp1
+            id_comp(icou,2) = icomp2
+            exit
+          end if
+        end do
+      end do
+!
+      end subroutine set_compare_table
 !
 !   --------------------------------------------------------------------
 !

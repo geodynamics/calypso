@@ -208,6 +208,7 @@
       use set_evoluved_boundaries
       use select_exp_scalar_ICB
       use select_exp_scalar_CMB
+      use sph_exp_fix_vector_ICB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc
@@ -235,6 +236,13 @@
       call solve_scalar_sph_crank(sph_rj, band_s_evo, band_s00_evo,     &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld,    &
      &    x00_w_center)
+!
+!
+      if(sph_bc%iflag_icb .eq. iflag_sph_filter_center) then
+        call set_sph_filter_vect_to_center                              &
+     &     (sph_rj%nidx_rj, bcs_S%ICB_Sspec%S_BC, is_scalar,            &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      end if
 !
       call fill_scalar_at_external                                      &
      &   (sph_bc, sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,     &

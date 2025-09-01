@@ -36,11 +36,12 @@
       implicit none
 !
       character(len = kchara), parameter, private                       &
-     &               :: ctl_file_name = 'control_assemble_sph'
+     &             :: ctl_file_name = 'control_assemble_sph'
 !
       type(control_param_assemble), save :: asbl_param_s
       type(spectr_data_4_assemble), save :: sph_asbl_s
       type(time_data), save :: init_t
+      real(kind = kreal) :: delta = TINY
 !
 ! ----------------------------------------------------------------------
 !
@@ -78,6 +79,7 @@
 !
       call set_control_4_newsph(mgd_ctl_s, asbl_param_s, sph_asbl_s,    &
      &    sph_org_maker_s, sph_asbl_s%new_sph_data)
+      delta = error_threshold_2_compare(mgd_ctl_s%delta_to_compare_ctl)
 !
       call alloc_spectr_data_4_assemble(sph_asbl_s)
 !
@@ -138,7 +140,10 @@
 !
       do istep = asbl_param_s%istep_start, asbl_param_s%istep_end
         if(mod(istep, asbl_param_s%increment_step) .ne. 0) cycle
+!
         istep_in = istep / asbl_param_s%increment_step
+        if(i_debug .gt. 0) write(my_rank+100,*)                         &
+     &                   'restart file step: ', istep_in
 !
 !     Load original spectr data
         call load_org_sph_data(istep_in, asbl_param_s%org_fld_file,     &
@@ -164,7 +169,7 @@
      &     (nprocs, my_rank, istep_out, asbl_param_s%new_fld_file,      &
      &      sph_asbl_s%fst_time_IO, sph_asbl_s%new_fst_IO)
 !
-        iflag = compare_assembled_sph_data(my_rank, init_t,             &
+        iflag = compare_assembled_sph_data(delta, init_t,               &
      &        sph_asbl_s%new_sph_data%sph, sph_asbl_s%new_sph_data%fld, &
      &        sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
 !
