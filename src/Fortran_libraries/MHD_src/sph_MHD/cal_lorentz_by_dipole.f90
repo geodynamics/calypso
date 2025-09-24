@@ -67,7 +67,7 @@
      &         (fl_prop, bs_trns_base, bs_trns_prod, fs_trns_prod,      &
      &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_flx, frc_rtp)
 !
-      use cal_products_smp
+      use cal_vector_products
 !
       type(fluid_property), intent(in) :: fl_prop
       type(base_field_address), intent(in) :: bs_trns_base
@@ -83,8 +83,9 @@
 !
       if(fs_trns_prod%i_dipole_Lorentz .gt. 0) then
 ! 
-      if(iflag_debug.gt.0) write(*,*) 'cal_dot_prod_no_coef_smp for dipole lorentz'
-        call cal_cross_prod_w_coef_smp(nnod, fl_prop%coef_lor,          &
+      if(iflag_debug.gt.0) write(*,*)                                   &
+     &      'cal_cross_product_w_coef for dipole lorentz'
+        call cal_cross_product_w_coef(nnod, fl_prop%coef_lor,           &
      &      fld_rtp(1,bs_trns_prod%i_dipole_J),                         &
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
      &      frc_rtp(1,fs_trns_prod%i_dipole_Lorentz) )
@@ -92,8 +93,9 @@
 !
       if(fs_trns_prod%i_dipole_ujb .gt. 0) then
 ! 
-        if(iflag_debug.gt.0) write(*,*) 'cal_dot_prod_no_coef_smp for dipole ujb'
-        call cal_dot_prod_no_coef_smp(nnod,                             &
+        if(iflag_debug.gt.0) write(*,*)                                 &
+     &      'cal_dot_product_no_coef for dipole ujb'
+        call cal_dot_product_no_coef(nnod,                              &
      &      frc_rtp(1,fs_trns_prod%i_dipole_Lorentz),                   &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
      &      frc_rtp(1,fs_trns_prod%i_dipole_ujb) )

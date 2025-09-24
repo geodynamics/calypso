@@ -103,7 +103,7 @@
      &         (bs_trns_base, fe_trns_prod, nnod,                       &
      &          ntot_comp_fld, fld_rtp, ntot_comp_hls, fhls_rtp)
 !
-      use cal_products_smp
+      use cal_vector_products
 !
       type(base_field_address), intent(in) :: bs_trns_base
       type(phys_products_address), intent(in) :: fe_trns_prod
@@ -116,19 +116,19 @@
 !
 !
       if(fe_trns_prod%i_k_heli .gt. 0) then
-        call cal_dot_prod_no_coef_smp(nnod,                             &
+        call cal_dot_product_no_coef(nnod,                              &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
      &      fld_rtp(1,bs_trns_base%i_vort),                             &
      &      fhls_rtp(1,fe_trns_prod%i_k_heli))
       end if
       if(fe_trns_prod%i_c_heli .gt. 0) then
-        call cal_dot_prod_no_coef_smp(nnod,                             &
+        call cal_dot_product_no_coef(nnod,                              &
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
      &      fld_rtp(1,bs_trns_base%i_current),                          &
      &      fhls_rtp(1,fe_trns_prod%i_c_heli))
       end if
       if(fe_trns_prod%i_x_heli .gt. 0) then
-        call cal_dot_prod_no_coef_smp(nnod,                             &
+        call cal_dot_product_no_coef(nnod,                              &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
      &      fhls_rtp(1,fe_trns_prod%i_x_heli))
@@ -185,13 +185,13 @@
      &      fmag_rtp(1,fe_trns_prod%i_square_j))
       end if
       if(fe_trns_prod%i_square_t .gt. 0) then
-        call cal_scalar_prod_no_coef_smp(nnod,                          &
+        call cal_scalar_product_no_coef(nnod,                           &
      &      fld_rtp(1,bs_trns_base%i_temp),                             &
      &      fld_rtp(1,bs_trns_base%i_temp),                             &
      &      fmag_rtp(1,fe_trns_prod%i_square_t))
       end if
       if(fe_trns_prod%i_square_c .gt. 0) then
-        call cal_scalar_prod_no_coef_smp(nnod,                          &
+        call cal_scalar_product_no_coef(nnod,                           &
      &      fld_rtp(1,bs_trns_base%i_light),                            &
      &      fld_rtp(1,bs_trns_base%i_light),                            &
      &      fmag_rtp(1,fe_trns_prod%i_square_c))
