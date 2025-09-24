@@ -1,8 +1,16 @@
-!
-!      module set_element_data_4_IO
-!
-!     Written by H. Matsui on Dec., 2008
-!
+!>@file   set_element_data_4_IO.f90
+!!        module set_element_data_4_IO
+!!
+!! @author H. Matsui
+!! @date   Programmed in Dec., 2008
+!!
+!> @brief Copy element data from IO buffer
+!!
+!!@verbatim
+!!      subroutine find_max_nnod_4_ele_by_eletype(ele, nnod_4_ele)
+!!        type(element_data), intent(inout) :: ele
+!!        integer(kind = kint), intent(inout) :: nnod_4_ele
+!!
 !!      subroutine copy_ele_connect_to_IO(ele, ele_IO)
 !!        type(element_data), intent(in) :: ele
 !!        type(element_data), intent(inout) :: ele_IO
@@ -36,6 +44,28 @@
 !
        contains
 !
+!------------------------------------------------------------------
+!
+      subroutine find_max_nnod_4_ele_by_eletype(ele, nnod_4_ele)
+!
+      use set_nnod_4_ele_by_type
+!
+      type(element_data), intent(inout) :: ele
+      integer(kind = kint), intent(inout) :: nnod_4_ele
+!
+      integer(kind = kint) :: i
+!
+      nnod_4_ele = 0
+!$omp parallel do reduction(max:nnod_4_ele)
+      do i = 1, ele%numele
+        call s_set_nnod_4_ele_by_eletype(ele%elmtyp(i), ele%nodelm(i))
+        nnod_4_ele = max(nnod_4_ele,ele%nodelm(i))
+      end do
+!$omp end parallel do
+!
+      end subroutine find_max_nnod_4_ele_by_eletype
+!
+!------------------------------------------------------------------
 !------------------------------------------------------------------
 !
       subroutine copy_ele_connect_to_IO(ele, ele_IO)

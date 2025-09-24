@@ -143,7 +143,7 @@
 !
       subroutine gz_read_element_info(FPz_f, ele_IO, zbuf)
 !
-      use set_nnod_4_ele_by_type
+      use set_element_data_4_IO
       use gzip_file_access
       use gz_data_IO
 !
@@ -158,13 +158,7 @@
        call read_gz_multi_int                                           &
      &    (FPz_f, ele_IO%numele, ele_IO%elmtyp, zbuf)
 !
-       ele_IO%nnod_4_ele = 0
-       do i = 1, ele_IO%numele
-         call s_set_nnod_4_ele_by_type                                  &
-     &      (ele_IO%elmtyp(i), ele_IO%nodelm(i))
-         ele_IO%nnod_4_ele = max(ele_IO%nnod_4_ele,ele_IO%nodelm(i))
-       end do
-!
+       call find_max_nnod_4_ele_by_eletype(ele_IO, ele_IO%nnod_4_ele)
        call alloc_ele_connectivity(ele_IO)
 !
        do i=1, ele_IO%numele

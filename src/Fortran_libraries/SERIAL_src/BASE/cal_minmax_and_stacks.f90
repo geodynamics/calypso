@@ -22,8 +22,8 @@
 !!      subroutine s_cal_dbl_minmax_and_stacks(num_out, num_in, num_grp,&
 !!     &          istack_begin, istack_grp, ntot_grp, max_grp, min_grp)
 !!
-!!      subroutine count_number_4_smp( np_smp, istart, iend,            &
-!!     &        i_smp_stack, max_4_smp)
+!!      subroutine count_number_4_smp(np_smp, istart, iend,             &
+!!     &                              i_smp_stack, max_4_smp)
 !!      subroutine set_group_size_4_smp(np_smp, num_group,              &
 !!     &          istack_group, istack_group_smp, max_4_smp)
 !!@endverbatim
@@ -215,7 +215,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine count_number_4_smp(np_smp, istart, iend,               &
-     &          i_smp_stack, max_4_smp)
+     &                              i_smp_stack, max_4_smp)
 !
       integer(kind = kint), intent(in)  :: np_smp
       integer(kind = kint), intent(in)  :: istart, iend
@@ -253,7 +253,7 @@
         ist = istack_group(i_grp-1) + 1
         ied = istack_group(i_grp  )
         call count_number_4_smp(np_smp, ist, ied,                       &
-     &       istack_group_smp(id_smp), imax )
+     &                          istack_group_smp(id_smp), imax)
         max_4_smp = max(max_4_smp,imax)
       end do
 !

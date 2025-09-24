@@ -160,7 +160,7 @@
       subroutine gz_read_element_info_b(FPz_f, zbuf, ele_IO)
 !
       use gz_binary_IO
-      use set_nnod_4_ele_by_type
+      use set_element_data_4_IO
 !
       character, pointer, intent(in) :: FPz_f
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -169,6 +169,7 @@
       integer (kind = kint) :: i
 !
       call gz_read_number_of_element_b(FPz_f, zbuf, ele_IO)
+      write(*,*) 'ele_IO%numele', ele_IO%numele
       if(zbuf%ierr_zlib .ne. 0) return
 !
       call alloc_element_types(ele_IO)
@@ -176,13 +177,7 @@
      &   (FPz_f, zbuf, cast_long(ele_IO%numele), ele_IO%elmtyp)
       if(zbuf%ierr_zlib .ne. 0) return
 !
-      ele_IO%nnod_4_ele = 0
-      do i = 1, ele_IO%numele
-        call s_set_nnod_4_ele_by_type                                   &
-     &     (ele_IO%elmtyp(i), ele_IO%nodelm(i))
-        ele_IO%nnod_4_ele = max(ele_IO%nnod_4_ele,ele_IO%nodelm(i))
-      end do
-!
+      call find_max_nnod_4_ele_by_eletype(ele_IO, ele_IO%nnod_4_ele)
       call alloc_ele_connectivity(ele_IO)
 !
       call gz_read_mul_int8_b                                           &

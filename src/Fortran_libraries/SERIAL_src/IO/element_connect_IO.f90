@@ -124,7 +124,7 @@
 !
       subroutine read_element_info(id_file, ele_IO, iend)
 !
-      use set_nnod_4_ele_by_type
+      use set_element_data_4_IO
 !
       integer (kind = kint), intent(in) :: id_file
       type(element_data), intent(inout) :: ele_IO
@@ -139,21 +139,16 @@
 !
        read(id_file,*) (ele_IO%elmtyp(i),i=1,ele_IO%numele)
 !
-       ele_IO%nnod_4_ele = 0
-       do i = 1, ele_IO%numele
-         call s_set_nnod_4_ele_by_type                                  &
-     &      (ele_IO%elmtyp(i), ele_IO%nodelm(i))
-         ele_IO%nnod_4_ele = max(ele_IO%nnod_4_ele,ele_IO%nodelm(i))
-       end do
 !
-       call alloc_ele_connectivity(ele_IO)
+      call find_max_nnod_4_ele_by_eletype(ele_IO, ele_IO%nnod_4_ele)
+      call alloc_ele_connectivity(ele_IO)
 !
-       do i=1, ele_IO%numele
-         read(id_file,*) ele_IO%iele_global(i),                         &
+      do i=1, ele_IO%numele
+        read(id_file,*) ele_IO%iele_global(i),                          &
      &                  ele_IO%ie(i,1:ele_IO%nodelm(i))
-       end do
+      end do
 !
-       end subroutine read_element_info
+      end subroutine read_element_info
 !
 !------------------------------------------------------------------
 !
