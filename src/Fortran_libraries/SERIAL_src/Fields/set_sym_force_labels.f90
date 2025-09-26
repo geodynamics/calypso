@@ -8,64 +8,107 @@
 !> @brief Labels and addresses for forces by sym field
 !!
 !!@verbatim
-!!      subroutine set_sym_force_addresses                         &
+!!      subroutine set_sym_sym_force_addresses                          &
 !!     &         (i_phys, field_name, force_by_sym, flag)
-!!        type(base_force_address), intent(inout) :: force_by_sym
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(base_force_address), intent(inout) :: force_by_sym_sym
+!!      subroutine set_asym_asym_force_addresses                        &
+!!     &         (i_phys, field_name, force_by_asym_asym, flag)
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(base_force_address), intent(inout) :: force_by_asym_asym
+!!      subroutine set_sym_asym_force_addresses                         &
+!!     &         (i_phys, field_name, force_by_sym_asym, flag)
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(base_force_address), intent(inout) :: force_by_sym_asym
+!!      subroutine set_asym_sym_force_addresses                         &
+!!     &         (i_phys, field_name, force_by_asym_sym, flag)
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(base_force_address), intent(inout) :: force_by_asym_sym
 !!
-!!      subroutine set_sym_ene_flux_addresses                        &
-!!     &         (i_phys, field_name, eflux_by_sym, flag)
-!!        type(energy_flux_address), intent(inout) :: eflux_by_sym
+!!      subroutine set_sym_eflux_address_sym_asym                       &
+!!     &         (i_phys, field_name, eflux_s_sxa, flag)
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(energy_flux_address), intent(inout) :: eflux_s_sxa
+!!      subroutine set_sym_eflux_address_asym_sym                       &
+!!     &         (i_phys, field_name, eflux_s_axs, flag)
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(energy_flux_address), intent(inout) :: eflux_s_axs
+!!      subroutine set_asym_eflux_address_sym_sym                       &
+!!     &         (i_phys, field_name, eflux_a_sxs, flag)
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(energy_flux_address), intent(inout) :: eflux_a_sxs
+!!      subroutine set_asym_eflux_address_asm_asm                       &
+!!     &         (i_phys, field_name, eflux_a_axa, flag)
+!!        integer(kind = kint), intent(in) :: i_phys
+!!        character(len = kchara), intent(in) :: field_name
+!!        type(energy_flux_address), intent(inout) :: eflux_a_axa
+!! !!!!!  Base field names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
-!! !!!!!  divergence of forces by sym field !!!!!!!!!!!!!!!!!!
+!! field names 
 !!
-!!      Field label  [Address]
+!!   wsym_x_usym  wasym_x_uasym  wsym_x_uasym  wasym_x_usym
+!!                 :        inertia (\omega \times u)
+!!   m_flux_sym_sym  m_flux_asym_asym  m_flux_sym_asym
+!!                 :  momentum flux     u_{i} u_{j}
+!!   Jsym_x_Bsym  Jasym_x_Basym  Jsym_x_Basym  Jasym_x_Bsym
+!!                 :  Lorentz force     J \times B
+!!   Bsym_nabla_Bsym  Basym_nabla_Basym
+!!   Bsym_nabla_Basym  Basym_nabla_Bsym
+!!                 :  magnetic tension   (B \nabla) B
+!!   maxwell_tensor_sym_sym, maxwell_tensor_asym_asym,
+!!   maxwell_tensor_sym_asym
+!!                 :  maxwell tensor       B_{i} B_{j}
 !!
-!!   inertia_by_sym             [force_by_sym%i_m_advect]
-!!   Lorentz_force_by_sym       [force_by_sym%i_lorentz]
-!!   magnetic_tension_by_sym    [force_by_sym%i_m_tension]
+!!   sym_thermal_buoyancy, asym_thermal_buoyancy
+!!                 :   Thermal buoyancy       - \alpha_{T} T g
+!!   sym_composite_buoyancy, asym_composite_buoyancy
+!!                 :   Compositional buoyancy  - \alpha_{C} C g
+!!   sym_buoyancy, asym_buoyancy
+!!                 :   Total buoyancy  - (\alpha_{T} T + \alpha_{C} C) g
 !!
-!!   sym_buoyancy               [force_by_sym%i_thrm_buo]
-!!   sym_comp_buoyancy          [force_by_sym%i_comp_buo]
+!!   usym_x_Bsym, uasym_x_Basym, usym_x_Basym, uasym_x_Bsym
+!!                 :     induction                 u \times B
+!!   Bsym_nabla_usym, Basym_nabla_uasym,
+!!   Bsym_nabla_uasym, Basym_nabla_usym
+!!                 :    magneitic streatch         (B \nabla) u
+!!   usym_Bsym, uasym_Basym, usym_Basym
+!!                 :    induction induction tensor
+!!                                 u_{i} B_{j}  - B_{i} u_{J}
 !!
-!!   vecp_induction_by_sym      [force_by_sym%i_vp_induct]
-!!   magnetic_induction_by_sym  [force_by_sym%i_induction]
-!!   magnetic_stretch_by_sym    [force_by_sym%i_mag_stretch]
+!!   usym_nabla_Tsym, uasym_nabla_Tasym,
+!!   usym_nabla_Tasym, uasym_nabla_Tsym
+!!                 :    heat advection     (u \cdot \nabla) T
+!!   usym_nabla_pTsym, uasym_nabla_pTasym,
+!!   usym_nabla_pTasym, uasym_nabla_pTsym
+!!                 :  perturbation of heat advection
+!!                                      (u \cdot \nabla) \Theta
+!!   heat_flux_sym_sym, heat_flux_asym_asym,
+!!   heat_flux_sym_asym, heat_flux_asym_sym
+!!                 :    heat flux                   uT
+!!   pert_h_flux_sym_sym, pert_h_flux_asym_asym
+!!   pert_h_flux_sym_asym, pert_h_flux_asym_sym
+!!                 :  perturbation of heat flux   u\Theta
 !!
-!!   heat_advect_by_sym         [force_by_sym%i_h_advect]
-!!   pert_h_advect_by_sym       [force_by_sym%i_ph_advect]
-!!   comp_advect_by_sym         [force_by_sym%i_c_advect]
-!!   pert_c_advect_by_sym       [force_by_sym%i_pc_advect]
-!!
-!!   momentum_flux_by_sym       [force_by_sym%i_m_flux]
-!!   maxwell_tensor_by_sym      [force_by_sym%i_maxwell]
-!!   induction_tensor_by_sym    [force_by_sym%i_induct_t]
-!!
-!!   heat_flux_by_sym           [force_by_sym%i_h_flux]
-!!   pert_h_flux_by_sym         [force_by_sym%i_ph_flux]
-!!   composite_flux_by_sym      [force_by_sym%i_c_flux]
-!!   pert_c_flux_by_sym         [force_by_sym%i_pc_flux]
-!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! !!!!!  List of energy flux by SGS terms  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!
-!!    Field name [Address]
-!!
-!!   inertia_work_by_sym          [eflux_by_sym%i_m_advect_work]
-!!   wk_against_Lorentz_by_sym    [eflux_by_sym%i_nega_ujb]
-!!   Lorentz_work_by_sym          [eflux_by_sym%i_ujb]
-!!   mag_tension_work_by_sym      [eflux_by_sym%i_m_tension_wk]
-!!
-!!   sym_buoyancy_flux            [eflux_by_sym%i_buo_gen]
-!!   sym_comp_buoyancy_flux       [eflux_by_sym%i_c_buo_gen]
-!!
-!!   mag_ene_generation_by_sym    [eflux_by_sym%i_me_gen]
-!!   mag_stretch_flux_by_sym
-!!                              [eflux_by_sym%i_mag_stretch_flux]
-!!
-!!   temp_generation_by_sym       [eflux_by_sym%i_temp_gen]
-!!   part_temp_gen_by_sym         [eflux_by_sym%i_par_t_gen]
-!!   comp_generation_by_sym       [eflux_by_sym%i_comp_gen]
-!!   part_comp_gen_by_sym         [eflux_by_sym%i_par_c_gen]
+!!   usym_nabla_Csym, uasym_nabla_Casym
+!!   usym_nabla_Casym, uasym_nabla_Csym
+!!                 :    composition advection     (u \cdot \nabla) C
+!!   usym_nabla_pCsym, uasym_nabla_pCasym,
+!!   usym_nabla_pCasym, uasym_nabla_pCsym
+!!                 :  perturbation of composition advection
+!!                                      (u \cdot \nabla) (C-C_0)
+!!   composite_flux_sym_sym, composite_flux_asym_asym, 
+!!   composite_flux_sym_asym, composite_flux_asym_sym
+!!                 :    composition flux                   uC
+!!   pert_c_flux_sym_sym, pert_c_flux_asym_asym,
+!!   pert_c_flux_sym_asym, pert_c_flux_asym_sym
+!!                 :  perturbation of composition flux   u(C-C_0)
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -86,7 +129,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_sym_sym_force_addresses                           &
-      &         (i_phys, field_name, force_by_sym_sym, flag)
+     &         (i_phys, field_name, force_by_sym_sym, flag)
 !
       use m_force_w_sym_labels
 !
@@ -152,8 +195,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_asym_asym_force_addresses                           &
-      &         (i_phys, field_name, force_by_asym_asym, flag)
+      subroutine set_asym_asym_force_addresses                          &
+     &         (i_phys, field_name, force_by_asym_asym, flag)
 !
       use m_force_w_sym_labels
 !
@@ -216,7 +259,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_sym_asym_force_addresses                           &
-      &         (i_phys, field_name, force_by_sym_asym, flag)
+     &         (i_phys, field_name, force_by_sym_asym, flag)
 !
       use m_force_w_sym_labels
 !
@@ -245,11 +288,11 @@
             force_by_sym_asym%i_comp_buo =   i_phys
 !
             else if(field_name .eq. usym_x_Basym%name) then
-            force_by_sym_asym%i_vp_induct =    i_phys
+            force_by_sym_asym%i_vp_induct =   i_phys
             else if(field_name .eq. rot_usym_x_Basym%name) then
-            force_by_sym_asym%i_induction =  i_phys
+            force_by_sym_asym%i_induction =   i_phys
             else if(field_name .eq. Bsym_nabla_uasym%name) then
-            force_by_sym_asym%i_mag_stretch =  i_phys
+            force_by_sym_asym%i_mag_stretch = i_phys
 !
             else if (field_name .eq. usym_nabla_Tasym%name) then
             force_by_sym_asym%i_h_advect =    i_phys
@@ -283,7 +326,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_asym_sym_force_addresses                           &
-      &         (i_phys, field_name, force_by_asym_sym, flag)
+     &         (i_phys, field_name, force_by_asym_sym, flag)
 !
       use m_force_w_sym_labels
 !
@@ -342,8 +385,8 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_sym_ene_flux_addresses_by_sym_asym                          &
-      &         (i_phys, field_name, eflux_s_sxa, flag)
+      subroutine set_sym_eflux_address_sym_asym                         &
+     &         (i_phys, field_name, eflux_s_sxa, flag)
 !
       use m_sym_ene_flux_labels
 !
@@ -365,13 +408,12 @@
             end if
       end if
 !
-      end subroutine set_sym_ene_flux_addresses_by_sym_asym
+      end subroutine set_sym_eflux_address_sym_asym
 !
 ! ----------------------------------------------------------------------
 !
-!
-      subroutine set_sym_ene_flux_addresses_by_asym_sym                          &
-      &         (i_phys, field_name, eflux_s_axs, flag)
+      subroutine set_sym_eflux_address_asym_sym                         &
+     &         (i_phys, field_name, eflux_s_axs, flag)
 !
       use m_sym_ene_flux_labels
 !
@@ -391,13 +433,12 @@
             end if
       end if
 !
-      end subroutine set_sym_ene_flux_addresses_by_asym_sym
+      end subroutine set_sym_eflux_address_asym_sym
 !
 ! ----------------------------------------------------------------------
 !
-!
-      subroutine set_asym_ene_flux_addresses_by_sym_sym                          &
-      &         (i_phys, field_name, eflux_a_sxs, flag)
+      subroutine set_asym_eflux_address_sym_sym                         &
+     &         (i_phys, field_name, eflux_a_sxs, flag)
 !
       use m_sym_ene_flux_labels
 !
@@ -419,13 +460,12 @@
             end if
       end if
 !
-      end subroutine set_asym_ene_flux_addresses_by_sym_sym
+      end subroutine set_asym_eflux_address_sym_sym
 !
 ! ----------------------------------------------------------------------
 !
-!
-      subroutine set_asym_ene_flux_addresses_by_asym_asym                          &
-      &         (i_phys, field_name, eflux_a_axa, flag)
+      subroutine set_asym_eflux_address_asm_asm                         &
+     &         (i_phys, field_name, eflux_a_axa, flag)
 !
       use m_sym_ene_flux_labels
 !
@@ -441,13 +481,12 @@
             if (field_name .eq. ua_d_ja_x_ba%name) then
             eflux_a_axa%i_ujb =           i_phys
             else if (field_name .eq. mns_ua_d_wa_x_ua%name) then
-            eflux_a_axa%i_m_advect_work =       i_phys
+            eflux_a_axa%i_m_advect_work = i_phys
             end if
       end if
 !
-      end subroutine set_asym_ene_flux_addresses_by_asym_asym
+      end subroutine set_asym_eflux_address_asm_asm
 !
 ! ----------------------------------------------------------------------
 !
       end module set_sym_force_labels
-            

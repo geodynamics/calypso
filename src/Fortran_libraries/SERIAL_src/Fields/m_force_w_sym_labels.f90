@@ -20,25 +20,28 @@
 !!
 !! field names 
 !!
-!!   inertia
+!!   wsym_x_usym  wasym_x_uasym  wsym_x_uasym  wasym_x_usym
 !!                 :        inertia (\omega \times u)
-!!   momentum_flux
+!!   m_flux_sym_sym  m_flux_asym_asym  m_flux_sym_asym
 !!                 :  momentum flux     u_{i} u_{j}
-!!   Lorentz_force
+!!   Jsym_x_Bsym  Jasym_x_Basym  Jsym_x_Basym  Jasym_x_Bsym
 !!                 :  Lorentz force     J \times B
-!!   magnetic_tension
+!!   Bsym_nabla_Bsym  Basym_nabla_Basym
+!!   Bsym_nabla_Basym  Basym_nabla_Bsym
 !!                 :  magnetic tension   (B \nabla) B
 !!   maxwell_tensor_sym_sym, maxwell_tensor_asym_asym,
 !!   maxwell_tensor_sym_asym
 !!                 :  maxwell tensor       B_{i} B_{j}
 !!
 !!   sym_thermal_buoyancy, asym_thermal_buoyancy
-!!                 :   Thermal buoyancy       - \alpha_{T} g T
+!!                 :   Thermal buoyancy       - \alpha_{T} T g
 !!   sym_composite_buoyancy, asym_composite_buoyancy
-!!                 :   compositional buoyancy  - \alpha_{C} g C
+!!                 :   Compositional buoyancy  - \alpha_{C} C g
+!!   sym_buoyancy, asym_buoyancy
+!!                 :   Total buoyancy  - (\alpha_{T} T + \alpha_{C} C) g
 !!
 !!   usym_x_Bsym, uasym_x_Basym, usym_x_Basym, uasym_x_Bsym
-!!                 :     induction                           u \times B
+!!                 :     induction                 u \times B
 !!   Bsym_nabla_usym, Basym_nabla_uasym,
 !!   Bsym_nabla_uasym, Basym_nabla_usym
 !!                 :    magneitic streatch         (B \nabla) u
@@ -207,30 +210,45 @@
      &                  math = '$ B_{sym} B_{asym} $')
 !
 !>        Field label of thermal buoyancy
-!!         @f$ -\alpha_{T} g_{i} T_{sym} @f$
+!!         @f$ -\alpha_{T} T_{sym} g_{i} @f$
       type(field_def), parameter :: sym_thermal_buoyancy                &
      &    = field_def(n_comp = n_vector,                                &
      &                  name = 'sym_thermal_buoyancy',                  &
-     &                  math = '$ -\alpha_{T} g_{i} T_{sym} $')
+     &                  math = '$ -\alpha_{T} T_{sym} g_{i} $')
 !>        Field label of thermal buoyancy
-!!         @f$ -\alpha_{T} g_{i} T_{asym} @f$
+!!         @f$ -\alpha_{T} T_{asym} g_{i} @f$
       type(field_def), parameter :: asym_thermal_buoyancy               &
      &    = field_def(n_comp = n_vector,                                &
      &                  name = 'asym_thermal_buoyancy',                 &
-     &                  math = '$ -\alpha_{T} g_{i} T_{asym} $')
+     &                  math = '$ -\alpha_{T} T_{asym} g_{i} $')
 !
 !>        Field label of compositional buoyancy
-!!         @f$ -\alpha_{C} g_{i} C_{sym} @f$
+!!         @f$ -\alpha_{C} C_{sym} g_{i} @f$
       type(field_def), parameter :: sym_composite_buoyancy              &
      &    = field_def(n_comp = n_vector,                                &
      &                  name = 'sym_composite_buoyancy',                &
-     &                  math = '$ -\alpha_{C} g_{i} C_{sym} $')
+     &                  math = '$ -\alpha_{C} C_{sym} g_{i} $')
 !>        Field label of compositional buoyancy
-!!         @f$ -\alpha_{C} g_{i} C_{asym} @f$
+!!         @f$ -\alpha_{C} C_{asym} g_{i} @f$
       type(field_def), parameter :: asym_composite_buoyancy             &
      &    = field_def(n_comp = n_vector,                                &
      &                  name = 'asym_composite_buoyancy',               &
-     &                  math = '$ -\alpha_{C} g_{i} C_{asym} $')
+     &                  math = '$ -\alpha_{C} C_{asym} g_{i} $')
+!
+!>        Field label of total buoyancy
+!!         @f$ - (\alpha_{T} T_{asym} + \alpha_{C} C_{sym}) g_{i} @f$
+      type(field_def), parameter :: sym_buoyancy                        &
+     &    = field_def(n_comp = n_vector,                                &
+     &                  name = 'sym_buoyancy',                          &
+     &                  math = '$ - (\alpha_{T} T_{sym} '               &
+     &                      // ' + \alpha_{C} C_{sym}) g_{i} $')
+!>        Field label of total buoyancy
+!!         @f$ - (\alpha_{T} T_{asym} + \alpha_{C} C_{asym}) g_{i} @f$
+      type(field_def), parameter :: asym_buoyancy                       &
+     &    = field_def(n_comp = n_vector,                                &
+     &                  name = 'asym_buoyancy',                         &
+     &                  math = '$ - (\alpha_{T} T_{asym} '              &
+     &                      // ' + \alpha_{C} C_{asym}) g_{i} $')
 !!
 !>        Field label of induction of vector potential
 !!         @f$ u_{sym} \times B_{sym} @f$
@@ -594,6 +612,9 @@
      &   .or. (field_name .eq. sym_thermal_buoyancy%name)               &
      &   .or. (field_name .eq. asym_thermal_buoyancy%name)              &
 !
+     &   .or. (field_name .eq. sym_buoyancy%name)                       &
+     &   .or. (field_name .eq. asym_buoyancy%name)                      &
+!
      &   .or. (field_name .eq. sym_composite_buoyancy%name)             &
      &   .or. (field_name .eq. asym_composite_buoyancy%name)            &
 !
@@ -700,6 +721,8 @@
       call set_field_label_to_ctl(asym_thermal_buoyancy,    array_c2i)
       call set_field_label_to_ctl(sym_composite_buoyancy,   array_c2i)
       call set_field_label_to_ctl(asym_composite_buoyancy,  array_c2i)
+      call set_field_label_to_ctl(sym_buoyancy,             array_c2i)
+      call set_field_label_to_ctl(asym_buoyancy,            array_c2i)
 !
       call set_field_label_to_ctl(usym_x_Bsym,              array_c2i)
       call set_field_label_to_ctl(uasym_x_Basym,            array_c2i)
