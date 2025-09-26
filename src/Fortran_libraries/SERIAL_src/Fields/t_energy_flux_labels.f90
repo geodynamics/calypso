@@ -75,7 +75,7 @@
 !>        Field address of work of magnetic tension
 !!         @f$ u_{i} (B_{j} \partial_{j}) B_{i} @f$
         integer (kind=kint) :: i_m_tension_wk  =   izero
-!>        Field address of buoyancy flux
+!>        Field address of thermal buoyancy flux
 !!         @f$ -u_{i} \alpha_{T} g_{i} T @f$
         integer (kind=kint) :: i_buo_gen =         izero
 !>        Field address of compositional buoyancy flux

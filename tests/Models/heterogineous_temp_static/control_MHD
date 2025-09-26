@@ -69,7 +69,7 @@ begin MHD_control
 !   vis_ene_diffuse, mag_ene_diffuse
 !
 !   thermal_diffusion, viscous_diffusion, magnetic_diffusion
-!   Coriolis_force, buoyancy
+!   Coriolis_force, thermal_buoyancy
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl

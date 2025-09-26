@@ -68,7 +68,7 @@
      &                math = '$ \partial_{i}'                           &
      &                    // '(e_{ijk} J_{j} B_{k})$')
 !
-!>        Field label for divergence of filtered buoyancy
+!>        Field label for divergence of filtered thermal buoyancy
 !!         @f$ -\partial_{i} \alpha_{T} g_{i} T @f$
       type(field_def), parameter :: div_buoyancy                        &
      &    = field_def(n_comp = n_scalar,                                &

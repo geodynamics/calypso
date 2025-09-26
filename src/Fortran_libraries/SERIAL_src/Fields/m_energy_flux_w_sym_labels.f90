@@ -178,13 +178,13 @@
      &            name = 'u_dot_Basym_nabla_Bsym',                      &
      &            math = '$ u \cdot (B_{sym} \cdot \nabla) B_{sym} $')
 !
-!>        Field label of buoyancy flux
+!>        Field label of thermal buoyancy flux
 !!         @f$ -u \cdot (\alpha_{T} g_{i} T_{sym}) @f$
       type(field_def), parameter :: sym_termal_buo_flux                 &
      &    = field_def(n_comp = n_scalar,                                &
      &            name = 'sym_termal_buo_flux',                         &
      &            math = '$ -u \cdot (\alpha_{T} g_{i} T_{sym}) $')
-!>        Field label of buoyancy flux
+!>        Field label of thermal buoyancy flux
 !!         @f$ -u \cdot (\alpha_{T} g_{i} T_{asym}) @f$
       type(field_def), parameter :: asym_termal_buo_flux                &
      &    = field_def(n_comp = n_scalar,                                &

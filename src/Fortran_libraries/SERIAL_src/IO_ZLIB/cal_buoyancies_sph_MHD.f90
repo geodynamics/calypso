@@ -17,20 +17,6 @@
 !!        real(kind = kreal) , intent(in) :: coef_buo, coef_comp_buo
 !!        real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!
-!!      subroutine rot_self_dbl_buoyancy_sph_MHD(kr_in, kr_out,         &
-!!     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,           &
-!!     &          nidx_rj, radius_1d_rj_r, nnod_rj, ntot_phys_rj, d_rj)
-!!      subroutine rot_r_cst_dbl_buoyancy_sph_MHD(kr_in, kr_out,        &
-!!     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,           &
-!!     &          nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
-!!        integer(kind = kint), intent(in) :: kr_in, kr_out
-!!        integer(kind= kint), intent(in) :: is_t, is_c
-!!        integer(kind= kint), intent(in) :: is_buo
-!!        integer(kind = kint), intent(in) :: nidx_rj(2)
-!!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
-!!        real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
-!!        real(kind = kreal), intent(in) :: coef_t_buo, coef_c_buo
-!!        real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!      subroutine rot_self_buoyancy_sph_MHD(kr_in, kr_out, coef,       &
 !!     &          is_fld, is_buo, nidx_rj, radius_1d_rj_r,              &
 !!     &          nnod_rj, ntot_phys_rj, d_rj)
@@ -103,75 +89,6 @@
 !$omp end parallel do
 !
       end subroutine cal_boussinesq_density_sph
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine rot_self_dbl_buoyancy_sph_MHD(kr_in, kr_out,           &
-     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,             &
-     &          nidx_rj, radius_1d_rj_r, nnod_rj, ntot_phys_rj, d_rj)
-!
-      integer(kind = kint), intent(in) :: kr_in, kr_out
-      integer(kind= kint), intent(in) :: is_t, is_c
-      integer(kind= kint), intent(in) :: is_buo
-      integer(kind = kint), intent(in) :: nidx_rj(2)
-      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
-      real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
-      real(kind = kreal), intent(in) :: coef_t_buo, coef_c_buo
-      real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
-!
-      integer(kind= kint) :: ist, ied, inod, j, k
-!
-!
-      ist = (kr_in-1)*nidx_rj(2) + 1
-      ied = kr_out * nidx_rj(2)
-!$omp parallel do private (inod,j,k)
-      do inod = ist, ied
-        j = mod((inod-1),nidx_rj(2)) + 1
-        k = 1 + (inod- j) / nidx_rj(2)
-!
-        d_rj(inod,is_buo  ) = 0.0d0
-        d_rj(inod,is_buo+1) = 0.0d0
-        d_rj(inod,is_buo+2) = (coef_t_buo * d_rj(inod,is_t)             &
-     &                       + coef_c_buo * d_rj(inod,is_c)  )          &
-     &                      * radius_1d_rj_r(k)
-      end do
-!$omp end parallel do
-!
-      end subroutine rot_self_dbl_buoyancy_sph_MHD
-!
-!-----------------------------------------------------------------------
-!
-      subroutine rot_r_cst_dbl_buoyancy_sph_MHD(kr_in, kr_out,          &
-     &          coef_t_buo, is_t, coef_c_buo, is_c, is_buo,             &
-     &          nidx_rj, nnod_rj, ntot_phys_rj, d_rj)
-!
-      integer(kind = kint), intent(in) :: kr_in, kr_out
-      integer(kind= kint), intent(in) :: is_t, is_c
-      integer(kind= kint), intent(in) :: is_buo
-      integer(kind = kint), intent(in) :: nidx_rj(2)
-      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
-      real(kind = kreal), intent(in) :: coef_t_buo, coef_c_buo
-      real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
-!
-      integer(kind= kint) :: ist, ied, inod, j, k
-!
-!
-      ist = (kr_in-1)*nidx_rj(2) + 1
-      ied = kr_out * nidx_rj(2)
-!$omp parallel do private (inod,j,k)
-      do inod = ist, ied
-        j = mod((inod-1),nidx_rj(2)) + 1
-        k = 1 + (inod- j) / nidx_rj(2)
-!
-        d_rj(inod,is_buo  ) = 0.0d0
-        d_rj(inod,is_buo+1) = 0.0d0
-        d_rj(inod,is_buo+2) = coef_t_buo * d_rj(inod,is_t)              &
-     &                       + coef_c_buo * d_rj(inod,is_c)
-      end do
-!$omp end parallel do
-!
-      end subroutine rot_r_cst_dbl_buoyancy_sph_MHD
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

@@ -103,7 +103,7 @@
         end if
 !   thermal buoyancy flag
         if(fl_prop%flag_thermal_buoyancy) then
-          call add_phys_name_ctl(buoyancy, field_ctl)
+          call add_phys_name_ctl(thermal_buoyancy, field_ctl)
           call add_phys_name_ctl(rot_buoyancy, field_ctl)
           call add_phys_name_ctl(div_buoyancy, field_ctl)
         end if
@@ -112,6 +112,11 @@
           call add_phys_name_ctl(composite_buoyancy, field_ctl)
           call add_phys_name_ctl(div_composite_buoyancy, field_ctl)
           call add_phys_name_ctl(rot_composite_buoyancy, field_ctl)
+        end if
+!   total buoyancy flag
+        if(fl_prop%flag_thermal_buoyancy                                &
+     &           .or. fl_prop%flag_comp_buoyancy) then
+          call add_phys_name_ctl(buoyancy, field_ctl)
         end if
       end if
 !

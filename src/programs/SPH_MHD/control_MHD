@@ -108,7 +108,7 @@ begin MHD_control
 !   thermal_diffusion, viscous_diffusion
 !   vector_potential_diffusion, magnetic_diffusion
 !   magnetic_tension, Lorentz_force
-!   Coriolis_force, buoyancy
+!   Coriolis_force, thermal_buoyancy
 !
 !
 !   heat_flux, pert_heat_flux

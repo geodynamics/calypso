@@ -322,8 +322,9 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \tt viscous\_diffusion & Viscous diffusion
 & $-\nu \nabla \times \nabla \times \bvec{u}$ \\
 \tt inertia & Inertia term &  $ -\bvec{\omega} \times \bvec{u} $ \\
-\tt buoyancy                   & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
-\tt composite\_buoyancy & Compositional buoyancy &  $ -\alpha_{C} C\bvec{g}  $\\
+\tt thermal\_buoyancy & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
+\tt composite\_buoyancy & Compositional buoyancy &  $ -\alpha_{C} C \bvec{g}  $\\
+\tt buoyancy & Total buoyancy &  $ -\left(\alpha_{T} T + \alpha_{C} C \right) \bvec{g}  $ \\
 \tt Lorentz\_force & Lorentz force &  $ \bvec{J} \times \bvec{B} $ \\
 \tt Coriolis\_force & Coriolis force &  $ -2 \Omega \hat{z} \times \bvec{u} $ \\
 \tt pressure\_gradient & Pressure gradient &  $  - \nabla P  $ \\

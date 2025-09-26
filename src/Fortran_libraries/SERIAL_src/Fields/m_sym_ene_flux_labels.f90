@@ -107,14 +107,14 @@
      &                math = '$ u_{asymi} (e_{ijk}'                     &
      &                  // ' \tilde{J}_{asymj} \tilde{B}_{asymk})$')
 !
-!>        Field label for sym buoyancy flux
+!>        Field label for sym thermal buoyancy flux
 !!         @f$ -u_{symi} \alpha_{T} g_{i} \tilde{T}_{sym} @f$
       type(field_def), parameter :: sym_buoyancy_flux                   &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'sym_buoyancy_flux',                       &
      &                math = '$ u_{asymi} (e_{ijk}'                     &
      &                  // ' \tilde{J}_{asymj} \tilde{B}_{symk})$')
-!>        Field label for asym buoyancy flux
+!>        Field label for asym thermal buoyancy flux
 !!         @f$ -u_{asymi} \alpha_{T} g_{i} \tilde{T}_{asym} @f$
       type(field_def), parameter :: asym_buoyancy_flux                  &
      &    = field_def(n_comp = n_scalar,                                &

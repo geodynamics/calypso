@@ -118,7 +118,7 @@
 !
       call append_c_to_ctl_array(Coriolis_force%name,     array_c)
       call append_c_to_ctl_array(Lorentz_force%name,      array_c)
-      call append_c_to_ctl_array(buoyancy%name,           array_c)
+      call append_c_to_ctl_array(thermal_buoyancy%name,   array_c)
       call append_c_to_ctl_array(composite_buoyancy%name, array_c)
 !
       end subroutine set_force_list_array

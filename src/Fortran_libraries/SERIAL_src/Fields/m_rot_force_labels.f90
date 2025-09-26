@@ -55,14 +55,14 @@
      &                math = '$ e_{ijk} \partial_{j}'                   &
      &               // '\left(e_{kkm} J_{l} B_{m} \right) $')
 !
-!>        Field label for curl of filtered buoyancy
+!>        Field label for curl of filtered thermal buoyancy
 !!        @f$ -e_{ijk} \partial_{j} \alpha_{T} T g_{k} @f$
       type(field_def), parameter :: rot_buoyancy                        &
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'rot_buoyancy',                            &
      &                math = '$-e_{ijk} \partial_{j} \alpha_{T}'        &
      &                    // ' T g_{k}$')
-!>        Field label for curl of compositional buoyancy
+!>        Field label for curl of filtered compositional buoyancy
 !!        @f$ -e_{ijk} \partial_{j} \alpha_{C} C g_{k} @f$
       type(field_def), parameter :: rot_composite_buoyancy              &
      &    = field_def(n_comp = n_vector,                                &

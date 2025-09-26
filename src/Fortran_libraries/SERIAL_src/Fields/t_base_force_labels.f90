@@ -27,9 +27,11 @@
 !!   Lorentz_force   [i_lorentz]:  Lorentz force     J \times B
 !!   magnetic_tension  [i_m_tension]:  magnetic tension   (B \nabla) B
 !!   Coriolis_force   [i_coriolis]:  Coriolis force     2 \Omega \times u
-!!   buoyancy   [i_buoyancy]:   Thermal buoyancy       - \alpha_{T} g T
+!!   thermal_buoyancy     [i_buoyancy]: Thermal buoyancy - \alpha_{T} T g
 !!   composite_buoyancy   [i_comp_buo]:
-!!                       compositional buoyancy  - \alpha_{C} g C
+!!                       compositional buoyancy          - \alpha_{C} C g
+!!   buoyancy   [i_buoyancy]:   total buoyancy
+!!                   - (\alpha_{T} T + \alpha_{C} C) g
 !!
 !!   vecp_induction   [i_vp_induct]:     induction         u \times B
 !!   magnetic_induction   [i_induction]:
@@ -86,7 +88,7 @@
 !>        start address for Coriolis force
 !!         @f$ -2 e_{ijk} \Omega_{j} u_{k} @f$
         integer (kind=kint) :: i_coriolis =        izero
-!>        start address for buoyancy
+!>        start address for thermal buoyancy
 !!         @f$ -\alpha_{T} g_{i} T @f$
         integer (kind=kint) :: i_buoyancy =        izero
 !>        start address for compositional buoyancy
@@ -173,7 +175,7 @@
         else if (field_name .eq. magnetic_tension%name) then
           forces%i_m_tension =  i_phys
 !
-        else if (field_name .eq. buoyancy%name) then
+        else if (field_name .eq. thermal_buoyancy%name) then
           forces%i_buoyancy =   i_phys
         else if (field_name .eq. composite_buoyancy%name) then
           forces%i_comp_buo =   i_phys

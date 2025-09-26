@@ -206,17 +206,17 @@
      &                  name = 'maxwell_tensor_sym_asym',               &
      &                  math = '$ B_{sym} B_{asym} $')
 !
-!>        Field label of buoyancy
+!>        Field label of thermal buoyancy
 !!         @f$ -\alpha_{T} g_{i} T_{sym} @f$
-      type(field_def), parameter :: sym_thermal_buoyancy                 &
+      type(field_def), parameter :: sym_thermal_buoyancy                &
      &    = field_def(n_comp = n_vector,                                &
-     &                  name = 'sym_thermal_buoyancy',                   &
+     &                  name = 'sym_thermal_buoyancy',                  &
      &                  math = '$ -\alpha_{T} g_{i} T_{sym} $')
-!>        Field label of buoyancy
+!>        Field label of thermal buoyancy
 !!         @f$ -\alpha_{T} g_{i} T_{asym} @f$
-      type(field_def), parameter :: asym_thermal_buoyancy                &
+      type(field_def), parameter :: asym_thermal_buoyancy               &
      &    = field_def(n_comp = n_vector,                                &
-     &                  name = 'asym_thermal_buoyancy',                  &
+     &                  name = 'asym_thermal_buoyancy',                 &
      &                  math = '$ -\alpha_{T} g_{i} T_{asym} $')
 !
 !>        Field label of compositional buoyancy

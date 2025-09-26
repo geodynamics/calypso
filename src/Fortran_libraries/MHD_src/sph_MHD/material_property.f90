@@ -155,7 +155,7 @@
         if(fl_prop%flag_coriolis) write(*,*)                            &
      &         'coefficient for coriolis force:      ',                 &
      &              fl_prop%coef_cor
-        if(fl_prop%flag_lorentz) write(*,*)                          &
+        if(fl_prop%flag_lorentz) write(*,*)                             &
      &         'coefficient for Lorentz force:       ',                 &
      &              fl_prop%coef_lor
         end if
