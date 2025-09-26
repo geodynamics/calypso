@@ -34,8 +34,6 @@
 !
       implicit  none
 !
-      private :: cal_r_double_buo_on_sphere
-!
 !-----------------------------------------------------------------------
 !
       contains
@@ -63,44 +61,33 @@
       type(base_force_address), intent(in) :: ipol_div_frc
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer(kind = kint) :: ipol_temp,  ipol_comp
+      integer(kind = kint) :: ipol_scalar
 !
 !
       if(flag_thermal_buoyancy) then
         if(ref_param_T%flag_ref_field) then
-          ipol_temp =  ipol_base%i_per_temp
+          ipol_scalar =  ipol_base%i_per_temp
         else
-          ipol_temp =  ipol_base%i_temp
+          ipol_scalar =  ipol_base%i_temp
         end if
+!
+        if (iflag_debug.eq.1) write(*,*) 'cal_r_buoyancy_on_sphere'
+        call cal_r_buoyancy_on_sphere(kr, coef_buo,                     &
+     &      ipol_scalar, ipol_div_frc%i_buoyancy,                       &
+     &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
       if(flag_comp_buoyancy) then
         if(ref_param_C%flag_ref_field) then
-          ipol_comp =  ipol_base%i_per_light
+          ipol_scalar =  ipol_base%i_per_light
         else
-          ipol_comp =  ipol_base%i_light
+          ipol_scalar =  ipol_base%i_light
         end if
-      end if
 !
-      if(flag_thermal_buoyancy .and. flag_comp_buoyancy) then
-        if (iflag_debug.eq.1)                                           &
-     &      write(*,*)'cal_r_double_buo_on_sphere', ipol_temp
-        call cal_r_double_buo_on_sphere(kr, coef_buo, coef_comp_buo,    &
-     &      ipol_temp, ipol_comp, ipol_div_frc%i_buoyancy,              &
-     &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-!
-      else if(flag_thermal_buoyancy) then
-        if (iflag_debug.eq.1) write(*,*) 'cal_r_buoyancy_on_sphere'
-        call cal_r_buoyancy_on_sphere(kr, coef_buo,                     &
-     &      ipol_temp, ipol_div_frc%i_buoyancy,                         &
-     &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-!
-      else if(flag_comp_buoyancy) then
         if (iflag_debug.eq.1) write(*,*) 'cal_r_buoyancy_on_sphere'
         call cal_r_buoyancy_on_sphere(kr, coef_comp_buo,                &
-     &      ipol_comp, ipol_div_frc%i_comp_buo,                         &
+     &      ipol_scalar, ipol_div_frc%i_comp_buo,                       &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
@@ -108,33 +95,6 @@
       end subroutine r_buoyancy_on_sphere
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine cal_r_double_buo_on_sphere                             &
-     &         (kr, coef_buo, coef_comp_buo, is_t, is_c, is_fr,         &
-     &          nidx_rj, radius_1d_rj_r, nnod_rj, ntot_phys_rj, d_rj)
-!
-      integer(kind= kint), intent(in) :: is_t, is_c, is_fr, kr
-      integer(kind = kint), intent(in) :: nidx_rj(2)
-      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
-      real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
-      real(kind = kreal), intent(in) :: coef_buo, coef_comp_buo
-      real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
-!
-      integer(kind= kint) :: inod, j
-!
-!
-!$omp parallel do private (inod,j)
-      do j = 1, nidx_rj(2)
-        inod = j + (kr-1) * nidx_rj(2)
-        d_rj(inod,is_fr) = (coef_buo*d_rj(inod,is_t)                    &
-     &                     + coef_comp_buo*d_rj(inod,is_c))             &
-     &                     * radius_1d_rj_r(kr)
-      end do
-!$omp end parallel do
-!
-      end subroutine cal_r_double_buo_on_sphere
-!
 !-----------------------------------------------------------------------
 !
       subroutine cal_r_buoyancy_on_sphere(kr, coef, is_fld, is_fr,      &

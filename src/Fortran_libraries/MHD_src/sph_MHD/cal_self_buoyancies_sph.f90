@@ -43,7 +43,7 @@
 !
       implicit  none
 !
-      private :: sel_buoyancies_sph_rj
+      private :: sel_buoyancy_sph_rj
 !
 !-----------------------------------------------------------------------
 !
@@ -93,19 +93,18 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call sel_buoyancies_sph_rj(fl_prop%i_grav, sph_rj, leg,           &
-     &    ibuo_temp, ipol_frc%i_buoyancy, fl_prop%coef_buo,             &
-     &    sph_bc_U, rj_fld)
-      call sel_buoyancies_sph_rj(fl_prop%i_grav, sph_rj, leg,           &
-     &    ibuo_comp, ipol_frc%i_comp_buo, fl_prop%coef_comp_buo,        &
-     &    sph_bc_U, rj_fld)
+      call sel_buoyancy_sph_rj(fl_prop%i_grav, sph_rj, leg, ibuo_temp,  &
+     &    ipol_frc%i_buoyancy, fl_prop%coef_buo, sph_bc_U, rj_fld)
+      call sel_buoyancy_sph_rj(fl_prop%i_grav, sph_rj, leg, ibuo_comp,  &
+     &    ipol_frc%i_comp_buo, fl_prop%coef_comp_buo, sph_bc_U, rj_fld)
 !
       end subroutine sel_buoyancies_sph_MHD
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_buoyancies_sph_rj(i_grav, sph_rj, leg,             &
-     &          ipol_scalar, ipol_buo, coef_buo, sph_bc_U, rj_fld)
+      subroutine sel_buoyancy_sph_rj                                    &
+     &         (i_grav, sph_rj, leg, ipol_scalar, ipol_buo,             &
+     &          coef_buo, sph_bc_U, rj_fld)
 !
       use cal_buoyancies_sph_MHD
       use adjust_reference_fields
@@ -141,7 +140,7 @@
       end if
       call delete_sphere_average(ipol_buo, sph_rj, rj_fld)
 !
-      end subroutine sel_buoyancies_sph_rj
+      end subroutine sel_buoyancy_sph_rj
 !
 !-----------------------------------------------------------------------
 !

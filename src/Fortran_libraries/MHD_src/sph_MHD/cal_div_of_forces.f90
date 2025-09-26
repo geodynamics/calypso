@@ -15,10 +15,16 @@
 !!        type(base_force_address), intent(in) :: ipol_div_frc
 !!        type(phys_data), intent(inout) :: rj_fld
 !!
-!!      subroutine add_div_advection_to_force                           &
+!!      subroutine sub_div_advection_to_force                           &
 !!     &         (is_press, is_div, nnod_rj, ntot_phys_rj, d_rj)
+!!        integer(kind = kint), intent(in) :: is_press, is_div
+!!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+!!        real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!      subroutine add_term_to_div_force                                &
 !!     &          (is_press, is_div, nnod_rj, ntot_phys_rj, d_rj)
+!!        integer(kind = kint), intent(in) :: is_press, is_div
+!!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+!!        real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!@endverbatim
 !
       module cal_div_of_forces
@@ -108,11 +114,11 @@
       else
         call clear_field_data(rj_fld, n_scalar, ipol_base%i_press)
 !
-!        if(fl_prop%flag_inertia) then
-!          call add_div_advection_to_force                              &
-!     &       (ipol_base%i_press, ipol_div_frc%i_m_advect,              &
-!     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-!        end if
+        if(fl_prop%flag_inertia) then
+          call sub_div_advection_to_force                               &
+     &       (ipol_base%i_press, ipol_div_frc%i_m_advect,               &
+     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        end if
 !
         if(fl_prop%flag_coriolis) then
           call add_term_to_div_force                                    &
@@ -239,7 +245,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine add_div_advection_to_force                             &
+      subroutine sub_div_advection_to_force                             &
      &         (is_press, is_div, nnod_rj, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: is_press, is_div
@@ -255,7 +261,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine add_div_advection_to_force
+      end subroutine sub_div_advection_to_force
 !
 ! ----------------------------------------------------------------------
 !
