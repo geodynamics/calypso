@@ -27,7 +27,7 @@
 !!   thermal_buoyancy     [i_thrm_buo]: Thermal buoyancy - \alpha_{T} g T
 !!   composite_buoyancy   [i_comp_buo]:
 !!                       compositional buoyancy          - \alpha_{C} g C
-!!   buoyancy             [i_buoyancy]: Total buoyancy
+!!   buoyancy             [i_thrm_buo]: Total buoyancy
 !!                            - (\alpha_{T} T + \alpha_{C} C) g
 !!
 !!   vecp_induction   [i_vp_induct]:     induction         u \times B

@@ -18,7 +18,7 @@
 !!   rot_inertia              [rot_forces%i_m_advect]
 !!   rot_Coriolis_force       [rot_forces%i_Coriolis]
 !!   rot_Lorentz_force        [rot_forces%i_lorentz]
-!!   rot_buoyancy             [rot_forces%i_buoyancy]
+!!   rot_buoyancy             [rot_forces%i_thrm_buo]
 !!   rot_composite_buoyancy   [rot_forces%i_comp_buo]
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -128,7 +128,7 @@
       if(flag_thermal_buoyancy) then
         call const_sph_div_force                                        &
      &     (sph_rj, r_2nd, sph_MHD_bc%sph_bc_U, g_sph_rj,               &
-     &      ipol_frc%i_buoyancy, ipol_div_frc%i_buoyancy, rj_fld)
+     &      ipol_frc%i_thrm_buo, ipol_div_frc%i_thrm_buo, rj_fld)
       end if
 !
       if(flag_comp_buoyancy) then

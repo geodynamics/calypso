@@ -58,7 +58,7 @@
 !
 !
       call sel_rot_buoyancy_sph_rj(fl_prop%i_grav, sph_rj,              &
-     &    ipol_base%i_temp, ipol_rot_frc%i_buoyancy,                    &
+     &    ipol_base%i_temp, ipol_rot_frc%i_thrm_buo,                    &
      &    fl_prop%coef_buo, sph_bc_U, rj_fld)
 ! 
       call sel_rot_buoyancy_sph_rj(fl_prop%i_grav, sph_rj,              &

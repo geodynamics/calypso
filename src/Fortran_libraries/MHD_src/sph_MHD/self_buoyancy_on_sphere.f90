@@ -73,7 +73,7 @@
 !
         if (iflag_debug.eq.1) write(*,*) 'cal_r_buoyancy_on_sphere'
         call cal_r_buoyancy_on_sphere(kr, coef_buo,                     &
-     &      ipol_scalar, ipol_div_frc%i_buoyancy,                       &
+     &      ipol_scalar, ipol_div_frc%i_thrm_buo,                       &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if

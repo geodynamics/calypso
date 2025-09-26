@@ -24,7 +24,7 @@
 !!   Lorentz_force_by_sym       [force_by_sym%i_lorentz]
 !!   magnetic_tension_by_sym    [force_by_sym%i_m_tension]
 !!
-!!   sym_buoyancy               [force_by_sym%i_buoyancy]
+!!   sym_buoyancy               [force_by_sym%i_thrm_buo]
 !!   sym_comp_buoyancy          [force_by_sym%i_comp_buo]
 !!
 !!   vecp_induction_by_sym      [force_by_sym%i_vp_induct]
@@ -110,7 +110,7 @@
             force_by_sym_sym%i_m_tension =  i_phys
 !
             else if(field_name .eq. asym_thermal_buoyancy%name) then
-            force_by_sym_sym%i_buoyancy =   i_phys
+            force_by_sym_sym%i_thrm_buo =   i_phys
             else if(field_name .eq. asym_composite_buoyancy%name) then
             force_by_sym_sym%i_comp_buo =   i_phys
 !
@@ -240,14 +240,13 @@
             force_by_sym_asym%i_m_tension =  i_phys
 !
             else if(field_name .eq. sym_thermal_buoyancy%name) then
-            force_by_sym_asym%i_buoyancy =   i_phys
+            force_by_sym_asym%i_thrm_buo =   i_phys
             else if(field_name .eq. sym_composite_buoyancy%name) then
             force_by_sym_asym%i_comp_buo =   i_phys
 !
             else if(field_name .eq. usym_x_Basym%name) then
             force_by_sym_asym%i_vp_induct =    i_phys
-            else if(field_name .eq. rot_usym_x_Basym%name)    &
-      &   then
+            else if(field_name .eq. rot_usym_x_Basym%name) then
             force_by_sym_asym%i_induction =  i_phys
             else if(field_name .eq. Bsym_nabla_uasym%name) then
             force_by_sym_asym%i_mag_stretch =  i_phys

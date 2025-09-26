@@ -94,7 +94,7 @@
 !
 !
       call sel_buoyancy_sph_rj(fl_prop%i_grav, sph_rj, leg, ibuo_temp,  &
-     &    ipol_frc%i_buoyancy, fl_prop%coef_buo, sph_bc_U, rj_fld)
+     &    ipol_frc%i_thrm_buo, fl_prop%coef_buo, sph_bc_U, rj_fld)
       call sel_buoyancy_sph_rj(fl_prop%i_grav, sph_rj, leg, ibuo_comp,  &
      &    ipol_frc%i_comp_buo, fl_prop%coef_comp_buo, sph_bc_U, rj_fld)
 !

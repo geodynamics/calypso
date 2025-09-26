@@ -27,7 +27,7 @@
 !!   Lorentz_force   [i_lorentz]:  Lorentz force     J \times B
 !!   magnetic_tension  [i_m_tension]:  magnetic tension   (B \nabla) B
 !!   Coriolis_force   [i_coriolis]:  Coriolis force     2 \Omega \times u
-!!   thermal_buoyancy     [i_buoyancy]: Thermal buoyancy - \alpha_{T} T g
+!!   thermal_buoyancy     [i_thrm_buo]: Thermal buoyancy - \alpha_{T} T g
 !!   composite_buoyancy   [i_comp_buo]:
 !!                       compositional buoyancy          - \alpha_{C} C g
 !!   buoyancy   [i_buoyancy]:   total buoyancy
@@ -89,11 +89,14 @@
 !!         @f$ -2 e_{ijk} \Omega_{j} u_{k} @f$
         integer (kind=kint) :: i_coriolis =        izero
 !>        start address for thermal buoyancy
-!!         @f$ -\alpha_{T} g_{i} T @f$
-        integer (kind=kint) :: i_buoyancy =        izero
+!!         @f$ -\alpha_{T} T g_{i} @f$
+        integer (kind=kint) :: i_thrm_buo =        izero
 !>        start address for compositional buoyancy
-!!         @f$ -\alpha_{C} g_{i} C @f$
+!!         @f$ -\alpha_{C} C g_{i} @f$
         integer (kind=kint) :: i_comp_buo =        izero
+!>        start address for thermal buoyancy
+!!         @f$ -(\alpha_{T} T + \alpha_{C} C) g_{i} @f$
+        integer (kind=kint) :: i_buoyancy =        izero
 !
 !>        start address for magnetic induction
 !!         @f$ e_{ijk} \partial_{j}\left(e_{klm}u_{l}B_{m} \right)@f$
@@ -176,7 +179,7 @@
           forces%i_m_tension =  i_phys
 !
         else if (field_name .eq. thermal_buoyancy%name) then
-          forces%i_buoyancy =   i_phys
+          forces%i_thrm_buo =   i_phys
         else if (field_name .eq. composite_buoyancy%name) then
           forces%i_comp_buo =   i_phys
 !
@@ -242,7 +245,7 @@
           rot_forces%i_lorentz =    i_phys
 !
         else if (field_name .eq. rot_buoyancy%name) then
-          rot_forces%i_buoyancy =   i_phys
+          rot_forces%i_thrm_buo =   i_phys
         else if (field_name .eq. rot_composite_buoyancy%name) then
           rot_forces%i_comp_buo =   i_phys
         end if
@@ -277,7 +280,7 @@
           div_forces%i_lorentz =    i_phys
 !
         else if (field_name .eq. div_buoyancy%name) then
-          div_forces%i_buoyancy =   i_phys
+          div_forces%i_thrm_buo =   i_phys
         else if (field_name .eq. div_composite_buoyancy%name) then
           div_forces%i_comp_buo =   i_phys
 !
