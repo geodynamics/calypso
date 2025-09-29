@@ -142,14 +142,14 @@
       if(flag) return
 !
 ! 
-      call set_sym_ene_flux_addresses_by_sym_asym                        &
-      &   (i_fld, field_name, iphys%eflux_to_sym_by_sym_asym, flag)
-      call set_sym_ene_flux_addresses_by_asym_sym                        &
-      &   (i_fld, field_name, iphys%eflux_to_sym_by_asym_sym, flag)
-      call set_asym_ene_flux_addresses_by_sym_sym                        &
-      &   (i_fld, field_name, iphys%eflux_to_asym_by_sym_sym, flag)
-      call set_asym_ene_flux_addresses_by_asym_asym                      &
-      &   (i_fld, field_name, iphys%eflux_to_asym_by_asym_asym, flag)
+      call set_sym_eflux_address_sym_asym                               &
+     &   (i_fld, field_name, iphys%eflux_to_sym_by_sym_asym, flag)
+      call set_sym_eflux_address_asym_sym                               &
+     &   (i_fld, field_name, iphys%eflux_to_sym_by_asym_sym, flag)
+      call set_asym_eflux_address_sym_sym                               &
+     &   (i_fld, field_name, iphys%eflux_to_asym_by_sym_sym, flag)
+      call set_asym_eflux_address_asm_asm                               &
+     &   (i_fld, field_name, iphys%eflux_to_asym_by_asym_asym, flag)
       if(flag) return
 !
 !
