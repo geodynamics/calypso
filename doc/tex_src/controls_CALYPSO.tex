@@ -361,8 +361,16 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \tt rot\_inertia & Curl of inertia &  $ -\nabla \times \left(\bvec{\omega} \times \bvec{u}\right) $ \\
 \tt rot\_Lorentz\_force & Curl of Lorentz force &  $ \nabla \times \left(\bvec{J} \times \bvec{B}\right) $ \\
 \tt rot\_Coriolis\_force & Curl of Coriolis force &  $ -2 \Omega \nabla \times \left(\hat{z} \times \bvec{u} \right) $ \\
-\tt rot\_buoyancy                   & Curl of thermal buoyancy &  $ - \nabla \times \left(\alpha_{T} T \bvec{g}\right)  $ \\
+\tt rot\_thermal\_buoyancy &   Curl of thermal buoyancy &  $ - \nabla \times \left(\alpha_{T} T \bvec{g}\right)  $ \\
 \tt rot\_composite\_buoyancy & Curl of compositional buoyancy &  $ - \nabla \times \left(\alpha_{C} C\bvec{g}\right)  $\\
+\tt rot\_buoyancy & Curl of total buoyancy &  $ - \nabla \times \left[\left(\alpha_{T} T + \alpha_{C} C \right) \bvec{g}\right]  $ \\
+\hline
+\tt div\_inertia & Divergence of inertia &  $ -\nabla \cdot \left(\bvec{\omega} \times \bvec{u}\right) $ \\
+\tt div\_Lorentz\_force & Divergence of Lorentz force &  $ \nabla \cdot \left(\bvec{J} \times \bvec{B}\right) $ \\
+\tt div\_Coriolis\_force & Divergence of Coriolis force &  $ -2 \Omega \nabla \cdot \left(\hat{z} \times \bvec{u} \right) $ \\
+\tt div\_thermal\_buoyancy & Divergence of thermal buoyancy &  $ - \nabla \cdot \left(\alpha_{T} T \bvec{g}\right)  $ \\
+\tt div\_composite\_buoyancy & Divergence of compositional buoyancy &  $ - \nabla \cdot \left(\alpha_{C} C \bvec{g}\right)  $\\
+\tt div\_buoyancy & Divergence of total buoyancy &  $ - \nabla \cdot \left[ \left(\alpha_{T} T + \alpha_{C} C \right) \bvec{g}\right]  $ \\
 \hline
 \tt Lorentz\_work & Work of Lorentz force
  & $\bvec{u}\cdot \left( \bvec{J} \times \bvec{B} \right) $ \\ 
@@ -574,8 +582,9 @@ The following fields are available.
  Label & Field name & Equation \\ \hline
 \verb|Coriolis| & Coriolis force & $-2\Omega \hat{z} \times \bvec{u} $ \\
 \verb|Lorentz| & Lorentz force &  $\bvec{J} \times \bvec{B} $ \\
-\verb|gravity| & Thermal buoyancy & $-\alpha_{T} T \bvec{g}$ \\
+\verb|Thermal_buoyancy| & Thermal buoyancy & $-\alpha_{T} T \bvec{g}$ \\
 \verb|Compositional_buoyancy| & Compositional buoyancy  & $-\alpha_{C} C \bvec{g}$\\ \hline
+\verb|gravity| & Thermal buoyancy {\color{red} (Deprecated)} & $-\alpha_{T} T \bvec{g}$ \\
 \verb|Composite_gravity| & Compositional buoyancy {\color{red} (Deprecated)} & $-\alpha_{C} C \bvec{g}$\\ \hline
 \end{tabular}
 \end{center}
