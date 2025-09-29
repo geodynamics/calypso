@@ -23,7 +23,7 @@
 !!                                           -u \cdot (J \times B)
 !!   mag_tension_work         [i_m_tension_wk]: Work of magnetic tension
 !!                                            u \cdot( (B \nabla) B)
-!!   buoyancy_flux            [i_buo_gen]:       Thermal buoyancy flux
+!!   buoyancy_flux            [i_t_buo_gen]:  Thermal buoyancy flux
 !!                                           -u \cdot (\alpha_{T} g T)
 !!   composite_buoyancy_flux  [i_c_buo_gen]:  Compositional buoyancy flux
 !!                                           -u \cdot (\alpha_{C} g C)
@@ -77,7 +77,7 @@
         integer (kind=kint) :: i_m_tension_wk  =   izero
 !>        Field address of thermal buoyancy flux
 !!         @f$ -u_{i} \alpha_{T} g_{i} T @f$
-        integer (kind=kint) :: i_buo_gen =         izero
+        integer (kind=kint) :: i_t_buo_gen =       izero
 !>        Field address of compositional buoyancy flux
 !!         @f$ -u_{i} \alpha_{c} g_{i} C @f$
         integer (kind=kint) :: i_c_buo_gen =       izero
@@ -140,7 +140,7 @@
           ene_flux%i_m_tension_wk =  i_phys
 !
         else if (field_name .eq. buoyancy_flux%name) then
-          ene_flux%i_buo_gen =       i_phys
+          ene_flux%i_t_buo_gen =     i_phys
         else if (field_name .eq. composite_buoyancy_flux%name) then
           ene_flux%i_c_buo_gen =     i_phys
 !

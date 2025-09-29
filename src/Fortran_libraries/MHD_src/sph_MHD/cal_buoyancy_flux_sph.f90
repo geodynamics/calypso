@@ -71,17 +71,17 @@
       type(spherical_transform_data), intent(inout) :: trns_f_eflux
 !
 !
-      if(fs_trns_eflux%i_buo_gen .gt. 0) then
+      if(fs_trns_eflux%i_t_buo_gen .gt. 0) then
         if(ref_param_T%flag_ref_field) then
           call sel_buoyancy_flux_rtp(sph_rtp, fl_prop%coef_buo,         &
      &        trns_b_scl%fld_rtp(1,bs_trns_scalar%i_per_temp),          &
      &        trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),               &
-     &        trns_f_eflux%fld_rtp(1,fs_trns_eflux%i_buo_gen))
+     &        trns_f_eflux%fld_rtp(1,fs_trns_eflux%i_t_buo_gen))
         else
           call sel_buoyancy_flux_rtp(sph_rtp, fl_prop%coef_buo,         &
      &        trns_b_scl%fld_rtp(1,bs_trns_scalar%i_temp),              &
      &        trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),               &
-     &        trns_f_eflux%fld_rtp(1,fs_trns_eflux%i_buo_gen))
+     &        trns_f_eflux%fld_rtp(1,fs_trns_eflux%i_t_buo_gen))
         end if
       end if
 !
@@ -121,21 +121,21 @@
       type(spherical_transform_data), intent(inout) :: trns_f_eflux
 !
 !
-      if(fs_trns_eflux%i_buo_gen .gt. 0) then
+      if(fs_trns_eflux%i_t_buo_gen .gt. 0) then
         if(ref_param_T%flag_ref_field) then
           call pole_sph_buoyancy_flux                                   &
      &       (sph_rtp%nnod_pole, sph_rtp%nidx_rtp(1),                   &
      &        sph_rtp%radius_1d_rtp_r, fl_prop%coef_buo,                &
      &        trns_b_scl%fld_pole(1,bs_trns_scalar%i_per_temp),         &
      &        trns_b_snap%fld_pole(1,bs_trns_base%i_velo),              &
-     &        trns_f_eflux%fld_pole(1,fs_trns_eflux%i_buo_gen))
+     &        trns_f_eflux%fld_pole(1,fs_trns_eflux%i_t_buo_gen))
         else
           call pole_sph_buoyancy_flux                                   &
      &       (sph_rtp%nnod_pole, sph_rtp%nidx_rtp(1),                   &
      &        sph_rtp%radius_1d_rtp_r,  fl_prop%coef_buo,               &
      &        trns_b_scl%fld_pole(1,bs_trns_scalar%i_temp),             &
      &        trns_b_snap%fld_pole(1,bs_trns_base%i_velo),              &
-     &        trns_f_eflux%fld_pole(1,fs_trns_eflux%i_buo_gen))
+     &        trns_f_eflux%fld_pole(1,fs_trns_eflux%i_t_buo_gen))
         end if
       end if
 !

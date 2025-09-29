@@ -21,8 +21,9 @@
 !!   div_inertia                [div_forces%i_m_advect]
 !!   div_Coriolis_force         [div_forces%i_Coriolis]
 !!   div_Lorentz_force          [div_forces%i_lorentz]
-!!   div_buoyancy               [div_forces%i_thrm_buo]
+!!   div_thermal_buoyancy       [div_forces%i_thrm_buo]
 !!   div_composite_buoyancy     [div_forces%i_comp_buo]
+!!   div_buoyancy               [div_forces%i_buoyancy]
 !!
 !!   div_momentum_flux          [div_forces%i_m_flux]
 !!   div_maxwell_tensor         [div_forces%i_maxwell]
@@ -68,18 +69,25 @@
      &                math = '$ \partial_{i}'                           &
      &                    // '(e_{ijk} J_{j} B_{k})$')
 !
-!>        Field label for divergence of filtered thermal buoyancy
-!!         @f$ -\partial_{i} \alpha_{T} g_{i} T @f$
-      type(field_def), parameter :: div_buoyancy                        &
+!>        Field label for divergence of thermal buoyancy
+!!         @f$ -\partial_{i} \alpha_{T} T g_{i} @f$
+      type(field_def), parameter :: div_thermal_buoyancy                &
      &    = field_def(n_comp = n_scalar,                                &
-     &                name = 'div_buoyancy',                            &
+     &                name = 'div_thermal_buoyancy',                    &
      &                math = '$-\partial_{i} \alpha_{T} T g_{i}$')
-!>        Field label for divergence of filtered compositional buoyancy
-!!         @f$ -\partial_{i} \alpha_{C} g_{i} C @f$
+!>        Field label for divergence of compositional buoyancy
+!!         @f$ -\partial_{i} \alpha_{C} C g_{i} @f$
       type(field_def), parameter :: div_composite_buoyancy              &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'div_composite_buoyancy',                  &
      &                math = '$-\partial_{i} \alpha_{C} C g_{i}$')
+!>        Field label for divergence of total buoyancy
+!!         @f$ -\partial_{i} (\alpha_{T} T + \alpha_{C} C) g_{i} @f$
+      type(field_def), parameter :: div_buoyancy                        &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'div_buoyancy',                            &
+     &                math = '$-\partial_{i} (\alpha_{T} T '            &
+     &                    // ' \alpha_{C} C) g_{i}$')
 !
 !>        Field label for divergence of momentum flux
 !!         @f$ \partial_{j} (u_{i} u_{j}) @f$
@@ -143,6 +151,7 @@
      &   .or. (field_name .eq. div_Coriolis_force%name)                 &
      &   .or. (field_name .eq. div_Lorentz_force%name)                  &
      &   .or. (field_name .eq. div_buoyancy%name)                       &
+     &   .or. (field_name .eq. div_thermal_buoyancy%name)               &
      &   .or. (field_name .eq. div_composite_buoyancy%name)
 !
       end function check_div_force
@@ -190,8 +199,9 @@
       call set_field_label_to_ctl(div_inertia,               array_c2i)
       call set_field_label_to_ctl(div_Coriolis_force,        array_c2i)
       call set_field_label_to_ctl(div_Lorentz_force,         array_c2i)
-      call set_field_label_to_ctl(div_buoyancy,              array_c2i)
+      call set_field_label_to_ctl(div_thermal_buoyancy,      array_c2i)
       call set_field_label_to_ctl(div_composite_buoyancy,    array_c2i)
+      call set_field_label_to_ctl(div_buoyancy,              array_c2i)
       call set_field_label_to_ctl(div_momentum_flux,         array_c2i)
       call set_field_label_to_ctl(div_maxwell_tensor,        array_c2i)
       call set_field_label_to_ctl(div_induction_tensor,      array_c2i)

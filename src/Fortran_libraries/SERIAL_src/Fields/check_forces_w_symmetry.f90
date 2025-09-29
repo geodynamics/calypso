@@ -20,6 +20,7 @@
       use m_constants
 !
       use t_base_force_labels
+      use m_base_force_labels
       use m_field_w_symmetry_labels
       use m_force_w_sym_labels
 !
@@ -57,6 +58,9 @@
         call add_phys_name_ctl(sym_magnetic_field, field_ctl)
       end if
 !
+     if( check_field_list_ctl(sym_buoyancy, field_ctl)) then
+        call add_phys_name_ctl(sym_buoyancy, field_ctl)
+      end if
       if( check_field_list_ctl(sym_thermal_buoyancy, field_ctl)) then
         call add_phys_name_ctl(sym_temperature, field_ctl)
       end if
@@ -126,6 +130,9 @@
         call add_phys_name_ctl(asym_magnetic_field, field_ctl)
       end if
 !
+      if(check_field_list_ctl(asym_buoyancy, field_ctl)) then
+        call add_phys_name_ctl(buoyancy, field_ctl)
+      end if
       if(check_field_list_ctl(asym_thermal_buoyancy, field_ctl)) then
         call add_phys_name_ctl(asym_temperature, field_ctl)
       end if

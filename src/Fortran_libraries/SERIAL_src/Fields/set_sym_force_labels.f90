@@ -146,48 +146,50 @@
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wsym_x_usym%name) then
-            force_by_sym_sym%i_m_advect =   i_phys
+              force_by_sym_sym%i_m_advect =   i_phys
             else if(field_name .eq. Jsym_x_Bsym%name) then
-            force_by_sym_sym%i_lorentz =    i_phys
+              force_by_sym_sym%i_lorentz =    i_phys
             else if(field_name .eq. Bsym_nabla_Bsym%name) then
-            force_by_sym_sym%i_m_tension =  i_phys
+              force_by_sym_sym%i_m_tension =  i_phys
 !
             else if(field_name .eq. asym_thermal_buoyancy%name) then
-            force_by_sym_sym%i_thrm_buo =   i_phys
+              force_by_sym_sym%i_thrm_buo =   i_phys
             else if(field_name .eq. asym_composite_buoyancy%name) then
-            force_by_sym_sym%i_comp_buo =   i_phys
+              force_by_sym_sym%i_comp_buo =   i_phys
+            else if(field_name .eq. asym_composite_buoyancy%name) then
+              force_by_sym_sym%i_buoyancy = i_phys
 !
             else if(field_name .eq. usym_x_Bsym%name) then
-            force_by_sym_sym%i_vp_induct =    i_phys
+              force_by_sym_sym%i_vp_induct =    i_phys
             else if(field_name .eq. rot_usym_x_Bsym%name) then
-            force_by_sym_sym%i_induction =  i_phys
+              force_by_sym_sym%i_induction =  i_phys
             else if(field_name .eq. Bsym_nabla_usym%name) then
-            force_by_sym_sym%i_mag_stretch =  i_phys
+              force_by_sym_sym%i_mag_stretch =  i_phys
 !
             else if (field_name .eq. usym_nabla_Tsym%name) then
-            force_by_sym_sym%i_h_advect =    i_phys
+              force_by_sym_sym%i_h_advect =    i_phys
             else if (field_name .eq. usym_nabla_pTsym%name) then
-            force_by_sym_sym%i_ph_advect =   i_phys
+              force_by_sym_sym%i_ph_advect =   i_phys
             else if (field_name .eq. usym_nabla_Csym%name) then
-            force_by_sym_sym%i_c_advect =    i_phys
+              force_by_sym_sym%i_c_advect =    i_phys
             else if (field_name .eq. usym_nabla_pCsym%name) then
-            force_by_sym_sym%i_pc_advect =   i_phys
+              force_by_sym_sym%i_pc_advect =   i_phys
 !
             else if (field_name .eq. heat_flux_sym_sym%name) then
-            force_by_sym_sym%i_h_flux =    i_phys
+              force_by_sym_sym%i_h_flux =    i_phys
             else if (field_name .eq. pert_h_flux_sym_sym%name) then
-            force_by_sym_sym%i_ph_flux =   i_phys
+              force_by_sym_sym%i_ph_flux =   i_phys
             else if (field_name .eq. composite_flux_sym_sym%name) then
-            force_by_sym_sym%i_c_flux =    i_phys
+              force_by_sym_sym%i_c_flux =    i_phys
             else if (field_name .eq. pert_c_flux_sym_sym%name) then
-            force_by_sym_sym%i_pc_flux =   i_phys
+              force_by_sym_sym%i_pc_flux =   i_phys
 !
             else if(field_name .eq. m_flux_sym_sym%name) then
-            force_by_sym_sym%i_m_flux =   i_phys
+              force_by_sym_sym%i_m_flux =   i_phys
             else if(field_name .eq. maxwell_tensor_sym_sym%name) then
-            force_by_sym_sym%i_maxwell =  i_phys
+              force_by_sym_sym%i_maxwell =  i_phys
             else if(field_name .eq. usym_Bsym%name) then
-            force_by_sym_sym%i_induct_t = i_phys
+              force_by_sym_sym%i_induct_t = i_phys
             end if
       end if
 !
@@ -213,44 +215,43 @@
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wasym_x_uasym%name) then
-            force_by_asym_asym%i_m_advect =   i_phys
+              force_by_asym_asym%i_m_advect =   i_phys
             else if(field_name .eq. Jasym_x_Basym%name) then
-            force_by_asym_asym%i_lorentz =    i_phys
+              force_by_asym_asym%i_lorentz =    i_phys
             else if(field_name .eq. Basym_nabla_Basym%name) then
-            force_by_asym_asym%i_m_tension =  i_phys
+              force_by_asym_asym%i_m_tension =  i_phys
 !
             else if(field_name .eq. uasym_x_Basym%name) then
-            force_by_asym_asym%i_vp_induct =    i_phys
-            else if(field_name .eq. rot_uasym_x_Basym%name)    &
-      &   then
-            force_by_asym_asym%i_induction =  i_phys
+              force_by_asym_asym%i_vp_induct =    i_phys
+            else if(field_name .eq. rot_uasym_x_Basym%name) then
+              force_by_asym_asym%i_induction =  i_phys
             else if(field_name .eq. Basym_nabla_uasym%name) then
-            force_by_asym_asym%i_mag_stretch =  i_phys
+              force_by_asym_asym%i_mag_stretch =  i_phys
 !
             else if (field_name .eq. uasym_nabla_Tasym%name) then
-            force_by_asym_asym%i_h_advect =    i_phys
+              force_by_asym_asym%i_h_advect =    i_phys
             else if (field_name .eq. uasym_nabla_pTasym%name) then
-            force_by_asym_asym%i_ph_advect =   i_phys
+              force_by_asym_asym%i_ph_advect =   i_phys
             else if (field_name .eq. uasym_nabla_Casym%name) then
-            force_by_asym_asym%i_c_advect =    i_phys
+              force_by_asym_asym%i_c_advect =    i_phys
             else if (field_name .eq. uasym_nabla_pCasym%name) then
-            force_by_asym_asym%i_pc_advect =   i_phys
+              force_by_asym_asym%i_pc_advect =   i_phys
 !
             else if (field_name .eq. heat_flux_asym_asym%name) then
-            force_by_asym_asym%i_h_flux =    i_phys
+              force_by_asym_asym%i_h_flux =    i_phys
             else if (field_name .eq. pert_h_flux_asym_asym%name) then
-            force_by_asym_asym%i_ph_flux =   i_phys
+              force_by_asym_asym%i_ph_flux =   i_phys
             else if (field_name .eq. composite_flux_asym_asym%name) then
-            force_by_asym_asym%i_c_flux =    i_phys
+              force_by_asym_asym%i_c_flux =    i_phys
             else if (field_name .eq. pert_c_flux_asym_asym%name) then
-            force_by_asym_asym%i_pc_flux =   i_phys
+              force_by_asym_asym%i_pc_flux =   i_phys
 !
             else if(field_name .eq. m_flux_asym_asym%name) then
-            force_by_asym_asym%i_m_flux =   i_phys
+              force_by_asym_asym%i_m_flux =   i_phys
             else if(field_name .eq. maxwell_tensor_asym_asym%name) then
-            force_by_asym_asym%i_maxwell =  i_phys
+              force_by_asym_asym%i_maxwell =  i_phys
             else if(field_name .eq. uasym_Basym%name) then
-            force_by_asym_asym%i_induct_t = i_phys
+              force_by_asym_asym%i_induct_t = i_phys
             end if
       end if
 !
@@ -276,48 +277,50 @@
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wsym_x_uasym%name) then
-            force_by_sym_asym%i_m_advect =   i_phys
+              force_by_sym_asym%i_m_advect =   i_phys
             else if(field_name .eq. Jsym_x_Basym%name) then
-            force_by_sym_asym%i_lorentz =    i_phys
+              force_by_sym_asym%i_lorentz =    i_phys
             else if(field_name .eq. Bsym_nabla_Basym%name) then
-            force_by_sym_asym%i_m_tension =  i_phys
+              force_by_sym_asym%i_m_tension =  i_phys
 !
             else if(field_name .eq. sym_thermal_buoyancy%name) then
-            force_by_sym_asym%i_thrm_buo =   i_phys
+              force_by_sym_asym%i_thrm_buo =   i_phys
             else if(field_name .eq. sym_composite_buoyancy%name) then
-            force_by_sym_asym%i_comp_buo =   i_phys
+              force_by_sym_asym%i_comp_buo =   i_phys
+            else if(field_name .eq. sym_buoyancy%name) then
+              force_by_sym_asym%i_buoyancy =   i_phys
 !
             else if(field_name .eq. usym_x_Basym%name) then
-            force_by_sym_asym%i_vp_induct =   i_phys
+              force_by_sym_asym%i_vp_induct =   i_phys
             else if(field_name .eq. rot_usym_x_Basym%name) then
-            force_by_sym_asym%i_induction =   i_phys
+              force_by_sym_asym%i_induction =   i_phys
             else if(field_name .eq. Bsym_nabla_uasym%name) then
-            force_by_sym_asym%i_mag_stretch = i_phys
+              force_by_sym_asym%i_mag_stretch = i_phys
 !
             else if (field_name .eq. usym_nabla_Tasym%name) then
-            force_by_sym_asym%i_h_advect =    i_phys
+              force_by_sym_asym%i_h_advect =    i_phys
             else if (field_name .eq. usym_nabla_pTasym%name) then
-            force_by_sym_asym%i_ph_advect =   i_phys
+              force_by_sym_asym%i_ph_advect =   i_phys
             else if (field_name .eq. usym_nabla_Casym%name) then
-            force_by_sym_asym%i_c_advect =    i_phys
+              force_by_sym_asym%i_c_advect =    i_phys
             else if (field_name .eq. usym_nabla_pCasym%name) then
-            force_by_sym_asym%i_pc_advect =   i_phys
+              force_by_sym_asym%i_pc_advect =   i_phys
 !
             else if (field_name .eq. heat_flux_sym_asym%name) then
-            force_by_sym_asym%i_h_flux =    i_phys
+              force_by_sym_asym%i_h_flux =    i_phys
             else if (field_name .eq. pert_h_flux_sym_asym%name) then
-            force_by_sym_asym%i_ph_flux =   i_phys
+              force_by_sym_asym%i_ph_flux =   i_phys
             else if (field_name .eq. composite_flux_sym_asym%name) then
-            force_by_sym_asym%i_c_flux =    i_phys
+              force_by_sym_asym%i_c_flux =    i_phys
             else if (field_name .eq. pert_c_flux_sym_asym%name) then
-            force_by_sym_asym%i_pc_flux =   i_phys
+              force_by_sym_asym%i_pc_flux =   i_phys
 !
             else if(field_name .eq. m_flux_sym_asym%name) then
-            force_by_sym_asym%i_m_flux =   i_phys
+              force_by_sym_asym%i_m_flux =   i_phys
             else if(field_name .eq. maxwell_tensor_sym_asym%name) then
-            force_by_sym_asym%i_maxwell =  i_phys
+              force_by_sym_asym%i_maxwell =  i_phys
             else if(field_name .eq. usym_Basym%name) then
-            force_by_sym_asym%i_induct_t = i_phys
+              force_by_sym_asym%i_induct_t = i_phys
             end if
       end if
 !
@@ -343,40 +346,39 @@
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wasym_x_usym%name) then
-            force_by_asym_sym%i_m_advect =   i_phys
+              force_by_asym_sym%i_m_advect =   i_phys
             else if(field_name .eq. Jasym_x_Bsym%name) then
-            force_by_asym_sym%i_lorentz =    i_phys
+              force_by_asym_sym%i_lorentz =    i_phys
             else if(field_name .eq. Basym_nabla_Bsym%name) then
-            force_by_asym_sym%i_m_tension =  i_phys
+              force_by_asym_sym%i_m_tension =  i_phys
 !
             else if(field_name .eq. uasym_x_Bsym%name) then
-            force_by_asym_sym%i_vp_induct =    i_phys
-            else if(field_name .eq. rot_uasym_x_Bsym%name)    &
-      &   then
-            force_by_asym_sym%i_induction =  i_phys
+              force_by_asym_sym%i_vp_induct =    i_phys
+            else if(field_name .eq. rot_uasym_x_Bsym%name) then
+              force_by_asym_sym%i_induction =  i_phys
             else if(field_name .eq. Basym_nabla_usym%name) then
-            force_by_asym_sym%i_mag_stretch =  i_phys
+              force_by_asym_sym%i_mag_stretch =  i_phys
 !
             else if (field_name .eq. uasym_nabla_Tsym%name) then
-            force_by_asym_sym%i_h_advect =    i_phys
+              force_by_asym_sym%i_h_advect =    i_phys
             else if (field_name .eq. uasym_nabla_pTsym%name) then
-            force_by_asym_sym%i_ph_advect =   i_phys
+              force_by_asym_sym%i_ph_advect =   i_phys
             else if (field_name .eq. uasym_nabla_Csym%name) then
-            force_by_asym_sym%i_c_advect =    i_phys
+              force_by_asym_sym%i_c_advect =    i_phys
             else if (field_name .eq. uasym_nabla_pCsym%name) then
-            force_by_asym_sym%i_pc_advect =   i_phys
+              force_by_asym_sym%i_pc_advect =   i_phys
 !
             else if (field_name .eq. heat_flux_asym_sym%name) then
-            force_by_asym_sym%i_h_flux =    i_phys
+              force_by_asym_sym%i_h_flux =    i_phys
             else if (field_name .eq. pert_h_flux_asym_sym%name) then
-            force_by_asym_sym%i_ph_flux =   i_phys
+              force_by_asym_sym%i_ph_flux =   i_phys
             else if (field_name .eq. composite_flux_asym_sym%name) then
-            force_by_asym_sym%i_c_flux =    i_phys
+              force_by_asym_sym%i_c_flux =    i_phys
             else if (field_name .eq. pert_c_flux_asym_sym%name) then
-            force_by_asym_sym%i_pc_flux =   i_phys
+              force_by_asym_sym%i_pc_flux =   i_phys
 !
             else if(field_name .eq. uasym_Bsym%name) then
-            force_by_asym_sym%i_induct_t = i_phys
+              force_by_asym_sym%i_induct_t = i_phys
             end if
       end if
 !
@@ -402,9 +404,9 @@
             if (field_name .eq. us_d_js_x_ba%name) then
             eflux_s_sxa%i_ujb =           i_phys
             else if (field_name .eq. mns_us_d_ws_x_ua%name) then
-            eflux_s_sxa%i_m_advect_work =       i_phys
+            eflux_s_sxa%i_m_advect_work = i_phys
             else if (field_name .eq. sym_buoyancy_flux%name) then
-            eflux_s_sxa%i_buo_gen =       i_phys
+            eflux_s_sxa%i_t_buo_gen =     i_phys
             end if
       end if
 !
@@ -454,9 +456,9 @@
             if (field_name .eq. ua_d_js_x_bs%name) then
             eflux_a_sxs%i_ujb =           i_phys
             else if (field_name .eq. mns_ua_d_ws_x_us%name) then
-            eflux_a_sxs%i_m_advect_work =       i_phys
+            eflux_a_sxs%i_m_advect_work = i_phys
             else if (field_name .eq. asym_buoyancy_flux%name) then
-            eflux_a_sxs%i_buo_gen =       i_phys
+            eflux_a_sxs%i_t_buo_gen =     i_phys
             end if
       end if
 !

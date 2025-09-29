@@ -24,7 +24,7 @@
 !!                                           -u \cdot (J \times B)
 !!   mag_tension_work         [i_m_tension_wk]: Work of magnetic tension
 !!                                            u \cdot( (B \nabla) B)
-!!   buoyancy_flux            [i_buo_gen]:       Thermal buoyancy flux
+!!   buoyancy_flux            [i_t_buo_gen]:  Thermal buoyancy flux
 !!                                           -u \cdot (\alpha_{T} g T)
 !!   composite_buoyancy_flux  [i_c_buo_gen]:  Compositional buoyancy flux
 !!                                           -u \cdot (\alpha_{C} g C)

@@ -89,7 +89,7 @@ begin MHD_control
         nod_value_ctl  rot_Coriolis_force       Viz_On   Monitor_Off
         nod_value_ctl  rot_Lorentz_force        Viz_On   Monitor_Off
         nod_value_ctl  rot_inertia              Viz_On   Monitor_Off
-        nod_value_ctl  rot_buoyancy             Viz_On   Monitor_Off
+        nod_value_ctl  rot_thermal_buoyancy     Viz_On   Monitor_Off
       end array nod_value_ctl
     end phys_values_ctl
 !
