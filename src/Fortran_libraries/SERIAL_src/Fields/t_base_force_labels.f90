@@ -167,53 +167,55 @@
      &      .or. check_flux_tensors(field_name)                         &
      &      .or. check_asym_flux_tensors(field_name)
       if(flag) then
-        if (field_name .eq. pressure_gradient%name) then
+        if     (field_name .eq. pressure_gradient%name) then
           forces%i_press_grad = i_phys
-        else if (field_name .eq. inertia%name) then
+        else if(field_name .eq. inertia%name) then
           forces%i_m_advect =   i_phys
-        else if (field_name .eq. Coriolis_force%name) then
+        else if(field_name .eq. Coriolis_force%name) then
           forces%i_coriolis =   i_phys
-        else if (field_name .eq. Lorentz_force%name) then
+        else if(field_name .eq. Lorentz_force%name) then
           forces%i_lorentz =    i_phys
-        else if (field_name .eq. magnetic_tension%name) then
+        else if(field_name .eq. magnetic_tension%name) then
           forces%i_m_tension =  i_phys
 !
-        else if (field_name .eq. thermal_buoyancy%name) then
+        else if(field_name .eq. thermal_buoyancy%name) then
           forces%i_thrm_buo =   i_phys
-        else if (field_name .eq. composite_buoyancy%name) then
+        else if(field_name .eq. composite_buoyancy%name) then
           forces%i_comp_buo =   i_phys
+        else if(field_name .eq. buoyancy%name) then
+          forces%i_buoyancy =   i_phys
 !
-        else if (field_name .eq. vecp_induction%name) then
+        else if(field_name .eq. vecp_induction%name) then
           forces%i_vp_induct =   i_phys
-        else if (field_name .eq. magnetic_induction%name) then
+        else if(field_name .eq. magnetic_induction%name) then
           forces%i_induction =   i_phys
-        else if (field_name .eq. magnetic_stretch%name) then
+        else if(field_name .eq. magnetic_stretch%name) then
           forces%i_mag_stretch = i_phys
 !
-        else if (field_name .eq. heat_advect%name) then
+        else if(field_name .eq. heat_advect%name) then
           forces%i_h_advect =  i_phys
-        else if (field_name .eq. pert_heat_advect%name) then
+        else if(field_name .eq. pert_heat_advect%name) then
           forces%i_ph_advect = i_phys
 !
-        else if (field_name .eq. composition_advect%name) then
+        else if(field_name .eq. composition_advect%name) then
           forces%i_c_advect =  i_phys
-        else if (field_name .eq. pert_comp_advect%name) then
+        else if(field_name .eq. pert_comp_advect%name) then
           forces%i_pc_advect = i_phys
 !
-        else if (field_name .eq. momentum_flux%name ) then
+        else if(field_name .eq. momentum_flux%name) then
           forces%i_m_flux =     i_phys
-        else if (field_name .eq. maxwell_tensor%name ) then
+        else if(field_name .eq. maxwell_tensor%name) then
           forces%i_maxwell =    i_phys
-        else if (field_name .eq. induction_tensor%name ) then
+        else if(field_name .eq. induction_tensor%name) then
           forces%i_induct_t =    i_phys
 !
-        else if (field_name .eq. heat_flux%name) then
+        else if(field_name .eq. heat_flux%name) then
           forces%i_h_flux =    i_phys
-        else if (field_name .eq. pert_heat_flux%name) then
+        else if(field_name .eq. pert_heat_flux%name) then
           forces%i_ph_flux =   i_phys
-        else if (field_name .eq. composite_flux%name) then
+        else if(field_name .eq. composite_flux%name) then
           forces%i_c_flux =    i_phys
-        else if (field_name .eq. pert_comp_flux%name) then
+        else if(field_name .eq. pert_comp_flux%name) then
           forces%i_pc_flux =   i_phys
         end if
       end if
@@ -237,17 +239,19 @@
 !
       flag = check_rot_force(field_name)
       if(flag) then
-        if (field_name .eq. rot_inertia%name) then
+        if     (field_name .eq. rot_inertia%name) then
           rot_forces%i_m_advect =   i_phys
-        else if (field_name .eq. rot_Coriolis_force%name) then
+        else if(field_name .eq. rot_Coriolis_force%name) then
           rot_forces%i_Coriolis =   i_phys
-        else if (field_name .eq. rot_Lorentz_force%name) then
+        else if(field_name .eq. rot_Lorentz_force%name) then
           rot_forces%i_lorentz =    i_phys
 !
-        else if (field_name .eq. rot_buoyancy%name) then
+        else if(field_name .eq. rot_thermal_buoyancy%name) then
           rot_forces%i_thrm_buo =   i_phys
-        else if (field_name .eq. rot_composite_buoyancy%name) then
+        else if(field_name .eq. rot_composite_buoyancy%name) then
           rot_forces%i_comp_buo =   i_phys
+        else if(field_name .eq. rot_buoyancy%name) then
+          rot_forces%i_buoyancy =   i_phys
         end if
       end if
 !
@@ -272,33 +276,33 @@
      &      .or. check_div_flux_tensor(field_name)                      &
      &      .or. check_div_scalar_flux(field_name)
       if(flag) then
-        if (field_name .eq. div_inertia%name) then
+        if     (field_name .eq. div_inertia%name) then
           div_forces%i_m_advect =   i_phys
-        else if (field_name .eq. div_Coriolis_force%name) then
+        else if(field_name .eq. div_Coriolis_force%name) then
           div_forces%i_Coriolis =   i_phys
-        else if (field_name .eq. div_Lorentz_force%name) then
+        else if(field_name .eq. div_Lorentz_force%name) then
           div_forces%i_lorentz =    i_phys
 !
-        else if (field_name .eq. div_buoyancy%name) then
+        else if(field_name .eq. div_buoyancy%name) then
           div_forces%i_thrm_buo =   i_phys
-        else if (field_name .eq. div_composite_buoyancy%name) then
+        else if(field_name .eq. div_composite_buoyancy%name) then
           div_forces%i_comp_buo =   i_phys
 !
-        else if (field_name .eq. div_heat_flux%name) then
+        else if(field_name .eq. div_heat_flux%name) then
           div_forces%i_h_flux =    i_phys
-        else if (field_name .eq. div_pert_heat_flux%name) then
+        else if(field_name .eq. div_pert_heat_flux%name) then
           div_forces%i_ph_flux =   i_phys
 !
-        else if (field_name .eq. div_composition_flux%name) then
+        else if(field_name .eq. div_composition_flux%name) then
           div_forces%i_c_flux =    i_phys
-        else if (field_name .eq. div_pert_composition_flux%name) then
+        else if(field_name .eq. div_pert_composition_flux%name) then
           div_forces%i_pc_flux =   i_phys
 !
-        else if (field_name .eq. div_momentum_flux%name) then
+        else if(field_name .eq. div_momentum_flux%name) then
           div_forces%i_m_flux =   i_phys
-        else if (field_name .eq. div_maxwell_tensor%name) then
+        else if(field_name .eq. div_maxwell_tensor%name) then
           div_forces%i_maxwell =  i_phys
-        else if (field_name .eq. div_induction_tensor%name) then
+        else if(field_name .eq. div_induction_tensor%name) then
           div_forces%i_induct_t = i_phys
         end if
       end if
