@@ -31,9 +31,11 @@
 !!          Work of magnetic tension          u \cdot( (B \nabla) B)
 !!
 !!   sym_termal_buo_flux, asym_termal_buo_flux:
-!!          Thermal buoyancy flux            -u \cdot (\alpha_{T} g T)
+!!          Thermal buoyancy flux            -u \cdot (\alpha_{T} T) g
 !!   sym_composite_buo_flux, asym_composite_buo_flux:
-!!          Compositional buoyancy flux      -u \cdot (\alpha_{C} g C)
+!!          Compositional buoyancy flux      -u \cdot (\alpha_{C} C) g
+!!   sym_buoyancy_flux, asym_buoyancy_flux:  Total buoyancy flux
+!!                            -u \cdot (\alpha_{T} T + \alpha_{C} C) g
 !!
 !!   B_rot_Bsym_x_usym, B_rot_Basym_x_uasym,
 !!   B_rot_Bsym_x_uasym, B_rot_Basym_x_usym:
@@ -179,30 +181,46 @@
      &            math = '$ u \cdot (B_{sym} \cdot \nabla) B_{sym} $')
 !
 !>        Field label of thermal buoyancy flux
-!!         @f$ -u \cdot (\alpha_{T} g_{i} T_{sym}) @f$
+!!         @f$ -u \cdot (\alpha_{T} T_{sym}) g_{i} @f$
       type(field_def), parameter :: sym_termal_buo_flux                 &
      &    = field_def(n_comp = n_scalar,                                &
      &            name = 'sym_termal_buo_flux',                         &
      &            math = '$ -u \cdot (\alpha_{T} g_{i} T_{sym}) $')
 !>        Field label of thermal buoyancy flux
-!!         @f$ -u \cdot (\alpha_{T} g_{i} T_{asym}) @f$
+!!         @f$ -u \cdot (\alpha_{T} T_{asym}) g_{i} @f$
       type(field_def), parameter :: asym_termal_buo_flux                &
      &    = field_def(n_comp = n_scalar,                                &
      &            name = 'asym_termal_buo_flux',                        &
      &            math = '$ -u \cdot (\alpha_{T} g_{i} T_{asym}) $')
 !
 !>        Field label of compositional buoyancy flux
-!!         @f$ -u \cdot (\alpha_{C} g_{i} C_{sym}) @f$
+!!         @f$ -u \cdot (\alpha_{C} C_{sym}) g_{i} @f$
       type(field_def), parameter :: sym_composite_buo_flux              &
      &    = field_def(n_comp = n_scalar,                                &
      &            name = 'sym_composite_buo_flux',                      &
      &            math = '$ -u \cdot (\alpha_{C} g_{i} C_{sym}) $')
 !>        Field label of compositional buoyancy flux
-!!         @f$ -u \cdot (\alpha_{C} g_{i} C_{asym}) @f$
+!!         @f$ -u \cdot (\alpha_{C} C_{asym}) g_{i} @f$
       type(field_def), parameter :: asym_composite_buo_flux             &
      &    = field_def(n_comp = n_scalar,                                &
      &            name = 'asym_composite_buo_flux',                     &
      &            math = '$ -u \cdot (\alpha_{C} g_{i} C_{asym}) $')
+!
+!>        Field label of total buoyancy flux
+!!        @f$ -u \cdot (\alpha_{T} T_{sym}+\alpha_{C} C_{sym})g_{i} @f$
+      type(field_def), parameter :: sym_buoyancy_flux                   &
+     &    = field_def(n_comp = n_scalar,                                &
+     &            name = 'sym_buoyancy_flux',                           &
+     &            math = '$ -u \cdot (\alpha_{T} T_{sym} '              &
+     &                // ' + \alpha_{C} C_{sym})g_{i} $')
+!>        Field label of total buoyancy flux
+!!      @f$ -u \cdot (\alpha_{T} T_{asym}+\alpha_{C} C_{asym})g_{i} @f$
+      type(field_def), parameter :: asym_buoyancy_flux                  &
+     &    = field_def(n_comp = n_scalar,                                &
+     &            name = 'asym_buoyancy_flux',                          &
+     &            math = '$ -u \cdot (\alpha_{T} T_{asym} '             &
+     &                // ' + \alpha_{C} C_{asym})g_{i} $')
+!
 !
 !>        Field label of magnetic energy flux
 !!         @f$ B \cdot \nabla \times (B_{sym} \times  u_{sym}) @f$
@@ -427,6 +445,9 @@
      &   .or. (field_name .eq. sym_composite_buo_flux%name)             &
      &   .or. (field_name .eq. asym_composite_buo_flux%name)            &
 !
+     &   .or. (field_name .eq. sym_buoyancy_flux%name)                  &
+     &   .or. (field_name .eq. asym_buoyancy_flux%name)                 &
+!
      &   .or. (field_name .eq. B_rot_Bsym_x_usym%name)                  &
      &   .or. (field_name .eq. B_rot_Basym_x_uasym%name)                &
      &   .or. (field_name .eq. B_rot_Bsym_x_uasym%name)                 &
@@ -496,6 +517,9 @@
 !
       call set_field_label_to_ctl(sym_composite_buo_flux,  array_c2i)
       call set_field_label_to_ctl(asym_composite_buo_flux, array_c2i)
+!
+      call set_field_label_to_ctl(sym_buoyancy_flux,       array_c2i)
+      call set_field_label_to_ctl(asym_buoyancy_flux,      array_c2i)
 !
       call set_field_label_to_ctl(B_rot_Bsym_x_usym,       array_c2i)
       call set_field_label_to_ctl(B_rot_Basym_x_uasym,     array_c2i)

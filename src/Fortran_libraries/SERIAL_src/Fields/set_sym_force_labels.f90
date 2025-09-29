@@ -404,9 +404,9 @@
             if (field_name .eq. us_d_js_x_ba%name) then
             eflux_s_sxa%i_ujb =           i_phys
             else if (field_name .eq. mns_us_d_ws_x_ua%name) then
-            eflux_s_sxa%i_m_advect_work =       i_phys
+            eflux_s_sxa%i_m_advect_work = i_phys
             else if (field_name .eq. sym_buoyancy_flux%name) then
-            eflux_s_sxa%i_buo_gen =       i_phys
+            eflux_s_sxa%i_t_buo_gen =     i_phys
             end if
       end if
 !
@@ -456,9 +456,9 @@
             if (field_name .eq. ua_d_js_x_bs%name) then
             eflux_a_sxs%i_ujb =           i_phys
             else if (field_name .eq. mns_ua_d_ws_x_us%name) then
-            eflux_a_sxs%i_m_advect_work =       i_phys
+            eflux_a_sxs%i_m_advect_work = i_phys
             else if (field_name .eq. asym_buoyancy_flux%name) then
-            eflux_a_sxs%i_buo_gen =       i_phys
+            eflux_a_sxs%i_t_buo_gen =     i_phys
             end if
       end if
 !

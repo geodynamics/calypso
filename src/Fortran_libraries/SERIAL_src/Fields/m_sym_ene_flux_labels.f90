@@ -22,7 +22,7 @@
 !!   Lorentz_work_sym          [eflux_by_filter%i_ujb]
 !!   mag_tension_work_sym      [eflux_by_filter%i_m_tension_wk]
 !!
-!!   sym_buoyancy_flux            [eflux_by_filter%i_buo_gen]
+!!   sym_buoyancy_flux            [eflux_by_filter%i_t_buo_gen]
 !!   sym_comp_buoyancy_flux       [eflux_by_filter%i_c_buo_gen]
 !!
 !!   mag_ene_generation_sym    [eflux_by_filter%i_me_gen]
