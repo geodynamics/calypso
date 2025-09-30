@@ -36,7 +36,7 @@ begin surface_rendering
       output_field  magnetic_field        cylindrical_vector
 !
       output_field  Lorentz_work            scalar
-      output_field  buoyancy_flux           scalar
+      output_field  thermal_buoyancy_flux   scalar
     end array output_field
   end output_field_define
 end surface_rendering

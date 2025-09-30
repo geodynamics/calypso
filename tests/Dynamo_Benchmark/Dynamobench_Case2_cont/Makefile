@@ -66,6 +66,11 @@ test:
 	fi
 	
 	$(TARGET_COMPARE_PSF)
+	@if [ `tail -n 1 flag.txt` != 0 ]; then\
+		echo 'Failed sectioning data check'; \
+		exit 1;\
+	fi
+	
 	@echo 'Dynamo Benchmark Case 2 continue check finished'
 
 clean:

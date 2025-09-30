@@ -61,7 +61,7 @@ begin MHD_control
 !   vector_potential, magnetic_field, current_density, magnetic_potential
 !   composition, perturbation_temp
 !
-!   buoyancy_flux, Lorentz_work
+!   thermal_buoyancy_flux, Lorentz_work
 !   magnetic_ene_generation
 !   temp_generation, part_temp_gen
 !   vis_ene_diffuse, mag_ene_diffuse
@@ -71,7 +71,7 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
-      array nod_value_ctl     6
+      array nod_value_ctl
         nod_value_ctl  velocity                Viz_Off  Monitor_Off
         nod_value_ctl  pressure                Viz_Off  Monitor_Off
         nod_value_ctl  temperature             Viz_On   Monitor_On
@@ -86,7 +86,7 @@ begin MHD_control
 !                    vector_potential, composition
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin time_evolution_ctl
-      array time_evo_ctl   2
+      array time_evo_ctl
         time_evo_ctl  temperature
         time_evo_ctl  composition
       end array time_evo_ctl
@@ -95,12 +95,12 @@ begin MHD_control
 !!!!!  setting for boundary condition
 !
     begin boundary_condition
-      array bc_temperature  2
+      array bc_temperature
         bc_temperature  fixed ICB  1.000
         bc_temperature  fixed CMB  0.000
       end array bc_temperature
 !
-      array bc_composition      2
+      array bc_composition
         bc_composition  fixed ICB  0.000
         bc_composition  fixed CMB  1.000
       end array bc_composition
