@@ -376,8 +376,9 @@ Supported field in the present version is listed in Table from \ref{table:fields
  & $\bvec{u}\cdot \left( \bvec{J} \times \bvec{B} \right) $ \\ 
 \tt work\_against\_Lorentz & Work against Lorentz force
  & $- \bvec{u}\cdot \left( \bvec{J} \times \bvec{B} \right) $ \\ 
-\tt buoyancy\_flux & Thermal buoyancy flux & $ -\alpha_{T} T \bvec{g} \cdot \bvec{u} $ \\
+\tt thermal\_buoyancy\_flux & Thermal buoyancy flux & $ -\alpha_{T} T \bvec{g} \cdot \bvec{u} $ \\
 \tt composite\_buoyancy\_flux & Compositional buoyancy flux & $ -\alpha_{c} C \bvec{g} \cdot \bvec{u} $ \\
+\tt buoyancy\_flux & Total buoyancy flux & $ -\left(\alpha_{T} T + \alpha_{c} C \right) \bvec{g} \cdot \bvec{u} $ \\
 \tt magnetic\_ene\_generation & Energy production by magnetic induction
  & $  \bvec{B} \cdot \left( \bvec{u} \times \bvec{B} \right) $ \\ 
 \hline
