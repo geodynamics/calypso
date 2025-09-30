@@ -44,9 +44,12 @@
 !
       logical :: error
       integer(kind = kint) :: ierr1, ierr2
-      real(kind = kreal) :: diff
       real(kind = kreal), allocatable :: spectr_IN1(:)
       real(kind = kreal), allocatable :: spectr_IN2(:)
+      real(kind = kreal) :: diff, max_diff
+      real(kind = kreal) :: d1_maxdiff, d2_maxdiff
+      integer(kind = kint) :: icomp_maxdiff, istep_maxdiff
+!
       integer(kind = kint) :: icou
       integer(kind = kint) :: icomp1, icomp2
 !
@@ -113,7 +116,12 @@
       allocate(cmp_name(num_compare))
       allocate(id_comp(num_compare,2))
       call set_compare_table(sph_IN1, sph_IN2, exclude,                 &
-     &                       num_compare, id_comp, cmp_name)
+     &                       num_compare, id_comp, cmp_name, error)
+      if(error) then
+        write(*,*) 'There is missing field.'
+        write(*,*) 'Check failed'
+        go to 99
+      end if
 !
       allocate(spectr_IN1(sph_IN1%ntot_sph_spec))
       allocate(spectr_IN2(sph_IN2%ntot_sph_spec))
@@ -137,7 +145,18 @@
           icomp1 = id_comp(icou,1)
           icomp2 = id_comp(icou,2)
           diff = compare_data(spectr_IN1(icomp1), spectr_IN2(icomp2))
-          if(abs(diff) .gt. 1.d-9) then
+!
+          if(diff .eq. zero) cycle
+!
+          if(diff .gt. max_diff) then
+            max_diff = diff
+            icomp_maxdiff = icou
+            istep_maxdiff = sph_IN1%i_step
+            d1_maxdiff = spectr_IN1(icomp1)
+            d2_maxdiff = spectr_IN2(icomp2)
+          end if
+!
+          if(abs(diff) .gt. 1.d-11) then
             write(*,*) 'Large error in ', trim(cmp_name(icou)),         &
      &           ' at step ', sph_IN1%i_step,                           &
      &           ': ', spectr_IN1(icomp1), spectr_IN2(icomp2), diff
@@ -146,6 +165,11 @@
           end if
         end do
       end do
+!
+      write(*,*) 'Maxmum difference at step ', istep_maxdiff
+      write(*,*) 'Maxmum difference in ', trim(cmp_name(icomp_maxdiff))
+      write(*,*) 'Relative difference: ', max_diff
+      write(*,*) 'data: ', d1_maxdiff, d2_maxdiff
 !
       call sel_close_read_gz_stream_file                                &
      &   (FPz_f1, id_file1, flag_gzip1, zbuf1)
@@ -204,18 +228,20 @@
 !   --------------------------------------------------------------------
 !
       subroutine set_compare_table(sph_IN, sph_OUT, exclude,            &
-     &                             num_compare, id_comp, cmp_name)
+     &          num_compare, id_comp, cmp_name, error)
 !
       type(read_sph_spectr_data) :: sph_IN, sph_OUT
       character(len = kchara), intent(in) :: exclude
+      integer(kind = kint), intent(in) :: num_compare
 !
-      integer(kind = kint) :: num_compare
-      integer(kind = kint) :: id_comp(num_compare,2)
-      character(len = kchara) :: cmp_name(num_compare)
+      integer(kind = kint), intent(inout) :: id_comp(num_compare,2)
+      character(len = kchara), intent(inout) :: cmp_name(num_compare)
+      logical, intent(inout) :: error
 !
       integer(kind = kint) :: ist, icou
       integer(kind = kint) :: icomp1, icomp2
 !
+      error = .FALSE.
       icou = 0
       ist = sph_IN%num_time_labels
       do icomp1 = 1, sph_IN%ntot_sph_spec
@@ -228,9 +254,13 @@
             cmp_name(icou) = sph_IN%ene_sph_spec_name(icomp1+ist)
             id_comp(icou,1) = icomp1
             id_comp(icou,2) = icomp2
-            exit
+            go to 10
           end if
         end do
+        error = .TRUE.
+        write(*,*) trim(sph_IN%ene_sph_spec_name(icomp1+ist)),          &
+     &            ' is missing.'
+  10    continue
       end do
 !
       end subroutine set_compare_table

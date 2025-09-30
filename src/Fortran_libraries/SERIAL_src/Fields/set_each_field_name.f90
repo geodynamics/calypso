@@ -94,8 +94,8 @@
 !   Old field label... Should be deleted later!!
       if(phys_name_ctl .eq. buoyancy_work%name) then
         flag = .TRUE.
-        call append_field_name_list(buoyancy_flux%name, n_scalar,       &
-     &      flag_viz, flag_monitor, ione, fld)
+        call append_field_name_list(thermal_buoyancy_flux%name,         &
+     &      n_scalar, flag_viz, flag_monitor, ione, fld)
         return
       end if
 !

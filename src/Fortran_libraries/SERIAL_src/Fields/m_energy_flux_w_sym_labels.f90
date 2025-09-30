@@ -31,11 +31,11 @@
 !!          Work of magnetic tension          u \cdot( (B \nabla) B)
 !!
 !!   sym_termal_buo_flux, asym_termal_buo_flux:
-!!          Thermal buoyancy flux            -u \cdot (\alpha_{T} T) g
+!!          Thermal buoyancy flux            -\alpha_{T} T g \cdot u
 !!   sym_composite_buo_flux, asym_composite_buo_flux:
-!!          Compositional buoyancy flux      -u \cdot (\alpha_{C} C) g
+!!          Compositional buoyancy flux      -\alpha_{C} C g \cdot u
 !!   sym_buoyancy_flux, asym_buoyancy_flux:  Total buoyancy flux
-!!                            -u \cdot (\alpha_{T} T + \alpha_{C} C) g
+!!                          -(\alpha_{T} T + \alpha_{C} C) g \cdot u
 !!
 !!   B_rot_Bsym_x_usym, B_rot_Basym_x_uasym,
 !!   B_rot_Bsym_x_uasym, B_rot_Basym_x_usym:

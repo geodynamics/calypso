@@ -24,10 +24,12 @@
 !!                                           -u \cdot (J \times B)
 !!   mag_tension_work         [i_m_tension_wk]: Work of magnetic tension
 !!                                            u \cdot( (B \nabla) B)
-!!   buoyancy_flux            [i_t_buo_gen]:  Thermal buoyancy flux
-!!                                           -u \cdot (\alpha_{T} g T)
+!!   thermal_buoyancy_flux    [i_t_buo_gen]:  Thermal buoyancy flux
+!!                                           -\alpha_{T} T g \cdot u
 !!   composite_buoyancy_flux  [i_c_buo_gen]:  Compositional buoyancy flux
-!!                                           -u \cdot (\alpha_{C} g C)
+!!                                           -\alpha_{C} C g \cdot u
+!!   buoyancy_flux            [i_buoyancy_flux]:  Total buoyancy flux
+!!                          -(\alpha_{T} T + \alpha_{C} C) g \cdot u
 !!
 !!   magnetic_ene_generation  [i_me_gen]:
 !!           energy flux by magneitic induction
@@ -88,17 +90,24 @@
      &                math = '$ u_{i} (B_{j} \partial_{j}) B_{i} $')
 !
 !>        Field label of buoyancy flux
-!!         @f$ -u_{i} \alpha_{T} g_{i} T @f$
-      type(field_def), parameter :: buoyancy_flux                       &
+!!         @f$ -u_{i} \alpha_{T} T g_{i} @f$
+      type(field_def), parameter :: thermal_buoyancy_flux               &
      &    = field_def(n_comp = n_scalar,                                &
-     &                name = 'buoyancy_flux',                           &
-     &                math = '$ -u_{i} \alpha_{T} g_{i} T $')
+     &                name = 'thermal_buoyancy_flux',                   &
+     &                math = '$ -u_{i} \alpha_{T} T g_{i} $')
 !>        Field label of compositional buoyancy flux
-!!         @f$ -u_{i} \alpha_{c} g_{i} C @f$
+!!         @f$ -u_{i} \alpha_{c} C g_{i} @f$
       type(field_def), parameter :: composite_buoyancy_flux             &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'composite_buoyancy_flux',                 &
-     &                math = '$ -u_{i} \alpha_{C} g_{i} C $')
+     &                math = '$ -u_{i} \alpha_{C} C g_{i} $')
+!>        Field label of buoyancy flux
+!!         @f$ -u_{i} \alpha_{T} T g_{i} @f$
+      type(field_def), parameter :: buoyancy_flux                       &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'buoyancy_flux',                           &
+     &                math = '$ -u_{i} (\alpha_{T} T '                  &
+     &                      // ' + \alpha_{C} C) g_{i} $')
 !!
 !>        Field label of magnetic energy flux
 !>       @f$ B_{i}e_{ijk} \partial_{j} (e_{klm}u_{l}B_{m}) @f$
@@ -177,8 +186,9 @@
      &   .or. (field_name .eq. work_against_Lorentz%name)               &
      &   .or. (field_name .eq. Lorentz_work%name)                       &
      &   .or. (field_name .eq. mag_tension_work%name)                   &
-     &   .or. (field_name .eq. buoyancy_flux%name)                      &
+     &   .or. (field_name .eq. thermal_buoyancy_flux%name)              &
      &   .or. (field_name .eq. composite_buoyancy_flux%name)            &
+     &   .or. (field_name .eq. buoyancy_flux%name)                      &
 !
      &   .or. (field_name .eq. magnetic_ene_generation%name)            &
      &   .or. (field_name .eq. magnetic_stretch_flux%name)              &
@@ -209,8 +219,9 @@
       call set_field_label_to_ctl(work_against_Lorentz,     array_c2i)
       call set_field_label_to_ctl(Lorentz_work,             array_c2i)
       call set_field_label_to_ctl(mag_tension_work,         array_c2i)
-      call set_field_label_to_ctl(buoyancy_flux,            array_c2i)
+      call set_field_label_to_ctl(thermal_buoyancy_flux,    array_c2i)
       call set_field_label_to_ctl(composite_buoyancy_flux,  array_c2i)
+      call set_field_label_to_ctl(buoyancy_flux,            array_c2i)
       call set_field_label_to_ctl(magnetic_ene_generation,  array_c2i)
       call set_field_label_to_ctl(magnetic_stretch_flux,    array_c2i)
       call set_field_label_to_ctl(temp_generation,          array_c2i)

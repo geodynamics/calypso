@@ -82,11 +82,13 @@
 !
 !
 !>       Filtered thermal buoyancy label
-      character(len=kchara), parameter                                  &
-     &             :: Filtered_gravity_label = 'Filtered_buoyancy'
+      character(len=kchara), parameter :: Filtered_thrm_gravity_label   &
+     &                                   = 'Filtered_thermal_buoyancy'
 !
       character(len=kchara), parameter                                  &
      &             :: Filtered_gravity_e1 = 'Filtered_gravity'
+      character(len=kchara), parameter                                  &
+     &             :: Filtered_gravity_e2 = 'Filtered_buoyancy'
 !
 !>       Filtered compositional buoyancy label
       character(len=kchara), parameter                                  &
@@ -131,7 +133,7 @@
 !
       call set_sph_force_list_array(array_c)
 !
-      call append_c_to_ctl_array(Filtered_gravity_label, array_c)
+      call append_c_to_ctl_array(Filtered_thrm_gravity_label, array_c)
       call append_c_to_ctl_array(Filtered_comp_gravity_label, array_c)
       call append_c_to_ctl_array(hd_filtered_inertia, array_c)
       call append_c_to_ctl_array(hd_filtered_Lorentz, array_c)
@@ -153,7 +155,7 @@
       call append_c_to_ctl_array(gravity_label, array_c)
       call append_c_to_ctl_array(comp_gravity_label, array_c)
 !
-      call append_c_to_ctl_array(Filtered_gravity_label, array_c)
+      call append_c_to_ctl_array(Filtered_thrm_gravity_label, array_c)
       call append_c_to_ctl_array(Filtered_comp_gravity_label, array_c)
       call append_c_to_ctl_array(hd_filtered_inertia, array_c)
       call append_c_to_ctl_array(hd_filtered_Lorentz, array_c)

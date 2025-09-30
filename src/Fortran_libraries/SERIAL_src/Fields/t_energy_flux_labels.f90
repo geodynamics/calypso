@@ -23,10 +23,12 @@
 !!                                           -u \cdot (J \times B)
 !!   mag_tension_work         [i_m_tension_wk]: Work of magnetic tension
 !!                                            u \cdot( (B \nabla) B)
-!!   buoyancy_flux            [i_t_buo_gen]:  Thermal buoyancy flux
-!!                                           -u \cdot (\alpha_{T} g T)
+!!   thermal_buoyancy_flux    [i_t_buo_gen]:  Thermal buoyancy flux
+!!                                           -\alpha_{T} T g \cdot u
 !!   composite_buoyancy_flux  [i_c_buo_gen]:  Compositional buoyancy flux
-!!                                           -u \cdot (\alpha_{C} g C)
+!!                                           -\alpha_{C} C g \cdot u
+!!   buoyancy_flux            [i_buoyancy_flux]:  Total buoyancy flux
+!!                          -(\alpha_{T} T + \alpha_{C} C) g \cdot u
 !!
 !!   magnetic_ene_generation  [i_me_gen]:
 !!           energy flux by magneitic induction
@@ -75,12 +77,16 @@
 !>        Field address of work of magnetic tension
 !!         @f$ u_{i} (B_{j} \partial_{j}) B_{i} @f$
         integer (kind=kint) :: i_m_tension_wk  =   izero
+!
 !>        Field address of thermal buoyancy flux
-!!         @f$ -u_{i} \alpha_{T} g_{i} T @f$
-        integer (kind=kint) :: i_t_buo_gen =       izero
+!!         @f$ -u_{i} \alpha_{T} T g_{i} @f$
+        integer (kind=kint) :: i_t_buo_gen =        izero
 !>        Field address of compositional buoyancy flux
-!!         @f$ -u_{i} \alpha_{c} g_{i} C @f$
-        integer (kind=kint) :: i_c_buo_gen =       izero
+!!         @f$ -u_{i} \alpha_{c} C g_{i} @f$
+        integer (kind=kint) :: i_c_buo_gen =        izero
+!>        Field address of total buoyancy flux
+!!         @f$ -u_{i} (\alpha_{T} T + \alpha_{c} C) g_{i} @f$
+        integer (kind=kint) :: i_buoyancy_flux =    izero
 !!
 !>        Field address of magnetic energy flux
 !>       @f$ B_{i}e_{ijk} \partial_{j} \left(e_{klm}u_{l}B_{m}\right) @f$
@@ -139,10 +145,12 @@
         else if (field_name .eq. mag_tension_work%name) then
           ene_flux%i_m_tension_wk =  i_phys
 !
-        else if (field_name .eq. buoyancy_flux%name) then
+        else if (field_name .eq. thermal_buoyancy_flux%name) then
           ene_flux%i_t_buo_gen =     i_phys
         else if (field_name .eq. composite_buoyancy_flux%name) then
           ene_flux%i_c_buo_gen =     i_phys
+        else if (field_name .eq. buoyancy_flux%name) then
+          ene_flux%i_buoyancy_flux = i_phys
 !
         else if (field_name .eq. magnetic_ene_generation%name) then
           ene_flux%i_me_gen =           i_phys
