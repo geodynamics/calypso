@@ -17,6 +17,10 @@
 !!
 !!   inertia_work             [i_m_advect_work]:  Work of Reynolds stress
 !!                                           -u \cdot (\omega \times u)
+!!                                           -u \cdot (u \cdot \nambla) u
+!!   work_against_inertia     [i_nega_m_advect_wk]:  Work against Reynolds stress
+!!                                            u \cdot (\omega \times u)
+!!                                            u \cdot (u \cdot \nambla) u
 !!   Lorentz_work             [i_ujb]:  Work of Lorentz force
 !!                                            u \cdot (J \times B)
 !!   work_against_Lorentz     [i_nega_ujb]:  Work against Lorentz force
@@ -66,17 +70,22 @@
 !>       Structure of start address of base forces
       type energy_flux_address
 !>        Field address of work of inertia
-!!         @f$ u_{i} (u_{j} \partial_{j} u_{i}) @f$
-        integer (kind=kint) :: i_m_advect_work =   izero
+!!         @f$ -u_{i} \left( e_{ijk} \omega_{j} u_{k} \right) @f$
+!!         @f$ -u_{i} (u_{j} \partial_{j} u_{i}) @f$
+        integer (kind=kint) :: i_m_advect_work =    izero
+!>        Field address of work against inertia
+!!         @f$  u_{i} \left( e_{ijk} \omega_{j} u_{k} \right) @f$
+!!         @f$  u_{i} (u_{j} \partial_{j} u_{i}) @f$
+        integer (kind=kint) :: i_nega_m_advect_wk = izero
 !>        Field address of work against Lorentz force
 !!         @f$ - u_{i} \left( e_{ijk} J_{j} B_{k} \right) @f$
-        integer (kind=kint) :: i_nega_ujb =        izero
+        integer (kind=kint) :: i_nega_ujb =         izero
 !>        Field address of work of Lorentz force
 !!         @f$ u_{i} \left( e_{ijk} J_{j} B_{k} \right) @f$
-        integer (kind=kint) :: i_ujb =             izero
+        integer (kind=kint) :: i_ujb =              izero
 !>        Field address of work of magnetic tension
 !!         @f$ u_{i} (B_{j} \partial_{j}) B_{i} @f$
-        integer (kind=kint) :: i_m_tension_wk  =   izero
+        integer (kind=kint) :: i_m_tension_wk  =    izero
 !
 !>        Field address of thermal buoyancy flux
 !!         @f$ -u_{i} \alpha_{T} T g_{i} @f$
@@ -136,40 +145,42 @@
 !
       flag = check_enegy_fluxes(field_name)
       if(flag) then
-        if (field_name .eq. inertia_work%name) then
-          ene_flux%i_m_advect_work = i_phys
-        else if (field_name .eq. work_against_Lorentz%name) then
-          ene_flux%i_nega_ujb =      i_phys
-        else if (field_name .eq. Lorentz_work%name) then
-          ene_flux%i_ujb =           i_phys
-        else if (field_name .eq. mag_tension_work%name) then
-          ene_flux%i_m_tension_wk =  i_phys
+        if     (field_name .eq. inertia_work%name) then
+           ene_flux%i_m_advect_work =   i_phys
+        else if(field_name .eq. work_against_inertia%name) then
+          ene_flux%i_nega_m_advect_wk = i_phys
+        else if(field_name .eq. work_against_Lorentz%name) then
+          ene_flux%i_nega_ujb =         i_phys
+        else if(field_name .eq. Lorentz_work%name) then
+          ene_flux%i_ujb =              i_phys
+        else if(field_name .eq. mag_tension_work%name) then
+          ene_flux%i_m_tension_wk =     i_phys
 !
-        else if (field_name .eq. thermal_buoyancy_flux%name) then
-          ene_flux%i_t_buo_gen =     i_phys
-        else if (field_name .eq. composite_buoyancy_flux%name) then
-          ene_flux%i_c_buo_gen =     i_phys
-        else if (field_name .eq. buoyancy_flux%name) then
-          ene_flux%i_buoyancy_flux = i_phys
+        else if(field_name .eq. thermal_buoyancy_flux%name) then
+          ene_flux%i_t_buo_gen =        i_phys
+        else if(field_name .eq. composite_buoyancy_flux%name) then
+          ene_flux%i_c_buo_gen =        i_phys
+        else if(field_name .eq. buoyancy_flux%name) then
+          ene_flux%i_buoyancy_flux =    i_phys
 !
-        else if (field_name .eq. magnetic_ene_generation%name) then
+        else if(field_name .eq. magnetic_ene_generation%name) then
           ene_flux%i_me_gen =           i_phys
-        else if (field_name .eq. magnetic_stretch_flux%name) then
+        else if(field_name .eq. magnetic_stretch_flux%name) then
           ene_flux%i_mag_stretch_flux = i_phys
 !
-        else if (field_name .eq. temp_generation%name) then
+        else if(field_name .eq. temp_generation%name) then
           ene_flux%i_temp_gen =  i_phys
-        else if (field_name .eq. pert_temp_generation%name) then
+        else if(field_name .eq. pert_temp_generation%name) then
           ene_flux%i_par_t_gen = i_phys
 !
-        else if (field_name .eq. comp_generation%name) then
+        else if(field_name .eq. comp_generation%name) then
           ene_flux%i_comp_gen =  i_phys
-        else if (field_name .eq. pert_comp_generation%name) then
+        else if(field_name .eq. pert_comp_generation%name) then
           ene_flux%i_par_c_gen = i_phys
 !
-        else if (field_name .eq. viscous_ene_diffusion%name) then
+        else if(field_name .eq. viscous_ene_diffusion%name) then
           ene_flux%i_vis_e_diffuse = i_phys
-        else if (field_name .eq. magnetic_ene_diffusion%name) then
+        else if(field_name .eq. magnetic_ene_diffusion%name) then
           ene_flux%i_mag_e_diffuse = i_phys
         end if
       end if

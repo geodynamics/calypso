@@ -10,11 +10,16 @@
 !!@verbatim
 !!      subroutine alloc_phys_rj_name_t(sph_phys)
 !!      subroutine alloc_phys_rj_data_t(nnod_rj, sph_phys)
-!!
 !!      subroutine dealloc_phys_rj_name_t(sph_phys)
+!!        integer(kind = kint), intent(in) :: nnod_rj
+!!        type(sph_phys_data), intent(inout) :: sph_phys
 !!
-!!      subroutine check_rj_spectr_name_t(sph_phys)
-!!      subroutine check_rj_spectr_data_t(id_rank, sph_phys)
+!!      subroutine check_rj_spectr_name(id_file, sph_phys)
+!!        integer(kind = kint), intent(in) :: id_rank
+!!        type(sph_phys_data), intent(in) :: sph_phys
+!!      subroutine check_rj_spectr_data(id_rank, sph_phys)
+!!        integer, intent(in) :: id_rank
+!!        type(sph_phys_data), intent(in) :: sph_phys
 !!@endverbatim
 !!
 !!@n @param id_rank process ID
@@ -97,20 +102,20 @@
 !  --------------------------------------------------------------------
 !  --------------------------------------------------------------------
 !
-      subroutine check_rj_spectr_name_t(sph_phys)
+      subroutine check_rj_spectr_name(id_file, sph_phys)
 !
+      integer(kind = kint), intent(in) :: id_file
       type(sph_phys_data), intent(in) :: sph_phys
 !
-      integer(kind = kint), parameter :: id_six = 6
 !
-      write(*,*) 'check_nodal_field_name for sph_phys%rj_fld'
-      call check_nodal_field_name(id_six, sph_phys%rj_fld)
+      write(id_file,*) 'Spherical harmonic coefficient field name list'
+      call check_nodal_field_name(id_file, sph_phys%rj_fld)
 !
-      end subroutine check_rj_spectr_name_t
+      end subroutine check_rj_spectr_name
 !
 !  --------------------------------------------------------------------
 !
-      subroutine check_rj_spectr_data_t(id_rank, sph_phys)
+      subroutine check_rj_spectr_data(id_rank, sph_phys)
 !
       integer, intent(in) :: id_rank
       type(sph_phys_data), intent(in) :: sph_phys
@@ -129,7 +134,7 @@
      &      sph_phys%rj_fld%istack_component(i_fld-1)+1)
       end do
 !
-      end subroutine check_rj_spectr_data_t
+      end subroutine check_rj_spectr_data
 !
 !  --------------------------------------------------------------------
 !

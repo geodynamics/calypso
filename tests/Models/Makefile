@@ -24,6 +24,14 @@ TARGET_SPH_PICK_MODE_CHECK = $(BUILDDIR)/tests/sph_picked_mode_check
 all: test
 
 test:
+	@echo "# Test in eq_symmetry_fields directory..."
+	@cd eq_symmetry_fields; \
+		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
+		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_SPH_MHD="$(TARGET_SPH_MHD)" \
+		TARGET_SPH_SNAP="$(TARGET_SPH_SNAP)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \
+		TARGET_COMPARE_PSF="$(TARGET_COMPARE_PSF)" TARGET_PSF_2_VTK="$(TARGET_PSF_2_VTK)" \
+		test
+	
 	@echo "# Test in heterogineous_temp_static directory..."
 	cd heterogineous_temp_static; \
 		$(GMAKE) MPIRUN="$(MPIRUN)" \
@@ -40,6 +48,7 @@ test:
 	rm -f *.o *.mod *~
 
 clean:
+	cd eq_symmetry_fields; make clean
 	cd heterogineous_temp_static; make clean
 	cd heterogineous_temp_evolve; make clean
 	

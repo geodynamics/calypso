@@ -37,11 +37,12 @@
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
 !
-      if(check_field_list_ctl(inertia_work, field_ctl)) then
+      if     (check_field_list_ctl(work_against_inertia, field_ctl)     &
+     &   .or. check_field_list_ctl(inertia_work, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(inertia, field_ctl)
       end if
-      if(check_field_list_ctl(work_against_Lorentz, field_ctl)          &
+      if     (check_field_list_ctl(work_against_Lorentz, field_ctl)     &
      &   .or. check_field_list_ctl(Lorentz_work, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(magnetic_field, field_ctl)

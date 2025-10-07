@@ -80,8 +80,9 @@
 !
 !    set nodal data
 !
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_field_data'
-      call s_set_control_field_data(field_ctl, rj_fld, ierr)
+      if(iflag_debug .ge. iflag_routine_msg) write(*,*)                 &
+     &        'Spectr field data names:'
+      call set_field_data_control(.TRUE., field_ctl, rj_fld, ierr)
 !
       end subroutine set_control_sph_mhd_fields
 !

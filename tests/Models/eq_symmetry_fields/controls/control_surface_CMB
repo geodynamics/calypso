@@ -1,0 +1,25 @@
+!
+!     example of control for CMB section
+!
+    begin surface_define
+      section_method    equation
+!
+      array coefs_ctl  10
+        coefs_ctl  x2     1.0
+        coefs_ctl  y2     1.0
+        coefs_ctl  z2     1.0
+        coefs_ctl  xy     0.0
+        coefs_ctl  yz     0.0
+        coefs_ctl  zx     0.0
+        coefs_ctl  x      0.0
+        coefs_ctl  y      0.0
+        coefs_ctl  z      0.0
+        coefs_ctl  const  -2.3667
+      end array coefs_ctl
+!
+      begin plot_area_ctl
+        array chosen_ele_grp_ctl
+          chosen_ele_grp_ctl   all
+        end array chosen_ele_grp_ctl
+      end plot_area_ctl
+    end surface_define

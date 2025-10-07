@@ -37,6 +37,8 @@ TARGET_TEST_SPH_GRID =       $(BUILDDIR)/tests/check_sph_comms
 TARGET_NEWSPH=               $(BUILDDIR)/utilities/assemble_sph
 TARGET_CMP_SPH_RST=          $(BUILDDIR)/tests/compare_sph_restart
 
+TARGET_CONTROL_MHD_CHECK =   $(BUILDDIR)/utilities/check_control_mhd
+
 #
 #  -------------------------------------------------------------------------
 #
@@ -70,6 +72,12 @@ test:
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
+	@echo "# Test in Control_file_check directory..."
+	@cd Control_file_check; \
+		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
+		GMAKE="$(GMAKE)" TARGET_CONTROL_MHD_CHECK="$(TARGET_CONTROL_MHD_CHECK)" \
+		test
+	
 	@echo "# Test in Dynamo_Benchmark directory..."
 	@cd Dynamo_Benchmark; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
@@ -77,6 +85,7 @@ test:
 		TARGET_SPH_SNAP="$(TARGET_SPH_SNAP)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \
 		TARGET_COMPARE_PSF="$(TARGET_COMPARE_PSF)" TARGET_PSF_2_VTK="$(TARGET_PSF_2_VTK)" \
 		test
+	
 	@echo "# Test in Models directory..."
 	@cd Models; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
@@ -106,15 +115,14 @@ sym_test:
 	@echo "# Calypso test finished!"; \
 
 clean:
-	cd Gauss_point_test; make clean
-	cd FFT_test; make clean
+	cd Gauss_point_test;    make clean
+	cd FFT_test;            make clean
 	cd Communication_check; make clean
-	cd restart_assemble; make clean
-	cd Dynamo_Benchmark; make clean
-	cd Models; make clean
+	cd restart_assemble;    make clean
+	cd Control_file_check;  make clean
+	cd Dynamo_Benchmark;    make clean
+	cd Models;              make clean
 	
-	cd sym_asym_field_test; make clean
-
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
 distclean: clean

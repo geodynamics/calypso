@@ -52,7 +52,7 @@
      &          bs_trns, fs_trns, be_trns, fe_trns,                     &
      &          trns_b_snap, trns_f_snap, trns_b_eflux, trns_f_eflux)
 !
-      use cal_buoyancy_flux_sph
+      use cal_buoyancy_flux_rtp
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(fluid_property), intent(in) :: fl_prop
@@ -93,12 +93,12 @@
      &    trns_f_eflux%ncomp, trns_f_eflux%fld_rtp)
 !
 !
-      call cal_buoyancy_flux_rtp                                        &
+      call s_cal_buoyancy_flux_rtp                                      &
      &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
      &    bs_trns%sym_fld, bs_trns%sym_fld,                             &
      &    fe_trns%eflux_to_sym_by_sym_asym,                             &
      &    trns_b_snap, trns_b_snap, trns_f_eflux)
-      call cal_buoyancy_flux_rtp                                        &
+      call s_cal_buoyancy_flux_rtp                                      &
      &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
      &   bs_trns%asym_fld, bs_trns%asym_fld,                            &
      &   fe_trns%eflux_to_asym_by_sym_sym,                              &
@@ -183,7 +183,14 @@
         call cal_dot_product_no_coef(nnod,                              &
      &      frc_rtp(1,f_trns_frc%i_lorentz),                            &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
-     &      flx_rtp(1,fs_trns_eflux%i_ujb) )
+     &      flx_rtp(1,fs_trns_eflux%i_ujb))
+      end if
+!
+      if(fs_trns_eflux%i_nega_ujb .gt. 0) then
+        call cal_dot_product_w_coef(nnod, dminus,                       &
+     &      frc_rtp(1,f_trns_frc%i_lorentz),                            &
+     &      fld_rtp(1,bs_trns_base%i_velo),                             &
+     &      flx_rtp(1,fs_trns_eflux%i_nega_ujb))
       end if
 !
       end subroutine cal_work_of_lorentz_on_node
@@ -209,11 +216,19 @@
 !
       real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
 !
+!
       if(fs_trns_eflux%i_m_advect_work .gt. 0) then
         call cal_dot_product_no_coef(nnod,                              &
      &      frc_rtp(1,f_trns_frc%i_m_advect),                           &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
-     &      flx_rtp(1,fs_trns_eflux%i_m_advect_work) )
+     &      flx_rtp(1,fs_trns_eflux%i_m_advect_work))
+      end if
+!
+      if(fs_trns_eflux%i_nega_m_advect_wk .gt. 0) then
+        call cal_dot_product_no_coef(nnod,                              &
+     &      frc_rtp(1,f_trns_frc%i_m_advect),                           &
+     &      fld_rtp(1,bs_trns_base%i_velo),                             &
+     &      flx_rtp(1,fs_trns_eflux%i_nega_m_advect_wk))
       end if
 !
       end subroutine cal_work_of_inertia_on_node

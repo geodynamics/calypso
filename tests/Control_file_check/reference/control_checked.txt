@@ -1,0 +1,439 @@
+!   Control for spherical_shell_ctl is read from file... sph_lm63_r80c_6/control_resolution
+!   Control for cross_section_ctl No.    1 is read from file ... controls/control_section_cmb
+!     Control for surface_define is read from ... controls/control_surface_CMB
+!     Control for output_field_define is included.
+!   Control for cross_section_ctl No.    2 is read from file ... controls/control_section_z0
+!     Control for surface_define is included.
+!     Control for output_field_define is read from file... controls/control_z_section_fields
+controls/control_z_section_fields
+!   Control for cross_section_ctl No.    3 is read from file ... controls/control_section_z0.3
+!     Control for surface_define is included.
+!     Control for output_field_define is read from file... controls/control_z_section_fields
+controls/control_z_section_fields
+!   Control for cross_section_ctl No.    4 is read from file ... controls/control_section_icb
+!     Control for surface_define is read from ... controls/control_surface_ICB
+!     Control for output_field_define is included.
+!   Control for isosurface_ctl No.    1 is read from file...  Isosurface control file: controls/control_isosurf_t0.25
+!     Control for field_on_isosurf is included.
+!   Control for zonal_mean_section_ctl No.    1 is read from file ... controls/control_zonal_mean
+!     Control for surface_define is read from ... controls/control_surface_y0
+!     Control for output_field_define is included.
+!  
+!  Checked control data
+!  
+begin  MHD_control
+  begin  data_files_def
+    debug_flag_ctl                  Off
+    num_subdomain_ctl                              6
+    num_smp_ctl                                    4
+    restart_file_prefix             'rst_6/rst'
+    field_file_prefix               'field/out'
+    restart_file_fmt_ctl            merged_bin_gz
+    field_file_fmt_ctl              merged_VTK_gz
+  end  data_files_def
+!  spherical_shell_ctl should be written to file ... sph_lm63_r80c_6/control_resolution
+  begin  spherical_shell_ctl
+    begin  num_domain_ctl
+      num_radial_domain_ctl                         2
+      num_horizontal_domain_ctl                     3
+    end  num_domain_ctl
+    begin  num_grid_sph
+      sph_coef_type_ctl                no_pole
+      sph_grid_type_ctl                with_pole
+      truncation_level_ctl                           63
+      ngrid_meridonal_ctl                            96
+      ngrid_zonal_ctl                               192
+      radial_grid_type_ctl             Chebyshev
+      num_fluid_grid_ctl                             80
+      fluid_core_size_ctl                 1.000000000000000E+000
+      ICB_to_CMB_ratio_ctl                3.500000000000000E-001
+    end  num_grid_sph
+  end  spherical_shell_ctl
+  begin  model
+    begin  phys_values_ctl
+      array  nod_value_ctl
+        nod_value_ctl  velocity                    Viz_On   Monitor_On
+        nod_value_ctl  temperature                 Viz_On   Monitor_On
+        nod_value_ctl  vorticity                   Viz_On   Monitor_On
+        nod_value_ctl  pressure                    Viz_On   Monitor_On
+        nod_value_ctl  magnetic_field              Viz_On   Monitor_On
+        nod_value_ctl  current_density             Viz_On   Monitor_On
+        nod_value_ctl  thermal_buoyancy_flux       Viz_On   Monitor_On
+        nod_value_ctl  Lorentz_work                Viz_On   Monitor_On
+        nod_value_ctl  truncated_magnetic_field    Viz_On   Monitor_Off
+        nod_value_ctl  stream_pol_velocity         Viz_On   Monitor_Off
+        nod_value_ctl  stream_pol_magne            Viz_On   Monitor_Off
+        nod_value_ctl  sym_velocity                Viz_On   Monitor_On
+        nod_value_ctl  asym_velocity               Viz_On   Monitor_On
+        nod_value_ctl  sym_temperature             Viz_On   Monitor_On
+        nod_value_ctl  asym_temperature            Viz_On   Monitor_On
+        nod_value_ctl  sym_pressure                Viz_Off  Monitor_Off
+        nod_value_ctl  asym_pressure               Viz_Off  Monitor_Off
+        nod_value_ctl  sym_vorticity               Viz_On   Monitor_On
+        nod_value_ctl  asym_vorticity              Viz_On   Monitor_On
+        nod_value_ctl  sym_magnetic_field          Viz_On   Monitor_On
+        nod_value_ctl  asym_magnetic_field         Viz_On   Monitor_On
+        nod_value_ctl  sym_current_density         Viz_On   Monitor_On
+        nod_value_ctl  asym_current_density        Viz_On   Monitor_On
+        nod_value_ctl  Jsym_x_Bsym                 Viz_On   Monitor_On
+        nod_value_ctl  Jasym_x_Basym               Viz_On   Monitor_On
+        nod_value_ctl  Jsym_x_Basym                Viz_On   Monitor_On
+        nod_value_ctl  Jasym_x_Bsym                Viz_On   Monitor_On
+        nod_value_ctl  wsym_x_usym                 Viz_On   Monitor_On
+        nod_value_ctl  wasym_x_uasym               Viz_On   Monitor_On
+        nod_value_ctl  wsym_x_uasym                Viz_On   Monitor_On
+        nod_value_ctl  wasym_x_usym                Viz_On   Monitor_On
+        nod_value_ctl  sym_thermal_buoyancy        Viz_On   Monitor_On
+        nod_value_ctl  asym_thermal_buoyancy       Viz_On   Monitor_On
+        nod_value_ctl  rot_usym_x_Bsym             Viz_On   Monitor_On
+        nod_value_ctl  rot_uasym_x_Basym           Viz_On   Monitor_On
+        nod_value_ctl  rot_usym_x_Basym            Viz_On   Monitor_On
+        nod_value_ctl  rot_uasym_x_Bsym            Viz_On   Monitor_On
+        nod_value_ctl  us_d_js_x_ba                Viz_On   Monitor_On
+        nod_value_ctl  us_d_ja_x_bs                Viz_On   Monitor_On
+        nod_value_ctl  ua_d_ja_x_ba                Viz_On   Monitor_On
+        nod_value_ctl  ua_d_js_x_bs                Viz_On   Monitor_On
+        nod_value_ctl  -us_d_ws_x_ua               Viz_On   Monitor_On
+        nod_value_ctl  sym_thermal_buoyancy_flux   Viz_On   Monitor_On
+        nod_value_ctl  asym_thermal_buoyancy_flux  Viz_On   Monitor_On
+        nod_value_ctl  rot_buoyancy                Viz_On   Monitor_On
+        nod_value_ctl  rot_Lorentz_force           Viz_On   Monitor_On
+        nod_value_ctl  rot_Coriolis_force          Viz_On   Monitor_On
+        nod_value_ctl  rot_inertia                 Viz_On   Monitor_On
+        nod_value_ctl  vorticity_diffusion         Viz_On   Monitor_On
+        nod_value_ctl  heat_flux                   Viz_On   Monitor_On
+        nod_value_ctl  inertia                     Viz_On   Monitor_On
+        nod_value_ctl  Lorentz_force               Viz_On   Monitor_On
+        nod_value_ctl  Coriolis_force              Viz_On   Monitor_On
+        nod_value_ctl  pressure_gradient           Viz_On   Monitor_On
+        nod_value_ctl  buoyancy                    Viz_On   Monitor_On
+        nod_value_ctl  rest_of_geostrophic         Viz_On   Monitor_On
+        nod_value_ctl  viscous_diffusion           Viz_On   Monitor_On
+        nod_value_ctl  magnetic_induction          Viz_On   Monitor_On
+        nod_value_ctl  Lorentz_force_dipole        Viz_On   Monitor_On
+        nod_value_ctl  buoyancy_flux               Viz_On   Monitor_Off
+        nod_value_ctl  grad_temp                   Viz_On   Monitor_Off
+      end  array  nod_value_ctl
+    end  phys_values_ctl
+    begin  time_evolution_ctl
+      array  time_evo_ctl
+        time_evo_ctl      temperature
+        time_evo_ctl      velocity
+        time_evo_ctl      magnetic_field
+      end  array  time_evo_ctl
+    end  time_evolution_ctl
+    begin  boundary_condition
+      array  bc_temperature
+        bc_temperature      fixed_flux  ICB     3.448980000000000E+000
+        bc_temperature      fixed_flux  CMB    -4.225000000000000E-001
+      end  array  bc_temperature
+      array  bc_velocity
+        bc_velocity      non_slip_sph  ICB     0.000000000000000E+000
+        bc_velocity      non_slip_sph  CMB     0.000000000000000E+000
+      end  array  bc_velocity
+      array  bc_magnetic_field
+        bc_magnetic_field      insulator  ICB     0.000000000000000E+000
+        bc_magnetic_field      insulator  CMB     0.000000000000000E+000
+      end  array  bc_magnetic_field
+    end  boundary_condition
+    begin  forces_define
+      array  force_ctl
+        force_ctl      Thermal_buoyancy
+        force_ctl      Coriolis
+        force_ctl      Lorentz
+      end  array  force_ctl
+    end  forces_define
+    begin  dimensionless_ctl
+      array  dimless_ctl
+        dimless_ctl  Pr            1.000000000000000E+000
+        dimless_ctl  mod_Raf       2.000000000000000E+003
+        dimless_ctl  Ek            5.999999999999999E-004
+        dimless_ctl  Pm            5.000000000000000E+000
+        dimless_ctl  R_o           1.538461500000000E+000
+      end  array  dimless_ctl
+    end  dimensionless_ctl
+    begin  coefficients_ctl
+      begin  thermal
+        array  coef_4_termal_ctl
+          coef_4_termal_ctl  One       1.000000000000000E+000
+        end  array  coef_4_termal_ctl
+        array  coef_4_t_diffuse_ctl
+          coef_4_t_diffuse_ctl  Pr      -1.000000000000000E+000
+        end  array  coef_4_t_diffuse_ctl
+      end  thermal
+      begin  momentum
+        array  coef_4_velocity_ctl
+          coef_4_velocity_ctl  One       1.000000000000000E+000
+        end  array  coef_4_velocity_ctl
+        array  coef_4_press_ctl
+          coef_4_press_ctl  Ek      -1.000000000000000E+000
+        end  array  coef_4_press_ctl
+        array  coef_4_v_diffuse_ctl
+          coef_4_v_diffuse_ctl  One       1.000000000000000E+000
+        end  array  coef_4_v_diffuse_ctl
+        array  coef_4_buoyancy_ctl
+          coef_4_buoyancy_ctl  R_o          -1.000000000000000E+000
+          coef_4_buoyancy_ctl  mod_Raf       1.000000000000000E+000
+          coef_4_buoyancy_ctl  Ek           -1.000000000000000E+000
+        end  array  coef_4_buoyancy_ctl
+        array  coef_4_Coriolis_ctl
+          coef_4_Coriolis_ctl  Two       1.000000000000000E+000
+          coef_4_Coriolis_ctl  Ek       -1.000000000000000E+000
+        end  array  coef_4_Coriolis_ctl
+        array  coef_4_Lorentz_ctl
+          coef_4_Lorentz_ctl  Pm      -1.000000000000000E+000
+          coef_4_Lorentz_ctl  Ek      -1.000000000000000E+000
+        end  array  coef_4_Lorentz_ctl
+      end  momentum
+      begin  induction
+        array  coef_4_magnetic_ctl
+          coef_4_magnetic_ctl  One       1.000000000000000E+000
+        end  array  coef_4_magnetic_ctl
+        array  coef_4_m_diffuse_ctl
+          coef_4_m_diffuse_ctl  Pm      -1.000000000000000E+000
+        end  array  coef_4_m_diffuse_ctl
+        array  coef_4_induction_ctl
+          coef_4_induction_ctl  One      -1.000000000000000E+000
+        end  array  coef_4_induction_ctl
+      end  induction
+    end  coefficients_ctl
+    begin  temperature_define
+      ref_temp_ctl                       none
+    end  temperature_define
+  end  model
+  begin  control
+    begin  time_step_ctl
+      elapsed_time_ctl                   8.000000000000000E+004
+      i_step_init_ctl                        280000000
+      i_step_finish_ctl                      280000500
+      i_step_check_ctl                              10
+      i_step_rst_ctl                              1000
+      i_step_sectioning_ctl                        200
+      i_step_isosurface_ctl                        200
+      i_step_field_ctl                               0
+      dt_ctl                             2.000000000000000E-006
+      time_init_ctl                      0.000000000000000E+000
+    end  time_step_ctl
+    begin  restart_file_ctl
+      rst_ctl      start_from_rst_file
+    end  restart_file_ctl
+    begin  time_loop_ctl
+      scheme_ctl                      Crank_Nicolson
+      coef_imp_v_ctl                     6.000000000000000E-001
+      coef_imp_t_ctl                     6.000000000000000E-001
+      coef_imp_b_ctl                     6.000000000000000E-001
+    end  time_loop_ctl
+  end  control
+  begin  sph_monitor_ctl
+    volume_average_prefix           'monitor/sph_ave_volume'
+    volume_pwr_spectr_prefix        'monitor/sph_pwr_volume'
+    volume_pwr_spectr_format        gzip
+    begin  gauss_coefficient_ctl
+      gauss_coefs_prefix          'monitor/gauss_coefs_Re'
+      gauss_coefs_format          gzip
+      gauss_coefs_radius_ctl         2.820000000000000E+000
+      array  pick_gauss_coef_degree_ctl
+        pick_gauss_coef_degree_ctl                     1
+        pick_gauss_coef_degree_ctl                     3
+      end  array  pick_gauss_coef_degree_ctl
+    end  gauss_coefficient_ctl
+    nusselt_number_prefix           'monitor/Nusselt'
+    nusselt_number_format           gzip
+    nusselt_number_prefix           'monitor/Nusselt'
+    nusselt_number_format           gzip
+    array  fields_on_circle_ctl
+    end  array  fields_on_circle_ctl
+  end  sph_monitor_ctl
+  begin  visual_control
+    array  cross_section_ctl
+!  cross_section_ctl No.    1 should be written to file ... controls/control_section_cmb
+      begin  cross_section_ctl
+        psf_file_head            'sections/cmb'
+        psf_output_type          binary_gz
+!  surface_define should be written to file ... controls/control_surface_CMB
+        begin  surface_define
+          section_method      equation
+          array  coefs_ctl
+            coefs_ctl  x2          1.000000000000000E+000
+            coefs_ctl  y2          1.000000000000000E+000
+            coefs_ctl  z2          1.000000000000000E+000
+            coefs_ctl  xy          0.000000000000000E+000
+            coefs_ctl  yz          0.000000000000000E+000
+            coefs_ctl  zx          0.000000000000000E+000
+            coefs_ctl  x           0.000000000000000E+000
+            coefs_ctl  y           0.000000000000000E+000
+            coefs_ctl  z           0.000000000000000E+000
+            coefs_ctl  const      -2.366700000000000E+000
+          end  array  coefs_ctl
+        end  surface_define
+        begin  output_field_define
+          array  output_field
+            output_field  temperature               scalar
+            output_field  magnetic_field            spherical_vector
+            output_field  truncated_magnetic_field  spherical_vector
+            output_field  sym_magnetic_field        spherical_vector
+            output_field  asym_magnetic_field       spherical_vector
+          end  array  output_field
+        end  output_field_define
+      end  cross_section_ctl
+!  cross_section_ctl No.    2 should be written to file ... controls/control_section_z0
+      begin  cross_section_ctl
+        psf_file_head            'sections/equator'
+        psf_output_type          UDT_gz
+        begin  surface_define
+          section_method      equation
+          array  coefs_ctl
+            coefs_ctl  x2          0.000000000000000E+000
+            coefs_ctl  y2          0.000000000000000E+000
+            coefs_ctl  z2          0.000000000000000E+000
+            coefs_ctl  xy          0.000000000000000E+000
+            coefs_ctl  yz          0.000000000000000E+000
+            coefs_ctl  zx          0.000000000000000E+000
+            coefs_ctl  x           0.000000000000000E+000
+            coefs_ctl  y           0.000000000000000E+000
+            coefs_ctl  z           1.000000000000000E+000
+            coefs_ctl  const       0.000000000000000E+000
+          end  array  coefs_ctl
+        end  surface_define
+!  output_field_define should be written to file ... controls/control_z_section_fields
+        begin  output_field_define
+          array  output_field
+            output_field  temperature     scalar
+            output_field  velocity        cylindrical_vector
+            output_field  vorticity       cylindrical_vector
+            output_field  magnetic_field  cylindrical_vector
+            output_field  Lorentz_work    scalar
+            output_field  buoyancy_flux   scalar
+          end  array  output_field
+        end  output_field_define
+      end  cross_section_ctl
+!  cross_section_ctl No.    3 should be written to file ... controls/control_section_z0.3
+      begin  cross_section_ctl
+        psf_file_head            'sections/z0.3'
+        psf_output_type          UDT_gzip
+        begin  surface_define
+          section_method      equation
+          array  coefs_ctl
+            coefs_ctl  x2          0.000000000000000E+000
+            coefs_ctl  y2          0.000000000000000E+000
+            coefs_ctl  z2          0.000000000000000E+000
+            coefs_ctl  xy          0.000000000000000E+000
+            coefs_ctl  yz          0.000000000000000E+000
+            coefs_ctl  zx          0.000000000000000E+000
+            coefs_ctl  x           0.000000000000000E+000
+            coefs_ctl  y           0.000000000000000E+000
+            coefs_ctl  z           1.000000000000000E+000
+            coefs_ctl  const      -3.000000000000000E-001
+          end  array  coefs_ctl
+        end  surface_define
+!  output_field_define should be written to file ... controls/control_z_section_fields
+        begin  output_field_define
+          array  output_field
+            output_field  temperature     scalar
+            output_field  velocity        cylindrical_vector
+            output_field  vorticity       cylindrical_vector
+            output_field  magnetic_field  cylindrical_vector
+            output_field  Lorentz_work    scalar
+            output_field  buoyancy_flux   scalar
+          end  array  output_field
+        end  output_field_define
+      end  cross_section_ctl
+!  cross_section_ctl No.    4 should be written to file ... controls/control_section_icb
+      begin  cross_section_ctl
+        psf_file_head            'sections/icb'
+        psf_output_type          UDT_gz
+!  surface_define should be written to file ... controls/control_surface_ICB
+        begin  surface_define
+          section_method      equation
+          array  coefs_ctl
+            coefs_ctl  x2          1.000000000000000E+000
+            coefs_ctl  y2          1.000000000000000E+000
+            coefs_ctl  z2          1.000000000000000E+000
+            coefs_ctl  xy          0.000000000000000E+000
+            coefs_ctl  yz          0.000000000000000E+000
+            coefs_ctl  zx          0.000000000000000E+000
+            coefs_ctl  x           0.000000000000000E+000
+            coefs_ctl  y           0.000000000000000E+000
+            coefs_ctl  z           0.000000000000000E+000
+            coefs_ctl  const      -2.900000000000000E-001
+          end  array  coefs_ctl
+        end  surface_define
+        begin  output_field_define
+          array  output_field
+            output_field  magnetic_field  spherical_vector
+            output_field  temperature     scalar
+            output_field  grad_temp       spherical_vector
+          end  array  output_field
+        end  output_field_define
+      end  cross_section_ctl
+    end  array  cross_section_ctl
+    array  isosurface_ctl
+! isosurface_ctl No.    1 should be written to file ... controls/control_isosurf_t0.25
+      begin  isosurface_ctl
+        isosurface_file_prefix      'isosurfaces/iso_temp'
+        iso_output_type             VTK_gz
+        begin  isosurf_define
+          isosurf_field          temperature
+          isosurf_component      scalar
+          isosurf_value             2.500000000000000E-001
+          array  isosurf_area_ctl
+            isosurf_area_ctl      outer_core
+          end  array  isosurf_area_ctl
+        end  isosurf_define
+        begin  field_on_isosurf
+          array  output_field
+            output_field  velocity        vector
+            output_field  magnetic_field  radial
+          end  array  output_field
+        end  field_on_isosurf
+      end  isosurface_ctl
+    end  array  isosurface_ctl
+  end  visual_control
+  begin  dynamo_vizs_control
+    begin  crustal_filtering_ctl
+      truncation_degree_ctl                    13
+    end  crustal_filtering_ctl
+ should be written to file ... controls/control_zonal_mean
+    begin  zonal_mean_section_ctl
+      psf_file_head            'sections/zm_y0'
+      psf_output_type          binary_gz
+!  surface_define should be written to file ... controls/control_surface_y0
+      begin  surface_define
+        section_method      equation
+        array  coefs_ctl
+          coefs_ctl  x2          0.000000000000000E+000
+          coefs_ctl  y2          0.000000000000000E+000
+          coefs_ctl  z2          0.000000000000000E+000
+          coefs_ctl  xy          0.000000000000000E+000
+          coefs_ctl  yz          0.000000000000000E+000
+          coefs_ctl  zx          0.000000000000000E+000
+          coefs_ctl  x           0.000000000000000E+000
+          coefs_ctl  y          -1.000000000000000E+000
+          coefs_ctl  z           0.000000000000000E+000
+          coefs_ctl  const       0.000000000000000E+000
+        end  array  coefs_ctl
+      end  surface_define
+      begin  output_field_define
+        array  output_field
+          output_field  temperature                 scalar
+          output_field  velocity                    spherical_vector
+          output_field  vorticity                   spherical_vector
+          output_field  magnetic_field              spherical_vector
+          output_field  stream_pol_velocity         phi
+          output_field  stream_pol_magne            phi
+          output_field  sym_temperature             scalar
+          output_field  asym_temperature            scalar
+          output_field  sym_magnetic_field          spherical_vector
+          output_field  asym_magnetic_field         spherical_vector
+          output_field  sym_thermal_buoyancy_flux   scalar
+          output_field  asym_thermal_buoyancy_flux  scalar
+          output_field  us_d_js_x_ba                scalar
+          output_field  us_d_ja_x_bs                scalar
+          output_field  ua_d_ja_x_ba                scalar
+          output_field  ua_d_js_x_bs                scalar
+          output_field  -us_d_ws_x_ua               scalar
+        end  array  output_field
+      end  output_field_define
+    end  zonal_mean_section_ctl
+  end  dynamo_vizs_control
+end  MHD_control

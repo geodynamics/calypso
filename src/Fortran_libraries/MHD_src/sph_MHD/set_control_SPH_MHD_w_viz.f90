@@ -95,9 +95,10 @@
 !
 !
 !       set nodal field list
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_field_data'
-      call s_set_control_field_data                                     &
-     &   (model_ctl%fld_ctl%field_ctl, nod_fld, ierr)
+      if(iflag_debug .ge. iflag_routine_msg) write(*,*)                 &
+     &        'Grid field data names:'
+      call set_field_data_control(.TRUE., model_ctl%fld_ctl%field_ctl,  &
+     &                            nod_fld, ierr)
 !
 !       set spectr field list
       if (iflag_debug.gt.0) write(*,*) 'set_control_sph_mhd_fields'

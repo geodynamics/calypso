@@ -22,6 +22,19 @@
 !!        type(base_force_address), intent(in) :: ipol_frc
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(phys_data), intent(inout) :: rj_fld
+!!
+!!      subroutine cal_total_buoyancy(i_frc, fld)
+!!        type(base_force_address), intent(in) :: i_frc
+!!        type(phys_data), intent(inout) :: fld
+!!      subroutine cal_total_div_buoyancy(i_div_frc, fld)
+!!        type(base_force_address), intent(in) :: i_div_frc
+!!        type(phys_data), intent(inout) :: fld
+!!      subroutine cal_total_buoyancy_scalar(i_thrm, i_comp, i_flux,    &
+!!     &                                     nnod, ntot_comp, d_fld)
+!!        integer(kind = kint), intent(in) :: i_thrm, i_comp
+!!        integer(kind = kint), intent(in) :: i_flux
+!!        integer(kind = kint), intent(in) :: nnod, ntot_comp
+!!        real (kind=kreal), intent(inout) :: d_fld(nnod,ntot_comp)
 !!@endverbatim
 !!
 !!@param sph_bc_U  Structure for basic velocity
@@ -32,6 +45,7 @@
       use m_precision
       use m_machine_parameter
       use m_constants
+      use m_phys_constants
 !
       use t_physical_property
       use t_reference_scalar_param
@@ -143,5 +157,80 @@
       end subroutine sel_buoyancy_sph_rj
 !
 !-----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine cal_total_buoyancy(i_frc, fld)
+!
+      use cal_add_smp
+      use copy_nodal_fields
+!
+      type(base_force_address), intent(in) :: i_frc
+      type(phys_data), intent(inout) :: fld
+!
+!
+      if(i_frc%i_buoyancy .le. 0) return
+      if(i_frc%i_thrm_buo*i_frc%i_comp_buo .gt. 0) then
+        call add_2_nod_vectors(fld, i_frc%i_thrm_buo, i_frc%i_comp_buo, &
+     &                              i_frc%i_buoyancy)
+      else if(i_frc%i_thrm_buo .gt. 0) then
+        call copy_vector_component(fld, i_frc%i_thrm_buo,               &
+     &                                  i_frc%i_buoyancy)
+      else if(i_frc%i_comp_buo .gt. 0) then
+        call copy_vector_component(fld, i_frc%i_comp_buo,               &
+     &                                  i_frc%i_buoyancy)
+      else
+        call clear_field_data(fld, n_vector, i_frc%i_buoyancy)
+      end if
+!
+      end subroutine cal_total_buoyancy
+!
+! ----------------------------------------------------------------------
+!
+      subroutine cal_total_div_buoyancy(i_div_frc, fld)
+!
+      type(base_force_address), intent(in) :: i_div_frc
+      type(phys_data), intent(inout) :: fld
+!
+!
+      call cal_total_buoyancy_scalar                                    &
+     &  (i_div_frc%i_thrm_buo, i_div_frc%i_comp_buo,                    &
+     &   i_div_frc%i_buoyancy, fld%n_point, fld%ntot_phys, fld%d_fld)
+!
+      end subroutine cal_total_div_buoyancy
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine cal_total_buoyancy_scalar(i_thrm, i_comp, i_flux,      &
+     &                                     nnod, ntot_comp, d_fld)
+!
+      use cal_add_smp
+      use copy_field_smp
+      use delete_field_smp
+!
+      integer(kind = kint), intent(in) :: i_thrm, i_comp
+      integer(kind = kint), intent(in) :: i_flux
+      integer(kind = kint), intent(in) :: nnod, ntot_comp
+      real (kind=kreal), intent(inout) :: d_fld(nnod,ntot_comp)
+!
+!
+      if(i_flux .le. 0) return
+      if(i_thrm*i_comp .gt. 0) then
+        call add_scalars_smp(nnod, d_fld(1,i_thrm), d_fld(1,i_comp),    &
+     &                       d_fld(1,i_flux))
+      else if(i_thrm .gt. 0) then
+        call copy_nod_scalar_smp(nnod, d_fld(1,i_thrm),                 &
+     &                           d_fld(1,i_flux))
+      else if(i_comp .gt. 0) then
+        call copy_nod_scalar_smp(nnod, d_fld(1,i_comp),                 &
+     &                           d_fld(1,i_flux))
+      else
+        call constant_scalar_smp(zero, nnod, ione, nnod,                &
+     &                           d_fld(1,i_flux))
+      end if
+!
+      end subroutine cal_total_buoyancy_scalar
+!
+! ----------------------------------------------------------------------
 !
       end module cal_self_buoyancies_sph
