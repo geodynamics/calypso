@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
-!     Cross section data directory for dynamo benchmark test Case 2
-!       Please see Christensen et.al. (2001) for the model description
+!     Resolution data directory for squatorially symmetric fields test
 !-----------------------------------------------------------------------
 !
- Restart data files are stored in this directory.
+ Resolution data control is stored in this directory.

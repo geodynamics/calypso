@@ -1,6 +1,5 @@
 !-----------------------------------------------------------------------
-!     field data directory for  dynamo benchmark test Case 2
-!       Please see Christensen et.al. (2001) for the model description
+!     Reference data directory for squatorially symmetric fields test
 !-----------------------------------------------------------------------
 !
- Field data for visualization are stored in this directory.
+ Reference data files are stored in this directory.
