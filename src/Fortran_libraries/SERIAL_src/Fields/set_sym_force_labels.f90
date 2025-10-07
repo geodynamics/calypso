@@ -146,25 +146,25 @@
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wsym_x_usym%name) then
-              force_by_sym_sym%i_m_advect =   i_phys
+              force_by_sym_sym%i_m_advect =    i_phys
             else if(field_name .eq. Jsym_x_Bsym%name) then
-              force_by_sym_sym%i_lorentz =    i_phys
+              force_by_sym_sym%i_lorentz =     i_phys
             else if(field_name .eq. Bsym_nabla_Bsym%name) then
-              force_by_sym_sym%i_m_tension =  i_phys
+              force_by_sym_sym%i_m_tension =   i_phys
 !
             else if(field_name .eq. asym_thermal_buoyancy%name) then
-              force_by_sym_sym%i_thrm_buo =   i_phys
+              force_by_sym_sym%i_thrm_buo =    i_phys
             else if(field_name .eq. asym_composite_buoyancy%name) then
-              force_by_sym_sym%i_comp_buo =   i_phys
-            else if(field_name .eq. asym_composite_buoyancy%name) then
-              force_by_sym_sym%i_buoyancy = i_phys
+              force_by_sym_sym%i_comp_buo =    i_phys
+            else if(field_name .eq. asym_buoyancy%name) then
+              force_by_sym_sym%i_buoyancy =    i_phys
 !
             else if(field_name .eq. usym_x_Bsym%name) then
-              force_by_sym_sym%i_vp_induct =    i_phys
+              force_by_sym_sym%i_vp_induct =   i_phys
             else if(field_name .eq. rot_usym_x_Bsym%name) then
-              force_by_sym_sym%i_induction =  i_phys
+              force_by_sym_sym%i_induction =   i_phys
             else if(field_name .eq. Bsym_nabla_usym%name) then
-              force_by_sym_sym%i_mag_stretch =  i_phys
+              force_by_sym_sym%i_mag_stretch = i_phys
 !
             else if (field_name .eq. usym_nabla_Tsym%name) then
               force_by_sym_sym%i_h_advect =    i_phys
@@ -401,13 +401,23 @@
 !
       flag = check_enegy_fluxes_w_sym(field_name)
       if(flag) then
-            if (field_name .eq. us_d_js_x_ba%name) then
-            eflux_s_sxa%i_ujb =           i_phys
-            else if (field_name .eq. mns_us_d_ws_x_ua%name) then
-            eflux_s_sxa%i_m_advect_work = i_phys
-            else if (field_name .eq. sym_buoyancy_flux%name) then
-            eflux_s_sxa%i_t_buo_gen =     i_phys
-            end if
+        if     (field_name .eq. us_d_js_x_ba%name) then
+          eflux_s_sxa%i_ujb =              i_phys
+        else if(field_name .eq. mns_us_d_js_x_ba%name) then
+          eflux_s_sxa%i_nega_ujb =         i_phys
+!
+        else if(field_name .eq. mns_us_d_ws_x_ua%name) then
+          eflux_s_sxa%i_m_advect_work =    i_phys
+        else if(field_name .eq. us_d_ws_x_ua%name) then
+          eflux_s_sxa%i_nega_m_advect_wk = i_phys
+!
+        else if(field_name .eq. sym_thermal_buoyancy_flux%name) then
+          eflux_s_sxa%i_t_buo_gen =     i_phys
+        else if(field_name .eq. sym_composite_buoyancy_flux%name) then
+          eflux_s_sxa%i_c_buo_gen =     i_phys
+        else if(field_name .eq. sym_buoyancy_flux%name) then
+          eflux_s_sxa%i_buoyancy_flux = i_phys
+        end if
       end if
 !
       end subroutine set_sym_eflux_address_sym_asym
@@ -428,11 +438,16 @@
 !
       flag = check_enegy_fluxes_w_sym(field_name)
       if(flag) then
-            if (field_name .eq. us_d_ja_x_bs%name) then
-            eflux_s_axs%i_ujb =           i_phys
-            else if (field_name .eq. mns_us_d_wa_x_us%name) then
-            eflux_s_axs%i_m_advect_work =       i_phys
-            end if
+        if (field_name .eq. us_d_ja_x_bs%name) then
+          eflux_s_axs%i_ujb =              i_phys
+        else if (field_name .eq. mns_us_d_ja_x_bs%name) then
+          eflux_s_axs%i_nega_ujb =         i_phys
+!
+        else if (field_name .eq. mns_us_d_wa_x_us%name) then
+          eflux_s_axs%i_m_advect_work =    i_phys
+        else if (field_name .eq. us_d_wa_x_us%name) then
+          eflux_s_axs%i_nega_m_advect_wk = i_phys
+        end if
       end if
 !
       end subroutine set_sym_eflux_address_asym_sym
@@ -453,13 +468,23 @@
 !
       flag = check_enegy_fluxes_w_sym(field_name)
       if(flag) then
-            if (field_name .eq. ua_d_js_x_bs%name) then
-            eflux_a_sxs%i_ujb =           i_phys
-            else if (field_name .eq. mns_ua_d_ws_x_us%name) then
-            eflux_a_sxs%i_m_advect_work = i_phys
-            else if (field_name .eq. asym_buoyancy_flux%name) then
-            eflux_a_sxs%i_t_buo_gen =     i_phys
-            end if
+        if     (field_name .eq. ua_d_js_x_bs%name) then
+          eflux_a_sxs%i_ujb =              i_phys
+        else if(field_name .eq. mns_ua_d_js_x_bs%name) then
+          eflux_a_sxs%i_nega_ujb =         i_phys
+!
+        else if(field_name .eq. mns_ua_d_ws_x_us%name) then
+          eflux_a_sxs%i_m_advect_work =    i_phys
+        else if(field_name .eq. ua_d_ws_x_us%name) then
+          eflux_a_sxs%i_nega_m_advect_wk = i_phys
+!
+        else if(field_name .eq. asym_thermal_buoyancy_flux%name) then
+          eflux_a_sxs%i_t_buo_gen =        i_phys
+        else if(field_name .eq. asym_composite_buoyancy_flux%name) then
+          eflux_a_sxs%i_t_buo_gen =        i_phys
+        else if(field_name .eq. asym_buoyancy_flux%name) then
+          eflux_a_sxs%i_buoyancy_flux =    i_phys
+        end if
       end if
 !
       end subroutine set_asym_eflux_address_sym_sym
@@ -480,11 +505,16 @@
 !
       flag = check_enegy_fluxes_w_sym(field_name)
       if(flag) then
-            if (field_name .eq. ua_d_ja_x_ba%name) then
-            eflux_a_axa%i_ujb =           i_phys
-            else if (field_name .eq. mns_ua_d_wa_x_ua%name) then
-            eflux_a_axa%i_m_advect_work = i_phys
-            end if
+        if (field_name .eq. ua_d_ja_x_ba%name) then
+          eflux_a_axa%i_ujb =              i_phys
+        else if (field_name .eq. mns_ua_d_ja_x_ba%name) then
+          eflux_a_axa%i_nega_ujb =         i_phys
+!
+        else if (field_name .eq. mns_ua_d_wa_x_ua%name) then
+          eflux_a_axa%i_m_advect_work =    i_phys
+        else if (field_name .eq. ua_d_wa_x_ua%name) then
+          eflux_a_axa%i_nega_m_advect_wk = i_phys
+        end if
       end if
 !
       end subroutine set_asym_eflux_address_asm_asm

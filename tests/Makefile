@@ -77,6 +77,7 @@ test:
 		TARGET_SPH_SNAP="$(TARGET_SPH_SNAP)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \
 		TARGET_COMPARE_PSF="$(TARGET_COMPARE_PSF)" TARGET_PSF_2_VTK="$(TARGET_PSF_2_VTK)" \
 		test
+	
 	@echo "# Test in Models directory..."
 	@cd Models; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
@@ -113,8 +114,6 @@ clean:
 	cd Dynamo_Benchmark; make clean
 	cd Models; make clean
 	
-	cd sym_asym_field_test; make clean
-
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
 distclean: clean

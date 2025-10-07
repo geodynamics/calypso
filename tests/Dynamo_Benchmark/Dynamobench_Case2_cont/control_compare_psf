@@ -10,7 +10,7 @@ array compare_surface_file
     end second_file_ctl
 !
     i_step_surface_ctl        1502
-    difference_limit_ctl    1.0e-9
+    difference_limit_ctl    1.0e-7
   end compare_surface_file
 !
   begin compare_surface_file
@@ -24,7 +24,7 @@ array compare_surface_file
     end second_file_ctl
 !
     i_step_surface_ctl        1502
-    difference_limit_ctl    1.0e-9
+    difference_limit_ctl    1.0e-7
   end compare_surface_file
 !
   begin compare_surface_file

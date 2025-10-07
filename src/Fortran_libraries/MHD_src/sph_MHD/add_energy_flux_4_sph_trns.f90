@@ -49,6 +49,9 @@
      &    ipol_efx%i_m_advect_work, iphys_efx%i_m_advect_work,          &
      &    f_trns_efx%i_m_advect_work, trns)
       call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_efx%i_nega_m_advect_wk, iphys_efx%i_nega_m_advect_wk,    &
+     &    f_trns_efx%i_nega_m_advect_wk, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_efx%i_me_gen, iphys_efx%i_me_gen,                        &
      &    f_trns_efx%i_me_gen, trns)
       call add_field_name_4_sph_trns_snap(d_rj,                         &
@@ -56,12 +59,16 @@
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_efx%i_nega_ujb, iphys_efx%i_nega_ujb,                    &
      &    f_trns_efx%i_nega_ujb, trns)
+!
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_efx%i_t_buo_gen, iphys_efx%i_t_buo_gen,                  &
      &    f_trns_efx%i_t_buo_gen, trns)
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_efx%i_c_buo_gen, iphys_efx%i_c_buo_gen,                  &
      &    f_trns_efx%i_c_buo_gen, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_efx%i_buoyancy_flux, iphys_efx%i_buoyancy_flux,          &
+     &    f_trns_efx%i_buoyancy_flux, trns)
 !
       end subroutine add_ene_flux_4_sph_trns_snap
 !
