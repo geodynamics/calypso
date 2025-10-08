@@ -16,7 +16,7 @@ all: test
 
 test:
 	make clean
-	~/src_kemo/bin/utilities/check_control_mhd control_MHD > log.txt
+	$(TARGET_CONTROL_MHD_CHECK) control_MHD > log.txt
 	diff -w log.txt reference/control_checked.txt
 	@echo 'Control file check test is succeessfully finished.'
 

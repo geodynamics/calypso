@@ -388,3 +388,4 @@ begin MHD_control
     file zonal_mean_section_ctl      'controls/control_zonal_mean'
   end dynamo_vizs_control
 end MHD_control
+
