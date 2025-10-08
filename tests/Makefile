@@ -95,24 +95,7 @@ test:
 		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
 		test
 	
-	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
-
-sym_test: 
-	@echo "# Test in sym_asym_field_test directory..."; \
-	cd sym_asym_field_test; \
-		$(GMAKE) \
-		GMAKE="$(GMAKE)" \
-		BUILDDIR="$(BUILDDIR)" \
-		TESTDIR="$(TESTDIR)" \
-		MHDDIR="$(MHDDIR)" \
-		MPIRUN="$(MPIRUN)" \
-		TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
-		TARGET_CHECK_SPH_GRID="$(TARGET_CHECK_SPH_GRID)" \
-		TARGET_TEST_SPH_GRID="$(TARGET_TEST_SPH_GRID)" \
-		TARGET_NEWSPH="$(TARGET_NEWSPH)" \
-		TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
-		test
-	@echo "# Calypso test finished!"; \
+	@echo "# --------- Calypso tests finished! -------------------------"
 
 clean:
 	cd Gauss_point_test;    make clean
