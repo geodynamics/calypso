@@ -1,9 +1,9 @@
 !
 !     example of control for surface rendering on equator
 !
-begin surface_rendering
-  psf_file_head    'sections/psf_eq'
-  psf_output_type    PSF
+begin cross_section_ctl
+  section_file_prefix    'sections/psf_eq'
+  section_file_format       PSF
 !
   begin surface_define
     section_method    equation
@@ -29,4 +29,4 @@ begin surface_rendering
   end surface_define
 !
   file output_field_define 'controls/ctl_fields_z_sections'
-end surface_rendering
+end cross_section_ctl

@@ -21,8 +21,8 @@
 !!
 !!  begin cross_section_ctl
 !!    section_file_prefix    'psf'
-!!    psf_output_type         ucd
-!!  
+!!    section_file_format     ucd
+!!
 !!    begin surface_define
 !!      section_method    equation
 !!  
@@ -54,8 +54,9 @@
 !!  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  
-!!      psf_output_type:
-!!           ucd, VTK
+!!    section_file_format:
+!!           'VTK', 'VTK_gz', 'VTD', 'VTD_gz', 'PSF', 'PSF_gz',
+!!           'UCD', 'UCD_gz', 'UDT', 'UDT_gz', 'binary', 'binary_gz',
 !!
 !!    num_result_comp: number of fields
 !!    output_field: (Original name: color_comp and color_subcomp)
@@ -145,9 +146,9 @@
         type(field_on_psf_ctl) :: fld_on_psf_c
 !
 !>        Structure for file prefix
-        type(read_character_item) :: psf_file_head_ctl
+        type(read_character_item) :: psf_file_prefix_ctl
 !>        Structure for data field format
-        type(read_character_item) :: psf_output_type_ctl
+        type(read_character_item) :: psf_file_format_ctl
 !
 !     Top level
         integer (kind=kint) :: i_psf_ctl = 0
@@ -169,8 +170,8 @@
       call dealloc_cont_dat_4_psf_def(psf_c%psf_def_c)
       call dealloc_fld_on_psf_control(psf_c%fld_on_psf_c)
 !
-      psf_c%psf_file_head_ctl%iflag =   0
-      psf_c%psf_output_type_ctl%iflag = 0
+      psf_c%psf_file_prefix_ctl%iflag = 0
+      psf_c%psf_file_format_ctl%iflag = 0
 !
       psf_c%i_psf_ctl =        0
       psf_c%i_output_field =   0
@@ -190,10 +191,10 @@
       call dup_fld_on_psf_control(org_psf_c%fld_on_psf_c,               &
      &                            new_psf_c%fld_on_psf_c)
 !
-      call copy_chara_ctl(org_psf_c%psf_file_head_ctl,                  &
-     &                    new_psf_c%psf_file_head_ctl)
-      call copy_chara_ctl(org_psf_c%psf_output_type_ctl,                &
-     &                    new_psf_c%psf_output_type_ctl)
+      call copy_chara_ctl(org_psf_c%psf_file_prefix_ctl,                &
+     &                    new_psf_c%psf_file_prefix_ctl)
+      call copy_chara_ctl(org_psf_c%psf_file_format_ctl,                &
+     &                    new_psf_c%psf_file_format_ctl)
 !
       new_psf_c%fname_section_ctl = org_psf_c%fname_section_ctl
       new_psf_c%fname_fld_on_psf =  org_psf_c%fname_fld_on_psf

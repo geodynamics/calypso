@@ -20,11 +20,11 @@ begin MHD_control
     debug_flag_ctl            'Off'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  2
+    num_smp_ctl                  4
 !
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
-    restart_file_fmt_ctl       'merged_gz'
+    restart_file_fmt_ctl       'merged_bin_gz'
     field_file_fmt_ctl         'merged_VTK_gz'
   end data_files_def
 !
@@ -52,7 +52,7 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
-  file spherical_shell_ctl  'control_resolution'
+  file spherical_shell_ctl  'sph_lm63r72c_ic_6/control_resolution'
 !
   begin model
 !!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -119,8 +119,8 @@ begin MHD_control
       end array bc_velocity
 !
       array bc_magnetic_field
-        bc_magnetic_field  sph_to_center  to_Center  0.000  end
-        bc_magnetic_field  insulator      CMB        0.000  end
+        bc_magnetic_field  sph_to_center  to_Center  0.000
+        bc_magnetic_field  insulator      CMB        0.000
       end array bc_magnetic_field
     end boundary_condition
 !
@@ -344,19 +344,19 @@ begin MHD_control
 !
   begin visual_control
     array cross_section_ctl
-      file  cross_section_ctl   control_psf_CMB
-      file  cross_section_ctl   control_psf_ICB
-      file  cross_section_ctl   control_psf_eq 
-      file  cross_section_ctl   control_psf_z0.3
-      file  cross_section_ctl   control_psf_s0.55
+      file  cross_section_ctl   controls/control_psf_CMB
+      file  cross_section_ctl   controls/control_psf_ICB
+      file  cross_section_ctl   controls/control_psf_eq 
+      file  cross_section_ctl   controls/control_psf_z0.3
+      file  cross_section_ctl   controls/control_psf_s0.55
     end array cross_section_ctl
 !
     array isosurface_ctl
-      file  isosurface_ctl      control_iso_temp
+      file  isosurface_ctl      controls/control_iso_temp
     end array isosurface_ctl
   end  visual_control
 !
   begin dynamo vizs control
-    file zonal mean section ctl  control_psf_zm
+    file zonal mean section ctl  controls/control_psf_zm
   end dynamo vizs control
 end MHD_control

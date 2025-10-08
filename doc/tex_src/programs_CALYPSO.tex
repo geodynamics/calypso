@@ -1062,8 +1062,10 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 \begin{itemize}
 	\item \hyperref[href_t:section_file_prefix]
 			{\tt section\_file\_prefix    [section\_prefix]}
-	\item \hyperref[href_t:psf_output_type]
-			{\tt psf\_output\_type        [file\_format]}
+	\item \hyperref[href_t:section_file_format]
+			{\tt section\_file\_format        [file\_format]}
+    \item \hyperref[href_t:psf_output_type]
+            {\tt psf\_output\_type        [file\_format]}         {\color{red}(Deprecated)}
 	\item File or Block \hyperref[href_t:surface_define]{\tt surface\_define    [File\_Name]}
 		\begin{itemize}
 			\item \hyperref[href_t:section_method]
@@ -1091,7 +1093,7 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 
 \paragraph{Output data format of sectioning module}
 \label{sec:PSF_data}
-Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|section_file_format| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|section_file_format|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format  and an example of data size and output time  for sectioning data}

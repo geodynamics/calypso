@@ -1,12 +1,12 @@
 array compare_surface_file
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix    'reference/CMB'
-      surface_file_format            vtk_gz
+      section_file_prefix    'reference/CMB'
+      section_file_format            vtk_gz
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix    'sections/CMB'
-      surface_file_format            vtk_gz
+      section_file_prefix    'sections/CMB'
+      section_file_format            vtk_gz
     end second_file_ctl
 !
     i_step_surface_ctl        1502
@@ -15,12 +15,12 @@ array compare_surface_file
 !
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix    'reference/equator'
-      surface_file_format            vtk
+      section_file_prefix    'reference/equator'
+      section_file_format            vtk
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix    'sections/equator'
-      surface_file_format            vtk
+      section_file_prefix    'sections/equator'
+      section_file_format            vtk
     end second_file_ctl
 !
     i_step_surface_ctl        1502
@@ -29,12 +29,12 @@ array compare_surface_file
 !
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix    'reference/cylinder_s055'
-      surface_file_format            vtd_gz
+      section_file_prefix    'reference/cylinder_s055'
+      section_file_format            vtd_gz
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix    'sections/cylinder_s055'
-      surface_file_format            vtd_gz
+      section_file_prefix    'sections/cylinder_s055'
+      section_file_format            vtd_gz
     end second_file_ctl
 !
     i_step_surface_ctl        1502
@@ -43,12 +43,12 @@ array compare_surface_file
 !
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix    'reference/zonal_mean'
-      surface_file_format            binary_gz
+      section_file_prefix    'reference/zonal_mean'
+      section_file_format            PSF_gz
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix    'sections/zonal_mean'
-      surface_file_format            binary_gz
+      section_file_prefix    'sections/zonal_mean'
+      section_file_format            PSF_gz
     end second_file_ctl
 !
     i_step_surface_ctl        1502
@@ -57,12 +57,12 @@ array compare_surface_file
 !
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix    'isosurfaces/temp0_7'
-      surface_file_format            vtk_gz
+      section_file_prefix    'isosurfaces/temp0_7'
+      section_file_format            vtk_gz
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix    'reference/temp0_7'
-      surface_file_format            vtk_gz
+      section_file_prefix    'reference/temp0_7'
+      section_file_format            vtk_gz
     end second_file_ctl
 !
     i_step_surface_ctl        1502

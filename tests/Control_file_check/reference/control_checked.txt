@@ -248,8 +248,8 @@ begin  MHD_control
     array  cross_section_ctl
 !  cross_section_ctl No.    1 should be written to file ... controls/control_section_cmb
       begin  cross_section_ctl
-        psf_file_head            'sections/cmb'
-        psf_output_type          binary_gz
+        section_file_prefix            'sections/cmb'
+        section_file_format          PSF_gz
 !  surface_define should be written to file ... controls/control_surface_CMB
         begin  surface_define
           section_method      equation
@@ -278,8 +278,8 @@ begin  MHD_control
       end  cross_section_ctl
 !  cross_section_ctl No.    2 should be written to file ... controls/control_section_z0
       begin  cross_section_ctl
-        psf_file_head            'sections/equator'
-        psf_output_type          UDT_gz
+        section_file_prefix            'sections/equator'
+        section_file_format          UDT_gz
         begin  surface_define
           section_method      equation
           array  coefs_ctl
@@ -309,8 +309,8 @@ begin  MHD_control
       end  cross_section_ctl
 !  cross_section_ctl No.    3 should be written to file ... controls/control_section_z0.3
       begin  cross_section_ctl
-        psf_file_head            'sections/z0.3'
-        psf_output_type          UDT_gzip
+        section_file_prefix            'sections/z0.3'
+        section_file_format          UDT_gzip
         begin  surface_define
           section_method      equation
           array  coefs_ctl
@@ -340,8 +340,8 @@ begin  MHD_control
       end  cross_section_ctl
 !  cross_section_ctl No.    4 should be written to file ... controls/control_section_icb
       begin  cross_section_ctl
-        psf_file_head            'sections/icb'
-        psf_output_type          UDT_gz
+        section_file_prefix            'sections/icb'
+        section_file_format          UDT_gz
 !  surface_define should be written to file ... controls/control_surface_ICB
         begin  surface_define
           section_method      equation
@@ -395,8 +395,8 @@ begin  MHD_control
     end  crustal_filtering_ctl
  should be written to file ... controls/control_zonal_mean
     begin  zonal_mean_section_ctl
-      psf_file_head            'sections/zm_y0'
-      psf_output_type          binary_gz
+      section_file_prefix            'sections/zm_y0'
+      section_file_format          PSF_gz
 !  surface_define should be written to file ... controls/control_surface_y0
       begin  surface_define
         section_method      equation

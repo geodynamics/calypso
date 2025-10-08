@@ -4,7 +4,7 @@
 !
 begin cross_section_ctl
   section_file_prefix    'sections/cylinder_s055'
-  psf_output_type        'vtd_gzip'
+  section_file_format        'vtd_gzip'
 !
   begin surface_define
     section_method    ellipsoid

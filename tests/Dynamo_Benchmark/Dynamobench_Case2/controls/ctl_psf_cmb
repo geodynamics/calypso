@@ -1,9 +1,9 @@
 !
 !     example of control for surface rendering on CMB
 !
-begin surface_rendering
-  psf_file_head    'sections/psf_cmb'
-  psf_output_type   VTK
+begin cross_section_ctl
+  section_file_prefix    'sections/psf_cmb'
+  section_file_format      VTK
 !
   begin surface_define
     section_method    equation
@@ -33,4 +33,4 @@ begin surface_rendering
       output_field   magnetic_field          spherical_vector
     end array output_field
   end output_field_define
-end surface_rendering
+end cross_section_ctl

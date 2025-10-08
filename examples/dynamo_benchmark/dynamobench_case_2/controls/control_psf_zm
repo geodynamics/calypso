@@ -3,6 +3,7 @@
 !
 begin cross_section_ctl
   section_file_prefix    'sections/zonal_mean'
+  section_file_format    'vtk_gz'
 !
   begin surface_define
     section_method    plane
@@ -29,10 +30,8 @@ begin cross_section_ctl
       output_field  temperature            scalar
 !
       output_field  velocity               spherical_vector
-      output_field  velocity               cylinder_r
       output_field  velocity               z
       output_field  magnetic_field         spherical_vector
-      output_field  magnetic_field         cylinder_r
       output_field  magnetic_field         z
 !
       output_field  Lorentz_work           scalar

@@ -1,9 +1,9 @@
 !
 !     example of control for surface rendering on z = 0.3 plane
 !
-begin surface_rendering
-  psf_file_head    'sections/psf_z0.3'
-  psf_output_type    PSF_gz
+begin cross_section_ctl
+  section_file_prefix    'sections/psf_z0.3'
+  section_file_format      PSF_gz
 !
   begin surface_define
     section_method    equation
@@ -29,4 +29,4 @@ begin surface_rendering
   end surface_define
 !
   file output_field_define 'controls/ctl_fields_z_sections'
-end surface_rendering
+end cross_section_ctl

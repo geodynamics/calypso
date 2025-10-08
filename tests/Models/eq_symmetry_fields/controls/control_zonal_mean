@@ -2,9 +2,9 @@
 !
 !     example of control for Kemo's surface rendering
 !
-begin surface_rendering
-  psf_file_head        'sections/zm_y0'
-  psf_output_type        binary_gz
+begin cross_section_ctl
+  section_file_prefix        'sections/zm_y0'
+  section_file_format        binary_gz
 !
   file surface_define  'controls/control_surface_y0'
 !
@@ -32,4 +32,4 @@ begin surface_rendering
       output_field  -us_d_ws_x_ua                scalar
     end array output_field
   end output_field_define
-end surface_rendering
+end cross_section_ctl

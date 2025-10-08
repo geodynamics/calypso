@@ -1,9 +1,9 @@
 !
 !     example of control for surface rendering on meridional section
 !
-begin surface_rendering
-  psf_file_head    'sections/zm_y0'
-  psf_output_type    VTK_gz
+begin cross_section_ctl
+  section_file_prefix    'sections/zm_y0'
+  section_file_format       VTK_gz
 !
   begin surface_define
     section_method    equation
@@ -39,4 +39,4 @@ begin surface_rendering
       output_field  thermal_buoyancy_flux  scalar
     end array output_field
   end output_field_define
-end surface_rendering
+end cross_section_ctl

@@ -4,7 +4,7 @@
 !
 begin cross_section_ctl
   section_file_prefix    'sections/CMB'
-  psf_output_type        'vtk_gz'
+  section_file_format        'vtk_gz'
 !
   begin surface_define
     section_method    sphere

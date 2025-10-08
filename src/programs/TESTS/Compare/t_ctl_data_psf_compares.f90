@@ -17,12 +17,12 @@
 !!  array compare_surface_file
 !!    begin compare_surface_file
 !!      begin first_file_ctl
-!!        surface_file_prefix    'isosurface/iso_w10n'
-!!        surface_file_format            VTK
+!!        section_file_prefix    'isosurface/iso_w10n'
+!!        section_file_format            VTK
 !!      end first_file_ctl
 !!      begin second_file_ctl
-!!        surface_file_prefix    'reference/iso_w10n'
-!!        surface_file_format            VTK_GZ
+!!        section_file_prefix    'reference/iso_w10n'
+!!        section_file_format            VTK_GZ
 !!      end second_file_ctl
 !!
 !!      i_step_surface_ctl      10

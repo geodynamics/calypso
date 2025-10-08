@@ -2,9 +2,9 @@
 !
 !     example of control for Kemo's surface rendering
 !
-begin surface_rendering
-  psf_file_head    'sections/cmb'
-  psf_output_type    binary_gz
+begin cross_section_ctl
+  section_file_prefix    'sections/cmb'
+  section_file_format    PSF_gz
 !
   file  surface_define  'controls/control_surface_CMB'
 !
@@ -17,4 +17,4 @@ begin surface_rendering
       output_field  asym_magnetic_field       spherical_vector
     end array output_field
   end output_field_define
-end surface_rendering
+end cross_section_ctl

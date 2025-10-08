@@ -84,9 +84,9 @@ begin MHD_control
       end array bc_velocity
 !
       array bc_magnetic_field
-        bc_magnetic_field  sph_to_center  to_Center  0.000  end
-!        bc_magnetic_field  insulator      ICB        0.000  end
-        bc_magnetic_field  insulator      CMB        0.000  end
+        bc_magnetic_field  sph_to_center  to_Center  0.000
+!        bc_magnetic_field  insulator      ICB        0.000
+        bc_magnetic_field  insulator      CMB        0.000
       end array bc_magnetic_field
     end boundary_condition
 !

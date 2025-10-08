@@ -1,12 +1,12 @@
 array compare_surface_file
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix       'reference/cmb'
-      surface_file_format            binary_gz
+      section_file_prefix       'reference/cmb'
+      section_file_format            PSF_gz
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix        'sections/cmb'
-      surface_file_format            binary_gz
+      section_file_prefix        'sections/cmb'
+      section_file_format            PSF_gz
     end second_file_ctl
 !
     i_step_surface_ctl        1400002
@@ -15,12 +15,12 @@ array compare_surface_file
 !
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix       'reference/equator'
-      surface_file_format            UDT_gz
+      section_file_prefix       'reference/equator'
+      section_file_format            UDT_gz
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix       'sections/equator'
-      surface_file_format            UDT_gz
+      section_file_prefix       'sections/equator'
+      section_file_format            UDT_gz
     end second_file_ctl
 !
     i_step_surface_ctl        1400002
@@ -29,12 +29,12 @@ array compare_surface_file
 !
   begin compare_surface_file
     begin first_file_ctl
-      surface_file_prefix    'reference/zm_y0'
-      surface_file_format            binary_gz
+      section_file_prefix    'reference/zm_y0'
+      section_file_format            PSF_gz
     end first_file_ctl
     begin second_file_ctl
-      surface_file_prefix    'sections/zm_y0'
-      surface_file_format            binary_gz
+      section_file_prefix    'sections/zm_y0'
+      section_file_format            PSF_gz
     end second_file_ctl
 !
     i_step_surface_ctl        1400002

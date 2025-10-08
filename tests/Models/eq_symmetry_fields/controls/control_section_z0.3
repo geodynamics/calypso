@@ -2,9 +2,9 @@
 !
 !     example of control for Kemo's surface rendering
 !
-begin surface_rendering
-  psf_file_head    'sections/z0.3'
-  psf_output_type  UDT_gzip
+begin cross_section_ctl
+  section_file_prefix    'sections/z0.3'
+  section_file_format      UDT_gzip
 !
   begin surface_define
     section_method    equation
@@ -31,4 +31,4 @@ begin surface_rendering
   end surface_define
 !
   file output_field_define    'controls/control_z_section_fields'
-end surface_rendering
+end cross_section_ctl

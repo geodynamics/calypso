@@ -17,12 +17,12 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  begin compare_surface_file
 !!    begin first_file_ctl
-!!      surface_file_prefix    'isosurface/iso_w10n'
-!!      surface_file_format            VTK
+!!      section_file_prefix    'isosurface/iso_w10n'
+!!      section_file_format            VTK
 !!    end first_file_ctl
 !!    begin second_file_ctl
-!!      surface_file_prefix    'isosurface/iso_w10n'
-!!      surface_file_format            VTK
+!!      section_file_prefix    'isosurface/iso_w10n'
+!!      section_file_format            VTK
 !!    end second_file_ctl
 !!
 !!    i_step_surface_ctl      10
@@ -88,9 +88,9 @@
      &             :: hd_diff_limit_ctl = 'difference_limit_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &             :: hd_surface_file_prefix = 'surface_file_prefix'
+     &             :: hd_surface_file_prefix = 'section_file_prefix'
       character(len=kchara), parameter, private                         &
-     &             :: hd_surface_file_format = 'surface_file_format'
+     &             :: hd_surface_file_format = 'section_file_format'
 !
       private :: read_ctl_data_psf_file, reset_ctl_data_psf_file
       private :: copy_ctl_data_psf_file

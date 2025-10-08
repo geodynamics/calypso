@@ -3,7 +3,7 @@
 !
 begin cross_section_ctl
   section_file_prefix    'sections/zonal_mean'
-  psf_output_type        'binary_gzip'
+  section_file_format        'PSF_gz'
 !
   begin surface_define
     section_method    plane

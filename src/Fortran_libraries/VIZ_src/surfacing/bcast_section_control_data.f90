@@ -112,8 +112,8 @@
       call calypso_mpi_bcast_character(psf_c%fname_fld_on_psf,          &
      &                                 cast_long(kchara), 0)
 !
-      call bcast_ctl_type_c1(psf_c%psf_file_head_ctl)
-      call bcast_ctl_type_c1(psf_c%psf_output_type_ctl)
+      call bcast_ctl_type_c1(psf_c%psf_file_prefix_ctl)
+      call bcast_ctl_type_c1(psf_c%psf_file_format_ctl)
 !
       call bcast_section_def_control(psf_c%psf_def_c)
       call bcast_fld_on_psf_control(psf_c%fld_on_psf_c)

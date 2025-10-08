@@ -2,9 +2,9 @@
 !
 !     example of control for Kemo's surface rendering
 !
-begin surface_rendering
-  psf_file_head    'sections/icb'
-  psf_output_type     UDT_gz
+begin cross_section_ctl
+  section_file_prefix    'sections/icb'
+  section_file_format     UDT_gz
 !
   file surface_define  'controls/control_surface_ICB'
 !
@@ -15,4 +15,4 @@ begin surface_rendering
       output_field  grad_temp             spherical_vector
     end array output_field
   end output_field_define
-end surface_rendering
+end cross_section_ctl
