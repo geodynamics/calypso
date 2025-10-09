@@ -134,7 +134,7 @@
 !
       ierr = 0
       call s_set_isosurface_file_ctl(default_iso_prefix,                &
-     &    iso_c%iso_file_head_ctl, iso_c%iso_output_type_ctl,           &
+     &    iso_c%iso_file_head_ctl, iso_c%iso_file_format_ctl,           &
      &    iso_file_IO)
       if((iso_file_IO%iflag_format/iflag_single) .eq. 0) then
         iso_file_IO%iflag_format = iso_file_IO%iflag_format             &

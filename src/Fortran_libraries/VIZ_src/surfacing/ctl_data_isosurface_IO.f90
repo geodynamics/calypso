@@ -25,7 +25,7 @@
 !!
 !!  begin isosurface_ctl
 !!    isosurface_file_prefix    'psf'
-!!    iso_output_type            ucd
+!!    isosurface_file_format     ucd
 !!
 !!    begin isosurf_define
 !!      isosurf_field        pressure
@@ -50,8 +50,9 @@
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
-!!    iso_output_type:
-!!           ucd, ucd_gz, iso
+!!    isosurface_file_format:
+!!           'VTK', 'VTK_gz', 'ISO', 'ISO_gz',
+!!           'UCD', 'UCD_gz', 'binary', 'binary_gz',
 !!
 !!    result_type:  (Original name: display_method)
 !!                   specified_fields
@@ -69,7 +70,8 @@
 !!    isosurf_comp: component for isosurface
 !!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
 !!    isosurf_value:  value for isosurface
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!@endverbatim
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!@endverbatim
 !
       module ctl_data_isosurface_IO
 !
@@ -90,7 +92,7 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_isosurf_prefix = 'isosurface_file_prefix'
       character(len=kchara), parameter, private                         &
-     &             :: hd_iso_out_type =   'iso_output_type'
+     &             :: hd_isosurf_format = 'isosurface_file_format'
       character(len=kchara), parameter, private                         &
      &             :: hd_iso_define =     'isosurf_define'
       character(len=kchara), parameter, private                         &
@@ -100,6 +102,8 @@
 !
       character(len=kchara), parameter, private                         &
      &             :: hd_iso_file_head = 'iso_file_head'
+      character(len=kchara), parameter, private                         &
+     &             :: hd_iso_out_type =   'iso_output_type'
       character(len=kchara), parameter, private                         &
      &             :: hd_iso_result = 'isosurf_result_define'
 !
@@ -140,10 +144,13 @@
 !
         call read_chara_ctl_type(c_buf, hd_isosurf_prefix,              &
      &      iso_c%iso_file_head_ctl)
+        call read_chara_ctl_type(c_buf, hd_isosurf_format,              &
+     &      iso_c%iso_file_format_ctl)
+!
         call read_chara_ctl_type(c_buf, hd_iso_file_head,               &
      &      iso_c%iso_file_head_ctl)
         call read_chara_ctl_type(c_buf, hd_iso_out_type,                &
-     &      iso_c%iso_output_type_ctl)
+     &      iso_c%iso_file_format_ctl)
       end do
       iso_c%i_iso_ctl = 1
 !
@@ -168,13 +175,13 @@
       if(iso_c%i_iso_ctl .le. 0) return
 !
       maxlen = len_trim(hd_isosurf_prefix)
-      maxlen = max(maxlen, len_trim(hd_iso_out_type))
+      maxlen = max(maxlen, len_trim(hd_isosurf_format))
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    iso_c%iso_file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    iso_c%iso_output_type_ctl)
+     &    iso_c%iso_file_format_ctl)
 !
       call write_iso_define_data(id_control, hd_iso_define,             &
      &                           iso_c%iso_def_c, level)
@@ -200,8 +207,8 @@
      &      iso_c%iso_file_head_ctl)
         call init_chara_ctl_item_label(hd_iso_file_head,                &
      &      iso_c%iso_file_head_ctl)
-        call init_chara_ctl_item_label(hd_iso_out_type,                 &
-     &      iso_c%iso_output_type_ctl)
+        call init_chara_ctl_item_label(hd_isosurf_format,               &
+     &      iso_c%iso_file_format_ctl)
 !
       end subroutine init_iso_ctl_stract
 !

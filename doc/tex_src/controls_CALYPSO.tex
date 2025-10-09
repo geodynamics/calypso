@@ -1280,10 +1280,10 @@ File prefix for cross section data is defined as character \verb|[file_prefix]|.
 \verb|[file_format]| \\
 File format for cross section data is defined as character \verb|[file_format]|. The following formats are available;
 \begin{description}
-\item{\tt VTK: }               VTK format
-\item{\tt VTK\_gz: }           Compressed VTK format (Available if zlib library is linked)
-\item{\tt PSF: }               Binary section data format
-\item{\tt PSF\_gzip: }         Compressed Binary section data format (Available if zlib library is linked)
+\item{\tt VTK:     } VTK format
+\item{\tt VTK\_gz: } Compressed VTK format (Available if zlib library is linked)
+\item{\tt PSF:     } Binary section data format
+\item{\tt PSF\_gz: } Compressed Binary section data format (Available if zlib library is linked)
 \end{description}
 
 \subsubsection{\tt surface\_define}
@@ -1462,14 +1462,14 @@ Control parameters for isosurfacing are defined in this block. \\
 \verb|[file_prefix]| \\
 File prefix for isosurface data is defined as character \verb|[file_prefix]|.
 
-\paragraph{\tt iso\_output\_type}
-\label{href_t:iso_output_type}
+\paragraph{{\tt isosurface\_file\_format} or {\tt iso\_output\_type}}
+\label{href_t:isosurface_file_format}
 File format for isosurface data is defined as character \verb|[file_format]|. The following formats are available;
 \begin{description}
-\item{\tt VTK: }               VTK format
-\item{\tt VTK\_gz: }           Compressed VTK format (Available if zlib library is linked)
-\item{\tt ISO: }               Binary isosurface data format
-\item{\tt ISO\_gzip: }         Compressed Binary isosurface data format (Available if zlib library is linked)
+\item{\tt VTK:     } VTK format
+\item{\tt VTK\_gz: } Compressed VTK format (Available if zlib library is linked)
+\item{\tt ISO:     } Binary isosurface data format
+\item{\tt ISO\_gz: } Compressed Binary isosurface data format (Available if zlib library is linked)
 \end{description}
 
 \subsubsection{\tt isosurf\_define}
@@ -1614,27 +1614,27 @@ End  time \verb|[TIME]| for the restart file is defined by real.
 
 \paragraph{\tt volume\_integrate\_prefix}
 \label{href_t:volume_integrate_prefix} 
-\verb|[File\_Prefix]| \\
-File prefix  \verb|[File\_Prefix]|  for  volume integrated data is defined by text.
+\verb|[File_Prefix]| \\
+File prefix \verb|[File_Prefix]|  for  volume integrated data is defined by text.
 
 \paragraph{\tt volume\_sph\_spectr\_prefix}
 \label{href_t:volume_sph_spectr_prefix} 
-\verb|[File\_Prefix]| \\
-File prefix  \verb|[File\_Prefix]|  for  volume integrated spectrum data is defined by text.
+\verb|[File_Prefix]| \\
+File prefix \verb|[File_Prefix]|  for  volume integrated spectrum data is defined by text.
 
 \paragraph{\tt sphere\_integrate\_prefix}
 \label{href_t:sphere_integrate_prefix} 
-\verb|[File\_Prefix]| \\
-File prefix  \verb|[File\_Prefix]|  for sphere integrated data is defined by text.
+\verb|[File_Prefix]| \\
+File prefix \verb|[File_Prefix]|  for sphere integrated data is defined by text.
 
 \paragraph{\tt layer\_sph\_spectr\_prefix}
 \label{href_t:layer_sph_spectr_prefix} 
-\verb|[File\_Prefix]| \\
-File prefix  \verb|[File\_Prefix]|  for  layered spectrum data is defined by text.
+\verb|[File_Prefix]| \\
+File prefix \verb|[File_Prefix]|  for  layered spectrum data is defined by text.
 
 \paragraph{\tt picked\_sph\_prefix}
 \label{href_t:picked_sph_prefix} 
-\verb|[File\_Prefix]| \\
-File prefix  \verb|[File\_Prefix]|  for  picked up spectrum data is defined by text.
+\verb|[File_Prefix]| \\
+File prefix \verb|[File_Prefix]|  for  picked up spectrum data is defined by text.
 
 

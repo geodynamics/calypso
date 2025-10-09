@@ -371,7 +371,7 @@ begin  MHD_control
 ! isosurface_ctl No.    1 should be written to file ... controls/control_isosurf_t0.25
       begin  isosurface_ctl
         isosurface_file_prefix      'isosurfaces/iso_temp'
-        iso_output_type             VTK_gz
+        isosurface_file_format       VTK_gz
         begin  isosurf_define
           isosurf_field          temperature
           isosurf_component      scalar

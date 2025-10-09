@@ -1129,8 +1129,10 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 \begin{itemize}
 	\item \hyperref[href_t:isosurface_file_prefix]
 			{\tt isosurface\_file\_prefix    [file\_prefix]}
-	\item \hyperref[href_t:iso_output_type]
-			{\tt iso\_output\_type           [file\_format]}
+	\item \hyperref[href_t:isosurface_file_format]
+			{\tt isosurface\_file\_format    [file\_format]}
+    \item \hyperref[href_t:isosurface_file_format]
+            {\tt iso\_output\_type           [file\_format] {\color{red} (Deprecated)}}
 %
 	\item Block \hyperref[href_t:isosurf_define]{\tt isosurf\_define}
 		\begin{itemize}
@@ -1154,7 +1156,7 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 
 \paragraph{Output data format of isosurface module}
 \label{sec:PSF_data}
-Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|isosurface_file_format| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|isosurface_file_format|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format and an example of data size and output time for isosurface data}

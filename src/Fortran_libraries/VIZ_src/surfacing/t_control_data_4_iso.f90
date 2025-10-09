@@ -20,7 +20,7 @@
 !!
 !!  begin isosurface_ctl
 !!    isosurface_file_prefix    'psf'
-!!    iso_output_type            ucd
+!!    isosurface_file_format     ucd
 !!
 !!    begin isosurf_define
 !!      isosurf_field        pressure
@@ -45,8 +45,9 @@
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
-!!    iso_output_type:
-!!           ucd, ucd_gz, iso
+!!    isosurface_file_format:
+!!           'VTK', 'VTK_gz', 'ISO', 'ISO_gz',
+!!           'UCD', 'UCD_gz', 'binary', 'binary_gz',
 !!
 !!    result_type:  (Original name: display_method)
 !!                   specified_fields
@@ -95,7 +96,7 @@
 !>        Structure for file prefix
         type(read_character_item) :: iso_file_head_ctl
 !>        Structure for data field format
-        type(read_character_item) :: iso_output_type_ctl
+        type(read_character_item) :: iso_file_format_ctl
 !
 !     Top level
         integer (kind=kint) :: i_iso_ctl = 0
@@ -113,7 +114,7 @@
 !
 !
       iso_c%iso_file_head_ctl%iflag =    0
-      iso_c%iso_output_type_ctl%iflag =  0
+      iso_c%iso_file_format_ctl%iflag =  0
 !
       iso_c%i_iso_ctl =         0
 !
@@ -132,8 +133,8 @@
 !
       call copy_chara_ctl(org_iso_c%iso_file_head_ctl,                  &
      &                    new_iso_c%iso_file_head_ctl)
-      call copy_chara_ctl(org_iso_c%iso_output_type_ctl,                &
-     &                    new_iso_c%iso_output_type_ctl)
+      call copy_chara_ctl(org_iso_c%iso_file_format_ctl,                &
+     &                    new_iso_c%iso_file_format_ctl)
 !
       new_iso_c%i_iso_ctl =        org_iso_c%i_iso_ctl
       new_iso_c%block_name =       org_iso_c%block_name
