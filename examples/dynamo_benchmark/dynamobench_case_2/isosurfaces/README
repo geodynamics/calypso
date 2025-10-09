@@ -3,4 +3,8 @@
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
- Field data for visualization are stored in this directory.
+ Isosurface data for visualization are stored in this directory.
+The following files are stored:
+
+README:                     This file     
+temp0_7.[isosurface step #].vtk.gz:    Isosurface data for visualization in compressed VTK data format

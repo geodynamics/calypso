@@ -4,3 +4,22 @@
 !-----------------------------------------------------------------------
 !
  Spherical harmonics monitor data files are stored in this directory.
+The following files are stored:
+
+README:                     This file     
+monitor/Nusselt.dat.gz             Time series of the Nusselt number
+monitor/dynamobench.dat:           Time series of the Dynamo benchmark results
+monitor/gauss_coefs.dat.gz:        Gauss coefficients at r = 2.91
+monitor/picked_mode_l1_m0c.dat.gz: Y_1^0 component of spherical harmonics coefficients
+monitor/picked_mode_l2_m0c.dat.gz: Y_2^0 component of spherical harmonics coefficients
+monitor/sph_pwr_layer_l.dat.gz:    Power spectrum as a function of spherical harmonics degree at specific radial layers
+monitor/sph_pwr_layer_lm.dat.gz:   Power spectrum as a function of meridional wave number at specific radial layers
+monitor/sph_pwr_layer_m.dat.gz:    Power spectrum as a function of spherical harmonics order at specific radial layers
+monitor/sph_pwr_layer_m0.dat.gz:   Axisymmetric power spectrum as a function of spherical harmonics degree at specific radial layers
+monitor/sph_pwr_layer_s.dat.gz:    Mean square at specific radial layers
+monitor/sph_ave_volume.dat.gz:     Average fields over the fluid shell
+monitor/sph_pwr_volume_l.dat.gz:   Power spectrum as a function of spherical harmonics degree average over the fluid shell
+monitor/sph_pwr_volume_lm.dat.gz:  Power spectrum as a function of meridional wave number average over the fluid shell
+monitor/sph_pwr_volume_m.dat.gz:   Power spectrum as a function of spherical harmonics order average over the fluid shell
+monitor/sph_pwr_volume_m0.dat.gz:  Axisymmetric power spectrum as a function of spherical harmonics degree average over the fluid shell
+monitor/sph_pwr_volume_s.dat.gz:   Mean square average over the fluid shell

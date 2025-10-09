@@ -346,6 +346,7 @@ begin MHD_control
     array cross_section_ctl
       file  cross_section_ctl   'controls/control_psf_CMB'
       file  cross_section_ctl   'controls/control_psf_ICB'
+      file  cross_section_ctl   'controls/control_psf_mid_depth'
       file  cross_section_ctl   'controls/control_psf_eq'
       file  cross_section_ctl   'controls/control_psf_z0.3'
       file  cross_section_ctl   'controls/control_psf_s0.55'

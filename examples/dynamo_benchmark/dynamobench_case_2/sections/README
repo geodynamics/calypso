@@ -3,4 +3,15 @@
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
-Sectioning data are stored in this directory.
+Sectioning data files for visualization are stored in this directory.
+The following files are stored:
+
+README:                     This file     
+CMB.[section step #].vtk.gz:          Section data at outer boundary of the shell in compressed VTK format
+ICB.[section step #].vtk.gz:          Section data at inner boundary of the shell in compressed VTK format
+mid_depth.[section step #].vtk.gz:    Section data at the mid-depth of the shell in compressed VTK format
+equator.[section step #].vtk:         Section data at the equatorial plane in VTK format
+section_z03.0.sgd.gz:                 Grid data at the z = 0.3 cross section in compressed binary format
+section_z03.[section step #].sdt.gz:  Field data at the z = 0.3 cross section in compressed binary format
+cylinder_s055.0.sgd:                  Grid data at the s = 0.55 cylinder section in compressed binary format
+cylinder_s055.[section step #].sdt:   Field data at the s = 0.55 cylinder section in compressed binary format
