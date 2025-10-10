@@ -31,8 +31,6 @@ begin cross_section_ctl
 !
       output_field  velocity               spherical_vector
       output_field  velocity               z
-!
-      output_field  thermal_buoyancy_flux  scalar
     end array output_field
   end output_field_define
 end cross_section_ctl

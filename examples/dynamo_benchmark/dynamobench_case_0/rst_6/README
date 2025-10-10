@@ -4,3 +4,7 @@
 !-----------------------------------------------------------------------
 !
  Restart data files are stored in this directory.
+The following files are stored:
+
+README:                     This file
+rst.[restart step #].fsb.gz: Restart data file

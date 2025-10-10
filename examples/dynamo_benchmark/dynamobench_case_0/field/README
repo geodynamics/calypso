@@ -4,3 +4,7 @@
 !-----------------------------------------------------------------------
 !
  Field data for visualization are stored in this directory.
+The following files are stored:
+
+README:                     This file     
+out.[field step #].vtk.gz:  Field data for visualization in compressed VTK data format
