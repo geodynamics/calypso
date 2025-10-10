@@ -15,3 +15,4 @@ section_z03.0.sgd.gz:                 Grid data at the z = 0.3 cross section in 
 section_z03.[section step #].sdt.gz:  Field data at the z = 0.3 cross section in compressed binary format
 cylinder_s055.0.sgd:                  Grid data at the s = 0.55 cylinder section in compressed binary format
 cylinder_s055.[section step #].sdt:   Field data at the s = 0.55 cylinder section in compressed binary format
+zonal_mean.[section step #].vtk.gz:   Meridional section of zonal mean field data in compressed VTK format

@@ -3,4 +3,8 @@
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
- Restart data files are stored in this directory.
+ Resolution control data file is stored in this directory.
+The following files are ready:
+
+README:              This file     
+control_resolution:  Control file for spatial resolution

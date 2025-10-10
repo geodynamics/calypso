@@ -17,13 +17,13 @@ begin MHD_control
   begin data_files_def
     debug_flag_ctl            'OFF'
 !
-    num_subdomain_ctl           4
+    num_subdomain_ctl           6
     num_smp_ctl                 2
 !
-    restart_file_prefix         'rst_4/rst'
+    restart_file_prefix         'rst_6/rst'
     field_file_prefix           'field/out'
 !
-    restart_file_fmt_ctl       'merged_gz'
+    restart_file_fmt_ctl       'merged_bin_gz'
     field_file_fmt_ctl         'merged_VTK_gz'
   end data_files_def
 !
@@ -53,20 +53,20 @@ begin MHD_control
 !
   begin spherical_shell_ctl
     begin num_domain_ctl
-      num_radial_domain_ctl         2
+      num_radial_domain_ctl         3
       num_horizontal_domain_ctl     2
     end num_domain_ctl
 !
     begin num_grid_sph
-      truncation_level_ctl      31
+      truncation_level_ctl      63
 !
-      ngrid_meridonal_ctl      48
-      ngrid_zonal_ctl          96
+      ngrid_meridonal_ctl       96
+      ngrid_zonal_ctl          192
 !
       radial_grid_type_ctl   Chebyshev
-      num_fluid_grid_ctl     48
-      fluid_core_size_ctl   1.0
-      ICB_to_CMB_ratio_ctl  0.35
+      num_fluid_grid_ctl     144
+      fluid_core_size_ctl    1.0
+      ICB_to_CMB_ratio_ctl   0.35
     end num_grid_sph
   end spherical_shell_ctl
 !
@@ -230,13 +230,13 @@ begin MHD_control
 !!!!!  information for sime integration
    begin time_step_ctl
       elapsed_time_ctl      42500.
-      i_step_init_ctl       0
-      i_step_finish_ctl     20000
+      i_step_init_ctl            0
+      i_step_finish_ctl     100000
 !
-      i_step_check_ctl      100
-      i_step_rst_ctl         5000
-      i_step_field_ctl      10000
-      i_step_sectioning_ctl  1000
+      i_step_check_ctl         100
+      i_step_rst_ctl          5000
+      i_step_field_ctl       10000
+      i_step_sectioning_ctl   1000
 !
       dt_ctl              5.0e-5
       time_init_ctl       0.0e-8
@@ -251,7 +251,6 @@ begin MHD_control
     begin time_loop_ctl
       coef_imp_v_ctl          6.0e-1
       coef_imp_t_ctl          6.0e-1
-      coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
       scheme_ctl              Crank_Nicolson
     end time_loop_ctl
@@ -260,44 +259,27 @@ begin MHD_control
   begin sph_monitor_ctl
     volume_average_prefix        'monitor/sph_ave_volume'
     volume_pwr_spectr_prefix     'monitor/sph_pwr_volume'
+    volume_pwr_spectr_format     'gzip'
+!
+    nusselt_number_prefix        'monitor/Nusselt'
+    nusselt_number_format        'gzip'
+!
+    begin dynamo_benchmark_data_ctl
+      dynamo_benchmark_file_prefix     'monitor/dynamobench'
+      dynamo_benchmark_file_format     'ASCII'
+      nphi_mid_eq_ctl                   512
+    end dynamo_benchmark_data_ctl
   end sph_monitor_ctl
 !
   begin visual_control
     array cross_section_ctl
-!
-      begin cross_section_ctl
-        section_file_prefix    'sections/equator'
-!
-        begin surface_define
-          section_method    plane
-!
-          array normal_vector
-            normal_vector  x   0.0
-            normal_vector  y   0.0
-            normal_vector  z   1.0
-          end array normal_vector
-!
-          array center_position
-            center_position  x   0.0
-            center_position  y   0.0
-            center_position  z   0.0
-          end array center_position
-!
-          array section_area_ctl
-            section_area_ctl   all   end
-          end array section_area_ctl
-        end surface_define
-!
-        begin output_field_define
-          array output_field
-            output_field  temperature           scalar
-            output_field  velocity              vector
-            output_field  velocity              radial     
-            output_field  velocity              phi   
-            output_field  vorticity             z
-          end array output_field
-        end output_field_define
-      end cross_section_ctl
+      file  cross_section_ctl   'controls/control_psf_mid_depth'
+      file  cross_section_ctl   'controls/control_psf_eq'
+      file  cross_section_ctl   'controls/control_psf_z0.3'
     end array cross_section_ctl
   end  visual_control
+!
+  begin dynamo_vizs_control
+    file zonal_mean_section_ctl  'controls/control_psf_zm'
+  end dynamo_vizs_control
 end MHD_control

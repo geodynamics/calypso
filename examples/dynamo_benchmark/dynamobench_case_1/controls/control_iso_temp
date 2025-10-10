@@ -1,6 +1,7 @@
 !
 begin isosurface_ctl
-  isosurface_file_prefix    'Isosurfaces/temp0_7'
+  isosurface_file_prefix    'isosurfaces/temp0_7'
+  isosurface_file_format            vtk_gz
 !
   begin isosurf_define
     isosurf_field        temperature
@@ -16,9 +17,9 @@ begin isosurface_ctl
     result_type      'field'
 !
     array output_field
-      output_field    velocity           vector         end
-      output_field    velocity           radial         end
-      output_field    magnetic_field     vector         end
+      output_field    velocity           vector
+      output_field    velocity           radial
+      output_field    magnetic_field     vector
     end array output_field
   end field_on_isosurf
 !

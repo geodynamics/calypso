@@ -3,4 +3,8 @@
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
- Spherical harmonics table data are stored in this directory.
+ Restart data files are stored in this directory.
+The following files are stored:
+
+README:                     This file
+rst.[restart step #].fsb.gz: Restart data file

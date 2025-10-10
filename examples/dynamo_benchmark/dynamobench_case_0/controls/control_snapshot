@@ -4,8 +4,6 @@ begin MHD_control
 !  num_subdomain_ctl: number of subdomains
 !  num_smp_ctl:       number of smp processes
 !
-!  mesh_file_head_ctl:  header of mesh file (Default: in.domain#)
-!
 !  sph_file_prefix:     prefix of spherical transfoem grid
 !  restart_file_prefix: prefix of restart file
 !                            (Default: restart/rst.step#.domain#)
@@ -17,57 +15,76 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
   begin data_files_def
-    debug_flag_ctl            'Off'
+    debug_flag_ctl            'OFF'
 !
-    num_subdomain_ctl            4
-    num_smp_ctl                  2
+    num_subdomain_ctl           6
+    num_smp_ctl                 2
 !
-    restart_file_prefix         'rst_4/rst'
+    restart_file_prefix         'rst_6/rst'
     field_file_prefix           'field/out'
 !
-    sph_file_fmt_ctl           'merged_gzip'
-    restart_file_fmt_ctl       'merged_gzip'
+    restart_file_fmt_ctl       'merged_bin_gz'
     field_file_fmt_ctl         'merged_VTK_gz'
   end data_files_def
 !
-  file spherical_shell_ctl  'control_resolution'
+!!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
+!
+!  To Define by external file...
+!    file spherical_shell_ctl  'file name'
+!
+!  num_domain_ctl:   Parallelization information
+!    num_radial_domain_ctl:        Number of radial decompositoin
+!    num_horizontal_domain_ctl:    Number of horizontal decompositoin
+!
+!   truncation_level_ctl: Truncation of spherical harmonics (Lmax)
+!   ngrid_meridonal_ctl:  Number of meridional grid points ( = 1.5 x (Lmax+1))
+!   num_horizontal_domain_ctl: Number of zonal grid points ( = 3 x (Lmax+1))
+!
+!   radial_grid_type_ctl:  Definition for radial grid   
+!         explicit:        Set each radial grid explicitly
+!         Chebyshev:       Set Chebyshev collocation points
+!         equi_distance:   Set equi-diatance grid
+!
+!   num_fluid_grid_ctl:    Number of radial grids
+!   fluid_core_size_ctl    Size of fluid shell
+!   ICB_to_CMB_ratio_ctl   Aspect ratio (r_o / r_i)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  begin spherical_shell_ctl
+    begin num_domain_ctl
+      num_radial_domain_ctl         3
+      num_horizontal_domain_ctl     2
+    end num_domain_ctl
+!
+    begin num_grid_sph
+      truncation_level_ctl      63
+!
+      ngrid_meridonal_ctl       96
+      ngrid_zonal_ctl          192
+!
+      radial_grid_type_ctl   Chebyshev
+      num_fluid_grid_ctl     144
+      fluid_core_size_ctl    1.0
+      ICB_to_CMB_ratio_ctl   0.35
+    end num_grid_sph
+  end spherical_shell_ctl
 !
   begin model
 !!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! available valuables 
 !   velocity, temperature, pressure, vorticity
-!   vector_potential, magnetic_field, current_density, magnetic_potential
-!   composition, perturbation_temp
+!   vector_potential, magnetic_field, current_density
+!   composition
 !
-!   thermal_buoyancy_flux, Lorentz_work
 !   magnetic_ene_generation
-!   temp_generation, part_temp_gen
-!   vis_ene_diffuse, mag_ene_diffuse
-!
-!   thermal_diffusion, viscous_diffusion, magnetic_diffusion
-!   Coriolis_force, thermal_buoyancy
-!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
       array nod_value_ctl
-        nod_value_ctl  velocity                 Viz_On   Monitor_On
-        nod_value_ctl  temperature              Viz_On   Monitor_On
-        nod_value_ctl  pressure                 Viz_On   Monitor_On
-        nod_value_ctl  vorticity                Viz_On   Monitor_On
-        nod_value_ctl  magnetic_field           Viz_On   Monitor_On
-        nod_value_ctl  current_density          Viz_On   Monitor_On
-!
-        nod_value_ctl  Lorentz_work             Viz_On   Monitor_On
-        nod_value_ctl  thermal_buoyancy_flux    Viz_On   Monitor_On
-!
-        nod_value_ctl  Coriolis_force           Viz_On   Monitor_On
-        nod_value_ctl  Lorentz_force            Viz_On   Monitor_On
-        nod_value_ctl  inertia                  Viz_On   Monitor_On
-!
-        nod_value_ctl  rot_Coriolis_force       Viz_On   Monitor_On
-        nod_value_ctl  rot_Lorentz_force        Viz_On   Monitor_On
-        nod_value_ctl  rot_inertia              Viz_On   Monitor_On
-        nod_value_ctl  rot_thermal_buoyancy     Viz_On   Monitor_On
+        nod_value_ctl  velocity                Viz_On   Monitor_On
+        nod_value_ctl  temperature             Viz_On   Monitor_On
+        nod_value_ctl  pressure                Viz_On   Monitor_On
+        nod_value_ctl  vorticity               Viz_On   Monitor_On
       end array nod_value_ctl
     end phys_values_ctl
 !
@@ -79,7 +96,6 @@ begin MHD_control
       array time_evo_ctl
         time_evo_ctl  temperature
         time_evo_ctl  velocity
-        time_evo_ctl  magnetic_field
       end array time_evo_ctl
     end time_evolution_ctl
 !
@@ -92,15 +108,10 @@ begin MHD_control
       end array bc_temperature
 !
       array bc_velocity
-        bc_velocity  non_slip_sph  ICB   0.000
-        bc_velocity  non_slip_sph  CMB   0.000
+        bc_velocity  non_slip_sph    ICB   0.000
+        bc_velocity  non_slip_sph    CMB   0.000
       end array bc_velocity
-!
-      array bc_magnetic_field
-        bc_magnetic_field  insulator  ICB  0.000
-        bc_magnetic_field  insulator  CMB  0.000
-      end array bc_magnetic_field
-    end boundary_condition
+   end boundary_condition
 !
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available forces
@@ -110,23 +121,21 @@ begin MHD_control
       array force_ctl
         force_ctl   Thermal_buoyancy
         force_ctl   Coriolis
-        force_ctl   Lorentz
       end array force_ctl
     end forces_define
 !
 !!!!!  dimensionless numbers !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available numbers
-!     Prandtl_number, magnetic_Prandtl_number
-!     Rayleigh_number, modified_Rayleigh_number
+!     Pr, Pm
+!     modified_Ra
 !     Reynords_number
 !     Taylor_number, Ekman_number
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
       array dimless_ctl
-        dimless_ctl  Prandtl_number                   1.0e-0
-        dimless_ctl  modified_Rayleigh_number         1.0E+2
-        dimless_ctl  Ekman_number                     1.0e-3
-        dimless_ctl  magnetic_Prandtl_number          5.0e+0
+        dimless_ctl  Pr                  1.0e-0
+        dimless_ctl  modified_Ra         1.0e+2
+        dimless_ctl  Ek                  1.0e-3
       end array dimless_ctl
     end dimensionless_ctl
 !
@@ -157,79 +166,62 @@ begin MHD_control
     begin coefficients_ctl
       begin thermal
         array coef_4_termal_ctl
-          coef_4_termal_ctl            One                        1.0
+          coef_4_termal_ctl            One           1.0
         end array coef_4_termal_ctl
 !
         array coef_4_t_diffuse_ctl
-          coef_4_t_diffuse_ctl         Prandtl_number            -1.0
+          coef_4_t_diffuse_ctl         Pr           -1.0
         end array coef_4_t_diffuse_ctl
       end thermal
 !
-!
       begin momentum
         array coef_4_velocity_ctl
-          coef_4_velocity_ctl          One                        1.0
+          coef_4_velocity_ctl          One           1.0
         end array coef_4_velocity_ctl
 !
         array coef_4_press_ctl
-          coef_4_press_ctl             Ekman_number              -1.0
+          coef_4_press_ctl             Ek           -1.0
         end array coef_4_press_ctl
 !
         array coef_4_v_diffuse_ctl
-          coef_4_v_diffuse_ctl         One                        1.0
+          coef_4_v_diffuse_ctl         One           1.0
         end array coef_4_v_diffuse_ctl
 !
         array coef_4_thermal_buoyancy_ctl
-          coef_4_thermal_buoyancy_ctl  Radial_35                  1.0
-          coef_4_thermal_buoyancy_ctl  modified_Rayleigh_number   1.0
-          coef_4_thermal_buoyancy_ctl  Ekman_number              -1.0
+          coef_4_thermal_buoyancy_ctl  Radial_35     1.0
+          coef_4_thermal_buoyancy_ctl  modified_Ra   1.0
+          coef_4_thermal_buoyancy_ctl  Ek           -1.0
         end array coef_4_thermal_buoyancy_ctl
 !
         array coef_4_Coriolis_ctl
-          coef_4_Coriolis_ctl          Two                        1.0
-          coef_4_Coriolis_ctl          Ekman_number              -1.0
+          coef_4_Coriolis_ctl          Two           1.0
+          coef_4_Coriolis_ctl          Ek           -1.0
         end array coef_4_Coriolis_ctl
-!
-        array coef_4_Lorentz_ctl
-          coef_4_Lorentz_ctl           magnetic_Prandtl_number   -1.0
-          coef_4_Lorentz_ctl           Ekman_number              -1.0
-        end array coef_4_Lorentz_ctl
       end momentum
 !
-!
-      begin induction
-        array coef_4_magnetic_ctl
-          coef_4_magnetic_ctl          One                        1.0
-        end array coef_4_magnetic_ctl
-!
-        array coef_4_m_diffuse_ctl
-          coef_4_m_diffuse_ctl         magnetic_Prandtl_number   -1.0
-        end array coef_4_m_diffuse_ctl
-!
-        array coef_4_induction_ctl
-          coef_4_induction_ctl         One                       -1.0
-        end array coef_4_induction_ctl
-      end induction
     end coefficients_ctl
 !
 !!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
 !    ref_temperature_ctl: none           (No reference of temperature)
-!                         spherical_shell (for spherical shell model)
+!                         spherical_shell ( for spherical shell model)
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin temperature_define
 !      ref_temp_ctl     none
       ref_temp_ctl              spherical_shell
+!
       begin low_temp_ctl
         depth         1.5384615384615384
         temperature   0.0d0
       end low_temp_ctl
+!
       begin high_temp_ctl
         depth         0.5384615384615384
         temperature   1.0d0
       end high_temp_ctl
     end temperature_define
+!
   end model
 !
 !
@@ -237,15 +229,14 @@ begin MHD_control
   begin control
 !!!!!  information for sime integration
    begin time_step_ctl
-      elapsed_time_ctl      80000.
-      i_step_init_ctl           2
-      i_step_finish_ctl     3
+      elapsed_time_ctl      42500.
+      i_step_init_ctl            0
+      i_step_finish_ctl     100000
 !
-      i_step_check_ctl         1
-      i_step_rst_ctl         1
-      i_step_field_ctl          0
-      i_step_sectioning_ctl   1
-      i_step_isosurface_ctl   1
+      i_step_check_ctl         100
+      i_step_rst_ctl          5000
+      i_step_field_ctl       10000
+      i_step_sectioning_ctl   1000
 !
       dt_ctl              5.0e-5
       time_init_ctl       0.0e-8
@@ -253,64 +244,42 @@ begin MHD_control
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-      rst_ctl                dynamo_benchmark_1
-!      rst_ctl                start_from_rst_file
+       rst_ctl                dynamo_benchmark_0
     end restart_file_ctl
-!
 !!!!!!   method for time evolution
 !
     begin time_loop_ctl
-      scheme_ctl              Crank_Nicolson
       coef_imp_v_ctl          6.0e-1
       coef_imp_t_ctl          6.0e-1
-      coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
-!      Legendre_trans_loop_ctl   'outer_field_loop'
+      scheme_ctl              Crank_Nicolson
     end time_loop_ctl
   end control
-!
-!   Long_loop, outer_field_loop...broken...
-!                   ('inner_radial_loop', 'outer_radial_loop', 'long_loop',
-!                    'original_loop', 'outer_field_loop'
 !
   begin sph_monitor_ctl
     volume_average_prefix        'monitor/sph_ave_volume'
     volume_pwr_spectr_prefix     'monitor/sph_pwr_volume'
+    volume_pwr_spectr_format     'gzip'
 !
-    begin pickup_spectr_ctl
-      picked_sph_prefix     'monitor/picked_mode'
+    nusselt_number_prefix        'monitor/Nusselt'
+    nusselt_number_format        'gzip'
 !
-      array pick_layer_ctl
-        pick_layer_ctl    8
-        pick_layer_ctl   16
-      end array pick_layer_ctl
-!
-      array pick_sph_spectr_ctl
-        pick_sph_spectr_ctl   1   0
-        pick_sph_spectr_ctl   2   0
-      end array pick_sph_spectr_ctl
-    end pickup_spectr_ctl
-!
-    begin gauss_coefficient_ctl
-      gauss_coefs_prefix    'monitor/gauss_coefs'
-      gauss_coefs_radius_ctl    2.91
-!
-      array pick_gauss_coef_degree_ctl
-        pick_gauss_coef_degree_ctl   1
-      end array pick_gauss_coef_degree_ctl
-    end gauss_coefficient_ctl
+    begin dynamo_benchmark_data_ctl
+      dynamo_benchmark_file_prefix     'monitor/dynamobench'
+      dynamo_benchmark_file_format     'ASCII'
+      nphi_mid_eq_ctl                   512
+    end dynamo_benchmark_data_ctl
   end sph_monitor_ctl
 !
   begin visual_control
     array cross_section_ctl
-      file  cross_section_ctl   control_psf_CMB
-      file  cross_section_ctl   control_psf_eq 
-      file  cross_section_ctl   control_psf_z0.3
-      file  cross_section_ctl   control_psf_s0.55
+      file  cross_section_ctl   'controls/control_psf_mid_depth'
+      file  cross_section_ctl   'controls/control_psf_eq'
+      file  cross_section_ctl   'controls/control_psf_z0.3'
     end array cross_section_ctl
-!
-    array isosurface_ctl
-      file  isosurface_ctl      control_iso_temp
-    end array isosurface_ctl
   end  visual_control
+!
+  begin dynamo_vizs_control
+    file zonal_mean_section_ctl  'controls/control_psf_zm'
+  end dynamo_vizs_control
 end MHD_control
