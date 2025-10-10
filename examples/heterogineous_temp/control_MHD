@@ -130,7 +130,7 @@ begin MHD_control
 !
 !    define
 !     coef_4_termal_ctl:      time integration and advection of temp
-!     coef_4_velocity_ctl:    time integration and advection of temperature
+!     coef_4_velocity_ctl:    time integration and advection of velocity
 !     coef_4_magnetic_ctl:    time integration and advection of magnetic f.
 !     coef_4_t_diffuse_ctl:   coefficients for thermal diffusion
 !     coef_4_v_diffuse_ctl:   coefficients for viscous diffusion
