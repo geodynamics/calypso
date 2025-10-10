@@ -35,8 +35,10 @@
 !>        Structure for end time data
         type(finish_data) :: finish_d
 !
+!>        Flag for Initial field mode
+!!         See module m_initial_field_control
+        integer(kind=kint) :: iflag_restart_mode = 0
 !>        Flag for initial step to use Euler scheme
-!!        insted of Adams-BAshforth
         integer(kind=kint) :: iflag_initial_step = 0
 !
 !>        Increment for mean restart data
@@ -80,8 +82,8 @@
 !
 !  control for restert
 !
-      call set_initial_field_id                                         &
-     &   (mr_ctl%restart_flag_ctl, tctl, MHD_step%init_d%time)
+      call set_initial_field_id(mr_ctl%restart_flag_ctl, tctl,          &
+     &    MHD_step%init_d%time, MHD_step%iflag_restart_mode)
 !
         MHD_step%time_d%flag_flex_step = .FALSE.
         if(tctl%flexible_step_ctl%iflag .gt. 0                          &

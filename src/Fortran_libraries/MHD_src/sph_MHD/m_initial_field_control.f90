@@ -8,9 +8,11 @@
 !
 !!@verbatim
 !!      subroutine set_initial_field_id                                 &
-!!     &         (restart_flag_ctl, tctl, time_init)
+!!     &         (restart_flag_ctl, tctl, time_init, iflag_restart_mode)
 !!        type(time_data_control), intent(in) :: tctl
 !!        type(read_character_item), intent(in) :: restart_flag_ctl
+!!        real(kind = kreal), intent(inout) :: time_init
+!!        integer(kind = kint), intent(inout) :: iflag_restart_mode
 !!@endverbatim
 !
       module m_initial_field_control
@@ -79,10 +81,6 @@
 !>     Initial field for linear convection model
       integer(kind=kint), parameter :: i_rst_licv =  -20
 !
-!
-!>     flag for the initial field
-      integer(kind=kint) :: iflag_restart = i_rst_no_file
-!
       private :: No_restart, From_restart
       private :: dynamobench_0, dynamobench_1, dynamobench_2
       private :: pseudo_bench, kinematic, liear_cv
@@ -95,7 +93,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine set_initial_field_id                                   &
-     &         (restart_flag_ctl, tctl, time_init)
+     &         (restart_flag_ctl, tctl, time_init, iflag_restart_mode)
 !
       use calypso_mpi
       use m_error_IDs
@@ -108,6 +106,7 @@
       type(read_character_item), intent(in) :: restart_flag_ctl
 !
       real(kind = kreal), intent(inout) :: time_init
+      integer(kind = kint), intent(inout) :: iflag_restart_mode
 !
 !
       if(restart_flag_ctl%iflag .eq. 0) then
@@ -116,41 +115,41 @@
       else
         if(     cmp_no_case(restart_flag_ctl%charavalue, No_restart)    &
      &       .or. restart_flag_ctl%charavalue .eq. '0') then
-          iflag_restart = i_rst_no_file
+          iflag_restart_mode = i_rst_no_file
         else if(cmp_no_case(restart_flag_ctl%charavalue, From_restart)  &
      &       .or. restart_flag_ctl%charavalue .eq. '1') then
-          iflag_restart = i_rst_by_file
+          iflag_restart_mode = i_rst_by_file
         else if(cmp_no_case(restart_flag_ctl%charavalue, dynamobench_0) &
      &       .or. restart_flag_ctl%charavalue .eq. '-1') then
-          iflag_restart = i_rst_dbench0
+          iflag_restart_mode = i_rst_dbench0
         else if(cmp_no_case(restart_flag_ctl%charavalue, dynamobench_1) &
      &       .or. restart_flag_ctl%charavalue .eq. '-2') then
-          iflag_restart = i_rst_dbench1
+          iflag_restart_mode = i_rst_dbench1
         else if(cmp_no_case(restart_flag_ctl%charavalue, dynamobench_2) &
      &       .or. restart_flag_ctl%charavalue .eq. '-2') then
-          iflag_restart = i_rst_dbench2
+          iflag_restart_mode = i_rst_dbench2
         else if(cmp_no_case(restart_flag_ctl%charavalue, pseudo_bench)  &
      &       .or. restart_flag_ctl%charavalue .eq. '-3') then
-          iflag_restart = i_rst_dbench_qcv
+          iflag_restart_mode = i_rst_dbench_qcv
         else if(cmp_no_case(restart_flag_ctl%charavalue, rotate_x)      &
      &       .or. restart_flag_ctl%charavalue .eq. '-11') then
-          iflag_restart = i_rst_rotate_x
+          iflag_restart_mode = i_rst_rotate_x
         else if(cmp_no_case(restart_flag_ctl%charavalue, rotate_y)      &
      &       .or. restart_flag_ctl%charavalue .eq. '-12') then
-          iflag_restart = i_rst_rotate_y
+          iflag_restart_mode = i_rst_rotate_y
         else if(cmp_no_case(restart_flag_ctl%charavalue, rotate_z)      &
      &       .or. restart_flag_ctl%charavalue .eq. '-13') then
-          iflag_restart = i_rst_rotate_z
+          iflag_restart_mode = i_rst_rotate_z
         else if(cmp_no_case(restart_flag_ctl%charavalue, kinematic)     &
      &       .or. restart_flag_ctl%charavalue .eq. '20') then
-          iflag_restart = i_rst_kinematic
+          iflag_restart_mode = i_rst_kinematic
         else if(cmp_no_case(restart_flag_ctl%charavalue, liear_cv)      &
      &       .or. restart_flag_ctl%charavalue .eq. '-20') then
-          iflag_restart = i_rst_licv
+          iflag_restart_mode = i_rst_licv
         end if
       end if
 !
-      if (iflag_restart .eq. i_rst_no_file) then
+      if (iflag_restart_mode .eq. i_rst_no_file) then
         if (tctl%time_init_ctl%iflag .eq. 0) then
           e_message  = 'Set initial time'
           call calypso_MPI_abort(ierr_evo, e_message)
@@ -160,7 +159,7 @@
       end if
 !
       if (iflag_debug .ge. iflag_routine_msg) then
-        write(*,*) 'iflag_restart ',iflag_restart
+        write(*,*) 'iflag_restart_mode ',iflag_restart_mode
         write(*,*) 'time_init ',time_init
       end if
 !

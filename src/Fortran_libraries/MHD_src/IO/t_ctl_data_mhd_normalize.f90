@@ -47,7 +47,7 @@
 !!
 !!    define
 !!     coef_4_termal_ctl:      time integration and advection of temp
-!!     coef_4_velocity_ctl:    time integration and advection of temperature
+!!     coef_4_velocity_ctl:    time integration and advection of velocity
 !!     coef_4_magnetic_ctl:    time integration and advection of magnetic f.
 !!     coef_4_composition_ctl: time integration and advection of composition
 !!

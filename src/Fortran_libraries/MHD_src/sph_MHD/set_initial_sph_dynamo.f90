@@ -75,7 +75,7 @@
       type(field_IO), intent(inout) :: sph_fst_IO
 !
 !
-      if (iflag_restart .ne. i_rst_by_file) return
+      if (MHD_step%iflag_restart_mode .ne. i_rst_by_file) return
         if(iflag_debug .gt. 0) write(*,*) 'read_alloc_sph_restart_data'
         call read_alloc_sph_restart_data                                &
      &     (MHD_files%fst_file_IO, MHD_step%init_d, MHD_step%time_d,    &
@@ -121,23 +121,23 @@
       type(field_IO), intent(inout) :: sph_fst_IO
 !
 !
-      if (iflag_restart .eq. i_rst_by_file) return
+      if(MHD_step%iflag_restart_mode .eq. i_rst_by_file) return
 !
 !   for dynamo benchmark
-      if(     iflag_restart .eq. i_rst_dbench0                          &
-     &   .or. iflag_restart .eq. i_rst_dbench1                          &
-     &   .or. iflag_restart .eq. i_rst_dbench2                          &
-     &   .or. iflag_restart .eq. i_rst_dbench_qcv) then
-        call sph_initial_data_4_benchmarks(sph%sph_params, sph%sph_rj,  &
-     &                                     ipol, rj_fld)
+      if     (MHD_step%iflag_restart_mode .eq. i_rst_dbench0            &
+     &   .or. MHD_step%iflag_restart_mode .eq. i_rst_dbench1            &
+     &   .or. MHD_step%iflag_restart_mode .eq. i_rst_dbench2            &
+     &   .or. MHD_step%iflag_restart_mode .eq. i_rst_dbench_qcv) then
+        call sph_initial_data_4_benchmarks(MHD_step%iflag_restart_mode, &
+     &      sph%sph_params, sph%sph_rj, ipol, rj_fld)
 !
 !   set small seed magnetic field
-      else if (iflag_restart .eq. i_rst_no_file) then
+      else if(MHD_step%iflag_restart_mode .eq. i_rst_no_file) then
         call sph_initial_data_w_seed_B                                  &
      &     (SPH_model%refs, sph%sph_params, sph%sph_rj,                 &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc,                   &
      &      ipol, rj_fld)
-      else if (iflag_restart .eq. i_rst_licv) then
+      else if(MHD_step%iflag_restart_mode .eq. i_rst_licv) then
         call sph_initial_field_4_licv(SPH_model%refs,                   &
      &      sph%sph_params, sph%sph_rj,                                 &
      &      SPH_model%MHD_prop, ipol, rj_fld)
@@ -150,7 +150,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
       call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
 !
-      if (iflag_restart.ne.i_rst_by_file                                &
+      if (MHD_step%iflag_restart_mode.ne.i_rst_by_file                  &
      &     .and. MHD_step%init_d%i_time_step.eq.0) then
         if(iflag_debug .gt. 0) write(*,*) 'output_sph_restart_control'
         call output_sph_restart_control(MHD_step%init_d%i_time_step,    &
@@ -165,7 +165,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine sph_initial_data_4_benchmarks                          &
-     &         (sph_params, sph_rj, ipol, rj_fld)
+     &         (iflag_restart_mode, sph_params, sph_rj, ipol, rj_fld)
 !
       use m_machine_parameter
       use m_initial_field_control
@@ -179,6 +179,7 @@
       use set_initial_sph_scalars
       use calypso_mpi
 !
+      integer(kind = kint), intent(in) :: iflag_restart_mode
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_address), intent(in) :: ipol
@@ -217,7 +218,7 @@
      &        rj_fld%d_fld(1,ipol%base%i_light))
         end if
 !
-        if(iflag_restart .eq. i_rst_dbench1) then
+        if(iflag_restart_mode .eq. i_rst_dbench1) then
           if(ipol%base%i_magne .gt. 0) then
             call calypso_mpi_barrier
             if(iflag_debug.gt.0) write(*,*) 'initilal for magnetic'
@@ -226,7 +227,7 @@
      &          sph_params%nlayer_ICB, sph_params%nlayer_CMB,           &
      &          rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
           end if
-        else if(iflag_restart .eq. i_rst_dbench2) then
+        else if(iflag_restart_mode .eq. i_rst_dbench2) then
           if(ipol%base%i_magne .gt. 0) then
             call calypso_mpi_barrier
             if(iflag_debug.gt.0) write(*,*) 'initilal for magnetic'
@@ -234,7 +235,7 @@
      &          sph_params%nlayer_CMB, sph_params%radius_CMB,           &
      &          rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
           end if
-        else if(iflag_restart .eq. i_rst_dbench_qcv) then
+        else if(iflag_restart_mode .eq. i_rst_dbench_qcv) then
           if(ipol%base%i_magne .gt. 0) then
            call initial_b_dynamobench_qcv(sph_rj, ipol,                 &
      &         sph_params%radius_ICB, sph_params%radius_CMB,            &

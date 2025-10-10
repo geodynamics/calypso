@@ -18,7 +18,7 @@
 !!!!!!  boundary condition for temperature  !!!!!!!!!!!!!!!!!!!!!!!!
 !!  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_temperature   2
+!!      array bc_temperature
 !!        bc_temperature  fixed ICB  1.000
 !!        bc_temperature  fixed CMB  0.000
 !!      end array bc_temperature
@@ -31,7 +31,7 @@
 !!     free_slip_sph
 !!     specitial (you have to define the B.C. in source file)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_velocity  7
+!!      array bc_velocity
 !!        bc_velocity  fix_x  ICB     0.000
 !!        bc_velocity  fix_y  ICB     0.000
 !!        bc_velocity  fix_z  ICB     0.000
@@ -43,13 +43,13 @@
 !!!!!!  boundary condition for pressure  !!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_pressure  1
+!!      array bc_pressure
 !!        bc_pressure  fixed Press  0.000
 !!      end array bc_pressure
 !!!!!!  boundary condition for dummy scalar  !!!!!!!!!!!!!!!!!!!!!!!
 !!  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_composition  1
+!!      array bc_composition
 !!        bc_composition fixed  Press  0.000
 !!      end array bc_composition
 !!!!!!  boundary condition for magnetic field  !!!!!!!!!!!!!!!!!!!!!
@@ -59,7 +59,7 @@
 !!     insulator (not recommend)
 !!     sph
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_magnetic_field   2
+!!      array bc_magnetic_field
 !!        bc_magnetic_field  fix_x  equator     0.000
 !!        bc_magnetic_field  fix_y  equator     0.000
 !!        bc_magnetic_field  fix_x  infinity     0.000
@@ -69,7 +69,7 @@
 !!!!!!  boundary condition for magnetic potential  !!!!!!!!!!!!!!!!!
 !!  available type:  fixed, file, sph
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_electric_potential   3
+!!      array bc_electric_potential
 !!        bc_electric_potential fixed   Centre  0.000
 !!        bc_electric_potential fixed  infinity  0.000
 !!        bc_electric_potential fixed  equator   0.000
@@ -80,7 +80,7 @@
 !!     file_x, file_y, file_z
 !!     sph
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_vector_potential    6
+!!      array bc_vector_potential
 !!        bc_vector_potential fix_x   infinity  0.000
 !!        bc_vector_potential fix_y   infinity  0.000
 !!        bc_vector_potential fix_z   infinity  0.000
@@ -95,7 +95,7 @@
 !!     insulator (not recommend)
 !!     sph
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array bc_current   0
+!!      array bc_current
 !!        bc_current  fix_x  infinity     0.000
 !!        bc_current  fix_y  infinity     0.000
 !!        bc_current  fix_z  infinity     0.000
