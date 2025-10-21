@@ -22,12 +22,12 @@
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
-!!        type(phys_data), intent(in) :: rj_fld
 !!        type(scalar_property), intent(in) :: sc_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(reference_scalar_param), intent(inout) :: ref_param
 !!        type(phys_data), intent(inout) :: ref_field
+!!        type(phys_data), intent(inout) :: rj_fld
 !!        type(sph_scalar_boundary_data), intent(inout) :: bcs_S
 !!        logical, intent(inout) :: flag_write_ref
 !!@endverbatim
@@ -78,7 +78,6 @@
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
-!      type(phys_data), intent(in) :: rj_fld
       type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
@@ -87,6 +86,7 @@
       type(sph_radial_interpolate), intent(inout) :: r_itp
       type(field_IO), intent(inout) :: ref_fld_IO
       type(phys_data), intent(inout) :: ref_field
+!      type(phys_data), intent(inout) :: rj_fld
       type(sph_scalar_boundary_data), intent(inout) :: bcs_S
       logical, intent(inout) :: flag_write_ref
 !

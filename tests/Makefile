@@ -21,6 +21,7 @@ TARGET_PSF_2_VTK =           $(BUILDDIR)/utilities/section_to_VTK
 TARGET_COMPARE_PSF =         $(BUILDDIR)/tests/compare_psf
 TARGET_SPH_ENE_CHECK =       $(BUILDDIR)/tests/sph_ene_check
 TARGET_SPH_PICK_MODE_CHECK = $(BUILDDIR)/tests/sph_picked_mode_check
+TARGET_SPH_REF_CHECK =       $(BUILDDIR)/tests/sph_ref_field_check
 #
 TARGET_GAUSS_TEST =          $(BUILDDIR)/tests/gauss_points
 TARGET_CMP_GAUSS_TEST =      $(BUILDDIR)/tests/compare_gauss_points
@@ -88,11 +89,12 @@ test:
 	
 	@echo "# Test in Models directory..."
 	@cd Models; \
-		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
+		$(GMAKE) SRCDIR="$(SRCDIR)" BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_SPH_MHD="$(TARGET_SPH_MHD)" \
 		TARGET_SPH_SNAP="$(TARGET_SPH_SNAP)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \
 		TARGET_COMPARE_PSF="$(TARGET_COMPARE_PSF)" TARGET_PSF_2_VTK="$(TARGET_PSF_2_VTK)" \
 		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
+		TARGET_SPH_REF_CHECK="$(TARGET_SPH_REF_CHECK)" \
 		test
 	
 	@echo "# --------- Calypso tests finished! -------------------------"

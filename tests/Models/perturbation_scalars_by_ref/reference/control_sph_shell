@@ -1,0 +1,27 @@
+begin MHD_control
+!!!!! Define for files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!  num_subdomain_ctl: number of subdomains
+!  num_smp_ctl:       number of smp processes
+!
+!  mesh_file_head_ctl:  header of mesh file (Default: in.domain#)
+!
+!  sph_file_prefix:     prefix of spherical transfoem grid
+!  restart_file_prefix: prefix of restart file
+!                            (Default: restart/rst.step#.domain#)
+!  field_file_prefix:   prefix of snapshot field data
+!                            (Default: out.step#.domain#.udt)
+!
+!  field_file_fmt_ctl:  data format for field files
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  begin data_files_def
+    num_subdomain_ctl            1
+!
+    sph_file_prefix             'in'
+  end data_files_def
+!
+  file spherical_shell_ctl  'control_resolution'
+!
+end MHD_control

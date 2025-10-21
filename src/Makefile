@@ -12,11 +12,16 @@ MPIBINDIR = $(MPICHDIR)/bin
 MPIINCDIR = $(MPICHDIR)/include
 #
 #
+SRCDIR=
 MAKEDIR= 
 BUILDDIR= 
 MHDDIR =
+EXPDIR=         $(SRCDIR)/examples
+TESTDIR=        $(SRCDIR)/tests
 
-MAKENAME= $(MAKEDIR)/Makefile
+MAKENAME=       $(MAKEDIR)/Makefile
+EXP_MAKEHEAD=   $(EXPDIR)/Makefile.header
+TESTS_MAKEHEAD= $(TESTDIR)/Makefile.header
 
 #
 #   zlib and libpng settings
@@ -121,80 +126,35 @@ makemake:
 	
 	echo "# create module list"
 	$(GMAKE) \
-	GMAKE='$(GMAKE)' \
-	MHDDIR='$(MHDDIR)' \
-	MAKEDIR='$(MAKEDIR)' \
-	MAKENAME='$(MAKENAME)' \
-	CC="$(CC)"   \
-	MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
-	DEPFLAGS='$(DEPFLAGS)' \
-	OPTFLAGS='$(OPTFLAGS)' \
-	C_INCLUDE='$(C_INCLUDE)' \
-	depends
+		GMAKE='$(GMAKE)' \
+		MHDDIR='$(MHDDIR)' \
+		MAKEDIR='$(MAKEDIR)' \
+		MAKENAME='$(MAKENAME)' \
+		CC="$(CC)"   \
+		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
+		DEPFLAGS='$(DEPFLAGS)' \
+		OPTFLAGS='$(OPTFLAGS)' \
+		C_INCLUDE='$(C_INCLUDE)' \
+		depends
+	
+	echo '#' > $(TESTS_MAKEHEAD)
+	echo '# Makefile header for Calypso Dynamo tests' >> $(TESTS_MAKEHEAD)
+	echo '#' >> $(TESTS_MAKEHEAD)
+	$(GMAKE) makeheaders \
+		MAKENAME="$(TESTS_MAKEHEAD)"
+	
+	echo '#' > $(EXP_MAKEHEAD)
+	echo '# Makefile header for Calypso Dynamo example' >> $(EXP_MAKEHEAD)
+	echo '#' >> $(EXP_MAKEHEAD)
+	$(GMAKE) makeheaders \
+		MAKENAME="$(EXP_MAKEHEAD)"
 	
 	echo '#' > $(MAKENAME)
-	echo '# Makefile for Kemono Dynamo simulation' >> $(MAKENAME)
+	echo '# Makefile for Calypso Dynamo simulation package' >> $(MAKENAME)
 	echo '#' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'SHELL = /bin/sh' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '#  all:         compile programs for simulations' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# Compiler commands' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo CC=$(CC)               >> $(MAKENAME)
-	@echo F90=$(MPIF90)          >> $(MAKENAME)
-	@echo AR=$(AR)               >> $(MAKENAME)
-	@echo RANLIB=$(RANLIB) >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# Compiler options' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'F90OPTFLAGS = $(F90OPTFLAGS) $(OPENMP_FCFLAGS)  $$(F_INCLUDE)' >> $(MAKENAME)
-	@echo 'F90CPPFLAGS = $(FORTRAN_C_CONNECT)'          >> $(MAKENAME)
-	@echo 'OPTFLAGS = $(OPTFLAGS) $(OPENMP_CFLAGS) $(COCOA_FLAG)' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# Libralies and includes settting' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
-	@echo 'F90LIBS =   $(F90LIBS)'   >> $(MAKENAME)
-	@echo 'F_INCLUDE = $(F_INCLUDE)' >> $(MAKENAME)
-	@echo 'C_INCLUDE = $(C_INCLUDE)' >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# zlib settings' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'ZLIB_CFLAGS = $(ZLIB_CFLAGS)' >> $(MAKENAME)
-	@echo 'ZLIB_LIBS =   $(ZLIB_LIBS)'   >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# BLAS settings' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'BLAS_LIBS =   $(BLAS_LIBS)'   >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# FFTW3 settings' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'FFTW3_CFLAGS =   $(FFTW3_CFLAGS)'                  >> $(MAKENAME)
-	@echo 'FFTW3_LIBS =     $(FFTW3_LIBS)'                    >> $(MAKENAME)
-	@echo 'FFTW3_OMP_LIBS = $(FFTW3_OMP_LIBS)'                >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# HDF5 settings' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'HDF5_FFLAGS = $(HDF5_FFLAGS)'    >> $(MAKENAME)
-	@echo 'HDF5_LDFLAGS = $(HDF5_LDFLAGS)'  >> $(MAKENAME)
-	@echo 'HDF5_FLIBS = $(HDF5_FLIBS)'      >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
-	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# Directory lists' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo SRCDIR =   $(SRCDIR)  >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo MAKEDIR =  $(MAKEDIR)  >> $(MAKENAME)
-	@echo BUILDDIR = $(BUILDDIR) >> $(MAKENAME)
-	@echo MHDDIR =   $(MHDDIR)   >> $(MAKENAME)
-	@echo INSTDIR =  $(INSTDIR)  >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	>> $(MAKENAME)
+	$(GMAKE) makeheaders \
+		MAKENAME="$(MAKENAME)"
+	
 	@echo '#' >> $(MAKENAME)
 	@echo 'create directory list...'
 	@for dir in $(SUBDIRS) ; do \
@@ -298,9 +258,79 @@ makemake:
 	@echo '#' >> $(MAKENAME)
 	cat $(MAKENAME).depends >> $(MAKENAME)
 	rm -f $(MAKEDIR)/Makefile.depends
+	
+	$(GMAKE) makeinstall \
+		MAKENAME="$(MAKENAME)"
+	$(GMAKE) makeclean \
+		MAKENAME="$(MAKENAME)"
+
+makeheaders:
 	@echo '#' >> $(MAKENAME)
-	@echo '# Rules for install' >> $(MAKENAME)
+	@echo 'SHELL = /bin/sh' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
+	@echo '#  all:         compile programs for simulations' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# Compiler commands' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo CC=$(CC)               >> $(MAKENAME)
+	@echo F90=$(MPIF90)          >> $(MAKENAME)
+	@echo AR=$(AR)               >> $(MAKENAME)
+	@echo RANLIB=$(RANLIB) >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# Compiler options' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'F90OPTFLAGS = $(F90OPTFLAGS) $(OPENMP_FCFLAGS)  $$(F_INCLUDE)' >> $(MAKENAME)
+	@echo 'F90CPPFLAGS = $(FORTRAN_C_CONNECT)'          >> $(MAKENAME)
+	@echo 'OPTFLAGS = $(OPTFLAGS) $(OPENMP_CFLAGS) $(COCOA_FLAG)' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# Libralies and includes settting' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	@echo 'F90LIBS =   $(F90LIBS)'   >> $(MAKENAME)
+	@echo 'F_INCLUDE = $(F_INCLUDE)' >> $(MAKENAME)
+	@echo 'C_INCLUDE = $(C_INCLUDE)' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# zlib settings' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'ZLIB_CFLAGS = $(ZLIB_CFLAGS)' >> $(MAKENAME)
+	@echo 'ZLIB_LIBS =   $(ZLIB_LIBS)'   >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# BLAS settings' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'BLAS_LIBS =   $(BLAS_LIBS)'   >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# FFTW3 settings' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'FFTW3_CFLAGS =   $(FFTW3_CFLAGS)'                  >> $(MAKENAME)
+	@echo 'FFTW3_LIBS =     $(FFTW3_LIBS)'                    >> $(MAKENAME)
+	@echo 'FFTW3_OMP_LIBS = $(FFTW3_OMP_LIBS)'                >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# HDF5 settings' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'HDF5_FFLAGS = $(HDF5_FFLAGS)'    >> $(MAKENAME)
+	@echo 'HDF5_LDFLAGS = $(HDF5_LDFLAGS)'  >> $(MAKENAME)
+	@echo 'HDF5_FLIBS = $(HDF5_FLIBS)'      >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# Directory lists' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo SRCDIR =   $(SRCDIR)  >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo MAKEDIR =  $(MAKEDIR)  >> $(MAKENAME)
+	@echo BUILDDIR = $(BUILDDIR) >> $(MAKENAME)
+	@echo MHDDIR =   $(MHDDIR)   >> $(MAKENAME)
+	@echo INSTDIR =  $(INSTDIR)  >> $(MAKENAME)
+	@echo EXPDIR =   $(EXPDIR)  >> $(MAKENAME)
+	@echo TESTDIR =  $(TESTDIR)  >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+
+
+makeinstall:
+	@echo '#' >> $(MAKENAME)
+	@echo '# ---  Rules for install  -------------------------------------' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo 'install:' >> $(MAKENAME)
 	@echo '	mkdir -p $$(INSTDIR)'              >> $(MAKENAME)
@@ -308,7 +338,12 @@ makemake:
 	@echo '	mkdir -p $$(INSTDIR)/bin'          >> $(MAKENAME)
 	@echo '	mkdir -p $$(INSTDIR)/include'      >> $(MAKENAME)
 	@echo '	cp $(BUILDDIR)/*  $$(INSTDIR)/bin' >> $(MAKENAME)
-	@echo ''       >> $(MAKENAME)
+	
+
+makeclean:
+	@echo '#' >> $(MAKENAME)
+	@echo '# --  Cleans  ----------------------------------' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
 	@echo 'clean:' >> $(MAKENAME)
 	@echo '	@rm -f m_*.o ;'     >> $(MAKENAME)
 	@echo '	@rm -f m_*.mod ;'   >> $(MAKENAME)

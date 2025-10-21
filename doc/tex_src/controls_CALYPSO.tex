@@ -3,7 +3,9 @@
 
 \subsection{Block {\tt data\_files\_def}}
 \label{href_t:data_files_def}
-File names and number of processes and threads are defined in this block. \\
+File names and number of processes and threads are defined in this block. 
+
+See \verb|t_ctl_data_4_platforms.f90| and \verb|ctl_data_platforms_IO.f90|.\\
 \hyperref[href_i:MHD_control]{(Back to {\tt control\_MHD})} \\
 \hyperref[href_i:spherical_shell_ctl]{(Back to {\tt control\_sph\_shell})} \\
 \hyperref[href_i:assemble_control]{(Back to {\tt control\_assemble\_sph})}
@@ -1035,16 +1037,29 @@ File format for mean square spectrum data averaged over the fluid shell. The fol
 \end{description}
 %
 
-\paragraph{\tt nusselt\_number\_prefix}
+\paragraph{{\tt nusselt\_number\_prefix} \\
+or {\tt thermal\_nusselt\_number\_prefix}}
 \label{href_t:nusselt_number_prefix}
 \verb|[nusselt_number_prefix]| \\
-File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, Nusselt number data file is not generated. \\
-{\bf CAUTION: Nusselt number is not evaluated if heat source exsists.}
+File prefix for thermal Nusselt number data at ICB and CMB \verb|[file_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, Nusselt number data file is not generated. \\
+{\bf CAUTION: Nusselt number is not evaluated if heat source exists.}
 
-\paragraph{\tt nusselt\_number\_format}
+\paragraph{{\tt nusselt\_number\_format} \\ 
+or {\tt thermal\_nusselt\_number\_format}}
 \label{href_t:nusselt_number_format}
 \verb|[file_format]| \\
-File format for Nusselt number data \verb|[nusselt_number_prefix].dat|. If \verb|[file_format]| is \verb|gzip|, Nusselt number data is compressed by zlib.  If the Nusselt number data file exist, this setting is ignored and append data in the existing file.
+File format for thermal Nusselt number data \verb|[file_prefix].dat|. If \verb|[file_format]| is \verb|gzip|, Nusselt number data is compressed by zlib.  If the Nusselt number data file exist, this setting is ignored and append data in the existing file.
+
+\paragraph{\tt comp\_nusselt\_number\_prefix}
+\label{href_t:comp_nusselt_number_prefix}
+\verb|[nusselt_number_prefix]| \\
+File prefix for compositionalNusselt number data at ICB and CMB \verb|[file_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, Nusselt number data file is not generated. \\
+{\bf CAUTION: Nusselt number is not evaluated if composition source exists.}
+
+\paragraph{\tt comp\_nusselt\_number\_format}
+\label{href_t:comp_nusselt_number_format}
+\verb|[file_format]| \\
+File format for compositional Nusselt number data \verb|[file_prefix].dat|. If \verb|[file_format]| is \verb|gzip|, Nusselt number data is compressed by zlib.  If the Nusselt number data file exist, this setting is ignored and append data in the existing file.
 
 %
 \subsubsection{\tt volume\_spectrum\_ctl}

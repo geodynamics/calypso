@@ -245,7 +245,7 @@ begin MHD_control
 !
 !
   begin control
-!!!!!  information for sime integration
+!!!!!  information for time integration
    begin time_step_ctl
       elapsed_time_ctl      80000.
       i_step_init_ctl           0

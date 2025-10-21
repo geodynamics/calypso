@@ -17,6 +17,7 @@ TARGET_PSF_2_VTK =           $(BUILDDIR)/utilities/section_to_VTK
 TARGET_COMPARE_PSF =         $(BUILDDIR)/tests/compare_psf
 TARGET_SPH_ENE_CHECK =       $(BUILDDIR)/tests/sph_ene_check
 TARGET_SPH_PICK_MODE_CHECK = $(BUILDDIR)/tests/sph_picked_mode_check
+TARGET_SPH_REF_CHECK =       $(BUILDDIR)/tests/sph_ref_field_check
 #
 #  -------------------------------------------------------------------------
 #
@@ -32,6 +33,26 @@ test:
 		TARGET_COMPARE_PSF="$(TARGET_COMPARE_PSF)" TARGET_PSF_2_VTK="$(TARGET_PSF_2_VTK)" \
 		test
 	
+	@echo "# Test in static_heat_source_by_rst directory..."
+	cd static_heat_source_by_rst; \
+		$(GMAKE) SRCDIR="$(SRCDIR)" MPIRUN="$(MPIRUN)" \
+		TARGET_SPH_MHD="$(TARGET_SPH_MHD)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \
+		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
+		test
+	@echo "# Test in static_heat_source_by_ref directory..."
+	cd static_heat_source_by_ref; \
+		$(GMAKE) SRCDIR="$(SRCDIR)" MPIRUN="$(MPIRUN)" \
+		TARGET_SPH_MHD="$(TARGET_SPH_MHD)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \
+		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
+		test
+	
+	@echo "# Test in perturbation_scalars_by_ref directory..."
+	cd perturbation_scalars_by_ref; \
+		$(GMAKE) SRCDIR="$(SRCDIR)" MPIRUN="$(MPIRUN)" \
+		TARGET_SPH_MHD="$(TARGET_SPH_MHD)" TARGET_SPH_REF_CHECK="$(TARGET_SPH_REF_CHECK)" \
+		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
+		test
+	
 	@echo "# Test in heterogineous_temp_static directory..."
 	cd heterogineous_temp_static; \
 		$(GMAKE) MPIRUN="$(MPIRUN)" \
@@ -45,12 +66,20 @@ test:
 		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
 		test
 	
-	rm -f *.o *.mod *~
+	@rm -f *.o *.mod *~
+	@echo 'Tests in Model folder are finished'
+
 
 clean:
 	cd eq_symmetry_fields; make clean
-	cd heterogineous_temp_static; make clean
-	cd heterogineous_temp_evolve; make clean
+	
+	cd static_heat_source_by_rst;   make clean
+	cd static_heat_source_by_ref;   make clean
+	
+	cd perturbation_scalars_by_ref; make clean
+	
+	cd heterogineous_temp_static;   make clean
+	cd heterogineous_temp_evolve;   make clean
 	
 	rm -f *.o *.mod *~
 

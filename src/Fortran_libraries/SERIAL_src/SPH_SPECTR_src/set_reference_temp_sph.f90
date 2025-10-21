@@ -20,8 +20,7 @@
 !!     &         reftemp_r, refgrad_r)
 !!
 !!      subroutine set_reftemp_4_sph(idx_rj_degree_zero, inod_rj_center,&
-!!     &          nnod_rj, nidx_rj, reftemp_r, refgrad_r,               &
-!!     &          reference_rj, ref_grad_rj)
+!!     &          nnod_rj, nidx_rj, reftemp_r, reference_rj)
 !!***********************************************************************
 !!*
 !!*     ref_temp(k,0) : reference of temperature  (output)
@@ -182,18 +181,17 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_reftemp_4_sph(idx_rj_degree_zero, inod_rj_center,  &
-     &          nnod_rj, nidx_rj, reftemp_r, refgrad_r,                 &
-     &          reference_rj, ref_grad_rj)
+     &          nnod_rj, nidx_rj, reftemp_r, reference_rj)
 !
       integer(kind = kint), intent(in) ::  nnod_rj
       integer(kind = kint), intent(in) ::  nidx_rj(2)
       integer(kind = kint), intent(in) ::  idx_rj_degree_zero
       integer(kind = kint), intent(in) ::  inod_rj_center
       real(kind=kreal), intent(in) :: reftemp_r(0:nidx_rj(1))
-      real(kind=kreal), intent(in) :: refgrad_r(0:nidx_rj(1))
+!      real(kind=kreal), intent(in) :: refgrad_r(0:nidx_rj(1))
 !
       real (kind=kreal), intent(inout) :: reference_rj(nnod_rj)
-      real (kind=kreal), intent(inout) :: ref_grad_rj(nnod_rj,3)
+!      real (kind=kreal), intent(inout) :: ref_grad_rj(nnod_rj,3)
 !
       integer(kind = kint) ::  kk, inod
 !
@@ -203,7 +201,7 @@
       do kk = 1, nidx_rj(1)
         inod = idx_rj_degree_zero + (kk-1) * nidx_rj(2)
         reference_rj(inod) =  reftemp_r(kk)
-        ref_grad_rj(inod,1) = refgrad_r(kk)
+!        ref_grad_rj(inod,1) = refgrad_r(kk)
       end do
 !
       if(inod_rj_center .gt. 0) then

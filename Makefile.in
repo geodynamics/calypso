@@ -88,6 +88,7 @@ makemake: $(MAKE_MOD_DEP)
 	cd $(MHDDIR) ; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
+		SRCDIR="$(SRCDIR)" \
 		MAKEDIR="$(MAKEDIR)" \
 		BUILDDIR="$(BUILDDIR)" \
 		INSTDIR="$(INSTDIR)" \

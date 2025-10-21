@@ -42,7 +42,7 @@ test:
 		echo 'Failed sectioning data check'; \
 		exit 1;\
 	fi
-	@echo 'Equatorially symmetric field check finished'
+	@echo 'Equatorially symmetric field check is finished'
 
 
 clean:
