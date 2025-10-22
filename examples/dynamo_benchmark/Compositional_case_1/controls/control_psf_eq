@@ -28,7 +28,7 @@ begin cross_section_ctl
 !
   begin output_field_define
     array output_field
-      output_field  composition           scalar
+      output_field  temperature           scalar
       output_field  velocity              vector
       output_field  velocity              radial     
       output_field  velocity              phi   

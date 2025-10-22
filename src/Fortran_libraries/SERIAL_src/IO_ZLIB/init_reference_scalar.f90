@@ -97,6 +97,7 @@
       if (ref_param%iflag_reference .ne. id_sphere_ref_temp             &
      & .and. ref_param%iflag_reference .ne. id_takepiro_temp            &
      & .and. ref_param%iflag_reference .ne. id_numerical_solution       &
+     & .and. ref_param%iflag_reference .ne. id_ref_field_file           &
      &    ) return
       flag_write_ref = .TRUE.
 !
@@ -138,6 +139,8 @@
      &     (sph_rj, r_2nd, sph_bc_S, bcs_S, fdm2_center,                &
      &      ref_field%d_fld(1,iref_scalar),                             &
      &      ref_field%d_fld(1,iref_grad))
+        call const_reference_source(sph_rj, sc_prop, band_s00_poisson,  &
+     &      iref_scalar, iref_source, ref_field)
         call dealloc_band_matrix(band_s00_poisson)
       else
         call no_ref_temp_sph_mhd(sph_rj%nidx_rj(1),                     &

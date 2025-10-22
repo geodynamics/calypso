@@ -26,7 +26,7 @@ begin cross_section_ctl
     array output_field
       output_field  magnetic_field        spherical_vector
       output_field  velocity              spherical_vector
-      output_field  composition           scalar
+      output_field  temperature           scalar
     end array output_field
   end output_field_define
 end cross_section_ctl

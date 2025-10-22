@@ -1,5 +1,6 @@
 !-----------------------------------------------------------------------
 !     Example using dynamo benchmark test Case 1
+!      using compostional buoyancy instead of thermal buoyancy
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !

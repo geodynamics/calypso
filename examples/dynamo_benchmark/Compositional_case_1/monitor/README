@@ -1,5 +1,6 @@
 !-----------------------------------------------------------------------
 !     Example using dynamo benchmark test Case 1
+!      using compostional buoyancy instead of thermal buoyancy
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
@@ -7,7 +8,7 @@
 The following files are stored:
 
 README:                     This file     
-monitor/Nusselt.dat.gz             Time series of the Nusselt number
+monitor/comp_Nusselt.dat.gz        Time series of the compositional Nusselt number
 monitor/dynamobench.dat:           Time series of the Dynamo benchmark results
 monitor/gauss_coefs.dat.gz:        Gauss coefficients at r = 2.91
 monitor/picked_mode_l1_m0c.dat.gz: Y_1^0 component of spherical harmonics coefficients

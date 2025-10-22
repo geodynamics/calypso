@@ -19,6 +19,7 @@ TARGET_SPH_ENE_CHECK =       $(BUILDDIR)/tests/sph_ene_check
 TARGET_SPH_PICK_MODE_CHECK = $(BUILDDIR)/tests/sph_picked_mode_check
 TARGET_SPH_REF_CHECK =       $(BUILDDIR)/tests/sph_ref_field_check
 #
+
 #  -------------------------------------------------------------------------
 #
 
@@ -52,7 +53,13 @@ test:
 		TARGET_SPH_MHD="$(TARGET_SPH_MHD)" TARGET_SPH_REF_CHECK="$(TARGET_SPH_REF_CHECK)" \
 		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
 		test
-	
+	@echo "# Test in perturbation_scalars_by_file directory..."
+	cd perturbation_scalars_by_file; \
+		$(GMAKE) SRCDIR="$(SRCDIR)" MPIRUN="$(MPIRUN)" \
+		TARGET_SPH_MHD="$(TARGET_SPH_MHD)" TARGET_SPH_REF_CHECK="$(TARGET_SPH_REF_CHECK)" \
+		TARGET_SPH_PICK_MODE_CHECK="$(TARGET_SPH_PICK_MODE_CHECK)" \
+		test
+
 	@echo "# Test in heterogineous_temp_static directory..."
 	cd heterogineous_temp_static; \
 		$(GMAKE) MPIRUN="$(MPIRUN)" \
@@ -73,13 +80,14 @@ test:
 clean:
 	cd eq_symmetry_fields; make clean
 	
-	cd static_heat_source_by_rst;   make clean
-	cd static_heat_source_by_ref;   make clean
+	cd static_heat_source_by_rst;    make clean
+	cd static_heat_source_by_ref;    make clean
 	
-	cd perturbation_scalars_by_ref; make clean
-	
-	cd heterogineous_temp_static;   make clean
-	cd heterogineous_temp_evolve;   make clean
+	cd perturbation_scalars_by_ref;  make clean
+	cd perturbation_scalars_by_file; make clean
+
+	cd heterogineous_temp_static;    make clean
+	cd heterogineous_temp_evolve;    make clean
 	
 	rm -f *.o *.mod *~
 

@@ -19,8 +19,8 @@ begin MHD_control
   begin data_files_def
     debug_flag_ctl            'Off'
 !
-    num_subdomain_ctl            6
-    num_smp_ctl                  4
+    num_subdomain_ctl            24
+    num_smp_ctl                   4
 !
     restart_file_prefix         'rst_6/rst'
     field_file_prefix           'field/out'
@@ -100,11 +100,6 @@ begin MHD_control
 !!!!!  setting for boundary condition
 !
     begin boundary_condition
-      array bc_temperature
-        bc_temperature  fixed ICB  1.000
-        bc_temperature  fixed CMB  0.000
-      end array bc_temperature
-!
       array bc_velocity
         bc_velocity  non_slip_sph  ICB   0.000
         bc_velocity  non_slip_sph  CMB   0.000
@@ -114,6 +109,11 @@ begin MHD_control
         bc_magnetic_field  insulator  ICB  0.000
         bc_magnetic_field  insulator  CMB  0.000
       end array bc_magnetic_field
+!
+	  array bc_composition
+        bc_composition  fixed ICB  1.000
+        bc_composition  fixed CMB  0.000
+      end array bc_composition
     end boundary_condition
 !
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -122,7 +122,7 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin forces_define
       array force_ctl
-        force_ctl   Thermal_buoyancy
+        force_ctl   Compositional_buoyancy
         force_ctl   Coriolis
         force_ctl   Lorentz
       end array force_ctl
@@ -137,8 +137,8 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
       array dimless_ctl
-        dimless_ctl  Prandtl_number                   1.0e-0
-        dimless_ctl  modified_Rayleigh_number         1.0E+2
+        dimless_ctl  comp_Pr                          1.0e-0
+        dimless_ctl  comp_Ram                         1.0E+2
         dimless_ctl  Ekman_number                     1.0e-3
         dimless_ctl  magnetic_Prandtl_number          5.0e+0
       end array dimless_ctl
@@ -169,17 +169,6 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
     begin coefficients_ctl
-      begin thermal
-        array coef_4_termal_ctl
-          coef_4_termal_ctl            One                        1.0
-        end array coef_4_termal_ctl
-!
-        array coef_4_t_diffuse_ctl
-          coef_4_t_diffuse_ctl         Prandtl_number            -1.0
-        end array coef_4_t_diffuse_ctl
-      end thermal
-!
-!
       begin momentum
         array coef_4_velocity_ctl
           coef_4_velocity_ctl          One                        1.0
@@ -193,11 +182,11 @@ begin MHD_control
           coef_4_v_diffuse_ctl         One                        1.0
         end array coef_4_v_diffuse_ctl
 !
-        array coef_4_thermal_buoyancy_ctl
-          coef_4_thermal_buoyancy_ctl  Radial_35                  1.0
-          coef_4_thermal_buoyancy_ctl  modified_Rayleigh_number   1.0
-          coef_4_thermal_buoyancy_ctl  Ekman_number              -1.0
-        end array coef_4_thermal_buoyancy_ctl
+        array coef_4_composit_buoyancy_ctl
+          coef_4_composit_buoyancy_ctl Radial_35                  1.0
+          coef_4_composit_buoyancy_ctl comp_Ram                   1.0
+          coef_4_composit_buoyancy_ctl Ekman_number              -1.0
+        end array coef_4_composit_buoyancy_ctl
 !
         array coef_4_Coriolis_ctl
           coef_4_Coriolis_ctl          Two                        1.0
@@ -224,6 +213,16 @@ begin MHD_control
           coef_4_induction_ctl         One                       -1.0
         end array coef_4_induction_ctl
       end induction
+!
+	  begin composition
+        array coef_4_composition_ctl
+           coef_4_composition_ctl      One                        1.0
+        end array coef_4_composition_ctl
+!
+        array coef_4_c_diffuse_ctl
+          coef_4_c_diffuse_ctl         comp_Pr                   -1.0
+        end array coef_4_c_diffuse_ctl
+      end composition
     end coefficients_ctl
 !
 !!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -232,24 +231,24 @@ begin MHD_control
 !                         spherical_shell (for spherical shell model)
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    begin temperature_define
-!      ref_temp_ctl     none
-      ref_temp_ctl              spherical_shell
-      begin low_temp_ctl
+    begin composition_define
+!      ref_comp_ctl     none
+      ref_comp_ctl              spherical_shell
+      begin low_comp_ctl
         depth         1.5384615384615384
-        temperature   0.0d0
-      end low_temp_ctl
-      begin high_temp_ctl
+        composition   0.0d0
+      end low_comp_ctl
+      begin high_comp_ctl
         depth         0.5384615384615384
-        temperature   1.0d0
-      end high_temp_ctl
-    end temperature_define
+        composition   1.0d0
+      end high_comp_ctl
+    end composition_define
   end model
 !
 !
 !
   begin control
-!!!!!  information for sime integration
+!!!!!  information for time integration
    begin time_step_ctl
       elapsed_time_ctl      80000.
       i_step_init_ctl           0
@@ -276,7 +275,7 @@ begin MHD_control
     begin time_loop_ctl
       scheme_ctl              Crank_Nicolson
       coef_imp_v_ctl          6.0e-1
-      coef_imp_t_ctl          6.0e-1
+      coef_imp_c_ctl          6.0e-1
       coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
     end time_loop_ctl
@@ -288,8 +287,8 @@ begin sph_monitor_ctl
     volume_pwr_spectr_prefix     'monitor/sph_pwr_volume'
     volume_pwr_spectr_format     'gzip'
 !
-    nusselt_number_prefix        'monitor/Nusselt'
-    nusselt_number_format        'gzip'
+    comp_Nusselt_number_prefix        'monitor/Nusselt'
+    comp_Nusselt_number_format        'gzip'
 !
     begin layered_spectrum_ctl
       layered_pwr_spectr_prefix    'monitor/sph_pwr_layer'
@@ -344,7 +343,7 @@ begin sph_monitor_ctl
     end array cross_section_ctl
 !
     array isosurface_ctl
-      file  isosurface_ctl      'controls/control_iso_temp'
+      file  isosurface_ctl      'controls/control_iso_comp'
     end array isosurface_ctl
   end  visual_control
 !

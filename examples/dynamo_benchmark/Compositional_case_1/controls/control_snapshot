@@ -74,14 +74,14 @@ begin MHD_control
     begin phys_values_ctl
       array nod_value_ctl
         nod_value_ctl  velocity                Viz_On   Monitor_On
-        nod_value_ctl  composition             Viz_On   Monitor_On
+        nod_value_ctl  temperature             Viz_On   Monitor_On
         nod_value_ctl  pressure                Viz_On   Monitor_On
         nod_value_ctl  vorticity               Viz_On   Monitor_On
         nod_value_ctl  magnetic_field          Viz_On   Monitor_On
         nod_value_ctl  current_density         Viz_On   Monitor_On
 !
         nod_value_ctl  Lorentz_work             Viz_On   Monitor_On
-        nod_value_ctl  composite_buoyancy_flux  Viz_On   Monitor_On
+        nod_value_ctl  thermal_buoyancy_flux    Viz_On   Monitor_On
       end array nod_value_ctl
     end phys_values_ctl
 !
@@ -91,7 +91,7 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin time_evolution_ctl
       array time_evo_ctl
-        time_evo_ctl  composition
+        time_evo_ctl  temperature
         time_evo_ctl  velocity
         time_evo_ctl  magnetic_field
       end array time_evo_ctl
@@ -233,14 +233,23 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin temperature_define
-      ref_temp_ctl     none
+!      ref_temp_ctl     none
+      ref_temp_ctl              spherical_shell
+      begin low_temp_ctl
+        depth         1.5384615384615384
+        temperature   0.0d0
+      end low_temp_ctl
+      begin high_temp_ctl
+        depth         0.5384615384615384
+        temperature   1.0d0
+      end high_temp_ctl
     end temperature_define
   end model
 !
 !
 !
   begin control
-!!!!!  information for sime integration
+!!!!!  information for time integration
    begin time_step_ctl
       elapsed_time_ctl      80000.
       i_step_init_ctl           0

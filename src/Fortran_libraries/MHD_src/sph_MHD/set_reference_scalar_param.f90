@@ -131,6 +131,7 @@
      &               ref_param%ref_file_IO%file_prefix, ' is missing.'
             call calypso_mpi_abort(ierr_file, e_message)
           end if
+          ref_param%ref_file_IO%iflag_IO = 1
         end if
       end if
 !
