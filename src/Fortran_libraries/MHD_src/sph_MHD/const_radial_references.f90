@@ -25,6 +25,14 @@
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(band_matrix_type), intent(in) :: band_s00_poisson
+!!      subroutine const_reference_source(sph_rj, sc_prop,              &
+!!     &          band_s00_poisson, iref_scalar, iref_source, ref_field)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(scalar_property), intent(in) :: sc_prop
+!!        type(band_matrix_type), intent(in) :: band_s00_poisson
+!!        integer(kind = kint), intent(in) :: iref_scalar
+!!        integer(kind = kint), intent(in) :: iref_source
+!!        type(phys_data), intent(inout) :: ref_field
 !!@endverbatim
       module const_radial_references
 !
@@ -142,6 +150,55 @@
 !
       end subroutine const_diffusive_profile_fix_bc
 !
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine const_reference_source(sph_rj, sc_prop,                &
+     &          band_s00_poisson, iref_scalar, iref_source, ref_field)
+!
+      use calypso_mpi
+      use calypso_mpi_real
+      use const_diffusive_profile
+!
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(scalar_property), intent(in) :: sc_prop
+      type(band_matrix_type), intent(in) :: band_s00_poisson
+!
+      integer(kind = kint), intent(in) :: iref_scalar
+      integer(kind = kint), intent(in) :: iref_source
+!
+      type(phys_data), intent(inout) :: ref_field
+!
+      real(kind = kreal), allocatable :: ref_local(:)
+      integer(kind = kint_gl) :: num64
+!
+!
+      allocate(ref_local(0:sph_rj%nidx_rj(1)))
+!$omp parallel workshare
+      ref_local(0:sph_rj%nidx_rj(1)) = 0.0d0
+!$omp end parallel workshare
+!
+      if(iref_source*iref_scalar .le. 0) return
+      if(sph_rj%idx_rj_degree_zero .gt. 0) then
+        if(iref_source .gt. 0) then
+          call cal_reference_source(sph_rj, band_s00_poisson,           &
+     &        ref_field%d_fld(1,iref_scalar), ref_local)
+!
+!$omp parallel workshare
+          ref_local(0:sph_rj%nidx_rj(1))                                &
+     &                  = ref_local(0:sph_rj%nidx_rj(1))                &
+     &                   * (sc_prop%coef_diffuse / sc_prop%coef_source)
+!$omp end parallel workshare
+        end if
+      end if
+!
+      num64 = sph_rj%nidx_rj(1) + 1
+      call calypso_mpi_allreduce_real                                   &
+     &   (ref_local(0), ref_field%d_fld(1,iref_source), num64, MPI_SUM)
+      deallocate(ref_local)
+!
+      end subroutine const_reference_source
+
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !

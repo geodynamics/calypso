@@ -134,38 +134,33 @@
         end if
       end if
 !
-      iflag = low_temp_ctl%depth%iflag*low_temp_ctl%value%iflag
-      if (iflag .eq. 0) then
-        if(   ref_param%iflag_reference .eq. id_no_ref_temp             &
-     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
-     &     ) then
-          ref_param%low_value  =  0.0d0
-          ref_param%depth_top  =  0.0d0
-        else
+      if(   ref_param%iflag_reference .eq. id_no_ref_temp               &
+     & .or. ref_param%iflag_reference .eq. id_numerical_solution        &
+     & .or. ref_param%iflag_reference .eq. id_read_file) then
+        ref_param%low_value  =    0.0d0
+        ref_param%depth_top  =    0.0d0
+        ref_param%high_value =    0.0d0
+        ref_param%depth_bottom =  0.0d0
+      else
+        iflag = low_temp_ctl%depth%iflag*low_temp_ctl%value%iflag
+        if (iflag .eq. 0) then
           write(e_message,'(3a)') 'Set lower ', trim(scalar_name),      &
      &                           ' and its position.'
           call calypso_MPI_abort(ierr_fld, e_message)
-        end if
-      else
-        ref_param%low_value  = low_temp_ctl%value%realvalue
-        ref_param%depth_top  = low_temp_ctl%depth%realvalue
-      end if
-!
-      iflag = high_temp_ctl%depth%iflag*high_temp_ctl%value%iflag
-      if (iflag .eq. 0) then
-        if(   ref_param%iflag_reference .eq. id_no_ref_temp             &
-     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
-     &     ) then
-          ref_param%high_value =  0.0d0
-          ref_param%depth_bottom =  0.0d0
         else
+          ref_param%low_value  = low_temp_ctl%value%realvalue
+          ref_param%depth_top  = low_temp_ctl%depth%realvalue
+        end if
+!
+        iflag = high_temp_ctl%depth%iflag*high_temp_ctl%value%iflag
+        if (iflag .eq. 0) then
           write(e_message,'(3a)') 'Set higher ', trim(scalar_name),     &
      &                           ' and its position.'
           call calypso_MPI_abort(ierr_fld, e_message)
+        else
+          ref_param%high_value = high_temp_ctl%value%realvalue
+          ref_param%depth_bottom = high_temp_ctl%depth%realvalue
         end if
-      else
-        ref_param%high_value = high_temp_ctl%value%realvalue
-        ref_param%depth_bottom = high_temp_ctl%depth%realvalue
       end if
 !
       if (iflag_debug .ge. iflag_routine_msg) then
