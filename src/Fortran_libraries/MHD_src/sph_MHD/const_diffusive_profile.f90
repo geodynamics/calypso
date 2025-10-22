@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine s_const_diffusive_profile(sph_rj, r_2nd,             &
-!!     &          sph_bc, bcs_S, fdm2_center, band_s00_poisson,         &
+!!     &          sc_prop, sph_bc, bcs_S, fdm2_center, band_s00_poisson,&
 !!     &          reftemp_r, refgrad_r, ref_local)
 !!      subroutine const_diffusive_profile_fixS(is_scalar, is_source,   &
 !!     &          sph_rj, r_2nd, sc_prop, sph_bc, bcs_S, fdm2_center,   &
@@ -65,7 +65,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_const_diffusive_profile(sph_rj, r_2nd,               &
-     &          sph_bc, bcs_S, fdm2_center, band_s00_poisson,           &
+     &          sc_prop, sph_bc, bcs_S, fdm2_center, band_s00_poisson,  &
      &          reftemp_r, refgrad_r, ref_local)
 !
       use calypso_mpi
@@ -78,6 +78,7 @@
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
@@ -92,6 +93,12 @@
 !      integer :: k
 !
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
+!$omp parallel workshare
+        ref_local(0:sph_rj%nidx_rj(1),0)                                &
+     &             = ref_local(0:sph_rj%nidx_rj(1),0)                   &
+     &              * (sc_prop%coef_source / sc_prop%coef_diffuse)
+!$omp end parallel workshare
+!
         call set_ICB_scalar_boundary_1d                                 &
      &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, ref_local(0,0))
         call set_CMB_scalar_boundary_1d                                 &

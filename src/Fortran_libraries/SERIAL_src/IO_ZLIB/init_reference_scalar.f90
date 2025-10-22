@@ -90,7 +90,6 @@
       type(sph_scalar_boundary_data), intent(inout) :: bcs_S
       logical, intent(inout) :: flag_write_ref
 !
-      character(len=kchara) :: file_name
       type(band_matrix_type) :: band_s00_poisson
 !
 !
@@ -122,7 +121,6 @@
      &     ((my_rank+50), mat_name, sc_prop%diffusie_reduction_ICB,     &
      &      sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,           &
      &      band_s00_poisson)
-        file_name = add_dat_extension(mat_name)
         call const_diffusive_profiles(sph_rj, sc_prop, sph_bc_S, bcs_S, &
      &      fdm2_center, r_2nd, band_s00_poisson,                       &
      &      iref_scalar, iref_grad, iref_source, ref_field)

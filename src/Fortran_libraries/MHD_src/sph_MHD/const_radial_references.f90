@@ -90,22 +90,19 @@
 !
 !
       allocate(ref_local(0:sph_rj%nidx_rj(1),0:1))
+!$omp parallel workshare
+      ref_local(0:sph_rj%nidx_rj(1),0:1) = 0.0d0
+!$omp end parallel workshare
 !
       if(sph_rj%idx_rj_degree_zero.gt.0 .and. iref_source.gt.0) then
 !$omp parallel workshare
         ref_local(0:sph_rj%nidx_rj(1),0)                                &
-     &             = ref_field%d_fld(1:sph_rj%nidx_rj(1)+1,iref_source) &
-     &              * (sc_prop%coef_source / sc_prop%coef_diffuse)
-        ref_local(0:sph_rj%nidx_rj(1),1) = 0.0d0
-!$omp end parallel workshare
-      else
-!$omp parallel workshare
-        ref_local(0:sph_rj%nidx_rj(1),0:1) = 0.0d0
+     &             = ref_field%d_fld(1:sph_rj%nidx_rj(1)+1,iref_source)
 !$omp end parallel workshare
       end if
 !
-      call s_const_diffusive_profile(sph_rj, r_2nd,                     &
-     &     sph_bc_S, bcs_S, fdm2_center, band_s00_poisson,              &
+      call s_const_diffusive_profile(sph_rj, r_2nd, sc_prop,            &
+     &    sph_bc_S, bcs_S, fdm2_center, band_s00_poisson,               &
      &    ref_field%d_fld(1,iref_scalar), ref_field%d_fld(1,iref_grad), &
      &    ref_local)
       deallocate(ref_local)
