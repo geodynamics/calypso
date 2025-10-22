@@ -11,12 +11,9 @@
 !!
 !!@verbatim
 !!      subroutine set_reference_scalar_ctl                             &
-!!     &        (charaflag, ref_ctl, ref_param, takepiro)
-!!        type(read_character_item), intent(in) :: ref_temp_ctl
-!!        type(read_character_item), intent(in) :: stratified_ctl
-!!        type(reference_point_control), intent(in) :: low_temp_ctl
-!!        type(reference_point_control), intent(in) :: high_temp_ctl
-!!        type(reference_point_control), intent(in) :: takepiro_ctl
+!!     &        (scalar_name, ref_ctl, ref_param, takepiro)
+!!        character(len = kchara), intent(in) :: scalar_name
+!!        type(reference_temperature_ctl), intent(in) :: ref_ctl
 !!        type(reference_scalar_param), intent(inout) :: ref_param
 !!        type(takepiro_model_param), intent(inout) :: takepiro
 !!@endverbatim
@@ -43,12 +40,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_reference_scalar_ctl                               &
-     &        (charaflag, ref_ctl, ref_param, takepiro)
+     &        (scalar_name, ref_ctl, ref_param, takepiro)
 !
       use calypso_mpi
       use t_ctl_data_temp_model
 !
-      character(len = kchara), intent(in) :: charaflag
+      character(len = kchara), intent(in) :: scalar_name
       type(reference_temperature_ctl), intent(in) :: ref_ctl
 !
       type(reference_scalar_param), intent(inout) :: ref_param
@@ -56,7 +53,7 @@
 !
 !
       call set_linear_ref_scalar_ctl                                    &
-     &   (ref_ctl%reference_ctl, ref_ctl%ref_file_ctl,                  &
+     &   (scalar_name, ref_ctl%reference_ctl, ref_ctl%ref_file_ctl,     &
      &    ref_ctl%low_ctl, ref_ctl%high_ctl, ref_param)
       call set_takepiro_scalar_ctl                                      &
      &   (ref_ctl%stratified_ctl, ref_ctl%takepiro_ctl,                 &
@@ -67,7 +64,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_linear_ref_scalar_ctl(ref_temp_ctl, ref_file_ctl,  &
+      subroutine set_linear_ref_scalar_ctl                              &
+     &         (scalar_name, ref_temp_ctl, ref_file_ctl,                &
      &          low_temp_ctl, high_temp_ctl, ref_param)
 !
       use calypso_mpi
@@ -76,6 +74,7 @@
       use m_error_IDs
       use delete_data_files
 !
+      character(len = kchara), intent(in) :: scalar_name
       type(read_character_item), intent(in) :: ref_temp_ctl
       type(read_character_item), intent(in) :: ref_file_ctl
       type(reference_point_control), intent(in) :: low_temp_ctl
@@ -143,8 +142,8 @@
           ref_param%low_value  =  0.0d0
           ref_param%depth_top  =  0.0d0
         else
-          e_message                                                     &
-     &          = 'Set lower temperature and its position'
+          write(e_message,'(3a)') 'Set lower ', trim(scalar_name),      &
+     &                           ' and its position.'
           call calypso_MPI_abort(ierr_fld, e_message)
         end if
       else
@@ -160,8 +159,8 @@
           ref_param%high_value =  0.0d0
           ref_param%depth_bottom =  0.0d0
         else
-          e_message                                                     &
-     &         = 'Set lower temperature and its position'
+          write(e_message,'(3a)') 'Set higher ', trim(scalar_name),     &
+     &                           ' and its position.'
           call calypso_MPI_abort(ierr_fld, e_message)
         end if
       else

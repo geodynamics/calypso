@@ -24,6 +24,14 @@
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(band_matrix_type), intent(in) :: band_s00_poisson
+!!      subroutine cal_reference_source(sph_rj, band_s00_poisson,       &
+!!     &                                ref_source, ref_local)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(band_matrix_type), intent(in) :: band_s00_poisson
+!!        real(kind = kreal), intent(in)                                &
+!!     &                :: ref_source(0:sph_rj%nidx_rj(1))
+!!        real(kind = kreal), intent(inout)                             &
+!!     &                :: ref_local(0:sph_rj%nidx_rj(1))
 !!@endverbatim
       module const_diffusive_profile
 !
@@ -242,6 +250,39 @@
      &   (sph_rj, sph_bc, bcs_S%CMB_Sspec, reftemp_r(0), refgrad_r(0))
 !
       end subroutine gradient_of_radial_reference
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_reference_source(sph_rj, band_s00_poisson,         &
+     &                                ref_source, ref_local)
+!
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(band_matrix_type), intent(in) :: band_s00_poisson
+!
+      real(kind = kreal), intent(in)                                    &
+     &                :: ref_source(0:sph_rj%nidx_rj(1))
+      real(kind = kreal), intent(inout)                                 &
+     &                :: ref_local(0:sph_rj%nidx_rj(1))
+!
+      integer(kind = kint) :: k
+!
+!
+      ref_local(0:sph_rj%nidx_rj(1)) = 0.0d0
+      k = 1
+      ref_local(k) =  band_s00_poisson%mat(2,k  ) * ref_source(k)       &
+     &              + band_s00_poisson%mat(1,k+1) * ref_source(k+1)
+!$omp parallel do
+      do k = 2, sph_rj%nidx_rj(1) - 1
+        ref_local(k) =  band_s00_poisson%mat(3,k-1) * ref_source(k-1)   &
+     &                + band_s00_poisson%mat(2,k  ) * ref_source(k)     &
+     &                + band_s00_poisson%mat(1,k+1) * ref_source(k+1)
+      end do
+!$omp end parallel do
+      k = sph_rj%nidx_rj(1)
+      ref_local(k) =  band_s00_poisson%mat(3,k-1) * ref_source(k-1)     &
+     &              + band_s00_poisson%mat(2,k  ) * ref_source(k)
+!
+      end subroutine cal_reference_source
 !
 ! -----------------------------------------------------------------------
 !
