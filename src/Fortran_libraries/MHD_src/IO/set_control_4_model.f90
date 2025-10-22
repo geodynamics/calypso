@@ -44,10 +44,10 @@
      &                                 mevo_ctl, evo_ctl, MHD_prop)
 !
       use calypso_mpi
+      use m_base_field_labels
       use t_ctl_data_mhd_evolution
       use t_ctl_data_temp_model
       use t_reference_scalar_param
-      use m_base_field_labels
       use set_reference_scalar_param
 !
       type(reference_temperature_ctl), intent(in) :: reft_ctl
@@ -140,16 +140,14 @@
 !
 !   set control for reference temperature 
 !
-      write(tmpchara,'(a)') 'Reference temperature'
-      call set_reference_scalar_ctl(tmpchara, reft_ctl,                 &
+      call set_reference_scalar_ctl(temperature%name, reft_ctl,         &
      &    MHD_prop%ref_param_T, MHD_prop%takepito_T)
       call set_filtered_advection_ctl                                   &
      &   (reft_ctl%filterd_advect_ctl, MHD_prop%ht_prop)
 !
 !   set control for reference
 !
-      write(tmpchara,'(a)') 'Reference composition'
-      call set_reference_scalar_ctl(tmpchara, refc_ctl,                 &
+      call set_reference_scalar_ctl(composition%name, refc_ctl,         &
      &    MHD_prop%ref_param_C, MHD_prop%takepito_C)
       call set_filtered_advection_ctl                                   &
      &   (refc_ctl%filterd_advect_ctl, MHD_prop%cp_prop)
