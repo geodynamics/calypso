@@ -106,7 +106,7 @@
         else if (cmp_no_case(tmpchara, label_get_numerical)) then
           ref_param%iflag_reference = id_numerical_solution
         else if (cmp_no_case(tmpchara, label_load_file)) then
-          ref_param%iflag_reference = id_read_file
+          ref_param%iflag_reference = id_ref_field_file
         end if
       end if
 !
@@ -114,10 +114,10 @@
       if     (ref_param%iflag_reference .eq. id_sphere_ref_temp         &
      &   .or. ref_param%iflag_reference .eq. id_takepiro_temp           &
      &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
-     &   .or. ref_param%iflag_reference .eq. id_read_file               &
+     &   .or. ref_param%iflag_reference .eq. id_ref_field_file          &
      &   ) ref_param%flag_ref_field = .TRUE.
 !
-      if(ref_param%iflag_reference .eq. id_read_file) then
+      if(ref_param%iflag_reference .eq. id_ref_field_file) then
         ref_param%ref_file_IO%iflag_IO = 0
         ref_param%ref_file_IO%iflag_format = id_ascii_file_fmt
         if(ref_file_ctl%iflag .le. 0) then
@@ -136,7 +136,7 @@
 !
       if(   ref_param%iflag_reference .eq. id_no_ref_temp               &
      & .or. ref_param%iflag_reference .eq. id_numerical_solution        &
-     & .or. ref_param%iflag_reference .eq. id_read_file) then
+     & .or. ref_param%iflag_reference .eq. id_ref_field_file) then
         ref_param%low_value  =    0.0d0
         ref_param%depth_top  =    0.0d0
         ref_param%high_value =    0.0d0

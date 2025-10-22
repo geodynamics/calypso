@@ -37,7 +37,7 @@
 !>      flag to use referece temperature as a function of @f$ r @f$
       integer (kind=kint), parameter :: id_sphere_ref_temp = 100
 !>      flag to obtain diffusive profile numerically
-      integer (kind=kint), parameter :: id_read_file = 10
+      integer (kind=kint), parameter :: id_ref_field_file = 10
 !>      flag to obtain diffusive profile numerically
       integer (kind=kint), parameter :: id_numerical_solution = 999
 !>      flag to use linearly decrease referece temperature

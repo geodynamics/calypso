@@ -126,7 +126,11 @@
      &      fdm2_center, r_2nd, band_s00_poisson,                       &
      &      iref_scalar, iref_grad, iref_source, ref_field)
         call dealloc_band_matrix(band_s00_poisson)
-      else if(ref_param%iflag_reference .eq. id_read_file) then
+      else if(ref_param%iflag_reference .eq. id_ref_field_file) then
+        call const_r_mat00_scalar_sph                                   &
+     &     ((my_rank+50), mat_name, sc_prop%diffusie_reduction_ICB,     &
+     &      sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,           &
+     &      band_s00_poisson)
         call load_sph_reference_one_field                               &
      &     (iref_radius, phys_name, iref_scalar, n_scalar,              &
      &      ref_param%ref_file_IO, ref_fld_IO, r_itp, ref_field)
@@ -134,6 +138,7 @@
      &     (sph_rj, r_2nd, sph_bc_S, bcs_S, fdm2_center,                &
      &      ref_field%d_fld(1,iref_scalar),                             &
      &      ref_field%d_fld(1,iref_grad))
+        call dealloc_band_matrix(band_s00_poisson)
       else
         call no_ref_temp_sph_mhd(sph_rj%nidx_rj(1),                     &
      &      sph_params%radius_ICB, sph_params%radius_CMB,               &
