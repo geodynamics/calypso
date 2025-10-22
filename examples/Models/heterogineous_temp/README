@@ -1,0 +1,22 @@
+!-----------------------------------------------------------------------
+!     Example using heterogeneous heat and compositional boundary conditions
+!-----------------------------------------------------------------------
+!
+Here is the input files to use heterogeneous heat and compositional boundary conditions in Calypso.
+To simplify the problem, only the thermal and compositional fields are evolved with no velocity.
+
+This example consists of the following files and directories
+
+control_MHD:        control file for simulation
+control_resolution:  control file for spatial resolution
+
+sph_lm4r64c_2:     Directory for spherical harmonics index table
+rst_2:              Directory for restart files
+field:              Directory for field data files
+
+This example only run with 2 MPI processes. The simulation procedure is the following
+
+1. Run simulation program
+[heterogineous_temp]$ mpirun -np 2 [CALYPSO_DIR]/bin/sph_mhd
+
+

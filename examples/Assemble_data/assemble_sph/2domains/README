@@ -1,0 +1,7 @@
+!-----------------------------------------------------------------------
+!     Example of data assembling test
+!-----------------------------------------------------------------------
+!
+ Here is the directory for spectr data files for restarting.
+ Files named "rst.[restart step #].[process #].fst" are saved
+ in this directory.

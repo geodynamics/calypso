@@ -1,0 +1,30 @@
+!-----------------------------------------------------------------------
+!     Example using heat and compositional source terms
+!-----------------------------------------------------------------------
+!
+Here is the input files to use heat and compositional source terms in Calypso.
+To simplify the problem, only the thermal and compositional fields are evolved with no velocity.
+
+This example consists of the following files and directories
+
+control_MHD:        control file for simulation
+control_resolution:  control file for spatial resolution
+
+sph_lm3r64c_1:     Directory for spherical harmonics index table
+rst_1:              Directory for restart files
+field:              Directory for field data files
+
+This example only run with 1 MPI process. The simulation procedure is the following
+
+1. Make initial field and indices
+ 1.1  Copy source code "const_sph_initial_spectr.f90" to 
+    [CALYPSO_DIR]/src/programs/data_utilities/INITIAL_FIELD
+   [sph_initial_field]$ cp const_sph_initial_spectr.f90 [CALYPSO_DIR]/src/programs/data_utilities/INITIAL_FIELD
+ 1.2  Build initial field generation program
+   [sph_initial_field]$ cd [CALYPSO_DIR]/work
+   [work]$ make
+ 1.3  Move this directory and construct initial field data
+   [work]$ cd [CALYPSO]/examples/heat_composition_source
+   [heat_composition_source]$ [CALYPSO_DIR]/bin/sph_initial_field
+2. Run simulation program
+   [heat_composition_source]$ mpirun -np 1 [CALYPSO_DIR]/bin/sph_mhd

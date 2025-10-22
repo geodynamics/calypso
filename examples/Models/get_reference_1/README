@@ -1,0 +1,24 @@
+!-----------------------------------------------------------------------
+!     Example to evaluate diffsive profile in the outer core
+!-----------------------------------------------------------------------
+!
+Here is the input files to use heat and compositional source terms in Calypso.
+To simplify the problem, only the thermal and compositional fields are estimated.
+
+This example consists of the following files and directories
+
+control_MHD:         control file for simulation
+control_resolution:  control file for spatial resolution
+radial_field.dat:    Input heat and composition source data
+result:              example of result data
+
+This example only run with 2 MPI process. The simulation procedure is the following
+
+1. Run simulation program
+   [heat_composition_source]$ mpirun -np 1 [CALYPSO_DIR]/bin/sph_mhd
+This program makes the following files
+
+radial_point.dat:       radial grid point data
+reference_fields.dat:   diffisive profile field data
+sph_ave_volume_s.dat:   volume average data
+time_total.dat.dat:     elapsed time data

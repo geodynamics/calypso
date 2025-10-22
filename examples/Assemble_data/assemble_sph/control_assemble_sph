@@ -1,0 +1,31 @@
+begin assemble_control
+!
+  begin data_files_def
+    num_subdomain_ctl           4
+
+    sph_file_prefix             'sph_lm31r48c_4/in'
+    restart_file_prefix         '4domains/rst'
+  end data_files_def
+!
+  begin new_data_files_def
+    num_new_domain_ctl           2
+!
+    new_sph_mode_prefix        'sph_lm31r48c_2/in'
+    new_restart_prefix         '2domains/rst'
+!
+    delete_original_data_flag       'NO'
+  end new_data_files_def
+!
+  begin control
+!!!!!  information for time integration
+    begin time_step_ctl
+      i_step_init_ctl       1
+      i_step_finish_ctl     4
+      i_step_rst_ctl        1
+    end time_step_ctl
+  end control
+!
+  begin newrst_magne_ctl
+    magnetic_field_ratio_ctl     1.0d0
+  end newrst_magne_ctl
+end assemble_control
