@@ -15,11 +15,10 @@
 !!
 !!      subroutine load_sph_reference_one_field                         &
 !!     &         (iref_radius, phys_name, iref_in, ncomp,               &
-!!     &          ref_file_IO, ref_fld_IO, r_itp, ref_field)
+!!     &          ref_file_IO, r_itp, ref_field)
 !!        character(len = kchara), intent(in) :: phys_name
 !!        integer(kind = kint), intent(in) :: iref_radius, iref_in, ncomp
 !!        type(field_IO_params), intent(in) :: ref_file_IO
-!!        type(field_IO), intent(inout) :: ref_fld_IO
 !!        type(sph_radial_interpolate), intent(inout) :: r_itp
 !!        type(phys_data), intent(inout) :: ref_field
 !!@endverbatim
@@ -86,6 +85,7 @@
       type(radial_reference_field), intent(inout) :: refs
 !
       type(time_data) :: time_IO
+      type(field_IO) :: ref_fld_IO
 !
 !
       if(my_rank .ne. 0) return
@@ -96,16 +96,16 @@
 !
 !
       call copy_rj_phys_name_to_IO                                      &
-     &   (refs%ref_field%num_phys_viz, refs%ref_field, refs%ref_fld_IO)
-      call alloc_phys_data_IO(refs%ref_fld_IO)
+     &   (refs%ref_field%num_phys_viz, refs%ref_field, ref_fld_IO)
+      call alloc_phys_data_IO(ref_fld_IO)
       call copy_rj_phys_data_to_IO                                      &
-     &   (refs%ref_field%num_phys_viz, refs%ref_field, refs%ref_fld_IO)
+     &   (refs%ref_field%num_phys_viz, refs%ref_field, ref_fld_IO)
 !
       call write_step_field_file(refs%ref_output_IO%file_prefix,        &
-     &                           my_rank, time_IO, refs%ref_fld_IO)
+     &                           my_rank, time_IO, ref_fld_IO)
 !
-      call dealloc_phys_data_IO(refs%ref_fld_IO)
-      call dealloc_phys_name_IO(refs%ref_fld_IO)
+      call dealloc_phys_data_IO(ref_fld_IO)
+      call dealloc_phys_name_IO(ref_fld_IO)
 !
       end subroutine output_reference_field
 !
@@ -126,6 +126,7 @@
       type(radial_reference_field), intent(inout) :: refs
 !
       type(time_data) :: time_IO
+      type(field_IO) :: ref_fld_IO
       integer(kind = kint) :: iend
       integer(kind = kint_gl) :: num64
 !
@@ -134,16 +135,15 @@
       if(refs%ref_input_IO%iflag_IO .eq. 0) return
       if(my_rank .eq. 0) then
         call read_and_alloc_step_field(refs%ref_input_IO%file_prefix,   &
-     &      my_rank, time_IO, refs%ref_fld_IO, iend)
+     &      my_rank, time_IO, ref_fld_IO, iend)
         if(iend .gt. 0) call calypso_mpi_abort(iend,                    &
      &                                         'Read file failed')
 !
         call interpolate_ref_fields_IO(radius_name,                     &
-     &      refs%iref_radius, refs%ref_fld_IO,                          &
-     &      refs%ref_field, refs%r_itp)
+     &      refs%iref_radius, ref_fld_IO, refs%ref_field, refs%r_itp)
 !
-        call dealloc_phys_data_IO(refs%ref_fld_IO)
-        call dealloc_phys_name_IO(refs%ref_fld_IO)
+        call dealloc_phys_data_IO(ref_fld_IO)
+        call dealloc_phys_name_IO(ref_fld_IO)
       end if
 !
       call calypso_mpi_bcast_int(refs%ref_field%iflag_update,           &
@@ -158,7 +158,7 @@
 !
       subroutine load_sph_reference_one_field                           &
      &         (iref_radius, phys_name, iref_in, ncomp,                 &
-     &          ref_file_IO, ref_fld_IO, r_itp, ref_field)
+     &          ref_file_IO, r_itp, ref_field)
 !
       use calypso_mpi
       use calypso_mpi_int
@@ -171,16 +171,14 @@
       character(len = kchara), intent(in) :: phys_name
       integer(kind = kint), intent(in) :: iref_radius, iref_in, ncomp
       type(field_IO_params), intent(in) :: ref_file_IO
-      type(field_IO), intent(inout) :: ref_fld_IO
       type(sph_radial_interpolate), intent(inout) :: r_itp
       type(phys_data), intent(inout) :: ref_field
 !
       type(time_data) :: time_IO
+      type(field_IO) :: ref_fld_IO
       integer(kind = kint) :: iend
-      integer(kind = kint_gl) :: num64
 !
 !
-      ref_field%iflag_update(1:ref_field%ntot_phys) = 0
       if(ref_file_IO%iflag_IO .eq. 0) return
       if(my_rank .eq. 0) then
         call read_and_alloc_step_field(ref_file_IO%file_prefix,         &
@@ -195,12 +193,6 @@
         call dealloc_phys_data_IO(ref_fld_IO)
         call dealloc_phys_name_IO(ref_fld_IO)
       end if
-!
-      call calypso_mpi_bcast_int(ref_field%iflag_update(iref_in),       &
-     &                           cast_long(ncomp), 0)
-      num64 = cast_long(ref_field%n_point * ncomp)
-      call calypso_mpi_bcast_real(ref_field%d_fld(1,iref_in),           &
-     &                            num64, 0)
 !
       end subroutine load_sph_reference_one_field
 !

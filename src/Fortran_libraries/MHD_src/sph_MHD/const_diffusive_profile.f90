@@ -13,8 +13,8 @@
 !!      subroutine const_diffusive_profile_fixS(is_scalar, is_source,   &
 !!     &          sph_rj, r_2nd, sc_prop, sph_bc, bcs_S, fdm2_center,   &
 !!     &          band_s00_poisson, rj_fld, reftemp_rj, reftemp_local)
-!!      subroutine gradient_of_radial_reference(sph_rj, r_2nd,          &
-!!     &          sph_bc, bcs_S, fdm2_center, reftemp_r, refgrad_r)
+!!      subroutine gradient_of_radial_reference(sph_rj, sph_bc, bcs_S,  &
+!!     &          r_2nd, fdm2_center, reftemp_r, refgrad_r)
 !!        integer(kind = kint), intent(in) :: is_scalar, is_source
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -71,11 +71,7 @@
 !
       use calypso_mpi
       use calypso_mpi_real
-      use const_sph_radial_grad
       use fill_scalar_field
-      use select_exp_scalar_ICB
-      use select_exp_scalar_CMB
-!      use cal_sol_reftemp_BiCGSTAB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -93,57 +89,163 @@
      &                :: grad_local(0:sph_rj%nidx_rj(1))
 !
       integer(kind = kint_gl) :: num64
-!      integer :: k
 !
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
-!$omp parallel workshare
-        ref_local(0:sph_rj%nidx_rj(1)) = ref_local(0:sph_rj%nidx_rj(1)) &
-     &                   * (sc_prop%coef_source / sc_prop%coef_diffuse)
-!$omp end parallel workshare
-!
-        call set_ICB_scalar_boundary_1d                                 &
-     &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, ref_local(0))
-        call set_CMB_scalar_boundary_1d                                 &
-     &     (sph_rj, sph_bc, bcs_S%CMB_Sspec, ref_local(0))
-!
-!        do k = 0, sph_rj%nidx_rj(1)
-!          write(*,*) k, 'RHS', ref_local(k)
-!        end do
-!
-        call lubksb_3band_ctr(band_s00_poisson, ref_local(0))
-!        call s_cal_sol_reftemp_BiCGSTAB                                &
-!     &     (band_s00_poisson, ref_local(0))
-!
-!        do k = 0, sph_rj%nidx_rj(1)
-!          write(*,*) k, 'Solution', ref_local(k)
-!        end do
-!
+        call cal_diffusive_profile                                      &
+     &     (sph_rj, sc_prop, sph_bc, bcs_S, r_2nd, fdm2_center,         &
+     &          band_s00_poisson, ref_local)
         call fill_scalar_1d_external(sph_bc, sph_rj%inod_rj_center,     &
-     &                               sph_rj%nidx_rj(1), ref_local(0))
+     &                               sph_rj%nidx_rj(1), ref_local)
 !
-        call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,       &
-     &                            sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat, &
-     &                            ref_local(0), grad_local(0))
-!
-        call sel_ICB_radial_grad_1d_scalar                              &
-     &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center,               &
-     &      ref_local, grad_local)
-        call sel_CMB_radial_grad_1d_scalar                              &
-     &     (sph_rj, sph_bc, bcs_S%CMB_Sspec, ref_local, grad_local)
+        call gradient_of_radial_reference(sph_rj, sph_bc, bcs_S,        &
+     &      r_2nd, fdm2_center, ref_local, grad_local)
       end if
 !
 !$omp parallel workshare
       reftemp_r(0:sph_rj%nidx_rj(1)) = 0.0d0
-      refgrad_r(0:sph_rj%nidx_rj(1)) = 0.0d0
 !$omp end parallel workshare
 !
       num64 = sph_rj%nidx_rj(1) + 1
       call calypso_mpi_allreduce_real(ref_local(0), reftemp_r,          &
      &                                num64, MPI_SUM)
+!
+!
+!$omp parallel workshare
+      refgrad_r(0:sph_rj%nidx_rj(1)) = 0.0d0
+!$omp end parallel workshare
+!
+      num64 = sph_rj%nidx_rj(1) + 1
       call calypso_mpi_allreduce_real(grad_local(0), refgrad_r,         &
      &                                num64, MPI_SUM)
 !
       end subroutine s_const_diffusive_profile
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_diffusive_profile                                  &
+     &         (sph_rj, sc_prop, sph_bc, bcs_S, r_2nd, fdm2_center,     &
+     &          band_s00_poisson, ref_local)
+!
+      use const_sph_radial_grad
+      use fill_scalar_field
+      use select_exp_scalar_ICB
+      use select_exp_scalar_CMB
+!      use cal_sol_reftemp_BiCGSTAB
+!
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
+      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_scalar_boundary_data), intent(in) :: bcs_S
+      type(fdm2_center_mat), intent(in) :: fdm2_center
+      type(band_matrix_type), intent(in) :: band_s00_poisson
+!
+      real(kind = kreal), intent(inout)                                 &
+     &                :: ref_local(0:sph_rj%nidx_rj(1))
+!
+!      real(kind = kreal), allocatable :: ref_CG(:)
+!
+!      integer :: k
+!
+!$omp parallel workshare
+      ref_local(0:sph_rj%nidx_rj(1)) = ref_local(0:sph_rj%nidx_rj(1))   &
+     &                   * (sc_prop%coef_source / sc_prop%coef_diffuse)
+!$omp end parallel workshare
+!
+      call set_ICB_scalar_boundary_1d(sph_rj, sph_bc, bcs_S%ICB_Sspec,  &
+     &                                ref_local(0))
+      call set_CMB_scalar_boundary_1d(sph_rj, sph_bc, bcs_S%CMB_Sspec,  &
+     &                                ref_local(0))
+!
+      call lubksb_3band_ctr(band_s00_poisson, ref_local(0))
+!
+!      allocate(ref_CG(0:sph_rj%nidx_rj(1)))
+!!$omp parallel workshare
+!      ref_CG(0:sph_rj%nidx_rj(1)) = ref_local(0:sph_rj%nidx_rj(1))
+!!$omp end parallel workshare
+!      call s_cal_sol_reftemp_BiCGSTAB(band_s00_poisson,                &
+!     &                                ref_CG(0))
+!
+!      do k = 0, sph_rj%nidx_rj(1)
+!        write(*,*) k, 'RHS', ref_local(k)
+!      end do
+!
+!      do k = 0, sph_rj%nidx_rj(1)
+!        write(*,*) k, 'Solution', ref_local(k), ref_CG(k)
+!      end do
+!      deallocate(ref_CG)
+!
+      end subroutine cal_diffusive_profile
+!
+! -----------------------------------------------------------------------
+!
+      subroutine gradient_of_radial_reference(sph_rj, sph_bc, bcs_S,    &
+     &          r_2nd, fdm2_center, reftemp_r, refgrad_r)
+!
+      use const_sph_radial_grad
+      use select_exp_scalar_ICB
+      use select_exp_scalar_CMB
+!
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(fdm_matrices), intent(in) :: r_2nd
+      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_scalar_boundary_data), intent(in) :: bcs_S
+      type(fdm2_center_mat), intent(in) :: fdm2_center
+      real(kind=kreal), intent(in) :: reftemp_r(0:sph_rj%nidx_rj(1))
+!
+      real(kind=kreal), intent(inout) :: refgrad_r(0:sph_rj%nidx_rj(1))
+!
+!
+      call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,         &
+     &                            sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat, &
+     &                            reftemp_r(0), refgrad_r(0))
+!
+      call sel_ICB_radial_grad_1d_scalar                                &
+     &   (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center,                 &
+     &    reftemp_r(0), refgrad_r(0))
+      call sel_CMB_radial_grad_1d_scalar                                &
+     &   (sph_rj, sph_bc, bcs_S%CMB_Sspec, reftemp_r(0), refgrad_r(0))
+!
+      end subroutine gradient_of_radial_reference
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_reference_source(sph_rj, sc_prop,                  &
+     &          band_s00_poisson, ref_source, ref_local)
+!
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(scalar_property), intent(in) :: sc_prop
+      type(band_matrix_type), intent(in) :: band_s00_poisson
+!
+      real(kind = kreal), intent(in)                                    &
+     &                :: ref_source(0:sph_rj%nidx_rj(1))
+      real(kind = kreal), intent(inout)                                 &
+     &                :: ref_local(0:sph_rj%nidx_rj(1))
+!
+      integer(kind = kint) :: k
+!
+!
+      ref_local(0:sph_rj%nidx_rj(1)) = 0.0d0
+      k = 0
+      ref_local(k) =  band_s00_poisson%mat(2,k  ) * ref_source(k)       &
+     &              + band_s00_poisson%mat(1,k+1) * ref_source(k+1)
+!$omp parallel do
+      do k = 1, sph_rj%nidx_rj(1) - 1
+        ref_local(k) =  band_s00_poisson%mat(3,k-1) * ref_source(k-1)   &
+     &                + band_s00_poisson%mat(2,k  ) * ref_source(k)     &
+     &                + band_s00_poisson%mat(1,k+1) * ref_source(k+1)
+      end do
+!$omp end parallel do
+      k = sph_rj%nidx_rj(1)
+      ref_local(k) =  band_s00_poisson%mat(3,k-1) * ref_source(k-1)     &
+     &              + band_s00_poisson%mat(2,k  ) * ref_source(k)
+!
+!$omp parallel workshare
+      ref_local(0:sph_rj%nidx_rj(1)) = ref_local(0:sph_rj%nidx_rj(1))   &
+     &                   * (sc_prop%coef_diffuse / sc_prop%coef_source)
+!$omp end parallel workshare
+!
+      end subroutine cal_reference_source
 !
 ! -----------------------------------------------------------------------
 !
@@ -223,80 +325,6 @@
      &                                num64, MPI_SUM)
 !
       end subroutine const_diffusive_profile_fixS
-!
-! -----------------------------------------------------------------------
-!
-      subroutine gradient_of_radial_reference(sph_rj, r_2nd,            &
-     &          sph_bc, bcs_S, fdm2_center, reftemp_r, refgrad_r)
-!
-      use const_sph_radial_grad
-      use fill_scalar_field
-      use select_exp_scalar_ICB
-      use select_exp_scalar_CMB
-!
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(fdm_matrices), intent(in) :: r_2nd
-      type(sph_boundary_type), intent(in) :: sph_bc
-      type(sph_scalar_boundary_data), intent(in) :: bcs_S
-      type(fdm2_center_mat), intent(in) :: fdm2_center
-!
-      real(kind=kreal), intent(inout) :: reftemp_r(0:sph_rj%nidx_rj(1))
-      real(kind=kreal), intent(inout) :: refgrad_r(0:sph_rj%nidx_rj(1))
-!
-!
-      call fill_scalar_1d_external(sph_bc, sph_rj%inod_rj_center,       &
-     &                             sph_rj%nidx_rj(1), reftemp_r(0))
-!
-      call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,         &
-     &                            sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat, &
-     &                            reftemp_r(0), refgrad_r(0))
-!
-      call sel_ICB_radial_grad_1d_scalar                                &
-     &   (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center,                 &
-     &    reftemp_r(0), refgrad_r(0))
-      call sel_CMB_radial_grad_1d_scalar                                &
-     &   (sph_rj, sph_bc, bcs_S%CMB_Sspec, reftemp_r(0), refgrad_r(0))
-!
-      end subroutine gradient_of_radial_reference
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_reference_source(sph_rj, sc_prop,                  &
-     &          band_s00_poisson, ref_source, ref_local)
-!
-      type(sph_rj_grid), intent(in) :: sph_rj
-      type(scalar_property), intent(in) :: sc_prop
-      type(band_matrix_type), intent(in) :: band_s00_poisson
-!
-      real(kind = kreal), intent(in)                                    &
-     &                :: ref_source(0:sph_rj%nidx_rj(1))
-      real(kind = kreal), intent(inout)                                 &
-     &                :: ref_local(0:sph_rj%nidx_rj(1))
-!
-      integer(kind = kint) :: k
-!
-!
-      ref_local(0:sph_rj%nidx_rj(1)) = 0.0d0
-      k = 1
-      ref_local(k) =  band_s00_poisson%mat(2,k  ) * ref_source(k)       &
-     &              + band_s00_poisson%mat(1,k+1) * ref_source(k+1)
-!$omp parallel do
-      do k = 2, sph_rj%nidx_rj(1) - 1
-        ref_local(k) =  band_s00_poisson%mat(3,k-1) * ref_source(k-1)   &
-     &                + band_s00_poisson%mat(2,k  ) * ref_source(k)     &
-     &                + band_s00_poisson%mat(1,k+1) * ref_source(k+1)
-      end do
-!$omp end parallel do
-      k = sph_rj%nidx_rj(1)
-      ref_local(k) =  band_s00_poisson%mat(3,k-1) * ref_source(k-1)     &
-     &              + band_s00_poisson%mat(2,k  ) * ref_source(k)
-!
-!$omp parallel workshare
-      ref_local(0:sph_rj%nidx_rj(1)) = ref_local(0:sph_rj%nidx_rj(1))   &
-     &                   * (sc_prop%coef_diffuse / sc_prop%coef_source)
-!$omp end parallel workshare
-!
-      end subroutine cal_reference_source
 !
 ! -----------------------------------------------------------------------
 !

@@ -46,7 +46,6 @@
       use t_field_component_labels
       use t_file_IO_parameter
       use t_sph_radial_interpolate
-      use t_field_data_IO
 !
       implicit  none
 !
@@ -57,6 +56,8 @@
 !
 !>      Structure of reference temperature
       type radial_reference_field
+!>        MPI process for reference field
+        integer :: irank_reference
 !>        Address of radius
         integer(kind = kint) :: iref_radius
 !>        Address of reference field
@@ -72,8 +73,6 @@
         type(field_IO_params) :: ref_input_IO
 !>        file name to write radial reference data
         type(field_IO_params) :: ref_output_IO
-!>        file name to write radial reference data
-        type(field_IO) :: ref_fld_IO
 !
 !>        Interpolation table from radial data input 
         type(sph_radial_interpolate) :: r_itp
