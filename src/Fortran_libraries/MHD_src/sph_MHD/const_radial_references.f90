@@ -104,7 +104,7 @@
       call s_const_diffusive_profile(sph_rj, r_2nd, sc_prop,            &
      &    sph_bc_S, bcs_S, fdm2_center, band_s00_poisson,               &
      &    ref_field%d_fld(1,iref_scalar), ref_field%d_fld(1,iref_grad), &
-     &    ref_local)
+     &    ref_local(0,0), ref_local(0,1))
       deallocate(ref_local)
 !
       end subroutine const_diffusive_profiles
@@ -177,16 +177,8 @@
 !
       if(iref_source*iref_scalar .le. 0) return
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
-        if(iref_source .gt. 0) then
-          call cal_reference_source(sph_rj, band_s00_poisson,           &
-     &        ref_field%d_fld(1,iref_scalar), ref_local)
-!
-!$omp parallel workshare
-          ref_local(0:sph_rj%nidx_rj(1))                                &
-     &                  = ref_local(0:sph_rj%nidx_rj(1))                &
-     &                   * (sc_prop%coef_diffuse / sc_prop%coef_source)
-!$omp end parallel workshare
-        end if
+        call cal_reference_source(sph_rj, sc_prop, band_s00_poisson,    &
+     &      ref_field%d_fld(1,iref_scalar), ref_local)
       end if
 !
       num64 = sph_rj%nidx_rj(1) + 1
