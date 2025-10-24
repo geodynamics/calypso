@@ -13,9 +13,8 @@
 !!      subroutine load_sph_reference_fields(refs)
 !!        type(radial_reference_field), intent(inout) :: refs
 !!
-!!      subroutine load_sph_reference_one_field                         &
-!!     &         (iref_radius, phys_name, iref_in, ncomp,               &
-!!     &          ref_file_IO, r_itp, ref_field)
+!!      subroutine load_sph_reference_one_field(iref_radius, phys_name, &
+!!     &          iref_in, ncomp, ref_file_IO, r_itp, ref_field)
 !!        character(len = kchara), intent(in) :: phys_name
 !!        integer(kind = kint), intent(in) :: iref_radius, iref_in, ncomp
 !!        type(field_IO_params), intent(in) :: ref_file_IO
@@ -156,17 +155,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine load_sph_reference_one_field                           &
-     &         (iref_radius, phys_name, iref_in, ncomp,                 &
-     &          ref_file_IO, r_itp, ref_field)
+      subroutine load_sph_reference_one_field(iref_radius, phys_name,   &
+     &          iref_in, ncomp, ref_file_IO, r_itp, ref_field)
 !
       use calypso_mpi
-      use calypso_mpi_int
-      use calypso_mpi_real
       use t_file_IO_parameter
       use field_file_IO
       use interpolate_reference_data
-      use transfer_to_long_integers
 !
       character(len = kchara), intent(in) :: phys_name
       integer(kind = kint), intent(in) :: iref_radius, iref_in, ncomp
@@ -180,19 +175,18 @@
 !
 !
       if(ref_file_IO%iflag_IO .eq. 0) return
-      if(my_rank .eq. 0) then
-        call read_and_alloc_step_field(ref_file_IO%file_prefix,         &
-     &      my_rank, time_IO, ref_fld_IO, iend)
-        if(iend .gt. 0) call calypso_mpi_abort(iend,                    &
-     &                                         'Read file failed')
 !
-        call interpolate_one_ref_field_IO(radius_name,                  &
-     &      iref_radius, phys_name, iref_in, ncomp, ref_fld_IO,         &
-     &      ref_field, r_itp)
+      call read_and_alloc_step_field(ref_file_IO%file_prefix,           &
+     &    my_rank, time_IO, ref_fld_IO, iend)
+      if(iend .gt. 0) call calypso_mpi_abort(iend,                      &
+     &                                       'Read file failed')
 !
-        call dealloc_phys_data_IO(ref_fld_IO)
-        call dealloc_phys_name_IO(ref_fld_IO)
-      end if
+      call interpolate_one_ref_field_IO(radius_name,                    &
+     &    iref_radius, phys_name, iref_in, ncomp, ref_fld_IO,           &
+     &    ref_field, r_itp)
+!
+      call dealloc_phys_data_IO(ref_fld_IO)
+      call dealloc_phys_name_IO(ref_fld_IO)
 !
       end subroutine load_sph_reference_one_field
 !

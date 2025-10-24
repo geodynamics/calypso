@@ -208,8 +208,8 @@
 
       flag_write_ref = .FALSE.
       refs%ref_field%iflag_update(1:refs%ref_field%ntot_phys) = 0
-      call s_init_reference_scalar                                      &
-     &   (MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
+      call s_init_reference_scalar(refs%irank_reference,                &
+     &    MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%ht_prop, sph_MHD_bc%sph_bc_T,                 &
      &    sph_MHD_bc%fdm2_center, tmat_name, MHD_prop%ref_param_T,      &
      &    refs%iref_radius, temperature%name,                           &
@@ -217,8 +217,8 @@
      &    refs%iref_base%i_heat_source, refs%r_itp,                     &
      &    refs%ref_field, sph_MHD_bc%bcs_T, flag_write_ref)
 !
-      call s_init_reference_scalar                                      &
-     &   (MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
+      call s_init_reference_scalar(refs%irank_reference,                &
+     &    MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%cp_prop, sph_MHD_bc%sph_bc_C,                 &
      &    sph_MHD_bc%fdm2_center, cmat_name, MHD_prop%ref_param_C,      &
      &    refs%iref_radius, composition%name,                           &
