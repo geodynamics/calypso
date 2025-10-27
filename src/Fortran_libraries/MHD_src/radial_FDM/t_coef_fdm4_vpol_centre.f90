@@ -138,6 +138,10 @@
       call set_forth_taylor_expand_CTR1(r(1), mat_fdm)
       call cal_inverse_nn_matrix                                        &
      &   (ifive, mat_fdm, mat_fdm(1,1), ierr)
+      if(ierr .eq. 1) then
+        write(*,*) 'singular matrix in cal_coef_fdm4_vpol_centre '
+      end if
+!
       call order_each_center_fdm4(mat_fdm, fdm4_center%dmat_vp1)
 !
       fdm4_center%dmat_vp2(-2:2,1) = zero

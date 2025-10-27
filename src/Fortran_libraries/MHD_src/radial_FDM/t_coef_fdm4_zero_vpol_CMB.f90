@@ -241,7 +241,7 @@
      &    mat_fdm_noslip_CMB1_4, ierr)
 !
       if(ierr .eq. 1) then
-        write(*,*) 'singular matrix mat_fdm_noslip_CMB1_4 ',            &
+        write(*,*) 'singular matrix in mat_fdm_noslip_CMB1_4 ',         &
      &             r_from_CMB(0)
       end if
 !

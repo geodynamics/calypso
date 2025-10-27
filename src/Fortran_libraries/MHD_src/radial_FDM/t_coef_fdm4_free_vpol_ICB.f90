@@ -255,7 +255,7 @@
      &    mat_fdm4_ICB1_free_vp, ierr)
 !
       if(ierr .eq. 1) then
-        write(*,*) 'singular matrix cal_fdm4_ICB1_free_vp ',            &
+        write(*,*) 'singular matrix in cal_fdm4_ICB1_free_vp ',         &
      &            r_from_ICB(0)
       end if
 !

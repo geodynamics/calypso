@@ -34,7 +34,7 @@
 !
       implicit  none
 !
-      real(kind = kreal), parameter, private :: eps = 1.0e-40
+      real(kind = kreal), parameter, private :: eps = 1.0e-60
 !
 !  ---------------------------------------------------------------------
 !
@@ -278,8 +278,7 @@
 !
       call cal_det_nn_matrix(nsize, a, det)
       if ( abs(det) .lt. eps ) then
-       
-      write(*,*) 'nxn matrix is singular'
+        write(*,*) 'nxn matrix is singular', det
         ierr = 1
         return
       else
