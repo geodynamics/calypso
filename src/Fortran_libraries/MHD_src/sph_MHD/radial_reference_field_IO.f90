@@ -57,17 +57,50 @@
       call alloc_phys_name(refs%ref_field)
 
       call append_reference_field_names                                 &
-     &  (radius_name, ipol%base, refs%iref_radius,                      &
-     &   refs%iref_base, refs%iref_grad, refs%iref_cmp, refs%ref_field)
+     &   (radius_name, ipol%base, ipol%diffusion, refs)
       call alloc_phys_data((sph_rj%nidx_rj(1)+1), refs%ref_field)
 !
-      refs%ref_field%d_fld(1,refs%iref_radius) = 0.0d0
-!$omp parallel workshare
-      refs%ref_field%d_fld(2:sph_rj%nidx_rj(1)+1,refs%iref_radius)      &
-     &                    = sph_rj%radius_1d_rj_r(1:sph_rj%nidx_rj(1))
-!$omp end parallel workshare
+      call copy_reference_radius_data                                   &
+     &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r(1),                  &
+     &    refs%ref_field%d_fld(1,refs%iref_radius))
 !
       end subroutine init_reft_rj_data
+!
+! -----------------------------------------------------------------------
+!
+      subroutine copy_reference_radius_data(nri, radius_rj, ref_r)
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: radius_rj(nri)
+!
+      real(kind = kreal), intent(inout) :: ref_r(0:nri)
+!
+!
+      ref_r(0) = 0.0d0
+!$omp parallel workshare
+      ref_r(1:nri) = radius_rj(1:nri)
+!$omp end parallel workshare
+!
+      end subroutine copy_reference_radius_data
+!
+! -----------------------------------------------------------------------
+!
+      subroutine copy_const_diffusivity_to_ref(nri, coef_diffuse,       &
+     &          ref_diffuse, grad_diffuse)
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: coef_diffuse
+!
+      real(kind = kreal), intent(inout) :: ref_diffuse(0:nri)
+      real(kind = kreal), intent(inout) :: grad_diffuse(0:nri)
+!
+!
+!$omp parallel workshare
+      ref_diffuse(0:nri) = coef_diffuse
+      grad_diffuse(0:nri) = zero
+!$omp end parallel workshare
+!
+      end subroutine copy_const_diffusivity_to_ref
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

@@ -21,11 +21,11 @@
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!
 !!      subroutine const_r_mat00_scalar_sph(id_file, mat_name,          &
-!!     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,    &
-!!     &          sph_bc, fdm2_center, band_s00_poisson)
+!!     &          diffuse_reduction_ratio_ICB, sph_params,              &
+!!     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !!      subroutine const_r_mat00_poisson_fixS(id_file, mat_name,        &
-!!     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,    &
-!!     &          sph_bc, fdm2_center, band_s00_poisson)
+!!     &          diffuse_reduction_ratio_ICB, sph_params,              &
+!!     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !!        integer(kind = kint), intent(in) :: id_file
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -33,7 +33,7 @@
 !!        type(sph_boundary_type), intent(in) :: sph_bc
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        character(len=kchara), intent(in) :: mat_name
-!!        real(kind = kreal), intent(in) :: diffusie_reduction_ICB
+!!        real(kind = kreal), intent(in) :: diffuse_reduction_ratio_ICB
 !!        type(band_matrix_type), intent(inout) :: band_s00_poisson
 !!@endverbatim
 !
@@ -166,8 +166,9 @@
       r_coef(1:sph_rj%nidx_rj(1)) = coef
 !$omp end parallel workshare
 !
-      if(property%diffusie_reduction_ICB .lt. one) then
-        r_coef(sph_params%nlayer_ICB) = property%diffusie_reduction_ICB &
+      if(property%diffuse_reduction_ratio_ICB .lt. one) then
+        r_coef(sph_params%nlayer_ICB)                                   &
+     &                           = property%diffuse_reduction_ratio_ICB &
      &                                 * r_coef(sph_params%nlayer_ICB)
         if(my_rank .eq. 0) write(*,*) 'reduction of diffusivity at',    &
      &    sph_params%nlayer_ICB, ' to ', r_coef(sph_params%nlayer_ICB), &
@@ -192,8 +193,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_r_mat00_scalar_sph(id_file, mat_name,            &
-     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,      &
-     &          sph_bc, fdm2_center, band_s00_poisson)
+     &          diffuse_reduction_ratio_ICB, sph_params,                &
+     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !
       use m_ludcmp_3band
       use set_radial_mat_sph
@@ -208,7 +209,7 @@
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       character(len=kchara), intent(in) :: mat_name
-      real(kind = kreal), intent(in) :: diffusie_reduction_ICB
+      real(kind = kreal), intent(in) :: diffuse_reduction_ratio_ICB
 !
       type(band_matrix_type), intent(inout) :: band_s00_poisson
 !
@@ -228,8 +229,8 @@
       r_coef(0:sph_rj%nidx_rj(1)) = one
 !$omp end parallel workshare
 !
-      if(diffusie_reduction_ICB .lt. one) then
-        r_coef(sph_params%nlayer_ICB) = diffusie_reduction_ICB
+      if(diffuse_reduction_ratio_ICB .lt. one) then
+        r_coef(sph_params%nlayer_ICB) = diffuse_reduction_ratio_ICB
         if(my_rank .eq. 0) write(*,*) 'reduction of diffusivity at',    &
      &    sph_params%nlayer_ICB, ' to ', r_coef(sph_params%nlayer_ICB)
       end if
@@ -268,8 +269,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_r_mat00_poisson_fixS(id_file, mat_name,          &
-     &          diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,      &
-     &          sph_bc, fdm2_center, band_s00_poisson)
+     &          diffuse_reduction_ratio_ICB, sph_params,                &
+     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !
       use m_ludcmp_3band
       use set_radial_mat_sph
@@ -284,7 +285,7 @@
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       character(len=kchara), intent(in) :: mat_name
-      real(kind = kreal), intent(in) :: diffusie_reduction_ICB
+      real(kind = kreal), intent(in) :: diffuse_reduction_ratio_ICB
 !
       type(band_matrix_type), intent(inout) :: band_s00_poisson
 !
@@ -304,8 +305,8 @@
       r_coef(1:sph_rj%nidx_rj(1)) = one
 !$omp end parallel workshare
 !
-      if(diffusie_reduction_ICB .lt. one) then
-        r_coef(sph_params%nlayer_ICB) = diffusie_reduction_ICB
+      if(diffuse_reduction_ratio_ICB .lt. one) then
+        r_coef(sph_params%nlayer_ICB) = diffuse_reduction_ratio_ICB
         if(my_rank .eq. 0) write(*,*) 'reduction of diffusivity at',    &
      &    sph_params%nlayer_ICB, ' to ', r_coef(sph_params%nlayer_ICB)
       end if

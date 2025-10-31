@@ -125,10 +125,9 @@
 !$omp end parallel workshare
         end if
 !
-        call const_r_mat00_scalar_sph                                   &
-     &     ((my_rank+50), mat_name, sc_prop%diffusie_reduction_ICB,     &
-     &      sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,           &
-     &      band_s00_poisson)
+        call const_r_mat00_scalar_sph((my_rank+50), mat_name,           &
+     &      sc_prop%diffuse_reduction_ratio_ICB, sph_params, sph_rj,    &
+     &      r_2nd, sph_bc_S, fdm2_center, band_s00_poisson)
         call cal_diffusive_profile                                      &
      &     (sph_rj, sc_prop, sph_bc_S, bcs_S, r_2nd, fdm2_center,       &
      &      band_s00_poisson, ref_field%d_fld(1,iref_scalar))
@@ -206,10 +205,9 @@
         end if
 !
         if(iref_source .gt. 0) then
-          call const_r_mat00_scalar_sph                                 &
-     &       ((my_rank+50), mat_name, sc_prop%diffusie_reduction_ICB,   &
-     &        sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,         &
-     &        band_s00_poisson)
+          call const_r_mat00_scalar_sph((my_rank+50), mat_name,         &
+     &        sc_prop%diffuse_reduction_ratio_ICB, sph_params, sph_rj,  &
+     &        r_2nd, sph_bc_S, fdm2_center, band_s00_poisson)
           call cal_reference_source(sph_rj, sc_prop, band_s00_poisson,  &
      &        ref_field%d_fld(1,iref_scalar),                           &
      &        ref_field%d_fld(1,iref_source))

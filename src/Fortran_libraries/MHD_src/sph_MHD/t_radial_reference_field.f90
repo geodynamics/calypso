@@ -15,15 +15,11 @@
 !!      subroutine set_default_reference_file_name(refs)
 !!        type(radial_reference_field), intent(in) :: refs
 !!      subroutine append_reference_field_names                         &
-!!     &         (radius_name, ipol_base, iref_radius,                  &
-!!     &          iref_base, iref_grad, iref_cmp, ref_field)
+!!     &         (radius_name, ipol_base, ipol_diffusion, refs)
 !!        character(len = kchara), intent(in) :: radius_name
 !!        type(base_field_address), intent(in) :: ipol_base
-!!        integer(kind = kint), intent(inout) :: iref_radius
-!!        type(base_field_address), intent(inout) :: iref_base
-!!        type(gradient_field_address), intent(inout) :: iref_grad
-!!        type(field_component_address), intent(inout) :: iref_cmp
-!!        type(phys_data), intent(inout) :: ref_field
+!!        type(diffusion_address), intent(in) ::  ipol_diffusion
+!!        type(radial_reference_field), intent(inout) :: refs
 !!
 !!      subroutine overwrite_sources_by_reference                       &
 !!     &         (sph_rj, iref_base, ipol_base, ref_field, rj_fld)
@@ -44,6 +40,7 @@
       use t_base_field_labels
       use t_grad_field_labels
       use t_field_component_labels
+      use t_diffusion_term_labels
       use t_file_IO_parameter
       use t_sph_radial_interpolate
 !
@@ -66,6 +63,11 @@
         type(gradient_field_address) :: iref_grad
 !>        Address of reference vector components
         type(field_component_address) :: iref_cmp
+!>        Diffusivity address for reference field
+        type(diffusivity_adress) :: iref_diffusivity
+!>        Dradient of diffusivity address for reference field
+        type(diffusivity_adress) :: iref_grad_diffusivity
+!
 !>        Structure of reference field (include center at the end)
         type(phys_data) :: ref_field
 !
@@ -77,6 +79,10 @@
 !>        Interpolation table from radial data input 
         type(sph_radial_interpolate) :: r_itp
       end type radial_reference_field
+!
+      private :: append_reference_scalar_list
+      private :: append_const_magnetic_fld_list
+      private :: append_r_diffusivities_list
 !
 ! -----------------------------------------------------------------------
 !
@@ -108,27 +114,47 @@
 ! -----------------------------------------------------------------------
 !
       subroutine append_reference_field_names                           &
-     &         (radius_name, ipol_base, iref_radius,                    &
-     &          iref_base, iref_grad, iref_cmp, ref_field)
+     &         (radius_name, ipol_base, ipol_diffusion, refs)
 !
-      use m_base_field_labels
-      use m_grad_field_labels
-      use m_field_component_labels
       use append_phys_data
 !
       character(len = kchara), intent(in) :: radius_name
       type(base_field_address), intent(in) :: ipol_base
+      type(diffusion_address), intent(in) ::  ipol_diffusion
 !
-      integer(kind = kint), intent(inout) :: iref_radius
+      type(radial_reference_field), intent(inout) :: refs
+!
+!
+      refs%iref_radius = refs%ref_field%ntot_phys + 1
+      call append_field_name_list(radius_name,                          &
+     &    ione, .TRUE., .FALSE., izero, refs%ref_field)
+!
+      call append_reference_scalar_list                                 &
+     &   (ipol_base, refs%iref_base, refs%iref_grad, refs%ref_field)
+      call append_const_magnetic_fld_list(ipol_base,                    &
+     &    refs%iref_cmp, refs%ref_field)
+      call append_r_diffusivities_list(ipol_diffusion,                  &
+     &    refs%iref_diffusivity, refs%iref_grad_diffusivity,            &
+     &    refs%ref_field)
+!
+      end subroutine append_reference_field_names
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine append_reference_scalar_list                           &
+     &         (ipol_base, iref_base, iref_grad, ref_field)
+!
+      use m_base_field_labels
+      use m_grad_field_labels
+      use append_phys_data
+!
+      type(base_field_address), intent(in) :: ipol_base
+!
       type(base_field_address), intent(inout) :: iref_base
       type(gradient_field_address), intent(inout) :: iref_grad
-      type(field_component_address), intent(inout) :: iref_cmp
       type(phys_data), intent(inout) :: ref_field
 !
-!
-      iref_radius = ref_field%ntot_phys + 1
-      call append_field_name_list(radius_name,                          &
-     &    ione, .TRUE., .FALSE., izero, ref_field)
 !
       if(ipol_base%i_heat_source .gt. 0) then
         iref_base%i_heat_source = ref_field%ntot_phys + 1
@@ -142,16 +168,16 @@
       end if
 !
       if(ipol_base%i_temp .gt. 0) then
-        iref_base%i_temp = ref_field%ntot_phys + 1
+        iref_base%i_temp =         ref_field%ntot_phys + 1
         call append_field_name_list(temperature%name,                   &
      &      ione, .TRUE., .FALSE., izero, ref_field)
 !
-        iref_grad%i_grad_temp = ref_field%ntot_phys + 1
+        iref_grad%i_grad_temp =     ref_field%ntot_phys + 1
         call append_field_name_list(grad_temp%name,                     &
      &      ione, .TRUE., .FALSE., izero, ref_field)
       end if
       if(ipol_base%i_light .gt. 0) then
-        iref_base%i_light = ref_field%ntot_phys + 1
+        iref_base%i_light =         ref_field%ntot_phys + 1
         call append_field_name_list(composition%name,                   &
      &      ione, .TRUE., .FALSE., izero, ref_field)
 !
@@ -159,6 +185,22 @@
         call append_field_name_list(grad_composition%name,              &
      &      ione, .TRUE., .FALSE., izero, ref_field)
       end if
+!
+      end subroutine append_reference_scalar_list
+!
+! -----------------------------------------------------------------------
+!
+      subroutine append_const_magnetic_fld_list(ipol_base,              &
+     &                                          iref_cmp, ref_field)
+!
+      use m_field_component_labels
+      use append_phys_data
+!
+      type(base_field_address), intent(in) :: ipol_base
+!
+      type(field_component_address), intent(inout) :: iref_cmp
+      type(phys_data), intent(inout) :: ref_field
+!
 !
       if(ipol_base%i_back_B .gt. 0) then
         iref_cmp%i_magne_y = ref_field%ntot_phys + 1
@@ -172,8 +214,66 @@
      &      ithree, .TRUE., .FALSE., izero, ref_field)
       end if
 !
-      end subroutine append_reference_field_names
+      end subroutine append_const_magnetic_fld_list
 !
+! -----------------------------------------------------------------------
+!
+      subroutine append_r_diffusivities_list                           &
+     &         (ipol_diffusion, iref_diffusivity,                      &
+     &          iref_grad_diffusivity, ref_field)
+!
+      use m_diffusion_term_labels
+      use append_phys_data
+!
+      type(diffusion_address), intent(in) ::  ipol_diffusion
+!
+      type(diffusivity_adress), intent(inout) :: iref_diffusivity
+      type(diffusivity_adress), intent(inout) :: iref_grad_diffusivity
+      type(phys_data), intent(inout) :: ref_field
+!
+!
+      if((ipol_diffusion%i_v_diffuse                                    &
+     &  + ipol_diffusion%i_w_diffuse) .gt. 0)  then
+        iref_diffusivity%i_K_viscosity =   ref_field%ntot_phys + 1
+        call append_field_name_list(kinetic_viscosity%name,             &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+!
+        iref_grad_diffusivity%i_K_viscosity = ref_field%ntot_phys + 1
+        call append_field_name_list(grad_kinetic_viscosity%name,        &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+      end if
+      if((ipol_diffusion%i_b_diffuse                                    &
+     &  + ipol_diffusion%i_vp_diffuse) .gt. 0) then
+        iref_diffusivity%i_B_diffusivity = ref_field%ntot_phys + 1
+        call append_field_name_list(magnetic_diffusivity%name,          &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+!
+        iref_grad_diffusivity%i_B_diffusivity = ref_field%ntot_phys + 1
+        call append_field_name_list(grad_magnetic_diffusivity%name,     &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+      end if
+      if(ipol_diffusion%i_t_diffuse .gt. 0)    then
+        iref_diffusivity%i_T_diffusivity = ref_field%ntot_phys + 1
+        call append_field_name_list(thermal_diffusivity%name,           &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+!
+        iref_grad_diffusivity%i_T_diffusivity = ref_field%ntot_phys + 1
+        call append_field_name_list(grad_thermal_diffusivity%name,      &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+      end if
+      if(ipol_diffusion%i_c_diffuse .gt. 0)    then
+        iref_diffusivity%i_C_diffusivity = ref_field%ntot_phys + 1
+        call append_field_name_list(chemical_diffusivity%name,          &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+!
+        iref_grad_diffusivity%i_C_diffusivity = ref_field%ntot_phys + 1
+        call append_field_name_list(grad_chemical_diffusivity%name,     &
+     &      ione, .TRUE., .FALSE., izero, ref_field)
+      end if
+!
+      end subroutine append_r_diffusivities_list
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine overwrite_sources_by_reference                         &

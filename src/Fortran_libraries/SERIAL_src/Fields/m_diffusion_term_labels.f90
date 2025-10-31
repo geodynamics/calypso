@@ -38,6 +38,15 @@
 !!   thermal_diffusivity           [diffusivity%i_T_diffusivity]:
 !!   chemical_diffusivity          [diffusivity%i_C_diffusivity]:
 !!
+!!   grad_viscosity                [grad_diffusivity%i_viscosity]:
+!!   grad_thermal_conductivity     [grad_diffusivity%i_T_conductivity]:
+!!   grad_chemical_conductivity    [grad_diffusivity%i_C_conductivity]:
+!!
+!!   grad_kinetic_viscosity        [grad_diffusivity%i_K_viscosity]:
+!!   grad_magnetic_diffusivity     [grad_diffusivity%i_B_diffusivity]:
+!!   grad_thermal_diffusivity      [grad_diffusivity%i_T_diffusivity]:
+!!   grad_chemical_diffusivity     [grad_diffusivity%i_C_diffusivity]:
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
 !!
@@ -102,43 +111,86 @@
 !>        Field label for kinetic viscosity
 !>                               @f$ \nu = \mu / \bar{\rho} @f$
       type(field_def), parameter :: kinetic_viscosity                   &
-     &    = field_def(n_comp = n_vector,                                &
+     &    = field_def(n_comp = n_scalar,                                &
      &                name = 'kinetic_viscosity',                       &
      &                math = '$ \nu = \mu / \bar{\rho} $')
 !
 !>        Field label for magnetic diffusivity @f$ \eta @f$
       type(field_def), parameter :: magnetic_diffusivity                &
-     &    = field_def(n_comp = n_vector,                                &
+     &    = field_def(n_comp = n_scalar,                                &
      &                name = 'magnetic_diffusivity',                    &
      &                math = '$ \eta $')
 !>        Field label for thermal diffusivity 
 !!                               @f$ \kappa_{T} = k / \bar{\rho} @f$
 
       type(field_def), parameter :: thermal_diffusivity                 &
-     &    = field_def(n_comp = n_vector,                                &
+     &    = field_def(n_comp = n_scalar,                                &
      &                name = 'thermal_diffusivity',                     &
      &                math = '$ \kappa_{T} = k / \bar{\rho} $')
 !>        Field label for chemical diffusivity  @f$ \kappa_{C} @f$
       type(field_def), parameter :: chemical_diffusivity                &
-     &    = field_def(n_comp = n_vector,                                &
+     &    = field_def(n_comp = n_scalar,                                &
      &                name = 'chemical_diffusivity',                    &
      &                math = '$ \kappa_{C} $')
 !
 !>        Field label for viscosity   @f$ \mu @f$
       type(field_def), parameter :: viscosity                           &
-     &    = field_def(n_comp = n_vector,                                &
+     &    = field_def(n_comp = n_scalar,                                &
      &                name = 'viscosity',                               &
      &                math = '$ \mu $')
 !>        Field label for thermal diffusivity @f$ k_{T} @f$
       type(field_def), parameter :: thermal_conductivity                &
-     &    = field_def(n_comp = n_vector,                                &
+     &    = field_def(n_comp = n_scalar,                                &
      &                name = 'thermal_conductivity',                    &
      &                math = '$ k_{T} $')
 !>        Field label for chemical diffusivity @f$ k_{C} @f$
       type(field_def), parameter :: chemical_conductivity               &
-     &    = field_def(n_comp = n_vector,                                &
+     &    = field_def(n_comp = n_scalar,                                &
      &                name = 'chemical_conductivity',                   &
      &                math = '$ k_{C} $')
+!
+!   --------------------------------------------------------------------
+!
+!>        Field label for kinetic viscosity
+!>                               @f$ d \nu / dr @f$
+      type(field_def), parameter :: grad_kinetic_viscosity              &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'grad_kinetic_viscosity',                  &
+     &                math = '$ d \nu / dr $')
+!
+!>        Field label for magnetic diffusivity @f$ d \eta / dr @f$
+      type(field_def), parameter :: grad_magnetic_diffusivity           &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'grad_magnetic_diffusivity',               &
+     &                math = '$ d \eta / dr $')
+!>        Field label for thermal diffusivity 
+!!                               @f$ d \kappa_{T} / dr @f$
+
+      type(field_def), parameter :: grad_thermal_diffusivity            &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'grad_thermal_diffusivity',                &
+     &                math = '$ d \kappa_{T} / dr $')
+!>        Field label for chemical diffusivity  @f$ d \kappa_{C} / dr @f$
+      type(field_def), parameter :: grad_chemical_diffusivity           &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'grad_chemical_diffusivity',               &
+     &                math = '$ d \kappa_{C} / dr $')
+!
+!>        Field label for viscosity   @f$ d \mu / dr @f$
+      type(field_def), parameter :: grad_viscosity                      &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'grad_viscosity',                          &
+     &                math = '$ d \mu / dr $')
+!>        Field label for thermal diffusivity @f$ d k_{T} / dr  @f$
+      type(field_def), parameter :: grad_thermal_conductivity           &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'grad_thermal_conductivity',               &
+     &                math = '$ d k_{T} / dr $')
+!>        Field label for chemical diffusivity @f$ d k_{C} / dr  @f$
+      type(field_def), parameter :: grad_chemical_conductivity          &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'grad_chemical_conductivity',              &
+     &                math = '$ d k_{C} / dr $')
 !
 ! ----------------------------------------------------------------------
 !
@@ -185,9 +237,19 @@
      &   .or. (field_name .eq. magnetic_diffusivity%name)               &
      &   .or. (field_name .eq. thermal_diffusivity%name)                &
      &   .or. (field_name .eq. chemical_diffusivity%name)               &
+!
      &   .or. (field_name .eq. viscosity%name)                          &
      &   .or. (field_name .eq. thermal_conductivity%name)               &
-     &   .or. (field_name .eq. chemical_conductivity%name)
+     &   .or. (field_name .eq. chemical_conductivity%name)              &
+!
+     &   .or. (field_name .eq. grad_kinetic_viscosity%name)             &
+     &   .or. (field_name .eq. grad_magnetic_diffusivity%name)          &
+     &   .or. (field_name .eq. grad_thermal_diffusivity%name)           &
+     &   .or. (field_name .eq. grad_chemical_diffusivity%name)          &
+!
+     &   .or. (field_name .eq. grad_viscosity%name)                     &
+     &   .or. (field_name .eq. grad_thermal_conductivity%name)          &
+     &   .or. (field_name .eq. grad_chemical_conductivity%name)
 !
       end function check_diffusivity
 !
@@ -230,6 +292,15 @@
       call set_field_label_to_ctl(viscosity,             array_c2i)
       call set_field_label_to_ctl(thermal_conductivity,  array_c2i)
       call set_field_label_to_ctl(chemical_conductivity, array_c2i)
+!
+      call set_field_label_to_ctl(grad_kinetic_viscosity,    array_c2i)
+      call set_field_label_to_ctl(grad_magnetic_diffusivity, array_c2i)
+      call set_field_label_to_ctl(grad_thermal_diffusivity,  array_c2i)
+      call set_field_label_to_ctl(grad_chemical_diffusivity, array_c2i)
+      call set_field_label_to_ctl(grad_viscosity,            array_c2i)
+      call set_field_label_to_ctl(grad_thermal_conductivity, array_c2i)
+      call set_field_label_to_ctl(grad_chemical_conductivity,           &
+     &                            array_c2i)
 !
       end subroutine set_base_diffusivity_names
 !

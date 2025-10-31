@@ -196,6 +196,48 @@
 !
       call init_reft_rj_data(sph%sph_rj, ipol, refs)
 !
+      write(*,*) 'fl_prop%coef_diffuse', MHD_prop%fl_prop%coef_diffuse
+      write(*,*) 'cd_prop%coef_diffuse', MHD_prop%cd_prop%coef_diffuse
+      write(*,*) 'ht_prop%coef_diffuse', MHD_prop%ht_prop%coef_diffuse
+      write(*,*) 'cp_prop%coef_diffuse', MHD_prop%cp_prop%coef_diffuse
+!
+      if((refs%iref_diffusivity%i_K_viscosity                           &
+     &    * refs%iref_grad_diffusivity%i_K_viscosity) .gt. 0) then
+        call copy_const_diffusivity_to_ref                              &
+     &    (sph%sph_rj%nidx_rj(1), MHD_prop%fl_prop%coef_diffuse,        &
+     &     refs%ref_field%d_fld(1,refs%iref_diffusivity%i_K_viscosity), &
+     &     refs%ref_field%d_fld(1,                                      &
+     &                       refs%iref_grad_diffusivity%i_K_viscosity))
+      end if
+!
+      if((refs%iref_diffusivity%i_B_diffusivity                         &
+     &    * refs%iref_grad_diffusivity%i_B_diffusivity) .gt. 0) then
+        call copy_const_diffusivity_to_ref                              &
+     &    (sph%sph_rj%nidx_rj(1), MHD_prop%cd_prop%coef_diffuse,        &
+     &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_B_diffusivity), &
+     &   refs%ref_field%d_fld(1,                                        &
+     &                     refs%iref_grad_diffusivity%i_B_diffusivity))
+      end if
+!
+      if((refs%iref_diffusivity%i_T_diffusivity                         &
+     &    * refs%iref_grad_diffusivity%i_T_diffusivity) .gt. 0) then
+        call copy_const_diffusivity_to_ref                              &
+     &    (sph%sph_rj%nidx_rj(1), MHD_prop%ht_prop%coef_diffuse,        &
+     &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_T_diffusivity), &
+     &   refs%ref_field%d_fld(1,                                        &
+     &                     refs%iref_grad_diffusivity%i_T_diffusivity))
+      end if
+!
+      if((refs%iref_diffusivity%i_C_diffusivity                         &
+     &    * refs%iref_grad_diffusivity%i_C_diffusivity) .gt. 0) then
+        call copy_const_diffusivity_to_ref                              &
+     &    (sph%sph_rj%nidx_rj(1), MHD_prop%cp_prop%coef_diffuse,        &
+     &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_C_diffusivity), &
+     &   refs%ref_field%d_fld(1,                                        &
+     &                     refs%iref_grad_diffusivity%i_C_diffusivity))
+      end if
+!
+!
       call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
       call load_sph_reference_fields(refs)
       call overwrite_sources_by_reference(sph%sph_rj, refs%iref_base,   &

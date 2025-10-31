@@ -203,7 +203,9 @@
         integer(kind = kint) :: ir_dkappa_norm =  izero
 !
 !>       coefficient for diffusion reduction for ICB
-        real(kind = kreal) :: diffusie_reduction_ICB = one
+        real(kind = kreal) :: diffuse_reduction_ratio_ICB = one
+!>       coefficient for diffusion reduction for ICB
+        real(kind = kreal) :: diffuse_reduction_width_ICB = zero
 !
 !>        Force flag for advection
         logical :: iflag_4_advection = .FALSE.

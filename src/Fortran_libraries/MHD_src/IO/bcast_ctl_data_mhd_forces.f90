@@ -167,7 +167,8 @@
       call bcast_ctl_type_c1(refs_ctl%reference_ctl)
       call bcast_ctl_type_c1(refs_ctl%ref_file_ctl)
       call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
-      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_ctl)
+      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_ratio)
+      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_width)
 !
       call calypso_mpi_bcast_character                                  &
      &   (refs_ctl%block_name, cast_long(kchara), 0)

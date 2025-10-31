@@ -31,7 +31,8 @@
 !!    begin temperature_define
 !!      filtered_advection_ctl       Off
 !!
-!!      ICB_diffusivity_reduction_ctl     0.1
+!!      ICB_diffusivity_reduction_ratio     0.1
+!!      ICB_diffusivity_reduction_width     0.001
 !!
 !!      ref_temp_ctl              spherical_shell
 !!      ref_field_file_name      'reference_temp.dat'
@@ -110,7 +111,8 @@
         type(read_character_item) :: stratified_ctl
         type(read_character_item) :: ref_file_ctl
 !
-        type(read_real_item) :: ICB_diffuse_reduction_ctl
+        type(read_real_item) :: ICB_diffuse_reduction_ratio
+        type(read_real_item) :: ICB_diffuse_reduction_width
 !
         type(reference_point_control) :: low_ctl
         type(reference_point_control) :: high_ctl
@@ -135,7 +137,8 @@
       call reset_ref_value_ctl(refs_ctl%high_ctl)
       call reset_takepiro_ctl(refs_ctl%takepiro_ctl)
 !
-      refs_ctl%ICB_diffuse_reduction_ctl%iflag = 0
+      refs_ctl%ICB_diffuse_reduction_ratio%iflag = 0
+      refs_ctl%ICB_diffuse_reduction_width%iflag = 0
       refs_ctl%filterd_advect_ctl%iflag =   0
       refs_ctl%reference_ctl%iflag =        0
       refs_ctl%stratified_ctl%iflag =       0
