@@ -30,6 +30,7 @@
       use m_error_IDs
 !
       use t_physical_property
+      use t_scalar_property
       use t_ctl_data_mhd_normalize
       use t_ctl_data_dimless_numbers
       use t_powers_4_coefficients

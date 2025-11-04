@@ -19,7 +19,6 @@
 !!        type(conductive_property), intent(in) :: cd_prop
 !!        type(reference_scalar_param), intent(in) :: ref_param_T
 !!        type(reference_scalar_param), intent(in) :: ref_param_C
-!!        type(scalar_property), intent(in) :: ht_prop, cp_prop
 !!        type(phys_address), intent(in) :: f_trns
 !!        type(phys_address), intent(in) :: bs_trns, bs_difv
 !!        type(phys_address), intent(in) :: be_trns, fe_trns

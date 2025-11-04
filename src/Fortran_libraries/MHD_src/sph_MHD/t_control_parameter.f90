@@ -16,6 +16,7 @@
 !
       use m_precision
       use t_physical_property
+      use t_scalar_property
       use t_reference_scalar_param
       use t_coef_parameters_list
       use t_ctl_param_val_density

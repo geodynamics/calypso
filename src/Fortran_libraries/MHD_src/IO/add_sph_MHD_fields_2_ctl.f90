@@ -21,6 +21,7 @@
 !
       use t_control_array_character3
       use t_physical_property
+      use t_scalar_property
 !
       implicit  none
 !

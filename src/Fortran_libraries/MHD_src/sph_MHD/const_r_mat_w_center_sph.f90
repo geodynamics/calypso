@@ -39,7 +39,7 @@
       use t_sph_center_matrix
       use t_physical_property
       use t_boundary_params_sph_MHD
-use t_coef_fdm2_centre
+      use t_coef_fdm2_centre
 !
       implicit none
 !
@@ -88,6 +88,7 @@ use t_coef_fdm2_centre
 !
       use t_sph_matrices
       use t_sph_matrix
+      use t_scalar_property
 !
       character(len=kchara), intent(in) :: mat_name
       real(kind = kreal), intent(in) :: dt

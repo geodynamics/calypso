@@ -56,7 +56,7 @@
       use t_schmidt_poly_on_rtm
 !
       use t_control_parameter
-      use t_physical_property
+      use t_scalar_property
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr

@@ -37,7 +37,7 @@
       use calypso_mpi
       use m_machine_parameter
       use m_sph_node_group_types
-      use t_physical_property
+      use t_scalar_property
       use t_control_array_chara2real
       use t_bc_data_list
       use m_fem_node_group_types

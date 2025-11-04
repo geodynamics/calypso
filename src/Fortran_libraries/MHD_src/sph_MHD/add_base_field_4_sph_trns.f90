@@ -37,6 +37,7 @@
       use t_base_field_labels
       use t_addresses_sph_transform
       use t_physical_property
+!      use t_scalar_property
 !
       implicit none
 !

@@ -58,6 +58,7 @@
 !
       use calypso_mpi
       use t_physical_property
+      use t_scalar_property
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop

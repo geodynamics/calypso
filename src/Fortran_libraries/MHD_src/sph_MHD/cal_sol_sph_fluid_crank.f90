@@ -200,7 +200,7 @@
      &         sph_bc, bcs_S, band_s_evo, band_s00_evo,                 &
      &         is_scalar, rj_fld, x00_w_center)
 !
-      use t_physical_property
+      use t_scalar_property
       use t_sph_center_matrix
       use t_boundary_params_sph_MHD
       use solve_sph_fluid_crank

@@ -45,7 +45,7 @@
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
       use t_no_heat_Nusselt
-      use t_physical_property
+      use t_scalar_property
       use t_fdm_coefs
       use t_sph_matrix
       use pickup_sph_spectr

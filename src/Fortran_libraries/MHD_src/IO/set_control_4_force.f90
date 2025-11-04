@@ -19,6 +19,7 @@
       use m_error_IDs
       use m_machine_parameter
       use m_force_control_labels
+      use m_property_flags
 !
       implicit  none
 !

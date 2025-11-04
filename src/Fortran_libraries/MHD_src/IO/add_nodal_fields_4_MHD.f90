@@ -26,7 +26,7 @@
 !
       use m_machine_parameter
       use t_control_parameter
-      use t_physical_property
+      use t_scalar_property
       use add_nodal_fields_ctl
       use calypso_mpi
 !

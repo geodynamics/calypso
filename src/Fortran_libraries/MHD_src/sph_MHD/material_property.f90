@@ -23,6 +23,7 @@
       use t_phys_address
       use t_control_parameter
       use t_physical_property
+      use t_scalar_property
       use t_coef_parameters_list
       use calypso_mpi
 !

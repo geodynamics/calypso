@@ -56,6 +56,7 @@
      &          iref_source, r_itp, ref_field, bcs_S, flag_write_ref)
 !
       use t_spheric_parameter
+      use t_scalar_property
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr

@@ -18,19 +18,9 @@
       use m_precision
       use m_constants
 !
+      use m_property_flags
+!
       implicit  none
-!
-!
-!>      Scheme ID for no evolution
-      integer (kind=kint), parameter :: id_no_evolution =     0
-!>      Scheme ID for explicit Euler scheme
-      integer (kind=kint), parameter :: id_explicit_euler =   1
-!>      Scheme ID for 2nd order Adams-Bashforth Scheme
-      integer (kind=kint), parameter :: id_explicit_adams2 =  2
-!>      Scheme ID for Crank-Nicolson Scheme
-      integer (kind=kint), parameter :: id_Crank_nicolson =   3
-!>      Scheme ID for Crank-Nicolson Scheme with consistent mass matrix
-      integer (kind=kint), parameter :: id_Crank_nicolson_cmass = 4
 !
 !
 !>     flag for no gravity
@@ -178,41 +168,6 @@
         logical :: iflag_4_filter_induction = .FALSE.
       end type conductive_property
 !
-!>      Structure for thermal property
-      type scalar_property
-!>        Time evolution flag for velocity
-        integer (kind=kint) :: iflag_scheme = id_no_evolution
-!>        Coefficient of implicit term
-        real(kind = kreal) :: coef_imp = half
-!>        Coefficient of explicit term
-        real(kind = kreal) :: coef_exp = half
-!
-!>       coefficient for time evolution of temperature and heat flux
-        real(kind = kreal) :: coef_advect
-!>       coefficient for heat flux (-coef_advect)
-        real(kind = kreal) :: coef_nega_adv
-!
-!>       coefficient for thermal diffusion
-        real(kind = kreal) :: coef_diffuse
-!>       coefficient for heat source term
-        real(kind = kreal) :: coef_source = zero
-!
-!>       radial field index for diffusivity variation
-        integer(kind = kint) :: ir_kappa =        izero
-!>       radial field index for diffusivity variation
-        integer(kind = kint) :: ir_dkappa_norm =  izero
-!
-!>       coefficient for diffusion reduction for ICB
-        real(kind = kreal) :: diffuse_reduction_ratio_ICB = one
-!>       coefficient for diffusion reduction for ICB
-        real(kind = kreal) :: diffuse_reduction_width_ICB = zero
-!
-!>        Force flag for advection
-        logical :: iflag_4_advection = .FALSE.
-!>        Force flag for Filtered advection
-        logical :: iflag_4_filter_advection = .FALSE.
-      end type scalar_property
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -240,28 +195,6 @@
       end subroutine dealloc_force_list
 !
 !  ---------------------------------------------------------------------
-!
-      subroutine set_filtered_advection_ctl                             &
-     &         (filterd_advect_ctl, scl_prop)
-!
-      use t_control_array_character
-      use skip_comment_f
-!
-      type(read_character_item), intent(in) :: filterd_advect_ctl
-      type(scalar_property), intent(inout) :: scl_prop
-!
-!
-      if(scl_prop%iflag_scheme .eq. id_no_evolution) return
-      scl_prop%iflag_4_advection = .TRUE.
-!
-      if(filterd_advect_ctl%iflag .gt. 0                                &
-     &   .and. yes_flag(filterd_advect_ctl%charavalue)) then
-        scl_prop%iflag_4_advection = .FALSE.
-        scl_prop%iflag_4_filter_advection = .TRUE.
-      end if
-!
-      end subroutine set_filtered_advection_ctl
-!
 ! -----------------------------------------------------------------------
 !
       subroutine set_filtered_induction_ctl                             &

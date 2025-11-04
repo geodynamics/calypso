@@ -351,6 +351,8 @@
      &          nidx_rj, ar_1d_rj, g_sph_rj, is_h_advect, is_velo,      &
      &          refgrad_r, rj_fld)
 !
+      use t_scalar_property
+!
       integer(kind = kint), intent(in) :: nidx_rj(2)
       integer(kind = kint), intent(in) :: is_h_advect, is_velo
       real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)

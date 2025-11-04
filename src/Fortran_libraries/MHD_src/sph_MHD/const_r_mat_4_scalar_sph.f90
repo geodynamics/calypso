@@ -46,6 +46,7 @@
       use m_machine_parameter
 !
       use t_physical_property
+      use t_scalar_property
       use t_spheric_parameter
       use t_spheric_rj_data
       use t_sph_matrices

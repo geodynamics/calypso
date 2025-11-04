@@ -14,7 +14,6 @@
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(fluid_property), intent(in) :: fl_prop
-!!        type(scalar_property), intent(in) :: ht_prop, cp_prop
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(phys_address), intent(in) :: bs_trns
 !!        type(phys_address), intent(in) :: be_trns, fe_trns

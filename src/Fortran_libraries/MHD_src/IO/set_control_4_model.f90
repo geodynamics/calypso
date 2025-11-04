@@ -44,7 +44,10 @@
      &                                 mevo_ctl, evo_ctl, MHD_prop)
 !
       use calypso_mpi
+!
       use m_base_field_labels
+      use m_property_flags
+!
       use t_ctl_data_mhd_evolution
       use t_ctl_data_temp_model
       use t_reference_scalar_param
@@ -131,27 +134,8 @@
 !
 !   set control for diffusion reduction by latent heating
 !
-      MHD_prop%ht_prop%diffuse_reduction_ratio_ICB = 1.0d0
-      MHD_prop%ht_prop%diffuse_reduction_width_ICB = 0.0d0
-      if(reft_ctl%ICB_diffuse_reduction_ratio%iflag .gt. 0) then
-        MHD_prop%ht_prop%diffuse_reduction_ratio_ICB                    &
-     &        = reft_ctl%ICB_diffuse_reduction_ratio%realvalue
-      end if
-      if(reft_ctl%ICB_diffuse_reduction_width%iflag .gt. 0) then
-        MHD_prop%ht_prop%diffuse_reduction_width_ICB                    &
-     &        = reft_ctl%ICB_diffuse_reduction_width%realvalue
-      end if
-!
-      MHD_prop%cp_prop%diffuse_reduction_ratio_ICB = 1.0d0
-      MHD_prop%cp_prop%diffuse_reduction_width_ICB = 0.0d0
-      if(refc_ctl%ICB_diffuse_reduction_ratio%iflag .gt. 0) then
-        MHD_prop%cp_prop%diffuse_reduction_ratio_ICB                    &
-     &        = refc_ctl%ICB_diffuse_reduction_ratio%realvalue
-      end if
-      if(refc_ctl%ICB_diffuse_reduction_width%iflag .gt. 0) then
-        MHD_prop%cp_prop%diffuse_reduction_width_ICB                    &
-     &        = refc_ctl%ICB_diffuse_reduction_width%realvalue
-      end if
+      call set_diffusion_reduction_ctl(reft_ctl, MHD_prop%ht_prop)
+      call set_diffusion_reduction_ctl(refc_ctl, MHD_prop%cp_prop)
 !
 !   set control for reference temperature 
 !
@@ -174,6 +158,9 @@
 !
       subroutine s_set_control_4_crank                                  &
      &         (mevo_ctl, fl_prop, cd_prop, ht_prop, cp_prop)
+!
+      use t_physical_property
+      use t_scalar_property
 !
       type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
       type(fluid_property), intent(inout) :: fl_prop
