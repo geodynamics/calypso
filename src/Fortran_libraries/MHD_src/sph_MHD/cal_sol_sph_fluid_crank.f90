@@ -34,7 +34,7 @@
 !!        type(sph_boundary_type), intent(in) :: sph_bc_B
 !!        type(sph_vector_boundary_data), intent(in) :: bcs_B
 !!
-!!      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, property,       &
+!!      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,       &
 !!     &         sph_bc, bcs_S, band_s_evo, band_s00_evo,               &
 !!     &         is_scalar, rj_fld, x00_w_center)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -196,7 +196,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, property,         &
+      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,         &
      &         sph_bc, bcs_S, band_s_evo, band_s00_evo,                 &
      &         is_scalar, rj_fld, x00_w_center)
 !
@@ -215,7 +215,7 @@
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(band_matrices_type), intent(in) :: band_s_evo
       type(band_matrix_type), intent(in) :: band_s00_evo
-      type(scalar_property), intent(in) :: property
+      type(scalar_property), intent(in) :: scl_prop
       real(kind = kreal), intent(in) :: dt
       integer(kind = kint), intent(in) :: is_scalar
 !
@@ -225,12 +225,12 @@
 !
 !
       call set_CMB_scalar_sph_crank(sph_rj, sph_bc, bcs_S%CMB_Sspec,    &
-     &    property%coef_advect, property%coef_diffuse,                  &
-     &    dt, property%coef_imp, is_scalar,                             &
+     &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
+     &    dt, scl_prop%coef_imp, is_scalar,                             &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call set_ICB_scalar_sph_crank(sph_rj, sph_bc, bcs_S%ICB_Sspec,    &
-     &    property%coef_advect, property%coef_diffuse,                  &
-     &    property%diffuse_reduction_ratio_ICB, dt, property%coef_imp,  &
+     &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
+     &    scl_prop%diffuse_reduction_ratio_ICB, dt, scl_prop%coef_imp,  &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call solve_scalar_sph_crank(sph_rj, band_s_evo, band_s00_evo,     &

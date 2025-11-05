@@ -8,14 +8,15 @@
 !!
 !!@verbatim
 !!      subroutine s_cal_sol_sph_MHD_crank                              &
-!!     &         (dt, sph_rj, r_2nd, MHD_prop, sph_MHD_bc, leg,         &
+!!     &         (dt, sph_rj, r_2nd, MHD_prop, refs, sph_MHD_bc, leg,   &
 !!     &          ipol, sph_MHD_mat, rj_fld)
 !!      subroutine set_sph_field_to_start(sph_rj, r_2nd,                &
-!!     &          MHD_prop, sph_MHD_bc, leg, ipol, rj_fld)
+!!     &          MHD_prop, refs, sph_MHD_bc, leg, ipol, rj_fld)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
+!!        type(radial_reference_field), intent(in) :: refs
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(phys_address), intent(in) :: ipol
 !!        type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
@@ -47,6 +48,7 @@
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_radial_matrices_sph_MHD
+      use t_radial_reference_field
       use t_work_4_sph_trans
 !
       implicit none
@@ -58,7 +60,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_cal_sol_sph_MHD_crank                                &
-     &         (dt, sph_rj, r_2nd, MHD_prop, sph_MHD_bc, leg,           &
+     &         (dt, sph_rj, r_2nd, MHD_prop, refs, sph_MHD_bc, leg,     &
      &          ipol, sph_MHD_mat, rj_fld)
 !
       use cal_sol_sph_fluid_crank
@@ -70,6 +72,7 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(radial_reference_field), intent(in) :: refs
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(legendre_4_sph_trans), intent(in) :: leg
       type(phys_address), intent(in) :: ipol
@@ -140,12 +143,14 @@
 !
       if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
         call update_after_heat_sph(sph_rj, r_2nd, MHD_prop%ht_prop,     &
-     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                      &
+     &      refs%iref_diffusivity, refs%iref_grad_diffusivity,          &
+     &      refs%ref_field, sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,      &
      &      sph_MHD_bc%fdm2_center, leg, ipol, rj_fld)
       end if
       if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
         call update_after_composit_sph(sph_rj, r_2nd, MHD_prop%cp_prop, &
-     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                      &
+     &      refs%iref_diffusivity, refs%iref_grad_diffusivity,          &
+     &      refs%ref_field, sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,      &
      &      sph_MHD_bc%fdm2_center, leg, ipol, rj_fld)
       end if
       if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
@@ -159,7 +164,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_sph_field_to_start(sph_rj, r_2nd,                  &
-     &          MHD_prop, sph_MHD_bc, leg, ipol, rj_fld)
+     &          MHD_prop, refs, sph_MHD_bc, leg, ipol, rj_fld)
 !
       use sph_radial_grad_4_velocity
       use sph_radial_grad_4_magne
@@ -169,6 +174,7 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(legendre_4_sph_trans), intent(in) :: leg
       type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(radial_reference_field), intent(in) :: refs
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -189,11 +195,13 @@
 !
       if(iflag_debug.gt.0) write(*,*) 'update_after_heat_sph'
       call update_after_heat_sph(sph_rj, r_2nd, MHD_prop%ht_prop,       &
-     &    sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                        &
+     &    refs%iref_diffusivity, refs%iref_grad_diffusivity,            &
+     &    refs%ref_field, sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,        &
      &    sph_MHD_bc%fdm2_center, leg, ipol, rj_fld)
       if(iflag_debug.gt.0) write(*,*) 'update_after_composit_sph'
       call update_after_composit_sph(sph_rj, r_2nd, MHD_prop%cp_prop,   &
-     &    sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                        &
+     &    refs%iref_diffusivity, refs%iref_grad_diffusivity,            &
+     &    refs%ref_field, sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,        &
      &    sph_MHD_bc%fdm2_center, leg, ipol, rj_fld)
 !
       if(ipol%base%i_current .gt. 0) then

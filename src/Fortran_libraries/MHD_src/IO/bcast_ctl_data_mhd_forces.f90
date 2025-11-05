@@ -167,6 +167,7 @@
       call bcast_ctl_type_c1(refs_ctl%reference_ctl)
       call bcast_ctl_type_c1(refs_ctl%ref_file_ctl)
       call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
+      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_radius)
       call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_ratio)
       call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_width)
 !

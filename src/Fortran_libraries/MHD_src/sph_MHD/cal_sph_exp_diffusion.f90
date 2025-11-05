@@ -11,6 +11,27 @@
 !!     &          is_fld, is_diffuse, nidx_rj, ar_1d_rj, g_sph_rj,      &
 !!     &          d1nod_mat_fdm_2, d2nod_mat_fdm_2,                     &
 !!     &          n_point, ntot_phys_rj, d_rj)
+!!      subroutine cal_sph_nod_scl_val_diffuse2                         &
+!!     &         (kr_in, kr_out, coef_d, k_ratio, dk_dr,                &
+!!     &          is_fld, is_diffuse, nidx_rj, ar_1d_rj, g_sph_rj,      &
+!!     &          d1nod_mat_fdm_2, d2nod_mat_fdm_2,                     &
+!!     &          n_point, ntot_phys_rj, d_rj)
+!!        integer(kind = kint), intent(in) :: kr_in, kr_out
+!!        integer(kind = kint), intent(in) :: is_fld
+!!        integer(kind = kint), intent(in) :: is_diffuse
+!!        integer(kind = kint), intent(in) :: n_point,  ntot_phys_rj
+!!        integer(kind = kint), intent(in) :: nidx_rj(2)
+!!        real(kind = kreal), intent(in) :: coef_d
+!!        real(kind = kreal), intent(in) :: k_ratio(0:nidx_rj(1))
+!!        real(kind = kreal), intent(in) :: dk_dr(0:nidx_rj(1))
+!!        real(kind = kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
+!!        real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)
+!!        real(kind = kreal), intent(in)                                &
+!!     &                   :: d1nod_mat_fdm_2(nidx_rj(1),-1:1)
+!!        real(kind = kreal), intent(in)                                &
+!!     &                   :: d2nod_mat_fdm_2(nidx_rj(1),-1:1)
+!!        real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
+!!
 !!      subroutine cal_sph_nod_vect_diffuse2(kr_in, kr_out, coef_d,     &
 !!     &          is_fld, is_diffuse, nidx_rj, ar_1d_rj, g_sph_rj,      &
 !!     &          d2nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
@@ -47,10 +68,9 @@
       integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind = kint), intent(in) :: is_fld
       integer(kind = kint), intent(in) :: is_diffuse
-      real(kind = kreal), intent(in) :: coef_d
-!
       integer(kind = kint), intent(in) :: n_point,  ntot_phys_rj
       integer(kind = kint), intent(in) :: nidx_rj(2)
+      real(kind = kreal), intent(in) :: coef_d
       real(kind = kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
       real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)
       real(kind = kreal), intent(in)                                    &
@@ -90,6 +110,64 @@
 !$omp end parallel do
 !
       end subroutine cal_sph_nod_scalar_diffuse2
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_sph_nod_scl_val_diffuse2                           &
+     &         (kr_in, kr_out, coef_d, k_ratio, dk_dr,                  &
+     &          is_fld, is_diffuse, nidx_rj, ar_1d_rj, g_sph_rj,        &
+     &          d1nod_mat_fdm_2, d2nod_mat_fdm_2,                       &
+     &          n_point, ntot_phys_rj, d_rj)
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
+      integer(kind = kint), intent(in) :: is_fld
+      integer(kind = kint), intent(in) :: is_diffuse
+      integer(kind = kint), intent(in) :: n_point,  ntot_phys_rj
+      integer(kind = kint), intent(in) :: nidx_rj(2)
+!
+      real(kind = kreal), intent(in) :: coef_d
+      real(kind = kreal), intent(in) :: k_ratio(0:nidx_rj(1))
+      real(kind = kreal), intent(in) :: dk_dr(0:nidx_rj(1))
+      real(kind = kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
+      real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)
+      real(kind = kreal), intent(in)                                    &
+     &                   :: d1nod_mat_fdm_2(nidx_rj(1),-1:1)
+      real(kind = kreal), intent(in)                                    &
+     &                   :: d2nod_mat_fdm_2(nidx_rj(1),-1:1)
+!
+      real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
+!
+      real(kind = kreal) :: d1s_dr1
+      real(kind = kreal) :: d2s_dr2
+      integer(kind = kint) :: inod, i_p1, i_n1, j, k
+      integer(kind = kint) :: ist, ied
+!
+!
+      ist  = kr_in * nidx_rj(2) + 1
+      ied = (kr_out-1) * nidx_rj(2)
+!$omp parallel do private(inod,i_p1,i_n1,j,k,d2s_dr2,d1s_dr1)
+!cdir nodep
+      do inod = ist, ied
+        i_p1 = inod + nidx_rj(2)
+        i_n1 = inod - nidx_rj(2)
+        j = mod((inod-1),nidx_rj(2)) + 1
+        k = 1 + (inod- j) / nidx_rj(2)
+!
+        d1s_dr1 =  d1nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_fld  )          &
+     &           + d1nod_mat_fdm_2(k, 0) * d_rj(inod,is_fld  )          &
+     &           + d1nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_fld  )
+        d2s_dr2 =  d2nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_fld  )          &
+     &           + d2nod_mat_fdm_2(k, 0) * d_rj(inod,is_fld  )          &
+     &           + d2nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_fld  )
+!
+        d_rj(inod,is_diffuse)                                           &
+     &     = coef_d*k_ratio(k) * (d2s_dr2 + two*ar_1d_rj(k,1) * d1s_dr1 &
+     &                 - g_sph_rj(j,3)*ar_1d_rj(k,2)*d_rj(inod,is_fld)) &
+     &     + coef_d * dk_dr(k) * d1s_dr1
+      end do
+!$omp end parallel do
+!
+      end subroutine cal_sph_nod_scl_val_diffuse2
 !
 ! -----------------------------------------------------------------------
 !

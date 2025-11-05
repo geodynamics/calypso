@@ -40,6 +40,7 @@
 !!
 !!    begin temperature_define
 !!      filtered_advection_ctl       Off
+!!      ICB_diffusivity_reduction_radius    0.53846154
 !!      ICB_diffusivity_reduction_ratio     0.1
 !!      ICB_diffusivity_reduction_width     0.001
 !!
@@ -82,9 +83,11 @@
       character(len=kchara), parameter, private                         &
      &    :: hd_filterd_advection = 'filtered_advection_ctl'
       character(len=kchara), parameter, private                         &
-     &    :: hd_diff_reduce_ratio = 'ICB_diffusivity_reduction_ratio'
+     &    :: hd_diff_reduce_radius = 'ICB_diffusivity_reduction_radius'
       character(len=kchara), parameter, private                         &
-     &    :: hd_diff_reduce_width = 'ICB_diffusivity_reduction_ratio'
+     &    :: hd_diff_reduce_ratio =  'ICB_diffusivity_reduction_ratio'
+      character(len=kchara), parameter, private                         &
+     &    :: hd_diff_reduce_width =  'ICB_diffusivity_reduction_width'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_ref_temp =       'ref_temp_ctl'
@@ -160,6 +163,8 @@
 !
         call read_real_ctl_type(c_buf, hd_diff_reduce_width,            &
      &                          reft_ctl%ICB_diffuse_reduction_width)
+        call read_real_ctl_type(c_buf, hd_diff_reduce_radius,           &
+     &                          reft_ctl%ICB_diffuse_reduction_radius)
       end do
       reft_ctl%i_temp_def = 1
 !
@@ -186,6 +191,7 @@
       maxlen = len_trim(hd_filterd_advection)
       maxlen = max(maxlen, len_trim(hd_diff_reduce_ratio))
       maxlen = max(maxlen, len_trim(hd_diff_reduce_width))
+      maxlen = max(maxlen, len_trim(hd_diff_reduce_radius))
       maxlen = max(maxlen, len_trim(hd_ref_temp))
       maxlen = max(maxlen, len_trim(hd_start_ctl))
       maxlen = max(maxlen, len_trim(hd_ref_field_file))
@@ -240,6 +246,8 @@
         call init_chara_ctl_item_label                                  &
      &     (hd_ref_field_file, reft_ctl%ref_file_ctl)
 !
+        call init_real_ctl_item_label(hd_diff_reduce_radius,            &
+     &                          reft_ctl%ICB_diffuse_reduction_radius)
         call init_real_ctl_item_label(hd_diff_reduce_ratio,             &
      &                          reft_ctl%ICB_diffuse_reduction_ratio)
         call init_real_ctl_item_label(hd_diff_reduce_width,             &

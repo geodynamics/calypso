@@ -33,14 +33,21 @@
 !!        Address for solution: is_ohmic, is_ohmic+2, is_ohmic+1
 !!
 !!      subroutine const_sph_scalar_diffusion                           &
-!!     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center,            &
-!!     &          g_sph_rj, coef_diffuse, is_fld, is_diffuse, rj_fld)
+!!     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center, g_sph_rj,  &
+!!     &          flag_val_diffuse, coef_diffuse, k_ratio, dk_dr,       &
+!!     &          is_fld, is_diffuse, rj_fld)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
-!!        type(phys_data), intent(inout) :: rj_fld
 !!        type(sph_boundary_type), intent(in) :: sph_bc
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
+!!        integer(kind = kint), intent(in) :: is_fld, is_diffuse
+!!        real(kind=kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
+!!        logical, intent(in) :: flag_val_diffuse
+!!        real(kind = kreal), intent(in) :: coef_diffuse
+!!        real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
+!!        real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
+!!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
 !!
 !!@param sph_bc  Structure for basic boundary condition parameters
@@ -215,8 +222,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_sph_scalar_diffusion                             &
-     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center,              &
-     &          g_sph_rj, coef_diffuse, is_fld, is_diffuse, rj_fld)
+     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center, g_sph_rj,    &
+     &          flag_val_diffuse, coef_diffuse, k_ratio, dk_dr,         &
+     &          is_fld, is_diffuse, rj_fld)
 !
       use select_exp_scalar_ICB
       use select_exp_scalar_CMB
@@ -229,16 +237,27 @@
 !
       integer(kind = kint), intent(in) :: is_fld, is_diffuse
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
+      logical, intent(in) :: flag_val_diffuse
       real(kind = kreal), intent(in) :: coef_diffuse
+      real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
+      real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
 !
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call cal_sph_nod_scalar_diffuse2(sph_bc%kr_in, sph_bc%kr_out,     &
-     &    coef_diffuse, is_fld, is_diffuse,                             &
-     &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                    &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,                         &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      if(flag_val_diffuse) then
+        call cal_sph_nod_scl_val_diffuse2(sph_bc%kr_in, sph_bc%kr_out,  &
+     &      coef_diffuse, k_ratio, dk_dr, is_fld, is_diffuse,           &
+     &      sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                  &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,                       &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      else
+        call cal_sph_nod_scalar_diffuse2(sph_bc%kr_in, sph_bc%kr_out,   &
+     &      coef_diffuse, is_fld, is_diffuse,                           &
+     &      sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                  &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,                       &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      end if
 !
       call sel_ICB_sph_scalar_diffusion                                 &
      &   (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center, g_sph_rj,       &

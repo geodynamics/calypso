@@ -12,8 +12,10 @@
 !!      subroutine update_after_magne_sph(sph_rj, r_2nd,                &
 !!     &          cd_prop, sph_bc_B, leg, ipol, rj_fld)
 !!      subroutine update_after_heat_sph(sph_rj, r_2nd, ht_prop,        &
+!!     &          iref_diffusivity, iref_grad_diffusivity, ref_field,   &
 !!     &          sph_bc_T, bcs_T, fdm2_center, leg, ipol, rj_fld)
 !!      subroutine update_after_composit_sph(sph_rj, r_2nd, cp_prop,    &
+!!     &          iref_diffusivity, iref_grad_diffusivity, ref_field,   &
 !!     &          sph_bc_C, bcs_C, fdm2_center, leg, ipol, rj_fld)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -30,6 +32,9 @@
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_C
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(diffusivity_adress), intent(in) :: iref_diffusivity
+!!        type(diffusivity_adress), intent(in) :: iref_grad_diffusivity
+!!        type(phys_data), intent(in) :: ref_field
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
@@ -49,6 +54,7 @@
       use t_scalar_property
       use t_spheric_rj_data
       use t_phys_address
+      use t_diffusion_term_labels
       use t_phys_data
       use t_fdm_coefs
       use t_boundary_data_sph_MHD
@@ -144,6 +150,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine update_after_heat_sph(sph_rj, r_2nd, ht_prop,          &
+     &          iref_diffusivity, iref_grad_diffusivity, ref_field,     &
      &          sph_bc_T, bcs_T, fdm2_center, leg, ipol, rj_fld)
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
@@ -153,6 +160,11 @@
       type(sph_scalar_boundary_data), intent(in) :: bcs_T
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(legendre_4_sph_trans), intent(in) :: leg
+!
+      type(diffusivity_adress), intent(in) :: iref_diffusivity
+      type(diffusivity_adress), intent(in) :: iref_grad_diffusivity
+      type(phys_data), intent(in) :: ref_field
+!
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
 !
@@ -171,8 +183,10 @@
         if(iflag_debug .gt. 0)  write(*,*)                              &
      &         'const_sph_scalar_diffusion', ipol%diffusion%i_t_diffuse
         call const_sph_scalar_diffusion                                 &
-     &     (sph_rj, r_2nd, sph_bc_T, bcs_T, fdm2_center,                &
-     &      leg%g_sph_rj, ht_prop%coef_diffuse,                         &
+     &     (sph_rj, r_2nd, sph_bc_T, bcs_T, fdm2_center, leg%g_sph_rj,  &
+     &      ht_prop%flag_val_diffuse, ht_prop%coef_diffuse,             &
+     &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
+     &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
      &      ipol%base%i_temp, ipol%diffusion%i_t_diffuse, rj_fld)
       end if
 !
@@ -181,6 +195,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine update_after_composit_sph(sph_rj, r_2nd, cp_prop,      &
+     &          iref_diffusivity, iref_grad_diffusivity, ref_field,     &
      &          sph_bc_C, bcs_C, fdm2_center, leg, ipol, rj_fld)
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
@@ -190,6 +205,11 @@
       type(sph_scalar_boundary_data), intent(in) :: bcs_C
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(legendre_4_sph_trans), intent(in) :: leg
+!
+      type(diffusivity_adress), intent(in) :: iref_diffusivity
+      type(diffusivity_adress), intent(in) :: iref_grad_diffusivity
+      type(phys_data), intent(in) :: ref_field
+!
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
 !
@@ -209,9 +229,11 @@
         if(iflag_debug .gt. 0)  write(*,*)                              &
      &         'const_sph_scalar_diffusion', ipol%diffusion%i_c_diffuse
         call const_sph_scalar_diffusion                                 &
-     &     (sph_rj, r_2nd, sph_bc_C, bcs_C, fdm2_center,                &
-     &      leg%g_sph_rj, cp_prop%coef_diffuse, ipol%base%i_light,      &
-     &      ipol%diffusion%i_c_diffuse, rj_fld)
+     &     (sph_rj, r_2nd, sph_bc_C, bcs_C, fdm2_center, leg%g_sph_rj,  &
+     &      cp_prop%flag_val_diffuse, cp_prop%coef_diffuse,             &
+     &      ref_field%d_fld(1,iref_diffusivity%i_C_diffusivity),        &
+     &      ref_field%d_fld(1,iref_grad_diffusivity%i_C_diffusivity),   &
+     &      ipol%base%i_light, ipol%diffusion%i_c_diffuse, rj_fld)
       end if
 !
       end subroutine update_after_composit_sph

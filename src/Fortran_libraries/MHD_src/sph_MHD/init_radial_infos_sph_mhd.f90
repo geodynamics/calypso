@@ -193,13 +193,18 @@
       logical :: flag_write_ref
       integer :: irank_local
 !
+      real(kind = kreal) :: range_ICB(3)
+      integer(kind = kint) :: kr_reduce_inner
+      integer(kind = kint) :: kr_reduce_outer
+      integer(kind = kint) :: k_reduce_old2new_in(3)
+      integer(kind = kint) :: k_reduce_old2new_out(3)
+      real(kind = kreal) :: coef_reduce_old2new_in(3)
+!
+      integer(kind = kint) :: kr
+      real(kind = kreal) :: grad, ratio
+!
 !
       call init_reft_rj_data(sph%sph_rj, ipol, refs)
-!
-      write(*,*) 'fl_prop%coef_diffuse', MHD_prop%fl_prop%coef_diffuse
-      write(*,*) 'cd_prop%coef_diffuse', MHD_prop%cd_prop%coef_diffuse
-      write(*,*) 'ht_prop%coef_diffuse', MHD_prop%ht_prop%coef_diffuse
-      write(*,*) 'cp_prop%coef_diffuse', MHD_prop%cp_prop%coef_diffuse
 !
       if((refs%iref_diffusivity%i_K_viscosity                           &
      &    * refs%iref_grad_diffusivity%i_K_viscosity) .gt. 0) then
@@ -226,6 +231,11 @@
      &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_T_diffusivity), &
      &   refs%ref_field%d_fld(1,                                        &
      &                     refs%iref_grad_diffusivity%i_T_diffusivity))
+!
+        call r_diffusivity_w_ICB_reduction                              &
+     &     (sph%sph_params, MHD_prop%ht_prop, refs%iref_radius,         &
+     &      refs%iref_diffusivity%i_T_diffusivity,                      &
+     &      refs%iref_grad_diffusivity%i_T_diffusivity, refs%ref_field)
       end if
 !
       if((refs%iref_diffusivity%i_C_diffusivity                         &
@@ -235,6 +245,11 @@
      &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_C_diffusivity), &
      &   refs%ref_field%d_fld(1,                                        &
      &                     refs%iref_grad_diffusivity%i_C_diffusivity))
+!
+        call r_diffusivity_w_ICB_reduction                              &
+     &     (sph%sph_params, MHD_prop%cp_prop, refs%iref_radius,         &
+     &      refs%iref_diffusivity%i_C_diffusivity,                      &
+     &      refs%iref_grad_diffusivity%i_C_diffusivity, refs%ref_field)
       end if
 !
 !
@@ -279,6 +294,99 @@
       call output_reference_field(refs)
 !
       end subroutine init_reference_fields
+!
+!  -------------------------------------------------------------------
+!
+      subroutine r_diffusivity_w_ICB_reduction(sph_params, scl_prop,    &
+     &          iref_radius, iref_diffusivity, iref_grad_diffuse,       &
+     &          ref_field)
+!
+      use radial_interpolation
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(scalar_property), intent(inout) :: scl_prop
+      integer(kind = kint), intent(in) :: iref_radius
+      integer(kind = kint), intent(in) :: iref_diffusivity
+      integer(kind = kint), intent(in) :: iref_grad_diffuse
+      type(phys_data), intent(inout) :: ref_field
+!
+      real(kind = kreal) :: range_ICB(3)
+      integer(kind = kint) :: kr_reduce_inner
+      integer(kind = kint) :: kr_reduce_outer
+      integer(kind = kint) :: k_reduce_old2new_in(3)
+      integer(kind = kint) :: k_reduce_old2new_out(3)
+      real(kind = kreal) :: coef_reduce_old2new_in(3)
+      real(kind = kreal) :: ratio
+!
+      integer(kind = kint) :: kr
+!
+!
+      if(scl_prop%diffuse_reduction_radius_ICB .le. zero)               &
+     &  scl_prop%diffuse_reduction_radius_ICB = sph_params%radius_ICB
+!
+        range_ICB(1) = scl_prop%diffuse_reduction_radius_ICB            &
+     &                - scl_prop%diffuse_reduction_width_ICB
+        range_ICB(2) = scl_prop%diffuse_reduction_radius_ICB
+        range_ICB(3) = scl_prop%diffuse_reduction_radius_ICB            &
+     &                + scl_prop%diffuse_reduction_width_ICB
+      write(*,*) 'ref_field%n_point', ref_field%n_point
+      write(*,*) 'ref_field%d_fld', size(ref_field%d_fld)
+      write(*,*) 'iref_radius', iref_radius
+!
+      call cal_radial_interpolation_coef                                &
+     &   (ref_field%n_point, ref_field%d_fld(1,iref_radius),            &
+     &    ithree, range_ICB, kr_reduce_inner, kr_reduce_outer,          &
+     &    k_reduce_old2new_in, k_reduce_old2new_out,                    &
+     &    coef_reduce_old2new_in)
+!
+        write(*,*) 'range_ICB',  range_ICB(1:3)
+        write(*,*) 'kr_reduce_inner',  kr_reduce_inner
+        write(*,*) 'kr_reduce_outer',  kr_reduce_outer
+        write(*,*) 'k_reduce_old2new_in',  k_reduce_old2new_in(1:3)
+        write(*,*) 'k_reduce_old2new_out',  k_reduce_old2new_out(1:3)
+        write(*,*) 'coef_reduce_old2new_in',  coef_reduce_old2new_in(1:3)
+!
+!        do kr = 1, k_reduce_old2new_in(1)
+!          ref_field%d_fld(kr,iref_diffusivity)                         &
+!     &        = ref_field%d_fld(kr,iref_diffusivity)
+!          ref_field%d_fld(kr,iref_grad_diffuse) =  zero
+!        end do
+        do kr = k_reduce_old2new_in(1)+1, k_reduce_old2new_in(2)-1
+          ratio = one - scl_prop%grad_diffusibity_ICB                   &
+     &           * (ref_field%d_fld(kr,iref_radius) - range_ICB(1))
+          ref_field%d_fld(kr,iref_diffusivity)                          &
+     &           = ratio * ref_field%d_fld(kr,iref_diffusivity)
+          ref_field%d_fld(kr,iref_grad_diffuse)                         &
+     &           = - scl_prop%grad_diffusibity_ICB
+        end do
+!
+        kr = k_reduce_old2new_in(2)
+        ref_field%d_fld(kr,iref_diffusivity)                            &
+     &     = scl_prop%diffuse_reduction_ratio_ICB                       &
+     &      * ref_field%d_fld(kr,iref_diffusivity)
+        ref_field%d_fld(kr,iref_grad_diffuse) =  zero
+!
+        do kr = k_reduce_old2new_in(2)+1, k_reduce_old2new_in(3)
+          ratio = one - scl_prop%grad_diffusibity_ICB                   &
+     &           * (range_ICB(3) - ref_field%d_fld(kr,iref_radius))
+          ref_field%d_fld(kr,iref_diffusivity)                          &
+     &           = ratio * ref_field%d_fld(kr,iref_diffusivity)
+          ref_field%d_fld(kr,iref_grad_diffuse)                         &
+     &           =  scl_prop%grad_diffusibity_ICB
+        end do
+!        do kr = k_reduce_old2new_in(3)+ 1, ref_field%n_point
+!          ref_field%d_fld(kr,iref_diffusivity)                         &
+!     &        = ref_field%d_fld(kr,iref_diffusivity)
+!          ref_field%d_fld(kr,iref_grad_diffuse) = zero
+!        end do
+!
+      do kr = 1, ref_field%n_point
+        write(*,*) kr, ref_field%d_fld(kr,iref_radius),                 &
+     &                 ref_field%d_fld(kr,iref_diffusivity),            &
+     &                 ref_field%d_fld(kr,iref_grad_diffuse)
+      end do
+!
+      end subroutine r_diffusivity_w_ICB_reduction
 !
 !  -------------------------------------------------------------------
 !
