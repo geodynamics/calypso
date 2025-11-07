@@ -67,25 +67,25 @@
       real(kind = kreal), intent(inout) :: scl_rj(nnod_rj)
       real(kind = kreal), intent(inout) :: dfs_rj(nnod_rj)
 !
-      real(kind = kreal) :: d1t_dr1, d2t_dr2
+      real(kind = kreal) :: d1s_dr1, d2s_dr2
       integer(kind = kint) :: inod, i_n1, i_n2, j
 !
 !
-!$omp parallel do private(inod,i_n1,i_n2,d2t_dr2,d1t_dr1)
+!$omp parallel do private(inod,i_n1,i_n2,d2s_dr2,d1s_dr1)
       do j = 1, jmax
         inod = j + (kr_out-1) * jmax
         i_n1 = inod - jmax
         i_n2 = i_n1 - jmax
 !
-        d1t_dr1 =  fdm2_fix_fld_CMB(-2,2) * scl_rj(i_n2)                &
+        d1s_dr1 =  fdm2_fix_fld_CMB(-2,2) * scl_rj(i_n2)                &
      &           + fdm2_fix_fld_CMB(-1,2) * scl_rj(i_n1)                &
      &           + fdm2_fix_fld_CMB( 0,2) * fix_CMB(j)
-        d2t_dr2 =  fdm2_fix_fld_CMB(-2,3) * scl_rj(i_n2)                &
+        d2s_dr2 =  fdm2_fix_fld_CMB(-2,3) * scl_rj(i_n2)                &
      &           + fdm2_fix_fld_CMB(-1,3) * scl_rj(i_n1)                &
      &           + fdm2_fix_fld_CMB( 0,3) * fix_CMB(j)
 !
         scl_rj(inod) = fix_CMB(j)
-        dfs_rj(inod) = coef_d * (d2t_dr2 + two*r_CMB(1) * d1t_dr1       &
+        dfs_rj(inod) = coef_d * (d2s_dr2 + two*r_CMB(1) * d1s_dr1       &
      &                - g_sph_rj(j,3)*r_CMB(2) * scl_rj(inod))
 !
       end do

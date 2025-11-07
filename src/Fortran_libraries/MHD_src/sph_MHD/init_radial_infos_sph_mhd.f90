@@ -339,12 +339,12 @@
      &    k_reduce_old2new_in, k_reduce_old2new_out,                    &
      &    coef_reduce_old2new_in)
 !
-        write(*,*) 'range_ICB',  range_ICB(1:3)
-        write(*,*) 'kr_reduce_inner',  kr_reduce_inner
-        write(*,*) 'kr_reduce_outer',  kr_reduce_outer
-        write(*,*) 'k_reduce_old2new_in',  k_reduce_old2new_in(1:3)
-        write(*,*) 'k_reduce_old2new_out',  k_reduce_old2new_out(1:3)
-        write(*,*) 'coef_reduce_old2new_in',  coef_reduce_old2new_in(1:3)
+!        write(*,*) 'range_ICB',  range_ICB(1:3)
+!        write(*,*) 'kr_reduce_inner',  kr_reduce_inner
+!        write(*,*) 'kr_reduce_outer',  kr_reduce_outer
+!        write(*,*) 'k_reduce_old2new_in',  k_reduce_old2new_in(1:3)
+!        write(*,*) 'k_reduce_old2new_out',  k_reduce_old2new_out(1:3)
+!        write(*,*) 'coef_reduce_old2new_in',coef_reduce_old2new_in(1:3)
 !
 !        do kr = 1, k_reduce_old2new_in(1)
 !          ref_field%d_fld(kr,iref_diffusivity)                         &
@@ -380,11 +380,11 @@
 !          ref_field%d_fld(kr,iref_grad_diffuse) = zero
 !        end do
 !
-      do kr = 1, ref_field%n_point
-        write(*,*) kr, ref_field%d_fld(kr,iref_radius),                 &
-     &                 ref_field%d_fld(kr,iref_diffusivity),            &
-     &                 ref_field%d_fld(kr,iref_grad_diffuse)
-      end do
+!      do kr = 1, ref_field%n_point
+!        write(*,*) kr, ref_field%d_fld(kr,iref_radius),                &
+!     &                 ref_field%d_fld(kr,iref_diffusivity),           &
+!     &                 ref_field%d_fld(kr,iref_grad_diffuse)
+!      end do
 !
       end subroutine r_diffusivity_w_ICB_reduction
 !

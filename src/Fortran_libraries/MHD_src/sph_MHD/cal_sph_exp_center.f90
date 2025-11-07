@@ -22,9 +22,22 @@
 !!     &         fdm2_fixed_center, is_fld, is_grd,                     &
 !!     &         n_point, ntot_phys_rj, d_rj)
 !!
-!!      subroutine cal_sph_div_flux_4_fix_ctr(jmax, r_CTR1, g_sph_rj,   &
-!!     &          fix_ICB, fdm2_fix_fld_ctr1, is_fld, is_div,           &
-!!     &          n_point, ntot_phys_rj, d_rj)
+!!      subroutine cal_sph_div_flux_4_fix_ctr                           &
+!!     &         (inod_rj_center, idx_rj_degree_zero, nnod_rj, jmax,    &
+!!     &          g_sph_rj, r_CTR1, fix_ICB, fdm2_fix_fld_ctr1,         &
+!!     &          flx_rj, adv_rj)
+!!      subroutine cal_sph_div_flux_4_fill_ctr                          &
+!!     &         (inod_rj_center, idx_rj_degree_zero, nnod_rj, jmax,    &
+!!     &          g_sph_rj, r_CTR1, fdm2_fix_fld_ctr1, flx_rj, adv_rj)
+!!        integer(kind = kint), intent(in) :: inod_rj_center
+!!        integer(kind = kint), intent(in) :: idx_rj_degree_zero
+!!        integer(kind = kint), intent(in) :: nnod_rj, jmax
+!!        real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+!!        real(kind = kreal), intent(in) :: r_CTR1(0:2)
+!!        real(kind = kreal), intent(in) :: fix_ICB(jmax)
+!!        real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
+!!        real(kind = kreal), intent(in) :: flx_rj(nnod_rj,3)
+!!        real(kind = kreal), intent(inout) :: adv_rj(nnod_rj)
 !!@endverbatim
 !!
 !!@n @param inod_rj_center        Local address for center
@@ -198,19 +211,21 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sph_div_flux_4_fix_ctr(jmax, r_CTR1, g_sph_rj,     &
-     &          fix_ICB, fdm2_fix_fld_ctr1, is_fld, is_div,             &
-     &          n_point, ntot_phys_rj, d_rj)
+      subroutine cal_sph_div_flux_4_fix_ctr                             &
+     &         (inod_rj_center, idx_rj_degree_zero, nnod_rj, jmax,      &
+     &          g_sph_rj, r_CTR1, fix_ICB, fdm2_fix_fld_ctr1,           &
+     &          flx_rj, adv_rj)
 !
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      integer(kind = kint), intent(in) :: is_fld, is_div
+      integer(kind = kint), intent(in) :: inod_rj_center
+      integer(kind = kint), intent(in) :: idx_rj_degree_zero
+      integer(kind = kint), intent(in) :: nnod_rj, jmax
       real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: r_CTR1(0:2)
       real(kind = kreal), intent(in) :: fix_ICB(jmax)
       real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
+      real(kind = kreal), intent(in) :: flx_rj(nnod_rj,3)
 !
-      real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
+      real(kind = kreal), intent(inout) :: adv_rj(nnod_rj)
 !
       real(kind = kreal) :: d1s_dr1
       integer(kind = kint) :: i_p1, j
@@ -221,15 +236,66 @@
         i_p1 = j + jmax
 !
         d1s_dr1 =  fdm2_fix_fld_ctr1(-1,2) * fix_ICB(j)                 &
-     &           + fdm2_fix_fld_ctr1( 0,2) * d_rj(j,is_fld)             &
-     &           + fdm2_fix_fld_ctr1( 1,2) * d_rj(i_p1,is_fld)
+     &           + fdm2_fix_fld_ctr1( 0,2) * flx_rj(j,   1)             &
+     &           + fdm2_fix_fld_ctr1( 1,2) * flx_rj(i_p1,1)
 !
-        d_rj(j,is_div) =  (d1s_dr1 - d_rj(j,is_fld+1) )                 &
-     &                   * max(g_sph_rj(j,3),half) * r_CTR1(2)
+        adv_rj(j) =  (d1s_dr1 - flx_rj(j,2) )                           &
+     &              * max(g_sph_rj(j,3),half) * r_CTR1(2)
       end do
 !$omp end parallel do
 !
+      if(inod_rj_center .gt. 0)  then
+        adv_rj(inod_rj_center) = adv_rj(idx_rj_degree_zero)
+      end if
+!
       end subroutine cal_sph_div_flux_4_fix_ctr
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_sph_div_flux_4_fill_ctr                            &
+     &         (inod_rj_center, idx_rj_degree_zero, nnod_rj, jmax,      &
+     &          g_sph_rj, r_CTR1, fdm2_fix_fld_ctr1, flx_rj, adv_rj)
+!
+      integer(kind = kint), intent(in) :: inod_rj_center
+      integer(kind = kint), intent(in) :: idx_rj_degree_zero
+      integer(kind = kint), intent(in) :: nnod_rj, jmax
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+      real(kind = kreal), intent(in) :: r_CTR1(0:2)
+      real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
+      real(kind = kreal), intent(in) :: flx_rj(nnod_rj,3)
+!
+      real(kind = kreal), intent(inout) :: adv_rj(nnod_rj)
+!
+      real(kind = kreal) :: d1s_dr1
+      integer(kind = kint) :: inod, i_n1, i_p1, j
+!
+!
+!$omp parallel do private(i_p1,j,d1s_dr1)
+      do j = 1, jmax
+        i_p1 = j + jmax
+        d1s_dr1 =  fdm2_fix_fld_ctr1( 0,2) * flx_rj(j,   1)             &
+     &           + fdm2_fix_fld_ctr1( 1,2) * flx_rj(i_p1,1)
+!
+        adv_rj(j) =  (d1s_dr1 - flx_rj(j,2))                            &
+     &              * max(g_sph_rj(j,3),half) * r_CTR1(2)
+      end do
+!$omp end parallel do
+!
+      if(inod_rj_center .le. 0) return
+!
+      i_n1 = inod_rj_center
+      inod = idx_rj_degree_zero
+      i_p1 = inod + jmax
+!
+      d1s_dr1 =  fdm2_fix_fld_ctr1(-1,2) * flx_rj(i_n1,1)               &
+     &         + fdm2_fix_fld_ctr1( 0,2) * flx_rj(inod,1)               &
+     &         + fdm2_fix_fld_ctr1( 1,2) * flx_rj(i_p1,1)
+      adv_rj(inod) = half * r_CTR1(2) * (d1s_dr1 - flx_rj(inod,2))
+!
+!
+      adv_rj(i_n1) = zero
+!
+      end subroutine cal_sph_div_flux_4_fill_ctr
 !
 ! -----------------------------------------------------------------------
 !

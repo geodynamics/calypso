@@ -7,11 +7,20 @@
 !> @brief Evaluate radial delivatives
 !!
 !!@verbatim
-!!      subroutine set_CMB_scalar_sph_crank(sph_rj, sph_bc, CMB_Sspec,  &
-!!     &          coef_f, coef_d, dt, coef_imp, is_field,               &
-!!     &          n_point, ntot_phys_rj, d_rj)
+!!      subroutine set_CMB_scalar_sph_crank                             &
+!!     &         (flag_val_diffuse, sph_rj, sph_bc, CMB_Sspec,          &
+!!     &          coef_f, coef_d, k_ratio, dk_dr, dt, coef_imp,         &
+!!     &          is_field, n_point, ntot_phys_rj, d_rj)
+!!        logical, intent(in) :: flag_val_diffuse
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_boundary_type), intent(in) :: sph_bc
+!!        type(sph_scalar_BC_coef), intent(in) :: CMB_Sspec
+!!        real(kind = kreal), intent(in) :: coef_f, coef_d
+!!        real(kind = kreal), intent(in) :: k_ratio, dk_dr
+!!        real(kind = kreal), intent(in) :: coef_imp, dt
+!!        integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
+!!        integer(kind = kint), intent(in) :: is_field
+!!        real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !!
 !!      subroutine sel_CMB_radial_grad_scalar                           &
 !!     &         (sph_rj, sph_bc, CMB_Sspec, g_sph_rj,                  &
@@ -74,20 +83,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_CMB_scalar_sph_crank(sph_rj, sph_bc, CMB_Sspec,    &
-     &          coef_f, coef_d, dt, coef_imp, is_field,                 &
-     &          n_point, ntot_phys_rj, d_rj)
+      subroutine set_CMB_scalar_sph_crank                               &
+     &         (flag_val_diffuse, sph_rj, sph_bc, CMB_Sspec,            &
+     &          coef_f, coef_d, k_ratio, dk_dr, dt, coef_imp,           &
+     &          is_field, n_point, ntot_phys_rj, d_rj)
 !
       use sph_exp_fixed_flux_CMB
       use sph_exp_fix_flx_diffuse_CMB
       use set_fixed_scalar_sph
       use cal_sph_exp_center
 !
+      logical, intent(in) :: flag_val_diffuse
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc
       type(sph_scalar_BC_coef), intent(in) :: CMB_Sspec
-      real(kind = kreal), intent(in) :: coef_imp, coef_f, coef_d
-      real(kind = kreal), intent(in) :: dt
+      real(kind = kreal), intent(in) :: coef_f, coef_d
+      real(kind = kreal), intent(in) :: k_ratio, dk_dr
+      real(kind = kreal), intent(in) :: coef_imp, dt
 !
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: is_field
@@ -104,9 +116,18 @@
      &      CMB_Sspec%S_BC, CMB_Sspec%S_CTR,                            &
      &      n_point, ntot_phys_rj, d_rj)
       else if(coef_f .ne. 0.0d0) then
-        call adjust_sph_out_fix_flux(sph_rj%nnod_rj, sph_rj%nidx_rj(2), &
-     &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB,        &
-     &      CMB_Sspec%S_BC, coef_d, coef_imp, dt, d_rj(1,is_field))
+        if(flag_val_diffuse) then
+          call adjust_sph_out_fix_flx_v_diff                            &
+     &       (sph_rj%nnod_rj, sph_rj%nidx_rj(2),                        &
+     &        sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB,      &
+     &        CMB_Sspec%S_BC, coef_d, k_ratio, dk_dr, coef_imp, dt,     &
+     &        d_rj(1,is_field))
+        else
+          call adjust_sph_out_fix_flux                                  &
+     &       (sph_rj%nnod_rj, sph_rj%nidx_rj(2),                        &
+     &        sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB,      &
+     &        CMB_Sspec%S_BC, coef_d, coef_imp, dt, d_rj(1,is_field))
+        end if
 !      else if(sph_bc%iflag_cmb .eq. iflag_fixed_flux                   &
 !     &    .or. sph_bc%iflag_cmb .eq. iflag_evolve_flux) then
       else
@@ -208,6 +229,49 @@
 !
       end subroutine sel_CMB_sph_scalar_diffusion
 !
+! -----------------------------------------------------------------------
+!
+      subroutine sel_CMB_sph_scalar_val_diffuse                         &
+     &         (sph_rj, sph_bc, CMB_Sspec, g_sph_rj,                    &
+     &          coef_diffuse, k_ratio, dk_dr, is_fld, is_diffuse,       &
+     &          n_point, ntot_phys_rj, d_rj)
+!
+      use sph_exp_fix_scl_diffuse_CMB
+      use sph_exp_fix_flx_diffuse_CMB
+!
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_scalar_BC_coef), intent(in) :: CMB_Sspec
+!
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
+      integer(kind = kint), intent(in) :: is_fld, is_diffuse
+      real(kind = kreal), intent(in) :: coef_diffuse
+      real(kind = kreal), intent(in) :: k_ratio, dk_dr
+      real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
+!
+      real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
+!
+!
+      if (sph_bc%iflag_cmb .eq. iflag_fixed_flux                        &
+     &    .or. sph_bc%iflag_cmb .eq. iflag_evolve_flux) then
+        call sph_out_fix_flux_val_diffuse2                              &
+     &     (sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
+     &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB,        &
+     &      CMB_Sspec%S_BC, coef_diffuse, k_ratio, dk_dr,               &
+     &      d_rj(1,is_fld), d_rj(1,is_diffuse))
+!      else if(sph_bc%iflag_cmb .eq. iflag_fixed_field                  &
+!     &   .or. sph_bc%iflag_cmb .eq. iflag_evolve_field) then
+      else
+        call sph_out_fix_scl_val_diffuse2                               &
+     &     (sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
+     &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_fld_CMB,       &
+     &      CMB_Sspec%S_BC, coef_diffuse, k_ratio, dk_dr,               &
+     &      d_rj(1,is_fld), d_rj(1,is_diffuse))
+      end if
+!
+      end subroutine sel_CMB_sph_scalar_val_diffuse
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine sel_CMB_sph_scalar_advect                              &

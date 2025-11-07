@@ -13,9 +13,6 @@
 !!      subroutine dsdr_sph_lm0_fix_scalar_in_2(idx_rj_degree_zero,     &
 !!     &          jmax, kr_in, r_ICB, fdm2_fix_fld_ICB, fix_ICB,        &
 !!     &          is_fld, is_grd, n_point, ntot_phys_rj, d_rj)
-!!      subroutine cal_sph_fix_scalar_in_diffuse2(jmax, g_sph_rj,       &
-!!     &          kr_in, r_ICB, fdm2_fix_fld_ICB, fix_ICB, coef_d,      &
-!!     &          is_fld, is_diffuse, n_point, ntot_phys_rj, d_rj)
 !!      subroutine cal_dsdr_sph_no_bc_in_2                              &
 !!     &         (jmax, kr_in, fdm2_fix_fld_ICB, is_fld, is_grd,        &
 !!     &          n_point, ntot_phys_rj, d_rj)
@@ -34,11 +31,9 @@
 !!         Matrix to evaluate radial derivative at ICB with fixed field
 !!
 !!@n @param fix_ICB(jmax) Spectr data for fixed scalar at ICB
-!!@n @param coef_d        Coefficient for diffusion term
 !!
 !!@n @param is_fld       Field address of input field
 !!@n @param is_grd       Field address of radial gradient of field
-!!@n @param is_diffuse   Field address for diffusion of field
 !!
 !!@n @param ntot_phys_rj   Total number of components
 !!@n @param d_rj           Spectrum data
@@ -127,50 +122,6 @@
         d_rj(inod,is_grd+2) = zero
 !
       end subroutine dsdr_sph_lm0_fix_scalar_in_2
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_sph_fix_scalar_in_diffuse2(jmax, g_sph_rj,         &
-     &          kr_in, r_ICB, fdm2_fix_fld_ICB, fix_ICB, coef_d,        &
-     &          is_fld, is_diffuse, n_point, ntot_phys_rj, d_rj)
-!
-      integer(kind = kint), intent(in) :: is_fld, is_diffuse
-      integer(kind = kint), intent(in) :: jmax, kr_in
-      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
-      real(kind = kreal), intent(in) :: fix_ICB(jmax)
-      real(kind = kreal), intent(in) :: r_ICB(0:2)
-      real(kind = kreal), intent(in) :: fdm2_fix_fld_ICB(0:2,3)
-      real(kind = kreal), intent(in) :: coef_d
-!
-      real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
-!
-      real(kind = kreal) :: d1t_dr1, d2t_dr2
-      integer(kind = kint) :: inod, i_p1, i_p2, j
-!
-!
-!$omp parallel do private(inod,i_p1,i_p2,d1t_dr1,d2t_dr2)
-      do j = 1, jmax
-        inod = j + (kr_in-1) * jmax
-        i_p1 = inod + jmax
-        i_p2 = i_p1 + jmax
-!
-        d1t_dr1 =  fdm2_fix_fld_ICB( 0,2) * fix_ICB(j)                  &
-     &           + fdm2_fix_fld_ICB( 1,2) * d_rj(i_p1,is_fld)           &
-     &           + fdm2_fix_fld_ICB( 2,2) * d_rj(i_p2,is_fld)
-        d2t_dr2 =  fdm2_fix_fld_ICB( 0,3) * fix_ICB(j)                  &
-     &           + fdm2_fix_fld_ICB( 1,3) * d_rj(i_p1,is_fld)           &
-     &           + fdm2_fix_fld_ICB( 2,3) * d_rj(i_p2,is_fld)
-!
-        d_rj(inod,is_fld) = fix_ICB(j)
-        d_rj(inod,is_diffuse)                                           &
-     &         = coef_d * (d2t_dr2 + two*r_ICB(1)*d1t_dr1               &
-     &          - g_sph_rj(j,3)*r_ICB(2) * d_rj(inod,is_fld) )
-!
-      end do
-!$omp end parallel do
-!
-      end subroutine cal_sph_fix_scalar_in_diffuse2
 !
 ! -----------------------------------------------------------------------
 !

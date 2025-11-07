@@ -113,7 +113,7 @@
       if(ipol%diffusion%i_w_diffuse .gt. 0) then
         if(iflag_debug.gt.0) write(*,*)'const_sph_vorticirty_diffusion'
         call const_sph_vorticirty_diffusion(sph_rj, r_2nd,              &
-     &      sph_bc_U, bc_fdms_U, leg%g_sph_rj, fl_prop%coef_diffuse,    &
+     &      sph_bc_U, bc_fdms_U, leg, fl_prop%coef_diffuse,             &
      &      ipol%base%i_vort, ipol%diffusion%i_w_diffuse, rj_fld)
       end if
 !
@@ -183,7 +183,7 @@
         if(iflag_debug .gt. 0)  write(*,*)                              &
      &         'const_sph_scalar_diffusion', ipol%diffusion%i_t_diffuse
         call const_sph_scalar_diffusion                                 &
-     &     (sph_rj, r_2nd, sph_bc_T, bcs_T, fdm2_center, leg%g_sph_rj,  &
+     &     (sph_rj, r_2nd, sph_bc_T, bcs_T, fdm2_center, leg,           &
      &      ht_prop%flag_val_diffuse, ht_prop%coef_diffuse,             &
      &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
      &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
@@ -229,7 +229,7 @@
         if(iflag_debug .gt. 0)  write(*,*)                              &
      &         'const_sph_scalar_diffusion', ipol%diffusion%i_c_diffuse
         call const_sph_scalar_diffusion                                 &
-     &     (sph_rj, r_2nd, sph_bc_C, bcs_C, fdm2_center, leg%g_sph_rj,  &
+     &     (sph_rj, r_2nd, sph_bc_C, bcs_C, fdm2_center, leg,           &
      &      cp_prop%flag_val_diffuse, cp_prop%coef_diffuse,             &
      &      ref_field%d_fld(1,iref_diffusivity%i_C_diffusivity),        &
      &      ref_field%d_fld(1,iref_grad_diffusivity%i_C_diffusivity),   &
