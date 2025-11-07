@@ -349,7 +349,7 @@
 !
       use sph_exp_fix_scalar_ICB
       use sph_exp_fixed_flux_ICB
-      use cal_sph_exp_center
+      use sph_exp_div_scl_flux_center
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm2_center_mat), intent(in) :: fdm2_center
@@ -364,13 +364,13 @@
 !
 !
       if     (sph_bc%iflag_icb .eq. iflag_sph_fill_center) then
-        call cal_sph_div_flux_4_fill_ctr                                &
+        call sph_div_flux_4_fill_center                                 &
      &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
      &      sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
      &      sph_bc%r_ICB, fdm2_center%dmat_fix_fld,                     &
      &      d_rj(1,is_flux), d_rj(1,is_advect))
       else if(sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
-        call cal_sph_div_flux_4_fix_ctr                                 &
+        call sph_div_flux_4_fix_center                                  &
      &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
      &      sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
      &      sph_bc%r_ICB, ICB_Sspec%S_BC, fdm2_center%dmat_fix_fld,     &
