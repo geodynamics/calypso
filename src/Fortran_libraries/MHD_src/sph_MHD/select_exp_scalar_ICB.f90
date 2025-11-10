@@ -31,13 +31,6 @@
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!
-!!      subroutine sel_ICB_sph_scalar_diffusion                         &
-!!     &         (sph_rj, sph_bc, ICB_Sspec, fdm2_center,               &
-!!     &          g_sph_rj, coef_diffuse, is_fld, is_diffuse,           &
-!!     &          n_point, ntot_phys_rj, d_rj)
-!!          Input:    is_fld
-!!          Solution: is_diffusee
-!!
 !!      subroutine sel_ICB_sph_scalar_advect                            &
 !!     &         (sph_rj, sph_bc, ICB_Sspec, fdm2_center, g_sph_rj,     &
 !!     &          is_flux, is_advect, n_point, ntot_phys_rj, d_rj)
@@ -222,123 +215,6 @@
       end if
 !
       end subroutine sel_ICB_radial_grad_scalar
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine sel_ICB_sph_scalar_diffusion                           &
-     &         (sph_rj, sph_bc, ICB_Sspec, fdm2_center,                 &
-     &          g_sph_rj, coef_diffuse, is_fld, is_diffuse,             &
-     &          n_point, ntot_phys_rj, d_rj)
-!
-      use sph_exp_fix_scl_diffuse_ICB
-      use sph_exp_fix_flx_diffuse_ICB
-      use sph_filled_center_diffuse2
-      use sph_fixed_center_diffuse2
-!
-      type(sph_rj_grid), intent(in) :: sph_rj
-      type(fdm2_center_mat), intent(in) :: fdm2_center
-      type(sph_boundary_type), intent(in) :: sph_bc
-      type(sph_scalar_BC_coef), intent(in) :: ICB_Sspec
-!
-      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      integer(kind = kint), intent(in) :: is_fld, is_diffuse
-      real(kind = kreal), intent(in) :: coef_diffuse
-      real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
-!
-      real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
-!
-!
-      if     (sph_bc%iflag_icb .eq. iflag_sph_fill_center) then
-        call sph_filled_ctr_diffuse_ctr2                                &
-     &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
-     &      sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj, sph_bc%r_ICB,  &
-     &      fdm2_center%dmat_fix_fld, fdm2_center%dmat_fix_dr,          &
-     &      coef_diffuse, d_rj(1,is_fld), d_rj(1,is_diffuse))
-      else if(sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
-        call sph_fixed_ctr_diffuse_ctr1                                 &
-     &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
-     &      sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
-     &      sph_bc%r_ICB, fdm2_center%dmat_fix_fld, ICB_Sspec%S_BC,     &
-     &      coef_diffuse, d_rj(1,is_fld), d_rj(1,is_diffuse))
-      else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                    &
-     &    .or. sph_bc%iflag_icb .eq. iflag_evolve_flux) then
-        call sph_in_fix_flux_scl_diffuse2                               &
-     &     (sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
-     &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_dr_ICB,         &
-     &      ICB_Sspec%S_BC, coef_diffuse, d_rj(1,is_fld),               &
-     &      d_rj(1,is_diffuse))
-!      else if(sph_bc%iflag_icb .eq. iflag_fixed_field                  &
-!     &   .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
-      else
-        call sph_in_fix_scalar_diffuse2                                 &
-     &     (sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
-     &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB,        &
-     &      ICB_Sspec%S_BC, coef_diffuse, d_rj(1,is_fld),               &
-     &      d_rj(1,is_diffuse))
-      end if
-!
-      end subroutine sel_ICB_sph_scalar_diffusion
-!
-! -----------------------------------------------------------------------
-!
-      subroutine sel_ICB_sph_scalar_val_diffuse                         &
-     &         (sph_rj, sph_bc, ICB_Sspec, fdm2_center, g_sph_rj,       &
-     &          coef_diffuse, k_ratio, dk_dr, is_fld, is_diffuse,       &
-     &          n_point, ntot_phys_rj, d_rj)
-!
-      use sph_exp_fix_scl_diffuse_ICB
-      use sph_exp_fix_flx_diffuse_ICB
-      use sph_filled_center_diffuse2
-      use sph_fixed_center_diffuse2
-!
-      type(sph_rj_grid), intent(in) :: sph_rj
-      type(fdm2_center_mat), intent(in) :: fdm2_center
-      type(sph_boundary_type), intent(in) :: sph_bc
-      type(sph_scalar_BC_coef), intent(in) :: ICB_Sspec
-!
-      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      integer(kind = kint), intent(in) :: is_fld, is_diffuse
-      real(kind = kreal), intent(in) :: coef_diffuse
-      real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
-      real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
-      real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
-!
-      real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
-!
-!
-      if     (sph_bc%iflag_icb .eq. iflag_sph_fill_center) then
-        call sph_filled_ctr_val_diffuse_ctr2                            &
-     &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
-     &      sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj, sph_bc%r_ICB,  &
-     &      fdm2_center%dmat_fix_fld, fdm2_center%dmat_fix_dr,          &
-     &      coef_diffuse, k_ratio(0), dk_dr(0),                         &
-     &      d_rj(1,is_fld), d_rj(1,is_diffuse))
-      else if(sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
-        call sph_fixed_ctr_val_diffuse_ctr1                             &
-     &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
-     &      sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj,                &
-     &      sph_bc%r_ICB, fdm2_center%dmat_fix_fld, ICB_Sspec%S_BC,     &
-     &      coef_diffuse, k_ratio(1), dk_dr(1),                         &
-     &      d_rj(1,is_fld), d_rj(1,is_diffuse))
-      else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                    &
-     &    .or. sph_bc%iflag_icb .eq. iflag_evolve_flux) then
-        call sph_in_fix_flux_val_diffuse2                               &
-     &     (sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj, sph_bc%kr_in,  &
-     &      sph_bc%r_ICB, sph_bc%fdm2_fix_dr_ICB, ICB_Sspec%S_BC,       &
-     &      coef_diffuse, k_ratio(sph_bc%kr_in), dk_dr(sph_bc%kr_in),   &
-     &      d_rj(1,is_fld), d_rj(1,is_diffuse))
-!      else if(sph_bc%iflag_icb .eq. iflag_fixed_field                  &
-!     &   .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
-      else
-        call sph_in_fix_scl_val_diffuse2                                &
-     &     (sph_rj%nnod_rj, sph_rj%nidx_rj(2), g_sph_rj, sph_bc%kr_in,  &
-     &      sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB, ICB_Sspec%S_BC,      &
-     &      coef_diffuse, k_ratio(sph_bc%kr_in), dk_dr(sph_bc%kr_in),   &
-     &      d_rj(1,is_fld), d_rj(1,is_diffuse))
-      end if
-!
-      end subroutine sel_ICB_sph_scalar_val_diffuse
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

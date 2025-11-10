@@ -187,7 +187,8 @@
      &      ht_prop%flag_val_diffuse, ht_prop%coef_diffuse,             &
      &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
      &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
-     &      ipol%base%i_temp, ipol%diffusion%i_t_diffuse, rj_fld)
+     &      rj_fld%d_fld(1,ipol%base%i_temp),                           &
+     &      rj_fld%d_fld(1,ipol%diffusion%i_t_diffuse))
       end if
 !
       end subroutine update_after_heat_sph
@@ -233,7 +234,8 @@
      &      cp_prop%flag_val_diffuse, cp_prop%coef_diffuse,             &
      &      ref_field%d_fld(1,iref_diffusivity%i_C_diffusivity),        &
      &      ref_field%d_fld(1,iref_grad_diffusivity%i_C_diffusivity),   &
-     &      ipol%base%i_light, ipol%diffusion%i_c_diffuse, rj_fld)
+     &      rj_fld%d_fld(1,ipol%base%i_light),                          &
+     &      rj_fld%d_fld(1,ipol%diffusion%i_c_diffuse))
       end if
 !
       end subroutine update_after_composit_sph
