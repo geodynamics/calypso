@@ -231,11 +231,9 @@
       end if
 !
       if(MHD_prop%ht_prop%iflag_scheme .ge. id_Crank_nicolson) then
-        call const_radial_mat_4_scalar_sph                              &
-     &     (temp_evo_name, MHD_prop%ht_prop%coef_advect, dt,            &
-     &      sph_params, sph_rj, r_2nd, MHD_prop%ht_prop,                &
+        call const_radial_mat_4_scalar_sph(temp_evo_name, dt, sph_rj,   &
+     &      g_sph_rj, r_2nd, sph_MHD_bc%fdm2_center, MHD_prop%ht_prop,  &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                      &
-     &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
      &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
      &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
      &      sph_MHD_mat%band_temp_evo)
@@ -246,11 +244,9 @@
       end if
 !
       if(MHD_prop%cp_prop%iflag_scheme .ge. id_Crank_nicolson) then
-        call const_radial_mat_4_scalar_sph                              &
-     &     (comp_evo_name, MHD_prop%cp_prop%coef_advect, dt,            &
-     &      sph_params, sph_rj, r_2nd, MHD_prop%cp_prop,                &
+        call const_radial_mat_4_scalar_sph(comp_evo_name, dt, sph_rj,   &
+     &      g_sph_rj, r_2nd, sph_MHD_bc%fdm2_center, MHD_prop%cp_prop,  &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                      &
-     &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
      &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
      &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
      &      sph_MHD_mat%band_comp_evo)

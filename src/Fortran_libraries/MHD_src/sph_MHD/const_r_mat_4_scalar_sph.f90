@@ -9,16 +9,24 @@
 !!      subroutine const_radial_mat_4_press_sph                         &
 !!     &         (sph_rj, r_2nd, fl_prop, sph_bc_U, fdm2_center,        &
 !!     &          g_sph_rj, band_p_poisson)
-!!      subroutine const_radial_mat_4_scalar_sph(mat_name, coef_advect, &
-!!     &          dt, sph_params, sph_rj, r_2nd, property,              &
-!!     &          sph_bc, bcs_S, fdm2_center, g_sph_rj, band_s_evo)
-!!        type(scalar_property), intent(in) :: property
-!!        type(sph_shell_parameters), intent(in) :: sph_params
-!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!      subroutine const_radial_mat_4_scalar_sph(mat_name, dt, sph_rj,  &
+!!     &          g_sph_rj, r_2nd, fdm2_center, property, sph_bc, bcs_S,&
+!!     &          k_ratio, dk_dr, band_s_evo)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(scalar_property), intent(in) :: property
+!!        type(fluid_property), intent(in) :: fl_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
+!!        type(sph_boundary_type), intent(in) :: sph_bc
 !!        type(sph_scalar_boundary_data) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
+!!        real(kind = kreal), intent(in) :: dt
+!!        real(kind=kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
+!!        real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
+!!        real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
+!!        character(len=kchara), intent(in) :: mat_name
+!!        type(band_matrices_type), intent(inout) :: band_p_poisson
+!!        type(band_matrices_type), intent(inout) :: band_s_evo
 !!
 !!      subroutine const_r_mat00_scalar_sph(id_file, mat_name,          &
 !!     &          diffuse_reduction_ratio_ICB, sph_params,              &
@@ -86,30 +94,23 @@
       type(band_matrices_type), intent(inout) :: band_p_poisson
 !
       real(kind = kreal) :: coef_p
-      real(kind = kreal), allocatable :: r_coef(:)
 !
 !
       write(band_p_poisson%mat_name,'(a)') 'pressure_poisson'
       coef_p = - fl_prop%coef_press
 !
-      allocate(r_coef(sph_rj%nidx_rj(1)))
-!$omp parallel workshare
-      r_coef(1:sph_rj%nidx_rj(1)) = coef_p
-!$omp end parallel workshare
-!
       call alloc_band_mat_sph(ithree, sph_rj, band_p_poisson)
-
+!
       call set_unit_mat_4_poisson                                       &
      &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                         &
      &    sph_bc_U%kr_in, sph_bc_U%kr_out, band_p_poisson%mat)
       call add_scalar_poisson_mat_sph                                   &
      &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
-     &    g_sph_rj, sph_bc_U%kr_in, sph_bc_U%kr_out, r_coef(1),         &
+     &    g_sph_rj, sph_bc_U%kr_in, sph_bc_U%kr_out, coef_p,            &
      &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_p_poisson%mat)
 !
       call sel_radial_mat_press_bc_sph(sph_rj, sph_bc_U, fdm2_center,   &
-     &    g_sph_rj, r_coef, band_p_poisson)
-      deallocate(r_coef)
+     &    g_sph_rj, coef_p, band_p_poisson)
 !
       call ludcmp_3band_mul_t                                           &
      &   (np_smp, sph_rj%istack_rj_j_smp, band_p_poisson)
@@ -119,17 +120,15 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_radial_mat_4_scalar_sph(mat_name, coef_advect,   &
-     &          dt, sph_params, sph_rj, r_2nd, property,                &
-     &          sph_bc, bcs_S, fdm2_center, g_sph_rj, k_ratio, dk_dr,   &
-     &          band_s_evo)
+      subroutine const_radial_mat_4_scalar_sph(mat_name, dt, sph_rj,    &
+     &          g_sph_rj, r_2nd, fdm2_center, property, sph_bc, bcs_S,  &
+     &          k_ratio, dk_dr, band_s_evo)
 !
       use m_ludcmp_3band
       use center_sph_matrices
       use set_radial_mat_sph
       use select_r_mat_scalar_bc_sph
 !
-      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(scalar_property), intent(in) :: property
@@ -137,9 +136,8 @@
       type(sph_scalar_boundary_data) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
-      real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
       real(kind = kreal), intent(in) :: dt
-      real(kind = kreal), intent(in) :: coef_advect
+      real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
       real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
       real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
       character(len=kchara), intent(in) :: mat_name
@@ -147,14 +145,13 @@
       type(band_matrices_type), intent(inout) :: band_s_evo
 !
       real(kind = kreal) :: coef
-      real(kind = kreal), allocatable :: r_coef(:)
 !
 !
       band_s_evo%mat_name = mat_name
       call alloc_band_mat_sph(ithree, sph_rj, band_s_evo)
       call set_unit_on_diag(band_s_evo)
 !
-      if(coef_advect .eq. zero) then
+      if(property%coef_advect .eq. zero) then
         coef = one
         call set_unit_mat_4_poisson                                     &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &
@@ -165,37 +162,25 @@
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), band_s_evo%mat)
       end if
 !
-      allocate(r_coef(sph_rj%nidx_rj(1)))
-!$omp parallel workshare
-      r_coef(1:sph_rj%nidx_rj(1)) = coef
-!$omp end parallel workshare
-!
-      if(property%diffuse_reduction_ratio_ICB .lt. one) then
-        r_coef(sph_params%nlayer_ICB)                                   &
-     &                           = property%diffuse_reduction_ratio_ICB &
-     &                                 * r_coef(sph_params%nlayer_ICB)
-        if(my_rank .eq. 0) write(*,*) 'reduction of diffusivity at',    &
-     &    sph_params%nlayer_ICB, ' to ', r_coef(sph_params%nlayer_ICB), &
-     &                        ' from ' , coef
-      end if
-!
-!
       if(property%flag_val_diffuse) then
         call add_scalar_r_diffuse_mat_sph                               &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,      &
      &      g_sph_rj, sph_bc%kr_in, sph_bc%kr_out,                      &
-     &      r_coef(1), k_ratio(1), dk_dr(1),                            &
+     &      coef, k_ratio(1), dk_dr(1),                                 &
      &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s_evo%mat)
       else
         call add_scalar_poisson_mat_sph                                 &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,      &
-     &      g_sph_rj, sph_bc%kr_in, sph_bc%kr_out, r_coef(1),           &
+     &      g_sph_rj, sph_bc%kr_in, sph_bc%kr_out, coef,                &
      &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s_evo%mat)
       end if
 !
-      call sel_radial_mat_scalar_bc_sph(sph_rj, sph_bc, bcs_S,          &
-     &    fdm2_center, g_sph_rj, r_coef, band_s_evo)
-      deallocate(r_coef)
+      call sel_sph_radial_mat_scalar_ICB(property%flag_val_diffuse,     &
+     &    sph_rj, sph_bc, bcs_S, fdm2_center, g_sph_rj,                 &
+     &    coef, k_ratio(sph_bc%kr_in), dk_dr(sph_bc%kr_in), band_s_evo)
+      call sel_sph_radial_mat_scalar_CMB(property%flag_val_diffuse,     &
+     &    sph_rj, sph_bc, bcs_S, fdm2_center, g_sph_rj,                 &
+     &    coef, k_ratio(sph_bc%kr_out), band_s_evo)
 !
       call ludcmp_3band_mul_t                                           &
      &   (np_smp, sph_rj%istack_rj_j_smp, band_s_evo)

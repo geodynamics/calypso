@@ -11,10 +11,14 @@
 !!     &          r_CTR1, fdm2_fix_fld_ctr1, coef_p, mat3)
 !!      subroutine add_scalar_poisson_mat_ctr1(nri, jmax, g_sph_rj,     &
 !!     &          r_CTR1, fdm2_fix_fld_ctr1, coef_p, mat3)
+!!      subroutine add_scl_val_diffuse_mat_ctr1                         &
+!!     &         (nri, jmax, g_sph_rj, r_CTR1, fdm2_fix_fld_ctr1,       &
+!!     &          coef_p, k_ratio, dk_dr, mat3)
 !!        integer(kind = kint), intent(in) :: jmax, nri
 !!        real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
 !!        real(kind = kreal), intent(in) :: r_CTR1(0:2)
 !!        real(kind = kreal), intent(in) :: coef_p
+!!        real(kind = kreal), intent(in) :: k_ratio, dk_dr
 !!        real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
 !!        real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
 !!
@@ -96,6 +100,38 @@
       end do
 !
       end subroutine add_scalar_poisson_mat_ctr1
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_scl_val_diffuse_mat_ctr1                           &
+     &         (nri, jmax, g_sph_rj, r_CTR1, fdm2_fix_fld_ctr1,         &
+     &          coef_p, k_ratio, dk_dr, mat3)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+      real(kind = kreal), intent(in) :: r_CTR1(0:2)
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: k_ratio, dk_dr
+      real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
+!
+      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!
+      integer(kind = kint) :: j
+!
+!
+      do j = 1, jmax
+        mat3(2,1,j) = mat3(2,1,j)                                       &
+     &               - coef_p * k_ratio * (fdm2_fix_fld_ctr1(0,3)       &
+     &                   + two*r_CTR1(1) * fdm2_fix_fld_ctr1(0,2)       &
+     &                   - g_sph_rj(j,3)*r_CTR1(2))                     &
+     &                  - coef_p * dk_dr * fdm2_fix_fld_ctr1(0,2)
+        mat3(1,2,j) = mat3(1,2,j)                                       &
+     &               - coef_p * k_ratio * (fdm2_fix_fld_ctr1(1,3)       &
+     &                   + two*r_CTR1(1) * fdm2_fix_fld_ctr1(1,2))      &
+     &                  - coef_p * dk_dr * fdm2_fix_fld_ctr1(1,2)
+      end do
+!
+      end subroutine add_scl_val_diffuse_mat_ctr1
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
