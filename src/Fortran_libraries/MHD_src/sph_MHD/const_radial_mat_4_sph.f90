@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine const_radial_mat_sph_mhd(dt, MHD_prop, sph_MHD_bc,   &
-!!     &          sph, r_2nd, leg, sph_MHD_mat)
+!!     &          sph, r_2nd, leg, refs, sph_MHD_mat)
 !!      subroutine const_radial_mat_sph_snap(MHD_prop, sph_MHD_bc,      &
 !!     &          sph_rj, r_2nd, leg, sph_MHD_mat)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -16,6 +16,7 @@
 !!        type(sph_grids), intent(in) :: sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(radial_reference_field), intent(in) :: refs
 !!        type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !!@endverbatim
 !
@@ -33,7 +34,10 @@
       use t_spheric_rj_data
       use t_fdm_coefs
       use t_schmidt_poly_on_rtm
+      use t_diffusion_term_labels
       use t_physical_property
+      use t_phys_data
+      use t_radial_reference_field
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_radial_matrices_sph_MHD
@@ -66,13 +70,14 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_radial_mat_sph_mhd(dt, MHD_prop, sph_MHD_bc,     &
-     &          sph, r_2nd, leg, sph_MHD_mat)
+     &          sph, r_2nd, leg, refs, sph_MHD_mat)
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(sph_grids), intent(in) :: sph
       type(fdm_matrices), intent(in) :: r_2nd
       type(legendre_4_sph_trans), intent(in) :: leg
+      type(radial_reference_field), intent(in) :: refs
 !
       real(kind = kreal), intent(in) :: dt
 !
@@ -83,7 +88,9 @@
       id_file = 50 + my_rank
       call const_radial_matrices_sph                                    &
      &   (id_file, dt, sph%sph_params, sph%sph_rj, r_2nd,               &
-     &    MHD_prop, sph_MHD_bc, leg%g_sph_rj, sph_MHD_mat)
+     &    MHD_prop, sph_MHD_bc, leg%g_sph_rj,                           &
+     &    refs%iref_diffusivity, refs%iref_grad_diffusivity,            &
+     &    refs%ref_field, sph_MHD_mat)
 !
       call const_radial_mat_sph_w_center                                &
      &   (dt, sph%sph_rj, MHD_prop, sph_MHD_bc, sph_MHD_mat)
@@ -136,8 +143,10 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_radial_matrices_sph                              &
-     &         (id_file, dt, sph_params, sph_rj, r_2nd, MHD_prop,       &
-     &          sph_MHD_bc, g_sph_rj, sph_MHD_mat)
+     &         (id_file, dt, sph_params, sph_rj,                        &
+     &          r_2nd, MHD_prop, sph_MHD_bc, g_sph_rj,                  &
+     &          iref_diffusivity, iref_grad_diffusivity, ref_field,     &
+     &          sph_MHD_mat)
 !
       use const_r_mat_4_scalar_sph
       use const_r_mat_4_vector_sph
@@ -149,6 +158,10 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!
+      type(diffusivity_adress), intent(in) :: iref_diffusivity
+      type(diffusivity_adress), intent(in) :: iref_grad_diffusivity
+      type(phys_data), intent(in) :: ref_field
 !
       real(kind = kreal), intent(in) :: dt
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
@@ -223,6 +236,8 @@
      &      sph_params, sph_rj, r_2nd, MHD_prop%ht_prop,                &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                      &
      &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
+     &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
+     &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
      &      sph_MHD_mat%band_temp_evo)
         if(i_debug .eq. iflag_full_msg) then
           call check_radial_band_mat(id_file, sph_rj,                   &
@@ -236,6 +251,8 @@
      &      sph_params, sph_rj, r_2nd, MHD_prop%cp_prop,                &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                      &
      &      sph_MHD_bc%fdm2_center, g_sph_rj,                           &
+     &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
+     &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
      &      sph_MHD_mat%band_comp_evo)
         if(i_debug .eq. iflag_full_msg) then
           call check_radial_band_mat(id_file, sph_rj,                   &

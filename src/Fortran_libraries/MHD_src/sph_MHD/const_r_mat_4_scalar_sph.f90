@@ -121,7 +121,8 @@
 !
       subroutine const_radial_mat_4_scalar_sph(mat_name, coef_advect,   &
      &          dt, sph_params, sph_rj, r_2nd, property,                &
-     &          sph_bc, bcs_S, fdm2_center, g_sph_rj, band_s_evo)
+     &          sph_bc, bcs_S, fdm2_center, g_sph_rj, k_ratio, dk_dr,   &
+     &          band_s_evo)
 !
       use m_ludcmp_3band
       use center_sph_matrices
@@ -139,6 +140,8 @@
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
       real(kind = kreal), intent(in) :: dt
       real(kind = kreal), intent(in) :: coef_advect
+      real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
+      real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
       character(len=kchara), intent(in) :: mat_name
 !
       type(band_matrices_type), intent(inout) :: band_s_evo
@@ -177,10 +180,18 @@
       end if
 !
 !
-      call add_scalar_poisson_mat_sph                                   &
-     &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
-     &    g_sph_rj, sph_bc%kr_in, sph_bc%kr_out, r_coef(1),             &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s_evo%mat)
+      if(property%flag_val_diffuse) then
+        call add_scalar_r_diffuse_mat_sph                               &
+     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,      &
+     &      g_sph_rj, sph_bc%kr_in, sph_bc%kr_out,                      &
+     &      r_coef(1), k_ratio(1), dk_dr(1),                            &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s_evo%mat)
+      else
+        call add_scalar_poisson_mat_sph                                 &
+     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,      &
+     &      g_sph_rj, sph_bc%kr_in, sph_bc%kr_out, r_coef(1),           &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s_evo%mat)
+      end if
 !
       call sel_radial_mat_scalar_bc_sph(sph_rj, sph_bc, bcs_S,          &
      &    fdm2_center, g_sph_rj, r_coef, band_s_evo)
