@@ -247,8 +247,8 @@
         call const_radial_mat_4_scalar_sph(comp_evo_name, dt, sph_rj,   &
      &      g_sph_rj, r_2nd, sph_MHD_bc%fdm2_center, MHD_prop%cp_prop,  &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                      &
-     &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
-     &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
+     &      ref_field%d_fld(1,iref_diffusivity%i_C_diffusivity),        &
+     &      ref_field%d_fld(1,iref_grad_diffusivity%i_C_diffusivity),   &
      &      sph_MHD_mat%band_comp_evo)
         if(i_debug .eq. iflag_full_msg) then
           call check_radial_band_mat(id_file, sph_rj,                   &
