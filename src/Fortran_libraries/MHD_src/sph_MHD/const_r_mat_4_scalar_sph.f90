@@ -6,10 +6,10 @@
 !>@brief Construct matrix for time evolution of scalar fields
 !!
 !!@verbatim
-!!      subroutine const_radial_mat_4_press_sph                         &
+!!      subroutine const_sph_radial_mat_4_press                         &
 !!     &         (sph_rj, r_2nd, fl_prop, sph_bc_U, fdm2_center,        &
 !!     &          g_sph_rj, band_p_poisson)
-!!      subroutine const_radial_mat_4_scalar_sph(mat_name, dt, sph_rj,  &
+!!      subroutine const_sph_radial_mat_4_scalar(mat_name, dt, sph_rj,  &
 !!     &          g_sph_rj, r_2nd, fdm2_center, property, sph_bc, bcs_S,&
 !!     &          k_ratio, dk_dr, band_s_evo)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -28,7 +28,7 @@
 !!        type(band_matrices_type), intent(inout) :: band_p_poisson
 !!        type(band_matrices_type), intent(inout) :: band_s_evo
 !!
-!!      subroutine const_r_mat00_scalar_sph(id_file, mat_name,          &
+!!      subroutine const_sph_radial_mat_scl(id_file, mat_name,          &
 !!     &          diffuse_reduction_ratio_ICB, sph_params,              &
 !!     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !!      subroutine const_r_mat00_poisson_fixS(id_file, mat_name,        &
@@ -72,7 +72,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_radial_mat_4_press_sph                           &
+      subroutine const_sph_radial_mat_4_press                           &
      &         (sph_rj, r_2nd, fl_prop, sph_bc_U, fdm2_center,          &
      &          g_sph_rj, band_p_poisson)
 !
@@ -115,12 +115,12 @@
       call ludcmp_3band_mul_t                                           &
      &   (np_smp, sph_rj%istack_rj_j_smp, band_p_poisson)
 !
-      end subroutine const_radial_mat_4_press_sph
+      end subroutine const_sph_radial_mat_4_press
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_radial_mat_4_scalar_sph(mat_name, dt, sph_rj,    &
+      subroutine const_sph_radial_mat_4_scalar(mat_name, dt, sph_rj,    &
      &          g_sph_rj, r_2nd, fdm2_center, property, sph_bc, bcs_S,  &
      &          k_ratio, dk_dr, band_s_evo)
 !
@@ -185,12 +185,12 @@
       call ludcmp_3band_mul_t                                           &
      &   (np_smp, sph_rj%istack_rj_j_smp, band_s_evo)
 !
-      end subroutine const_radial_mat_4_scalar_sph
+      end subroutine const_sph_radial_mat_4_scalar
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_r_mat00_scalar_sph(id_file, mat_name,            &
-     &          diffuse_reduction_ratio_ICB, sph_params,                &
+      subroutine const_sph_radial_mat_scl(id_file, mat_name,            &
+     &          diffuse_reduction_ratio_ICB, k_ratio, dk_dr, sph_params,                &
      &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !
       use m_ludcmp_3band
@@ -207,6 +207,8 @@
 !
       character(len=kchara), intent(in) :: mat_name
       real(kind = kreal), intent(in) :: diffuse_reduction_ratio_ICB
+      real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
+      real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
 !
       type(band_matrix_type), intent(inout) :: band_s00_poisson
 !
@@ -232,8 +234,7 @@
      &    sph_params%nlayer_ICB, ' to ', r_coef(sph_params%nlayer_ICB)
       end if
 !
-      call add_scalar_poisson00_mat_sph                                 &
-     &   (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                           &
+      call add_sph_ref_poisson_mat(sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,  &
      &    sph_bc%kr_in, sph_bc%kr_out, r_coef(1),                       &
      &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
 !
@@ -261,7 +262,7 @@
      &                                 band_s00_poisson)
       end if
 !
-      end subroutine const_r_mat00_scalar_sph
+      end subroutine const_sph_radial_mat_scl
 !
 ! -----------------------------------------------------------------------
 !
@@ -309,8 +310,7 @@
       end if
 !
 !
-      call add_scalar_poisson00_mat_sph                                 &
-     &   (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                           &
+      call add_sph_ref_poisson_mat(sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,  &
      &    sph_bc%kr_in, sph_bc%kr_out, r_coef(1),                       &
      &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
 !

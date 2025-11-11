@@ -8,10 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine init_rms_sph_mhd_control(MHD_prop, sph_MHD_bc,       &
-!!     &          r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats, monitor,  &
-!!     &          SR_sig, SR_r)
+!!     &          refs, r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats,     &
+!!     &          monitor, SR_sig, SR_r)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!!        type(radial_reference_field), intent(in) :: refs
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(phys_data), intent(in) :: nod_fld
@@ -64,6 +65,7 @@
       use t_energy_label_parameters
       use t_fdm_coefs
       use t_physical_property
+      use t_radial_reference_field
       use t_radial_matrices_sph_MHD
       use t_sph_matrix
 !
@@ -78,8 +80,8 @@
 !  --------------------------------------------------------------------
 !
       subroutine init_rms_sph_mhd_control(MHD_prop, sph_MHD_bc,         &
-     &          r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats, monitor,    &
-     &          SR_sig, SR_r)
+     &          refs, r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats,       &
+     &          monitor, SR_sig, SR_r)
 !
       use t_solver_SR
       use cal_heat_source_Nu
@@ -88,6 +90,7 @@
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+      type(radial_reference_field), intent(in) :: refs
       type(fdm_matrices), intent(in) :: r_2nd
       type(parameters_4_sph_trans), intent(in) :: trans_p
       type(phys_data), intent(in) :: nod_fld
@@ -106,6 +109,8 @@
         write(mat_name,'(a)') 'Diffusive_Temperature'
         call init_poisson_matrix_for_Nu                                 &
      &     (mat_name, SPH_MHD%sph, r_2nd, MHD_prop%ht_prop,             &
+     &      refs%ref_field%d_fld(1,refs%iref_diffusivity%i_T_diffusivity),        &
+     &      refs%ref_field%d_fld(1,refs%iref_grad_diffusivity%i_T_diffusivity),   &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
      &      MHD_mats%band_T00_poisson_fixT, monitor%heat_Nusselt)
       end if
@@ -114,6 +119,8 @@
         write(mat_name,'(a)') 'Diffusive_Composition'
         call init_poisson_matrix_for_Nu                                 &
      &     (mat_name, SPH_MHD%sph, r_2nd, MHD_prop%cp_prop,             &
+     &      refs%ref_field%d_fld(1,refs%iref_diffusivity%i_C_diffusivity),       &
+     &      refs%ref_field%d_fld(1,refs%iref_grad_diffusivity%i_C_diffusivity),  &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
      &      MHD_mats%band_C00_poisson_fixC, monitor%comp_Nusselt)
       end if

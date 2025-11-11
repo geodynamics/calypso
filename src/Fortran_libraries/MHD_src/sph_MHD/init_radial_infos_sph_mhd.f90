@@ -267,8 +267,12 @@
       refs%ref_field%iflag_update(1:refs%ref_field%ntot_phys) = 0
       call s_init_reference_scalar(refs%irank_reference,                &
      &    MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
-     &    r_2nd, MHD_prop%ht_prop, sph_MHD_bc%sph_bc_T,                 &
-     &    sph_MHD_bc%fdm2_center, tmat_name, MHD_prop%ref_param_T,      &
+     &    r_2nd, MHD_prop%ht_prop,                                      &
+     &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_T_diffusivity), &
+     &   refs%ref_field%d_fld(1,                                        &
+     &                     refs%iref_grad_diffusivity%i_T_diffusivity), &
+     &    sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                  &
+     &    tmat_name, MHD_prop%ref_param_T,                              &
      &    refs%iref_radius, temperature%name,                           &
      &    refs%iref_base%i_temp, refs%iref_grad%i_grad_temp,            &
      &    refs%iref_base%i_heat_source, refs%r_itp,                     &
@@ -276,8 +280,12 @@
 !
       call s_init_reference_scalar(refs%irank_reference,                &
      &    MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
-     &    r_2nd, MHD_prop%cp_prop, sph_MHD_bc%sph_bc_C,                 &
-     &    sph_MHD_bc%fdm2_center, cmat_name, MHD_prop%ref_param_C,      &
+     &    r_2nd, MHD_prop%cp_prop,                                      &
+     &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_C_diffusivity), &
+     &   refs%ref_field%d_fld(1,                                        &
+     &                     refs%iref_grad_diffusivity%i_C_diffusivity), &
+     &    sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                  &
+     &    cmat_name, MHD_prop%ref_param_C,                              &
      &    refs%iref_radius, composition%name,                           &
      &    refs%iref_base%i_light, refs%iref_grad%i_grad_composit,       &
      &    refs%iref_base%i_light_source, refs%r_itp,                    &

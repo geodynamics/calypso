@@ -61,7 +61,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine init_poisson_matrix_for_Nu                             &
-     &         (mat_name, sph, r_2nd, sc_prop, sph_bc_S, fdm2_center,   &
+     &         (mat_name, sph, r_2nd, sc_prop, k_ratio, dk_dr, sph_bc_S, fdm2_center,   &
      &          band_s00_poisson_fixS, Nu_type)
 !
       use t_fdm_coefs
@@ -76,14 +76,17 @@
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
+      real(kind = kreal), intent(in) :: k_ratio(0:sph%sph_rj%nidx_rj(1))
+      real(kind = kreal), intent(in) :: dk_dr(0:sph%sph_rj%nidx_rj(1))
+!
       type(band_matrix_type), intent(inout) :: band_s00_poisson_fixS
       type(nusselt_number_data), intent(inout) :: Nu_type
 !
 !
       if(Nu_type%iflag_Nusselt .eq. iflag_no_source_Nu) return
         call alloc_Nu_radial_reference(sph%sph_rj, Nu_type)
-        call const_r_mat00_scalar_sph                                   &
-     &     (my_rank+50, mat_name, sc_prop%diffuse_reduction_ratio_ICB,  &
+        call const_sph_radial_mat_scl                                   &
+     &     (my_rank+50, mat_name, sc_prop%diffuse_reduction_ratio_ICB, k_ratio, dk_dr, &
      &      sph%sph_params, sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,   &
      &      band_s00_poisson_fixS)
 !

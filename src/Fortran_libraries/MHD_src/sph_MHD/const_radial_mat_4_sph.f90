@@ -120,8 +120,8 @@
 !
       if(MHD_prop%fl_prop%iflag_scheme .lt. id_Crank_nicolson) return
       if(iflag_debug .gt. 0)                                            &
-     &          write(*,*) 'const_radial_mat_4_press_sph'
-      call const_radial_mat_4_press_sph                                 &
+     &          write(*,*) 'const_sph_radial_mat_4_press'
+      call const_sph_radial_mat_4_press                                 &
      &   (sph_rj, r_2nd, MHD_prop%fl_prop,                              &
      &    sph_MHD_bc%sph_bc_U, sph_MHD_bc%fdm2_center,                  &
      &    leg%g_sph_rj, sph_MHD_mat%band_p_poisson)
@@ -187,8 +187,8 @@
      &      sph_MHD_mat%band_wt_evo)
 !
         if(iflag_debug .gt. 0)                                          &
-     &          write(*,*) 'const_radial_mat_4_press_sph'
-        call const_radial_mat_4_press_sph                               &
+     &          write(*,*) 'const_sph_radial_mat_4_press'
+        call const_sph_radial_mat_4_press                               &
      &     (sph_rj, r_2nd, MHD_prop%fl_prop,                            &
      &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%fdm2_center,                &
      &      g_sph_rj, sph_MHD_mat%band_p_poisson)
@@ -231,7 +231,7 @@
       end if
 !
       if(MHD_prop%ht_prop%iflag_scheme .ge. id_Crank_nicolson) then
-        call const_radial_mat_4_scalar_sph(temp_evo_name, dt, sph_rj,   &
+        call const_sph_radial_mat_4_scalar(temp_evo_name, dt, sph_rj,   &
      &      g_sph_rj, r_2nd, sph_MHD_bc%fdm2_center, MHD_prop%ht_prop,  &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                      &
      &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
@@ -244,7 +244,7 @@
       end if
 !
       if(MHD_prop%cp_prop%iflag_scheme .ge. id_Crank_nicolson) then
-        call const_radial_mat_4_scalar_sph(comp_evo_name, dt, sph_rj,   &
+        call const_sph_radial_mat_4_scalar(comp_evo_name, dt, sph_rj,   &
      &      g_sph_rj, r_2nd, sph_MHD_bc%fdm2_center, MHD_prop%cp_prop,  &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                      &
      &      ref_field%d_fld(1,iref_diffusivity%i_C_diffusivity),        &
