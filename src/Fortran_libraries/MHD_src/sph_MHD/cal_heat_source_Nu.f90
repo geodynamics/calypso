@@ -66,7 +66,7 @@
 !
       use t_fdm_coefs
       use t_coef_fdm2_centre
-      use const_r_mat_4_scalar_sph
+      use const_sph_r_mat_ref_scalar
 !
       character(len=kchara), intent(in) :: mat_name
 !
@@ -85,8 +85,8 @@
 !
       if(Nu_type%iflag_Nusselt .eq. iflag_no_source_Nu) return
         call alloc_Nu_radial_reference(sph%sph_rj, Nu_type)
-        call const_sph_radial_mat_scl                                   &
-     &     (my_rank+50, mat_name, sc_prop%diffuse_reduction_ratio_ICB, k_ratio, dk_dr, &
+        call s_const_sph_r_mat_ref_scalar(my_rank+50, mat_name,         &
+     &      sc_prop%diffuse_reduction_ratio_ICB, k_ratio, dk_dr,        &
      &      sph%sph_params, sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,   &
      &      band_s00_poisson_fixS)
 !
