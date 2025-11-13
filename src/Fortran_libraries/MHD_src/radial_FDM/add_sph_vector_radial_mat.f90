@@ -1,0 +1,138 @@
+!>@file   add_sph_vector_radial_mat.f90
+!!@brief  module add_sph_vector_radial_mat
+!!
+!!@author H. Matsui
+!!@date Programmed in Apr, 2009
+!
+!>@brief  Construct matrix for spherical shell dynamo model
+!!
+!!@verbatim
+!!      subroutine add_vector_poisson_mat_sph(nri, jmax, ar_1d_rj,      &
+!!     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
+!!      subroutine add_vector_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,    &
+!!        integer(kind = kint), intent(in) :: jmax, nri
+!!        integer(kind = kint), intent(in) :: kr_in, kr_out
+!!        real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+!!        real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+!!        real(kind = kreal), intent(in) :: coef_p
+!!        real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
+!!        real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!!
+!!    Format of band matrix
+!!               | a(2,1)  a(1,2)  ........     0         0     |
+!!               | a(3,1)  a(2,2)  ........     .         .     |
+!!               |   0     a(3,2)  ........     .         .     |
+!!    a(i,j)  =  |   .       0     ........     0         .     |
+!!               | ...... a(3,k-1)  a(2,k)  a(1,k+1) .......... |
+!!               |   .       .     ........  a(1,N-2)     0     |
+!!               |   .       .     ........  a(2,N-2)  a(1,N-1) |
+!!               |   0       0     ........  a(3,N-2)  a(2,N-1) |
+!!
+!!   Original band matrix
+!!      band_a(i-j+iband+1,j) = a(i,j)
+!!      band_a(k,j) = a(k+j-iband-1,j)
+!!   3-band matrix
+!!      band_a(i-j+2,j) = a(i,j)
+!!      band_a(k,j) = a(k+j-2,j)
+!!   5-band matrix
+!!      band_lu(i-j+3,j) = a(i,j)
+!!      band_lu(k,j) = a(k+j-3,j)
+!!   7-band matrix
+!!      band_lu(i-j+4,j) = a(i,j)
+!!      band_lu(k,j) = a(k+j-4,j)
+!!@endverbatim
+!!
+!!@n @param nri     Number of radial points
+!!@n @param jmax    Number of spherical harmonics modes
+!!@n @param kr_st   Start radial address to construct matrix
+!!@n @param kr_ed   End radial address to construct matrix
+!!@n @param kr_in    Radial address for inner boundary
+!!@n @param kr_out   Radial address for outer boundary
+!!@n @param coef_d     Coefficient of diffusiotn term
+!!@n @param coef_p     Coefficient of pressure gradient
+!!
+!!@n @param mat5(5,nri,jmax)  Band matrix
+!!@n @param mat3(3,nri,jmax)  Band matrix
+!
+      module add_sph_vector_radial_mat
+!
+      use m_precision
+!
+      use calypso_mpi
+      use m_constants
+!
+      implicit none
+!
+! -----------------------------------------------------------------------
+!
+      contains
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_vector_poisson_mat_sph(nri, jmax, ar_1d_rj,        &
+     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
+!
+      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do k = kr_in+1, kr_out-1
+        do j = 1, jmax
+          mat3(3,k-1,j) = mat3(3,k-1,j)                                 &
+     &                   - coef_p *  d2nod_mat_fdm_2(k,-1)
+          mat3(2,k,  j) = mat3(2,k,  j)                                 &
+     &                   - coef_p * (d2nod_mat_fdm_2(k, 0)              &
+     &                    - g_sph_rj(j,3)*ar_1d_rj(k,2) )
+          mat3(1,k+1,j) = mat3(1,k+1,j)                                 &
+     &                   - coef_p *  d2nod_mat_fdm_2(k, 1)
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine add_vector_poisson_mat_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_vector_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,      &
+     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
+!
+      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do k = kr_in+1, kr_out-1
+        do j = 1, jmax
+          mat3(3,k-1,j) = mat3(3,k-1,j)                                 &
+     &                   - coef_p *  d2nod_mat_fdm_2(k,-1)
+          mat3(2,k,  j) = mat3(2,k,  j)                                 &
+     &                   - coef_p * (d2nod_mat_fdm_2(k, 0)              &
+     &                    - g_sph_rj(j,3)*ar_1d_rj(k,2) )
+          mat3(1,k+1,j) = mat3(1,k+1,j)                                 &
+     &                   - coef_p *  d2nod_mat_fdm_2(k, 1)
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine add_vector_r_diffuse_mat_sph
+!
+! -----------------------------------------------------------------------
+!
+      end module add_sph_vector_radial_mat

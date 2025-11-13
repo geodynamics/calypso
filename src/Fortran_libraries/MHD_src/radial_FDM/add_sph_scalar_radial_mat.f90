@@ -1,5 +1,5 @@
-!>@file   set_radial_mat_sph.f90
-!!@brief  module set_radial_mat_sph
+!>@file   add_sph_scalar_radial_mat.f90
+!!@brief  module add_sph_scalar_radial_mat
 !!
 !!@author H. Matsui
 !!@date Programmed in Apr, 2009
@@ -7,23 +7,22 @@
 !>@brief  Construct matrix for spherical shell dynamo model
 !!
 !!@verbatim
-!!      subroutine set_unit_mat5_4_time_evo(nri, jmax, mat5)
-!!      subroutine set_unit_mat_4_time_evo(nri, jmax, mat3)
-!!      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,     &
-!!     &          mat3)
-!!
 !!      subroutine add_scalar_poisson_mat_sph(nri, jmax, ar_1d_rj,      &
 !!     &         g_sph_rj, kr_in, kr_out, coef_p,                       &
 !!     &         d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
-!!      subroutine add_vector_poisson_mat_sph(nri, jmax, ar_1d_rj,      &
-!!     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
 !!      subroutine add_scalar_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,    &
 !!     &         g_sph_rj, kr_in, kr_out, coef_p, val_r, dval_r,        &
 !!     &         d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
-!!      subroutine add_vector_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,    &
-!!     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
+!!        integer(kind = kint), intent(in) :: jmax, nri
+!!        integer(kind = kint), intent(in) :: kr_in, kr_out
+!!        real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+!!        real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+!!        real(kind = kreal), intent(in) :: coef_p
+!!        real(kind = kreal), intent(in) :: val_r(nri), dval_r(nri)
+!!        real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
+!!        real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
+!!        real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
 !!
-!!      subroutine set_unit_mat_4_poisson00(nri, kr_in, kr_out, mat3)
 !!      subroutine add_sph_ref_poisson_mat                              &
 !!     &         (nri, ar_1d_rj, kr_in, kr_out, coef_p,                 &
 !!     &          d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
@@ -32,7 +31,7 @@
 !!     &          d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
 !!        integer(kind = kint), intent(in) :: nri, kr_in, kr_out
 !!        real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
-!!        real(kind = kreal), intent(in) :: coef_p(nri)
+!!        real(kind = kreal), intent(in) :: coef_p
 !!        real(kind = kreal), intent(in) :: k_ratio(0:nri)
 !!        real(kind = kreal), intent(in) :: dk_dr(0:nri)
 !!        real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
@@ -75,7 +74,7 @@
 !!@n @param mat5(5,nri,jmax)  Band matrix
 !!@n @param mat3(3,nri,jmax)  Band matrix
 !
-      module set_radial_mat_sph
+      module add_sph_scalar_radial_mat
 !
       use m_precision
 !
@@ -88,100 +87,6 @@
 !
       contains
 !
-! -----------------------------------------------------------------------
-!
-      subroutine set_unit_mat5_4_time_evo(nri, jmax, mat5)
-!
-      integer(kind = kint), intent(in) :: jmax, nri
-!
-      real(kind = kreal), intent(inout) :: mat5(5,nri,jmax)
-!
-      integer(kind = kint) :: k, j
-!
-!
-!$omp parallel do private (k,j)
-      do j = 1, jmax
-        do k = 3, nri
-          mat5(5,k-2,j) = zero
-        end do
-        do k = 2, nri
-          mat5(4,k-1,j) = zero
-        end do
-        do k = 1, nri
-          mat5(3,k,  j) = one
-        end do
-        do k = 1, nri-1
-          mat5(2,k+1,j) = zero
-        end do
-        do k = 1, nri-2
-          mat5(1,k+2,j) = zero
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine set_unit_mat5_4_time_evo
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_unit_mat_4_time_evo(nri, jmax, mat3)
-!
-      integer(kind = kint), intent(in) :: jmax, nri
-!
-      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
-!
-      integer(kind = kint) :: k, j
-!
-!
-!$omp parallel do private (k,j)
-      do j = 1, jmax
-        do k = 2, nri
-          mat3(3,k-1,j) = zero
-        end do
-        do k = 1, nri
-          mat3(2,k,  j) = one
-        end do
-        do k = 1, nri-1
-          mat3(1,k+1,j) = zero
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine set_unit_mat_4_time_evo
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,       &
-     &          mat3)
-!
-      integer(kind = kint), intent(in) :: jmax, nri
-      integer(kind = kint), intent(in) :: kr_in, kr_out
-!
-      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
-!
-      integer(kind = kint) :: k, j
-!
-!
-!$omp parallel do private (k,j)
-      do j = 1, jmax
-        do k = 1, nri
-          mat3(3,k,j) = zero
-          mat3(1,k,j) = zero
-        end do
-        do k = 1, kr_in-1
-          mat3(2,k,j) = one
-        end do
-        do k = kr_in, kr_out
-          mat3(2,k,j) = zero
-        end do
-        do k = kr_out+1, nri
-          mat3(2,k,j) = one
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine set_unit_mat_4_poisson
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine add_scalar_poisson_mat_sph(nri, jmax, ar_1d_rj,        &
@@ -220,40 +125,6 @@
 !
       end subroutine add_scalar_poisson_mat_sph
 !
-! -----------------------------------------------------------------------
-!
-      subroutine add_vector_poisson_mat_sph(nri, jmax, ar_1d_rj,        &
-     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
-!
-      integer(kind = kint), intent(in) :: jmax, nri
-      integer(kind = kint), intent(in) :: kr_in, kr_out
-      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
-      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
-      real(kind = kreal), intent(in) :: coef_p
-      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
-!
-      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
-!
-      integer(kind = kint) :: k, j
-!
-!
-!$omp parallel do private (k,j)
-      do k = kr_in+1, kr_out-1
-        do j = 1, jmax
-          mat3(3,k-1,j) = mat3(3,k-1,j)                                 &
-     &                   - coef_p *  d2nod_mat_fdm_2(k,-1)
-          mat3(2,k,  j) = mat3(2,k,  j)                                 &
-     &                   - coef_p * (d2nod_mat_fdm_2(k, 0)              &
-     &                    - g_sph_rj(j,3)*ar_1d_rj(k,2) )
-          mat3(1,k+1,j) = mat3(1,k+1,j)                                 &
-     &                   - coef_p *  d2nod_mat_fdm_2(k, 1)
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine add_vector_poisson_mat_sph
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine add_scalar_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,      &
@@ -297,64 +168,6 @@
       end subroutine add_scalar_r_diffuse_mat_sph
 !
 ! -----------------------------------------------------------------------
-!
-      subroutine add_vector_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,      &
-     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
-!
-      integer(kind = kint), intent(in) :: jmax, nri
-      integer(kind = kint), intent(in) :: kr_in, kr_out
-      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
-      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
-      real(kind = kreal), intent(in) :: coef_p
-      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
-!
-      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
-!
-      integer(kind = kint) :: k, j
-!
-!
-!$omp parallel do private (k,j)
-      do k = kr_in+1, kr_out-1
-        do j = 1, jmax
-          mat3(3,k-1,j) = mat3(3,k-1,j)                                 &
-     &                   - coef_p *  d2nod_mat_fdm_2(k,-1)
-          mat3(2,k,  j) = mat3(2,k,  j)                                 &
-     &                   - coef_p * (d2nod_mat_fdm_2(k, 0)              &
-     &                    - g_sph_rj(j,3)*ar_1d_rj(k,2) )
-          mat3(1,k+1,j) = mat3(1,k+1,j)                                 &
-     &                   - coef_p *  d2nod_mat_fdm_2(k, 1)
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine add_vector_r_diffuse_mat_sph
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine set_unit_mat_4_poisson00(nri, kr_in, kr_out, mat3)
-!
-      integer(kind = kint), intent(in) :: nri, kr_in, kr_out
-!
-      real(kind = kreal), intent(inout) :: mat3(3,0:nri)
-!
-      integer(kind = kint) :: k
-!
-!
-      do k = 0, nri
-        mat3(3,k) = zero
-        mat3(2,k) = one
-        mat3(1,k) = zero
-      end do
-      do k = kr_in, kr_out
-        mat3(2,k) = zero
-      end do
-      do k = kr_out+1, nri
-        mat3(2,k) = one
-      end do
-!
-      end subroutine set_unit_mat_4_poisson00
-!
 ! -----------------------------------------------------------------------
 !
       subroutine add_sph_ref_poisson_mat                                &
@@ -363,7 +176,7 @@
 !
       integer(kind = kint), intent(in) :: nri, kr_in, kr_out
       real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
-      real(kind = kreal), intent(in) :: coef_p(nri)
+      real(kind = kreal), intent(in) :: coef_p
       real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
       real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
 !
@@ -374,12 +187,12 @@
 !
 !$omp parallel do private (k)
       do k = kr_in+1, kr_out-1
-        mat3(3,k-1) = mat3(3,k-1) - coef_p(k) * (d2nod_mat_fdm_2(k,-1)  &
-     &                   + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k,-1))
-        mat3(2,k  ) = mat3(2,k  ) - coef_p(k) * (d2nod_mat_fdm_2(k, 0)  &
-     &                   + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 0))
-        mat3(1,k+1) = mat3(1,k+1) - coef_p(k) * (d2nod_mat_fdm_2(k, 1)  &
-     &                   + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 1))
+        mat3(3,k-1) = mat3(3,k-1) - coef_p * (d2nod_mat_fdm_2(k,-1)     &
+     &                + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k,-1))
+        mat3(2,k  ) = mat3(2,k  ) - coef_p * (d2nod_mat_fdm_2(k, 0)     &
+     &                + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 0))
+        mat3(1,k+1) = mat3(1,k+1) - coef_p * (d2nod_mat_fdm_2(k, 1)     &
+     &                + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 1))
       end do
 !$omp end parallel do
 !
@@ -393,7 +206,7 @@
 !
       integer(kind = kint), intent(in) :: nri, kr_in, kr_out
       real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
-      real(kind = kreal), intent(in) :: coef_p(nri)
+      real(kind = kreal), intent(in) :: coef_p
       real(kind = kreal), intent(in) :: k_ratio(0:nri)
       real(kind = kreal), intent(in) :: dk_dr(0:nri)
       real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
@@ -407,17 +220,17 @@
 !$omp parallel do private (k)
       do k = kr_in+1, kr_out-1
         mat3(3,k-1) = mat3(3,k-1)                                       &
-     &               - coef_p(k) * k_ratio(k) * (d2nod_mat_fdm_2(k,-1)  &
+     &                  - coef_p * k_ratio(k) * (d2nod_mat_fdm_2(k,-1)  &
      &                   + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k,-1)) &
-     &                  - coef_p(k) * dk_dr(k) * d1nod_mat_fdm_2(k,-1)
+     &                     - coef_p * dk_dr(k) * d1nod_mat_fdm_2(k,-1)
         mat3(2,k  ) = mat3(2,k  )                                       &
-     &               - coef_p(k) * k_ratio(k) * (d2nod_mat_fdm_2(k, 0)  &
+     &                  - coef_p * k_ratio(k) * (d2nod_mat_fdm_2(k, 0)  &
      &                   + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 0)) &
-     &                  - coef_p(k) * dk_dr(k) * d1nod_mat_fdm_2(k, 0)
+     &                     - coef_p * dk_dr(k) * d1nod_mat_fdm_2(k, 0)
         mat3(1,k+1) = mat3(1,k+1)                                       &
-     &               - coef_p(k) * k_ratio(k) * (d2nod_mat_fdm_2(k, 1)  &
+     &                  - coef_p * k_ratio(k) * (d2nod_mat_fdm_2(k, 1)  &
      &                   + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 1)) &
-     &                  - coef_p(k) * dk_dr(k) * d1nod_mat_fdm_2(k, 1)
+     &                  - coef_p * dk_dr(k) * d1nod_mat_fdm_2(k, 1)
       end do
 !$omp end parallel do
 !
@@ -425,4 +238,4 @@
 !
 ! -----------------------------------------------------------------------
 !
-      end module set_radial_mat_sph
+      end module add_sph_scalar_radial_mat

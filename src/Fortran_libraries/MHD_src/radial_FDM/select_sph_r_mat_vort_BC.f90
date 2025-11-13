@@ -55,8 +55,6 @@
       use t_coef_sph_velocity_BCs
       use t_coef_fdm2_centre
 !
-      use set_radial_mat_sph
-!
       implicit none
 !
 ! -----------------------------------------------------------------------

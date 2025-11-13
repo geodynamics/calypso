@@ -7,11 +7,11 @@
 !!
 !!@verbatim
 !!      subroutine s_const_sph_r_mat_ref_scalar(id_file, mat_name,      &
-!!     &          diffuse_reduction_ratio_ICB, sph_params,              &
-!!     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
+!!     &          flag_val_diffuse, k_ratio, dk_dr, sph_rj, r_2nd,      &
+!!     &          sph_bc, fdm2_center, band_s00_poisson)
 !!      subroutine const_r_mat00_poisson_fixS(id_file, mat_name,        &
-!!     &          diffuse_reduction_ratio_ICB, sph_params,              &
-!!     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
+!!     &          flag_val_diffuse, k_ratio, dk_dr, sph_rj, r_2nd,      &
+!!     &          sph_bc, fdm2_center, band_s00_poisson)
 !!        integer(kind = kint), intent(in) :: id_file
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -51,29 +51,28 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_const_sph_r_mat_ref_scalar(id_file, mat_name,        &
-     &          diffuse_reduction_ratio_ICB, k_ratio, dk_dr, sph_params,                &
-     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
+     &          flag_val_diffuse, k_ratio, dk_dr, sph_rj, r_2nd,        &
+     &          sph_bc, fdm2_center, band_s00_poisson)
 !
       use m_ludcmp_3band
-      use set_radial_mat_sph
-      use select_r_mat_scalar_bc_sph
+      use set_sph_unit_radial_mat
+      use add_sph_scalar_radial_mat
+      use sel_sph_r_mat_ref_scalar_bc
       use check_sph_radial_mat
 !
       integer(kind = kint), intent(in) :: id_file
-      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(sph_boundary_type), intent(in) :: sph_bc
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       character(len=kchara), intent(in) :: mat_name
-      real(kind = kreal), intent(in) :: diffuse_reduction_ratio_ICB
       real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
       real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
+      logical, intent(in) :: flag_val_diffuse
 !
       type(band_matrix_type), intent(inout) :: band_s00_poisson
 !
-      real(kind = kreal), allocatable :: r_coef(:)
 !      integer :: i
 !
 !
@@ -84,24 +83,20 @@
       call set_unit_mat_4_poisson00(sph_rj%nidx_rj(1),                  &
      &    sph_bc%kr_in, sph_bc%kr_out, band_s00_poisson%mat)
 !
-      allocate(r_coef(0:sph_rj%nidx_rj(1)))
-!$omp parallel workshare
-      r_coef(0:sph_rj%nidx_rj(1)) = one
-!$omp end parallel workshare
-!
-      if(diffuse_reduction_ratio_ICB .lt. one) then
-        r_coef(sph_params%nlayer_ICB) = diffuse_reduction_ratio_ICB
-        if(my_rank .eq. 0) write(*,*) 'reduction of diffusivity at',    &
-     &    sph_params%nlayer_ICB, ' to ', r_coef(sph_params%nlayer_ICB)
+      if(flag_val_diffuse) then
+        call add_sph_ref_val_diffusion_mat                              &
+     &     (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                         &
+     &      sph_bc%kr_in, sph_bc%kr_out, one, k_ratio, dk_dr,           &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
+      else
+        call add_sph_ref_poisson_mat                                    &
+     &     (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                         &
+     &      sph_bc%kr_in, sph_bc%kr_out, one,                           &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
       end if
 !
-      call add_sph_ref_poisson_mat(sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,  &
-     &    sph_bc%kr_in, sph_bc%kr_out, r_coef(1),                       &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
-!
-      call sel_radial_mat00_scalar_bc_sph                               &
-     &   (sph_rj, sph_bc, fdm2_center, r_coef, band_s00_poisson)
-      deallocate(r_coef)
+      call sel_sph_r_mat_ref_scl_bc(flag_val_diffuse, sph_rj, sph_bc,   &
+     &    fdm2_center, one, k_ratio, dk_dr, band_s00_poisson)
 !
 !      write(*,*) 0, 'band_s00_poisson%mat(2,i)', &
 !     &          1e30, band_s00_poisson%mat(2,0), &
@@ -128,27 +123,27 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_r_mat00_poisson_fixS(id_file, mat_name,          &
-     &          diffuse_reduction_ratio_ICB, sph_params,                &
-     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson)
+     &          flag_val_diffuse, k_ratio, dk_dr, sph_rj, r_2nd,        &
+     &          sph_bc, fdm2_center, band_s00_poisson)
 !
       use m_ludcmp_3band
-      use set_radial_mat_sph
-      use select_r_mat_scalar_bc_sph
+      use set_sph_unit_radial_mat
+      use add_sph_scalar_radial_mat
+      use sel_sph_r_mat_ref_scalar_bc
       use check_sph_radial_mat
 !
       integer(kind = kint), intent(in) :: id_file
-      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(sph_boundary_type), intent(in) :: sph_bc
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       character(len=kchara), intent(in) :: mat_name
-      real(kind = kreal), intent(in) :: diffuse_reduction_ratio_ICB
+      real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
+      real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
+      logical, intent(in) :: flag_val_diffuse
 !
       type(band_matrix_type), intent(inout) :: band_s00_poisson
-!
-      real(kind = kreal), allocatable :: r_coef(:)
 !
 !
       write(band_s00_poisson%mat_name,'(2a)')                           &
@@ -159,28 +154,20 @@
       call set_unit_mat_4_poisson00(sph_rj%nidx_rj(1),                  &
      &    sph_bc%kr_in, sph_bc%kr_out, band_s00_poisson%mat)
 !
-      allocate(r_coef(sph_rj%nidx_rj(1)))
-!$omp parallel workshare
-      r_coef(1:sph_rj%nidx_rj(1)) = one
-!$omp end parallel workshare
-!
-      if(diffuse_reduction_ratio_ICB .lt. one) then
-        r_coef(sph_params%nlayer_ICB) = diffuse_reduction_ratio_ICB
-        if(my_rank .eq. 0) write(*,*) 'reduction of diffusivity at',    &
-     &    sph_params%nlayer_ICB, ' to ', r_coef(sph_params%nlayer_ICB)
+      if(flag_val_diffuse) then
+        call add_sph_ref_val_diffusion_mat                              &
+     &     (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                         &
+     &      sph_bc%kr_in, sph_bc%kr_out, one, k_ratio, dk_dr,           &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
+      else
+        call add_sph_ref_poisson_mat                                    &
+     &     (sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,                         &
+     &      sph_bc%kr_in, sph_bc%kr_out, one,                           &
+     &      r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
       end if
 !
-!
-      call add_sph_ref_poisson_mat(sph_rj%nidx_rj(1), sph_rj%ar_1d_rj,  &
-     &    sph_bc%kr_in, sph_bc%kr_out, r_coef(1),                       &
-     &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_s00_poisson%mat)
-!
-      call sel_r_mat_poisson_fixBC_sph                                  &
-     &   (sph_rj, sph_bc, fdm2_center, band_s00_poisson)
-      deallocate(r_coef)
-!
-      if(i_debug .gt. 0) write(*,*) 'const_radial_mat_scalar00_sph'
-!
+      call sel_sph_r_mat_poisson_fixBC(flag_val_diffuse, sph_rj,        &
+     &    sph_bc, fdm2_center, k_ratio, dk_dr, band_s00_poisson)
 !
       call ludcmp_3band_ctr(band_s00_poisson)
 !

@@ -61,11 +61,12 @@
      &          g_sph_rj, band_p_poisson)
 !
       use m_ludcmp_3band
+      use set_sph_unit_radial_mat
       use cal_inner_core_rotation
       use center_sph_matrices
       use mat_product_3band_mul
-      use set_radial_mat_sph
-      use select_r_mat_scalar_bc_sph
+      use add_sph_scalar_radial_mat
+      use sel_sph_r_mat_scalar_bc
 !
       type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
@@ -93,7 +94,7 @@
      &    g_sph_rj, sph_bc_U%kr_in, sph_bc_U%kr_out, coef_p,            &
      &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat, band_p_poisson%mat)
 !
-      call sel_radial_mat_press_bc_sph(sph_rj, sph_bc_U, fdm2_center,   &
+      call sel_sph_radial_mat_press_bc(sph_rj, sph_bc_U, fdm2_center,   &
      &    g_sph_rj, coef_p, band_p_poisson)
 !
       call ludcmp_3band_mul_t                                           &
@@ -109,9 +110,10 @@
      &          k_ratio, dk_dr, band_s_evo)
 !
       use m_ludcmp_3band
+      use set_sph_unit_radial_mat
       use center_sph_matrices
-      use set_radial_mat_sph
-      use select_r_mat_scalar_bc_sph
+      use add_sph_scalar_radial_mat
+      use sel_sph_r_mat_scalar_bc
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd

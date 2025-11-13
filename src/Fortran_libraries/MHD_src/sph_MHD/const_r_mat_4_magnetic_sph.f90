@@ -36,8 +36,6 @@
       use t_boundary_sph_spectr
       use t_coef_fdm2_centre
 !
-      use set_radial_mat_sph
-!
       implicit none
 !
       character(len=kchara), parameter, private                         &
@@ -55,6 +53,8 @@
      &         (dt, sph_rj, r_2nd, cd_prop, sph_bc_B, bcs_B,            &
      &          fdm2_center, g_sph_rj, band_bp_evo, band_bt_evo)
 !
+      use set_sph_unit_radial_mat
+      use add_sph_vector_radial_mat
       use select_sph_r_mat_magne_BC
       use set_sph_scalar_matrix_CMB
       use center_sph_matrices

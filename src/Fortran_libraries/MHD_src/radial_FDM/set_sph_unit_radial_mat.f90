@@ -1,0 +1,202 @@
+!>@file   set_sph_unit_radial_mat.f90
+!!@brief  module set_sph_unit_radial_mat
+!!
+!!@author H. Matsui
+!!@date Programmed in Apr, 2009
+!
+!>@brief  Set unit matrix for spherical shell dynamo model
+!!
+!!@verbatim
+!!      subroutine set_unit_mat5_4_time_evo(nri, jmax, mat5)
+!!      subroutine set_unit_mat_4_time_evo(nri, jmax, mat3)
+!!      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,     &
+!!     &          mat3)
+!!        integer(kind = kint), intent(in) :: jmax, nri
+!!        integer(kind = kint), intent(in) :: kr_in, kr_out
+!!        real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!!        real(kind = kreal), intent(inout) :: mat5(5,nri,jmax)
+!!
+!!      subroutine set_unit_mat_4_poisson00(nri, kr_in, kr_out, mat3)
+!!        integer(kind = kint), intent(in) :: nri, kr_in, kr_out
+!!        real(kind = kreal), intent(inout) :: mat3(3,0:nri)
+!!
+!!        integer(kind = kint), intent(in) :: nri, kr_in, kr_out
+!!        real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+!!        real(kind = kreal), intent(in) :: coef_p
+!!        real(kind = kreal), intent(in) :: k_ratio(0:nri)
+!!        real(kind = kreal), intent(in) :: dk_dr(0:nri)
+!!        real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
+!!        real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
+!!        real(kind = kreal), intent(inout) :: mat3(3,0:nri)
+!!
+!!    Format of band matrix
+!!               | a(2,1)  a(1,2)  ........     0         0     |
+!!               | a(3,1)  a(2,2)  ........     .         .     |
+!!               |   0     a(3,2)  ........     .         .     |
+!!    a(i,j)  =  |   .       0     ........     0         .     |
+!!               | ...... a(3,k-1)  a(2,k)  a(1,k+1) .......... |
+!!               |   .       .     ........  a(1,N-2)     0     |
+!!               |   .       .     ........  a(2,N-2)  a(1,N-1) |
+!!               |   0       0     ........  a(3,N-2)  a(2,N-1) |
+!!
+!!   Original band matrix
+!!      band_a(i-j+iband+1,j) = a(i,j)
+!!      band_a(k,j) = a(k+j-iband-1,j)
+!!   3-band matrix
+!!      band_a(i-j+2,j) = a(i,j)
+!!      band_a(k,j) = a(k+j-2,j)
+!!   5-band matrix
+!!      band_lu(i-j+3,j) = a(i,j)
+!!      band_lu(k,j) = a(k+j-3,j)
+!!   7-band matrix
+!!      band_lu(i-j+4,j) = a(i,j)
+!!      band_lu(k,j) = a(k+j-4,j)
+!!@endverbatim
+!!
+!!@n @param nri     Number of radial points
+!!@n @param jmax    Number of spherical harmonics modes
+!!@n @param kr_st   Start radial address to construct matrix
+!!@n @param kr_ed   End radial address to construct matrix
+!!@n @param kr_in    Radial address for inner boundary
+!!@n @param kr_out   Radial address for outer boundary
+!!@n @param coef_d     Coefficient of diffusiotn term
+!!@n @param coef_p     Coefficient of pressure gradient
+!!
+!!@n @param mat5(5,nri,jmax)  Band matrix
+!!@n @param mat3(3,nri,jmax)  Band matrix
+!
+      module set_sph_unit_radial_mat
+!
+      use m_precision
+!
+      use calypso_mpi
+      use m_constants
+!
+      implicit none
+!
+! -----------------------------------------------------------------------
+!
+      contains
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_unit_mat5_4_time_evo(nri, jmax, mat5)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+!
+      real(kind = kreal), intent(inout) :: mat5(5,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do j = 1, jmax
+        do k = 3, nri
+          mat5(5,k-2,j) = zero
+        end do
+        do k = 2, nri
+          mat5(4,k-1,j) = zero
+        end do
+        do k = 1, nri
+          mat5(3,k,  j) = one
+        end do
+        do k = 1, nri-1
+          mat5(2,k+1,j) = zero
+        end do
+        do k = 1, nri-2
+          mat5(1,k+2,j) = zero
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine set_unit_mat5_4_time_evo
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_unit_mat_4_time_evo(nri, jmax, mat3)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+!
+      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do j = 1, jmax
+        do k = 2, nri
+          mat3(3,k-1,j) = zero
+        end do
+        do k = 1, nri
+          mat3(2,k,  j) = one
+        end do
+        do k = 1, nri-1
+          mat3(1,k+1,j) = zero
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine set_unit_mat_4_time_evo
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,       &
+     &          mat3)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: kr_in, kr_out
+!
+      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do j = 1, jmax
+        do k = 1, nri
+          mat3(3,k,j) = zero
+          mat3(1,k,j) = zero
+        end do
+        do k = 1, kr_in-1
+          mat3(2,k,j) = one
+        end do
+        do k = kr_in, kr_out
+          mat3(2,k,j) = zero
+        end do
+        do k = kr_out+1, nri
+          mat3(2,k,j) = one
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine set_unit_mat_4_poisson
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_unit_mat_4_poisson00(nri, kr_in, kr_out, mat3)
+!
+      integer(kind = kint), intent(in) :: nri, kr_in, kr_out
+!
+      real(kind = kreal), intent(inout) :: mat3(3,0:nri)
+!
+      integer(kind = kint) :: k
+!
+!
+      do k = 0, nri
+        mat3(3,k) = zero
+        mat3(2,k) = one
+        mat3(1,k) = zero
+      end do
+      do k = kr_in, kr_out
+        mat3(2,k) = zero
+      end do
+      do k = kr_out+1, nri
+        mat3(2,k) = one
+      end do
+!
+      end subroutine set_unit_mat_4_poisson00
+!
+! -----------------------------------------------------------------------
+!
+      end module set_sph_unit_radial_mat

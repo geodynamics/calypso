@@ -62,8 +62,6 @@
       use t_coef_sph_velocity_BCs
       use t_coef_fdm2_centre
 !
-      use set_radial_mat_sph
-!
       implicit none
 !
       character(len=kchara), parameter, private                         &
@@ -89,6 +87,8 @@
 !
       use calypso_mpi
       use m_ludcmp_band
+      use set_sph_unit_radial_mat
+      use add_sph_vector_radial_mat
       use select_sph_r_mat_vort_BC
       use center_sph_matrices
       use mat_product_3band_mul
@@ -189,6 +189,8 @@
      &          g_sph_rj, band_vt_evo)
 !
       use m_ludcmp_band
+      use set_sph_unit_radial_mat
+      use add_sph_vector_radial_mat
       use select_sph_r_mat_vort_BC
       use cal_inner_core_rotation
       use center_sph_matrices

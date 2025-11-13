@@ -10,15 +10,33 @@
 !!      subroutine copy_to_band3_mat_w_center(nri, c_evo, mat3, mat00_3)
 !!      subroutine copy_to_band3_mat_no_center(nri, mat3, mat00_3)
 !!      subroutine add_scalar_poisson_mat_fill_ctr(nri, r_CTR1,         &
+!!        integer(kind = kint), intent(in) :: nri
+!!        real(kind = kreal), intent(in) :: c_evo
+!!        real(kind = kreal), intent(in) :: mat3(3,nri)
+!!        real(kind = kreal), intent(inout) :: mat00_3(3,0:nri)
+!!
 !!     &         fdm2_fix_dr_center, fdm2_fix_fld_ctr1, coef_p, mat00_3)
+!!      subroutine add_scl_val_dfse_mat_fill_ctr(nri, r_CTR1,           &
+!!     &          fdm2_fix_dr_center, fdm2_fix_fld_ctr1,                &
+!!     &          coef_p, k_ratio, dk_dr, mat00_3)
+!!        integer(kind = kint), intent(in) :: nri
+!!        real(kind = kreal), intent(in) :: r_CTR1(0:2)
+!!        real(kind = kreal), intent(in) :: coef_p
+!!        real(kind = kreal), intent(in) :: fdm2_fix_dr_center(-1:1,3)
+!!        real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
+!!        real(kind = kreal), intent(inout) :: mat00_3(3,0:nri)
+!!
 !!      subroutine add_scalar_poisson_mat_fix_ctr(nri, r_CTR1,          &
 !!     &          fdm2_fix_fld_ctr1, coef_p, mat00_3)
+!!      subroutine add_scl_val_diffuse_mat_fix_ctr(nri, r_CTR1,         &
+!!     &          fdm2_fix_fld_ctr1, coef_p, k_ratio, dk_dr, mat00_3)
 !!      subroutine add_scalar_poisson_mat_no_fld(nri, mat00_3)
 !!        integer(kind = kint), intent(in) :: nri
 !!        real(kind = kreal), intent(in) :: c_evo
 !!        real(kind = kreal), intent(in) :: mat3(3,nri)
 !!        real(kind = kreal), intent(in) :: r_CTR1(0:2)
 !!        real(kind = kreal), intent(in) :: coef_p
+!!        real(kind = kreal), intent(in) :: k_ratio, dk_dr
 !!        real(kind = kreal), intent(in) :: fdm2_fix_dr_center(-1:1,3)
 !!        real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
 !!        real(kind = kreal), intent(inout) :: mat00_3(3,0:nri)
@@ -136,6 +154,45 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine add_scl_val_dfse_mat_fill_ctr(nri, r_CTR1,             &
+     &          fdm2_fix_dr_center, fdm2_fix_fld_ctr1,                  &
+     &          coef_p, k_ratio, dk_dr, mat00_3)
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: r_CTR1(0:2)
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: k_ratio, dk_dr
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_center(-1:1,3)
+      real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
+!
+      real(kind = kreal), intent(inout) :: mat00_3(3,0:nri)
+!
+!
+!
+!      mat00_3(3,-1) = mat00_3(3,-1) - coef_p * k_ratio * fdm2_fix_dr_center(-1,3)
+      mat00_3(2,0) = mat00_3(2,0)                                       &
+     &              - coef_p * k_ratio * fdm2_fix_dr_center( 0,3)
+      mat00_3(1,1) = mat00_3(1,1)                                       &
+     &              - coef_p * k_ratio * fdm2_fix_dr_center( 1,3)
+!
+      mat00_3(3,0) = mat00_3(3,0)                                       &
+     &              - coef_p * k_ratio * (fdm2_fix_fld_ctr1(-1,3)       &
+     &                  + two*r_CTR1(1) * fdm2_fix_fld_ctr1(-1,2))      &
+     &                 - coef_p * dk_dr * fdm2_fix_fld_ctr1(-1,2)
+      mat00_3(2,1) = mat00_3(2,1)                                       &
+     &              - coef_p * k_ratio * (fdm2_fix_fld_ctr1( 0,3)       &
+     &                  + two*r_CTR1(1) * fdm2_fix_fld_ctr1( 0,2))      &
+     &                 - coef_p * dk_dr * fdm2_fix_fld_ctr1( 0,2)
+      mat00_3(1,2) = mat00_3(1,2)                                       &
+     &              - coef_p * k_ratio * (fdm2_fix_fld_ctr1( 1,3)       &
+     &                  + two*r_CTR1(1) * fdm2_fix_fld_ctr1( 1,2))      &
+     &                 - coef_p * dk_dr * fdm2_fix_fld_ctr1( 1,2)
+!
+      end subroutine add_scl_val_dfse_mat_fill_ctr
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
       subroutine add_scalar_poisson_mat_fix_ctr(nri, r_CTR1,            &
      &          fdm2_fix_fld_ctr1, coef_p, mat00_3)
 !
@@ -158,6 +215,38 @@
      &                     + two*r_CTR1(1) * fdm2_fix_fld_ctr1(1,2))
 !
       end subroutine add_scalar_poisson_mat_fix_ctr
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_scl_val_diffuse_mat_fix_ctr(nri, r_CTR1,           &
+     &          fdm2_fix_fld_ctr1, coef_p, k_ratio, dk_dr, mat00_3)
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: r_CTR1(0:2)
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: k_ratio, dk_dr
+      real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
+!
+      real(kind = kreal), intent(inout) :: mat00_3(3,0:nri)
+!
+!
+      mat00_3(2,0) = one
+      mat00_3(1,1) = zero
+!
+      mat00_3(3,0) = mat00_3(3,0)                                       &
+     &              - coef_p * k_ratio * (fdm2_fix_fld_ctr1(-1,3)       &
+     &                  + two*r_CTR1(1) * fdm2_fix_fld_ctr1(-1,2))      &
+     &                 - coef_p * dk_dr * fdm2_fix_fld_ctr1(-1,2)
+      mat00_3(2,1) = mat00_3(2,1)                                       &
+     &              - coef_p * k_ratio * (fdm2_fix_fld_ctr1( 0,3)       &
+     &                  + two*r_CTR1(1) * fdm2_fix_fld_ctr1( 0,2))      &
+     &                 - coef_p * dk_dr * fdm2_fix_fld_ctr1( 0,2)
+      mat00_3(1,2) = mat00_3(1,2)                                       &
+     &              - coef_p * k_ratio * (fdm2_fix_fld_ctr1( 1,3)       &
+     &                  + two*r_CTR1(1) * fdm2_fix_fld_ctr1( 1,2))      &
+     &                 - coef_p * dk_dr * fdm2_fix_fld_ctr1( 1,2)
+!
+      end subroutine add_scl_val_diffuse_mat_fix_ctr
 !
 ! -----------------------------------------------------------------------
 !

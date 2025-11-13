@@ -44,8 +44,6 @@
       use t_boundary_sph_spectr
       use t_coef_fdm2_centre
 !
-      use set_radial_mat_sph
-!
       implicit none
 !
 ! -----------------------------------------------------------------------

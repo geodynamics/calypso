@@ -131,9 +131,8 @@
         end if
 !
         call s_const_sph_r_mat_ref_scalar((my_rank+50), mat_name,       &
-     &      sc_prop%diffuse_reduction_ratio_ICB, k_ratio, dk_dr,        &
-     &      sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,           &
-     &      band_s00_poisson)
+     &      sc_prop%flag_val_diffuse, k_ratio, dk_dr, sph_rj,           &
+     &      r_2nd, sph_bc_S, fdm2_center, band_s00_poisson)
         call cal_diffusive_profile                                      &
      &     (sph_rj, sc_prop, sph_bc_S, bcs_S, r_2nd, fdm2_center,       &
      &      band_s00_poisson, ref_field%d_fld(1,iref_scalar))
@@ -215,9 +214,8 @@
 !
         if(iref_source .gt. 0) then
           call s_const_sph_r_mat_ref_scalar((my_rank+50), mat_name,     &
-     &        sc_prop%diffuse_reduction_ratio_ICB, k_ratio, dk_dr,      &
-     &        sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,         &
-     &        band_s00_poisson)
+     &        sc_prop%flag_val_diffuse, k_ratio, dk_dr, sph_rj,         &
+     &        r_2nd, sph_bc_S, fdm2_center, band_s00_poisson)
           call cal_reference_source(sph_rj, sc_prop, band_s00_poisson,  &
      &        ref_field%d_fld(1,iref_scalar),                           &
      &        ref_field%d_fld(1,iref_source))

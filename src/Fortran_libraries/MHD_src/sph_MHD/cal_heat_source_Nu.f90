@@ -86,9 +86,8 @@
       if(Nu_type%iflag_Nusselt .eq. iflag_no_source_Nu) return
         call alloc_Nu_radial_reference(sph%sph_rj, Nu_type)
         call s_const_sph_r_mat_ref_scalar(my_rank+50, mat_name,         &
-     &      sc_prop%diffuse_reduction_ratio_ICB, k_ratio, dk_dr,        &
-     &      sph%sph_params, sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,   &
-     &      band_s00_poisson_fixS)
+     &      sc_prop%flag_val_diffuse, k_ratio, dk_dr, sph%sph_rj,       &
+     &      r_2nd, sph_bc_S, fdm2_center, band_s00_poisson_fixS)
 !
       end subroutine init_poisson_matrix_for_Nu
 !

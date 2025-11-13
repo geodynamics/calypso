@@ -93,7 +93,9 @@
      &    refs%ref_field, sph_MHD_mat)
 !
       call const_radial_mat_sph_w_center                                &
-     &   (dt, sph%sph_rj, MHD_prop, sph_MHD_bc, sph_MHD_mat)
+     &   (dt, sph%sph_rj, MHD_prop, sph_MHD_bc,                         &
+     &    refs%iref_diffusivity, refs%iref_grad_diffusivity,            &
+     &    refs%ref_field, sph_MHD_mat)
 !
       end subroutine const_radial_mat_sph_mhd
 !
@@ -261,7 +263,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_radial_mat_sph_w_center                          &
-     &         (dt, sph_rj, MHD_prop, sph_MHD_bc, sph_MHD_mat)
+     &         (dt, sph_rj, MHD_prop, sph_MHD_bc,                       &
+     &          iref_diffusivity, iref_grad_diffusivity, ref_field,     &
+     &          sph_MHD_mat)
 !
       use const_r_mat_w_center_sph
 !
@@ -269,6 +273,10 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!
+      type(diffusivity_adress), intent(in) :: iref_diffusivity
+      type(diffusivity_adress), intent(in) :: iref_grad_diffusivity
+      type(phys_data), intent(in) :: ref_field
 !
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !
@@ -285,11 +293,15 @@
 !
         call const_radial_mat_scalar00_sph                              &
      &     (temp_l0_wc_name, dt, sph_rj, MHD_prop%ht_prop,              &
+     &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
+     &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
      &      sph_MHD_mat%band_temp_evo, sph_MHD_mat%band_temp00_evo)
 !
         call const_radial_mat_scalar00_sph                              &
      &     (comp_l0_wc_name, dt, sph_rj, MHD_prop%cp_prop,              &
+     &      ref_field%d_fld(1,iref_diffusivity%i_C_diffusivity),        &
+     &      ref_field%d_fld(1,iref_grad_diffusivity%i_C_diffusivity),   &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
      &      sph_MHD_mat%band_comp_evo, sph_MHD_mat%band_comp00_evo)
       end if
