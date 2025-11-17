@@ -9,9 +9,11 @@
 !!        by finite difference method
 !!
 !!@verbatim
-!!      subroutine init_r_infos_sph_mhd_evo(bc_IO, sph_grps, MHD_BC,    &
-!!     &          ipol, sph, r_2nd, r_n2e_3rd, r_e2n_1st,               &
-!!     &          omega_sph, MHD_prop, radial_variation, sph_MHD_bc)
+!!      subroutine init_r_infos_sph_mhd_evo(ipol, sph,                  &
+!!     &          r_2nd, r_n2e_3rd, r_e2n_1st, omega_sph, MHD_prop)
+!!      subroutine init_bc_infos_sph_mhd_evo                            &
+!!     &         (bc_IO, sph_grps, MHD_BC, ipol, sph, r_2nd,            &
+!!     &          MHD_prop, radial_variation, sph_MHD_bc)
 !!      subroutine init_reference_fields(sph, ipol, r_2nd,              &
 !!     &          refs, rj_fld, MHD_prop, sph_MHD_bc)
 !!        type(boundary_spectra), intent(in) :: bc_IO
@@ -110,8 +112,8 @@
       if(iflag_debug .gt. 0) write(*,*) 'const_second_fdm_coefs'
       if(iflag_debug .ge. iflag_full_msg)                               &
     &                    open(id_check, file='FDM.dat')
-      call const_second_fdm_coefs                                       &
-     &   (id_check, sph%sph_params, sph%sph_rj, r_2nd)
+      call const_second_fdm_coefs(id_check, sph%sph_params, sph%sph_rj, &
+     &                            r_2nd)
 !
       if (iflag_debug.gt.0) write(*,*) 'const_first_fdm_ele_to_node'
       call const_first_fdm_ele_to_node(id_check, sph%sph_rj, r_e2n_1st)
@@ -135,7 +137,6 @@
       type(MHD_BC_lists), intent(in) :: MHD_BC
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
-!
       type(fdm_matrices), intent(in) :: r_2nd
 !
       type(MHD_evolution_param), intent(inout) :: MHD_prop
@@ -144,7 +145,7 @@
 !
       integer(kind = kint), parameter :: id_check = 50
 !
-!*  ---------- Radial variations of density and diffusivities  -------
+!
       call init_radius_variations_sph_mhd(sph%sph_rj, r_2nd, MHD_prop,  &
      &                                    radial_variation)
 !
@@ -154,13 +155,12 @@
      &   (bc_IO, sph%sph_params, sph%sph_rj, sph_grps%radial_rj_grp,    &
      &    MHD_prop, radial_variation, MHD_BC, sph_MHD_bc)
 !
-      if(iflag_debug .ge. iflag_full_msg)                               &
-    &                open(id_check, file='FDM.dat', position='append')
       if(iflag_debug .ge. iflag_full_msg) then
-        call check_bc_sph_mhd(id_check, sph%sph_rj, MHD_prop,           &
-     &                        sph_MHD_bc)
+        open(id_check, file='FDM.dat', position='APPEND')
+        call check_bc_sph_mhd                                           &
+     &     (id_check, sph%sph_rj, MHD_prop, sph_MHD_bc)
+        close(id_check)
       end if
-      if(iflag_debug .ge. iflag_full_msg) close(id_check)
 !
       end subroutine init_bc_infos_sph_mhd_evo
 !
@@ -212,6 +212,16 @@
      &            :: cmat_name = 'reference_Composition'
       logical :: flag_write_ref
       integer :: irank_local
+!
+      real(kind = kreal) :: range_ICB(3)
+      integer(kind = kint) :: kr_reduce_inner
+      integer(kind = kint) :: kr_reduce_outer
+      integer(kind = kint) :: k_reduce_old2new_in(3)
+      integer(kind = kint) :: k_reduce_old2new_out(3)
+      real(kind = kreal) :: coef_reduce_old2new_in(3)
+!
+      integer(kind = kint) :: kr
+      real(kind = kreal) :: grad, ratio
 !
 !
       call init_reft_rj_data(sph%sph_rj, ipol, refs)

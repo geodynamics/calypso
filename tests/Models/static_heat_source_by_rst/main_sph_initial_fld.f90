@@ -82,7 +82,7 @@
 !
       call set_sph_MHD_sprctr_data(SPH_model%MHD_prop, SPH_MHD)
 !
-       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
+      if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
       call init_r_infos_sph_mhd_evo(SPH_MHD%ipol, SPH_MHD%sph,          &
      &    SPH_WK%r_2nd, SPH_WK%r_n2e_3rd, SPH_WK%r_e2n_1st,             &
      &    SPH_model%omega_sph, SPH_model%MHD_prop)
