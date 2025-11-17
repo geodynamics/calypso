@@ -240,9 +240,12 @@
       time_IO%time = zero
       time_IO%dt = zero
 !
-      write(*,*) 'radial_variation%num_phys', radial_variation%num_phys
-      write(*,*) 'radial_variation%num_component', radial_variation%num_component
-      write(*,*) 'radial_variation%istack_component', radial_variation%istack_component
+!      write(*,*) 'radial_variation%num_phys',                          &
+!     &          radial_variation%num_phys
+!      write(*,*) 'radial_variation%num_component',                     &
+!     &           radial_variation%num_component
+!      write(*,*) 'radial_variation%istack_component',                  &
+!     &           radial_variation%istack_component
 !
       call copy_rj_phys_name_to_IO                                      &
      &   (radial_variation%num_phys, radial_variation, ref_fld_IO)

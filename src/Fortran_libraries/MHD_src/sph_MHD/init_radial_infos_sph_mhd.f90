@@ -70,20 +70,14 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine init_r_infos_sph_mhd_evo(bc_IO, sph_grps, MHD_BC,      &
-     &          ipol, sph, r_2nd, r_n2e_3rd, r_e2n_1st,                 &
-     &          omega_sph, MHD_prop, radial_variation, sph_MHD_bc)
+      subroutine init_r_infos_sph_mhd_evo(ipol, sph,                    &
+     &          r_2nd, r_n2e_3rd, r_e2n_1st, omega_sph, MHD_prop)
 !
       use second_fdm_node_coefs
       use third_fdm_node_to_ele
       use first_fdm_ele_to_node
       use material_property
-      use init_sph_radius_variations
-      use set_bc_sph_mhd
 !
-      type(boundary_spectra), intent(in) :: bc_IO
-      type(sph_group_data), intent(in) :: sph_grps
-      type(MHD_BC_lists), intent(in) :: MHD_BC
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
 !
@@ -93,8 +87,6 @@
 !
       type(sph_rotation), intent(inout) :: omega_sph
       type(MHD_evolution_param), intent(inout) :: MHD_prop
-      type(phys_data), intent(inout) :: radial_variation
-      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !
       integer(kind = kint), parameter :: id_check = 50
 !
@@ -118,13 +110,39 @@
       if(iflag_debug .gt. 0) write(*,*) 'const_second_fdm_coefs'
       if(iflag_debug .ge. iflag_full_msg)                               &
     &                    open(id_check, file='FDM.dat')
-      call const_second_fdm_coefs(id_check, sph%sph_params, sph%sph_rj, &
-     &                            r_2nd)
+      call const_second_fdm_coefs                                       &
+     &   (id_check, sph%sph_params, sph%sph_rj, r_2nd)
 !
       if (iflag_debug.gt.0) write(*,*) 'const_first_fdm_ele_to_node'
       call const_first_fdm_ele_to_node(id_check, sph%sph_rj, r_e2n_1st)
       if (iflag_debug.gt.0) write(*,*) 'const_third_fdm_node_to_ele'
       call const_third_fdm_node_to_ele(id_check, sph%sph_rj, r_n2e_3rd)
+      if(iflag_debug .ge. iflag_full_msg) close(id_check)
+!
+      end subroutine init_r_infos_sph_mhd_evo
+!
+!  -------------------------------------------------------------------
+!
+      subroutine init_bc_infos_sph_mhd_evo                              &
+     &         (bc_IO, sph_grps, MHD_BC, ipol, sph, r_2nd,              &
+     &          MHD_prop, radial_variation, sph_MHD_bc)
+!
+      use init_sph_radius_variations
+      use set_bc_sph_mhd
+!
+      type(boundary_spectra), intent(in) :: bc_IO
+      type(sph_group_data), intent(in) :: sph_grps
+      type(MHD_BC_lists), intent(in) :: MHD_BC
+      type(phys_address), intent(in) :: ipol
+      type(sph_grids), intent(in) :: sph
+!
+      type(fdm_matrices), intent(in) :: r_2nd
+!
+      type(MHD_evolution_param), intent(inout) :: MHD_prop
+      type(phys_data), intent(inout) :: radial_variation
+      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
+!
+      integer(kind = kint), parameter :: id_check = 50
 !
 !*  ---------- Radial variations of density and diffusivities  -------
       call init_radius_variations_sph_mhd(sph%sph_rj, r_2nd, MHD_prop,  &
@@ -136,13 +154,15 @@
      &   (bc_IO, sph%sph_params, sph%sph_rj, sph_grps%radial_rj_grp,    &
      &    MHD_prop, radial_variation, MHD_BC, sph_MHD_bc)
 !
+      if(iflag_debug .ge. iflag_full_msg)                               &
+    &                open(id_check, file='FDM.dat', position='append')
       if(iflag_debug .ge. iflag_full_msg) then
         call check_bc_sph_mhd(id_check, sph%sph_rj, MHD_prop,           &
      &                        sph_MHD_bc)
       end if
       if(iflag_debug .ge. iflag_full_msg) close(id_check)
 !
-      end subroutine init_r_infos_sph_mhd_evo
+      end subroutine init_bc_infos_sph_mhd_evo
 !
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
@@ -193,19 +213,10 @@
       logical :: flag_write_ref
       integer :: irank_local
 !
-      real(kind = kreal) :: range_ICB(3)
-      integer(kind = kint) :: kr_reduce_inner
-      integer(kind = kint) :: kr_reduce_outer
-      integer(kind = kint) :: k_reduce_old2new_in(3)
-      integer(kind = kint) :: k_reduce_old2new_out(3)
-      real(kind = kreal) :: coef_reduce_old2new_in(3)
-!
-      integer(kind = kint) :: kr
-      real(kind = kreal) :: grad, ratio
-!
 !
       call init_reft_rj_data(sph%sph_rj, ipol, refs)
 !
+      flag_write_ref = .FALSE.
       if((refs%iref_diffusivity%i_K_viscosity                           &
      &    * refs%iref_grad_diffusivity%i_K_viscosity) .gt. 0) then
         call copy_const_diffusivity_to_ref                              &
@@ -213,6 +224,7 @@
      &     refs%ref_field%d_fld(1,refs%iref_diffusivity%i_K_viscosity), &
      &     refs%ref_field%d_fld(1,                                      &
      &                       refs%iref_grad_diffusivity%i_K_viscosity))
+        flag_write_ref = .TRUE.
       end if
 !
       if((refs%iref_diffusivity%i_B_diffusivity                         &
@@ -222,6 +234,7 @@
      &   refs%ref_field%d_fld(1,refs%iref_diffusivity%i_B_diffusivity), &
      &   refs%ref_field%d_fld(1,                                        &
      &                     refs%iref_grad_diffusivity%i_B_diffusivity))
+        flag_write_ref = .TRUE.
       end if
 !
       if((refs%iref_diffusivity%i_T_diffusivity                         &
@@ -236,6 +249,7 @@
      &     (sph%sph_params, MHD_prop%ht_prop, refs%iref_radius,         &
      &      refs%iref_diffusivity%i_T_diffusivity,                      &
      &      refs%iref_grad_diffusivity%i_T_diffusivity, refs%ref_field)
+        flag_write_ref = .TRUE.
       end if
 !
       if((refs%iref_diffusivity%i_C_diffusivity                         &
@@ -250,6 +264,7 @@
      &     (sph%sph_params, MHD_prop%cp_prop, refs%iref_radius,         &
      &      refs%iref_diffusivity%i_C_diffusivity,                      &
      &      refs%iref_grad_diffusivity%i_C_diffusivity, refs%ref_field)
+        flag_write_ref = .TRUE.
       end if
 !
 !
@@ -263,7 +278,6 @@
       call calypso_mpi_allreduce_one_int                                &
      &   (irank_local, refs%irank_reference, MPI_SUM)
 
-      flag_write_ref = .FALSE.
       refs%ref_field%iflag_update(1:refs%ref_field%ntot_phys) = 0
       call s_init_reference_scalar(refs%irank_reference,                &
      &    MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
