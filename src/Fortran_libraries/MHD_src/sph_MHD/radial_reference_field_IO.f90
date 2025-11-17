@@ -7,7 +7,7 @@
 !>@brief  reference temperature as a function of r
 !!
 !!@verbatim
-!!      subroutine init_reft_rj_data(sph_rj, ipol, refs)
+!!      subroutine init_radial_reference_data(sph_rj, ipol, refs)
 !!      subroutine output_reference_field(refs)
 !!        type(radial_reference_field), intent(in) :: refs
 !!      subroutine load_sph_reference_fields(refs)
@@ -44,7 +44,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_reft_rj_data(sph_rj, ipol, refs)
+      subroutine init_radial_reference_data(sph_rj, ipol, refs)
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_address), intent(in) :: ipol
@@ -64,7 +64,7 @@
      &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r(1),                  &
      &    refs%ref_field%d_fld(1,refs%iref_radius))
 !
-      end subroutine init_reft_rj_data
+      end subroutine init_radial_reference_data
 !
 ! -----------------------------------------------------------------------
 !

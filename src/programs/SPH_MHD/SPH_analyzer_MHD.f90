@@ -71,6 +71,7 @@
       use adjust_reference_fields
       use material_property
       use init_radial_infos_sph_mhd
+      use radial_reference_field_IO
       use const_radial_mat_4_sph
       use cal_sol_sph_MHD_crank
       use cal_nonlinear
@@ -122,6 +123,9 @@
      &    SPH_MHD%fld, sph_fst_IO)
 !
 !  -------------------------------
+!
+      call init_radial_reference_data(SPH_MHD%sph%sph_rj, SPH_MHD%ipol, &
+     &                                SPH_model%refs)
 !
       if (iflag_debug.gt.0) write(*,*) 'init_reference_fields '
       call init_reference_fields                                        &

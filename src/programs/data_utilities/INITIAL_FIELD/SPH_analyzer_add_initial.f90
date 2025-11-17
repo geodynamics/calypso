@@ -94,6 +94,7 @@
       use material_property
       use sph_transforms_4_MHD
       use init_radial_infos_sph_mhd
+      use radial_reference_field_IO
       use const_radial_mat_4_sph
       use set_initial_sph_dynamo
       use sph_mhd_rst_IO_control
@@ -139,6 +140,9 @@
      &    MHD_step%rst_step)
 !
 ! ---------------------------------
+!
+      call init_radial_reference_data(SPH_MHD%sph%sph_rj, SPH_MHD%ipol, &
+     &                                SPH_model%refs)
 !
       call init_reference_fields                                        &
      &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd, SPH_model%refs,      &

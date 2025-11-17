@@ -224,8 +224,6 @@
       real(kind = kreal) :: grad, ratio
 !
 !
-      call init_reft_rj_data(sph%sph_rj, ipol, refs)
-!
       flag_write_ref = .FALSE.
       if((refs%iref_diffusivity%i_K_viscosity                           &
      &    * refs%iref_grad_diffusivity%i_K_viscosity) .gt. 0) then

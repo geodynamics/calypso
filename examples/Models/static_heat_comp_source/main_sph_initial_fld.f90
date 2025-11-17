@@ -68,6 +68,7 @@
      &                                   SPH_model, SPH_MHD, SPH_WK)
 !
       use init_radial_infos_sph_mhd
+      use radial_reference_field_IO
       use check_dependency_for_MHD
       use input_control_sph_MHD
       use schmidt_poly_on_rtm_grid
@@ -102,6 +103,9 @@
      &    SPH_model%MHD_prop, PH_model%radial_variation, SPH_model%sph_MHD_bc)
 !
 ! ---------------------------------
+!
+      call init_radial_reference_data(SPH_MHD%sph%sph_rj, SPH_MHD%ipol, &
+     &                                SPH_model%refs)
 !
       call init_reference_fields                                        &
      &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd, SPH_model%refs,      &

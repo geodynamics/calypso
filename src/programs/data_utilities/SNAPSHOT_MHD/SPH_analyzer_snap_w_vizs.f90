@@ -67,6 +67,7 @@
       use material_property
       use init_sphrical_transform_MHD
       use init_radial_infos_sph_mhd
+      use radial_reference_field_IO
       use const_radial_mat_4_sph
       use r_interpolate_sph_data
       use sph_mhd_rst_IO_control
@@ -114,6 +115,9 @@
      &    MHD_step%rst_step)
 !
 ! ---------------------------------
+!
+      call init_radial_reference_data(SPH_MHD%sph%sph_rj, SPH_MHD%ipol, &
+     &                                SPH_model%refs)
 !
       if (iflag_debug.gt.0) write(*,*) 'init_reference_fields '
       call init_reference_fields                                        &
