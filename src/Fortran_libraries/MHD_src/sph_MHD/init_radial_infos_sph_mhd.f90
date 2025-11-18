@@ -129,7 +129,6 @@
      &         (bc_IO, sph_grps, MHD_BC, ipol, sph, r_2nd,              &
      &          MHD_prop, radial_variation, sph_MHD_bc)
 !
-      use init_sph_radius_variations
       use set_bc_sph_mhd
 !
       type(boundary_spectra), intent(in) :: bc_IO
@@ -138,16 +137,12 @@
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
       type(fdm_matrices), intent(in) :: r_2nd
+      type(phys_data), intent(in) :: radial_variation
 !
       type(MHD_evolution_param), intent(inout) :: MHD_prop
-      type(phys_data), intent(inout) :: radial_variation
       type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !
       integer(kind = kint), parameter :: id_check = 50
-!
-!
-      call init_radius_variations_sph_mhd(sph%sph_rj, r_2nd, MHD_prop,  &
-     &                                    radial_variation)
 !
 !*  ---------- boundary conditions  ---------------
       if(iflag_debug.gt.0) write(*,*) 'set_fdm_matrices_sph_mhd'
