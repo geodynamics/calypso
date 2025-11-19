@@ -65,6 +65,8 @@
 !
       implicit none
 !
+      private :: set_ctl_SPH_val_diffusions
+!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -268,11 +270,11 @@
      &    MHD_prop%val_mag_diffuse_param,                               &
      &    MHD_prop%flag_mag_diffuse_variation)
       call set_valuable_diffusion_ctl                                   &
-     &   (my_rank, model_ctl%val_thermal_diffuse_c,                     &
+     &   (my_rank, model_ctl%reft_ctl%valuable_diffusion_ctl,           &
      &    MHD_prop%val_thermal_diffuse_param,                           &
      &    MHD_prop%flag_term_diffuse_variation)
       call set_valuable_diffusion_ctl                                   &
-     &   (my_rank, model_ctl%val_comp_diffuse_c,                        &
+     &   (my_rank, model_ctl%refc_ctl%valuable_diffusion_ctl,           &
      &    MHD_prop%val_comp_diffuse_param,                              &
      &    MHD_prop%flag_comp_diffuse_variation)
 !

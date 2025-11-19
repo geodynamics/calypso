@@ -40,9 +40,6 @@
 !!
 !!    begin temperature_define
 !!      filtered_advection_ctl       Off
-!!      ICB_diffusivity_reduction_radius    0.53846154
-!!      ICB_diffusivity_reduction_ratio     0.1
-!!      ICB_diffusivity_reduction_width     0.001
 !!
 !!      ref_temp_ctl              spherical_shell
 !!      ref_field_file_name      'reference_temp.dat'
@@ -74,6 +71,7 @@
       use t_control_array_character
       use t_control_array_real
       use t_ctl_data_temp_model
+      use t_ctl_data_valuable_diffuse
       use skip_comment_f
 !
       implicit  none
@@ -82,12 +80,6 @@
 !
       character(len=kchara), parameter, private                         &
      &    :: hd_filterd_advection = 'filtered_advection_ctl'
-      character(len=kchara), parameter, private                         &
-     &    :: hd_diff_reduce_radius = 'ICB_diffusivity_reduction_radius'
-      character(len=kchara), parameter, private                         &
-     &    :: hd_diff_reduce_ratio =  'ICB_diffusivity_reduction_ratio'
-      character(len=kchara), parameter, private                         &
-     &    :: hd_diff_reduce_width =  'ICB_diffusivity_reduction_width'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_ref_temp =       'ref_temp_ctl'
@@ -103,16 +95,15 @@
       character(len=kchara), parameter, private                         &
      &       :: hd_takepiro_ctl = 'takepiro_model_ctl'
 !
+      character(len=kchara), parameter, private                         &
+     &       :: hd_thermal_diffusion_ctl = 'thermal_diffusivity_ctl'
+!
 !    5th level for higher temp position
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_position =  'depth'
       character(len=kchara), parameter, private                         &
      &       :: hd_temp_value = 'temperature'
-!
-!    Deprecated label
-      character(len=kchara), parameter, private                         &
-     &    :: hd_diffusivity_reduction = 'ICB_diffusivity_reduction_ctl'
 !
       private :: read_ref_temp_ctl, write_ref_temp_ctl
 !
@@ -147,6 +138,10 @@
         call read_takepiro_ctl(id_control, hd_takepiro_ctl,             &
      &      reft_ctl%takepiro_ctl, c_buf)
 !
+        call read_val_diffuse_ctl_data                                  &
+     &     (id_control, hd_thermal_diffusion_ctl,                       &
+     &      reft_ctl%valuable_diffusion_ctl, c_buf)
+!
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_filterd_advection, reft_ctl%filterd_advect_ctl)
         call read_chara_ctl_type                                        &
@@ -155,16 +150,6 @@
      &     (c_buf, hd_start_ctl, reft_ctl%stratified_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_ref_field_file, reft_ctl%ref_file_ctl)
-!
-        call read_real_ctl_type(c_buf, hd_diff_reduce_ratio,            &
-     &                          reft_ctl%ICB_diffuse_reduction_ratio)
-        call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
-     &                          reft_ctl%ICB_diffuse_reduction_ratio)
-!
-        call read_real_ctl_type(c_buf, hd_diff_reduce_width,            &
-     &                          reft_ctl%ICB_diffuse_reduction_width)
-        call read_real_ctl_type(c_buf, hd_diff_reduce_radius,           &
-     &                          reft_ctl%ICB_diffuse_reduction_radius)
       end do
       reft_ctl%i_temp_def = 1
 !
@@ -189,9 +174,6 @@
       if(reft_ctl%i_temp_def .le. 0) return
 !
       maxlen = len_trim(hd_filterd_advection)
-      maxlen = max(maxlen, len_trim(hd_diff_reduce_ratio))
-      maxlen = max(maxlen, len_trim(hd_diff_reduce_width))
-      maxlen = max(maxlen, len_trim(hd_diff_reduce_radius))
       maxlen = max(maxlen, len_trim(hd_ref_temp))
       maxlen = max(maxlen, len_trim(hd_start_ctl))
       maxlen = max(maxlen, len_trim(hd_ref_field_file))
@@ -200,10 +182,9 @@
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    reft_ctl%filterd_advect_ctl)
-      call write_real_ctl_type(id_control, level, maxlen,               &
-     &    reft_ctl%ICB_diffuse_reduction_ratio)
-      call write_real_ctl_type(id_control, level, maxlen,               &
-     &    reft_ctl%ICB_diffuse_reduction_width)
+!
+      call write_val_diffuse_ctl_data                                   &
+     &   (id_control, reft_ctl%valuable_diffusion_ctl, level)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    reft_ctl%reference_ctl)
@@ -236,6 +217,8 @@
       call init_ref_temp_ctl_label(hd_high_temp, reft_ctl%high_ctl)
       call init_takepiro_ctl_label(hd_takepiro_ctl,                     &
      &                             reft_ctl%takepiro_ctl)
+      call init_val_diffuse_ctl_label(hd_thermal_diffusion_ctl,         &
+     &                                reft_ctl%valuable_diffusion_ctl)
 !
         call init_chara_ctl_item_label                                  &
      &     (hd_filterd_advection, reft_ctl%filterd_advect_ctl)
@@ -245,13 +228,6 @@
      &     (hd_start_ctl, reft_ctl%stratified_ctl)
         call init_chara_ctl_item_label                                  &
      &     (hd_ref_field_file, reft_ctl%ref_file_ctl)
-!
-        call init_real_ctl_item_label(hd_diff_reduce_radius,            &
-     &                          reft_ctl%ICB_diffuse_reduction_radius)
-        call init_real_ctl_item_label(hd_diff_reduce_ratio,             &
-     &                          reft_ctl%ICB_diffuse_reduction_ratio)
-        call init_real_ctl_item_label(hd_diff_reduce_width,             &
-     &                          reft_ctl%ICB_diffuse_reduction_width)
 !
       end subroutine init_temp_model_ctl_label
 !

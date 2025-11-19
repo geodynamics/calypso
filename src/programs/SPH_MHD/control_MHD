@@ -446,6 +446,11 @@ begin MHD_control
         depth         0.5384615384615384
         temperature   1.0d0
       end high_temp_ctl
+!
+      begin thermal_diffusivity_ctl
+        radial_variation_ctl      ON
+        variation_file_name    'viscous_variation'
+      end   thermal_diffusivity_ctl
     end temperature_define
 !
     begin Magneto_convection_def
@@ -548,11 +553,6 @@ begin MHD_control
         diffusivity_list_ctl      1.53846   1.0
       end array diffusivity_list_ctl
     end   magnetic_diffusion_ctl
-!
-    begin thermal_diffusion_ctl
-      radial_variation_ctl      ON
-      variation_file_name    'viscous_variation'
-    end   thermal_diffusion_ctl
 !
     begin composition_diffusion_ctl
       radial_variation_ctl      ON

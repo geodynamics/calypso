@@ -105,18 +105,18 @@
       scl_prop%diffuse_reduction_ratio_ICB =   1.0d0
       scl_prop%diffuse_reduction_width_ICB =   0.0d0
       scl_prop%grad_diffusibity_ICB =          0.0d0
-      if(ref_scl_ctl%ICB_diffuse_reduction_radius%iflag .gt. 0) then
+      if(ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_radius%iflag .gt. 0) then
         scl_prop%diffuse_reduction_radius_ICB                           &
-     &        = ref_scl_ctl%ICB_diffuse_reduction_radius%realvalue
+     &        = ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_radius%realvalue
       end if
-      if(ref_scl_ctl%ICB_diffuse_reduction_ratio%iflag .gt. 0) then
+      if(ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_ratio%iflag .gt. 0) then
         scl_prop%flag_val_diffuse = .TRUE.
         scl_prop%diffuse_reduction_ratio_ICB                            &
-     &        = ref_scl_ctl%ICB_diffuse_reduction_ratio%realvalue
+     &        = ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_ratio%realvalue
       end if
-      if(ref_scl_ctl%ICB_diffuse_reduction_width%iflag .gt. 0) then
+      if(ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_width%iflag .gt. 0) then
         scl_prop%diffuse_reduction_width_ICB                            &
-     &        = ref_scl_ctl%ICB_diffuse_reduction_width%realvalue
+     &        = ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_width%realvalue
       end if
 !
       if(scl_prop%diffuse_reduction_width_ICB .gt. 0.0d0) then

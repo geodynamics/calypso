@@ -18,12 +18,15 @@
 !!        type(magneto_convection_control), intent(inout) :: mcv_ctl
 !!      subroutine bcast_magnetic_scale_ctl(bscale_ctl)
 !!        type(magnetic_field_scale_control), intent(inout) :: bscale_ctl
-!!      subroutine reset_ref_scalar_ctl(refs_ctl)
+!!      subroutine bcast_ref_scalar_ctl(refs_ctl)
 !!        type(reference_temperature_ctl), intent(inout) :: refs_ctl
+!!
 !!      subroutine bcast_ref_value_ctl(ref_ctl)
 !!        type(reference_point_control), intent(inout) :: ref_ctl
 !!      subroutine bcast_takepiro_ctl(takepiro_ctl)
 !!        type(takepiro_model_control), intent(inout) :: takepiro_ctl
+!!      subroutine bcast_val_diffuse_ctl(vdiffuse_ctl)
+!!        type(val_diffuse_ctl), intent(inout) :: vdiffuse_ctl
 !!@endverbatim
 !
       module bcast_ctl_data_mhd_forces
@@ -162,14 +165,12 @@
       call bcast_ref_value_ctl(refs_ctl%low_ctl)
       call bcast_ref_value_ctl(refs_ctl%high_ctl)
       call bcast_takepiro_ctl(refs_ctl%takepiro_ctl)
+      call bcast_val_diffuse_ctl(refs_ctl%valuable_diffusion_ctl)
 !
       call bcast_ctl_type_c1(refs_ctl%filterd_advect_ctl)
       call bcast_ctl_type_c1(refs_ctl%reference_ctl)
       call bcast_ctl_type_c1(refs_ctl%ref_file_ctl)
       call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
-      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_radius)
-      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_ratio)
-      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_width)
 !
       call calypso_mpi_bcast_character                                  &
      &   (refs_ctl%block_name, cast_long(kchara), 0)
@@ -220,6 +221,33 @@
       call calypso_mpi_bcast_one_int(takepiro_ctl%i_takepiro_t_ctl, 0)
 !
       end subroutine bcast_takepiro_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_val_diffuse_ctl(vdiffuse_ctl)
+!
+      use t_ctl_data_valuable_diffuse
+      use transfer_to_long_integers
+      use calypso_mpi_char
+      use calypso_mpi_int
+      use bcast_control_arrays
+!
+      type(val_diffuse_ctl), intent(inout) :: vdiffuse_ctl
+!
+      call bcast_ctl_type_c1(vdiffuse_ctl%r_variation_ctl)
+      call bcast_ctl_type_c1(vdiffuse_ctl%variation_file_name)
+!
+      call bcast_ctl_array_r2(vdiffuse_ctl%diffusivity_list_ctl)
+!
+      call bcast_ctl_type_r1(vdiffuse_ctl%ICB_reduction_radius)
+      call bcast_ctl_type_r1(vdiffuse_ctl%ICB_reduction_ratio)
+      call bcast_ctl_type_r1(vdiffuse_ctl%ICB_reduction_width)
+!
+      call calypso_mpi_bcast_character                                  &
+     &   (vdiffuse_ctl%block_name, cast_long(kchara), 0)
+      call calypso_mpi_bcast_one_int(vdiffuse_ctl%i_val_diffuse, 0)
+!
+      end subroutine bcast_val_diffuse_ctl
 !
 !   --------------------------------------------------------------------
 !

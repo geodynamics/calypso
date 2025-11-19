@@ -25,10 +25,27 @@
       use m_precision
       use m_constants
 !
+      integer(kind = kint), parameter :: iflag_constant =        0
+      integer(kind = kint), parameter :: iflag_file_list =       1
+      integer(kind = kint), parameter :: iflag_list_in_ctl =     2
+      integer(kind = kint), parameter :: iflag_ICB_reduction = 100
+!
+      character(len = kchara), parameter                                &
+     &               :: ICB_reduction_flag =  'reduction_at_ICB'
+      character(len = kchara), parameter                                &
+     &               :: ICB_reduction_flag1 = 'ICB_reduction'
+!
+      character(len = kchara), parameter                                &
+     &               :: list_in_ctl_flag =    'list_in_control'
+      character(len = kchara), parameter                                &
+     &               :: load_file_flag =      'file'
+!
 !>      Block for polytorope definision
       type val_diffuse_parameters
 !>       Stepped variation flag
         logical :: flag_stepped = .FALSE.
+!>       Integer flag for valuable diffusion mode
+        integer(kind = kint) :: iflag_radial_diffusion = 0
 !
 !>       Density file name
         character(len = kchara) :: diffuse_file_name
@@ -86,12 +103,26 @@
       type(val_diffuse_parameters), intent(inout) :: v_diffuse_param
       logical, intent(inout) :: flag_val_diffuse
 !
+      character(len=kchara) :: tmpchara
 !
-      flag_val_diffuse = .FALSE.
+!
+      v_diffuse_param%iflag_radial_diffusion = iflag_constant
       if(val_diffuse_c%r_variation_ctl%iflag .gt. 0) then
-        flag_val_diffuse                                                &
-     &             = yes_flag(val_diffuse_c%r_variation_ctl%charavalue)
+        tmpchara = val_diffuse_c%r_variation_ctl%charavalue
+        if(     cmp_no_case(tmpchara, ICB_reduction_flag)               &
+     &     .or. cmp_no_case(tmpchara, ICB_reduction_flag1)) then
+          v_diffuse_param%iflag_radial_diffusion = iflag_ICB_reduction
+        else if(cmp_no_case(tmpchara, list_in_ctl_flag)) then
+          v_diffuse_param%iflag_radial_diffusion = iflag_list_in_ctl
+        else if(cmp_no_case(tmpchara, load_file_flag)) then
+          v_diffuse_param%iflag_radial_diffusion = iflag_file_list
+        end if
       end if
+      if(v_diffuse_param%iflag_radial_diffusion .gt. 0)                 &
+     &                                    flag_val_diffuse = .FALSE.
+      write(*,*) 'flag_val_diffuse    ', flag_val_diffuse
+      write(*,*) 'v_diffuse_param%iflag_radial_diffusion    ',   &
+     &          v_diffuse_param%iflag_radial_diffusion
       if(flag_val_diffuse .eqv. .FALSE.) return
 !
       if(val_diffuse_c%variation_file_name%iflag .gt. 0) then
@@ -109,9 +140,9 @@
           v_diffuse_param%diffusion_list(i)                             &
      &       = val_diffuse_c%diffusivity_list_ctl%vec2(i)
         end do
-      else
-        if(my_rank .eq. 0) write(*,*) 'Set density variation controls'
-        flag_val_diffuse = .FALSE.
+!      else
+!        if(my_rank .eq. 0) write(*,*) 'Set density variation controls'
+!        flag_val_diffuse = .FALSE.
       end if
 !
       end subroutine set_valuable_diffusion_ctl

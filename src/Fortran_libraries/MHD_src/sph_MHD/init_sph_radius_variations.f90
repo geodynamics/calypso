@@ -127,6 +127,17 @@
 !
       integer(kind = kint) :: icou_ref = 0
 !
+      write(*,*) 'MHD_prop%flag_ref_density_valiation', &
+     &          MHD_prop%flag_ref_density_valiation
+      write(*,*) 'MHD_prop%flag_viscous_variation', &
+     &          MHD_prop%flag_viscous_variation
+      write(*,*) 'MHD_prop%flag_mag_diffuse_variation', &
+     &          MHD_prop%flag_mag_diffuse_variation
+      write(*,*) 'MHD_prop%flag_term_diffuse_variation', &
+     &          MHD_prop%flag_term_diffuse_variation
+      write(*,*) 'MHD_prop%flag_comp_diffuse_variation', &
+     &          MHD_prop%flag_comp_diffuse_variation
+!
       icou_ref = 1
       if(MHD_prop%flag_ref_density_valiation)  icou_ref = icou_ref + 3
       if(MHD_prop%flag_viscous_variation)      icou_ref = icou_ref + 2

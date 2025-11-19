@@ -87,8 +87,6 @@
 !>      Block for compositional diffusivity definision
         type(val_diffuse_ctl) :: val_mag_diffuse_c
 !>      Block for compositional diffusivity definision
-        type(val_diffuse_ctl) :: val_thermal_diffuse_c
-!>      Block for compositional diffusivity definision
         type(val_diffuse_ctl) :: val_comp_diffuse_c
 !
         integer (kind=kint) :: i_model = 0
@@ -124,9 +122,9 @@
 !
       call dealloc_val_diffuse_ctl_data(model_ctl%val_viscous_c)
       call dealloc_val_diffuse_ctl_data(model_ctl%val_mag_diffuse_c)
-      call dealloc_val_diffuse_ctl_data                                 &
-     &   (model_ctl%val_thermal_diffuse_c)
-      call dealloc_val_diffuse_ctl_data(model_ctl%val_comp_diffuse_c)
+!
+      call dealloc_ref_scalar_ctl(model_ctl%reft_ctl)
+      call dealloc_ref_scalar_ctl(model_ctl%refc_ctl)
 !
       model_ctl%i_model = 0
 !
