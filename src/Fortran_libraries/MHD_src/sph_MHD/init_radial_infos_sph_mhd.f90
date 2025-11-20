@@ -210,47 +210,14 @@
 !
 !
       flag_write_ref = .FALSE.
-      if((MHD_prop%fl_prop%ir_nu                                        &
-     &    * MHD_prop%fl_prop%ir_dnu_norm) .gt. 0) then
-        call copy_const_diffusivity_to_ref                              &
-     &     (MHD_prop%fl_prop%ir_nu, MHD_prop%fl_prop%ir_dnu_norm,       &
-     &      refs%ref_field)
-        flag_write_ref = .TRUE.
-      end if
-!
-      if((MHD_prop%cd_prop%ir_eta                                       &
-     &    * MHD_prop%cd_prop%ir_deta_norm) .gt. 0) then
-        call copy_const_diffusivity_to_ref                              &
-     &     (MHD_prop%cd_prop%ir_eta, MHD_prop%cd_prop%ir_deta_norm,     &
-     &      refs%ref_field)
-        flag_write_ref = .TRUE.
-      end if
-!
-      if((MHD_prop%ht_prop%ir_kappa                                     &
-     &    * MHD_prop%ht_prop%ir_dkappa_norm) .gt. 0) then
-!        call copy_const_diffusivity_to_ref                             &
-!     &     (MHD_prop%ht_prop%ir_kappa, MHD_prop%ht_prop%ir_dkappa_norm,&
-!     &      refs%ref_field)
-!!
-!        call r_diffusivity_w_ICB_reduction                             &
-!     &     (sph%sph_params, MHD_prop%ht_prop, refs%iref_radius,        &
-!     &      MHD_prop%ht_prop%ir_kappa, MHD_prop%ht_prop%ir_dkappa_norm,&
-!     &      refs%ref_field)
-        flag_write_ref = .TRUE.
-      end if
-!
-      if((MHD_prop%cp_prop%ir_kappa                                     &
-     &    * MHD_prop%cp_prop%ir_dkappa_norm) .gt. 0) then
-        call copy_const_diffusivity_to_ref                              &
-     &     (MHD_prop%cp_prop%ir_kappa, MHD_prop%cp_prop%ir_dkappa_norm, &
-     &      refs%ref_field)
-!
-        call r_diffusivity_w_ICB_reduction                              &
-     &     (sph%sph_params, MHD_prop%cp_prop, refs%iref_radius,         &
-     &      MHD_prop%cp_prop%ir_kappa, MHD_prop%cp_prop%ir_dkappa_norm, &
-     &      refs%ref_field)
-        flag_write_ref = .TRUE.
-      end if
+      if((MHD_prop%fl_prop%ir_nu * MHD_prop%fl_prop%ir_dnu_norm)        &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
+      if((MHD_prop%cd_prop%ir_eta * MHD_prop%cd_prop%ir_deta_norm)      &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
+      if((MHD_prop%ht_prop%ir_kappa * MHD_prop%ht_prop%ir_dkappa_norm)  &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
+      if((MHD_prop%cp_prop%ir_kappa * MHD_prop%cp_prop%ir_dkappa_norm)  &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
 !
 !
       call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)

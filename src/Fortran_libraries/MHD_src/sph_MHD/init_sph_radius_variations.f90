@@ -72,15 +72,30 @@
      &      density%name, MHD_prop%fl_prop%ir_rho,                      &
      &      sph%sph_rj, r_2nd, MHD_prop%polytrope_param,                &
      &      refs%ref_field, r_itp, fld_IO)
-        call set_sph_radial_diffusivity(my_rank, radius_name,           &
-     &      kinetic_viscosity%name, MHD_prop%fl_prop%ir_nu,             &
-     &      sph%sph_rj, r_2nd, MHD_prop%val_viscous_param,              &
-     &      refs%ref_field, r_itp, fld_IO)
 !
-        call set_sph_radial_diffusivity(my_rank, radius_name,           &
-     &      magnetic_diffusivity%name, MHD_prop%cd_prop%ir_eta,         &
-     &      sph%sph_rj, r_2nd, MHD_prop%val_mag_diffuse_param,          &
-     &      refs%ref_field, r_itp, fld_IO)
+        if(MHD_prop%val_viscous_param%iflag_radial_diffusion            &
+     &      .eq. iflag_constant) then
+          call copy_const_diffusivity_to_ref                            &
+     &       (MHD_prop%fl_prop%ir_nu, MHD_prop%fl_prop%ir_dnu_norm,     &
+     &        refs%ref_field)
+        else
+          call set_sph_radial_diffusivity(my_rank, radius_name,         &
+     &        kinetic_viscosity%name, MHD_prop%fl_prop%ir_nu,           &
+     &        sph%sph_rj, r_2nd, MHD_prop%val_viscous_param,            &
+     &        refs%ref_field, r_itp, fld_IO)
+        end if
+!
+        if(MHD_prop%val_mag_diffuse_param%iflag_radial_diffusion        &
+     &      .eq. iflag_constant) then
+          call copy_const_diffusivity_to_ref                            &
+     &       (MHD_prop%cd_prop%ir_eta, MHD_prop%cd_prop%ir_deta_norm,   &
+     &        refs%ref_field)
+        else
+          call set_sph_radial_diffusivity(my_rank, radius_name,         &
+     &        magnetic_diffusivity%name, MHD_prop%cd_prop%ir_eta,       &
+     &        sph%sph_rj, r_2nd, MHD_prop%val_mag_diffuse_param,        &
+     &        refs%ref_field, r_itp, fld_IO)
+        end if
 !
         if(MHD_prop%val_thermal_diffuse_param%iflag_radial_diffusion    &
      &      .eq. iflag_constant) then
@@ -88,13 +103,6 @@
      &        MHD_prop%ht_prop%ir_dkappa_norm, refs%ref_field)
         else if(MHD_prop%val_thermal_diffuse_param%iflag_radial_diffusion    &
      &      .eq. iflag_ICB_reduction) then
-          write(*,*) 'r_diffusivity_w_ICB_reduction'
-          write(*,*) 'MHD_prop%ht_prop%diffuse_reduction_ratio_ICB', &
-     &              MHD_prop%ht_prop%diffuse_reduction_ratio_ICB
-          write(*,*) 'MHD_prop%ht_prop%diffuse_reduction_width_ICB', &
-     &              MHD_prop%ht_prop%diffuse_reduction_width_ICB
-          write(*,*) 'MHD_prop%ht_prop%diffuse_reduction_radius_ICB', &
-     &              MHD_prop%ht_prop%diffuse_reduction_radius_ICB
           call r_diffusivity_w_ICB_reduction                            &
      &       (sph%sph_params, MHD_prop%ht_prop, refs%iref_radius,       &
      &      MHD_prop%ht_prop%ir_kappa, MHD_prop%ht_prop%ir_dkappa_norm, &
@@ -106,10 +114,22 @@
      &        refs%ref_field, r_itp, fld_IO)
         end if
 !
-        call set_sph_radial_diffusivity(my_rank, radius_name,           &
-     &      chemical_diffusivity%name, MHD_prop%cp_prop%ir_kappa,       &
-     &      sph%sph_rj, r_2nd, MHD_prop%val_comp_diffuse_param,         &
-     &      refs%ref_field, r_itp, fld_IO)
+        if(MHD_prop%val_comp_diffuse_param%iflag_radial_diffusion       &
+     &      .eq. iflag_constant) then
+          call copy_const_diffusivity_to_ref(MHD_prop%cp_prop%ir_kappa, &
+     &        MHD_prop%cp_prop%ir_dkappa_norm, refs%ref_field)
+        else if(MHD_prop%val_comp_diffuse_param%iflag_radial_diffusion  &
+     &      .eq. iflag_ICB_reduction) then
+          call r_diffusivity_w_ICB_reduction                            &
+     &     (sph%sph_params, MHD_prop%cp_prop, refs%iref_radius,         &
+     &      MHD_prop%cp_prop%ir_kappa, MHD_prop%cp_prop%ir_dkappa_norm, &
+     &      refs%ref_field)
+        else
+          call set_sph_radial_diffusivity(my_rank, radius_name,         &
+     &        chemical_diffusivity%name, MHD_prop%cp_prop%ir_kappa,     &
+     &        sph%sph_rj, r_2nd, MHD_prop%val_comp_diffuse_param,       &
+     &        refs%ref_field, r_itp, fld_IO)
+        end if
       end if
 !
       do k = 1, refs%ref_field%ntot_phys
