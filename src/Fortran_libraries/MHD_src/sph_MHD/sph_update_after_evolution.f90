@@ -185,8 +185,8 @@
         call const_sph_scalar_diffusion                                 &
      &     (sph_rj, r_2nd, sph_bc_T, bcs_T, fdm2_center, leg,           &
      &      ht_prop%flag_val_diffuse, ht_prop%coef_diffuse,             &
-     &      ref_field%d_fld(1,iref_diffusivity%i_T_diffusivity),        &
-     &      ref_field%d_fld(1,iref_grad_diffusivity%i_T_diffusivity),   &
+     &      ref_field%d_fld(1,ht_prop%ir_kappa),                        &
+     &      ref_field%d_fld(1,ht_prop%ir_dkappa_norm),                  &
      &      rj_fld%d_fld(1,ipol%base%i_temp),                           &
      &      rj_fld%d_fld(1,ipol%diffusion%i_t_diffuse))
       end if
@@ -232,8 +232,8 @@
         call const_sph_scalar_diffusion                                 &
      &     (sph_rj, r_2nd, sph_bc_C, bcs_C, fdm2_center, leg,           &
      &      cp_prop%flag_val_diffuse, cp_prop%coef_diffuse,             &
-     &      ref_field%d_fld(1,iref_diffusivity%i_C_diffusivity),        &
-     &      ref_field%d_fld(1,iref_grad_diffusivity%i_C_diffusivity),   &
+     &      ref_field%d_fld(1,cp_prop%ir_kappa),                        &
+     &      ref_field%d_fld(1,cp_prop%ir_dkappa_norm),                  &
      &      rj_fld%d_fld(1,ipol%base%i_light),                          &
      &      rj_fld%d_fld(1,ipol%diffusion%i_c_diffuse))
       end if

@@ -109,8 +109,8 @@
         write(mat_name,'(a)') 'Diffusive_Temperature'
         call init_poisson_matrix_for_Nu                                 &
      &     (mat_name, SPH_MHD%sph, r_2nd, MHD_prop%ht_prop,             &
-     &      refs%ref_field%d_fld(1,refs%iref_diffusivity%i_T_diffusivity),        &
-     &      refs%ref_field%d_fld(1,refs%iref_grad_diffusivity%i_T_diffusivity),   &
+     &      refs%ref_field%d_fld(1,MHD_prop%ht_prop%ir_kappa),          &
+     &      refs%ref_field%d_fld(1,MHD_prop%ht_prop%ir_dkappa_norm),    &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
      &      MHD_mats%band_T00_poisson_fixT, monitor%heat_Nusselt)
       end if
@@ -119,8 +119,8 @@
         write(mat_name,'(a)') 'Diffusive_Composition'
         call init_poisson_matrix_for_Nu                                 &
      &     (mat_name, SPH_MHD%sph, r_2nd, MHD_prop%cp_prop,             &
-     &      refs%ref_field%d_fld(1,refs%iref_diffusivity%i_C_diffusivity),       &
-     &      refs%ref_field%d_fld(1,refs%iref_grad_diffusivity%i_C_diffusivity),  &
+     &      refs%ref_field%d_fld(1,MHD_prop%cp_prop%ir_kappa),          &
+     &      refs%ref_field%d_fld(1,MHD_prop%cp_prop%ir_dkappa_norm),    &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
      &      MHD_mats%band_C00_poisson_fixC, monitor%comp_Nusselt)
       end if
