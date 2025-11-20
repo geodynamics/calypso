@@ -11,9 +11,8 @@
 !!
 !!@verbatim
 !!      subroutine s_init_reference_scalar                              &
-!!     &         (irank_reference, takepiro, sph_params, sph_rj,        &
-!!     &          r_2nd, sc_prop, k_ratio, dk_dr,                       &
-!!     &          sph_bc_S, fdm2_center, mat_name, ref_param,           &
+!!     &         (irank_reference, takepiro, sph_params, sph_rj, r_2nd, &
+!!     &          sc_prop,  sph_bc_S, fdm2_center, mat_name, ref_param, &
 !!     &          iref_radius, phys_name, iref_scalar, iref_grad,       &
 !!     &          iref_source, r_itp, ref_field, bcs_S, flag_write_ref)
 !!        integer, intent(in) :: irank_reference
@@ -27,8 +26,6 @@
 !!        type(scalar_property), intent(in) :: sc_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
-!!        real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
-!!        real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
 !!        type(reference_scalar_param), intent(inout) :: ref_param
 !!        type(phys_data), intent(inout) :: ref_field
 !!        type(phys_data), intent(inout) :: rj_fld
@@ -53,9 +50,8 @@
 !  -------------------------------------------------------------------
 !
       subroutine s_init_reference_scalar                                &
-     &         (irank_reference, takepiro, sph_params, sph_rj,          &
-     &          r_2nd, sc_prop, k_ratio, dk_dr,                         &
-     &          sph_bc_S, fdm2_center, mat_name, ref_param,             &
+     &         (irank_reference, takepiro, sph_params, sph_rj, r_2nd,   &
+     &          sc_prop,  sph_bc_S, fdm2_center, mat_name, ref_param,   &
      &          iref_radius, phys_name, iref_scalar, iref_grad,         &
      &          iref_source, r_itp, ref_field, bcs_S, flag_write_ref)
 !
@@ -86,9 +82,6 @@
       type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
-!
-      real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
-      real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
 !
       type(reference_scalar_param), intent(inout) :: ref_param
       type(sph_radial_interpolate), intent(inout) :: r_itp
@@ -121,16 +114,15 @@
      &    ref_field%d_fld(1,iref_grad))
       else if(ref_param%iflag_reference                                 &
      &                             .eq. id_numerical_solution) then
-        call const_diffusive_profiles(irank_reference,                  &
-     &      sph_params, sph_rj, sc_prop, k_ratio, dk_dr,                &
+        call const_diffusive_profiles(irank_reference, sph_rj, sc_prop, &
      &      sph_bc_S, bcs_S, fdm2_center, r_2nd, mat_name,              &
      &      iref_source, iref_scalar, iref_grad, ref_field)
       else if(ref_param%iflag_reference .eq. id_ref_field_file) then
         call const_grad_diffusive_prof                                  &
      &     (irank_reference, ref_param%ref_file_IO, phys_name,          &
-     &      sph_params, sph_rj, sc_prop, k_ratio, dk_dr, sph_bc_S, bcs_S, &
-     &      r_2nd, fdm2_center, mat_name, iref_radius, iref_scalar,     &
-     &      iref_grad, iref_source, ref_field, r_itp)
+     &      sph_rj, sc_prop, sph_bc_S, bcs_S, r_2nd, fdm2_center,       &
+     &      mat_name, iref_radius, iref_scalar, iref_grad, iref_source, &
+     &      ref_field, r_itp)
       else
         call no_ref_temp_sph_mhd(sph_rj%nidx_rj(1),                     &
      &      sph_params%radius_ICB, sph_params%radius_CMB,               &

@@ -234,8 +234,6 @@
       call s_init_reference_scalar(refs%irank_reference,                &
      &    MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%ht_prop,                                      &
-     &    refs%ref_field%d_fld(1,MHD_prop%ht_prop%ir_kappa),            &
-     &    refs%ref_field%d_fld(1,MHD_prop%ht_prop%ir_dkappa_norm),      &
      &    sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                  &
      &    tmat_name, MHD_prop%ref_param_T,                              &
      &    refs%iref_radius, temperature%name,                           &
@@ -246,8 +244,6 @@
       call s_init_reference_scalar(refs%irank_reference,                &
      &    MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%cp_prop,                                      &
-     &    refs%ref_field%d_fld(1,MHD_prop%cp_prop%ir_kappa),            &
-     &    refs%ref_field%d_fld(1,MHD_prop%cp_prop%ir_dkappa_norm),      &
      &    sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                  &
      &    cmat_name, MHD_prop%ref_param_C,                              &
      &    refs%iref_radius, composition%name,                           &

@@ -34,19 +34,17 @@
 !!        type(sph_boundary_type), intent(in) :: sph_bc_B
 !!        type(sph_vector_boundary_data), intent(in) :: bcs_B
 !!
-!
-!!      subroutine cal_sol_scalar_sph_crank                             &
-!!     &         (dt, sph_rj, scl_prop, k_ratio, dk_dr, sph_bc, bcs_S,  &
-!!     &          band_s_evo, band_s00_evo, is_scalar,                  &
-!!     &          rj_fld, x00_w_center)
+!!
+!!      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,       &
+!!     &          ref_field, sph_bc, bcs_S, band_s_evo, band_s00_evo,   &
+!!     &          is_scalar, rj_fld, x00_w_center)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_boundary_type), intent(in) :: sph_bc
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(band_matrices_type), intent(in) :: band_s_evo
 !!        type(band_matrix_type), intent(in) :: band_s00_evo
 !!        type(scalar_property), intent(in) :: scl_prop
-!!        real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
-!!        real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
+!!        type(phys_data), intent(in) :: ref_field
 !!        real(kind = kreal), intent(in) :: dt
 !!        integer(kind = kint), intent(in) :: is_scalar
 !!        type(phys_data), intent(inout) :: rj_fld
@@ -204,10 +202,9 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sol_scalar_sph_crank                               &
-     &         (dt, sph_rj, scl_prop, k_ratio, dk_dr, sph_bc, bcs_S,    &
-     &          band_s_evo, band_s00_evo, is_scalar,                    &
-     &          rj_fld, x00_w_center)
+      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,         &
+     &          ref_field, sph_bc, bcs_S, band_s_evo, band_s00_evo,     &
+     &          is_scalar, rj_fld, x00_w_center)
 !
       use t_scalar_property
       use t_sph_center_matrix
@@ -225,9 +222,7 @@
       type(band_matrices_type), intent(in) :: band_s_evo
       type(band_matrix_type), intent(in) :: band_s00_evo
       type(scalar_property), intent(in) :: scl_prop
-!
-      real(kind = kreal), intent(in) :: k_ratio(0:sph_rj%nidx_rj(1))
-      real(kind = kreal), intent(in) :: dk_dr(0:sph_rj%nidx_rj(1))
+      type(phys_data), intent(in) :: ref_field
 !
       real(kind = kreal), intent(in) :: dt
       integer(kind = kint), intent(in) :: is_scalar
@@ -240,13 +235,15 @@
       call set_CMB_scalar_sph_crank                                     &
      &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc, bcs_S%CMB_Sspec,   &
      &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
-     &    k_ratio(sph_bc%kr_out), dk_dr(sph_bc%kr_out),                 &
+     &    ref_field%d_fld(sph_bc%kr_out,scl_prop%ir_kappa),             &
+     &    ref_field%d_fld(sph_bc%kr_out,scl_prop%ir_dkappa_norm),       &
      &    dt, scl_prop%coef_imp, is_scalar,                             &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call set_ICB_scalar_sph_crank                                     &
      &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc, bcs_S%ICB_Sspec,   &
      &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
-     &    k_ratio(sph_bc%kr_in), dk_dr(sph_bc%kr_in),                   &
+     &    ref_field%d_fld(sph_bc%kr_in,scl_prop%ir_kappa),              &
+     &    ref_field%d_fld(sph_bc%kr_in,scl_prop%ir_dkappa_norm),        &
      &    dt, scl_prop%coef_imp, is_scalar,                             &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !

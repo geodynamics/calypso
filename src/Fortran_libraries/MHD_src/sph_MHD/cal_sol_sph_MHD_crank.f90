@@ -104,9 +104,7 @@
       if(iflag_debug.gt.0) write(*,*) 'cal_sol_scalar_sph_crank'
       if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
         call cal_sol_scalar_sph_crank(dt, sph_rj, MHD_prop%ht_prop,     &
-     &      refs%ref_field%d_fld(1,MHD_prop%ht_prop%ir_kappa),          &
-     &      refs%ref_field%d_fld(1,MHD_prop%ht_prop%ir_dkappa_norm),    &
-     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                      &
+     &      refs%ref_field, sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,      &
      &      sph_MHD_mat%band_temp_evo, sph_MHD_mat%band_temp00_evo,     &
      &      ipol%base%i_temp, rj_fld, sph_MHD_mat%x00_w_center)
       end if
@@ -115,9 +113,7 @@
       if(iflag_debug.gt.0) write(*,*) 'cal_sol_scalar_sph_crank'
       if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
         call cal_sol_scalar_sph_crank(dt, sph_rj, MHD_prop%cp_prop,     &
-     &      refs%ref_field%d_fld(1,MHD_prop%cp_prop%ir_kappa),          &
-     &      refs%ref_field%d_fld(1,MHD_prop%cp_prop%ir_dkappa_norm),    &
-     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                      &
+     &      refs%ref_field, sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,      &
      &      sph_MHD_mat%band_comp_evo, sph_MHD_mat%band_comp00_evo,     &
      &      ipol%base%i_light, rj_fld, sph_MHD_mat%x00_w_center)
       end if

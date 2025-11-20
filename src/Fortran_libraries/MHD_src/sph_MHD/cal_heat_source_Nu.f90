@@ -7,14 +7,15 @@
 !> @brief Evaluate Nusselt number without heat source
 !!
 !!@verbatim
-!!      subroutine init_poisson_matrix_for_Nu                           &
-!!     &         (mat_name, sph, r_2nd, sc_prop, sph_bc_S, fdm2_center, &
+!!      subroutine init_poisson_matrix_for_Nu(mat_name, sph, r_2nd,     &
+!!     &          sc_prop, ref_field, sph_bc_S, fdm2_center,            &
 !!     &          band_s00_poisson_fixS, Nu_type)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(scalar_property), intent(in) :: sc_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
+!!        type(phys_data), intent(in) :: ref_field
 !!        type(band_matrix_type), intent(inout) :: band_s00_poisson_fixS
 !!        type(nusselt_number_data), intent(inout) :: Nu_type
 !!      subroutine sel_Nusselt_routine(is_scalar, is_source, is_grad_s, &
@@ -60,8 +61,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_poisson_matrix_for_Nu                             &
-     &         (mat_name, sph, r_2nd, sc_prop, k_ratio, dk_dr, sph_bc_S, fdm2_center,   &
+      subroutine init_poisson_matrix_for_Nu(mat_name, sph, r_2nd,       &
+     &          sc_prop, ref_field, sph_bc_S, fdm2_center,              &
      &          band_s00_poisson_fixS, Nu_type)
 !
       use t_fdm_coefs
@@ -75,9 +76,7 @@
       type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
-!
-      real(kind = kreal), intent(in) :: k_ratio(0:sph%sph_rj%nidx_rj(1))
-      real(kind = kreal), intent(in) :: dk_dr(0:sph%sph_rj%nidx_rj(1))
+      type(phys_data), intent(in) :: ref_field
 !
       type(band_matrix_type), intent(inout) :: band_s00_poisson_fixS
       type(nusselt_number_data), intent(inout) :: Nu_type
@@ -85,9 +84,12 @@
 !
       if(Nu_type%iflag_Nusselt .eq. iflag_no_source_Nu) return
         call alloc_Nu_radial_reference(sph%sph_rj, Nu_type)
-        call s_const_sph_r_mat_ref_scalar(my_rank+50, mat_name,         &
-     &      sc_prop%flag_val_diffuse, k_ratio, dk_dr, sph%sph_rj,       &
-     &      r_2nd, sph_bc_S, fdm2_center, band_s00_poisson_fixS)
+        call s_const_sph_r_mat_ref_scalar                               &
+     &     (my_rank+50, mat_name, sc_prop%flag_val_diffuse,             &
+     &      ref_field%d_fld(1,sc_prop%ir_kappa),                        &
+     &      ref_field%d_fld(1,sc_prop%ir_dkappa_norm),                  &
+     &      sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,                   &
+     &      band_s00_poisson_fixS)
 !
       end subroutine init_poisson_matrix_for_Nu
 !
