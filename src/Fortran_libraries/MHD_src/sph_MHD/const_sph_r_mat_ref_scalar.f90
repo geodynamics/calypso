@@ -115,7 +115,7 @@
 !
       if(i_debug .eq. iflag_full_msg) then
         call check_center_band_matrix(id_file, sph_rj,                  &
-     &                                 band_s00_poisson)
+     &                                band_s00_poisson)
       end if
 !
       end subroutine s_const_sph_r_mat_ref_scalar

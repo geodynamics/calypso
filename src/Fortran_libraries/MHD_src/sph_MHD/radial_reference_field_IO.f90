@@ -8,6 +8,15 @@
 !!
 !!@verbatim
 !!      subroutine init_radial_reference_data(sph_rj, ipol, refs)
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(phys_address), intent(in) :: ipol
+!!        type(MHD_evolution_param), intent(inout) :: MHD_prop
+!!        type(radial_reference_field), intent(inout) :: refs
+!!      subroutine copy_const_diffusivity_to_ref(i_kappa, i_dkdr,       &
+!!     &                                         ref_field)
+!!        integer(kind = kint), intent(in) :: i_kappa, i_dkdr
+!!        type(phys_data), intent(inout) :: ref_field
+!!
 !!      subroutine output_reference_field(refs)
 !!        type(radial_reference_field), intent(in) :: refs
 !!      subroutine load_sph_reference_fields(refs)
@@ -32,6 +41,7 @@
       use t_radial_reference_field
       use t_field_data_IO
       use t_time_data
+      use t_control_parameter
 !
       implicit  none
 !
@@ -44,11 +54,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_radial_reference_data(sph_rj, ipol, refs)
+      subroutine init_radial_reference_data(sph_rj, ipol,               &
+     &                                      MHD_prop, refs)
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_address), intent(in) :: ipol
 !
+      type(MHD_evolution_param), intent(inout) :: MHD_prop
       type(radial_reference_field), intent(inout) :: refs
 !
 !
@@ -56,8 +68,8 @@
       refs%ref_field%ntot_phys =  0
       call alloc_phys_name(refs%ref_field)
 
-      call append_reference_field_names                                 &
-     &   (radius_name, ipol%base, ipol%diffusion, refs)
+      call append_reference_field_names(radius_name, ipol%base,         &
+     &                                  MHD_prop, refs)
       call alloc_phys_data((sph_rj%nidx_rj(1)+1), refs%ref_field)
 !
       call copy_reference_radius_data                                   &
@@ -85,20 +97,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_const_diffusivity_to_ref(nri, coef_diffuse,       &
-     &          ref_diffuse, grad_diffuse)
+      subroutine copy_const_diffusivity_to_ref(i_kappa, i_dkdr,         &
+     &                                         ref_field)
 !
-      integer(kind = kint), intent(in) :: nri
-      real(kind = kreal), intent(in) :: coef_diffuse
-!
-      real(kind = kreal), intent(inout) :: ref_diffuse(0:nri)
-      real(kind = kreal), intent(inout) :: grad_diffuse(0:nri)
+      integer(kind = kint), intent(in) :: i_kappa, i_dkdr
+      type(phys_data), intent(inout) :: ref_field
 !
 !
+      if(i_kappa .gt. 0) then
 !$omp parallel workshare
-      ref_diffuse(0:nri) = coef_diffuse
-      grad_diffuse(0:nri) = zero
+        ref_field%d_fld(1:ref_field%n_point,i_kappa) = one
 !$omp end parallel workshare
+      end if
+      if(i_dkdr .gt. 0) then
+!$omp parallel workshare
+        ref_field%d_fld(1:ref_field%n_point,i_dkdr) = zero
+!$omp end parallel workshare
+      end if
 !
       end subroutine copy_const_diffusivity_to_ref
 !

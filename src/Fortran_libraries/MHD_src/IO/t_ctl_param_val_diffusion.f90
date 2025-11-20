@@ -119,10 +119,7 @@
         end if
       end if
       if(v_diffuse_param%iflag_radial_diffusion .gt. 0)                 &
-     &                                    flag_val_diffuse = .FALSE.
-      write(*,*) 'flag_val_diffuse    ', flag_val_diffuse
-      write(*,*) 'v_diffuse_param%iflag_radial_diffusion    ',   &
-     &          v_diffuse_param%iflag_radial_diffusion
+     &                                    flag_val_diffuse = .TRUE.
       if(flag_val_diffuse .eqv. .FALSE.) return
 !
       if(val_diffuse_c%variation_file_name%iflag .gt. 0) then

@@ -97,15 +97,15 @@
      &    SPH_model%omega_sph, SPH_model%MHD_prop)
 !
       call init_radial_reference_data(SPH_MHD%sph%sph_rj, SPH_MHD%ipol, &
-     &                                SPH_model%refs)
-      call init_radius_variations_sph_mhd                               &
-     &   (SPH_MHD%sph%sph_rj, SPH_WK%r_2nd,                             &
-     &    SPH_model%MHD_prop,  SPH_model%radial_variation)
+     &    SPH_model%MHD_prop, SPH_model%refs)
+      call init_radius_variations_sph_mhd(SPH_MHD%sph, SPH_WK%r_2nd,    &
+     &    SPH_model%MHD_prop, SPH_model%refs)
 !
       if (iflag_debug.gt.0) write(*,*) 'init_bc_infos_sph_mhd_evo'
       call init_bc_infos_sph_mhd_evo(SPH_model%bc_IO, SPH_MHD%groups,   &
      &    SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph, SPH_WK%r_2nd,    &
-     &    SPH_model%MHD_prop, SPH_model%radial_variation, SPH_model%sph_MHD_bc)
+     &    SPH_model%MHD_prop, SPH_model%refs%ref_field,                 &
+     &    SPH_model%sph_MHD_bc)
 !
 !  -------------------------------
 !
