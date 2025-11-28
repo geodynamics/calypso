@@ -23,7 +23,6 @@ test:
 		echo 'Failed Y_{0}^{0} data check'; \
 		exit 1;\
 	fi
-	@sync
 	$(TARGET_SPH_REF_CHECK)  reference/reference_fields.dat     reference_fields.dat >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed refernce field data (reference_fields.dat) check'; \
