@@ -808,23 +808,83 @@ Reference temperature obtained from the given boundary condition and radial heat
 \label{href_t:ref_field_file_name}
  [File\_Name] for the reference temperature is defined as text. 
 
-\paragraph{\tt low\_temp\_ctl}
+\subsubsection{\tt low\_temp\_ctl}
+\hyperref[href_i:low_temp_ctl]{(Back to {\tt control\_MHD})}
+Amplitude of low reference temperature $T_{l}$ and its radius $r_{l}$ (Generally $r_{l} = r_{o}$) are defined in this block. \\
 \label{href_t:low_temp_ctl}
-Amplitude of low reference temperature $T_{l}$ and its radius $r_{l}$ (Generally $r_{l} = r_{o}$) are defined in this block.
-
-\paragraph{\tt high\_temp\_ctl}
-\label{href_t:high_temp_ctl}
-Amplitude of high reference temperature $T_{h}$ and its radius $r_{h}$ (Generally $r_{h} = r_{i}$) are defined in this block.
 
 \paragraph{\tt depth}
-\label{href_t:depth}
+\label{href_t:l_depth}
 \verb|[RADIUS]| \\
 Radius for reference temperature is defined by real.
 
 \paragraph{\tt temperature}
-\label{href_t:temperature}
+\label{href_t:l_temperature}
 \verb|[TEMPERATURE]| \\
 Temperature for reference temperature is defined by real.
+
+\subsubsection{\tt high\_temp\_ctl}
+\label{href_t:high_temp_ctl}
+Amplitude of high reference temperature $T_{h}$ and its radius $r_{h}$ (Generally $r_{h} = r_{i}$) are defined in this block. \\
+\hyperref[href_i:high_temp_ctl]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt depth}
+\label{href_t:h_depth}
+\verb|[RADIUS]| \\
+Radius for reference temperature is defined by real.
+
+\paragraph{\tt temperature}
+\label{href_t:h_temperature}
+\verb|[TEMPERATURE]| \\
+Temperature for reference temperature is defined by real.
+
+\subsubsection{\tt thermal\_diffusivity\_ctl}
+\label{href_t:thermal_diffusivity_ctl}
+Radial variation of thermal diffusivity is defined in this block. \\
+\hyperref[href_i:thermal_diffusivity_ctl]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt radial\_variation\_ctl}
+\label{href_t:radial_variation_ctl}
+\verb|[TYPE]| \\
+Thermal diffusivity variation type is defined by text. The following variation type are available. 
+%
+\begin{description}
+\item{\tt none: }   \\
+Thermal diffusivity is constant.
+\item{\tt reduction\_at\_ICB: }   \\
+Set reduced diffusivity at ICB due to modeled latent heat. The diffusivity profile is defined by \hyperref[href_t:ICB_reduction_radius]{\tt ICB\_reduction\_radius}, \hyperref[href_t:ICB_reduction_ratio]{\tt ICB\_reduction\_ratio}, \\
+and \hyperref[href_t:ICB_reduction_width]{\tt ICB\_reduction\_width}.
+\item{\tt list\_in\_control: }   \\
+Thermal diffusivity variation is defined by array \hyperref[href_t:diffusivity_list_ctl]{\tt diffusivity\_list\_ctl}.
+\item{\tt file: }   \\
+Thermal diffusivity variation is defined by data in a file name {\tt [FILE\_NAME]} defined by \hyperref[href_t:variation_file_name]{\tt variation\_file\_name}.
+\end{description}
+%
+
+\paragraph{\tt variation\_file\_name}
+\label{href_t:variation_file_name}
+\verb|[FILE_NAME]| \\
+File name for diffusivity variation data {\tt [FILE\_NAME]} is defined as text. The radial variation data can be choose the same file for the reference scalar or heat source data file.
+
+\paragraph{\tt diffusivity\_list\_ctl}
+\label{href_t:diffusivity_list_ctl}
+\verb|[RADIUS]  [RATIO]| \\
+List of radial diffusivity variation as two real array. Feature radius {\tt [RADIUS]} and diffusivity at the point {\tt [RATIO]} is defined. The diffusivity is linearly interpolated between the radial points.
+
+\paragraph{\tt ICB\_reduction\_radius}
+\label{href_t:ICB_reduction_radius}
+\verb|[RADIUS]| \\
+Radius of thermal diffusivity at the point where the minimum diffusivity.
+
+\paragraph{\tt ICB\_reduction\_ratio}
+\label{href_t:ICB_reduction_ratio}
+\verb|[RATIO]| \\
+Ratio of thermal diffusivity at the point where the minimum diffusivity defined by {\tt ICB\_reduction\_radius} to the other area.
+
+\paragraph{\tt ICB\_reduction\_width}
+\label{href_t:ICB_reduction_width}
+\verb|[WIDTH]| \\
+Width of linearly decreasing the thermal diffusivity from the point where the minimum diffusivity.
 
 \subsection{\tt composition\_define}
 \label{href_t:composition_define}

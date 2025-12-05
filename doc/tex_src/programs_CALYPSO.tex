@@ -244,15 +244,27 @@ Block \verb|MHD_control|  (Top block of the control file)
 		\item \verb||
 				\hyperref[href_t:ref_field_file_name]{\tt ref\_field\_file\_name [File\_Name]}
 		\item Block \hyperref[href_t:low_temp_ctl]{\tt low\_temp\_ctl}
-			\begin{itemize}
-			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
-			\item \hyperref[href_t:temperature]{\tt temperature  [TEMPERATURE]}
+			\begin{itemize}  \label{href_i:low_temp_ctl}
+			\item \hyperref[href_t:l_depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:l_temperature]{\tt temperature  [TEMPERATURE]}
 			\end{itemize}
 %
 		\item Block \hyperref[href_t:high_temp_ctl]{\tt high\_temp\_ctl}
-			\begin{itemize}
-			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
-			\item \hyperref[href_t:temperature]{\tt temperature  [TEMPERATURE]}
+			\begin{itemize}  \label{href_i:high_temp_ctl}
+			\item \hyperref[href_t:h_depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:h_temperature]{\tt temperature  [TEMPERATURE]}
+			\end{itemize}
+%
+		\item Block \hyperref[href_t:thermal_diffusivity_ctl]{\tt thermal\_diffusivity\_ctl}
+			\begin{itemize}  \label{href_i:thermal_diffusivity_ctl}
+			\item \hyperref[href_t:radial_variation_ctl]{\tt radial\_variation\_ctl  [RADIUS]}
+			\item \hyperref[href_t:variation_file_name]{\tt variation\_file\_name  [FILE\_NAME]}
+			\item Array \hyperref[href_t:diffusivity_list_ctl]{\tt diffusivity\_list\_ctl  [RADIUS]  [RATIO]}
+
+%
+			\item \hyperref[href_t:ICB_reduction_radius]{\tt ICB\_reduction\_radius  [RADIUS]}
+			\item \hyperref[href_t:ICB_reduction_ratio]{\tt ICB\_reduction\_ratio   [RATIO]}
+			\item \hyperref[href_t:ICB_reduction_width]{\tt ICB\_reduction\_width   [WIDTH]}
 			\end{itemize}
 		\end{itemize}
 %
