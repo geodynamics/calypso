@@ -845,7 +845,7 @@ Radial variation of thermal diffusivity is defined in this block. \\
 
 \paragraph{\tt radial\_variation\_ctl}
 \label{href_t:radial_variation_ctl}
-\verb|[TYPE]| \\
+\verb|[VARIATION_TYPE]| \\
 Thermal diffusivity variation type is defined by text. The following variation type are available. 
 %
 \begin{description}
@@ -864,27 +864,31 @@ Thermal diffusivity variation is defined by data in a file name {\tt [FILE\_NAME
 \paragraph{\tt variation\_file\_name}
 \label{href_t:variation_file_name}
 \verb|[FILE_NAME]| \\
-File name for diffusivity variation data {\tt [FILE\_NAME]} is defined as text. The radial variation data can be choose the same file for the reference scalar or heat source data file.
+File name for diffusivity variation data {\tt [FILE\_NAME]} is defined as text. The radial variation data can be choose the same file for the reference scalar or heat source data file. This parameter is used for the by {\tt file} mode in {\tt [VARIATION\_TYPE]}.
 
 \paragraph{\tt diffusivity\_list\_ctl}
 \label{href_t:diffusivity_list_ctl}
 \verb|[RADIUS]  [RATIO]| \\
-List of radial diffusivity variation as two real array. Feature radius {\tt [RADIUS]} and diffusivity at the point {\tt [RATIO]} is defined. The diffusivity is linearly interpolated between the radial points.
+List of radial diffusivity variation as two reals array. Feature radius {\tt [RADIUS]} and diffusivity at the point {\tt [RATIO]} are defined. The diffusivity is linearly interpolated between the radial points. This parameter is used for the by {\tt list\_in\_control} mode in {\tt [VARIATION\_TYPE]}.
+
 
 \paragraph{\tt ICB\_reduction\_radius}
 \label{href_t:ICB_reduction_radius}
 \verb|[RADIUS]| \\
-Radius of thermal diffusivity at the point where the minimum diffusivity.
+Radius of thermal diffusivity at the point where the minimum diffusivity. This parameter is used for the by {\tt reduction\_at\_ICB} mode in {\tt [VARIATION\_TYPE]}.
 
 \paragraph{\tt ICB\_reduction\_ratio}
 \label{href_t:ICB_reduction_ratio}
 \verb|[RATIO]| \\
-Ratio of thermal diffusivity at the point where the minimum diffusivity defined by {\tt ICB\_reduction\_radius} to the other area.
+Ratio of thermal diffusivity at the point where the minimum diffusivity defined by \\
+{\tt ICB\_reduction\_radius} to the other area. This parameter is used for the by \\
+{\tt reduction\_at\_ICB} mode in {\tt [VARIATION\_TYPE]}.
+
 
 \paragraph{\tt ICB\_reduction\_width}
 \label{href_t:ICB_reduction_width}
 \verb|[WIDTH]| \\
-Width of linearly decreasing the thermal diffusivity from the point where the minimum diffusivity.
+Width of linearly decreasing the thermal diffusivity from the point where the minimum diffusivity. This parameter is used for the by {\tt reduction\_at\_ICB} mode in {\tt [VARIATION\_TYPE]}.
 
 \subsection{\tt composition\_define}
 \label{href_t:composition_define}
