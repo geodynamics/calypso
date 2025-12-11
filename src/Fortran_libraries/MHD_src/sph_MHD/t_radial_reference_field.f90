@@ -51,6 +51,11 @@
       character(len = kchara), parameter, private                       &
      &     :: default_output_reference_file = 'reference_fields.dat'
 !
+      character(len = kchara), parameter, private                       &
+     &     :: drho_dr_name =   'normalized_drho_dr'
+      character(len = kchara), parameter, private                       &
+     &     :: d2rho_dr2_name = 'normalized_d2rho_dr2'
+!
 !>      Structure of reference temperature
       type radial_reference_field
 !>        MPI process for reference field
@@ -221,6 +226,7 @@
       subroutine append_r_diffusivities_list(MHD_prop,                  &
      &          iref_diffusivity, iref_grad_diffusivity, ref_field)
 !
+      use m_base_field_labels
       use m_diffusion_term_labels
       use append_phys_data
 !
@@ -233,13 +239,13 @@
       if(MHD_prop%flag_ref_density_valiation) then
         write(*,*) 'flag_ref_density_valiation ON'
         MHD_prop%fl_prop%ir_rho =        ref_field%ntot_phys + 1
-        call append_field_name_list('density',                          &
+        call append_field_name_list(density%name,                       &
      &      ione, .TRUE., .FALSE., izero, ref_field)
         MHD_prop%fl_prop%ir_drho_norm =  ref_field%ntot_phys + 2
-        call append_field_name_list('normalized_drho_dr',               &
+        call append_field_name_list(drho_dr_name,                       &
      &      ione, .TRUE., .FALSE., izero, ref_field)
         MHD_prop%fl_prop%ir_d2rho_norm = ref_field%ntot_phys + 3
-        call append_field_name_list('normalized_d2rho_dr2',             &
+        call append_field_name_list(d2rho_dr2_name,                     &
      &      ione, .TRUE., .FALSE., izero, ref_field)
       end if
 !

@@ -12,6 +12,10 @@
 !!     &                                      scl_prop)
 !!        type(read_character_item), intent(in) :: filterd_advect_ctl
 !!        type(scalar_property), intent(inout) :: scl_prop
+!!      subroutine set_diffusion_reduction_ctl(valuable_diffusion_ctl,  &
+!!     &                                       scl_prop)
+!!        type(val_diffuse_ctl), intent(in) :: valuable_diffusion_ctl
+!!        type(scalar_property), intent(inout) :: scl_prop
 !!@endverbatim
 !
       module t_scalar_property
@@ -93,11 +97,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_diffusion_reduction_ctl(ref_scl_ctl, scl_prop)
+      subroutine set_diffusion_reduction_ctl(valuable_diffusion_ctl,    &
+     &                                       scl_prop)
 !
-      use t_ctl_data_temp_model
+      use t_ctl_data_valuable_diffuse
 !
-      type(reference_temperature_ctl), intent(in) :: ref_scl_ctl
+      type(val_diffuse_ctl), intent(in) :: valuable_diffusion_ctl
       type(scalar_property), intent(inout) :: scl_prop
 !
 !
@@ -105,18 +110,18 @@
       scl_prop%diffuse_reduction_ratio_ICB =   1.0d0
       scl_prop%diffuse_reduction_width_ICB =   0.0d0
       scl_prop%grad_diffusibity_ICB =          0.0d0
-      if(ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_radius%iflag .gt. 0) then
+      if(valuable_diffusion_ctl%ICB_reduction_radius%iflag .gt. 0) then
         scl_prop%diffuse_reduction_radius_ICB                           &
-     &        = ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_radius%realvalue
+     &        = valuable_diffusion_ctl%ICB_reduction_radius%realvalue
       end if
-      if(ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_ratio%iflag .gt. 0) then
+      if(valuable_diffusion_ctl%ICB_reduction_ratio%iflag .gt. 0) then
         scl_prop%flag_val_diffuse = .TRUE.
         scl_prop%diffuse_reduction_ratio_ICB                            &
-     &        = ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_ratio%realvalue
+     &        = valuable_diffusion_ctl%ICB_reduction_ratio%realvalue
       end if
-      if(ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_width%iflag .gt. 0) then
+      if(valuable_diffusion_ctl%ICB_reduction_width%iflag .gt. 0) then
         scl_prop%diffuse_reduction_width_ICB                            &
-     &        = ref_scl_ctl%valuable_diffusion_ctl%ICB_reduction_width%realvalue
+     &        = valuable_diffusion_ctl%ICB_reduction_width%realvalue
       end if
 !
       if(scl_prop%diffuse_reduction_width_ICB .gt. 0.0d0) then

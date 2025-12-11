@@ -70,6 +70,7 @@
 !
       use calypso_mpi
       use t_control_array_character
+      use t_ctl_data_ref_point
       use m_file_format_switch
       use m_error_IDs
       use delete_data_files

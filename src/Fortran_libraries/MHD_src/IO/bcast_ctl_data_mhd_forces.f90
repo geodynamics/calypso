@@ -183,7 +183,7 @@
 !
       subroutine bcast_ref_value_ctl(ref_ctl)
 !
-      use t_ctl_data_temp_model
+      use t_ctl_data_ref_point
       use bcast_control_arrays
       use calypso_mpi_int
       use calypso_mpi_char

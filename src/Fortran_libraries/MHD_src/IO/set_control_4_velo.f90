@@ -82,20 +82,20 @@
         end do
 !
         do i = 1, velo_nod%num_bc
-         call set_bc_group_types_each_dir(node_bc_U_ctl%c1_tbl(i),      &
-     &                                    velo_nod%ibc_type(i))
-         call set_bc_group_types_vector(node_bc_U_ctl%c1_tbl(i),        &
-     &                                  velo_nod%ibc_type(i))
-         call set_bc_group_types_sgs_vect(node_bc_U_ctl%c1_tbl(i),      &
-     &                                    velo_nod%ibc_type(i))
-         call set_bc_group_types_rotation(node_bc_U_ctl%c1_tbl(i),      &
-     &                                    velo_nod%ibc_type(i))
-         call set_bc_group_types_sph_center(node_bc_U_ctl%c1_tbl(i),    &
-     &                                      velo_nod%ibc_type(i))
-         call set_bc_group_types_sph_velo(node_bc_U_ctl%c1_tbl(i),      &
-     &                                    velo_nod%ibc_type(i))
-         call set_bc_group_special_velocity(node_bc_U_ctl%c1_tbl(i),    &
-     &                                      velo_nod%ibc_type(i))
+          call set_bc_group_types_each_dir(node_bc_U_ctl%c1_tbl(i),     &
+     &                                     velo_nod%ibc_type(i))
+          call set_bc_group_types_vector(node_bc_U_ctl%c1_tbl(i),       &
+     &                                   velo_nod%ibc_type(i))
+          call set_bc_group_types_sgs_vect(node_bc_U_ctl%c1_tbl(i),     &
+     &                                     velo_nod%ibc_type(i))
+          call set_bc_group_types_rotation(node_bc_U_ctl%c1_tbl(i),     &
+     &                                     velo_nod%ibc_type(i))
+          call set_bc_group_types_sph_center(node_bc_U_ctl%c1_tbl(i),   &
+     &                                       velo_nod%ibc_type(i))
+          call set_bc_group_types_sph_velo(node_bc_U_ctl%c1_tbl(i),     &
+     &                                     velo_nod%ibc_type(i))
+          call set_bc_group_special_velocity(node_bc_U_ctl%c1_tbl(i),   &
+     &                                       velo_nod%ibc_type(i))
         end do
 !
         if(iflag_debug .gt. 0) then

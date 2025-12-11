@@ -134,8 +134,10 @@
 !
 !   set control for diffusion reduction by latent heating
 !
-      call set_diffusion_reduction_ctl(reft_ctl, MHD_prop%ht_prop)
-      call set_diffusion_reduction_ctl(refc_ctl, MHD_prop%cp_prop)
+      call set_diffusion_reduction_ctl(reft_ctl%valuable_diffusion_ctl, &
+     &                                 MHD_prop%ht_prop)
+      call set_diffusion_reduction_ctl(refc_ctl%valuable_diffusion_ctl, &
+     &                                 MHD_prop%cp_prop)
 !
 !   set control for reference temperature 
 !
