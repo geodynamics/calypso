@@ -124,7 +124,7 @@
       call set_unit_on_diag(band_vp_evo)
       call set_unit_on_diag(band_wt_evo)
 !
-      if(fl_prop%coef_diffuse .eq. zero) then
+      if(fl_prop%coef_velo .eq. zero) then
         coef_dvt = one
         call set_unit_mat_4_poisson                                     &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &
@@ -217,7 +217,7 @@
       call alloc_band_mat_sph(ithree, sph_rj, band_vt_evo)
       call set_unit_on_diag(band_vt_evo)
 !
-      if(fl_prop%coef_diffuse .eq. zero) then
+      if(fl_prop%coef_velo .eq. zero) then
         coef_dvt = one
         call set_unit_mat_4_poisson                                     &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &
@@ -294,7 +294,7 @@
       real(kind = kreal) :: hdiv_visous_mat(sph_rj%nidx_rj(2),-2:1)
 !
 !
-      if(fl_prop%coef_diffuse .eq. zero) then
+      if(fl_prop%coef_velo .eq. zero) then
         coef_dvt = one
       else
         coef_dvt = fl_prop%coef_imp * fl_prop%coef_diffuse * dt
@@ -362,7 +362,7 @@
       real(kind = kreal) :: coef_dvt
 !
 !
-      if(fl_prop%coef_diffuse .eq. zero) then
+      if(fl_prop%coef_velo .eq. zero) then
         coef_dvt = one
       else
         coef_dvt = fl_prop%coef_imp * fl_prop%coef_diffuse * dt
