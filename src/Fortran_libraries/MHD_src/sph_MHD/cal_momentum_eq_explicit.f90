@@ -95,7 +95,13 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      if(fl_prop%iflag_scheme .eq. id_explicit_euler) then
+      if(fl_prop%iflag_scheme .eq. id_no_evolution) return
+!
+      if(fl_prop%coef_velo .eq. zero) then
+        call sel_exp_static_vorticity_euler                             &
+     &     (sph_rj, fl_prop, sph_bc_U, ipol%base, ipol%exp_work,        &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      else if(fl_prop%iflag_scheme .eq. id_explicit_euler) then
         call cal_vorticity_eq_euler(sph_rj, fl_prop, sph_bc_U,          &
      &      ipol%base, ipol%exp_work, ipol%diffusion,                   &
      &      time_d%dt, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
@@ -128,29 +134,35 @@
 !
 !
       if(cd_prop%iflag_Bevo_scheme .eq. id_no_evolution) return
-      if(cd_prop%iflag_Bevo_scheme .eq. id_explicit_euler) then
-          if(iflag_debug .gt. 0) write(*,*)                             &
-     &                  'cal_diff_induction_MHD_euler'
-          call cal_diff_induction_MHD_euler(cd_prop, ipol%base,         &
-     &        ipol%forces, ipol%diffusion, time_d%dt,                   &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if(time_d%i_time_step .eq. 1) then
-          if(iflag_debug .gt. 0) write(*,*)                             &
-     &                  'cal_diff_induction_MHD_euler'
-          call cal_diff_induction_MHD_euler(cd_prop, ipol%base,         &
-     &        ipol%forces, ipol%diffusion, time_d%dt,                   &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-          if(iflag_debug .gt. 0) write(*,*)                             &
+      if(cd_prop%coef_magne .eq. zero) then
+        if(iflag_debug .gt. 0) write(*,*)                               &
+     &                  'sel_exp_static_induction_euler'
+        call sel_exp_static_induction_euler(ipol%base, ipol%forces,     &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      else if(cd_prop%iflag_Bevo_scheme .eq. id_explicit_euler) then
+        if(iflag_debug .gt. 0) write(*,*)                               &
+     &                  'cal_diff_induction_MHD_euler'
+        call cal_diff_induction_MHD_euler(cd_prop, ipol%base,           &
+     &      ipol%forces, ipol%diffusion, time_d%dt,                     &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      else if(time_d%i_time_step .eq. 1) then
+        if(iflag_debug .gt. 0) write(*,*)                               &
+     &                  'cal_diff_induction_MHD_euler'
+        call cal_diff_induction_MHD_euler(cd_prop, ipol%base,           &
+     &      ipol%forces, ipol%diffusion, time_d%dt,                     &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+!
+        if(iflag_debug .gt. 0) write(*,*)                               &
      &              'set_ini_adams_mag_induct'
-          call set_ini_adams_mag_induct(ipol%exp_work, ipol%forces,     &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        call set_ini_adams_mag_induct(ipol%exp_work, ipol%forces,       &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       else
-          if(iflag_debug .gt. 0) write(*,*)                             &
+        if(iflag_debug .gt. 0) write(*,*)                               &
      &                'cal_diff_induction_MHD_adams'
-          call cal_diff_induction_MHD_adams(cd_prop, ipol%base,         &
-     &        ipol%exp_work, ipol%forces, ipol%diffusion, time_d%dt,    &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        call cal_diff_induction_MHD_adams(cd_prop, ipol%base,           &
+     &      ipol%exp_work, ipol%forces, ipol%diffusion, time_d%dt,      &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
       end subroutine sel_explicit_sph_induction

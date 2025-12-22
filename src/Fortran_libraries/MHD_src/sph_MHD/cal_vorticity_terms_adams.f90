@@ -13,12 +13,18 @@
 !!      subroutine cal_vorticity_eq_euler(sph_rj, fl_prop, sph_bc_U,    &
 !!     &          ipol_base, ipol_exp, ipol_dif,                        &
 !!     &          dt, nnod_rj, ntot_phys_rj, d_rj)
+!!      subroutine sel_exp_static_vorticity_euler                       &
+!!     &         (sph_rj, fl_prop, sph_bc_U, ipol_base, ipol_exp,       &
+!!     &          nnod_rj, ntot_phys_rj, d_rj)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(base_field_address), intent(in) :: ipol_base
 !!        type(explicit_term_address), intent(in) :: ipol_exp
 !!        type(diffusion_address), intent(in) :: ipol_dif
+!!        real(kind = kreal), intent(in) :: dt
+!!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+!!        real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!
 !!      subroutine set_MHD_terms_to_force                               &
 !!     &         (ipol_exp, ipol_rot_frc, is_rot_buo,                   &
@@ -82,6 +88,7 @@
       type(diffusion_address), intent(in) :: ipol_dif
       real(kind = kreal), intent(in) :: dt
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+!
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
       integer(kind = kint) :: inod, ist, ied
@@ -145,6 +152,36 @@
 !$omp end parallel do
 !
       end subroutine cal_vorticity_eq_euler
+!
+! ----------------------------------------------------------------------
+!
+      subroutine sel_exp_static_vorticity_euler                         &
+     &         (sph_rj, fl_prop, sph_bc_U, ipol_base, ipol_exp,         &
+     &          nnod_rj, ntot_phys_rj, d_rj)
+!
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(fluid_property), intent(in) :: fl_prop
+      type(sph_boundary_type), intent(in) :: sph_bc_U
+      type(base_field_address), intent(in) :: ipol_base
+      type(explicit_term_address), intent(in) :: ipol_exp
+      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+      real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
+!
+      integer(kind = kint) :: inod, ist, ied
+!
+!
+      if(fl_prop%iflag_scheme .eq. id_no_evolution) return
+      ist = (sph_bc_U%kr_in-1) * sph_rj%nidx_rj(2) + 1
+      ied =  sph_bc_U%kr_out *   sph_rj%nidx_rj(2)
+!$omp parallel do private (inod)
+      do inod = ist, ied
+        d_rj(inod,ipol_base%i_vort  ) = d_rj(inod,ipol_exp%i_forces  )
+!
+        d_rj(inod,ipol_base%i_vort+2) = d_rj(inod,ipol_exp%i_forces+2)
+      end do
+!$omp end parallel do
+!
+      end subroutine sel_exp_static_vorticity_euler
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
