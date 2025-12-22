@@ -16,6 +16,15 @@
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(inout) :: rj_fld
+!!
+!!      subroutine sel_explicit_sph_momentum(time_d, sph_rj,            &
+!!     &          fl_prop, sph_bc_U, ipol, rj_fld)
+!!        type(time_data), intent(in) :: time_d
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(fluid_property), intent(in) :: fl_prop
+!!        type(sph_boundary_type), intent(in) :: sph_bc_U
+!!        type(phys_address), intent(in) :: ipol
+!!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
 !!
 !!@param i_step  time step
@@ -38,7 +47,6 @@
 !
       implicit  none
 !
-      private :: sel_explicit_sph_momentum
       private :: sel_explicit_sph_induction
       private :: sel_explicit_sph_scalar
 !
@@ -94,27 +102,36 @@
 !
       type(phys_data), intent(inout) :: rj_fld
 !
+      integer(kind = kint) :: ist, ied
+!
 !
       if(fl_prop%iflag_scheme .eq. id_no_evolution) return
+      ist = (sph_bc_U%kr_in-1) * sph_rj%nidx_rj(2) + 1
+      ied = sph_bc_U%kr_out *    sph_rj%nidx_rj(2)
 !
       if(fl_prop%coef_velo .eq. zero) then
         call sel_exp_static_vorticity_euler                             &
-     &     (sph_rj, fl_prop, sph_bc_U, ipol%base, ipol%exp_work,        &
+     &     (ist, ied, sph_rj%inod_rj_center,                            &
+     &      fl_prop, ipol%base, ipol%exp_work,                          &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       else if(fl_prop%iflag_scheme .eq. id_explicit_euler) then
-        call cal_vorticity_eq_euler(sph_rj, fl_prop, sph_bc_U,          &
+        call cal_vorticity_eq_euler                                     &
+     &     (ist, ied, sph_rj%inod_rj_center, time_d%dt, fl_prop,        &
      &      ipol%base, ipol%exp_work, ipol%diffusion,                   &
-     &      time_d%dt, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       else if(time_d%i_time_step .eq. 1) then
-        call cal_vorticity_eq_euler(sph_rj, fl_prop, sph_bc_U,          &
+        call cal_vorticity_eq_euler                                     &
+     &     (ist, ied, sph_rj%inod_rj_center, time_d%dt, fl_prop,        &
      &      ipol%base, ipol%exp_work, ipol%diffusion,                   &
-     &      time_d%dt, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call set_ini_adams_inertia(fl_prop, ipol%exp_work,              &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        call set_ini_adams_inertia                                      &
+     &     (ist, ied, sph_rj%inod_rj_center, ipol%exp_work,             &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       else
-        call cal_vorticity_eq_adams(sph_rj, fl_prop, sph_bc_U,          &
+        call cal_vorticity_eq_adams                                     &
+     &     (ist, ied, sph_rj%inod_rj_center, time_d%dt, fl_prop,        &
      &      ipol%base, ipol%exp_work, ipol%diffusion,                   &
-     &      time_d%dt, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
       end subroutine sel_explicit_sph_momentum
@@ -190,10 +207,9 @@
       integer(kind = kint) :: ist, ied
 !
 !
+      if(scl_prop%iflag_scheme .eq. id_no_evolution) return
       ist = (sph_bc_S%kr_in-1) * sph_rj%nidx_rj(2) + 1
       ied =  sph_bc_S%kr_out *   sph_rj%nidx_rj(2)
-!
-      if(scl_prop%iflag_scheme .eq. id_no_evolution) return
 !
       if(scl_prop%coef_advect .eq. zero) then
         call sel_exp_static_src_euler(ist, ied, sph_rj%inod_rj_center,  &
