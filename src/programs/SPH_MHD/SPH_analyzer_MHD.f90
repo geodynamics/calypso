@@ -221,9 +221,8 @@
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+2)
       if(iflag_debug.gt.0) write(*,*) 'sel_explicit_sph'
       call sel_explicit_sph                                             &
-     &   (MHD_step%time_d%i_time_step, MHD_step%time_d%dt,              &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_MHD%sph,        &
-     &    SPH_MHD%ipol, SPH_MHD%fld)
+     &   (MHD_step%time_d, SPH_model%MHD_prop, SPH_model%sph_MHD_bc,    &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !*
 !*  ----------  time evolution by inplicit method ----------
 !*
