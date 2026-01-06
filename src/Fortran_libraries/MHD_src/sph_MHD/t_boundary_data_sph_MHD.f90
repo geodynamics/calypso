@@ -8,14 +8,6 @@
 !!
 !!
 !!@verbatim
-!!      subroutine set_MHD_evolved_boundaries                           &
-!!     &         (time_d, sph, MHD_prop, sph_MHD_bc)
-!!      subroutine set_cv_evolved_boundaries                            &
-!!     &         (time_d, sph, MHD_prop, sph_MHD_bc)
-!!        type(time_data), intent(in) :: time_d
-!!        type(sph_grids), intent(in) :: sph
-!!        type(MHD_evolution_param), intent(in) :: MHD_prop
-!!        type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !!@endverbatim
 !!
 !!@n @param jmax    number of modes for spherical harmonics @f$L*(L+2)@f$
@@ -66,60 +58,9 @@
 !
 ! ----------------------------------------------------------------------
 !
-      contains
+!      contains
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine set_MHD_evolved_boundaries                             &
-     &         (time_d, sph, MHD_prop, sph_MHD_bc)
-!
-      use set_evoluved_boundaries
-!
-      type(time_data), intent(in) :: time_d
-      type(sph_grids), intent(in) :: sph
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-!
-      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
-!
-!
-      call set_cv_evolved_boundaries(time_d, sph, MHD_prop, sph_MHD_bc)
-!
-      if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
-        call set_evo_vector_boundaries(time_d%time, sph%sph_rj,         &
-     &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%bcs_B)
-      end if
-!
-      end subroutine set_MHD_evolved_boundaries
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_cv_evolved_boundaries                              &
-     &         (time_d, sph, MHD_prop, sph_MHD_bc)
-!
-      use set_evoluved_boundaries
-!
-      type(time_data), intent(in) :: time_d
-      type(sph_grids), intent(in) :: sph
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-!
-      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
-!
-!
-      if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
-        call set_evo_vector_boundaries(time_d%time, sph%sph_rj,         &
-     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
-      end if
-      if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
-        call set_evo_scalar_boundaries(time_d%time, sph%sph_rj,         &
-     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T)
-      end if
-      if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
-        call set_evo_scalar_boundaries(time_d%time, sph%sph_rj,         &
-     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C)
-      end if
-!
-      end subroutine set_cv_evolved_boundaries
-!
 ! ----------------------------------------------------------------------
 !
       end module t_boundary_data_sph_MHD

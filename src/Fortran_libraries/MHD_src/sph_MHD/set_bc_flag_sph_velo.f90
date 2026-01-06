@@ -127,7 +127,7 @@
       if      (ibc_type .eq. iflag_free_sph) then
         sph_bc_U%iflag_icb = iflag_free_slip
       else if (ibc_type .eq. iflag_non_slip_sph) then
-        sph_bc_U%iflag_icb = iflag_fixed_velo
+        sph_bc_U%iflag_icb = iflag_non_slip
       else if (ibc_type .eq. iflag_rotatable_icore) then
         sph_bc_U%iflag_icb = iflag_rotatable_ic
       else if (ibc_type .eq. iflag_sph_2_center) then
@@ -197,7 +197,7 @@
       if      (ibc_type .eq. iflag_free_sph) then
         sph_bc_U%iflag_cmb = iflag_free_slip
       else if (ibc_type .eq. iflag_non_slip_sph) then
-        sph_bc_U%iflag_cmb = iflag_fixed_velo
+        sph_bc_U%iflag_cmb = iflag_non_slip
 !
       else if (ibc_type .eq. (iflag_bc_rot+1)) then
         sph_bc_U%iflag_cmb = iflag_fixed_field

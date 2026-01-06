@@ -47,9 +47,9 @@
       integer(kind = kint), parameter :: iflag_evolve_flux =       51
 !
 !
-!>      integer flag for fixed velocity boundary at inner core
-      integer(kind = kint), parameter :: iflag_fixed_velo = 100
-!>      integer flag for free-slip boundary at inner core
+!>      integer flag for non-slip boundary condition
+      integer(kind = kint), parameter :: iflag_non_slip =   100
+!>      integer flag for free-slip boundary condition
       integer(kind = kint), parameter :: iflag_free_slip =  101
 !>      integer flag for rotatable inner core
       integer(kind = kint), parameter :: iflag_rotatable_ic = 110

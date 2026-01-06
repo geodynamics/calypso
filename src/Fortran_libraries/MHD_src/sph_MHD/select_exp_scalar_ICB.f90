@@ -106,8 +106,7 @@
 !
       if(sph_bc%iflag_icb .eq. iflag_sph_filter_center) then
         call set_sph_filter_vect_to_center                              &
-     &     (sph_rj%nidx_rj, ICB_Sspec%S_BC, is_field,                   &
-     &      n_point, ntot_phys_rj, d_rj)
+     &     (sph_rj%nidx_rj, ICB_Sspec%S_BC, n_point, d_rj(1,is_field))
       end if
 !
 !   Set RHS vector for ICB
@@ -116,13 +115,11 @@
      &  .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
         call s_set_fixed_scalar_sph(sph_rj%nidx_rj(2),                  &
      &      sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
-     &      ione, sph_bc%kr_in, is_field,                               &
-     &      ICB_Sspec%S_BC, ICB_Sspec%S_CTR,                            &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      ione, sph_bc%kr_in, ICB_Sspec%S_BC, ICB_Sspec%S_CTR,        &
+     &      n_point, d_rj(1,is_field))
       else if(sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
-        call cal_sph_fixed_center                                       &
-     &     (sph_rj%inod_rj_center, sph_bc%CTR_fld, is_field,            &
-     &      n_point, ntot_phys_rj, d_rj)
+        call cal_sph_fixed_center(sph_rj%inod_rj_center,                &
+     &      sph_bc%CTR_fld, n_point, d_rj(1,is_field))
       else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                    &
      &     .and. coef_f .ne. 0.0d0) then
         if(flag_val_diffuse) then
@@ -139,10 +136,9 @@
 !      else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                   &
 !     &    .or. sph_bc%iflag_icb .eq. iflag_evolve_flux) then
       else
-        call poisson_in_fixed_flux_sph                                  &
-     &     (sph_rj%nidx_rj(2), sph_bc%kr_in, sph_bc%r_ICB,              &
-     &      sph_bc%fdm2_fix_dr_ICB, ICB_Sspec%S_BC,                     &
-     &      is_field, n_point, ntot_phys_rj, d_rj)
+        call poisson_in_fixed_flux_sph(sph_rj%nidx_rj(2), sph_bc%kr_in, &
+     &      sph_bc%r_ICB, sph_bc%fdm2_fix_dr_ICB, ICB_Sspec%S_BC,       &
+     &      n_point, d_rj(1,is_field))
       end if
 !
       end subroutine set_ICB_scalar_sph_crank
@@ -172,46 +168,42 @@
 !
 !
       if     (sph_bc%iflag_icb .eq. iflag_sph_fill_center) then
-        call cal_sph_center1_grad22                                     &
-     &     (sph_rj%nidx_rj(2), sph_bc%r_ICB, g_sph_rj,                  &
-     &      fdm2_center%dmat_fix_fld, is_fld, is_grad,                  &
-     &      n_point, ntot_phys_rj, d_rj)
+        call cal_sph_center1_grad22(sph_rj%nidx_rj(2), sph_bc%r_ICB,    &
+     &      g_sph_rj, fdm2_center%dmat_fix_fld,                         &
+     &      n_point, d_rj(1,is_fld), d_rj(1,is_grad))
         call sph0_scalar_fill_ctr_grad2                                 &
      &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
      &      sph_rj%nidx_rj(2), fdm2_center%dmat_fix_fld,                &
-     &      is_fld, is_grad, n_point, ntot_phys_rj, d_rj)
+     &      n_point, d_rj(1,is_fld), d_rj(1,is_grad))
       else if(sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
-        call cal_sph_center1_grad22                                     &
-     &     (sph_rj%nidx_rj(2), sph_bc%r_ICB, g_sph_rj,                  &
-     &      fdm2_center%dmat_fix_fld, is_fld, is_grad,                  &
-     &      n_point, ntot_phys_rj, d_rj)
+        call cal_sph_center1_grad22(sph_rj%nidx_rj(2), sph_bc%r_ICB,    &
+     &      g_sph_rj, fdm2_center%dmat_fix_fld,                         &
+     &      n_point, d_rj(1,is_fld), d_rj(1,is_grad))
         call dsdr_sph_lm0_fixed_ctr_2                                   &
      &     (sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
      &      sph_rj%nidx_rj(2), sph_bc%r_ICB, g_sph_rj, sph_bc%CTR_fld,  &
      &      fdm2_center%dmat_fix_fld, fdm2_center%dmat_fixed,           &
-     &      is_fld, is_grad, n_point, ntot_phys_rj, d_rj)
+     &      n_point, d_rj(1,is_fld), d_rj(1,is_grad))
       else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                    &
      &    .or. sph_bc%iflag_icb .eq. iflag_evolve_flux) then
         call dsdr_sph_in_fix_flux_2(sph_rj%nidx_rj(2), g_sph_rj,        &
      &      sph_bc%kr_in, sph_bc%r_ICB, ICB_Sspec%S_BC,                 &
-     &      is_fld, is_grad, n_point, ntot_phys_rj, d_rj)
+     &      n_point, d_rj(1,is_fld), d_rj(1,is_grad))
         call dsdr_sph_lm0_in_fix_flux_2                                 &
      &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(2),               &
-     &      sph_bc%kr_in, sph_bc%r_ICB, ICB_Sspec%S_BC, is_grad,        &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      sph_bc%kr_in, sph_bc%r_ICB, ICB_Sspec%S_BC,                 &
+     &      n_point, d_rj(1,is_grad))
 !      else if(sph_bc%iflag_icb .eq. iflag_fixed_field                  &
 !     &   .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
       else
         call dsdr_sph_fix_scalar_in_2                                   &
      &     (sph_rj%nidx_rj(2), g_sph_rj,                                &
      &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB,        &
-     &      ICB_Sspec%S_BC, is_fld, is_grad,                            &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      ICB_Sspec%S_BC, n_point, d_rj(1,is_fld), d_rj(1,is_grad))
         call dsdr_sph_lm0_fix_scalar_in_2                               &
      &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(2),               &
      &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB,        &
-     &      ICB_Sspec%S_BC, is_fld, is_grad,                            &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      ICB_Sspec%S_BC, n_point, d_rj(1,is_fld), d_rj(1,is_grad))
       end if
 !
       end subroutine sel_ICB_radial_grad_scalar
@@ -253,18 +245,16 @@
      &      d_rj(1,is_flux), d_rj(1,is_advect))
       else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                    &
      &    .or. sph_bc%iflag_icb .eq. iflag_evolve_flux) then
-        call cal_div_sph_in_fix_flux_2                                  &
-     &     (sph_rj%nidx_rj(2), g_sph_rj, sph_bc%kr_in,                  &
-     &      sph_bc%r_ICB, ICB_Sspec%S_BC, is_flux, is_advect,           &
-     &      n_point, ntot_phys_rj, d_rj)
+        call cal_div_sph_in_fix_flux_2(sph_rj%nidx_rj(2), g_sph_rj,     &
+     &      sph_bc%kr_in, sph_bc%r_ICB, ICB_Sspec%S_BC,                 &
+     &      n_point, d_rj(1,is_flux), d_rj(1,is_advect))
 !      else if(sph_bc%iflag_icb .eq. iflag_fixed_field                  &
 !     &   .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
       else
-        call cal_sph_div_flux_4_fix_in                                  &
-     &     (sph_rj%nidx_rj(2), g_sph_rj,                                &
+        call cal_sph_div_flux_4_fix_in(sph_rj%nidx_rj(2), g_sph_rj,     &
      &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB,        &
-     &      ICB_Sspec%S_BC, is_flux, is_advect,                         &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      ICB_Sspec%S_BC, n_point, d_rj(1,is_flux),                   &
+     &      d_rj(1,is_advect))
       end if
 !
       end subroutine sel_ICB_sph_scalar_advect

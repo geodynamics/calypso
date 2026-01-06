@@ -191,12 +191,9 @@
 !
 !* obtain linear terms for starting
 !*
-      if(iflag_debug .gt. 0) write(*,*) 'set_MHD_evolved_boundaries'
-      call set_MHD_evolved_boundaries(MHD_step%time_d, SPH_MHD%sph,     &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
-!
       if(iflag_debug .gt. 0) write(*,*) 'set_sph_field_to_start'
-      call set_sph_field_to_start(SPH_MHD%sph%sph_rj, SPH_WK%r_2nd,     &
+      call set_sph_field_to_start                                       &
+     &   (MHD_step%time_d, SPH_MHD%sph, SPH_WK%r_2nd,                   &
      &    SPH_model%MHD_prop, SPH_model%refs, SPH_model%sph_MHD_bc,     &
      &    SPH_WK%trans_p%leg, SPH_MHD%ipol, SPH_MHD%fld)
 !

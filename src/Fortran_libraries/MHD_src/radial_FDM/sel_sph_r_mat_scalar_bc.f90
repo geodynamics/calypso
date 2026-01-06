@@ -80,7 +80,7 @@
 !      else if(sph_bc_U%iflag_icb .eq. iflag_free_sph) then
 !      else if(sph_bc_U%iflag_icb .eq. iflag_evolve_field) then
 !      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_field) then
-!      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_velo) then
+!      else if(sph_bc_U%iflag_icb .eq. iflag_non_slip) then
       else
         call add_icb_scalar_poisson_mat                                 &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &

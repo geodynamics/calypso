@@ -254,8 +254,8 @@
 !
       if(sph_bc%iflag_icb .eq. iflag_sph_filter_center) then
         call set_sph_filter_vect_to_center                              &
-     &     (sph_rj%nidx_rj, bcs_S%ICB_Sspec%S_BC, is_scalar,            &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &     (sph_rj%nidx_rj, bcs_S%ICB_Sspec%S_BC,                       &
+     &      rj_fld%n_point, rj_fld%d_fld(1,is_scalar))
       end if
 !
       call fill_scalar_at_external                                      &

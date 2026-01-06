@@ -116,7 +116,7 @@
      &        one, band_vs_poisson%mat)
 !      else if(sph_bc_U%iflag_icb .eq. iflag_evolve_field) then
 !      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_field) then
-!      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_velo) then
+!      else if(sph_bc_U%iflag_icb .eq. iflag_non_slip) then
         else
           call add_fix_flux_icb_poisson_mat                             &
      &       (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,           &
@@ -170,7 +170,7 @@
      &        coef_dvt, band_vt_evo%mat)
 !      else if(sph_bc_U%iflag_icb .eq. iflag_evolve_field) then
 !      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_field) then
-!      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_velo) then
+!      else if(sph_bc_U%iflag_icb .eq. iflag_non_slip) then
 !      else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         else
           call set_fix_fld_icb_poisson_mat                              &
@@ -210,7 +210,7 @@
      &      one, band_vs_poisson%mat)
 !      else if(sph_bc_U%iflag_cmb .eq. iflag_evolve_field) then
 !      else if(sph_bc_U%iflag_cmb .eq. iflag_fixed_field) then
-!      else if(sph_bc_U%iflag_cmb .eq. iflag_fixed_velo) then
+!      else if(sph_bc_U%iflag_cmb .eq. iflag_non_slip) then
       else
         call add_fix_flux_cmb_poisson_mat                               &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
@@ -250,7 +250,7 @@
      &      coef_dvt, band_vt_evo%mat)
 !      else if(sph_bc_U%iflag_cmb .eq. iflag_evolve_field) then
 !      else if(sph_bc_U%iflag_cmb .eq. iflag_fixed_field) then
-!      else if(sph_bc_U%iflag_cmb .eq. iflag_fixed_velo) then
+!      else if(sph_bc_U%iflag_cmb .eq. iflag_non_slip) then
       else
         call set_fix_fld_cmb_poisson_mat                                &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &
