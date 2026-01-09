@@ -94,7 +94,7 @@
         call cal_sph_nod_cmb_qvc_b_and_j(sph_rj%nidx_rj(2), g_sph_rj,   &
      &      sph_bc_B%kr_out, sph_bc_B%r_CMB,                            &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
-     &      is_magne, is_current, n_point, ntot_phys_rj, d_rj)
+     &      n_point, d_rj(1,is_magne), d_rj(1,is_current))
       else if(sph_bc_B%iflag_cmb .eq. iflag_evolve_field) then
         call cal_sph_nod_cmb_rigid_vect                                 &
      &     (sph_rj%nidx_rj(2), sph_bc_B%kr_out,                         &
@@ -109,7 +109,7 @@
         call cal_sph_nod_cmb_ins_b_and_j(sph_rj%nidx_rj(2), g_sph_rj,   &
      &      sph_bc_B%kr_out, sph_bc_B%r_CMB,                            &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
-     &      is_magne, is_current, n_point, ntot_phys_rj, d_rj)
+     &      n_point, d_rj(1,is_magne), d_rj(1,is_current))
       end if
 !
       end subroutine sel_CMB_grad_bp_and_current
@@ -136,9 +136,8 @@
 !
 !
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
-        call cal_sph_nod_cmb_qvc_mag2                                   &
-     &     (sph_rj%nidx_rj(2), sph_bc_B%kr_out, is_magne,               &
-     &      n_point, ntot_phys_rj, d_rj)
+        call cal_sph_nod_cmb_qvc_mag2(sph_rj%nidx_rj(2),                &
+     &      sph_bc_B%kr_out, n_point, d_rj(1,is_magne))
       else if(sph_bc_B%iflag_cmb .eq. iflag_evolve_field) then
         call cal_sph_nod_cmb_rigid_vect                                 &
      &     (sph_rj%nidx_rj(2), sph_bc_B%kr_out,                         &
@@ -147,8 +146,7 @@
 !      else if(sph_bc_B%iflag_cmb .eq. iflag_sph_insulator) then
       else
         call cal_sph_nod_cmb_ins_mag2(sph_rj%nidx_rj(2), g_sph_rj,      &
-     &      sph_bc_B%kr_out, sph_bc_B%r_CMB, is_magne,                  &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      sph_bc_B%kr_out, sph_bc_B%r_CMB, n_point, d_rj(1,is_magne))
       end if
 !
       end subroutine sel_CMB_grad_poloidal_magne
@@ -177,7 +175,7 @@
         call cal_sph_nod_cmb_qvc_rot2(sph_rj%nidx_rj(2), g_sph_rj,      &
      &      sph_bc_B%kr_out, sph_bc_B%r_CMB,                            &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
-     &      is_magne, is_current, n_point, ntot_phys_rj, d_rj)
+     &      n_point, d_rj(1,is_magne), d_rj(1,is_current))
       else if(sph_bc_B%iflag_cmb .eq. iflag_evolve_field) then
         call cal_sph_nod_cmb_fixed_rot2(sph_rj%nidx_rj(2), g_sph_rj,    &
      &      sph_bc_B%kr_out, sph_bc_B%r_CMB,                            &
@@ -188,7 +186,7 @@
         call cal_sph_nod_cmb_ins_rot2(sph_rj%nidx_rj(2), g_sph_rj,      &
      &      sph_bc_B%kr_out, sph_bc_B%r_CMB,                            &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
-     &      is_magne, is_current, n_point, ntot_phys_rj, d_rj)
+     &      n_point, d_rj(1,is_magne), d_rj(1,is_current))
       end if
 !
       end subroutine sel_CMB_sph_current
@@ -214,14 +212,13 @@
 !
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_vp_rot2                                &
-     &     (sph_rj%nidx_rj(2), sph_bc_B%kr_out, is_fld, is_rot,         &
-     &      n_point, ntot_phys_rj, d_rj)
+     &     (sph_rj%nidx_rj(2), sph_bc_B%kr_out,                         &
+     &      n_point, d_rj(1,is_fld), d_rj(1,is_rot))
 !      else if(sph_bc_B%iflag_cmb .eq. iflag_sph_insulator) then
       else
         call cal_sph_nod_cmb_ins_vp_rot2                                &
      &     (sph_rj%nidx_rj(2), g_sph_rj, sph_bc_B%kr_out,               &
-     &      sph_bc_B%r_CMB, is_fld, is_rot,                             &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      sph_bc_B%r_CMB, n_point, d_rj(1,is_fld), d_rj(1,is_rot))
       end if
 !
       end subroutine sel_CMB_sph_rotation_uxb
@@ -255,8 +252,7 @@
      &     (sph_rj%nidx_rj(2), g_sph_rj,                                &
      &      sph_bc_B%kr_out, sph_bc_B%r_CMB,                            &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
-     &      coef_diffuse, is_magne, is_ohmic,                           &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      coef_diffuse, n_point, d_rj(1,is_magne), d_rj(1,is_ohmic))
       else if(sph_bc_B%iflag_cmb .eq. iflag_evolve_field) then
         call cal_sph_nod_cmb_fixed_diffuse2(sph_rj%nidx_rj(2),          &
      &      g_sph_rj, sph_bc_B%kr_out, sph_bc_B%r_CMB,                  &
@@ -268,8 +264,7 @@
      &     (sph_rj%nidx_rj(2), g_sph_rj,                                &
      &      sph_bc_B%kr_out, sph_bc_B%r_CMB,                            &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
-     &      coef_diffuse, is_magne, is_ohmic,                           &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      coef_diffuse, n_point, d_rj(1,is_magne), d_rj(1,is_ohmic))
       end if
 !
       call cal_dsdr_sph_no_bc_out_2(sph_rj%nidx_rj(2), sph_bc_B%kr_out, &

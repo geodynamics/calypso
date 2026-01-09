@@ -7,15 +7,19 @@
 !>@brief  Update each field for MHD dynamo model
 !!
 !!@verbatim
-!!      subroutine cal_sol_velo_by_vort_sph_crank                       &
-!!     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, bcs_U,            &
+!!      subroutine cal_sol_velo_by_vort_sph_crank(dt, sph_rj, leg,      &
+!!     &          r_2nd, fl_prop, sph_bc_U, bc_fdms_U, bcs_U,           &
 !!     &          band_vp_evo, band_vt_evo, ipol, rj_fld)
+!!        real(kind = kreal), intent(in) :: dt
 !!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(fluid_property), intent(in) :: fl_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(sph_vector_boundary_data), intent(in) :: bcs_U
 !!        type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
-!!        type(band_matrices_type), intent(in) :: band_vp_evo, band_vt_evo
+!!        type(band_matrices_type), intent(in) :: band_vp_evo
+!!        type(band_matrices_type), intent(in) :: band_vt_evo
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(inout) :: rj_fld
 !!          Input address:    ipol%base%i_vort, ipol%base%i_vort+2
@@ -84,10 +88,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sol_velo_by_vort_sph_crank                         &
-     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, bcs_U,              &
+      subroutine cal_sol_velo_by_vort_sph_crank(dt, sph_rj, leg,        &
+     &          r_2nd, fl_prop, sph_bc_U, bc_fdms_U, bcs_U,             &
      &          band_vp_evo, band_vt_evo, ipol, rj_fld)
 !
+      use t_physical_property
+      use t_schmidt_poly_on_rtm
       use t_coef_sph_velocity_BCs
       use copy_field_smp
       use solve_sph_fluid_crank
@@ -95,13 +101,19 @@
       use set_evoluved_boundaries
       use select_exp_velocity_ICB
       use select_exp_velocity_CMB
+      use select_exp_viscosity_ICB
+      use select_exp_viscosity_CMB
 !
+      real(kind = kreal), intent(in) :: dt
       type(sph_rj_grid), intent(in) :: sph_rj
+      type(legendre_4_sph_trans), intent(in) :: leg
       type(fdm_matrices), intent(in) :: r_2nd
+      type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_vector_boundary_data), intent(in) :: bcs_U
       type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
-      type(band_matrices_type), intent(in) :: band_vp_evo, band_vt_evo
+      type(band_matrices_type), intent(in) :: band_vp_evo
+      type(band_matrices_type), intent(in) :: band_vt_evo
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
@@ -117,6 +129,13 @@
       call delete_zero_degree_vect                                      &
      &   (ipol%base%i_velo, sph_rj%idx_rj_degree_zero, rj_fld%n_point,  &
      &    sph_rj%nidx_rj, rj_fld%ntot_phys, rj_fld%d_fld)
+!
+      call sel_ICB_sph_wtor_evo_RHS(dt, sph_rj, leg%g_sph_rj, r_2nd,    &
+     &    fl_prop, sph_bc_U, bcs_U%ICB_Vspec, ipol%base%i_velo,         &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      call sel_CMB_sph_wtor_evo_RHS(dt, sph_rj, leg%g_sph_rj, r_2nd,    &
+     &    fl_prop, sph_bc_U, bcs_U%CMB_Vspec, ipol%base%i_velo,         &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call sel_ICB_grad_poloidal_moment(sph_rj, r_2nd, sph_bc_U,        &
      &    bcs_U%ICB_Vspec, bc_fdms_U%fdm2_free_ICB, ipol%base%i_velo,   &

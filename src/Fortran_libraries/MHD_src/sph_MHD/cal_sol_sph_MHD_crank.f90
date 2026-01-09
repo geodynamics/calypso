@@ -100,7 +100,8 @@
      &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
         if (iflag_debug .gt. 0)                                         &
      &       write(*,*) 'cal_sol_velo_by_vort_sph_crank'
-        call cal_sol_velo_by_vort_sph_crank(sph%sph_rj, r_2nd,          &
+        call cal_sol_velo_by_vort_sph_crank                             &
+     &    (time_d%dt, sph%sph_rj, leg, r_2nd, MHD_prop%fl_prop,         &
      &     sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_fdms_U, sph_MHD_bc%bcs_U, &
      &     sph_MHD_mat%band_vp_evo, sph_MHD_mat%band_vt_evo,            &
      &     ipol, rj_fld)

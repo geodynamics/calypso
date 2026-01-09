@@ -107,8 +107,8 @@
 !
       use t_coef_sph_velocity_BCs
       use cal_sph_exp_1st_diff
-      use select_exp_velocity_ICB
-      use select_exp_velocity_CMB
+      use select_exp_viscosity_ICB
+      use select_exp_viscosity_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -150,8 +150,8 @@
 !
       use t_coef_sph_velocity_BCs
       use cal_sph_exp_1st_diff
-      use select_exp_velocity_ICB
-      use select_exp_velocity_CMB
+      use select_exp_viscosity_ICB
+      use select_exp_viscosity_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd

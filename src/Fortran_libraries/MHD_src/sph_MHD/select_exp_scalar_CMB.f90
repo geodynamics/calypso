@@ -124,10 +124,9 @@
 !      else if(sph_bc%iflag_cmb .eq. iflag_fixed_flux                   &
 !     &    .or. sph_bc%iflag_cmb .eq. iflag_evolve_flux) then
       else
-        call poisson_out_fixed_flux_sph                                 &
-     &     (sph_rj%nidx_rj(2), sph_bc%kr_out, sph_bc%r_CMB,             &
-     &      sph_bc%fdm2_fix_dr_CMB, CMB_Sspec%S_BC, is_field,           &
-     &      n_point, ntot_phys_rj, d_rj)
+        call poisson_out_fixed_flux_sph(sph_rj%nidx_rj(2),              &
+     &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB,        &
+     &      CMB_Sspec%S_BC, n_point, d_rj(1,is_field))
       end if
 !
       end subroutine set_CMB_scalar_sph_crank
@@ -156,14 +155,13 @@
 !
       if (sph_bc%iflag_cmb .eq. iflag_fixed_flux                        &
      &    .or. sph_bc%iflag_cmb .eq. iflag_evolve_flux) then
-        call dsdr_sph_out_fix_flux_2                                    &
-     &     (sph_rj%nidx_rj(2), g_sph_rj, sph_bc%kr_out,                 &
-     &      sph_bc%r_CMB, CMB_Sspec%S_BC, is_fld, is_grad,              &
-     &      n_point, ntot_phys_rj, d_rj)
+        call dsdr_sph_out_fix_flux_2(sph_rj%nidx_rj(2), g_sph_rj,       &
+     &      sph_bc%kr_out, sph_bc%r_CMB, CMB_Sspec%S_BC,                &
+     &      n_point, d_rj(1,is_fld), d_rj(1,is_grad))
         call dsdr_sph_lm0_out_fix_flux_2                                &
      &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(2),               &
-     &      sph_bc%kr_out, sph_bc%r_CMB, CMB_Sspec%S_BC, is_grad,       &
-     &      n_point, ntot_phys_rj, d_rj)
+     &      sph_bc%kr_out, sph_bc%r_CMB, CMB_Sspec%S_BC,                &
+     &      n_point, d_rj(1,is_grad))
 !      else if(sph_bc%iflag_cmb .eq. iflag_fixed_field                  &
 !     &   .or. sph_bc%iflag_cmb .eq. iflag_evolve_field) then
       else
@@ -202,10 +200,9 @@
 !
       if (sph_bc%iflag_cmb .eq. iflag_fixed_flux                        &
      &    .or. sph_bc%iflag_cmb .eq. iflag_evolve_flux) then
-        call cal_div_sph_out_fix_flux_2                                 &
-     &     (sph_rj%nidx_rj(2), g_sph_rj, sph_bc%kr_out,                 &
-     &      sph_bc%r_CMB, CMB_Sspec%S_BC, is_flux, is_advect,           &
-     &      n_point, ntot_phys_rj, d_rj)
+        call cal_div_sph_out_fix_flux_2(sph_rj%nidx_rj(2), g_sph_rj,    &
+     &      sph_bc%kr_out, sph_bc%r_CMB, CMB_Sspec%S_BC,                &
+     &      n_point, d_rj(1,is_flux), d_rj(1,is_advect))
 !      else if(sph_bc%iflag_cmb .eq. iflag_fixed_field                  &
 !     &   .or. sph_bc%iflag_cmb .eq. iflag_evolve_field) then
       else
