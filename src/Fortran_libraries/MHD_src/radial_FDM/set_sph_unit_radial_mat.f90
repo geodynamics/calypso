@@ -9,8 +9,8 @@
 !!@verbatim
 !!      subroutine set_unit_mat5_4_time_evo(nri, jmax, mat5)
 !!      subroutine set_unit_mat_4_time_evo(nri, jmax, mat3)
-!!      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,     &
-!!     &          mat3)
+!!      subroutine set_unit_mat_4_poisson                               &
+!!     &         (nri, jmax, kr_in, kr_out,  mat3)
 !!        integer(kind = kint), intent(in) :: jmax, nri
 !!        integer(kind = kint), intent(in) :: kr_in, kr_out
 !!        real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
@@ -140,8 +140,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,       &
-     &          mat3)
+      subroutine set_unit_mat_4_poisson                                 &
+     &         (nri, jmax, kr_in, kr_out,  mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
       integer(kind = kint), intent(in) :: kr_in, kr_out

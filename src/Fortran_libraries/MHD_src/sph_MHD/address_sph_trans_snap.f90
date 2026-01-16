@@ -115,8 +115,12 @@
       call add_scalar_comps_sph_trns_snap                               &
      &   (d_rj, ipol%fld_cmp, iphys%fld_cmp, b_trns%fld_cmp,            &
      &    trns_back)
+      call add_sym_scl_cmps_sph_trns_snap                               &
+     &   (d_rj, ipol%fld_cmp, iphys%fld_cmp, b_trns%fld_cmp,            &
+     &    trns_back)
 !
-      if(iflag_debug.gt.0) write(*,*) 'add_flux_prods_sph_trns_snap backward'
+      if(iflag_debug .gt. 0)                                            &
+     &     write(*,*) 'add_flux_prods_sph_trns_snap backward'
       call add_flux_prods_sph_trns_snap                                 &
      &   (d_rj, ipol%prod_fld, iphys%prod_fld, b_trns%prod_fld,         &
      &    trns_back)

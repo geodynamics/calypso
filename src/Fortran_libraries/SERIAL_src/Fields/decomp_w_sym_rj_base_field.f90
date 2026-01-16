@@ -8,9 +8,8 @@
 !> @brief decomp base fields
 !!
 !!@verbatim
-!!      subroutine s_decomp_rj_base_field(ltr_filter, sph_rj,           &
-!!     &          base_fld, filter_fld, rj_fld)
-!!        integer(kind = kint), intent(in) :: ltr_filter
+!!      subroutine s_decomp_w_sym_rj_base_field(sph_rj,                 &
+!!     &          base_fld, sym_fld, asym_fld, rj_fld)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(base_field_address), intent(in) :: base_fld
 !!        type(base_field_address), intent(in) :: filter_fld
@@ -84,8 +83,8 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine decomp_rj_vector(sph_rj,                 &
-     &          rj_fld, ipol_fld, ipol_sym, ipol_asym)
+      subroutine decomp_rj_vector(sph_rj, rj_fld, ipol_fld,             &
+     &                            ipol_sym, ipol_asym)
 !
       integer(kind = kint), intent(in) :: ipol_fld, ipol_sym, ipol_asym
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -141,8 +140,8 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine decomp_rj_scalar(sph_rj,                               &
-     &          rj_fld, ipol_fld, ipol_sym, ipol_asym)
+      subroutine decomp_rj_scalar(sph_rj, rj_fld, ipol_fld,             &
+     &                            ipol_sym, ipol_asym)
 !
       integer(kind = kint), intent(in) :: ipol_fld, ipol_sym, ipol_asym
       type(sph_rj_grid), intent(in) :: sph_rj

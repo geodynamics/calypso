@@ -93,7 +93,7 @@
         call add_phys_name_ctl(entropy, field_ctl)
       end if
 !
-      if( check_field_list_ctl(sym_perturbation_temp, field_ctl)        &
+      if(      check_field_list_ctl(sym_perturbation_temp, field_ctl)   &
      &    .or. check_field_list_ctl(asym_perturbation_temp, field_ctl)  &
      &   ) then
         call add_phys_name_ctl(perturbation_temp, field_ctl)
@@ -115,6 +115,41 @@
       end if
 !
       end subroutine add_field_w_symmetry_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_field_ctl_4_sym_scl_comps(field_ctl)
+!
+      use m_field_component_labels
+      use m_base_field_labels
+      use add_nodal_fields_ctl
+!
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
+!
+      if(check_field_list_ctl(sym_temp_from_CMB, field_ctl)) then
+        call add_phys_name_ctl(sym_temperature, field_ctl)
+      end if
+!
+      if(check_field_list_ctl(sym_comp_from_CMB, field_ctl)) then
+        call add_phys_name_ctl(sym_composition, field_ctl)
+      end if
+!
+      if(check_field_list_ctl(sym_density_from_CMB, field_ctl)) then
+        call add_phys_name_ctl(sym_density, field_ctl)
+      end if
+!
+      if(check_field_list_ctl(sym_entropy_from_CMB, field_ctl)) then
+        call add_phys_name_ctl(sym_entropy, field_ctl)
+      end if
+!
+      if(   check_field_list_ctl(sym_pressure_from_CMB, field_ctl)      &
+     & .or. check_field_list_ctl(sym_aspherical_pressure, field_ctl)    &
+     &  ) then
+        call add_phys_name_ctl(sym_pressure, field_ctl)
+      end if
+!
+      end subroutine add_field_ctl_4_sym_scl_comps
 !
 ! -----------------------------------------------------------------------
 !

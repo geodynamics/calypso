@@ -76,6 +76,9 @@
       call add_force_by_sym_sym_ctl(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &    'add_force_by_sym_sym_ctl end'
+      call add_field_ctl_4_sym_scl_comps(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_field_ctl_4_sym_scl_comps end'
 !
       call add_field_w_symmetry_ctl(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &

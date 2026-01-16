@@ -113,6 +113,13 @@
       real(kind = kreal) :: coef_dvt
 !
 !
+!      do j = 1, sph_rj%nidx_rj(2)
+!        if(sph_rj%idx_gl_1d_rj_j(j,3) .ne. 0) cycle
+!        write(*,'(i4,a,2i4,f5.2,i4)') my_rank, 'BC_Lmax', j,           &
+!     &          sph_rj%idx_gl_1d_rj_j(j,2), bcs_U%ICB_Vspec%Vp_BC(j),  &
+!     &          int(bcs_U%ICB_Vspec%Vp_BC(j))
+!      end do
+!
       band_vs_poisson%mat_name = wt_poison_name
       band_wt_evo%mat_name =     wt_evo_name
       band_vp_evo%mat_name =     vp_evo_name

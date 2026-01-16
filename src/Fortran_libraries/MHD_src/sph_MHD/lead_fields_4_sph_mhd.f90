@@ -146,12 +146,14 @@
      &      sph_MHD_mat%band_p_poisson, SPH_MHD%ipol, SPH_MHD%fld)
       end if
 !
-      call s_adjust_scalar_rj_fields(SPH_MHD%sph,                       &
-     &    SPH_MHD%ipol%base, SPH_MHD%ipol%fld_cmp,                      &
-     &    SPH_MHD%ipol%prod_fld, SPH_MHD%fld)
       call s_decomp_w_sym_rj_base_field(SPH_MHD%sph%sph_rj,             &
      &    SPH_MHD%ipol%base, SPH_MHD%ipol%sym_fld,                      &
      &    SPH_MHD%ipol%asym_fld, SPH_MHD%fld)
+      call s_adjust_scalar_rj_fields(SPH_MHD%sph,                       &
+     &    SPH_MHD%ipol%base, SPH_MHD%ipol%fld_cmp,                      &
+     &    SPH_MHD%ipol%prod_fld, SPH_MHD%fld)
+      call adjust_sym_scalar_rj_fields(SPH_MHD%sph,                     &
+     &    SPH_MHD%ipol%sym_fld, SPH_MHD%ipol%fld_cmp, SPH_MHD%fld)
 !
       call sel_field_address_for_buoyancies(SPH_MHD%ipol%sym_fld,       &
      &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &

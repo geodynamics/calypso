@@ -14,6 +14,12 @@
 !!        type(field_component_address), intent(in) :: ipol_cmp
 !!        type(phys_products_address), intent(in) :: ipol_prod
 !!        type(phys_data), intent(inout) :: rj_fld
+!!      subroutine adjust_sym_scalar_rj_fields                          &
+!!     &         (sph, ipol_sym_base, ipol_cmp, rj_fld)
+!!        type(sph_grids), intent(in) :: sph
+!!        type(base_field_address), intent(in) :: ipol_sym_base
+!!        type(field_component_address), intent(in) :: ipol_cmp
+!!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
 !
       module adjust_scalar_rj_fields
@@ -71,6 +77,11 @@
      &      rj_fld%d_fld(1,ipol_cmp%i_density_from_CMB))
       end if
 !
+      if(ipol_cmp%i_pressure_from_CMB .gt. 0) then
+        call shift_by_CMB_average(sph%sph_params, sph%sph_rj,           &
+     &      rj_fld%d_fld(1,ipol_base%i_press),                          &
+     &      rj_fld%d_fld(1,ipol_cmp%i_pressure_from_CMB))
+      end if
 !
       if(ipol_cmp%i_asph_pressure .gt. 0) then
         call remove_sphere_average(sph%sph_rj,                          &
@@ -92,6 +103,61 @@
       end if
 !
       end subroutine s_adjust_scalar_rj_fields
+!
+!-----------------------------------------------------------------------
+!
+      subroutine adjust_sym_scalar_rj_fields                            &
+     &         (sph, ipol_sym_base, ipol_cmp, rj_fld)
+!
+      use t_base_field_labels
+      use t_field_component_labels
+      use t_field_product_labels
+      use t_phys_data
+!
+      type(sph_grids), intent(in) :: sph
+      type(base_field_address), intent(in) :: ipol_sym_base
+      type(field_component_address), intent(in) :: ipol_cmp
+!
+      type(phys_data), intent(inout) :: rj_fld
+!
+!
+      if(ipol_cmp%i_sym_temp_from_CMB .gt. 0) then
+        call shift_by_CMB_average(sph%sph_params, sph%sph_rj,           &
+     &      rj_fld%d_fld(1,ipol_sym_base%i_temp),                       &
+     &      rj_fld%d_fld(1,ipol_cmp%i_sym_temp_from_CMB))
+      end if
+!
+      if(ipol_cmp%i_sym_light_from_CMB .gt. 0) then
+        call shift_by_CMB_average(sph%sph_params, sph%sph_rj,           &
+     &      rj_fld%d_fld(1,ipol_sym_base%i_light),                      &
+     &      rj_fld%d_fld(1,ipol_cmp%i_sym_light_from_CMB))
+      end if
+!
+      if(ipol_cmp%i_sym_entropy_from_CMB .gt. 0) then
+        call shift_by_CMB_average(sph%sph_params, sph%sph_rj,           &
+     &      rj_fld%d_fld(1,ipol_sym_base%i_entropy),                    &
+     &      rj_fld%d_fld(1,ipol_cmp%i_sym_entropy_from_CMB))
+      end if
+!
+      if(ipol_cmp%i_sym_density_from_CMB .gt. 0) then
+        call shift_by_CMB_average(sph%sph_params, sph%sph_rj,           &
+     &      rj_fld%d_fld(1,ipol_sym_base%i_density),                    &
+     &      rj_fld%d_fld(1,ipol_cmp%i_sym_density_from_CMB))
+      end if
+!
+      if(ipol_cmp%i_sym_pressure_from_CMB .gt. 0) then
+        call shift_by_CMB_average(sph%sph_params, sph%sph_rj,           &
+     &      rj_fld%d_fld(1,ipol_sym_base%i_press),                      &
+     &      rj_fld%d_fld(1,ipol_cmp%i_sym_pressure_from_CMB))
+      end if
+!
+      if(ipol_cmp%i_sym_asph_pressure .gt. 0) then
+        call remove_sphere_average(sph%sph_rj,                          &
+     &      rj_fld%d_fld(1,ipol_sym_base%i_press),                      &
+     &      rj_fld%d_fld(1,ipol_cmp%i_sym_asph_pressure))
+      end if
+!
+      end subroutine adjust_sym_scalar_rj_fields
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

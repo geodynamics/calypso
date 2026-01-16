@@ -232,8 +232,8 @@
       real(kind = kreal) :: coef_dvt
 !
 !
-      if(      (sph_bc_U%iflag_cmb .eq. iflag_evolve_field)             &
-     &    .or. (sph_bc_U%iflag_cmb .eq. iflag_fixed_field)) then
+      if(      (sph_bc_U%iflag_icb .eq. iflag_evolve_field)             &
+     &    .or. (sph_bc_U%iflag_icb .eq. iflag_fixed_field)) then
         if(fl_prop%coef_velo .eq. zero) then
           coef_dvt = one
         else
