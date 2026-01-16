@@ -105,7 +105,7 @@
      &         (d_rj, ipol, iphys, trns_eflux,                          &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
-      use address_sph_trans_snap
+      use address_sph_trans_ene_flux
 !
       type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
@@ -148,7 +148,7 @@
      &         (d_rj, ipol, iphys, trns_difv,                           &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
-      use address_sph_trans_snap
+      use address_sph_trans_ene_flux
 !
       type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
