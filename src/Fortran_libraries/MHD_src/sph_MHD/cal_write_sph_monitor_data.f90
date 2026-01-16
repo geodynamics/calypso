@@ -193,6 +193,7 @@
       use cal_heat_source_Nu
       use cal_CMB_dipolarity
       use cal_typical_scale
+      use pick_CMB_average
       use const_data_4_dynamobench
       use sph_fwd_trans_on_circles
 !
@@ -231,6 +232,10 @@
      &      sph_MHD_bc%fdm2_center, MHD_mats%band_C00_poisson_fixC,     &
      &      rj_fld, monitor%comp_Nusselt)
       end if
+!!
+      if(iflag_debug.gt.0)  write(*,*) 's_pick_CMB_average'
+      call s_pick_CMB_average(my_rank, sph%sph_rj, ipol, rj_fld,        &
+     &                        monitor%ave_CMB)
 !
       if(iflag_debug.gt.0)  write(*,*) 's_cal_CMB_dipolarity'
       call s_cal_CMB_dipolarity(my_rank, rj_fld,                        &
@@ -303,6 +308,10 @@
      &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
      &      ipol%base%i_magne, monitor%dip)
       end if
+!
+      call write_CMB_average(my_rank, time_d%i_time_step, time_d%time,  &
+     &    sph_params%l_truncation, sph_rj%nidx_rj(1),                   &
+     &    sph_params%nlayer_CMB, monitor%ave_CMB)
 !
       call write_typical_scales(time_d%i_time_step, time_d%time,        &
      &    sph_params, sph_rj, sph_MHD_bc%sph_bc_U,                      &

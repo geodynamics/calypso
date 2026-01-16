@@ -46,6 +46,7 @@
       use t_boundary_params_sph_MHD
       use t_field_on_circle
       use t_field_4_dynamobench
+      use t_CMB_average_data
 !
       use pickup_sph_spectr_data
 !
@@ -70,6 +71,8 @@
 !>        Structure for Nusselt number data
         type(nusselt_number_data) :: comp_Nusselt
 !
+!>        Structure for CMB average data
+        type(CMB_average_data) :: ave_CMB
 !>        Structure for dipolarity data
         type(dipolarity_data) :: dip
 !>        Structure for typical scale data
@@ -113,6 +116,7 @@
       use m_error_IDs
       use cal_rms_fields_by_sph
       use cal_CMB_dipolarity
+      use pick_CMB_average
       use write_picked_sph_spectr
       use t_solver_SR
 !
@@ -130,6 +134,9 @@
       call init_energy_labels_base(monitor%ene_labels)
       call init_sph_spectr_data_and_file(sph, rj_fld, monitor)
 !
+      call init_CMB_average_field_list                                  &
+     &   (my_rank, sph%sph_params, sph%sph_rj, ipol,                    &
+     &    monitor%pwr, monitor%ave_CMB)
       call init_dipolarity_4_sph_spectr(sph%sph_params, monitor%pwr,    &
      &                                  monitor%dip)
 !

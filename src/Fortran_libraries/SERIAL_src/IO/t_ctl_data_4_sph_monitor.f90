@@ -40,6 +40,9 @@
 !!    heat_Nusselt_number_format        'gzip'
 !!    comp_Nusselt_number_format        'gzip'
 !!
+!!    CMB_average_file_prefix         'CMB_average'
+!!    CMB_average_file_format         'gzip'
+!!
 !!    typical_scale_prefix         'typical_scale'
 !!    typical_scale_format         'gzip'
 !!!
@@ -153,9 +156,13 @@
 !
 !>        Structure for typical scale file prefix
         type(read_character_item) :: typ_scale_file_prefix_ctl
-!
 !>        Structure for typical scale file format
         type(read_character_item) :: typ_scale_file_format_ctl
+!
+!>        Structure for CMB average data prefix
+        type(read_character_item) :: CMB_ave_file_prefix_ctl
+!>        Structure for CMB average data file format
+        type(read_character_item) :: CMB_ave_file_format_ctl
 !
         integer (kind = kint) :: i_sph_monitor = 0
       end type sph_monitor_control
@@ -195,8 +202,11 @@
       smonitor_ctl%heat_Nusselt_file_format%iflag =  0
       smonitor_ctl%comp_Nusselt_file_prefix%iflag =  0
       smonitor_ctl%comp_Nusselt_file_format%iflag =  0
+!
       smonitor_ctl%typ_scale_file_prefix_ctl%iflag = 0
       smonitor_ctl%typ_scale_file_format_ctl%iflag = 0
+      smonitor_ctl%CMB_ave_file_prefix_ctl%iflag =   0
+      smonitor_ctl%CMB_ave_file_format_ctl%iflag =   0
 !
       do i = 1, smonitor_ctl%num_vspec_ctl
        call reset_volume_spectr_control(smonitor_ctl%v_pwr(i))

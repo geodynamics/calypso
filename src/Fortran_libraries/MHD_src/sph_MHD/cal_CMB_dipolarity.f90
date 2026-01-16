@@ -66,7 +66,7 @@
       integer(kind = kint) :: i, num
       character(len = kchara) :: input_flag
 !
-!    Turn On Nusselt number if temperature gradient is there
+!    Turn On dipolarity
       dip%iflag_dipolarity = 0
       do i = 1, rj_fld%num_phys
         if(rj_fld%phys_name(i) .eq. magnetic_field%name) then
@@ -83,25 +83,25 @@
         dip%iflag_dipolarity = 0
       end if
 !
+      if(dip%iflag_dipolarity .le. 0) return
+!
       dip%flag_gzip_dipolarity = .FALSE.
-      if(dip%iflag_dipolarity .gt. 0) then
-        if(fdip_file_format%iflag .gt. 0) then
-          input_flag = fdip_file_format%charavalue
-          if(check_mul_flags(input_flag, gzip_flags))                   &
+      if(fdip_file_format%iflag .gt. 0) then
+        input_flag = fdip_file_format%charavalue
+        if(check_mul_flags(input_flag, gzip_flags))                     &
      &                           dip%flag_gzip_dipolarity = .TRUE.
-        end if
-!
-        num = 1
-        if(fdip_truncation%num .gt. 0) then
-          num = fdip_truncation%num + 1
-        end if
-        call alloc_dipolarity_data(num, dip)
-!
-        dip%ltr_max(1) = -1
-        do i = 2, dip%num_dip
-          dip%ltr_max(i) = fdip_truncation%ivec(i-1)
-        end do
       end if
+!
+      num = 1
+      if(fdip_truncation%num .gt. 0) then
+        num = fdip_truncation%num + 1
+      end if
+      call alloc_dipolarity_data(num, dip)
+!
+      dip%ltr_max(1) = -1
+      do i = 2, dip%num_dip
+        dip%ltr_max(i) = fdip_truncation%ivec(i-1)
+      end do
 !
       end subroutine set_ctl_dipolarity_params
 !
@@ -120,22 +120,21 @@
       integer(kind = kint) :: i, knum
 !
 !
-      if(dip%iflag_dipolarity .gt. 0) then
-        do i = 1, dip%num_dip
-          if(dip%ltr_max(i).le.0                                        &
+      if(dip%iflag_dipolarity .le. 0) return
+      do i = 1, dip%num_dip
+        if(dip%ltr_max(i).le.0                                          &
      &            .or. dip%ltr_max(i).gt.sph_params%l_truncation) then
-            dip%ltr_max(i) = sph_params%l_truncation
-          end if
-          dip%dip_name(i) = append_index(dip%ltr_max(i), dip_ltr_label) 
-        end do
+          dip%ltr_max(i) = sph_params%l_truncation
+        end if
+        dip%dip_name(i) = append_index(dip%ltr_max(i), dip_ltr_label)
+      end do
 !
-        do knum = 1, pwr%nri_rms
-          if(pwr%kr_4_rms(knum,1) .eq. sph_params%nlayer_CMB) then
-            dip%krms_CMB = knum
-            dip%rdip_CMB = sph_params%radius_CMB
-          end if
-        end do
-      end if
+      do knum = 1, pwr%nri_rms
+        if(pwr%kr_4_rms(knum,1) .eq. sph_params%nlayer_CMB) then
+          dip%kr_dip_CMB = knum
+          dip%rdip_CMB =   sph_params%radius_CMB
+        end if
+      end do
 !
       end subroutine init_dipolarity_4_sph_spectr
 !
@@ -168,14 +167,14 @@
       if(dip%icomp_mene .le. 0) return
 !
       if(id_rank .eq. pwr%irank_l) then
-        pwr_g10 = pwr%shl_l(dip%krms_CMB,1,dip%icomp_mene)
+        pwr_g10 = pwr%shl_l(dip%kr_dip_CMB,1,dip%icomp_mene)
 !
         do i = 1, dip%num_dip
           me_cmb_d = 0.0d0
 !$omp parallel do reduction(+:me_cmb_d)
           do l = 1, dip%ltr_max(i)
             me_cmb_d = me_cmb_d                                         &
-     &                + pwr%shl_l(dip%krms_CMB,l,dip%icomp_mene)
+     &                + pwr%shl_l(dip%kr_dip_CMB,l,dip%icomp_mene)
           end do
 !$omp end parallel do
           dip%f_dip(i) = pwr_g10 / me_cmb_d
