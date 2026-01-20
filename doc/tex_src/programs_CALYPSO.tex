@@ -365,6 +365,10 @@ Block \verb|MHD_control|  (Top block of the control file)
 			{\tt comp\_nusselt\_number\_prefix       [file\_prefix]}
 	\item \hyperref[href_t:comp_nusselt_number_format]
 			{\tt comp\_nusselt\_number\_format       [file\_format]}
+	\item \hyperref[href_t:CMB_average_file_prefix]
+			{\tt CMB\_average\_file\_prefix          [file\_prefix]}
+	\item \hyperref[href_t:CMB_average_file_format]
+			{\tt CMB\_average\_file\_format          [file\_format]}
 %
 	\item Array \hyperref[href_t:volume_spectrum_ctl]{\tt volume\_spectrum\_ctl}
 		\begin{itemize}
@@ -1602,9 +1606,9 @@ $
 \end{description}
 
 
-\subsubsection{Nusselt number data {\tt [nusselt\_number\_prefix].dat}}
+\subsubsection{(Thermal) Nusselt number data {\tt [nusselt\_number\_prefix].dat}}
 {\bf CAUTION: Nusselt number is not evaluated if heat source is exsist.}
-The Nusselt number Nu at CMB and ICB is written for each step in one line. The Nusselt number is evaluated by
+The thermal Nusselt number $Nu$ at CMB and ICB is written for each step in one line. The Nusselt number is evaluated by
 %
 \begin{eqnarray*}
 Nu = \frac{<\partial T / \partial r>}{\partial T_{diff}/ \partial r},
@@ -1618,6 +1622,26 @@ T_{diff} = \frac{r_{o}T_{o} - r_{i}T_{i}}{r_{o} - r_{i}}
 This diffusive temperature profile is for the case without heat source in the fluid. If simulation is performed including the heat source, this data file does not written.
 
 The header format is the same as the volume mean square data, but number of components are 2 for the Nusselt number for the inner and outer boundaries.
+
+\subsubsection{Compositional Nusselt number data {\tt [comp\_nusselt\_number\_prefix].dat}}
+{\bf CAUTION: Nusselt number is not evaluated if compositional source is exsist.}
+The compositional Nusselt number $Nu_{C}$ at CMB and ICB is written for each step in one line. As thermal Nusselt number, The compositional Nusselt number is evaluated by
+%
+\begin{eqnarray*}
+Nu_{C} = \frac{<\partial C / \partial r>}{\partial C_{diff}/ \partial r},
+\end{eqnarray*}
+where, $<\partial C / \partial r>$ and $C_{diff}$ are the horizontal average of the temperature gradient at ICB and CMB and diffusive composition profile, respectively. $C_{diff}$ is evaluated without heat source, as
+\begin{eqnarray*}
+C_{diff} = \frac{r_{o}C_{o} - r_{i}C_{i}}{r_{o} - r_{i}}
+    +  \frac{r_{o}r_{i}\left(C_{i} - C_{o}\right)}{r_{o} - r_{i}} \frac{1}{r}.
+\end{eqnarray*}
+%
+This diffusive composition profile is for the case without light element source in the fluid. If simulation is performed including the light element source, this data file does not written.
+
+The header format is the same as the volume mean square data, but number of components are 2 for the compositional Nusselt number for the inner and outer boundaries.
+
+\subsubsection{CMB average data {\tt [CMB\_average\_file\_prefix].dat}}
+Fields averaged over the outer boundary (CMB) $f_{CMB} = \int f(r=r_o) dS$ are written for each step in each line.
 
 \subsubsection{Dipolrity data {\tt [dipolarity\_file\_prefix].dat}}
 The dipolarity $f_{\rm dip}$ is evaluated the poloidal magnetic field at CMB is written for each step in one line. The dipolarity represents the relative strength of the axial dipole magnetic field, which is defined by the ration of the magnetic energy of the dipole component to the total magnetic energy at the CMB as

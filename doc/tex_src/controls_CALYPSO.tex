@@ -493,6 +493,22 @@ Supported field in the present version is listed in Table from \ref{table:fields
 \end{table}
 %
 %
+\begin{table}[htp]
+\caption{List of field name}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\tt [Name] & field name & Description \\ \hline \hline
+\tt temperature\_from\_CMB & Temperature from CMB average & $T - |T_{CMB}|$ \\
+\tt composition\_from\_CMB & Composition variation from CMB average & $C - |C_{CMB}|$ \\
+\tt pressure\_from\_CMB & Pressure from CMB average & $P - |P_{CMB}|$ \\
+\hline
+%
+\end{tabular}
+\end{center}
+\label{table:field_components}
+\end{table}
+
 
 \subsection{\tt time\_evolution\_ctl}
 \label{href_t:time_evolution_ctl}
@@ -1117,13 +1133,23 @@ File format for thermal Nusselt number data \verb|[file_prefix].dat|. If \verb|[
 \paragraph{\tt comp\_nusselt\_number\_prefix}
 \label{href_t:comp_nusselt_number_prefix}
 \verb|[nusselt_number_prefix]| \\
-File prefix for compositionalNusselt number data at ICB and CMB \verb|[file_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, Nusselt number data file is not generated. \\
+File prefix for compositional Nusselt number data at ICB and CMB \verb|[file_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, Nusselt number data file is not generated. \\
 {\bf CAUTION: Nusselt number is not evaluated if composition source exists.}
 
 \paragraph{\tt comp\_nusselt\_number\_format}
 \label{href_t:comp_nusselt_number_format}
 \verb|[file_format]| \\
 File format for compositional Nusselt number data \verb|[file_prefix].dat|. If \verb|[file_format]| is \verb|gzip|, Nusselt number data is compressed by zlib.  If the Nusselt number data file exist, this setting is ignored and append data in the existing file.
+
+\paragraph{\tt CMB\_average\_file\_prefix}
+\label{href_t:CMB_average_file_prefix}
+\verb|[file_prefix]| \\
+File prefix for CMB average data \verb|[file_prefix]| is defined by Text. Program add {\tt .dat} or {\tt .dat.gz} extension after this file prefix. If this file prefix is not defined, CMB average data file is not generated. \\
+
+\paragraph{\tt CMB\_average\_file\_format}
+\label{href_t:CMB_average_file_format}
+\verb|[file_format]| \\
+File format for CMB average data \verb|[file_prefix].dat|. If \verb|[file_format]| is \verb|gzip|,  CMB average data is compressed by zlib.  If the  CMB average data file exist, this setting is ignored and append data in the existing file.
 
 %
 \subsubsection{\tt volume\_spectrum\_ctl}
