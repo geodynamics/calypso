@@ -1,22 +1,22 @@
-!   Control for spherical_shell_ctl is read from file... sph_lm63_r80c_6/control_resolution
-!   Control for cross_section_ctl No.    1 is read from file ... controls/control_section_cmb
-!     Control for surface_define is read from ... controls/control_surface_CMB
+!   Control block spherical_shell_ctl is read from: sph_lm63_r80c_6/control_resolution
+!   Control for cross_section_ctl No.    1 is read from: controls/control_section_cmb
+!     Control for surface_define is read from: controls/control_surface_CMB
 !     Control for output_field_define is included.
-!   Control for cross_section_ctl No.    2 is read from file ... controls/control_section_z0
+!   Control for cross_section_ctl No.    2 is read from: controls/control_section_z0
 !     Control for surface_define is included.
-!     Control for output_field_define is read from file... controls/control_z_section_fields
+!     Control block output_field_define is read from: controls/control_z_section_fields
 controls/control_z_section_fields
-!   Control for cross_section_ctl No.    3 is read from file ... controls/control_section_z0.3
+!   Control for cross_section_ctl No.    3 is read from: controls/control_section_z0.3
 !     Control for surface_define is included.
-!     Control for output_field_define is read from file... controls/control_z_section_fields
+!     Control block output_field_define is read from: controls/control_z_section_fields
 controls/control_z_section_fields
-!   Control for cross_section_ctl No.    4 is read from file ... controls/control_section_icb
-!     Control for surface_define is read from ... controls/control_surface_ICB
+!   Control for cross_section_ctl No.    4 is read from: controls/control_section_icb
+!     Control for surface_define is read from: controls/control_surface_ICB
 !     Control for output_field_define is included.
-!   Control for isosurface_ctl No.    1 is read from file...  Isosurface control file: controls/control_isosurf_t0.25
+!   Control for isosurface_ctl No.    1 is read from: controls/control_isosurf_t0.25
 !     Control for field_on_isosurf is included.
-!   Control for zonal_mean_section_ctl No.    1 is read from file ... controls/control_zonal_mean
-!     Control for surface_define is read from ... controls/control_surface_y0
+!   Control for zonal_mean_section_ctl No.    1 is read from: controls/control_zonal_mean
+!     Control for surface_define is read from: controls/control_surface_y0
 !     Control for output_field_define is included.
 !  
 !  Checked control data
