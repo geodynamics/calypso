@@ -48,15 +48,17 @@
 !>        average magnetic energy (poloidal, toroidal, total)
         real(kind = kreal) :: ME_bench(3)
 !
+!>        Taeget wave number in zonal direction
+        integer(kind = kint) :: m_bench = 4
 !>        time for previus monitoring of omega
         real(kind = kreal) :: t_prev = zero
 !>        longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
-        real(kind = kreal) :: phi_zero(4) = (/zero,zero,zero,zero/)
+        real(kind = kreal), allocatable :: phi_zero(:)
 !>        longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
 !!        at previous monitoring
-        real(kind = kreal) :: phi_prev(4) = (/zero,zero,zero,zero/)
+        real(kind = kreal), allocatable :: phi_prev(:)
 !>        drift phase velocity for @f$v_r = 0 @f$
-        real(kind = kreal) :: phase_vr(4) = (/zero,zero,zero,zero/)
+        real(kind = kreal), allocatable :: phase_vr(:)
 !>        drift phase velocity for @f$v_r = 0 @f$
         real(kind = kreal) :: ave_phase_vr = 0.0d0
 !>        mangetic energy in inner core
@@ -76,6 +78,8 @@
 !
 !>        local point data
         real(kind = kreal), allocatable :: d_zero(:,:)
+!>        Average of local point data
+        real(kind = kreal), allocatable :: ave_zero_fld(:)
 !
 !>        Address list for circle data
         type(base_field_address) :: iphys_dbench
@@ -94,9 +98,23 @@
       type(phys_data), intent(inout) :: d_circle
       type(dynamobench_monitor), intent(inout) :: bench
 !
-      allocate(bench%d_zero(0:4,d_circle%ntot_phys))
+!
+      allocate(bench%phi_zero(bench%m_bench))
+      allocate(bench%phi_prev(bench%m_bench))
+      allocate(bench%phase_vr(bench%m_bench))
+      if(bench%m_bench .gt. 0) then
+        bench%phi_zero(1:bench%m_bench) = 0.0d0
+        bench%phi_prev(1:bench%m_bench) = 0.0d0
+        bench%phase_vr(1:bench%m_bench) = 0.0d0
+      end if
+!
+      allocate(bench%d_zero(bench%m_bench,d_circle%ntot_phys))
+      allocate(bench%ave_zero_fld(d_circle%ntot_phys))
+!
       if(d_circle%ntot_phys .le. 0) return
-      bench%d_zero(0:4,1:d_circle%ntot_phys) = 0.0d0
+      bench%ave_zero_fld(d_circle%ntot_phys) = 0.0d0
+      if(bench%m_bench .le. 0) return
+      bench%d_zero(1:bench%m_bench,1:d_circle%ntot_phys) = 0.0d0
 !
       end subroutine alloc_dynamobench_monitor
 !
@@ -106,8 +124,11 @@
 !
       type(dynamobench_monitor), intent(inout) :: bench
 !
-      if(allocated(bench%d_zero) .eqv. .FALSE.) return
-      deallocate(bench%d_zero)
+      if(allocated(bench%ave_zero_fld)) deallocate(bench%ave_zero_fld)
+      if(allocated(bench%d_zero))       deallocate(bench%d_zero)
+      if(allocated(bench%phase_vr))     deallocate(bench%phase_vr)
+      if(allocated(bench%phi_prev))     deallocate(bench%phi_prev)
+      if(allocated(bench%phi_zero))     deallocate(bench%phi_zero)
 !
       end subroutine dealloc_dynamobench_monitor
 !

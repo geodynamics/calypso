@@ -36,6 +36,7 @@
 !!    dynamobench_spectr_prefix        'monitor/dbench_spectr'
 !!
 !!    nphi_mid_eq_ctl                   500
+!!    reference_zonal_mode_ctl            4
 !!  end dynamo_benchmark_data_ctl
 !!
 !! -----------------------------------------------------------------
@@ -72,6 +73,8 @@
 !
 !>        Structure for Number of zonal points for benchamek check
         type(read_integer_item) :: nphi_mid_eq_ctl
+!>        Structure for reference zonal wave number for benchamek check
+        type(read_integer_item) :: ref_zonal_mode_ctl
 !
         integer (kind = kint) :: i_dynamobench_ctl = 0
       end type dynamobench_control
@@ -93,6 +96,8 @@
 !
       character(len=kchara), parameter, private                         &
      &    :: hd_nphi_mid_eq = 'nphi_mid_eq_ctl'
+      character(len=kchara), parameter, private                         &
+     &    :: hd_ref_zonal_mode = 'reference_zonal_mode_ctl'
 !
 ! -----------------------------------------------------------------------
 !
@@ -112,6 +117,7 @@
       dbench_ctl%dbench_spectr_file_ctl%iflag =   0
 !
       dbench_ctl%nphi_mid_eq_ctl%iflag = 0
+      dbench_ctl%ref_zonal_mode_ctl%iflag = 0
 !
       dbench_ctl%i_dynamobench_ctl = 0
 !
@@ -152,6 +158,8 @@
 !
         call read_integer_ctl_type(c_buf, hd_nphi_mid_eq,               &
      &      dbench_ctl%nphi_mid_eq_ctl)
+        call read_integer_ctl_type(c_buf, hd_ref_zonal_mode,            &
+     &      dbench_ctl%ref_zonal_mode_ctl)
       end do
       dbench_ctl%i_dynamobench_ctl = 1
 !
@@ -180,6 +188,7 @@
       maxlen = max(maxlen, len_trim(hd_dbench_field_prefix))
       maxlen = max(maxlen, len_trim(hd_dbench_spectr_prefix))
       maxlen = max(maxlen, len_trim(hd_nphi_mid_eq))
+      maxlen = max(maxlen, len_trim(hd_ref_zonal_mode))
 !
       level = write_begin_flag_for_ctl(id_control, level,               &
      &                                 dbench_ctl%block_name)
@@ -195,6 +204,8 @@
      &    dbench_ctl%dbench_spectr_file_ctl)
       call write_integer_ctl_type(id_control, level, maxlen,            &
      &    dbench_ctl%nphi_mid_eq_ctl)
+      call write_integer_ctl_type(id_control, level, maxlen,            &
+     &    dbench_ctl%ref_zonal_mode_ctl)
 !
       level =  write_end_flag_for_ctl(id_control, level,                &
      &                                dbench_ctl%block_name)
@@ -223,6 +234,8 @@
 !
         call init_int_ctl_item_label(hd_nphi_mid_eq,                    &
      &      dbench_ctl%nphi_mid_eq_ctl)
+        call init_int_ctl_item_label(hd_ref_zonal_mode,                 &
+     &      dbench_ctl%ref_zonal_mode_ctl)
 !
       end subroutine init_ctl_data_dynamobench_label
 !

@@ -64,7 +64,7 @@
 !
 !     read controls
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_control_params_4_sections'
+      if (iflag_debug.gt.0) write(*,*) 's_input_control_section_only'
       if(iflag_TOT_time) call start_elapsed_time(ied_total_elapsed)
       call s_input_control_section_only(fname_viz_ctl, sec_viz_ctl5,    &
      &                                  FEM_viz5, t_VIZ5)

@@ -7,11 +7,13 @@
 !>@brief  Control data for merge program
 !!
 !!@verbatim
-!!      subroutine read_control_4_merge(file_name, mgd_ctl)
-!!      subroutine read_control_assemble_sph(mgd_ctl)
+!!      subroutine read_control_4_merge(file_name, mgd_ctl, error_file)
+!!      subroutine read_control_assemble_sph(file_name,                 &
+!!     &                                     mgd_ctl, error_file)
 !!      subroutine reset_merge_control_data(mgd_ctl)
 !!        character (len = kchara), intent(in) :: file_name
 !!        type(control_data_4_merge), intent(inout) :: mgd_ctl
+!!        logical, intent(inout) :: error_file
 !!@endverbatim
 !
 !
@@ -120,10 +122,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_control_4_merge(file_name, mgd_ctl)
+      subroutine read_control_4_merge(file_name, mgd_ctl, error_file)
 !
       character (len = kchara), intent(in) :: file_name
+!
       type(control_data_4_merge), intent(inout) :: mgd_ctl
+      logical, intent(inout) :: error_file
 !
       type(buffer_for_control) :: c_buf1
 !
@@ -137,7 +141,8 @@
         if(c_buf1%iend .gt. 0) exit
 !
         call read_merge_control_data(control_file_code, hd_assemble,    &
-     &     mgd_ctl, c_buf1)
+     &                               mgd_ctl, c_buf1, error_file)
+        if(error_file) return
         if(mgd_ctl%i_assemble .gt. 0) exit
       end do
       close(control_file_code)
@@ -148,10 +153,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_control_assemble_sph(file_name, mgd_ctl)
+      subroutine read_control_assemble_sph(file_name,                   &
+     &                                     mgd_ctl, error_file)
 !
       character (len = kchara), intent(in) :: file_name
+!
       type(control_data_4_merge), intent(inout) :: mgd_ctl
+      logical, intent(inout) :: error_file
 !
       type(buffer_for_control) :: c_buf1
 !
@@ -164,8 +172,9 @@
      &                                  hd_assemble, c_buf1)
         if(c_buf1%iend .gt. 0) exit
 !
-      call read_merge_control_data(control_file_code, hd_assemble,      &
-     &                             mgd_ctl, c_buf1)
+        call read_merge_control_data(control_file_code, hd_assemble,    &
+     &                               mgd_ctl, c_buf1, error_file)
+        if(error_file) return
         if(mgd_ctl%i_assemble .gt. 0) exit
       end do
       close(control_file_code)
@@ -177,8 +186,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-       subroutine read_merge_control_data                               &
-      &         (id_control, hd_block, mgd_ctl, c_buf)
+       subroutine read_merge_control_data(id_control, hd_block,         &
+      &                                   mgd_ctl, c_buf, error_file)
 !
       use ctl_data_platforms_IO
       use ctl_file_gen_sph_shell_IO
@@ -188,6 +197,7 @@
 !
       type(control_data_4_merge), intent(inout) :: mgd_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(mgd_ctl%i_assemble .gt. 0) return
@@ -216,9 +226,13 @@
      &     (id_control, hd_newrst_magne, mgd_ctl, c_buf)
 !
         call sel_read_ctl_gen_shell_grids(id_control, hd_orgsph_shell,  &
-     &      mgd_ctl%fname_src_psph_ctl,  mgd_ctl%src_psph_ctl, c_buf)
+     &      mgd_ctl%fname_src_psph_ctl,  mgd_ctl%src_psph_ctl,          &
+     &      c_buf, error_file)
+        if(error_file) return
         call sel_read_ctl_gen_shell_grids(id_control, hd_newsph_shell,  &
-     &      mgd_ctl%fname_asbl_psph_ctl, mgd_ctl%asbl_psph_ctl, c_buf)
+     &      mgd_ctl%fname_asbl_psph_ctl, mgd_ctl%asbl_psph_ctl,         &
+     &      c_buf, error_file)
+        if(error_file) return
 !
         call read_real_ctl_type(c_buf, hd_delta_to_compare,             &
      &      mgd_ctl%delta_to_compare_ctl)

@@ -8,12 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine sel_read_ctl_pvr_section_def(id_control, hd_block,   &
-!!     &          fname_sect_ctl, psf_def_c, c_buf)
+!!     &          fname_sect_ctl, psf_def_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        character(len = kchara), intent(inout) :: fname_sect_ctl
 !!        type(psf_define_ctl), intent(inout) :: psf_def_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!
 !!      subroutine sel_write_ctl_pvr_section_def(id_control, hd_block,  &
 !!     &          fname_sect_ctl, psf_def_c, level)
@@ -58,21 +59,25 @@
 ! -----------------------------------------------------------------------
 !
       subroutine sel_read_ctl_pvr_section_def(id_control, hd_block,     &
-     &          fname_sect_ctl, psf_def_c, c_buf)
+     &          fname_sect_ctl, psf_def_c, c_buf, error_file)
 !
       use ctl_data_section_def_IO
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
       character(len = kchara), intent(inout) :: fname_sect_ctl
       type(psf_define_ctl), intent(inout) :: psf_def_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_file_flag(c_buf, hd_block)) then
         fname_sect_ctl = third_word(c_buf)
 !
-        write(*,'(2a)') ' is read from ... ', trim(fname_sect_ctl)
+        call check_write_ctl_file_message(fname_sect_ctl, error_file)
+        if(error_file) return
+!
         call read_ctl_file_pvr_section_def(id_control+2,                &
      &      fname_sect_ctl, hd_block, psf_def_c, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then

@@ -9,11 +9,12 @@
 !!@verbatim
 !!      subroutine init_dynamo_sects_ctl_label(hd_block, zm_sects)
 !!      subroutine read_dynamo_sects_control                            &
-!!     &         (id_control, hd_block, zm_sects, c_buf)
+!!     &         (id_control, hd_block, zm_sects, c_buf, error_file
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(sph_dynamo_section_controls), intent(inout) :: zm_sects
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_dynamo_sects_control                           &
 !!     &         (id_control, hd_block, zm_sects, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -85,15 +86,17 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_dynamo_sects_control                              &
-     &         (id_control, hd_block, zm_sects, c_buf)
+     &         (id_control, hd_block, zm_sects, c_buf, error_file)
 !
       use t_read_control_elements
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(sph_dynamo_section_controls), intent(inout) :: zm_sects
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(zm_sects%i_viz_ctl .gt. 0) return
@@ -108,9 +111,11 @@
      &      zm_sects%crust_filter_ctl, c_buf)
 !
         call read_single_sect_ctl(id_control, hd_zm_section,            &
-     &      zm_sects%zm_psf_ctls, c_buf)
+     &      zm_sects%zm_psf_ctls, c_buf, error_file)
+        if(error_file) return
         call read_single_sect_ctl(id_control, hd_zRMS_section,          &
-     &      zm_sects%zRMS_psf_ctls, c_buf)
+     &      zm_sects%zRMS_psf_ctls, c_buf, error_file)
+        if(error_file) return
       end do
       zm_sects%i_viz_ctl = 1
 !
@@ -178,8 +183,8 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_single_sect_ctl                                   &
-     &          (id_control, hd_section, psf_ctls, c_buf)
+      subroutine read_single_sect_ctl(id_control, hd_section,           &
+     &                                psf_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use t_control_data_sections
@@ -190,8 +195,10 @@
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: hd_section
+!
       type(section_controls), intent(inout) :: psf_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(psf_ctls%num_psf_ctl .gt. 0) return
@@ -206,9 +213,12 @@
 !
         call write_multi_ctl_file_message                               &
      &     (hd_section, psf_ctls%num_psf_ctl, c_buf%level)
+!
         call sel_read_control_4_psf_file(id_control, hd_section,        &
      &      psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl),               &
-     &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl), c_buf)
+     &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl),              &
+     &      c_buf, error_file)
+        if(error_file) return
       end if
 !
       end subroutine read_single_sect_ctl

@@ -375,6 +375,7 @@ begin MHD_control
       dynamo_benchmark_file_prefix     'monitor/dynamobench'
       dynamo_benchmark_file_format     'gzip'
       nphi_mid_eq_ctl                   512
+      reference_zonal_mode_ctl            4
     end dynamo_benchmark_data_ctl
   end sph_monitor_ctl
 !

@@ -7,12 +7,13 @@
 !!
 !!@verbatim
 !!      subroutine init_iso_ctl_stract(hd_block, iso_c)
-!!      subroutine s_read_iso_control_data                              &
-!!     &         (id_control, hd_block, iso_c, c_buf)
+!!      subroutine s_read_iso_control_data(id_control, hd_block,        &
+!!     &                                   iso_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(iso_ctl), intent(inout) :: iso_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_iso_control_data                               &
 !!     &         (id_control, hd_block, iso_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -84,7 +85,6 @@
       use t_control_array_character
       use t_control_data_4_iso_def
       use t_control_data_4_fld_on_psf
-      use calypso_mpi
 !
       implicit  none
 !
@@ -113,8 +113,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_read_iso_control_data                                &
-     &         (id_control, hd_block, iso_c, c_buf)
+      subroutine s_read_iso_control_data(id_control, hd_block,          &
+     &                                   iso_c, c_buf, error_file)
 !
       use skip_comment_f
       use ctl_file_field_on_psf_IO
@@ -123,6 +123,7 @@
       character(len=kchara), intent(in) :: hd_block
       type(iso_ctl), intent(inout) :: iso_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
@@ -134,10 +135,13 @@
 !
         call sel_read_ctl_field_on_psf_file                             &
      &     (id_control, hd_field_on_iso, iso_c%fname_fld_on_iso,        &
-     &      iso_c%fld_on_iso_c, c_buf)
+     &      iso_c%fld_on_iso_c, c_buf, error_file)
+        if(error_file) return
+!
         call sel_read_ctl_field_on_psf_file                             &
      &     (id_control, hd_iso_result, iso_c%fname_fld_on_iso,          &
-     &      iso_c%fld_on_iso_c, c_buf)
+     &      iso_c%fld_on_iso_c, c_buf, error_file)
+        if(error_file) return
 !
         call read_iso_define_data                                       &
      &     (id_control, hd_iso_define, iso_c%iso_def_c, c_buf)

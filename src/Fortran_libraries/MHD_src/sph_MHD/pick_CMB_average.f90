@@ -13,16 +13,13 @@
 !!        type(read_character_item), intent(in) :: CMB_ave_file_format
 !!        type(CMB_average_data), intent(inout) :: ave_CMB
 !!      subroutine init_CMB_average_field_list                          &
-!!     &         (my_rank, sph_params, sph_rj, ipol, pwr, ave_CMB)
-!!        integer, intent(in) :: my_rank
+!!     &         (sph_params, sph_rj, ipol, pwr, ave_CMB)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_address), intent(in) :: ipol
 !!        type(sph_mean_squares), intent(in) :: pwr
 !!        type(CMB_average_data), intent(inout) :: ave_CMB
-!!      subroutine s_pick_CMB_average(my_rank, sph_rj, ipol,            &
-!!     &                              rj_fld, ave_CMB)
-!!        integer, intent(in) :: my_rank
+!!      subroutine s_pick_CMB_average(sph_rj, ipol, rj_fld, ave_CMB)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(in) :: rj_fld
@@ -82,14 +79,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine init_CMB_average_field_list                            &
-     &         (my_rank, sph_params, sph_rj, ipol, pwr, ave_CMB)
+     &         (sph_params, sph_rj, ipol, pwr, ave_CMB)
 !
       use t_spheric_parameter
       use t_spheric_rj_data
       use t_phys_address
       use t_rms_4_sph_spectr
 !
-      integer, intent(in) :: my_rank
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_address), intent(in) :: ipol
@@ -109,10 +105,6 @@
         return
       end if
 !
-      if(sph_rj%idx_rj_degree_zero .gt. 0) then
-        ave_CMB%irank_CMB_ave = my_rank
-      end if
-!
       call set_CMB_average_address(ipol%base, ave_CMB%num_CMB_ave,      &
      &    ave_CMB%CMB_ave_name, ave_CMB%imonitor_CMB)
 !
@@ -127,13 +119,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_pick_CMB_average(my_rank, sph_rj, ipol,              &
-     &                              rj_fld, ave_CMB)
+      subroutine s_pick_CMB_average(sph_rj, ipol, rj_fld, ave_CMB)
 !
       use t_spheric_rj_data
       use t_phys_data
 !
-      integer, intent(in) :: my_rank
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(in) :: rj_fld
@@ -143,7 +133,6 @@
       integer(kind = kint) :: inod
 !
 !
-      if(my_rank .ne. ave_CMB%irank_CMB_ave)   return
       if(ave_CMB%iflag_CMB_average .le. izero) return
       if(ave_CMB%num_CMB_ave .le. izero)       return
       if(sph_rj%idx_rj_degree_zero .le. izero) return

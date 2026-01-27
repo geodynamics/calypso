@@ -10,14 +10,14 @@
 !!@verbatim
 !!      subroutine delete_file_if_exist(file_name)
 !!      subroutine delete_file_by_f(file_name)
-!!      subroutine delete_parallel_files(iflag_fmt, nprocs, file_head)
+!!      subroutine delete_parallel_files(nprocs, file_prefix)
 !!
 !!      logical function check_file_exist(file_name)
 !!      logical function check_file_writable(my_rank, file_name)
 !!@endverbatim
 !!
 !!@n @param  file_name   file name
-!!@n @param  file_head   file header to delete
+!!@n @param  file_prefix file header to delete
 !!@n @param  iflag_fmt   file format flag
 !!@n @param  nprocs      MPI rank
 !!@n @param  nprocs      number of subdomains
@@ -25,7 +25,6 @@
       module delete_data_files
 !
       use m_precision
-      use m_file_format_switch
 !
       implicit none
 !
@@ -65,27 +64,19 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine delete_parallel_files(iflag_fmt, nprocs, file_head)
+      subroutine delete_parallel_files(nprocs, file_prefix)
 !
       use set_parallel_file_name
 !
-      integer(kind=kint), intent(in) :: iflag_fmt, nprocs
-      character(len=kchara), intent(in) :: file_head
+      integer(kind=kint), intent(in) :: nprocs
+      character(len=kchara), intent(in) :: file_prefix
 !
-      integer :: ip, id_rank
-      character(len=kchara) :: file_name, fname_tmp
+      integer :: ip
+      character(len=kchara) :: file_name
 !
 !
       do ip = 1, int(nprocs)
-        id_rank = ip - 1
-        fname_tmp = add_process_id(id_rank, file_head)
-!
-        if(iflag_fmt .eq. id_gzip_txt_file_fmt) then
-          file_name =  add_gzip_extension(fname_tmp)
-        else
-          file_name = fname_tmp
-        end if
-!
+        file_name = add_process_id((ip - 1), file_prefix)
         call delete_file_by_f(file_name)
       end do
 !

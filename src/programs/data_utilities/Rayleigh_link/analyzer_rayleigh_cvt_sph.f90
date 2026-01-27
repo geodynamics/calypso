@@ -73,11 +73,18 @@
       type(control_data_4_merge) :: mgd_ctl_s
       type(sph_grid_maker_in_sim) :: sph_org_maker_s
 !
+      logical :: error_file = .FALSE.
+!
 !
       write(*,*) 'Simulation start: PE. ', my_rank
 !
-      if(my_rank .eq. 0) call read_control_assemble_sph                 &
-     &                      (ctl_file_name, mgd_ctl_s)
+      error_file = .FALSE.
+      if(my_rank .eq. 0) then
+        call read_control_assemble_sph(ctl_file_name,                   &
+     &                                 mgd_ctl_s, error_file)
+        if(error_file) call calypso_mpi_abort(ierr_file,                &
+     &                                        "Missing control file")
+      end if
       call bcast_merge_control_data(mgd_ctl_s)
 !
       if(mgd_ctl_s%i_assemble .ne. 1) then

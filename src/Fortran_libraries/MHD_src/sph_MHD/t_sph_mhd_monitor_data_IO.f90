@@ -134,13 +134,12 @@
       call init_energy_labels_base(monitor%ene_labels)
       call init_sph_spectr_data_and_file(sph, rj_fld, monitor)
 !
-      call init_CMB_average_field_list                                  &
-     &   (my_rank, sph%sph_params, sph%sph_rj, ipol,                    &
-     &    monitor%pwr, monitor%ave_CMB)
+      call init_CMB_average_field_list(sph%sph_params, sph%sph_rj,      &
+     &    ipol, monitor%pwr, monitor%ave_CMB)
       call init_dipolarity_4_sph_spectr(sph%sph_params, monitor%pwr,    &
      &                                  monitor%dip)
 !
-      if ( iflag_debug.gt.0 ) write(*,*) 'init_sph_spec_4_monitor'
+      if(iflag_debug .gt. 0) write(*,*) 'init_sph_spec_4_monitor'
       call init_sph_spec_4_monitor(sph%sph_params, sph%sph_rj,          &
      &    rj_fld, monitor%pick_list, monitor%pick_coef)
       ierr_lc =  error_picked_spectr_files(sph%sph_params,              &

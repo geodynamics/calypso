@@ -12,14 +12,13 @@
 !!        integer(kind = kint), intent(in) :: num
 !!        type(CMB_average_data), intent(inout) :: ave_CMB
 !!
-!!      subroutine write_CMB_average(my_rank, i_step, time, ltr, nri,   &
-!!     &                             nlayer_CMB, ave_CMB)
-!!        integer, intent(in) :: my_rank
-!!        integer, intent(in) :: id_rank
+!!      subroutine write_CMB_average(i_step, time, sph_params, sph_rj,  &
+!!     &                             ave_CMB)
 !!        integer(kind = kint), intent(in) :: i_step
 !!        real(kind = kreal), intent(in) :: time
-!!        integer(kind = kint), intent(in) :: ltr, nri
+!!        integer(kind = kint), intent(in) :: ltr
 !!        integer(kind = kint), intent(in) :: nlayer_CMB
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(CMB_average_data), intent(in) :: ave_CMB
 !!
 !!      subroutine dup_CMB_average_header_to_IO                         &
@@ -41,8 +40,6 @@
       implicit none
 !
       type CMB_average_data
-!>        MPI process for CMB average
-        integer :: irank_CMB_ave = -1
 !>        Integer flag for CMB average data output
         integer(kind = kint) :: iflag_CMB_average = 0
 !>        compressed file flag for CMB average
@@ -116,19 +113,20 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_CMB_average(my_rank, i_step, time, ltr, nri,     &
-     &                             nlayer_CMB, ave_CMB)
+      subroutine write_CMB_average(i_step, time, sph_params, sph_rj,    &
+     &                             ave_CMB)
 !
+      use t_spheric_parameter
+      use t_spheric_rj_data
       use t_buffer_4_gzip
       use sph_monitor_data_text
       use select_gz_stream_file_IO
       use gz_open_sph_vol_mntr_file
 !
-      integer, intent(in) :: my_rank
       integer(kind = kint), intent(in) :: i_step
       real(kind = kreal), intent(in) :: time
-      integer(kind = kint), intent(in) :: ltr, nri
-      integer(kind = kint), intent(in) :: nlayer_CMB
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(CMB_average_data), intent(in) :: ave_CMB
 !
       logical :: flag_gzip_lc
@@ -137,10 +135,11 @@
 !
 !
       if(ave_CMB%iflag_CMB_average .le. izero) return
-      if(my_rank .ne. ave_CMB%irank_CMB_ave)   return
+      if(sph_rj%idx_rj_degree_zero .le. 0) return
 !
       call dup_CMB_average_header_to_IO                                 &
-     &   (ltr, nri, nlayer_CMB, ave_CMB, sph_OUT_d)
+     &   (sph_params%l_truncation, sph_rj%nidx_rj(1),                   &
+     &    sph_params%nlayer_CMB, ave_CMB, sph_OUT_d)
 !
       flag_gzip_lc = ave_CMB%flag_gzip_CMB_average
       call sel_open_sph_vol_monitor_file                                &

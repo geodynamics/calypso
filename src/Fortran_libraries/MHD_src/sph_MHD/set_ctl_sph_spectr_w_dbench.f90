@@ -113,6 +113,11 @@
      &                 = dbench_ctl%detailed_dbench_file_ctl%charavalue
       end if
 !
+      bench%m_bench = 4
+      if(dbench_ctl%ref_zonal_mode_ctl%iflag .gt. 0) then
+        bench%m_bench = dbench_ctl%ref_zonal_mode_ctl%intvalue
+      end if
+!
       circle%circle_field_file_prefix = 'NO_FILE'
       if(dbench_ctl%dbench_field_file_ctl%iflag .gt. 0) then
         circle%circle_field_file_prefix                                 &

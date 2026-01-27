@@ -8,12 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine init_psf_ctl_stract(psf_c)
-!!      subroutine s_read_psf_control_data                              &
-!!     &         (id_control, hd_block, psf_c, c_buf)
+!!      subroutine s_read_psf_control_data(id_control, hd_block,        &
+!!     &                                   psf_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(psf_ctl), intent(inout) :: psf_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout)  :: error_file
 !!      subroutine write_psf_control_data                               &
 !!     &         (id_control, hd_block, psf_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -133,7 +134,6 @@
       use t_control_data_4_psf_def
       use t_control_data_4_fld_on_psf
       use t_control_data_4_psf
-      use calypso_mpi
 !
       implicit  none
 !
@@ -159,8 +159,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_read_psf_control_data                                &
-     &         (id_control, hd_block, psf_c, c_buf)
+      subroutine s_read_psf_control_data(id_control, hd_block,          &
+     &                                   psf_c, c_buf, error_file)
 !
       use ctl_file_section_def_IO
       use ctl_file_field_on_psf_IO
@@ -171,6 +171,7 @@
 !
       type(psf_ctl), intent(inout) :: psf_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout)  :: error_file
 !
 !
       if(psf_c%i_psf_ctl .gt. 0) return
@@ -186,12 +187,14 @@
      &       (hd_surface_define, izero, c_buf%level)
           call sel_read_ctl_pvr_section_def(id_control,                 &
      &        hd_surface_define, psf_c%fname_section_ctl,               &
-     &        psf_c%psf_def_c, c_buf)
+     &        psf_c%psf_def_c, c_buf, error_file)
+          if(error_file) return
         end if
 !
         call sel_read_ctl_field_on_psf_file                             &
      &     (id_control, hd_output_field, psf_c%fname_fld_on_psf,        &
-     &      psf_c%fld_on_psf_c, c_buf)
+     &      psf_c%fld_on_psf_c, c_buf, error_file)
+        if(error_file) return
 !
         call read_chara_ctl_type(c_buf, hd_psf_file_prefix,             &
      &      psf_c%psf_file_prefix_ctl)

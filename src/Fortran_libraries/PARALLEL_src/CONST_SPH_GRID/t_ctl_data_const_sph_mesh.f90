@@ -11,10 +11,11 @@
 !!@n        Modified by H. Matsui on Oct., 2012
 !!
 !!@verbatim
-!!      subroutine read_control_4_const_shell(file_name,                &
-!!     &                                      gen_SPH_ctl, c_buf)
+!!      subroutine read_control_4_const_shell(file_name, gen_SPH_ctl,   &
+!!     &                                      c_buf, error_file)
 !!        character(len=kchara), intent(in) :: file_name
 !!        type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_control_4_const_shell(file_name, gen_SPH_ctl)
 !!        character(len=kchara), intent(in) :: file_name
 !!        type(sph_mesh_generation_ctl), intent(in) :: gen_SPH_ctl
@@ -67,12 +68,14 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_control_4_const_shell(file_name,                  &
-     &                                      gen_SPH_ctl, c_buf)
+      subroutine read_control_4_const_shell(file_name, gen_SPH_ctl,     &
+     &                                      c_buf, error_file)
 !
       character(len=kchara), intent(in) :: file_name
+!
       type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
       type(buffer_for_control), intent(inout) :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       c_buf%level = c_buf%level + 1
@@ -85,7 +88,8 @@
 !
         call read_sph_shell_define_ctl                                  &
      &     (control_file_code, gen_SPH_ctl%hd_mesh_generation,          &
-     &      gen_SPH_ctl, c_buf)
+     &      gen_SPH_ctl, c_buf, error_file)
+        if(error_file) return
         if(gen_SPH_ctl%i_sph_mesh_ctl .gt. 0) exit
       end do
 !
@@ -124,8 +128,8 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine read_sph_shell_define_ctl                              &
-     &         (id_control, hd_block, gen_SPH_ctl, c_buf)
+      subroutine read_sph_shell_define_ctl(id_control, hd_block,        &
+     &          gen_SPH_ctl, c_buf, error_file)
 !
       use ctl_data_platforms_IO
       use ctl_file_gen_sph_shell_IO
@@ -135,6 +139,7 @@
 !
       type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(gen_SPH_ctl%i_sph_mesh_ctl .gt. 0) return
@@ -149,8 +154,11 @@
 !
         call read_control_platforms                                     &
      &     (id_control, hd_platform, gen_SPH_ctl%plt, c_buf)
+!
         call sel_read_ctl_gen_shell_grids(id_control, hd_sph_shell,     &
-     &      gen_SPH_ctl%fname_psph, gen_SPH_ctl%psph_ctl, c_buf)
+     &      gen_SPH_ctl%fname_psph, gen_SPH_ctl%psph_ctl,               &
+     &      c_buf, error_file)
+        if(error_file) return
       end do
       gen_SPH_ctl%i_sph_mesh_ctl = 1
 !

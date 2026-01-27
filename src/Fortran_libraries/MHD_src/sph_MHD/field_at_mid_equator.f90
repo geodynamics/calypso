@@ -28,6 +28,19 @@
 !!      subroutine cal_field_4_dynamobench                              &
 !!     &         (time, t_prev, circle, d_circle, ibench_velo,          &
 !!     &          phi_zero, phi_prev, drift, ave_drift, d_zero)
+!!        real(kind=kreal), intent(in) :: time, t_prev
+!!        type(circle_parameters), intent(in) :: circle
+!!        type(phys_data), intent(in) :: d_circle
+!!        integer(kind = kint), intent(in) :: ibench_velo
+!!        integer(kind = kint), intent(in) :: m_bench
+!!        real(kind = kreal), intent(inout) :: phi_zero(m_bench)
+!!        real(kind = kreal), intent(inout) :: phi_prev(m_bench)
+!!        real(kind = kreal), intent(inout) :: drift(m_bench)
+!!        real(kind = kreal), intent(inout) :: ave_drift
+!!        real(kind = kreal), intent(inout)                             &
+!!     &                   :: d_zero(m_bench,d_circle%ntot_phys)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &                   :: ave_zero(d_circle%ntot_phys)
 !!@endverbatim
 !
       module field_at_mid_equator
@@ -86,7 +99,7 @@
       use t_sph_circle_parameters
       use transfer_to_long_integers
 !
-      real(kind=kreal), intent(in) :: time
+      real(kind = kreal), intent(in) :: time
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_data), intent(in) :: rj_fld
       type(phys_address), intent(in) :: ipol
@@ -165,7 +178,8 @@
 !
       subroutine cal_field_4_dynamobench                                &
      &         (time, t_prev, circle, d_circle, ibench_velo,            &
-     &          phi_zero, phi_prev, drift, ave_drift, d_zero)
+     &          m_bench, phi_zero, phi_prev, drift, d_zero,             &
+     &          ave_drift, ave_zero)
 !
       use calypso_mpi
       use t_phys_data
@@ -175,11 +189,16 @@
       type(circle_parameters), intent(in) :: circle
       type(phys_data), intent(in) :: d_circle
       integer(kind = kint), intent(in) :: ibench_velo
+      integer(kind = kint), intent(in) :: m_bench
 !
-      real(kind = kreal), intent(inout) :: phi_zero(4), phi_prev(4)
-      real(kind = kreal), intent(inout) :: drift(4), ave_drift
+      real(kind = kreal), intent(inout) :: phi_zero(m_bench)
+      real(kind = kreal), intent(inout) :: phi_prev(m_bench)
+      real(kind = kreal), intent(inout) :: drift(m_bench)
+      real(kind = kreal), intent(inout) :: ave_drift
       real(kind = kreal), intent(inout)                                 &
-     &                   :: d_zero(0:4,d_circle%ntot_phys)
+     &                   :: d_zero(m_bench,d_circle%ntot_phys)
+      real(kind = kreal), intent(inout)                                 &
+     &                   :: ave_zero(d_circle%ntot_phys)
 !
       integer(kind = kint) :: nd, mphi, mp_next, icou
       real(kind = kreal) :: coef, pi
@@ -203,27 +222,26 @@
      &                     + (one - coef) * d_circle%d_fld(mp_next,nd)
           end do
 !
-          if(icou .eq. 4) exit
+          if(icou .eq. m_bench) exit
         end if
       end do
 !
-      drift(1:4) = (phi_zero(1:4) - phi_prev(1:4))
-      do icou = 1, 4
+      drift(1:m_bench) = (phi_zero(1:m_bench) - phi_prev(1:m_bench))
+      do icou = 1, m_bench
         if(drift(icou) .lt. -pi) drift(icou) = drift(icou) + two*pi
         if(drift(icou) .gt.  pi) drift(icou) = drift(icou) - two*pi
       end do
 !
       if(t_prev .eq. time) then
-        drift(1:4)  = 0.0d0
+        drift(1:m_bench)  = 0.0d0
       else
-        drift(1:4) = drift(1:4) / (time - t_prev)
+        drift(1:m_bench) = drift(1:m_bench) / (time - t_prev)
       end if
-      phi_prev(1:4) = phi_zero(1:4)
+      phi_prev(1:m_bench) = phi_zero(1:m_bench)
 !
-      ave_drift = quad * (drift(1) + drift(2) + drift(3) + drift(4))
+      ave_drift = sum(drift(1:m_bench)) / dble(m_bench)
       do nd = 1, d_circle%ntot_phys
-        d_zero(0,nd) = quad * (d_zero(1,nd) + d_zero(2,nd)              &
-     &                       + d_zero(3,nd) + d_zero(4,nd))
+        ave_zero(nd) = sum(d_zero(1:m_bench,nd)) / dble(m_bench)
       end do
 !
       end subroutine cal_field_4_dynamobench

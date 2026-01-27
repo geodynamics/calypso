@@ -234,7 +234,7 @@
       end if
 !!
       if(iflag_debug.gt.0)  write(*,*) 's_pick_CMB_average'
-      call s_pick_CMB_average(my_rank, sph%sph_rj, ipol, rj_fld,        &
+      call s_pick_CMB_average(sph%sph_rj, ipol, rj_fld,                 &
      &                        monitor%ave_CMB)
 !
       if(iflag_debug.gt.0)  write(*,*) 's_cal_CMB_dipolarity'
@@ -309,9 +309,8 @@
      &      ipol%base%i_magne, monitor%dip)
       end if
 !
-      call write_CMB_average(my_rank, time_d%i_time_step, time_d%time,  &
-     &    sph_params%l_truncation, sph_rj%nidx_rj(1),                   &
-     &    sph_params%nlayer_CMB, monitor%ave_CMB)
+      call write_CMB_average(time_d%i_time_step, time_d%time,           &
+     &    sph_params, sph_rj, monitor%ave_CMB)
 !
       call write_typical_scales(time_d%i_time_step, time_d%time,        &
      &    sph_params, sph_rj, sph_MHD_bc%sph_bc_U,                      &

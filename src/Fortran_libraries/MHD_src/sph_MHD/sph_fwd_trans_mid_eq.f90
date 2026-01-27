@@ -80,8 +80,9 @@
       if(my_rank .eq. 0) then
         call cal_field_4_dynamobench                                    &
      &     (time, bench%t_prev, cdat%circle, cdat%d_circle,             &
-     &      bench%iphys_dbench%i_velo, bench%phi_zero, bench%phi_prev,  &
-     &      bench%phase_vr, bench%ave_phase_vr, bench%d_zero)
+     &      bench%iphys_dbench%i_velo, bench%m_bench,                   &
+     &      bench%phi_zero, bench%phi_prev, bench%phase_vr,             &
+     &      bench%d_zero, bench%ave_phase_vr, bench%ave_zero_fld)
       end if
       bench%t_prev = time
 !
@@ -191,7 +192,6 @@
       use t_phys_data
       use t_phys_address
       use t_circle_transform
-      use t_field_4_dynamobench
 !
       type(phys_address), intent(in) :: ipol
       type(circle_parameters), intent(in) :: circle

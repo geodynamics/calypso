@@ -15,9 +15,10 @@
 !!        integer(kind = kint), intent(in) :: num_out
 !!        real(kind = kreal), intent(inout) :: detail_out(num_out)
 !!      subroutine cnt_detail_dbench_monitor_name(sph_bc_U, sph_bc_B,  &
-!!     &         ipol_base, nfield_sph_spec, ntot_sph_spec)
+!!     &          ipol_base, m_bench, nfield_sph_spec, ntot_sph_spec)
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
 !!        type(base_field_address), intent(in) :: ipol_base
+!!        integer(kind = kint), intent(in) :: m_bench
 !!        integer(kind = kint), intent(inout) :: nfield_sph_spec
 !!        integer(kind = kint), intent(inout) :: ntot_sph_spec
 !!      subroutine copy_detail_dbench_monitor_name                      &
@@ -99,25 +100,31 @@
         jcou = jcou + 1
       end if
 !
-      detail_out(jcou+1:jcou+4) = bench%phi_zero(1:4)
-      detail_out(jcou+5) = bench%ave_phase_vr
-      detail_out(jcou+6:jcou+7) = bench%omega_vm4(1:2)
-      jcou = jcou + 7
+      detail_out(jcou+1:jcou+bench%m_bench)                             &
+     &     = bench%phi_zero(1:bench%m_bench)
+      jcou = jcou + bench%m_bench
+!
+      detail_out(jcou+1) = bench%ave_phase_vr
+      detail_out(jcou+2:jcou+3) = bench%omega_vm4(1:2)
+      jcou = jcou + 3
 !
       if(ipol_base%i_magne .gt. 0) then
         detail_out(jcou+1)                                              &
-     &       = bench%d_zero(0,bench%iphys_dbench%i_magne+1)
+     &       = bench%ave_zero_fld(bench%iphys_dbench%i_magne+1)
         jcou = jcou + 1
       end if
 !
-      detail_out(jcou+1) = bench%d_zero(0,bench%iphys_dbench%i_velo+2)
+      detail_out(jcou+1)                                                &
+     &        = bench%ave_zero_fld(bench%iphys_dbench%i_velo+2)
       jcou = jcou + 1
       if(ipol_base%i_temp .gt. 0) then
-        detail_out(jcou+1) = bench%d_zero(0,bench%iphys_dbench%i_temp)
+        detail_out(jcou+1)                                              &
+     &        = bench%ave_zero_fld(bench%iphys_dbench%i_temp)
         jcou = jcou + 1
       end if
       if(ipol_base%i_light .gt. 0) then
-        detail_out(jcou+1) = bench%d_zero(0,bench%iphys_dbench%i_light)
+        detail_out(jcou+1)                                              &
+     &        = bench%ave_zero_fld(bench%iphys_dbench%i_light)
       end if
 !
       end subroutine dup_detail_dbench_monitor_data
@@ -126,16 +133,18 @@
 ! ----------------------------------------------------------------------
 !
       subroutine cnt_detail_dbench_monitor_name(sph_bc_U, sph_bc_B,    &
-     &         ipol_base, nfield_sph_spec, ntot_sph_spec)
+     &          ipol_base, m_bench, nfield_sph_spec, ntot_sph_spec)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
       type(base_field_address), intent(in) :: ipol_base
+      integer(kind = kint), intent(in) :: m_bench
+!
       integer(kind = kint), intent(inout) :: nfield_sph_spec
       integer(kind = kint), intent(inout) :: ntot_sph_spec
 !
 !
-      nfield_sph_spec =  1 + 7 + 1
-      ntot_sph_spec =    3 + 7 + 1
+      nfield_sph_spec =  1 + 3 + 1 + m_bench
+      ntot_sph_spec =    3 + 3 + 1 + m_bench
 !
       if(ipol_base%i_magne .gt. 0) then
         nfield_sph_spec = nfield_sph_spec + 1 + 1
@@ -174,7 +183,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine copy_detail_dbench_monitor_name                        &
-     &         (sph_bc_U, sph_bc_B, ipol_base,                          &
+     &         (sph_bc_U, sph_bc_B, ipol_base, m_bench,                 &
      &          nfield_sph_spec, num_labels,                            &
      &          ncomp_sph_spec, ene_sph_spec_name)
 !
@@ -182,6 +191,7 @@
 !
       type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
       type(base_field_address), intent(in) :: ipol_base
+      integer(kind = kint), intent(in) :: m_bench
       integer(kind = kint), intent(in) :: nfield_sph_spec
       integer(kind = kint), intent(in) :: num_labels
       integer(kind = kint), intent(inout)                               &
@@ -237,7 +247,7 @@
         jcou = jcou + ncomp_sph_spec(icou)
       end if
 !
-      do i = 1,  4
+      do i = 1, m_bench
         ncomp_sph_spec(icou+1) = 1
         write(ene_sph_spec_name(jcou+1),'(a4,i1)')  'phi_', i
         icou = icou + 1
@@ -249,12 +259,14 @@
       jcou = jcou + ncomp_sph_spec(icou)
 !
       ncomp_sph_spec(icou+1) = 1
-      ene_sph_spec_name(jcou+1) = 'omega_vp44'
+      write(ene_sph_spec_name(jcou+1),'(a10,i1,a2,i1)')                 &
+     &                        'omega_vp_l', m_bench, '_m', m_bench
       icou = icou + 1
       jcou = jcou + ncomp_sph_spec(icou)
 !
       ncomp_sph_spec(icou+1) = 1
-      ene_sph_spec_name(jcou+1) = 'omega_vt54'
+      write(ene_sph_spec_name(jcou+1),'(a10,i1,a2,i1)')                 &
+     &                        'omega_vt_l', (m_bench+1), '_m', m_bench
       icou = icou + 1
       jcou = jcou + ncomp_sph_spec(icou)
 !

@@ -22,11 +22,12 @@
 !!        integer(kind = kint), intent(inout) :: nfield_sph_spec
 !!        integer(kind = kint), intent(inout) :: ntot_sph_spec
 !!      subroutine copy_dynamobench_monitor_name                        &
-!!     &         (sph_bc_U, sph_bc_B, ipol_base,                        &
+!!     &         (sph_bc_U, sph_bc_B, ipol_base, m_bench,               &
 !!     &          nfield_sph_spec, num_labels,                          &
 !!     &          ncomp_sph_spec, ene_sph_spec_name)
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
 !!        type(base_field_address), intent(in) :: ipol_base
+!!        integer(kind = kint), intent(in) :: m_bench
 !!        integer(kind = kint), intent(in) :: nfield_sph_spec
 !!        integer(kind = kint), intent(in) :: num_labels
 !!        integer(kind = kint), intent(inout)                           &
@@ -100,19 +101,23 @@
         jcou = jcou + 1
       end if
 !
-      data_out(jcou+1) = bench%d_zero(0,bench%iphys_dbench%i_velo+2)
+      data_out(jcou+1)                                                  &
+     &     = bench%ave_zero_fld(bench%iphys_dbench%i_velo+2)
       jcou = jcou + 1
 !
       if(ipol_base%i_magne .gt. 0) then
-        data_out(jcou+1) = bench%d_zero(0,bench%iphys_dbench%i_magne+1)
+        data_out(jcou+1)                                                &
+     &     = bench%ave_zero_fld(bench%iphys_dbench%i_magne+1)
         jcou = jcou + 1
       end if
       if(ipol_base%i_temp .gt. 0) then
-        data_out(jcou+1) = bench%d_zero(0,bench%iphys_dbench%i_temp)
+        data_out(jcou+1)                                                &
+     &      = bench%ave_zero_fld(bench%iphys_dbench%i_temp)
         jcou = jcou + 1
       end if
       if(ipol_base%i_light .gt. 0) then
-        data_out(jcou+1) = bench%d_zero(0,bench%iphys_dbench%i_light)
+        data_out(jcou+1)                                                &
+     &     = bench%ave_zero_fld(bench%iphys_dbench%i_light)
         jcou = jcou + 1
       end if
 !
@@ -174,7 +179,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine copy_dynamobench_monitor_name                          &
-     &         (sph_bc_U, sph_bc_B, ipol_base,                          &
+     &         (sph_bc_U, sph_bc_B, ipol_base, m_bench,                 &
      &          nfield_sph_spec, num_labels,                            &
      &          ncomp_sph_spec, ene_sph_spec_name)
 !
@@ -182,6 +187,7 @@
 !
       type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
       type(base_field_address), intent(in) :: ipol_base
+      integer(kind = kint), intent(in) :: m_bench
       integer(kind = kint), intent(in) :: nfield_sph_spec
       integer(kind = kint), intent(in) :: num_labels
       integer(kind = kint), intent(inout)                               &
@@ -263,12 +269,14 @@
       jcou = jcou + ncomp_sph_spec(icou)
 !
       ncomp_sph_spec(icou+1) = 1
-      ene_sph_spec_name(jcou+1) = 'omega_vp44'
+      write(ene_sph_spec_name(jcou+1),'(a10,i1,a2,i1)')                 &
+     &                        'omega_vp_l', m_bench, '_m', m_bench
       icou = icou + 1
       jcou = jcou + ncomp_sph_spec(icou)
 !
       ncomp_sph_spec(icou+1) = 1
-      ene_sph_spec_name(jcou+1) = 'omega_vt54'
+      write(ene_sph_spec_name(jcou+1),'(a10,i1,a2,i1)')                 &
+     &                        'omega_vt_l', (m_bench+1), '_m', m_bench
       icou = icou + 1
       jcou = jcou + ncomp_sph_spec(icou)
 !
