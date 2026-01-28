@@ -96,6 +96,7 @@
       use sum_rotation_of_forces
       use cal_self_buoyancies_sph
       use rot_self_buoyancies_sph
+      use add_sph_ref_scalar_advect
 !
       use m_work_time
       use m_elapsed_labels_4_MHD
@@ -244,6 +245,7 @@
       use copy_nodal_fields
       use cal_nonlinear_sph_MHD
       use sum_rotation_of_forces
+      use add_sph_ref_scalar_advect
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
@@ -258,6 +260,9 @@
       type(phys_data), intent(inout) :: rj_fld
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
+!
+      real(kind = kreal), allocatable :: ref_grad_local(:)
+      real(kind = kreal), allocatable :: ref_grad_S(:)
 !
 !
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
@@ -296,8 +301,11 @@
       end if
 !
 !
-      call add_ref_advect_sph_MHD(sph%sph_rj, sph_MHD_bc, MHD_prop,     &
-     &                            trans_p%leg, refs, ipol, rj_fld)
+      allocate(ref_grad_local(0:sph%sph_rj%nidx_rj(1)))
+      allocate(ref_grad_S(0:sph%sph_rj%nidx_rj(1)))
+      call add_ref_advect_sph_licv(sph%sph_rj, sph_MHD_bc, MHD_prop,    &
+     &    trans_p%leg, refs, ipol, rj_fld, ref_grad_local, ref_grad_S)
+      deallocate(ref_grad_local, ref_grad_S)
 !
 !
 !      call licv_forces_to_explicit(MHD_prop%fl_prop,                   &
