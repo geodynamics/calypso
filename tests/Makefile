@@ -48,38 +48,63 @@ TARGET_CONTROL_MHD_CHECK =   $(BUILDDIR)/utilities/check_control_mhd
 all: test
 
 test:
-	@echo "# Test in Gauss_point_test directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test in Gauss_point_test directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd Gauss_point_test; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		TARGET_GAUSS_TEST="$(TARGET_GAUSS_TEST)" TARGET_CMP_GAUSS_TEST="$(TARGET_CMP_GAUSS_TEST)" \
 		test
-	@echo "# Test in FFT_test directory..."
+	
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test in FFT_test directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd FFT_test; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" TARGET_FFTPACK_TEST="$(TARGET_FFTPACK_TEST)" TARGET_FFW3_F_TEST="$(TARGET_FFW3_F_TEST)" \
 		TARGET_SGL_FFW3_TEST="$(TARGET_SGL_FFW3_TEST)" TARGET_CMPR_FFT_TEST="$(TARGET_CMPR_FFT_TEST)" \
 		test
 	
-	@echo "# Test in Communication_check directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Tests in Communication_check directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd Communication_check; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_CHECK_SPH_GRID="$(TARGET_CHECK_SPH_GRID)" TARGET_TEST_SPH_GRID="$(TARGET_TEST_SPH_GRID)" \
 		test
-	@echo "# Test in restart_assemble directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Tests in restart_assemble directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd restart_assemble; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test in Control_file_check directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test in Control_file_check directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd Control_file_check; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" TARGET_CONTROL_MHD_CHECK="$(TARGET_CONTROL_MHD_CHECK)" \
 		test
 	
-	@echo "# Test in Dynamo_Benchmark directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Tests in Dynamo_Benchmark directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd Dynamo_Benchmark; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_SPH_MHD="$(TARGET_SPH_MHD)" \
@@ -87,7 +112,11 @@ test:
 		TARGET_COMPARE_PSF="$(TARGET_COMPARE_PSF)" TARGET_PSF_2_VTK="$(TARGET_PSF_2_VTK)" \
 		test
 	
-	@echo "# Test in Models directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Tests in Models directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd Models; \
 		$(GMAKE) SRCDIR="$(SRCDIR)" BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_SPH_MHD="$(TARGET_SPH_MHD)" \

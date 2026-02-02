@@ -15,7 +15,7 @@ TARGET_SPH_ENE_CHECK = $(SRCDIR)/bin/tests/sph_ene_check
 
 all: test
 
-test: 
+test:
 	rm -f *.dat *.txt rst_4/rst.* monitor/*.dat field/out.*
 	$(MPIRUN) -np 4 $(TARGET_SPH_MHD)
 	@sync

@@ -23,49 +23,81 @@ TARGET_CMP_SPH_RST=  $(BUILDDIR)/tests/compare_sph_restart
 all: test
 
 test: 
-	@echo "# Test restart data assemble in ascii directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in ascii directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd ascii; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test restart data assemble in binary directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in binary directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd binary; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test restart data assemble in gzip directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in gzip directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd gzip; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test restart data assemble in binary_gz directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in binary_gz directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd binary_gz; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test restart data assemble in merged directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in merged directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd merged; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test restart data assemble in merged_bin directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in merged_bin directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd merged_bin; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test restart data assemble in merged_gz directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in merged_gz directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd merged_gz; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test
 	
-	@echo "# Test restart data assemble in merged_bin_gz directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------'
+	@echo "#   Test restart data assemble in merged_bin_gz directory..."
+	@echo '# -----------------------------------------------------------'
+	@echo '#'
 	@cd merged_bin_gz; $(GMAKE) \
 		MPIRUN="$(MPIRUN)" TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \

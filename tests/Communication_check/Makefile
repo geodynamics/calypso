@@ -28,47 +28,83 @@ MPI_TEST =  $(MPIRUN) -np $(NP) $(TARGET_TEST_SPH_GRID)
 all: test
 
 test: 
-	@echo "# Test spherical harmonics indexining in ascii directory..."
+	@echo '#'
+	@echo '# -------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in ascii directory..."
+	@echo '# -------------------------------------------------------------'
+	@echo '#'
 	@cd ascii; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in binary directory..."
+	@echo '#'
+	@echo '# --------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in binary directory..."
+	@echo '# --------------------------------------------------------------'
+	@echo '#'
 	@cd binary; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in gzip directory..."
+	@echo '#'
+	@echo '# -------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in gzip directory..."
+	@echo '# -------------------------------------------------------------'
+	@echo '#'
 	@cd gzip; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in binary_gz directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in binary_gz directory..."
+	@echo '# -----------------------------------------------------------------'
+	@echo '#'
 	@cd binary_gz; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in merged directory..."
+	@echo '#'
+	@echo '# --------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in merged directory..."
+	@echo '# --------------------------------------------------------------'
+	@echo '#'
 	@cd merged; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in merged_bin directory..."
+	@echo '#'
+	@echo '# ------------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in merged_bin directory..."
+	@echo '# ------------------------------------------------------------------'
+	@echo '#'
 	@cd merged_bin; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in merged_gz directory..."
+	@echo '#'
+	@echo '# -----------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in merged_gz directory..."
+	@echo '# -----------------------------------------------------------------'
+	@echo '#'
 	@cd merged_gz; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in merged_bin_gz directory..."
+	@echo '#'
+	@echo '# ---------------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in merged_bin_gz directory..."
+	@echo '# ---------------------------------------------------------------------'
+	@echo '#'
 	@cd merged_bin_gz; \
 		$(GMAKE) MPI_GEN="$(MPI_GEN)" MPI_CHECK="$(MPI_CHECK)" MPI_TEST="$(MPI_TEST)" \
 		test
 	
-	@echo "# Test spherical harmonics indexining in no_file directory..."
+	@echo '#'
+	@echo '# ---------------------------------------------------------------'
+	@echo "#   Test spherical harmonics indexining in no_file directory..."
+	@echo '# ---------------------------------------------------------------'
+	@echo '#'
 	@cd no_file; \
 		$(GMAKE) MPI_TEST="$(MPI_TEST)" \
 		test
