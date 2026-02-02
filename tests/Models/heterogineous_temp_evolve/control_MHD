@@ -180,6 +180,16 @@ begin MHD_control
 !        end array coef_4_light_source_ctl
       end  composition
     end coefficients_ctl
+!
+!!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!    ref_temperature_ctl: none           (No reference of temperature)
+!                         spherical_shell ( for spherical shell model)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin temperature_define
+      ref_temp_ctl            none
+    end temperature_define
   end model
 !
 !
