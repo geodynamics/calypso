@@ -30,12 +30,6 @@
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
 !!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
-!!      subroutine set_control_SPH_MHD_bcs                              &
-!!     &         (MHD_prop, nbc_ctl, sbc_ctl, MHD_BC)
-!!        type(MHD_evolution_param), intent(in) :: MHD_prop
-!!        type(node_bc_control), intent(in) :: nbc_ctl
-!!        type(surf_bc_control), intent(in) :: sbc_ctl
-!!        type(MHD_BC_lists), intent(inout) :: MHD_BC
 !!@endverbatim
 !
       module set_control_sph_mhd
@@ -64,8 +58,6 @@
       use t_field_on_circle
 !
       implicit none
-!
-      private :: set_ctl_SPH_val_diffusions
 !
 ! ----------------------------------------------------------------------
 !
@@ -96,11 +88,14 @@
       use set_ctl_parallel_platform
       use set_control_4_model
       use set_control_sph_data_MHD
+      use set_control_SPH_MHD_bcs
       use set_control_4_force
       use set_ctl_4_shell_grids
 !
       use set_control_4_pickup_sph
       use parallel_ucd_IO_select
+      use m_initial_field_control
+      use set_reference_scalar_param
 !
       type(platform_data_control), intent(in) :: plt
       type(platform_data_control), intent(in) :: org_plt
@@ -165,130 +160,33 @@
      &    MHD_prop%MHD_coef_list)
 !
 !   Set external magnetic field scale
-      call set_coefs_4_magnetic_scale                                   &
-     &   (model_ctl%bscale_ctl, MHD_prop%MHD_coef_list)
+      call set_coefs_4_magnetic_scale(model_ctl%bscale_ctl,             &
+     &                                MHD_prop%MHD_coef_list)
 !
 !   Set polytrope and valuable diffusivities
       call set_ctl_SPH_val_diffusions(model_ctl, MHD_prop)
 !
 !   set boundary conditions
 !
-      call set_control_SPH_MHD_bcs                                      &
+      call s_set_control_SPH_MHD_bcs                                    &
      &   (MHD_prop, model_ctl%nbc_ctl, model_ctl%sbc_ctl, MHD_BC)
 !
-!   set control parameters
+!   set time step parameters
+!
+      if (iflag_debug.gt.0) write(*,*) 'set_initial_field_id'
+      call set_initial_field_id(smctl_ctl%mrst_ctl%restart_flag_ctl,    &
+     &                          MHD_step%iflag_restart_mode)
+      call check_set_initial_time(MHD_step%iflag_restart_mode,          &
+     &                            smctl_ctl%tctl, MHD_step%init_d%time)
 !
       if (iflag_debug.gt.0) write(*,*) 's_set_control_4_time_steps'
-      call s_set_control_4_time_steps                                   &
-     &   (smctl_ctl%mrst_ctl, smctl_ctl%tctl, MHD_step)
+      call s_set_control_4_time_steps(smctl_ctl%tctl, MHD_step)
 !
       call s_set_control_4_crank(smctl_ctl%mevo_ctl,                    &
-     &    MHD_prop%fl_prop, MHD_prop%cd_prop,                           &
-     &    MHD_prop%ht_prop, MHD_prop%cp_prop)
+     &                           MHD_prop%fl_prop, MHD_prop%cd_prop,    &
+     &                           MHD_prop%ht_prop, MHD_prop%cp_prop)
 !
       end subroutine set_control_4_SPH_MHD
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_control_SPH_MHD_bcs                                &
-     &         (MHD_prop, nbc_ctl, sbc_ctl, MHD_BC)
-!
-      use t_ctl_data_node_boundary
-      use t_ctl_data_surf_boundary
-!
-      use set_control_4_velo
-      use set_control_4_press
-      use set_control_4_temp
-      use set_control_4_magne
-      use set_control_4_composition
-!
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(node_bc_control), intent(in) :: nbc_ctl
-      type(surf_bc_control), intent(in) :: sbc_ctl
-!
-      type(MHD_BC_lists), intent(inout) :: MHD_BC
-!
-!
-!   set boundary conditions for temperature
-!
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_4_temp'
-      call s_set_control_4_temp(MHD_prop%ht_prop,                       &
-     &    nbc_ctl%node_bc_T_ctl, sbc_ctl%surf_bc_HF_ctl,                &
-     &    MHD_BC%temp_BC%nod_BC, MHD_BC%temp_BC%surf_BC)
-!
-!
-!   set boundary conditions for velocity
-!
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_4_velo'
-      call s_set_control_4_velo(MHD_prop%fl_prop,                       &
-     &    nbc_ctl%node_bc_U_ctl, sbc_ctl%surf_bc_ST_ctl,                &
-     &    MHD_BC%velo_BC%nod_BC, MHD_BC%velo_BC%surf_BC)
-!
-!  set boundary conditions for pressure
-!
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_4_press'
-      call s_set_control_4_press(MHD_prop%fl_prop,                      &
-     &    nbc_ctl%node_bc_P_ctl, sbc_ctl%surf_bc_PN_ctl,                &
-     &    MHD_BC%press_BC%nod_BC, MHD_BC%press_BC%surf_BC)!
-!   set boundary conditions for composition variation
-!
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_4_composition'
-      call s_set_control_4_composition(MHD_prop%cp_prop,                &
-     &    nbc_ctl%node_bc_C_ctl, sbc_ctl%surf_bc_CF_ctl,                &
-     &    MHD_BC%light_BC%nod_BC, MHD_BC%light_BC%surf_BC)
-!
-!   set boundary_conditons for magnetic field
-!
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_4_magne'
-      call s_set_control_4_magne(MHD_prop%cd_prop,                      &
-     &    nbc_ctl%node_bc_B_ctl, sbc_ctl%surf_bc_BN_ctl,                &
-     &    MHD_BC%magne_BC%nod_BC, MHD_BC%magne_BC%surf_BC)
-!
-      end subroutine set_control_SPH_MHD_bcs
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_ctl_SPH_val_diffusions(model_ctl, MHD_prop)
-!
-      use t_ctl_param_val_density
-      use t_ctl_param_val_diffusion
-!
-      type(mhd_model_control), intent(in) :: model_ctl
-      type(MHD_evolution_param), intent(inout) :: MHD_prop
-!
-!   Set polytrope
-      call set_valuable_density_ctl                                     &
-     &   (my_rank, model_ctl%polytrope_c, MHD_prop%polytrope_param,     &
-     &    MHD_prop%flag_ref_density_valiation)
-!
-!   Set valuable diffusivities
-      call set_valuable_diffusion_ctl                                   &
-     &   (my_rank, model_ctl%val_viscous_c,                             &
-     &    MHD_prop%val_viscous_param, MHD_prop%flag_viscous_variation)
-      call set_valuable_diffusion_ctl                                   &
-     &   (my_rank, model_ctl%val_mag_diffuse_c,                         &
-     &    MHD_prop%val_mag_diffuse_param,                               &
-     &    MHD_prop%flag_mag_diffuse_variation)
-      call set_valuable_diffusion_ctl                                   &
-     &   (my_rank, model_ctl%reft_ctl%valuable_diffusion_ctl,           &
-     &    MHD_prop%val_thermal_diffuse_param,                           &
-     &    MHD_prop%flag_term_diffuse_variation)
-      call set_valuable_diffusion_ctl                                   &
-     &   (my_rank, model_ctl%refc_ctl%valuable_diffusion_ctl,           &
-     &    MHD_prop%val_comp_diffuse_param,                              &
-     &    MHD_prop%flag_comp_diffuse_variation)
-!
-      if(iflag_debug .le. 0) return
-      call check_polytrope_parameters(MHD_prop%polytrope_param)
-!
-      call check_val_diffuse_parameters(MHD_prop%val_viscous_param)
-      call check_val_diffuse_parameters(MHD_prop%val_mag_diffuse_param)
-      call check_val_diffuse_parameters                                 &
-     &   (MHD_prop%val_thermal_diffuse_param)
-      call check_val_diffuse_parameters                                 &
-     &   (MHD_prop%val_comp_diffuse_param)
-!
-      end subroutine set_ctl_SPH_val_diffusions
 !
 ! ----------------------------------------------------------------------
 !

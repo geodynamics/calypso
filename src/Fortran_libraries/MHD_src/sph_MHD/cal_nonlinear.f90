@@ -7,12 +7,15 @@
 !>@brief Evaluate nonlinear terms by pseudo spectram scheme
 !!
 !!@verbatim
-!!      subroutine nonlinear(r_2nd, SPH_model, trans_p,                 &
-!!     &                     WK, SPH_MHD, SR_sig, SR_r)
+!!      subroutine nonlinear(sph, comms_sph, r_2nd, SPH_model, trans_p, &
+!!     &                     ipol, WK, rj_fld, SR_sig, SR_r)
+!!        type(sph_grids), intent(in) :: sph
+!!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(phys_address), intent(in) :: ipol
 !!        type(SGS_model_control_params), intent(in) :: SGS_param
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
-!!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+!!        type(phys_data), intent(inout) :: rj_fld
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine nonlinear_by_pseudo_sph                              &
@@ -35,23 +38,6 @@
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
-!!      subroutine licv_exp(refs, MHD_prop, sph_MHD_bc,                 &
-!!     &          sph, comms_sph, omega_sph, trans_p, ipol, WK,         &
-!!     &          rj_fld, SR_sig, SR_r)
-!!        type(SGS_model_control_params), intent(in) :: SGS_param
-!!        type(sph_grids), intent(in) :: sph
-!!        type(sph_comm_tables), intent(in) :: comms_sph
-!!        type(sph_rotation), intent(in) :: omega_sph
-!!        type(fdm_matrices), intent(in) :: r_2nd
-!!        type(parameters_4_sph_trans), intent(in) :: trans_p
-!!        type(phys_address), intent(in) :: ipol
-!!        type(works_4_sph_trans_MHD), intent(inout) :: WK
-!!        type(phys_data), intent(inout) :: rj_fld
-!!        type(radial_reference_field), intent(in) :: refs
-!!        type(MHD_evolution_param), intent(in) :: MHD_prop
-!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!!        type(send_recv_status), intent(inout) :: SR_sig
-!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !
 !
@@ -66,9 +52,12 @@
       use t_physical_property
       use t_SPH_MHD_model_data
       use t_SPH_mesh_field_data
+      use t_spheric_parameter
+      use t_sph_trans_comm_tbl
+      use t_phys_address
+      use t_phys_data
       use t_poloidal_rotation
       use t_fdm_coefs
-      use t_sph_trans_arrays_MHD
       use t_sph_trans_arrays_MHD
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
@@ -87,8 +76,8 @@
 !*
 !*   ------------------------------------------------------------------
 !*
-      subroutine nonlinear(r_2nd, SPH_model, trans_p,                   &
-     &                     WK, SPH_MHD, SR_sig, SR_r)
+      subroutine nonlinear(sph, comms_sph, r_2nd, SPH_model, trans_p,   &
+     &                     ipol, WK, rj_fld, SR_sig, SR_r)
 !
       use cal_inner_core_rotation
 !
@@ -101,12 +90,15 @@
       use m_work_time
       use m_elapsed_labels_4_MHD
 !
+      type(sph_grids), intent(in) :: sph
+      type(sph_comm_tables), intent(in) :: comms_sph
       type(fdm_matrices), intent(in) :: r_2nd
       type(parameters_4_sph_trans), intent(in) :: trans_p
       type(SPH_MHD_model_data), intent(in) :: SPH_model
+      type(phys_address), intent(in) :: ipol
 !
       type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+      type(phys_data), intent(inout) :: rj_fld
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
@@ -116,52 +108,51 @@
 !
 !   ----  lead buoyancies
         call sel_buoyancies_sph_MHD                                     &
-     &     (SPH_MHD%sph%sph_rj, trans_p%leg, SPH_MHD%ipol%forces,       &
+     &     (sph%sph_rj, trans_p%leg, ipol%forces,                       &
      &      SPH_model%MHD_prop%fl_prop, SPH_model%sph_MHD_bc%sph_bc_U,  &
-     &      SPH_MHD%ipol%base%i_temp, SPH_MHD%ipol%base%i_light,        &
-     &      SPH_MHD%fld)
+     &      ipol%base%i_temp, ipol%base%i_light, rj_fld)
 !
 !   ----  lead rotation of buoyancies
         if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
-        call sel_rot_buoyancy_sph_MHD(SPH_MHD%sph%sph_rj,               &
-     &      SPH_MHD%ipol%base, SPH_MHD%ipol%rot_forces,                 &
+        call sel_rot_buoyancy_sph_MHD                                   &
+     &     (sph%sph_rj, ipol%base, ipol%rot_forces,                     &
      &      SPH_model%MHD_prop%fl_prop, SPH_model%sph_MHD_bc%sph_bc_U,  &
-     &      SPH_MHD%fld)
+     &      rj_fld)
       end if
 !
 !   ----  lead nonlinear terms by phesdo spectrum
       if (iflag_debug.eq.1) write(*,*) 'nonlinear_by_pseudo_sph'
       call nonlinear_by_pseudo_sph                                      &
-     &   (SPH_MHD%sph, SPH_MHD%comms, SPH_model%omega_sph,              &
+     &   (sph, comms_sph, SPH_model%omega_sph,                          &
      &    r_2nd, SPH_model%MHD_prop, SPH_model%sph_MHD_bc, trans_p,     &
      &    WK%gt_cor, WK%trns_MHD, WK%WK_leg, WK%WK_FFTs_MHD,            &
-     &    WK%cor_rlm, SPH_MHD%ipol, SPH_MHD%fld, SR_sig, SR_r)
+     &    WK%cor_rlm, ipol, rj_fld, SR_sig, SR_r)
 !
 !   ----  Lead advection of reference field
-      call add_ref_advect_sph_MHD                                       &
-     &   (SPH_MHD%sph%sph_rj, SPH_model%sph_MHD_bc, SPH_model%MHD_prop, &
-     &    trans_p%leg, SPH_model%refs, SPH_MHD%ipol, SPH_MHD%fld)
+      call add_ref_advect_sph_MHD(sph%sph_rj, trans_p%leg,              &
+     &    SPH_model%sph_MHD_bc, SPH_model%MHD_prop,                     &
+     &    SPH_model%refs%iref_grad, SPH_model%refs%ref_field,           &
+     &    ipol%base, ipol%forces, rj_fld)
 !
 !*  ----  copy coriolis term for inner core rotation
 !*
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+8)
       call copy_icore_rot_to_tor_coriolis                               &
-     &   (SPH_model%sph_MHD_bc%sph_bc_U, SPH_MHD%sph%sph_rj,            &
-     &    SPH_MHD%ipol%forces, SPH_MHD%ipol%rot_forces, SPH_MHD%fld)
+     &   (SPH_model%sph_MHD_bc%sph_bc_U, sph%sph_rj,                    &
+     &    ipol%forces, ipol%rot_forces, rj_fld)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+8)
 !
       if(SPH_model%MHD_prop%fl_prop%iflag_scheme .eq. id_no_evolution)  &
      &      return
 !
-!        if(iflag_debug .gt. 0) write(*,*)                               &
+!        if(iflag_debug .gt. 0) write(*,*)                              &
 !     &       'sum_forces_to_explicit for forces'
 !        call sum_forces_to_explicit(SPH_model%MHD_prop%fl_prop,        &
-!     &      SPH_MHD%ipol%exp_work, SPH_MHD%ipol%forces, SPH_MHD%fld)
+!     &      ipol%exp_work, ipol%forces, rj_fld)
         if(iflag_debug .gt. 0) write(*,*)                               &
      &       'sum_forces_to_explicit for rotation of forces'
         call sum_forces_to_explicit(SPH_model%MHD_prop%fl_prop,         &
-     &      SPH_MHD%ipol%exp_work, SPH_MHD%ipol%rot_forces,             &
-     &      SPH_MHD%fld)
+     &      ipol%exp_work, ipol%rot_forces, rj_fld)
 !
       end subroutine nonlinear
 !*
@@ -231,92 +222,6 @@
 !
       end subroutine nonlinear_by_pseudo_sph
 !
-!*   ------------------------------------------------------------------
-!*   ------------------------------------------------------------------
-!*
-      subroutine licv_exp(refs, MHD_prop, sph_MHD_bc,                   &
-     &          sph, comms_sph, omega_sph, trans_p, ipol, WK,           &
-     &          rj_fld, SR_sig, SR_r)
-!
-      use m_phys_constants
-      use cal_self_buoyancies_sph
-      use rot_self_buoyancies_sph
-      use sph_transforms_4_MHD
-      use copy_nodal_fields
-      use cal_nonlinear_sph_MHD
-      use sum_rotation_of_forces
-      use add_sph_ref_scalar_advect
-!
-      type(sph_grids), intent(in) :: sph
-      type(sph_comm_tables), intent(in) :: comms_sph
-      type(sph_rotation), intent(in) :: omega_sph
-      type(parameters_4_sph_trans), intent(in) :: trans_p
-      type(phys_address), intent(in) :: ipol
-      type(radial_reference_field), intent(in) :: refs
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!
-      type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(phys_data), intent(inout) :: rj_fld
-      type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_real_buffer), intent(inout) :: SR_r
-!
-      real(kind = kreal), allocatable :: ref_grad_local(:)
-      real(kind = kreal), allocatable :: ref_grad_S(:)
-!
-!
-      if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
-!   ----  lead rotation of buoyancies
-        call sel_buoyancies_sph_MHD                                     &
-     &     (sph%sph_rj, trans_p%leg, ipol%forces,                       &
-     &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,                      &
-     &      ipol%base%i_temp, ipol%base%i_light, rj_fld)
-!
-!   ----  lead rotation of buoyancies
-        if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
-        call sel_rot_buoyancy_sph_MHD                                   &
-     &     (sph%sph_rj, ipol%base, ipol%rot_forces,                     &
-     &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, rj_fld)
-      end if
-!*
-!*  ----  copy velocity for coriolis term ------------------
-      if(iflag_debug.eq.1) write(*,*) 'sph_transform_4_licv'
-      if(MHD_prop%fl_prop%flag_coriolis) then
-        call sph_transform_4_licv                                       &
-     &     (sph%sph_rlm, comms_sph%comm_rlm, comms_sph%comm_rj,         &
-     &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, omega_sph, trans_p,  &
-     &      WK%gt_cor, WK%trns_MHD, rj_fld, WK%cor_rlm, SR_sig, SR_r)
-      end if
-!
-!   ----  lead nonlinear terms by phesdo spectrum
-!
-      if(ipol%forces%i_h_advect .gt. 0) then
-        call clear_field_data(rj_fld, n_scalar, ipol%forces%i_h_advect)
-      end if
-      if(ipol%forces%i_c_advect .gt. 0) then
-        call clear_field_data(rj_fld, n_scalar, ipol%forces%i_c_advect)
-      end if
-      if(ipol%exp_work%i_forces .gt. 0) then
-        call clear_field_data(rj_fld, n_vector, ipol%exp_work%i_forces)
-      end if
-!
-!
-      allocate(ref_grad_local(0:sph%sph_rj%nidx_rj(1)))
-      allocate(ref_grad_S(0:sph%sph_rj%nidx_rj(1)))
-      call add_ref_advect_sph_licv(sph%sph_rj, sph_MHD_bc, MHD_prop,    &
-     &    trans_p%leg, refs, ipol, rj_fld, ref_grad_local, ref_grad_S)
-      deallocate(ref_grad_local, ref_grad_S)
-!
-!
-!      call licv_forces_to_explicit(MHD_prop%fl_prop,                   &
-!     &    ipol%exp_work, ipol%forces, rj_fld)
-
-        call licv_forces_to_explicit(MHD_prop%fl_prop,                  &
-     &      ipol%exp_work, ipol%rot_forces, rj_fld)
-!
-!
-      end subroutine licv_exp
-!*
 !*   ------------------------------------------------------------------
 !
       end module cal_nonlinear

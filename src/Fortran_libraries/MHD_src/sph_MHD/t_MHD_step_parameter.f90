@@ -8,8 +8,7 @@
 !> @brief Parameteres for time steppings
 !
 !!@verbatim
-!!      subroutine s_set_control_4_time_steps(mr_ctl, tctl, MHD_step)
-!!        type(mhd_restart_control), intent(in) :: mr_ctl
+!!      subroutine s_set_control_4_time_steps(tctl, MHD_step)
 !!        type(time_data_control), intent(in) :: tctl
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!@endverbatim
@@ -67,31 +66,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_time_steps(mr_ctl, tctl, MHD_step)
+      subroutine s_set_control_4_time_steps(tctl, MHD_step)
 !
       use t_ctl_data_mhd_evo_scheme
-      use t_ctl_data_mhd_restart
-      use m_initial_field_control
       use cal_num_digits
       use skip_comment_f
 !
-      type(mhd_restart_control), intent(in) :: mr_ctl
       type(time_data_control), intent(in) :: tctl
       type(MHD_step_param), intent(inout) :: MHD_step
 !
 !
-!  control for restert
-!
-      call set_initial_field_id(mr_ctl%restart_flag_ctl, tctl,          &
-     &    MHD_step%init_d%time, MHD_step%iflag_restart_mode)
-!
-        MHD_step%time_d%flag_flex_step = .FALSE.
-        if(tctl%flexible_step_ctl%iflag .gt. 0                          &
+!      Set time stepping mode
+      MHD_step%time_d%flag_flex_step = .FALSE.
+      if(tctl%flexible_step_ctl%iflag .gt. 0                            &
      &     .and. yes_flag(tctl%flexible_step_ctl%charavalue)) then
-          MHD_step%time_d%flag_flex_step = .TRUE.
-        end if
+        MHD_step%time_d%flag_flex_step = .TRUE.
+      end if
 !
-      if (tctl%dt_ctl%iflag .eq. 0) then
+      if(tctl%dt_ctl%iflag .eq. 0) then
         e_message = 'Set delta t'
         call calypso_MPI_abort(ierr_evo, e_message)
       else

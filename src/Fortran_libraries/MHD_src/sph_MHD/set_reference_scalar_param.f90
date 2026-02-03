@@ -16,6 +16,9 @@
 !!        type(reference_temperature_ctl), intent(in) :: ref_ctl
 !!        type(reference_scalar_param), intent(inout) :: ref_param
 !!        type(takepiro_model_param), intent(inout) :: takepiro
+!!      subroutine set_ref_scalar_for_licv(MHD_step, ref_param)
+!!        type(MHD_step_param), intent(in) :: MHD_step
+!!        type(reference_scalar_param), intent(inout) :: ref_param
 !!@endverbatim
 !
       module set_reference_scalar_param
@@ -60,6 +63,23 @@
      &    ref_param%iflag_reference, takepiro)
 !
       end subroutine set_reference_scalar_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_ref_scalar_for_licv(MHD_step, ref_param)
+!
+      use t_MHD_step_parameter
+      use m_initial_field_control
+!
+      type(MHD_step_param), intent(in) :: MHD_step
+      type(reference_scalar_param), intent(inout) :: ref_param
+!
+!
+      if(MHD_step%iflag_restart_mode .eq. i_rst_licv) then
+        ref_param%iflag_reference = id_numerical_solution
+      end if
+!
+      end subroutine set_ref_scalar_for_licv
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

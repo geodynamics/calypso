@@ -7,17 +7,22 @@
 !> @brief Control flags for initial data
 !
 !!@verbatim
-!!      subroutine set_initial_field_id                                 &
-!!     &         (restart_flag_ctl, tctl, time_init, iflag_restart_mode)
-!!        type(time_data_control), intent(in) :: tctl
+!!      subroutine set_initial_field_id(restart_flag_ctl,               &
+!!     &                                iflag_restart_mode)
 !!        type(read_character_item), intent(in) :: restart_flag_ctl
-!!        real(kind = kreal), intent(inout) :: time_init
 !!        integer(kind = kint), intent(inout) :: iflag_restart_mode
+!!      subroutine check_set_initial_time(iflag_restart_mode, tctl,     &
+!!     &                                  time_init)
+!!        type(time_data_control), intent(in) :: tctl
+!!        integer(kind = kint), intent(in) :: iflag_restart_mode
+!!        real(kind = kreal), intent(inout) :: time_init
 !!@endverbatim
 !
       module m_initial_field_control
 !
       use m_precision
+      use m_error_IDs
+      use m_machine_parameter
 !
       implicit none
 !
@@ -92,20 +97,15 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_initial_field_id                                   &
-     &         (restart_flag_ctl, tctl, time_init, iflag_restart_mode)
+      subroutine set_initial_field_id(restart_flag_ctl,                 &
+     &                                iflag_restart_mode)
 !
       use calypso_mpi
-      use m_error_IDs
-      use m_machine_parameter
       use t_control_array_character
-      use t_ctl_data_4_time_steps
       use skip_comment_f
 !
-      type(time_data_control), intent(in) :: tctl
       type(read_character_item), intent(in) :: restart_flag_ctl
 !
-      real(kind = kreal), intent(inout) :: time_init
       integer(kind = kint), intent(inout) :: iflag_restart_mode
 !
 !
@@ -149,8 +149,26 @@
         end if
       end if
 !
-      if (iflag_restart_mode .eq. i_rst_no_file) then
-        if (tctl%time_init_ctl%iflag .eq. 0) then
+      end subroutine set_initial_field_id
+!
+!-----------------------------------------------------------------------
+!
+      subroutine check_set_initial_time(iflag_restart_mode, tctl,       &
+     &                                  time_init)
+!
+      use calypso_mpi
+      use t_control_array_character
+      use t_ctl_data_4_time_steps
+      use skip_comment_f
+!
+      type(time_data_control), intent(in) :: tctl
+      integer(kind = kint), intent(in) :: iflag_restart_mode
+!
+      real(kind = kreal), intent(inout) :: time_init
+!
+!
+      if(iflag_restart_mode .eq. i_rst_no_file) then
+        if(tctl%time_init_ctl%iflag .eq. 0) then
           e_message  = 'Set initial time'
           call calypso_MPI_abort(ierr_evo, e_message)
         else
@@ -163,7 +181,7 @@
         write(*,*) 'time_init ',time_init
       end if
 !
-      end subroutine set_initial_field_id
+      end subroutine check_set_initial_time
 !
 !-----------------------------------------------------------------------
 !

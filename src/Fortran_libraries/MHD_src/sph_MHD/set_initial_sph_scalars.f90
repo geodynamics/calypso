@@ -7,11 +7,12 @@
 !> @brief Set initial data for spectrum dynamos
 !!
 !!@verbatim
-!!      subroutine set_ini_reference_temp_sph                           &
-!!     &         (is_temp, reftemp_rj, sph_rj, ref_param,               &
-!!     &          nlayer_ICB, nlayer_CMB, n_point, ntot_phys_rj, d_rj)
+!!      subroutine set_ini_reference_temp_sph(sph_rj, reftemp_j,        &
+!!     &                                      temp_rj)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
-!!        type(reference_scalar_param), intent(in) :: ref_param
+!!        real(kind=kreal), intent(in)                                  &
+!!     &                 :: reftemp_j(0:sph_rj%nidx_rj(1))
+!!        real (kind=kreal), intent(inout) :: temp_rj(sph_rj%nnod_rj)
 !!      subroutine set_ini_ref_temp_benchmark                           &
 !!     &         (sph_rj, nlayer_ICB, nlayer_CMB, temp_rj)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -42,12 +43,10 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_ini_reference_temp_sph(sph_rj, ref_param,          &
-     &          reftemp_j, nlayer_ICB, nlayer_CMB, temp_rj)
+      subroutine set_ini_reference_temp_sph(sph_rj, reftemp_j,          &
+     &                                      temp_rj)
 !
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(reference_scalar_param), intent(in) :: ref_param
-      integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       real(kind=kreal), intent(in)                                      &
      &                 :: reftemp_j(0:sph_rj%nidx_rj(1))
 !
@@ -66,23 +65,10 @@
 !   set reference temperature (l = m = 0)
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
         jj = sph_rj%idx_rj_degree_zero
-        if (ref_param%iflag_reference .eq. id_sphere_ref_temp) then
-          do k = 1, sph_rj%nidx_rj(1)
-            inod = local_sph_node_address(sph_rj, k, jj)
-            temp_rj(inod) = reftemp_j(k)
-          end do
-        else
-          do k = 1, nlayer_ICB-1
-            inod = local_sph_node_address(sph_rj, k, jj)
-            temp_rj(inod) = 1.0d0
-          end do
-          do k = nlayer_ICB, nlayer_CMB
-            inod = local_sph_node_address(sph_rj, k, jj)
-            temp_rj(inod)                                               &
-     &           = (sph_rj%ar_1d_rj(k,1) * 20.d0/13.0d0 - 1.0d0 )       &
-     &            * 7.0d0 / 13.0d0
-          end do
-        end if
+        do k = 1, sph_rj%nidx_rj(1)
+          inod = local_sph_node_address(sph_rj, k, jj)
+          temp_rj(inod) = reftemp_j(k)
+        end do
       end if
 !
 !    Center
@@ -147,7 +133,7 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
-      integer ( kind = kint), intent(in) :: isig
+      integer(kind = kint), intent(in) :: isig
       real(kind=kreal), intent(inout) :: temp_rj(sph_rj%nnod_rj)
 !
       integer :: m, k, jj
@@ -158,7 +144,7 @@
       pi = four * atan(one)
       shell = r_CMB - r_ICB
 !
-      m = int( mod(isig,ikilo) / icent )
+      m = int(mod(isig,ikilo) / icent)
       jj = find_local_sph_address(sph_rj, m, m)
 !
       if (jj .gt. 0) then

@@ -57,6 +57,8 @@
       subroutine init_radial_reference_data(sph_rj, ipol,               &
      &                                      MHD_prop, refs)
 !
+      use append_reference_field_names
+!
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_address), intent(in) :: ipol
 !
@@ -68,8 +70,8 @@
       refs%ref_field%ntot_phys =  0
       call alloc_phys_name(refs%ref_field)
 
-      call append_reference_field_names(radius_name, ipol%base,         &
-     &                                  MHD_prop, refs)
+      call append_ref_field_names(radius_name, ipol%base,               &
+     &                            MHD_prop, refs)
       call alloc_phys_data((sph_rj%nidx_rj(1)+1), refs%ref_field)
 !
       call copy_reference_radius_data                                   &
