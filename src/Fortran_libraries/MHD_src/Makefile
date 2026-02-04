@@ -9,6 +9,7 @@ LIB_MHD_FILE= libcalypso_MHD.a
 
 SUBDIRS = \
 IO \
+initial_data \
 radial_FDM \
 sph_MHD
 
@@ -57,6 +58,7 @@ mod_list:
 	@echo '$$(MOD_SPH_MHD_FDM)'  \\  >> $(MAKENAME)
 	@echo '$$(MOD_SPH_MHD)'      \\  >> $(MAKENAME)
 	@echo '$$(MOD_SPH_SNAPSHOT)' \\  >> $(MAKENAME)
+	@echo '$$(MOD_INITIAL)'      \\  >> $(MAKENAME)
 	@echo >> $(MAKENAME)
 	
 	@for dir in $(SUBDIRS); do \
