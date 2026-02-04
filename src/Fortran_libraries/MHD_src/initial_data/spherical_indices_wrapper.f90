@@ -15,8 +15,8 @@
 !!      integer function find_local_sph_mode_address(sph, l, m)
 !!        type(sph_grids), intent(in) :: sph
 !!        integer, intent(in) :: l, m
-!!      integer(kind = kint) function local_sph_data_address            &
-!!     &                            (sph, kr, j_lc)
+!!      integer(kind = kint) function local_sph_data_address(sph,       &
+!!     &                                                     kr, j_lc)
 !!        type(sph_grids), intent(in) :: sph
 !!        integer, intent(in) :: kr, j_lc
 !!      real(kind = kreal) function radius_1d_rj_r(sph, kr)
@@ -28,6 +28,7 @@
 !!      integer(kind= kint) function nlayer_ICB(sph)
 !!      integer(kind= kint) function nlayer_CMB(sph)
 !!      integer(kind = kint) function inod_rj_center(sph)
+!!      integer(kind = kint) function idx_rj_degree_zero(sph)
 !!      integer(kind = kint) function nnod_rj(sph)
 !!      integer(kind = kint) function num_rj_radial_point(sph)
 !!      integer(kind = kint) function num_rj_horiz_point(sph)
@@ -87,8 +88,8 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function local_sph_data_address              &
-     &                            (sph, kr, j_lc)
+      integer(kind = kint) function local_sph_data_address(sph,         &
+     &                                                     kr, j_lc)
 !
       type(sph_grids), intent(in) :: sph
       integer, intent(in) :: kr, j_lc
@@ -151,6 +152,7 @@
       end function nlayer_CMB
 !
 !-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       integer(kind = kint) function inod_rj_center(sph)
 !
@@ -160,6 +162,17 @@
 !
       end function inod_rj_center
 !
+!-----------------------------------------------------------------------
+!
+      integer(kind = kint) function idx_rj_degree_zero(sph)
+!
+      type(sph_grids), intent(in) :: sph
+!
+      idx_rj_degree_zero = sph%sph_rj%idx_rj_degree_zero
+!
+      end function idx_rj_degree_zero
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       integer(kind = kint) function nidx_rj(sph, nd)

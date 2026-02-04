@@ -72,7 +72,7 @@
       if (js .gt. 0) then
 !$omp parallel do private(k,inod,rr)
         do k = nlayer_ICB(sph), nlayer_CMB(sph)
-          inod = js + (k-1) * num_rj_horiz_point(sph)
+          inod = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k)
 !
           d_rj_magne(inod,1) = (five / eight)                           &
@@ -90,7 +90,7 @@
       if (jt .gt. 0) then
 !$omp parallel do private(k,inod,rr)
         do k = nlayer_ICB(sph), nlayer_CMB(sph)
-          inod = jt + (k-1) * num_rj_horiz_point(sph)
+          inod = local_sph_data_address(sph, k, jt)
           rr = radius_1d_rj_r(sph, k)
           d_rj_magne(inod,3) =  (ten/three) * rr * sin(pi*(rr-r_in))
 !
@@ -134,7 +134,7 @@
       if(js .gt. 0) then
 !$omp parallel do private(k,inod,rr)
         do k = 1, nlayer_CMB(sph)
-          inod = js + (k-1) * num_rj_horiz_point(sph)
+          inod = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k)
           d_rj_magne(inod,1) = (five / two) * rr**2                     &
      &                      * (four*r_out - three*rr) / (r_out+three)
@@ -151,7 +151,7 @@
       if (jt .gt. 0) then
 !$omp parallel do private(k,inod,rr)
         do k = 1, nlayer_CMB(sph)
-          inod = jt + (k-1) * num_rj_horiz_point(sph)
+          inod = local_sph_data_address(sph, k, jt)
           rr = radius_1d_rj_r(sph, k)
 !
           d_rj_magne(inod,3) = (ten / three) * rr * sin(pi*rr/r_out)
@@ -198,7 +198,7 @@
       if(js .gt. 0) then
 !$omp parallel do private(k,inod,rr)
         do k = nlayer_ICB(sph), nlayer_CMB(sph)
-          inod = js + (k-1) * num_rj_horiz_point(sph)
+          inod = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k)
 !
           d_rj_magne(inod,1) =  (five / eight) * (dnine*half * rr**4    &
@@ -223,7 +223,7 @@
       if(jt .gt. 0) then
 !$omp parallel do private(k,inod,rr)
         do k = nlayer_ICB(sph), nlayer_CMB(sph)
-          inod = jt + (k-1) * num_rj_horiz_point(sph)
+          inod = local_sph_data_address(sph, k, jt)
           rr = radius_1d_rj_r(sph, k)
           d_rj_magne(inod,3) = (ten/eight) * rr * sin(pi*(rr-r_in))
 !
