@@ -7,16 +7,20 @@
 !> @brief Set initial data for spectrum dynamos
 !!
 !!@verbatim
-!!      subroutine initial_sph_reference_scalar                         &
-!!     &         (sph, nri_ref, reftemp_j, n_point, temp_rj)
-!!      subroutine initial_sph_ref_temp_dbench(sph, n_point, temp_rj)
-!!      subroutine init_sph_sectorial_temp(isig, sph, n_point, temp_rj)
-!!      subroutine initital_sph_noize_temp(sph, n_point, temp_rj) 
+!!      subroutine initial_sph_reference_scalar(sph, nri_ref, reftemp_j,&
+!!     &                                        n_point, temp_rj)
+!!      subroutine initial_sph_ref_temp_dbench(sph, sph_bc_T,           &
+!!     &                                       n_point, temp_rj)
+!!      subroutine init_sph_sectorial_temp(isig, sph, sph_bc_T,         &
+!!     &                                   n_point, temp_rj)
+!!      subroutine initital_sph_noise_temp(sph, sph_bc_T,               &
+!!     &                                   n_point, temp_rj)
 !!        type(sph_grids), intent(in) :: sph
+!!        type(sph_boundary_type), intent(in) :: sph_bc_T
 !!        integer(kind = kint), intent(in) :: nri_ref
 !!        real(kind=kreal), intent(in) :: reftemp_j(0:nri_ref-1)
 !!        integer(kind = kint), intent(in) :: n_point
-!!        real (kind=kreal), intent(inout) :: temp_rj(n_point)
+!!        real(kind = kreal), intent(inout) :: temp_rj(n_point)
 !!@endverbatim
 !
 !
@@ -29,6 +33,7 @@
 !
       use t_spheric_parameter
       use t_reference_scalar_param
+      use t_boundary_params_sph_MHD
 !
       implicit none
 !
@@ -38,17 +43,17 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine initial_sph_reference_scalar                           &
-     &         (sph, nri_ref, reftemp_j, n_point, temp_rj)
+      subroutine initial_sph_reference_scalar(sph, nri_ref, reftemp_j,  &
+     &                                        n_point, temp_rj)
 !
-      use spherical_indices_wrapper
+      use spherical_indices_picker
 !
       type(sph_grids), intent(in) :: sph
       integer(kind = kint), intent(in) :: nri_ref
       real(kind=kreal), intent(in) :: reftemp_j(0:nri_ref-1)
       integer(kind = kint), intent(in) :: n_point
 !
-      real (kind=kreal), intent(inout) :: temp_rj(n_point)
+      real(kind = kreal), intent(inout) :: temp_rj(n_point)
 !
       integer(kind = kint) :: inod
       integer :: k, jj
@@ -75,23 +80,28 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine initial_sph_ref_temp_dbench(sph, n_point, temp_rj)
+      subroutine initial_sph_ref_temp_dbench(sph, sph_bc_T,             &
+     &                                       n_point, temp_rj)
 !
-      use spherical_indices_wrapper
+      use spherical_indices_picker
+      use sph_boundary_data_picker
 !
       type(sph_grids), intent(in) :: sph
+      type(sph_boundary_type), intent(in) :: sph_bc_T
       integer(kind = kint), intent(in) :: n_point
 !
-      real (kind=kreal), intent(inout) :: temp_rj(n_point)
+      real(kind = kreal), intent(inout) :: temp_rj(n_point)
 !
-      integer(kind = kint) :: inod
-      integer(kind = kint) :: k, jj
+      integer(kind = kint) :: kr_in, kr_out
+      integer(kind = kint) :: k, jj, inod
       real(kind = kreal) :: r_in, r_out, shell
 !
 !
-      r_in =  r_ICB(sph)
-      r_out = r_CMB(sph)
-      shell = r_CMB(sph) - r_ICB(sph)
+      kr_in =  sph_inner_boundary_r_grid(sph_bc_T)
+      kr_out = sph_outer_boundary_r_grid(sph_bc_T)
+      r_in =   sph_inner_boundary_radius(sph_bc_T)
+      r_out =  sph_outer_boundary_radius(sph_bc_T)
+      shell =  r_out - r_in
 !
 !$omp parallel workshare
       temp_rj(1:n_point) = zero
@@ -100,18 +110,18 @@
 !   set reference temperature (l = m = 0)
       jj = idx_rj_degree_zero(sph)
       if(jj .gt. 0) then
-        do k = 1, nlayer_ICB(sph)-1
+        do k = 1, kr_in-1
           inod = local_sph_data_address(sph, k, jj)
           temp_rj(inod) = 1.0d0
         end do
 !
-        do k = nlayer_ICB(sph), nlayer_CMB(sph)
+        do k = kr_in, kr_out
           inod = local_sph_data_address(sph, k, jj)
           temp_rj(inod)                                                 &
      &         = (r_out*r_in / radius_1d_rj_r(sph,k) - r_in) / shell
         end do
 !
-        do k = nlayer_CMB(sph)+1, num_rj_radial_point(sph)
+        do k = kr_out+1, num_rj_radial_point(sph)
           inod = local_sph_data_address(sph, k, jj)
           temp_rj(inod) = 0.0d0
         end do
@@ -125,34 +135,39 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine init_sph_sectorial_temp(isig, sph, n_point, temp_rj)
+      subroutine init_sph_sectorial_temp(isig, sph, sph_bc_T,           &
+     &                                   n_point, temp_rj)
 !
-      use spherical_indices_wrapper
+      use spherical_indices_picker
+      use sph_boundary_data_picker
 !
       type(sph_grids), intent(in) :: sph
+      type(sph_boundary_type), intent(in) :: sph_bc_T
       integer(kind = kint), intent(in) :: isig
       integer(kind = kint), intent(in) :: n_point
 !
-      real(kind=kreal), intent(inout) :: temp_rj(n_point)
+      real(kind = kreal), intent(inout) :: temp_rj(n_point)
 !
       integer(kind = kint) :: m, k, jj
-      integer(kind = kint) :: inod
+      integer(kind = kint) :: kr_in, kr_out, inod
       real(kind = kreal) :: pi, xr, shell, r_in, r_out
 !
 !
       pi = four * atan(one)
-      r_in =  r_ICB(sph)
-      r_out = r_CMB(sph)
-      shell = r_CMB(sph) - r_ICB(sph)
+      kr_in =  sph_inner_boundary_r_grid(sph_bc_T)
+      kr_out = sph_outer_boundary_r_grid(sph_bc_T)
+      r_in =   sph_inner_boundary_radius(sph_bc_T)
+      r_out =  sph_outer_boundary_radius(sph_bc_T)
+      shell =  r_out - r_in
 !
       m = int(mod(isig,100000) / icent)
       jj = find_local_sph_mode_address(sph, m, m)
 !
       if (jj .gt. 0) then
 !$omp parallel do private(k,inod,xr)
-        do k = nlayer_ICB(sph), nlayer_CMB(sph)
+        do k = kr_in, kr_out
           xr = two * radius_1d_rj_r(sph,k) - (r_in + r_out) / shell
-          inod = jj + (k-1) * num_rj_horiz_point(sph)
+          inod = local_sph_data_address(sph, k, jj)
 !
           temp_rj(inod) = (one-three*xr**2+three*xr**4-xr**6)           &
      &                            * 0.1d0 * three / (sqrt(two*pi))
@@ -169,31 +184,36 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine initital_sph_noize_temp(sph, n_point, temp_rj) 
+      subroutine initital_sph_noise_temp(sph, sph_bc_T,                 &
+     &                                   n_point, temp_rj)
 !
-      use spherical_indices_wrapper
+      use spherical_indices_picker
+      use sph_boundary_data_picker
 !
       type(sph_grids), intent(in) :: sph
+      type(sph_boundary_type), intent(in) :: sph_bc_T
       integer(kind = kint), intent(in) :: n_point
 !
-      real(kind=kreal), intent(inout) :: temp_rj(n_point)
+      real(kind = kreal), intent(inout) :: temp_rj(n_point)
 !
-      integer(kind = kint) :: k, kst, ked
+      integer(kind = kint) :: k, kr_in, kr_out
       integer(kind = kint) :: inod, j
       real(kind = kreal) :: pi, xr, shell, r_in, r_out
 !
 !
       pi = four * atan(one)
-      kst = nlayer_ICB(sph) + 2
-      ked = nlayer_CMB(sph) - 2
-      r_in =  radius_1d_rj_r(sph,kst)
-      r_out = radius_1d_rj_r(sph,ked)
-      shell = r_CMB(sph) - r_ICB(sph)
+!
+      kr_in =  sph_inner_boundary_r_grid(sph_bc_T) + 2
+      kr_out = sph_outer_boundary_r_grid(sph_bc_T) - 2
+      r_in =   radius_1d_rj_r(sph,kr_in)
+      r_out =  radius_1d_rj_r(sph,kr_out)
+      shell =  r_out - r_in
 !
 !$omp parallel do private(j,k,inod,xr)
       do j = 1, num_rj_horiz_point(sph)
         if(j .eq. idx_rj_degree_zero(sph)) cycle
-        do k = kst, ked
+!
+        do k = kr_in, kr_out
           inod = local_sph_data_address(sph, k, j)
 !
           xr = two * radius_1d_rj_r(sph,k) - (r_in + r_out) / shell
@@ -203,7 +223,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine initital_sph_noize_temp
+      end subroutine initital_sph_noise_temp
 !
 !-----------------------------------------------------------------------
 !

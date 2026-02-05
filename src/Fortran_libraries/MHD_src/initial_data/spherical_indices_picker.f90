@@ -1,5 +1,5 @@
-!>@file   spherical_indices_wrapper.f90
-!!@brief  module spherical_indices_wrapper
+!>@file   spherical_indices_picker.f90
+!!@brief  module spherical_indices_picker
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2013
@@ -60,7 +60,7 @@
 !!@endverbatim
 !
 !
-      module spherical_indices_wrapper
+      module spherical_indices_picker
 !
       use m_precision
       use m_constants
@@ -216,4 +216,4 @@
 !
 !-----------------------------------------------------------------------
 !
-      end module spherical_indices_wrapper
+      end module spherical_indices_picker

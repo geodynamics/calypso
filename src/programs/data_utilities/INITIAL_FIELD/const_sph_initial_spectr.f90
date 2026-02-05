@@ -170,15 +170,16 @@
       call set_initial_heat_source_sph                                  &
      &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                        &
      &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
-!      call add_outer_core_heat_source                                  &
+!      call outer_core_heat_source                                      &
+!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
+!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld%n_point,              &
+!     &    SPH_MHD%fld)
+!      call inner_core_heat_source_temp                                 &
 !     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
 !     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
-!      call add_inner_core_heat_source                                  &
-!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
-!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
-!      call add_whole_core_heat_source                                  &
-!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
-!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+!      call whole_core_heat_source_temp                                 &
+!     &   (SPH_MHD%sph, sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,          &
+!     &    SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  Set light element source if light element is exist
       call set_initial_light_source_sph                                 &

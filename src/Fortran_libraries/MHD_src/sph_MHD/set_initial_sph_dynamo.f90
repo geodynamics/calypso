@@ -123,12 +123,12 @@
      &   .or. MHD_step%iflag_restart_mode .eq. i_rst_dbench2            &
      &   .or. MHD_step%iflag_restart_mode .eq. i_rst_dbench_qcv) then
         call sph_initial_data_4_benchmarks(MHD_step%iflag_restart_mode, &
-     &                                     sph, ipol, rj_fld)
+     &      sph, SPH_model%sph_MHD_bc, ipol, rj_fld)
 !
 !   set small seed magnetic field
       else if(MHD_step%iflag_restart_mode .eq. i_rst_no_file) then
-        call sph_initial_data_w_seed_B(sph, SPH_model%sph_MHD_bc,       &
-     &                                 SPH_model%refs, ipol, rj_fld)
+        call sph_initial_data_w_seed_B                                  &
+     &     (sph, SPH_model%sph_MHD_bc, SPH_model%refs, ipol, rj_fld)
       end if
 !
       call extend_by_potential_with_j                                   &

@@ -9,12 +9,13 @@
 !!
 !!@verbatim
 !!      subroutine initial_magne_sph_dbench_case1                       &
-!!     &         (sph, n_point, d_rj_magne, d_rj_current)
+!!     &         (sph, sph_bc_B, n_point, d_rj_magne, d_rj_current)
 !!      subroutine initial_magne_sph_dbench_case2                       &
-!!     &         (sph, n_point, d_rj_magne, d_rj_current)
+!!     &         (sph, sph_bc_B, n_point, d_rj_magne, d_rj_current)
 !!      subroutine initial_magne_sph_dbench_qcv                         &
-!!     &         (sph, n_point, d_rj_magne, d_rj_current)
+!!     &         (sph, sph_bc_B, n_point, d_rj_magne, d_rj_current)
 !!        type(sph_grids), intent(in) :: sph
+!!        type(sph_boundary_type), intent(in) :: sph_bc_B
 !!        integer(kind = kint), intent(in) :: n_point
 !!        real(kind = kreal), intent(inout) :: d_rj_magne(n_point,3)
 !!        real(kind = kreal), intent(inout) :: d_rj_current(n_point,3)
@@ -33,6 +34,7 @@
       use m_constants
 !
       use t_spheric_parameter
+      use t_boundary_params_sph_MHD
 !
       implicit none
 !
@@ -43,23 +45,27 @@
 !-----------------------------------------------------------------------
 !
       subroutine initial_magne_sph_dbench_case1                         &
-     &         (sph, n_point, d_rj_magne, d_rj_current)
+     &         (sph, sph_bc_B, n_point, d_rj_magne, d_rj_current)
 !
-      use spherical_indices_wrapper
+      use spherical_indices_picker
+      use sph_boundary_data_picker
 !
       type(sph_grids), intent(in) :: sph
+      type(sph_boundary_type), intent(in) :: sph_bc_B
       integer(kind = kint), intent(in) :: n_point
 !
       real(kind = kreal), intent(inout) :: d_rj_magne(n_point,3)
       real(kind = kreal), intent(inout) :: d_rj_current(n_point,3)
 !
       real (kind = kreal) :: pi, rr, r_in, r_out
-      integer(kind = kint) :: inod, k, js, jt
+      integer(kind = kint) :: inod, k, js, jt, kr_in, kr_out
 !
 !
       pi = four * atan(one)
-      r_in =  r_ICB(sph)
-      r_out = r_CMB(sph)
+      kr_in =  sph_inner_boundary_r_grid(sph_bc_B)
+      kr_out = sph_outer_boundary_r_grid(sph_bc_B)
+      r_in =   sph_inner_boundary_radius(sph_bc_B)
+      r_out =  sph_outer_boundary_radius(sph_bc_B)
 !
 !!!!!     Clear magnetic field and current density
 !$omp parallel workshare
@@ -71,7 +77,7 @@
       js = find_local_sph_mode_address(sph, 1,0)
       if (js .gt. 0) then
 !$omp parallel do private(k,inod,rr)
-        do k = nlayer_ICB(sph), nlayer_CMB(sph)
+        do k = kr_in, kr_out
           inod = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k)
 !
@@ -89,7 +95,7 @@
       jt = find_local_sph_mode_address(sph, 2,0)
       if (jt .gt. 0) then
 !$omp parallel do private(k,inod,rr)
-        do k = nlayer_ICB(sph), nlayer_CMB(sph)
+        do k = kr_in, kr_out
           inod = local_sph_data_address(sph, k, jt)
           rr = radius_1d_rj_r(sph, k)
           d_rj_magne(inod,3) =  (ten/three) * rr * sin(pi*(rr-r_in))
@@ -106,22 +112,25 @@
 !-----------------------------------------------------------------------
 !
       subroutine initial_magne_sph_dbench_case2                         &
-     &         (sph, n_point, d_rj_magne, d_rj_current)
+     &         (sph, sph_bc_B, n_point, d_rj_magne, d_rj_current)
 !
-      use spherical_indices_wrapper
+      use spherical_indices_picker
+      use sph_boundary_data_picker
 !
       type(sph_grids), intent(in) :: sph
+      type(sph_boundary_type), intent(in) :: sph_bc_B
       integer(kind = kint), intent(in) :: n_point
 !
       real(kind = kreal), intent(inout) :: d_rj_magne(n_point,3)
       real(kind = kreal), intent(inout) :: d_rj_current(n_point,3)
 !
       real (kind = kreal) :: pi, rr, r_out
-      integer(kind = kint) :: inod, k, js, jt
+      integer(kind = kint) :: inod, k, js, jt, kr_out
 !
 !
       pi = four * atan(one)
-      r_out = r_CMB(sph)
+      kr_out = sph_outer_boundary_r_grid(sph_bc_B)
+      r_out =  sph_outer_boundary_radius(sph_bc_B)
 !
 !!!!!     Clear magnetic field and current density
 !$omp parallel workshare
@@ -133,7 +142,7 @@
       js = find_local_sph_mode_address(sph, 1,0)
       if(js .gt. 0) then
 !$omp parallel do private(k,inod,rr)
-        do k = 1, nlayer_CMB(sph)
+        do k = 1, kr_out
           inod = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k)
           d_rj_magne(inod,1) = (five / two) * rr**2                     &
@@ -150,7 +159,7 @@
       jt = find_local_sph_mode_address(sph, 2,0)
       if (jt .gt. 0) then
 !$omp parallel do private(k,inod,rr)
-        do k = 1, nlayer_CMB(sph)
+        do k = 1, kr_out
           inod = local_sph_data_address(sph, k, jt)
           rr = radius_1d_rj_r(sph, k)
 !
@@ -169,23 +178,27 @@
 !-----------------------------------------------------------------------
 !
       subroutine initial_magne_sph_dbench_qcv                           &
-     &         (sph, n_point, d_rj_magne, d_rj_current)
+     &         (sph, sph_bc_B, n_point, d_rj_magne, d_rj_current)
 !
-      use spherical_indices_wrapper
+      use spherical_indices_picker
+      use sph_boundary_data_picker
 !
       type(sph_grids), intent(in) :: sph
+      type(sph_boundary_type), intent(in) :: sph_bc_B
       integer(kind = kint), intent(in) :: n_point
 !
       real(kind = kreal), intent(inout) :: d_rj_magne(n_point,3)
       real(kind = kreal), intent(inout) :: d_rj_current(n_point,3)
 !
       real (kind = kreal) :: pi, rr, r_in, r_out
-      integer(kind = kint) :: inod, k, js, jt
+      integer(kind = kint) :: inod, k, js, jt, kr_in, kr_out
 !
 !
       pi = four * atan(one)
-      r_in =  r_ICB(sph)
-      r_out = r_CMB(sph)
+      kr_in =  sph_inner_boundary_r_grid(sph_bc_B)
+      kr_out = sph_outer_boundary_r_grid(sph_bc_B)
+      r_in =   sph_inner_boundary_radius(sph_bc_B)
+      r_out =  sph_outer_boundary_radius(sph_bc_B)
 !
 !!!!!     Clear magnetic field and current density
 !$omp parallel workshare
@@ -197,7 +210,7 @@
       js = find_local_sph_mode_address(sph, 1,0)
       if(js .gt. 0) then
 !$omp parallel do private(k,inod,rr)
-        do k = nlayer_ICB(sph), nlayer_CMB(sph)
+        do k = kr_in, kr_out
           inod = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k)
 !
@@ -222,7 +235,7 @@
       jt = find_local_sph_mode_address(sph, 2,0)
       if(jt .gt. 0) then
 !$omp parallel do private(k,inod,rr)
-        do k = nlayer_ICB(sph), nlayer_CMB(sph)
+        do k = kr_in, kr_out
           inod = local_sph_data_address(sph, k, jt)
           rr = radius_1d_rj_r(sph, k)
           d_rj_magne(inod,3) = (ten/eight) * rr * sin(pi*(rr-r_in))
