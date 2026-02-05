@@ -22,23 +22,6 @@ test:
 	$(MPIRUN) -np 2 $(TARGET_SPH_MHD)
 	
 	@sync
-	@echo 'Compare with reference mean square data'
-	$(TARGET_SPH_ENE_CHECK)  reference/sph_ave_volume     monitor/sph_ave_volume    > log.txt
-	@if [ `tail -n 1 flag.txt` != 0 ]; then\
-		echo 'Failed volume average data check'; \
-		exit 1;\
-	fi
-	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_s   monitor/sph_pwr_volume_s  >> log.txt
-	@if [ `tail -n 1 flag.txt` != 0 ]; then\
-		echo 'Failed volume mean square data check'; \
-		exit 1;\
-	fi
-	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_m0  monitor/sph_pwr_volume_m0 >> log.txt
-	@if [ `tail -n 1 flag.txt` != 0 ]; then\
-		echo 'Failed axisymmetric mean square data check'; \
-		exit 1;\
-	fi
-	
 	$(TARGET_SPH_PICK_MODE_CHECK)  reference/picked_mode_l0_m0c  monitor/picked_mode_l0_m0c >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed Y_{0}^{0} data check'; \
@@ -67,6 +50,23 @@ test:
 	$(TARGET_SPH_PICK_MODE_CHECK)  reference/picked_mode_l2_m2s  monitor/picked_mode_l2_m2s >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed Y_{2}^{2s} data check'; \
+		exit 1;\
+	fi
+	
+	@echo 'Compare with reference mean square data'
+	$(TARGET_SPH_ENE_CHECK)  reference/sph_ave_volume     monitor/sph_ave_volume    > log.txt
+	@if [ `tail -n 1 flag.txt` != 0 ]; then\
+		echo 'Failed volume average data check'; \
+		exit 1;\
+	fi
+	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_s   monitor/sph_pwr_volume_s  >> log.txt
+	@if [ `tail -n 1 flag.txt` != 0 ]; then\
+		echo 'Failed volume mean square data check'; \
+		exit 1;\
+	fi
+	$(TARGET_SPH_ENE_CHECK)  reference/sph_pwr_volume_m0  monitor/sph_pwr_volume_m0 >> log.txt
+	@if [ `tail -n 1 flag.txt` != 0 ]; then\
+		echo 'Failed axisymmetric mean square data check'; \
 		exit 1;\
 	fi
 
