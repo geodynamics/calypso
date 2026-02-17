@@ -31,7 +31,6 @@
       use t_spheric_parameter
       use t_spheric_rj_data
       use t_group_data
-      use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_bc_data_list
       use t_sph_boundary_input_data

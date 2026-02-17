@@ -29,7 +29,6 @@
       use m_boundary_condition_IDs
       use t_spheric_parameter
       use t_spheric_rj_data
-      use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
       use t_sph_boundary_input_data

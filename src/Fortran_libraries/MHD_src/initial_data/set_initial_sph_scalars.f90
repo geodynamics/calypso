@@ -9,6 +9,12 @@
 !!@verbatim
 !!      subroutine initial_sph_reference_scalar(sph, nri_ref, reftemp_j,&
 !!     &                                        n_point, temp_rj)
+!!        type(sph_grids), intent(in) :: sph
+!!        integer(kind = kint), intent(in) :: nri_ref
+!!        real(kind=kreal), intent(in) :: reftemp_j(0:nri_ref-1)
+!!        integer(kind = kint), intent(in) :: n_point
+!!        real(kind = kreal), intent(inout) :: temp_rj(n_point)
+!!
 !!      subroutine initial_sph_ref_temp_dbench(sph, sph_bc_T,           &
 !!     &                                       n_point, temp_rj)
 !!      subroutine init_sph_sectorial_temp(isig, sph, sph_bc_T,         &
@@ -78,6 +84,7 @@
 !
       end subroutine initial_sph_reference_scalar
 !
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine initial_sph_ref_temp_dbench(sph, sph_bc_T,             &

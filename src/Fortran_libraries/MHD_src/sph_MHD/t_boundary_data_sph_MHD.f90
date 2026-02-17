@@ -8,6 +8,12 @@
 !!
 !!
 !!@verbatim
+!!      subroutine check_bc_sph_mhd(id_file, sph_rj,                    &
+!!     &                            MHD_prop, sph_MHD_bc)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(MHD_evolution_param), intent(in) :: MHD_prop
+!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!@endverbatim
 !!
 !!@n @param jmax    number of modes for spherical harmonics @f$L*(L+2)@f$
@@ -58,8 +64,77 @@
 !
 ! ----------------------------------------------------------------------
 !
-!      contains
+      contains
 !
 ! ----------------------------------------------------------------------
+!
+      subroutine check_bc_sph_mhd(id_file, sph_rj,                      &
+     &                            MHD_prop, sph_MHD_bc)
+!
+      use m_base_field_labels
+!
+      use t_spheric_rj_data
+      use t_coef_fdm1_free_rotate_ICB
+      use t_coef_fdm1_free_rotate_CMB
+      use set_bc_flag_sph_velo
+      use set_bc_sph_scalars
+!
+      use set_sph_bc_magne_sph
+!
+      integer(kind = kint), intent(in) :: id_file
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!
+!
+      if(iflag_debug .gt. 1) then
+        write(id_file,*) 'sph_bc_U%iflag_icb',                          &
+     &        sph_MHD_bc%sph_bc_U%kr_in,  sph_MHD_bc%sph_bc_U%iflag_icb
+        write(id_file,*) 'sph_bc_U%iflag_cmb',                          &
+     &        sph_MHD_bc%sph_bc_U%kr_out, sph_MHD_bc%sph_bc_U%iflag_cmb
+        write(id_file,*) 'sph_bc_T%iflag_icb',                          &
+     &        sph_MHD_bc%sph_bc_T%kr_in,  sph_MHD_bc%sph_bc_T%iflag_icb
+        write(id_file,*) 'sph_bc_T%iflag_cmb',                          &
+     &        sph_MHD_bc%sph_bc_T%kr_out, sph_MHD_bc%sph_bc_T%iflag_cmb
+        write(id_file,*) 'sph_bc_B%iflag_icb',                          &
+     &        sph_MHD_bc%sph_bc_B%kr_in,  sph_MHD_bc%sph_bc_B%iflag_icb
+        write(id_file,*) 'sph_bc_B%iflag_cmb',                          &
+     &        sph_MHD_bc%sph_bc_B%kr_out, sph_MHD_bc%sph_bc_B%iflag_cmb
+        write(id_file,*) 'sph_bc_C%iflag_icb',                          &
+     &        sph_MHD_bc%sph_bc_C%kr_in,  sph_MHD_bc%sph_bc_C%iflag_icb
+        write(id_file,*) 'sph_bc_C%iflag_cmb',                          &
+     &        sph_MHD_bc%sph_bc_C%kr_out, sph_MHD_bc%sph_bc_C%iflag_cmb
+      end if
+!
+      if (iflag_debug .eq. iflag_full_msg) then
+        if (MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
+          call check_fdm_coefs_4_BC2                                    &
+     &       (id_file, velocity%name, sph_MHD_bc%sph_bc_U)
+!
+          call check_sph_fdm_boundaries(id_file,                        &
+     &        sph_MHD_bc%sph_bc_U%kr_in, sph_MHD_bc%sph_bc_U%kr_out,    &
+     &        sph_rj, sph_MHD_bc%bc_fdms_U)
+        end if
+!
+        if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution)     &
+     &   then
+          call check_fdm_coefs_4_BC2                                    &
+     &       (id_file, magnetic_field%name, sph_MHD_bc%sph_bc_B)
+        end if
+        if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
+          call check_fdm_coefs_4_BC2                                    &
+     &       (id_file, temperature%name,  sph_MHD_bc%sph_bc_T)
+        end if
+        if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
+          call check_fdm_coefs_4_BC2                                    &
+     &       (id_file, composition%name, sph_MHD_bc%sph_bc_C)
+        end if
+!
+        call check_fdm2_coefs_centre(id_file, sph_MHD_bc%fdm2_center)
+      end if
+!
+      end subroutine check_bc_sph_mhd
+!
+! -----------------------------------------------------------------------
 !
       end module t_boundary_data_sph_MHD
