@@ -228,8 +228,8 @@ begin MHD_control
 !
 !!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
-!    ref_temperature_ctl: none           (No reference of temperature)
-!                         spherical_shell (for spherical shell model)
+!    ref_temp_ctl: none           (No reference of temperature)
+!                  spherical_shell ( for spherical shell model)
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin temperature_define

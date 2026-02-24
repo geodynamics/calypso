@@ -422,13 +422,13 @@ begin MHD_control
 !
 !!!!!!!!! model for stratification !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
-!    ref_temperature_ctl: none           (No reference of temperature)
-!                         spherical_shell ( for spherical shell model)
-!                         numerical_solution ( Get numerical solution)
-!                         linear_x        ( propotional to x-direction )
-!                         linear_y        ( propotional to x-direction )
-!                         linear_z        ( propotional to x-direction )
-!
+!    ref_temp_ctl: none           (No reference of temperature)
+!                  spherical_shell ( for spherical shell model)
+!                  sph_constant_heat (for spherical shell model)
+!                  numerical_solution ( Get numerical solution)
+!                  linear_x        ( propotional to x-direction )
+!                  linear_y        ( propotional to x-direction )
+!                  linear_z        ( propotional to x-direction )
 !
 !    stratified_ctl:   0...off  1...on
 !     stratified_sigma_ctl: intense ofstratification
