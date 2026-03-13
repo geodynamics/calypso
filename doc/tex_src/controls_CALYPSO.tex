@@ -802,7 +802,9 @@ Type of reference temperature is defined by text. The following options are avai
 \item{\tt none: }   \\
 Reference of temperature is not defined. Temperature $T$ is used to time evolution and thermal buoyancy.
 \item{\tt file: }      \\
-Read reference temperature from data file defined by \hyperref[href_t:ref_field_file_name]{\tt [ref\_field\_file\_name]}
+Read reference temperature or heat source from data file defined by \hyperref[href_t:ref_field_file_name]{\tt [ref\_field\_file\_name]}
+\item{\tt restart: }      \\
+Read reference {\bf heat source} from restart data.
 \item{\tt numerical\_solution: } \\
 Reference temperature obtained from the given boundary condition and radial heat source by
 \begin{eqnarray}

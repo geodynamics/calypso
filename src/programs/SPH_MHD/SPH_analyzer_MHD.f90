@@ -140,8 +140,8 @@
 !
       if(iflag_debug.gt.0) write(*,*)' sph_initial_MHD_data_control'
       call sph_initial_MHD_data_control                                 &
-     &   (MHD_files, SPH_model, SPH_MHD%sph, SPH_MHD%ipol, MHD_step,    &
-     &    SPH_MHD%fld, sph_fst_IO)
+     &   (MHD_files, SPH_model, SPH_WK%monitor%bench,                   &
+     &    SPH_MHD%sph, SPH_MHD%ipol, MHD_step, SPH_MHD%fld, sph_fst_IO)
       MHD_step%iflag_initial_step = 0
 !
       if (iflag_debug.eq.1) write(*,*)' sync_temp_by_per_temp_sph'
