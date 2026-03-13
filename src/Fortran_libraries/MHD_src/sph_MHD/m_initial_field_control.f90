@@ -33,24 +33,40 @@
      &                      :: From_restart = 'start_from_rst_file'
 !
 !>      Label for dynamo benchmark Case 0
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                      :: dynamobench_0 = 'dynamo_benchmark_0'
 !>      Label for dynamo benchmark Case 1
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                      :: dynamobench_1 = 'dynamo_benchmark_1'
 !>      Label for dynamo benchmark Case 2
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                      :: dynamobench_2 = 'dynamo_benchmark_2'
 !>      Label for  pseudo vacuume dynamo benchmar
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                      :: pseudo_bench = 'pseudo_vacuum_benchmark'
 !
+!>      Label to change initial zonal mode
+!!           based on dynamo benchmark Case 0
+      character(len=kchara), parameter, private                         &
+     &          :: dynamobench_0_with_m = 'dynamo_benchmark_0_given_m'
+!>      Label to change initial zonal mode
+!!           based on dynamo benchmark Case 1
+      character(len=kchara), parameter, private                         &
+     &          :: dynamobench_1_with_m = 'dynamo_benchmark_1_given_m'
+!>      Label to change initial zonal mode
+!!           based on dynamo benchmark Case 2
+      character(len=kchara), parameter, private                         &
+     &          :: dynamobench_2_with_m = 'dynamo_benchmark_2_given_m'
+!
 !>      Label for solid body rotation around x-axis
-      character(len=kchara), parameter :: rotate_x = 'rotate_x'
+      character(len=kchara), parameter, private                         &
+     &                      :: rotate_x = 'rotate_x'
 !>      Label for solid body rotation around y-axis
-      character(len=kchara), parameter :: rotate_y = 'rotate_y'
+      character(len=kchara), parameter, private                         &
+     &                      :: rotate_y = 'rotate_y'
 !>      Label for solid body rotation around z-axis
-      character(len=kchara), parameter :: rotate_z = 'rotate_z'
+      character(len=kchara), parameter, private                         &
+     &                      :: rotate_z = 'rotate_z'
 !
 !>      Label for kinematic dynamo
       character(len=kchara), parameter :: kinematic = 'kinematic'
@@ -71,6 +87,16 @@
 !>      Use initial field for  dynamo benchmark Case 2
       integer(kind=kint), parameter :: i_rst_dbench2 = -3
 !
+!>      initial data ID to set initial zonal mode
+!!           based on dynamo benchmark Case 0
+      integer(kind=kint), parameter :: i_rst_val_m_dbench0 = -100
+!>      initial data ID to set initial zonal mode
+!!           based on dynamo benchmark Case 1
+      integer(kind=kint), parameter :: i_rst_val_m_dbench1 = -101
+!>      initial data ID to set initial zonal mode
+!!           based on dynamo benchmark Case 2
+      integer(kind=kint), parameter :: i_rst_val_m_dbench2 = -102
+!
 !>      Use initial field for pseudo vacuume dynamo benchmark
       integer(kind=kint), parameter :: i_rst_dbench_qcv = -31
 !
@@ -87,9 +113,7 @@
       integer(kind=kint), parameter :: i_rst_licv =  -20
 !
       private :: No_restart, From_restart
-      private :: dynamobench_0, dynamobench_1, dynamobench_2
-      private :: pseudo_bench, kinematic, liear_cv
-      private :: rotate_x, rotate_y, rotate_z
+      private :: kinematic, liear_cv
 !
 !-----------------------------------------------------------------------
 !
@@ -108,43 +132,59 @@
 !
       integer(kind = kint), intent(inout) :: iflag_restart_mode
 !
+      character(len=kchara) :: tmpchara
+!
 !
       if(restart_flag_ctl%iflag .eq. 0) then
         e_message  = 'Set initial condition'
         call calypso_MPI_abort(ierr_evo, e_message)
       else
-        if(     cmp_no_case(restart_flag_ctl%charavalue, No_restart)    &
-     &       .or. restart_flag_ctl%charavalue .eq. '0') then
+        tmpchara = restart_flag_ctl%charavalue
+!
+        if(     cmp_no_case(tmpchara, No_restart)                       &
+     &       .or. tmpchara .eq. '0') then
           iflag_restart_mode = i_rst_no_file
-        else if(cmp_no_case(restart_flag_ctl%charavalue, From_restart)  &
-     &       .or. restart_flag_ctl%charavalue .eq. '1') then
+        else if(cmp_no_case(tmpchara, From_restart)                     &
+     &       .or. tmpchara .eq. '1') then
           iflag_restart_mode = i_rst_by_file
-        else if(cmp_no_case(restart_flag_ctl%charavalue, dynamobench_0) &
-     &       .or. restart_flag_ctl%charavalue .eq. '-1') then
+!
+        else if(cmp_no_case(tmpchara, dynamobench_0)                    &
+     &       .or. tmpchara .eq. '-0') then
           iflag_restart_mode = i_rst_dbench0
-        else if(cmp_no_case(restart_flag_ctl%charavalue, dynamobench_1) &
-     &       .or. restart_flag_ctl%charavalue .eq. '-2') then
+        else if(cmp_no_case(tmpchara, dynamobench_1)                    &
+     &       .or. tmpchara .eq. '-1') then
           iflag_restart_mode = i_rst_dbench1
-        else if(cmp_no_case(restart_flag_ctl%charavalue, dynamobench_2) &
-     &       .or. restart_flag_ctl%charavalue .eq. '-2') then
+        else if(cmp_no_case(tmpchara, dynamobench_2)                    &
+     &       .or. tmpchara .eq. '-2') then
           iflag_restart_mode = i_rst_dbench2
-        else if(cmp_no_case(restart_flag_ctl%charavalue, pseudo_bench)  &
-     &       .or. restart_flag_ctl%charavalue .eq. '-3') then
+        else if(cmp_no_case(tmpchara, pseudo_bench)                     &
+     &       .or. tmpchara .eq. '-3') then
           iflag_restart_mode = i_rst_dbench_qcv
-        else if(cmp_no_case(restart_flag_ctl%charavalue, rotate_x)      &
-     &       .or. restart_flag_ctl%charavalue .eq. '-11') then
+!
+        else if(cmp_no_case(tmpchara, dynamobench_0_with_m)             &
+     &       .or. tmpchara .eq. '-100') then
+          iflag_restart_mode = i_rst_val_m_dbench0
+        else if(cmp_no_case(tmpchara, dynamobench_1_with_m)             &
+     &       .or. tmpchara .eq. '-101') then
+          iflag_restart_mode = i_rst_val_m_dbench1
+        else if(cmp_no_case(tmpchara, dynamobench_2_with_m)             &
+     &       .or. tmpchara .eq. '-102') then
+          iflag_restart_mode = i_rst_val_m_dbench2
+!
+        else if(cmp_no_case(tmpchara, rotate_x)                         &
+     &       .or. tmpchara .eq. '-11') then
           iflag_restart_mode = i_rst_rotate_x
-        else if(cmp_no_case(restart_flag_ctl%charavalue, rotate_y)      &
-     &       .or. restart_flag_ctl%charavalue .eq. '-12') then
+        else if(cmp_no_case(tmpchara, rotate_y)                         &
+     &       .or. tmpchara .eq. '-12') then
           iflag_restart_mode = i_rst_rotate_y
-        else if(cmp_no_case(restart_flag_ctl%charavalue, rotate_z)      &
-     &       .or. restart_flag_ctl%charavalue .eq. '-13') then
+        else if(cmp_no_case(tmpchara, rotate_z)                         &
+     &       .or. tmpchara .eq. '-13') then
           iflag_restart_mode = i_rst_rotate_z
-        else if(cmp_no_case(restart_flag_ctl%charavalue, kinematic)     &
-     &       .or. restart_flag_ctl%charavalue .eq. '20') then
+        else if(cmp_no_case(tmpchara, kinematic)                        &
+     &       .or. tmpchara .eq. '20') then
           iflag_restart_mode = i_rst_kinematic
-        else if(cmp_no_case(restart_flag_ctl%charavalue, liear_cv)      &
-     &       .or. restart_flag_ctl%charavalue .eq. '-20') then
+        else if(cmp_no_case(tmpchara, liear_cv)                         &
+     &       .or. tmpchara .eq. '-20') then
           iflag_restart_mode = i_rst_licv
         end if
       end if

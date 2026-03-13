@@ -105,7 +105,7 @@
       jcou = jcou + bench%m_bench
 !
       detail_out(jcou+1) = bench%ave_phase_vr
-      detail_out(jcou+2:jcou+3) = bench%omega_vm4(1:2)
+      detail_out(jcou+2:jcou+3) = bench%omega_vmm(1:2)
       jcou = jcou + 3
 !
       if(ipol_base%i_magne .gt. 0) then

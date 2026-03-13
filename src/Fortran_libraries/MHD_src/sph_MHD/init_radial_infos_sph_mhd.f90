@@ -194,12 +194,16 @@
 !
       use calypso_mpi
       use calypso_mpi_int
+      use t_time_data
+      use t_file_IO_parameter
       use sph_mhd_rst_IO_control
       use reference_sources_from_d_rj
       use init_reference_scalar
       use init_external_magne_sph
       use radial_reference_field_IO
       use m_base_field_labels
+!
+      use field_file_IO
 !
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
@@ -217,6 +221,8 @@
       logical :: flag_write_ref
       integer :: irank_local
 !
+      type(field_IO) :: radial_fld_IO
+!
 !
       flag_write_ref = .FALSE.
       if((MHD_prop%fl_prop%ir_nu * MHD_prop%fl_prop%ir_dnu_norm)        &
@@ -228,24 +234,62 @@
       if((MHD_prop%cp_prop%ir_kappa * MHD_prop%cp_prop%ir_dkappa_norm)  &
      &                                  .gt. 0) flag_write_ref = .TRUE.
 !
+      refs%ref_field%iflag_update(1:refs%ref_field%ntot_phys) = 0
 !
-      call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
-      call load_sph_reference_fields(refs)
-      call overwrite_sources_by_reference(sph%sph_rj, refs%iref_base,   &
-     &    ipol%base, refs%ref_field, rj_fld)
 !
       irank_local = 0
       if(sph%sph_rj%idx_rj_degree_zero .gt. 0) irank_local = my_rank
       call calypso_mpi_allreduce_one_int                                &
      &   (irank_local, refs%irank_reference, MPI_SUM)
-
-      refs%ref_field%iflag_update(1:refs%ref_field%ntot_phys) = 0
+!
+!       Set source term from restart
+      if(MHD_prop%ref_param_T%iflag_reference                           &
+     &               .eq. id_ref_restart_file) then
+        call set_reference_source_from_rst(sph%sph_rj,                  &
+     &      ipol%base%i_heat_source, rj_fld,                            &
+     &      refs%iref_base%i_heat_source, refs%ref_field)
+      end if
+      if(MHD_prop%ref_param_C%iflag_reference                           &
+     &               .eq. id_ref_restart_file) then
+        call set_reference_source_from_rst(sph%sph_rj,                  &
+     &      ipol%base%i_light_source, rj_fld,                           &
+     &      refs%iref_base%i_light_source, refs%ref_field)
+      end if
+!
+!       Load reference data from file defined in platform_ctl
+      if(refs%ref_input_IO%iflag_IO .gt. 0) then
+        if(iflag_debug .gt. 0) write(*,*) 'ref_input_IO%iflag_IO',      &
+     &                      refs%ref_input_IO%iflag_IO
+        call load_sph_reference_sources(refs%ref_input_IO, refs)
+        call overwrite_sources_by_reference(sph%sph_rj,                 &
+     &      refs%iref_base, ipol%base, refs%ref_field, rj_fld)
+      end if
+!
+      if(my_rank .eq. refs%irank_reference) then
+        if(MHD_prop%ref_param_T%iflag_reference                         &
+     &                    .eq. id_ref_field_file) then
+          call load_sph_reference_two_field                             &
+     &       (MHD_prop%ref_param_T%ref_file_IO, refs%iref_radius,       &
+     &        temperature%name, heat_source%name,                       &
+     &        refs%iref_base%i_temp, refs%iref_base%i_heat_source,      &
+     &        n_scalar, refs%r_itp, refs%ref_field)
+        end if
+        if(MHD_prop%ref_param_C%iflag_reference                         &
+     &                  .eq. id_ref_field_file) then
+          call load_sph_reference_two_field                             &
+     &       (MHD_prop%ref_param_C%ref_file_IO, refs%iref_radius,       &
+     &        composition%name, composition_source%name,                &
+     &        refs%iref_base%i_light, refs%iref_base%i_light_source,    &
+     &        n_scalar, refs%r_itp, refs%ref_field)
+        end if
+      end if
+!
       call s_init_reference_scalar(refs%irank_reference,                &
      &    MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%ht_prop,                                      &
      &    sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                  &
      &    tmat_name, MHD_prop%ref_param_T,                              &
-     &    refs%iref_radius, temperature%name,                           &
+     &    refs%iref_radius, temperature%name, heat_source%name,         &
      &    refs%iref_base%i_temp, refs%iref_grad%i_grad_temp,            &
      &    refs%iref_base%i_heat_source, refs%r_itp,                     &
      &    refs%ref_field, sph_MHD_bc%bcs_T, flag_write_ref)
@@ -255,7 +299,7 @@
      &    r_2nd, MHD_prop%cp_prop,                                      &
      &    sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                  &
      &    cmat_name, MHD_prop%ref_param_C,                              &
-     &    refs%iref_radius, composition%name,                           &
+     &    refs%iref_radius, composition%name, composition_source%name,  &
      &    refs%iref_base%i_light, refs%iref_grad%i_grad_composit,       &
      &    refs%iref_base%i_light_source, refs%r_itp,                    &
      &    refs%ref_field, sph_MHD_bc%bcs_C, flag_write_ref)

@@ -14,17 +14,18 @@
 !!        type(phys_address), intent(in) :: ipol
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!
-!!      subroutine cal_drift_by_v44(time, sph_rj, rj_fld, ipol,         &
-!!     &          circle, t_prev, phase_vm4, phase_vm4_prev, omega_vm4)
+!!      subroutine cal_drift_by_vmm(time, sph_rj, rj_fld, ipol, circle, &
+!!     &          m_bench, t_prev, phase_vmm, phase_vmm_prev, omega_vmm)
 !!        real(kind=kreal), intent(in) :: time
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(phys_address), intent(in) :: ipol
 !!        type(circle_parameters), intent(in) :: circle
+!!        integer(kind = kint), intent(in) :: m_bench
 !!        real(kind = kreal), intent(inout) :: t_prev
-!!        real(kind = kreal), intent(inout) :: phase_vm4(2)
-!!        real(kind = kreal), intent(inout) :: phase_vm4_prev(2)
-!!        real(kind = kreal), intent(inout) :: omega_vm4(2)
+!!        real(kind = kreal), intent(inout) :: phase_vmm(2)
+!!        real(kind = kreal), intent(inout) :: phase_vmm_prev(2)
+!!        real(kind = kreal), intent(inout) :: omega_vmm(2)
 !!      subroutine cal_field_4_dynamobench                              &
 !!     &         (time, t_prev, circle, d_circle, ibench_velo,          &
 !!     &          phi_zero, phi_prev, drift, ave_drift, d_zero)
@@ -88,8 +89,8 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_drift_by_v44(time, sph_rj, rj_fld, ipol,           &
-     &          circle, t_prev, phase_vm4, phase_vm4_prev, omega_vm4)
+      subroutine cal_drift_by_vmm(time, sph_rj, rj_fld, ipol, circle,   &
+     &          m_bench, t_prev, phase_vmm, phase_vmm_prev, omega_vmm)
 !
       use calypso_mpi
       use calypso_mpi_real
@@ -99,20 +100,21 @@
       use t_sph_circle_parameters
       use transfer_to_long_integers
 !
-      real(kind = kreal), intent(in) :: time
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_data), intent(in) :: rj_fld
       type(phys_address), intent(in) :: ipol
       type(circle_parameters), intent(in) :: circle
+      real(kind = kreal), intent(in) :: time
+      integer(kind = kint), intent(in) :: m_bench
 !
       real(kind = kreal), intent(inout) :: t_prev
-      real(kind = kreal), intent(inout) :: phase_vm4(2)
-      real(kind = kreal), intent(inout) :: phase_vm4_prev(2)
-      real(kind = kreal), intent(inout) :: omega_vm4(2)
+      real(kind = kreal), intent(inout) :: phase_vmm(2)
+      real(kind = kreal), intent(inout) :: phase_vmm_prev(2)
+      real(kind = kreal), intent(inout) :: omega_vmm(2)
 !
-      integer(kind = kint) :: j4c, j4s, kr_in, kr_out, i_in, i_out
+      integer(kind = kint) :: jmc, jms, kr_in, kr_out, i_in, i_out
       real(kind = kreal) :: c_in, c_out
-      real(kind = kreal) :: v4_lc(4), v4_gl(4)
+      real(kind = kreal) :: vm_lc(4), vm_gl(4)
 !
 !
       if(time .eq. t_prev) return
@@ -121,58 +123,57 @@
       kr_out = circle%kr_gl_rcirc_out
       c_in =   circle%coef_gl_rcirc_in
       c_out =  circle%coef_gl_rcirc_out
-      v4_lc(1:4) = 0.0d0
+      vm_lc(1:4) = 0.0d0
 !
-      j4c = find_local_sph_address(sph_rj, 4, 4)
-      if(j4c .gt. 0) then
-        i_in =  local_sph_node_address(sph_rj, kr_in, j4c)
-        i_out = local_sph_node_address(sph_rj, kr_out, j4c)
-        v4_lc(1) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo)        &
+      jmc = find_local_sph_address(sph_rj, m_bench,  m_bench)
+      if(jmc .gt. 0) then
+        i_in =  local_sph_node_address(sph_rj, kr_in,  jmc)
+        i_out = local_sph_node_address(sph_rj, kr_out, jmc)
+        vm_lc(1) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo)        &
      &            + c_out * rj_fld%d_fld(i_out,ipol%base%i_velo)
       end if
 !
-      j4s = find_local_sph_address(sph_rj, 4,-4)
-      if(j4s .gt. 0) then
-        i_in =  local_sph_node_address(sph_rj, kr_in, j4s)
-        i_out = local_sph_node_address(sph_rj, kr_out, j4s)
-        v4_lc(2) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo)        &
+      jms = find_local_sph_address(sph_rj, m_bench, -m_bench)
+      if(jms .gt. 0) then
+        i_in =  local_sph_node_address(sph_rj, kr_in,  jms)
+        i_out = local_sph_node_address(sph_rj, kr_out, jms)
+        vm_lc(2) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo)        &
      &            + c_out * rj_fld%d_fld(i_out,ipol%base%i_velo)
       end if
 !
-      j4c = find_local_sph_address(sph_rj, 5, 4)
-      if(j4c .gt. 0) then
-        i_in =  local_sph_node_address(sph_rj, kr_in, j4c)
-        i_out = local_sph_node_address(sph_rj, kr_out, j4c)
-        v4_lc(3) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo+2)      &
+      jmc = find_local_sph_address(sph_rj, (m_bench+1),  m_bench)
+      if(jmc .gt. 0) then
+        i_in =  local_sph_node_address(sph_rj, kr_in,  jmc)
+        i_out = local_sph_node_address(sph_rj, kr_out, jmc)
+        vm_lc(3) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo+2)      &
      &            + c_out * rj_fld%d_fld(i_out,ipol%base%i_velo+2)
       end if
 !
-      j4s = find_local_sph_address(sph_rj, 5,-4)
-      if(j4s .gt. 0) then
-        i_in =  local_sph_node_address(sph_rj, kr_in, j4s)
-        i_out = local_sph_node_address(sph_rj, kr_out, j4s)
-        v4_lc(4) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo+2)      &
+      jms = find_local_sph_address(sph_rj, (m_bench+1), -m_bench)
+      if(jms .gt. 0) then
+        i_in =  local_sph_node_address(sph_rj, kr_in,  jms)
+        i_out = local_sph_node_address(sph_rj, kr_out, jms)
+        vm_lc(4) = c_in *   rj_fld%d_fld(i_in, ipol%base%i_velo+2)      &
      &            + c_out * rj_fld%d_fld(i_out,ipol%base%i_velo+2)
       end if
 !
-      call calypso_mpi_reduce_real                                      &
-     &   (v4_lc, v4_gl, cast_long(ifour), MPI_SUM, 0)
-!
+      call calypso_mpi_reduce_real(vm_lc, vm_gl, cast_long(ifour),      &
+     &                             MPI_SUM, 0)
       if(my_rank .ne. 0) return
 !
-      phase_vm4(1) = atan2(v4_gl(2), v4_gl(1))
-      phase_vm4(2) = atan2(v4_gl(4), v4_gl(3))
+      phase_vmm(1) = atan2(vm_gl(2), vm_gl(1))
+      phase_vmm(2) = atan2(vm_gl(4), vm_gl(3))
 !
       if(t_prev .eq. time) then
-        omega_vm4(1:2) = 0.0d0
+        omega_vmm(1:2) = 0.0d0
       else
-        omega_vm4(1:2) = quad * (phase_vm4(1:2) - phase_vm4_prev(1:2))  &
-     &                / (time - t_prev)
+        omega_vmm(1:2) = (phase_vmm(1:2) - phase_vmm_prev(1:2))         &
+     &                  / (dble(m_bench) * (time - t_prev))
       end if
 !
-      phase_vm4_prev(1:2) = phase_vm4(1:2)
+      phase_vmm_prev(1:2) = phase_vmm(1:2)
 !
-      end subroutine cal_drift_by_v44
+      end subroutine cal_drift_by_vmm
 !
 ! ----------------------------------------------------------------------
 !

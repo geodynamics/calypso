@@ -40,10 +40,10 @@
 !!
 !!
 !!      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,       &
-!!     &          ref_field, sph_bc, bcs_S, band_s_evo, band_s00_evo,   &
+!!     &          ref_field, sph_bc_S, bcs_S, band_s_evo, band_s00_evo, &
 !!     &          is_scalar, rj_fld, x00_w_center)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
-!!        type(sph_boundary_type), intent(in) :: sph_bc
+!!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(band_matrices_type), intent(in) :: band_s_evo
 !!        type(band_matrix_type), intent(in) :: band_s00_evo
@@ -222,7 +222,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,         &
-     &          ref_field, sph_bc, bcs_S, band_s_evo, band_s00_evo,     &
+     &          ref_field, sph_bc_S, bcs_S, band_s_evo, band_s00_evo,   &
      &          is_scalar, rj_fld, x00_w_center)
 !
       use t_scalar_property
@@ -236,7 +236,7 @@
       use sph_exp_fix_vector_ICB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(band_matrices_type), intent(in) :: band_s_evo
       type(band_matrix_type), intent(in) :: band_s00_evo
@@ -252,17 +252,17 @@
 !
 !
       call set_CMB_scalar_sph_crank                                     &
-     &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc, bcs_S%CMB_Sspec,   &
+     &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc_S, bcs_S%CMB_Sspec, &
      &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
-     &    ref_field%d_fld(sph_bc%kr_out,scl_prop%ir_kappa),             &
-     &    ref_field%d_fld(sph_bc%kr_out,scl_prop%ir_dkappa_norm),       &
+     &    ref_field%d_fld(sph_bc_S%kr_out,scl_prop%ir_kappa),           &
+     &    ref_field%d_fld(sph_bc_S%kr_out,scl_prop%ir_dkappa_norm),     &
      &    dt, scl_prop%coef_imp, is_scalar,                             &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call set_ICB_scalar_sph_crank                                     &
-     &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc, bcs_S%ICB_Sspec,   &
+     &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc_S, bcs_S%ICB_Sspec, &
      &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
-     &    ref_field%d_fld(sph_bc%kr_in,scl_prop%ir_kappa),              &
-     &    ref_field%d_fld(sph_bc%kr_in,scl_prop%ir_dkappa_norm),        &
+     &    ref_field%d_fld(sph_bc_S%kr_in,scl_prop%ir_kappa),            &
+     &    ref_field%d_fld(sph_bc_S%kr_in,scl_prop%ir_dkappa_norm),      &
      &    dt, scl_prop%coef_imp, is_scalar,                             &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
@@ -271,14 +271,14 @@
      &    x00_w_center)
 !
 !
-      if(sph_bc%iflag_icb .eq. iflag_sph_filter_center) then
+      if(sph_bc_S%iflag_icb .eq. iflag_sph_filter_center) then
         call set_sph_filter_vect_to_center                              &
      &     (sph_rj%nidx_rj, bcs_S%ICB_Sspec%S_BC,                       &
      &      rj_fld%n_point, rj_fld%d_fld(1,is_scalar))
       end if
 !
       call fill_scalar_at_external                                      &
-     &   (sph_bc, sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,     &
+     &   (sph_bc_S, sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,   &
      &    sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                         &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !

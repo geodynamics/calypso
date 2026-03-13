@@ -33,12 +33,12 @@
 !!        Address for solution: is_ohmic, is_ohmic+2, is_ohmic+1
 !!
 !!      subroutine const_sph_scalar_diffusion                           &
-!!     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center, leg,       &
+!!     &         (sph_rj, r_2nd, sph_bc_S, bcs_S, fdm2_center, leg,     &
 !!     &          flag_val_diffuse, coef_diffuse, k_ratio, dk_dr,       &
 !!     &          scl_rj, dfs_rj)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
-!!        type(sph_boundary_type), intent(in) :: sph_bc
+!!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(legendre_4_sph_trans), intent(in) :: leg
@@ -50,7 +50,7 @@
 !!        real(kind = kreal), intent(inout) :: dfs_rj(sph_rj%nnod_rj)
 !!@endverbatim
 !!
-!!@param sph_bc  Structure for basic boundary condition parameters
+!!@param sph_bc_S  Structure for basic boundary condition parameters
 !!@param sph_bc_U  Structure for basic boundary condition parameters
 !!                 for velocity
 !!@param sph_bc_B  Structure for basic boundary condition parameters
@@ -225,7 +225,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_sph_scalar_diffusion                             &
-     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center, leg,         &
+     &         (sph_rj, r_2nd, sph_bc_S, bcs_S, fdm2_center, leg,       &
      &          flag_val_diffuse, coef_diffuse, k_ratio, dk_dr,         &
      &          scl_rj, dfs_rj)
 !
@@ -233,7 +233,7 @@
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
-      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(legendre_4_sph_trans), intent(in) :: leg
@@ -249,30 +249,30 @@
 !
       if(flag_val_diffuse) then
         call cal_sph_nod_scl_val_diffuse2                               &
-     &     (sph_bc%kr_in, sph_bc%kr_out, coef_diffuse, k_ratio, dk_dr,  &
+     &     (sph_bc_S%kr_in, sph_bc_S%kr_out,                            &
+     &      coef_diffuse, k_ratio, dk_dr,                               &
      &      sph_rj%nnod_rj, sph_rj%nidx_rj, sph_rj%ar_1d_rj,            &
      &      leg%g_sph_rj, r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,         &
      &      scl_rj, dfs_rj)
 !
         call sel_CMB_sph_scalar_val_diffuse                             &
-     &     (sph_rj, sph_bc, bcs_S%CMB_Sspec, leg%g_sph_rj,              &
-     &      coef_diffuse, k_ratio(sph_bc%kr_out), dk_dr(sph_bc%kr_out), &
+     &     (sph_rj, sph_bc_S, bcs_S%CMB_Sspec, leg, coef_diffuse,       &
+     &      k_ratio(sph_bc_S%kr_out), dk_dr(sph_bc_S%kr_out),           &
      &      scl_rj, dfs_rj)
         call sel_ICB_sph_scalar_val_diffuse                             &
-     &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center,               &
-     &      leg%g_sph_rj, coef_diffuse, k_ratio, dk_dr, scl_rj, dfs_rj)
+     &     (sph_rj, sph_bc_S, bcs_S%ICB_Sspec, fdm2_center,             &
+     &      leg, coef_diffuse, k_ratio, dk_dr, scl_rj, dfs_rj)
       else
         call cal_sph_nod_scalar_diffuse2                                &
-     &     (sph_bc%kr_in, sph_bc%kr_out, coef_diffuse,                  &
+     &     (sph_bc_S%kr_in, sph_bc_S%kr_out, coef_diffuse,              &
      &      sph_rj%nnod_rj, sph_rj%nidx_rj, sph_rj%ar_1d_rj,            &
      &      leg%g_sph_rj, r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,         &
      &      scl_rj, dfs_rj)
 !
-        call sel_CMB_sph_scalar_diffusion(sph_rj, sph_bc,               &
-     &      bcs_S%CMB_Sspec, leg%g_sph_rj, coef_diffuse,                &
-     &      scl_rj, dfs_rj)
-        call sel_ICB_sph_scalar_diffusion(sph_rj, sph_bc,               &
-     &      bcs_S%ICB_Sspec, fdm2_center, leg%g_sph_rj, coef_diffuse,   &
+        call sel_CMB_sph_scalar_diffusion(sph_rj, sph_bc_S,             &
+     &      bcs_S%CMB_Sspec, leg, coef_diffuse, scl_rj, dfs_rj)
+        call sel_ICB_sph_scalar_diffusion(sph_rj, sph_bc_S,             &
+     &      bcs_S%ICB_Sspec, fdm2_center, leg, coef_diffuse,            &
      &      scl_rj, dfs_rj)
       end if
 !

@@ -70,9 +70,9 @@
 !
 !   Evaluate drift frequencty by velocity 
 !
-      call cal_drift_by_v44(time, sph_rj, rj_fld, ipol,                 &
-     &    cdat%circle, bench%t_prev, bench%phase_vm4,                   &
-     &    bench%phase_vm4_prev, bench%omega_vm4)
+      call cal_drift_by_vmm(time, sph_rj, rj_fld, ipol,                 &
+     &    cdat%circle, bench%m_bench, bench%t_prev, bench%phase_vmm,    &
+     &    bench%phase_vmm_prev, bench%omega_vmm)
 !
 !   find local point for dynamobench
 !

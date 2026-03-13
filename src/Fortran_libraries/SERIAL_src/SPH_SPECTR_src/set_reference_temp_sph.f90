@@ -11,16 +11,43 @@
 !!@verbatim
 !!      subroutine no_ref_temp_sph_mhd(nri, r_ICB, r_CMB,               &
 !!     &          depth_top, depth_bottom, reftemp_r, refgrad_r)
+!!        integer(kind = kint), intent(in) :: nri
+!!        real(kind = kreal), intent(in) :: r_ICB, r_CMB
+!!        real(kind = kreal), intent(inout) :: depth_top, depth_bottom
+!!        real(kind = kreal), intent(inout) :: reftemp_r(0:nri)
+!!        real(kind = kreal), intent(inout) :: refgrad_r(0:nri)
 !!      subroutine set_ref_temp_sph_mhd                                 &
 !!     &         (low_temp, depth_top, high_temp, depth_bottom,         &
 !!     &          nidx_rj, r_1d_rj, ar_1d_rj, reftemp_r, refgrad_r)
+!!        real (kind = kreal), intent(in) :: low_temp, high_temp
+!!        real (kind = kreal), intent(in) :: depth_top, depth_bottom
+!!        integer(kind = kint), intent(in) :: nidx_rj(2)
+!!        real(kind=kreal), intent(in) :: r_1d_rj(nidx_rj(1))
+!!        real(kind=kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
+!!        real(kind=kreal), intent(inout) :: reftemp_r(0:nidx_rj(1))
+!!        real(kind=kreal), intent(inout) :: refgrad_r(0:nidx_rj(1))
 !!      subroutine set_stratified_sph_mhd                               &
 !!     &        (stratified_sigma, stratified_width, stratified_outer_r,&
 !!     &         nidx_rj, r_ICB, r_CMB, kr_ICB, kr_CMB, r_1d_rj,        &
 !!     &         reftemp_r, refgrad_r)
+!!        real(kind = kreal), intent(in) :: stratified_sigma
+!!        real(kind = kreal), intent(in) :: stratified_width
+!!        real(kind = kreal), intent(in) :: stratified_outer_r
+!!        integer(kind = kint), intent(in) :: nidx_rj(2)
+!!        integer(kind = kint), intent(in) :: kr_ICB, kr_CMB
+!!        real(kind = kreal), intent(in) :: r_ICB, r_CMB
+!!        real(kind=kreal), intent(in) :: r_1d_rj(nidx_rj(1))
+!!        real(kind=kreal), intent(inout) :: reftemp_r(0:nidx_rj(1))
+!!        real(kind=kreal), intent(inout) :: refgrad_r(0:nidx_rj(1))
 !!
 !!      subroutine set_reftemp_4_sph(idx_rj_degree_zero, inod_rj_center,&
 !!     &          nnod_rj, nidx_rj, reftemp_r, reference_rj)
+!!        integer(kind = kint), intent(in) ::  nnod_rj
+!!        integer(kind = kint), intent(in) ::  nidx_rj(2)
+!!        integer(kind = kint), intent(in) ::  idx_rj_degree_zero
+!!        integer(kind = kint), intent(in) ::  inod_rj_center
+!!        real(kind=kreal), intent(in) :: reftemp_r(0:nidx_rj(1))
+!!        real (kind=kreal), intent(inout) :: reference_rj(nnod_rj)
 !!***********************************************************************
 !!*
 !!*     ref_temp(k,0) : reference of temperature  (output)
@@ -60,19 +87,18 @@
       subroutine no_ref_temp_sph_mhd(nri, r_ICB, r_CMB,                 &
      &          depth_top, depth_bottom, reftemp_r, refgrad_r)
 !
-!
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
 !
       real(kind = kreal), intent(inout) :: depth_top, depth_bottom
-      real(kind=kreal), intent(inout) :: reftemp_r(0:nri)
-      real(kind=kreal), intent(inout) :: refgrad_r(0:nri)
+      real(kind = kreal), intent(inout) :: reftemp_r(0:nri)
+      real(kind = kreal), intent(inout) :: refgrad_r(0:nri)
 !
 !
       reftemp_r(1:nri) = zero
       refgrad_r(1:nri) = zero
-      depth_bottom = r_ICB
-      depth_top =    r_CMB
+      depth_bottom =     r_ICB
+      depth_top =        r_CMB
 !
       end subroutine no_ref_temp_sph_mhd
 !
@@ -130,9 +156,9 @@
      &         nidx_rj, r_ICB, r_CMB, kr_ICB, kr_CMB, r_1d_rj,          &
      &         reftemp_r, refgrad_r)
 !
-      real  (kind=kreal), intent(in) :: stratified_sigma
-      real  (kind=kreal), intent(in) :: stratified_width
-      real  (kind=kreal), intent(in) :: stratified_outer_r
+      real(kind = kreal), intent(in) :: stratified_sigma
+      real(kind = kreal), intent(in) :: stratified_width
+      real(kind = kreal), intent(in) :: stratified_outer_r
 !
       integer(kind = kint), intent(in) :: nidx_rj(2)
       integer(kind = kint), intent(in) :: kr_ICB, kr_CMB

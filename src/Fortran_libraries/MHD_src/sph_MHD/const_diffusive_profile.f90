@@ -8,27 +8,27 @@
 !!
 !!@verbatim
 !!      subroutine cal_diffusive_profile                                &
-!!     &         (sph_rj, sc_prop, sph_bc, bcs_S, r_2nd, fdm2_center,   &
+!!     &         (sph_rj, sc_prop, sph_bc_S, bcs_S, r_2nd, fdm2_center, &
 !!     &          band_s00_poisson, ref_local)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(scalar_property), intent(in) :: sc_prop
-!!        type(sph_boundary_type), intent(in) :: sph_bc
+!!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(band_matrix_type), intent(in) :: band_s00_poisson
 !!        real(kind = kreal), intent(inout)                             &
 !!     &                :: ref_local(0:sph_rj%nidx_rj(1))
 !!      subroutine const_diffusive_profile_fixS(is_scalar, is_source,   &
-!!     &          sph_rj, r_2nd, sc_prop, sph_bc, bcs_S, fdm2_center,   &
+!!     &          sph_rj, r_2nd, sc_prop, sph_bc_S, bcs_S, fdm2_center, &
 !!     &          band_s00_poisson, rj_fld, reftemp_rj, reftemp_local)
-!!      subroutine gradient_of_radial_reference(sph_rj, sph_bc, bcs_S,  &
+!!      subroutine gradient_of_radial_reference(sph_rj, sph_bc_S, bcs_S,&
 !!     &          r_2nd, fdm2_center, reftemp_r, refgrad_r)
 !!        integer(kind = kint), intent(in) :: is_scalar, is_source
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(scalar_property), intent(in) :: sc_prop
-!!        type(sph_boundary_type), intent(in) :: sph_bc
+!!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(phys_data), intent(in) :: rj_fld
@@ -75,7 +75,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_diffusive_profile                                  &
-     &         (sph_rj, sc_prop, sph_bc, bcs_S, r_2nd, fdm2_center,     &
+     &         (sph_rj, sc_prop, sph_bc_S, bcs_S, r_2nd, fdm2_center,   &
      &          band_s00_poisson, ref_local)
 !
       use const_sph_radial_grad
@@ -87,7 +87,7 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(scalar_property), intent(in) :: sc_prop
-      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(band_matrix_type), intent(in) :: band_s00_poisson
@@ -104,10 +104,10 @@
      &                   * (sc_prop%coef_source / sc_prop%coef_diffuse)
 !$omp end parallel workshare
 !
-      call set_ICB_scalar_boundary_1d(sph_rj, sph_bc, bcs_S%ICB_Sspec,  &
-     &                                ref_local(0))
-      call set_CMB_scalar_boundary_1d(sph_rj, sph_bc, bcs_S%CMB_Sspec,  &
-     &                                ref_local(0))
+      call set_ICB_scalar_boundary_1d                                   &
+     &   (sph_rj, sph_bc_S, bcs_S%ICB_Sspec, ref_local(0))
+      call set_CMB_scalar_boundary_1d                                   &
+     &   (sph_rj, sph_bc_S, bcs_S%CMB_Sspec,  ref_local(0))
 !
       call lubksb_3band_ctr(band_s00_poisson, ref_local(0))
 !
@@ -131,7 +131,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gradient_of_radial_reference(sph_rj, sph_bc, bcs_S,    &
+      subroutine gradient_of_radial_reference(sph_rj, sph_bc_S, bcs_S,  &
      &          r_2nd, fdm2_center, reftemp_r, refgrad_r)
 !
       use const_sph_radial_grad
@@ -140,7 +140,7 @@
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
-      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       real(kind=kreal), intent(in) :: reftemp_r(0:sph_rj%nidx_rj(1))
@@ -148,15 +148,16 @@
       real(kind=kreal), intent(inout) :: refgrad_r(0:sph_rj%nidx_rj(1))
 !
 !
-      call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,         &
+      call cal_sph_nod_gradient_1d(sph_bc_S%kr_in, sph_bc_S%kr_out,     &
      &                            sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat, &
      &                            reftemp_r(0), refgrad_r(0))
 !
       call sel_ICB_radial_grad_1d_scalar                                &
-     &   (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center,                 &
+     &   (sph_rj, sph_bc_S, bcs_S%ICB_Sspec, fdm2_center,               &
      &    reftemp_r(0), refgrad_r(0))
       call sel_CMB_radial_grad_1d_scalar                                &
-     &   (sph_rj, sph_bc, bcs_S%CMB_Sspec, reftemp_r(0), refgrad_r(0))
+     &   (sph_rj, sph_bc_S, bcs_S%CMB_Sspec,                            &
+     &    reftemp_r(0), refgrad_r(0))
 !
       end subroutine gradient_of_radial_reference
 !
@@ -202,7 +203,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_diffusive_profile_fixS(is_scalar, is_source,     &
-     &          sph_rj, r_2nd, sc_prop, sph_bc, bcs_S, fdm2_center,     &
+     &          sph_rj, r_2nd, sc_prop, sph_bc_S, bcs_S, fdm2_center,   &
      &          band_s00_poisson, rj_fld, reftemp_rj, reftemp_local)
 !
       use calypso_mpi
@@ -216,7 +217,7 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(scalar_property), intent(in) :: sc_prop
-      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(phys_data), intent(in) :: rj_fld
@@ -249,23 +250,23 @@
         end if
 !
         call set_ICB_scalar_boundary_1d                                 &
-     &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, reftemp_local(0,0))
+     &     (sph_rj, sph_bc_S, bcs_S%ICB_Sspec, reftemp_local(0,0))
 !
         inod = sph_rj%idx_rj_degree_zero                                &
-     &        + (sph_bc%kr_out-1) * sph_rj%nidx_rj(2)
-        reftemp_local(sph_bc%kr_out,0) = rj_fld%d_fld(inod,is_scalar)
+     &        + (sph_bc_S%kr_out-1) * sph_rj%nidx_rj(2)
+        reftemp_local(sph_bc_S%kr_out,0) = rj_fld%d_fld(inod,is_scalar)
 !
         call lubksb_3band_ctr(band_s00_poisson, reftemp_local(0,0))
-        call fill_scalar_1d_external(sph_bc, sph_rj%inod_rj_center,     &
+        call fill_scalar_1d_external(sph_bc_S, sph_rj%inod_rj_center,   &
      &      sph_rj%nidx_rj(1), reftemp_local(0,0))
 !
-        call cal_sph_nod_gradient_1d(sph_bc%kr_in, sph_bc%kr_out,       &
+        call cal_sph_nod_gradient_1d(sph_bc_S%kr_in, sph_bc_S%kr_out,   &
      &      sph_rj%nidx_rj(1), r_2nd%fdm(1)%dmat,                       &
      &      reftemp_local(0,0), reftemp_local(0,1))
 !
-        call fix_ICB_radial_grad_1d_scalar(sph_rj, sph_bc, fdm2_center, &
-     &      reftemp_local(0,0), reftemp_local(0,1))
-        call fix_CMB_radial_grad_1d_scalar(sph_rj, sph_bc,              &
+        call fix_ICB_radial_grad_1d_scalar(sph_rj, sph_bc_S,            &
+     &      fdm2_center, reftemp_local(0,0), reftemp_local(0,1))
+        call fix_CMB_radial_grad_1d_scalar(sph_rj, sph_bc_S,            &
      &      reftemp_local(0,0), reftemp_local(0,1))
       end if
 !

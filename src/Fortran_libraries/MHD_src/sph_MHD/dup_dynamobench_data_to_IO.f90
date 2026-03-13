@@ -122,7 +122,7 @@
       end if
 !
       data_out(jcou+1) = bench%ave_phase_vr
-      data_out(jcou+2:jcou+3) = bench%omega_vm4(1:2)
+      data_out(jcou+2:jcou+3) = bench%omega_vmm(1:2)
       jcou = jcou + 3
 !
       end subroutine dup_dynamobench_monitor_data

@@ -36,8 +36,10 @@
       integer (kind=kint), parameter :: id_z_ref_temp = 3
 !>      flag to use referece temperature as a function of @f$ r @f$
       integer (kind=kint), parameter :: id_sphere_ref_temp = 100
-!>      flag to obtain diffusive profile numerically
-      integer (kind=kint), parameter :: id_ref_field_file = 10
+!>      flag to obtain diffusive profile from file
+      integer (kind=kint), parameter :: id_ref_field_file =   10
+!>      flag to obtain diffusive profile from restart
+      integer (kind=kint), parameter :: id_ref_restart_file = 20
 !>      flag to obtain diffusive profile numerically
       integer (kind=kint), parameter :: id_numerical_solution = 999
 !>      flag to use linearly decrease referece temperature
@@ -61,6 +63,7 @@
       character(len = kchara), parameter                                &
      &               :: label_get_numerical = 'numerical_solution'
       character(len = kchara), parameter :: label_load_file = 'file'
+      character(len = kchara), parameter :: label_load_rst = 'restart'
 !
       type reference_scalar_param
 !>        switch to use perturbation of scalar
@@ -118,10 +121,11 @@
       array_c%num =         0
       call alloc_control_array_chara(array_c)
 !
-      call append_c_to_ctl_array(label_none, array_c)
-      call append_c_to_ctl_array(label_sph_shell, array_c)
-      call append_c_to_ctl_array(label_get_numerical, array_c)
-      call append_c_to_ctl_array(label_load_file, array_c)
+      call append_c_to_ctl_array(label_none,           array_c)
+      call append_c_to_ctl_array(label_sph_shell,      array_c)
+      call append_c_to_ctl_array(label_get_numerical,  array_c)
+      call append_c_to_ctl_array(label_load_file,      array_c)
+      call append_c_to_ctl_array(label_load_rst,       array_c)
       call append_c_to_ctl_array(label_sph_const_heat, array_c)
 !
       end subroutine set_sph_reftemp_list_array

@@ -117,6 +117,11 @@
       if(dbench_ctl%ref_zonal_mode_ctl%iflag .gt. 0) then
         bench%m_bench = dbench_ctl%ref_zonal_mode_ctl%intvalue
       end if
+      if(bench%m_bench .eq. 0) then
+        write(*,*) 'Target zonal wave number to measure is more than 0'
+        write(*,*) 'Target zonal wave number is now 4'
+        bench%m_bench = 4
+      end if
 !
       circle%circle_field_file_prefix = 'NO_FILE'
       if(dbench_ctl%dbench_field_file_ctl%iflag .gt. 0) then

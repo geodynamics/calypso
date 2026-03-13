@@ -68,13 +68,14 @@
 !>        magnetic torque for inner core
         real(kind = kreal) :: m_torque_icore(-1:1)
 !
-!>        phase of by @f$ V_{S4}^{4} @f$
-        real(kind = kreal) :: phase_vm4(2)      = (/zero,zero/)
-!>        phase of by @f$ V_{S4}^{4} @f$
+!>        phase of by @f$ V_{Sm}^{m} @f$ and @f$ V_{T(m+1)}^{m} @f$
+        real(kind = kreal) :: phase_vmm(2)      = (/zero,zero/)
+!>        phase of by @f$ V_{Sm}^{m} @f$ and @f$ V_{T(m+1)}^{m} @f$
 !!        at previous monitoring
-        real(kind = kreal) :: phase_vm4_prev(2) = (/zero,zero/)
-!>        drift frequency obtained by @f$ V_{S4}^{4} @f$
-        real(kind = kreal) :: omega_vm4(2)      = (/zero,zero/)
+        real(kind = kreal) :: phase_vmm_prev(2) = (/zero,zero/)
+!>        drift frequency obtained by @f$ V_{Sm}^{m} @f$
+!!                                and @f$ V_{T(m+1)}^{m} @f$
+        real(kind = kreal) :: omega_vmm(2)      = (/zero,zero/)
 !
 !>        local point data
         real(kind = kreal), allocatable :: d_zero(:,:)

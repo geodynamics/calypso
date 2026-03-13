@@ -112,22 +112,24 @@
         ref_param%iflag_reference = id_no_ref_temp
       else
         tmpchara = ref_temp_ctl%charavalue
-        if (cmp_no_case(tmpchara, label_sph_shell)) then
+        if     (cmp_no_case(tmpchara, label_sph_shell)) then
           ref_param%iflag_reference = id_sphere_ref_temp
-        else if (cmp_no_case(tmpchara, label_takepiro)) then
+        else if(cmp_no_case(tmpchara, label_takepiro)) then
           ref_param%iflag_reference = id_takepiro_temp
-        else if (cmp_no_case(tmpchara, label_sph_const_heat)) then
+        else if(cmp_no_case(tmpchara, label_sph_const_heat)) then
           ref_param%iflag_reference = id_linear_r_ref_temp
-        else if (cmp_no_case(tmpchara, label_linear_x)) then
+        else if(cmp_no_case(tmpchara, label_linear_x)) then
           ref_param%iflag_reference = id_x_ref_temp
-        else if (cmp_no_case(tmpchara, label_linear_y)) then
+        else if(cmp_no_case(tmpchara, label_linear_y)) then
           ref_param%iflag_reference = id_y_ref_temp
-        else if (cmp_no_case(tmpchara, label_linear_z)) then
+        else if(cmp_no_case(tmpchara, label_linear_z)) then
           ref_param%iflag_reference = id_z_ref_temp
-        else if (cmp_no_case(tmpchara, label_get_numerical)) then
+        else if(cmp_no_case(tmpchara, label_get_numerical)) then
           ref_param%iflag_reference = id_numerical_solution
-        else if (cmp_no_case(tmpchara, label_load_file)) then
+        else if(cmp_no_case(tmpchara, label_load_file)) then
           ref_param%iflag_reference = id_ref_field_file
+        else if(cmp_no_case(tmpchara, label_load_rst)) then
+          ref_param%iflag_reference = id_ref_restart_file
         end if
       end if
 !
@@ -136,6 +138,7 @@
      &   .or. ref_param%iflag_reference .eq. id_takepiro_temp           &
      &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
      &   .or. ref_param%iflag_reference .eq. id_ref_field_file          &
+     &   .or. ref_param%iflag_reference .eq. id_ref_restart_file        &
      &   ) ref_param%flag_ref_field = .TRUE.
 !
       if(ref_param%iflag_reference .eq. id_ref_field_file) then
@@ -158,7 +161,8 @@
 !
       if(   ref_param%iflag_reference .eq. id_no_ref_temp               &
      & .or. ref_param%iflag_reference .eq. id_numerical_solution        &
-     & .or. ref_param%iflag_reference .eq. id_ref_field_file) then
+     & .or. ref_param%iflag_reference .eq. id_ref_field_file            &
+     & .or. ref_param%iflag_reference .eq. id_ref_restart_file) then
         ref_param%low_value  =    0.0d0
         ref_param%depth_top  =    0.0d0
         ref_param%high_value =    0.0d0

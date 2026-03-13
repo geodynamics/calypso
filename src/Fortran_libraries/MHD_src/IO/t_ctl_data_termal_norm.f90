@@ -35,15 +35,15 @@
 !! example of control block
 !!
 !!      begin thermal
-!!        array coef_4_termal_ctl     1
+!!        array coef_4_termal_ctl
 !!          coef_4_termal_ctl            One                   1.0
 !!        end array coef_4_termal_ctl
 !!
-!!        array coef_4_t_diffuse_ctl  1
+!!        array coef_4_t_diffuse_ctl
 !!          coef_4_t_diffuse_ctl         Prandtl_number       -1.0
 !!        end array coef_4_t_diffuse_ctl
 !!
-!!        array coef_4_heat_source_ctl  1
+!!        array coef_4_heat_source_ctl
 !!          coef_4_heat_source_ctl       One                   1.0
 !!        end array coef_4_heat_source_ctl
 !!      end  thermal
