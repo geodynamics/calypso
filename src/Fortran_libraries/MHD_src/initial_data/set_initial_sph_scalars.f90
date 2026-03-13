@@ -142,7 +142,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine init_sph_sectorial_temp(isig, sph, sph_bc_T,           &
+      subroutine init_sph_sectorial_temp(m_bench, sph, sph_bc_T,        &
      &                                   n_point, temp_rj)
 !
       use spherical_indices_picker
@@ -150,13 +150,13 @@
 !
       type(sph_grids), intent(in) :: sph
       type(sph_boundary_type), intent(in) :: sph_bc_T
-      integer(kind = kint), intent(in) :: isig
+      integer(kind = kint), intent(in) :: m_bench
       integer(kind = kint), intent(in) :: n_point
 !
       real(kind = kreal), intent(inout) :: temp_rj(n_point)
 !
-      integer(kind = kint) :: m, k, jj
-      integer(kind = kint) :: kr_in, kr_out, inod
+      integer(kind = kint) :: k, jj
+      integer(kind = kint) :: kr_in, kr_out, inod, ictr
       real(kind = kreal) :: pi, xr, shell, r_in, r_out
 !
 !
@@ -167,8 +167,7 @@
       r_out =  sph_outer_boundary_radius(sph_bc_T)
       shell =  r_out - r_in
 !
-      m = int(mod(isig,100000) / icent)
-      jj = find_local_sph_mode_address(sph, m, m)
+      jj = find_local_sph_mode_address(sph, m_bench, m_bench)
 !
       if (jj .gt. 0) then
 !$omp parallel do private(k,inod,xr)
@@ -183,8 +182,11 @@
       end if
 !
 !    Center
-      inod = inod_rj_center(sph)
-      if(inod .gt. 0) temp_rj(inod) = temp_rj(inod)
+      ictr = inod_rj_center(sph)
+      if(ictr .gt. 0) then
+        inod = local_sph_data_address(sph, 1, jj)
+        temp_rj(ictr) = temp_rj(inod)
+      end if
 !
       end subroutine init_sph_sectorial_temp
 !

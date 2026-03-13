@@ -18,11 +18,11 @@
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(inout) :: rj_fld
 !!
-!!      subroutine init_sph_scalar_dbench(isig, sph, sph_bc_S,          &
+!!      subroutine init_sph_scalar_dbench(m_bench, sph, sph_bc_S,       &
 !!     &                                  ipol_scalar, rj_fld)
 !!      subroutine init_sph_scalar_with_noise(sph, sph_bc_S,            &
 !!     &          iref_scalar, ref_field, ipol_scalar, rj_fld)
-!!        integer(kind = kint), intent(in) :: isig
+!!        integer(kind = kint), intent(in) :: m_bench
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(phys_data), intent(in) :: ref_field
@@ -51,16 +51,18 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sph_initial_data_4_benchmarks                          &
-     &         (iflag_restart_mode, sph, sph_MHD_bc, ipol, rj_fld)
+      subroutine sph_initial_data_4_benchmarks(iflag_restart_mode,      &
+     &          m_bench, sph, sph_MHD_bc, ipol, rj_fld)
 !
       use m_machine_parameter
       use m_initial_field_control
 !
       use initial_magne_sph_dynamo
+      use initial_magne_sph_vector
       use calypso_mpi
 !
       integer(kind = kint), intent(in) :: iflag_restart_mode
+      integer(kind = kint), intent(in) :: m_bench
       type(sph_grids), intent(in) :: sph
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(phys_address), intent(in) :: ipol
@@ -71,21 +73,19 @@
 !
 !
       call calypso_mpi_barrier
-!$omp parallel workshare
-      rj_fld%d_fld(1:rj_fld%n_point,ipol%base%i_velo  ) = 0.0d0
-      rj_fld%d_fld(1:rj_fld%n_point,ipol%base%i_velo+1) = 0.0d0
-      rj_fld%d_fld(1:rj_fld%n_point,ipol%base%i_velo+2) = 0.0d0
-!$omp end parallel workshare
-!
+      if(ipol%base%i_velo .gt. 0) then
+        call reset_initial_sph_vector(rj_fld%n_point,                   &
+     &                                rj_fld%d_fld(1,ipol%base%i_velo))
+      end if
 !
       if(ipol%base%i_temp .gt. 0) then
         if(iflag_debug.gt.0) write(*,*) 'initilal for temperature'
-        call init_sph_scalar_dbench(isig, sph, sph_MHD_bc%sph_bc_T,     &
+        call init_sph_scalar_dbench(m_bench, sph, sph_MHD_bc%sph_bc_T,  &
      &                              ipol%base%i_temp, rj_fld)
       end if
 !
       if(ipol%base%i_light .gt. 0) then
-        call init_sph_scalar_dbench(isig, sph, sph_MHD_bc%sph_bc_C,     &
+        call init_sph_scalar_dbench(m_bench, sph, sph_MHD_bc%sph_bc_C,  &
      &                              ipol%base%i_light, rj_fld)
       end if
 !
@@ -104,6 +104,7 @@
       use t_boundary_data_sph_MHD
       use t_radial_reference_field
       use initial_magne_sph_dynamo
+      use initial_magne_sph_vector
 !
       type(sph_grids), intent(in) :: sph
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -113,11 +114,10 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-!$omp parallel workshare
-      rj_fld%d_fld(1:rj_fld%n_point,ipol%base%i_velo  ) = 0.0d0
-      rj_fld%d_fld(1:rj_fld%n_point,ipol%base%i_velo+1) = 0.0d0
-      rj_fld%d_fld(1:rj_fld%n_point,ipol%base%i_velo+2) = 0.0d0
-!$omp end parallel workshare
+      if(ipol%base%i_velo .gt. 0) then
+        call reset_initial_sph_vector(rj_fld%n_point,                   &
+     &                                rj_fld%d_fld(1,ipol%base%i_velo))
+      end if
 !
       if((ipol%base%i_temp*refs%iref_base%i_temp) .gt. 0)  then
         call init_sph_scalar_with_noise(sph, sph_MHD_bc%sph_bc_T,       &
@@ -141,12 +141,12 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine init_sph_scalar_dbench(isig, sph, sph_bc_S,            &
+      subroutine init_sph_scalar_dbench(m_bench, sph, sph_bc_S,         &
      &                                  ipol_scalar, rj_fld)
 !
       use set_initial_sph_scalars
 !
-      integer(kind = kint), intent(in) :: isig
+      integer(kind = kint), intent(in) :: m_bench
       type(sph_grids), intent(in) :: sph
       type(sph_boundary_type), intent(in) :: sph_bc_S
       integer(kind = kint), intent(in) :: ipol_scalar
@@ -158,10 +158,10 @@
       rj_fld%d_fld(1:rj_fld%n_point,ipol_scalar) = 0.0d0
 !$omp end parallel workshare
 !
-      call initial_sph_ref_temp_dbench(sph, sph_bc_S, rj_fld%n_point,   &
-     &                                 rj_fld%d_fld(1,ipol_scalar))
-      call init_sph_sectorial_temp(isig, sph, sph_bc_S, rj_fld%n_point, &
-     &                             rj_fld%d_fld(1,ipol_scalar))
+      call initial_sph_ref_temp_dbench(sph, sph_bc_S,                   &
+     &    rj_fld%n_point, rj_fld%d_fld(1,ipol_scalar))
+      call init_sph_sectorial_temp(m_bench, sph, sph_bc_S,              &
+     &    rj_fld%n_point, rj_fld%d_fld(1,ipol_scalar))
 !
       end subroutine init_sph_scalar_dbench
 !
@@ -185,8 +185,8 @@
       rj_fld%d_fld(1:rj_fld%n_point,ipol_scalar) = 0.0d0
 !$omp end parallel workshare
 !
-      call initial_sph_reference_scalar(sph,                            &
-     &    ref_field%n_point, ref_field%d_fld(1,iref_scalar),            &
+      call initial_sph_reference_scalar                                 &
+     &   (sph, ref_field%n_point, ref_field%d_fld(1,iref_scalar),       &
      &    rj_fld%n_point, rj_fld%d_fld(1,ipol_scalar))
       call initital_sph_noise_temp(sph, sph_bc_S, rj_fld%n_point,       &
      &                             rj_fld%d_fld(1,ipol_scalar))
