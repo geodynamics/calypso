@@ -153,7 +153,7 @@
                 write(*,*) 'Large error in ',                           &
      &           trim(picked_IO1%spectr_name(icomp)),                   &
      &           ': ', picked_IO1%d_pk(ist+icomp),                      &
-     &                 picked_IO1%d_pk(ist+icomp), diff
+     &                 picked_IO2%d_pk(ist+icomp), diff
                 go to 99
               end if
             end do
