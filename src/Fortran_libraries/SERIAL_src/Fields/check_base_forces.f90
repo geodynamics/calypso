@@ -64,6 +64,11 @@
         call add_phys_name_ctl(pressure, field_ctl)
       end if
 !
+      if(check_field_list_ctl(buoyancy, field_ctl)) then
+        call add_phys_name_ctl(thermal_buoyancy,   field_ctl)
+        call add_phys_name_ctl(composite_buoyancy, field_ctl)
+      end if
+!
       if(check_field_list_ctl(thermal_buoyancy, field_ctl))             &
         call add_phys_name_ctl(temperature, field_ctl)
       if(check_field_list_ctl(composite_buoyancy, field_ctl))           &
