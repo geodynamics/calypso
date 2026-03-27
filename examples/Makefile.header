@@ -23,8 +23,8 @@ OPTFLAGS = -O3 -g
 #
 
 F90LIBS =   $(ZLIB_LIBS) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LDFLAGS) $(HDF5_FLIBS)
-F_INCLUDE = -I. $(HDF5_FFLAGS)
-C_INCLUDE = -I. $(ZLIB_CFLAGS)  $(FFTW3_CFLAGS)
+F_INCLUDE = -I. -I/Users/matsui/Calypso_test/work $(HDF5_FFLAGS)
+C_INCLUDE = -I. -I/Users/matsui/Calypso_test/work $(ZLIB_CFLAGS)  $(FFTW3_CFLAGS)
 
 #
 # zlib settings
@@ -61,4 +61,50 @@ MHDDIR = /Users/matsui/Calypso_test/src
 INSTDIR = /usr/local
 EXPDIR = /Users/matsui/Calypso_test/examples
 TESTDIR = /Users/matsui/Calypso_test/tests
+#
+#
+# -----------------------------------------------------------
+# library lists
+# -----------------------------------------------------------
+LIB_CALYPSO =      -lcalypso
+LIB_CALYPSO_FILE = libcalypso.a
+#
+LIB_MESH =      -lcalypso_core
+LIB_MESH_FILE = libcalypso_core.a
+
+LIB_SOLVER =      -lcalypso_solver
+LIB_SOLVER_FILE = libcalypso_solver.a
+
+LIB_PARA =      -lcalypso_parallel
+LIB_PARA_FILE = libcalypso_parallel.a
+#
+LIB_MHD = -lcalypso_MHD
+LIB_MHD_FILE = libcalypso_MHD.a
+#
+LIB_UTILS =       -lcalypso_utils
+LIB_UTILS_FILE =  libcalypso_utils.a
+#
+LIB_VIZ =      -lkemo_viz
+LIB_VIZ_FILE = libkemo_viz.a
+
+LIB_CALYPSO_C =      -lcalypso_c
+LIB_CALYPSO_C_FILE = libcalypso_c.a
+
+LIB_FFTPACK =      -lfftpack.5d
+LIB_FFTPACK_FILE = libfftpack.5d.a
+
+LIBS_SPH_MHD= \
+$(LIB_CALYPSO) $(LIB_CALYPSO_C) $(LIB_FFTPACK) $(LIB_NETLIB)
+LIB_FILES_SPH_MHD= \
+$(LIB_CALYPSO_FILE) $(LIB_CALYPSO_C_FILE) $(LIB_FFTPACK_FILE) $(LIB_NETLIB_FILE)
+#
+LIBS_MESH_UTILS= \
+$(LIB_CALYPSO) $(LIB_CALYPSO_C)
+LIB_FILES_MESH_UTILS= \
+$(LIB_CALYPSO_FILE) $(LIB_CALYPSO_C_FILE)
+#
+LIBS_FFT_TEST= \
+$(LIB_MESH) $(LIB_FFTPACK) $(LIB_NETLIB)
+LIB_FILES_FFT_TEST= \
+$(LIB_MESH_FILE) $(LIB_FFTPACK_FILE) $(LIB_NETLIB_FILE)
 #

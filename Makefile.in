@@ -126,6 +126,7 @@ test:
 	cd $(TESTDIR) ; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
+		SRCDIR="$(SRCDIR)" \
 		BUILDDIR="$(BUILDDIR)" \
 		TESTDIR="$(TESTDIR)" \
 		MHDDIR="$(MHDDIR)" \

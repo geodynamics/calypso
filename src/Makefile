@@ -40,8 +40,8 @@ programs
 
 
 
-F_INCLUDE = -I.
-C_INCLUDE = -I.
+F_INCLUDE = -I. -I$(MAKEDIR)
+C_INCLUDE = -I. -I$(MAKEDIR)
 
 CPP_FLAGS =
 
@@ -142,11 +142,23 @@ makemake:
 	echo '#' >> $(TESTS_MAKEHEAD)
 	$(GMAKE) makeheaders \
 		MAKENAME="$(TESTS_MAKEHEAD)"
+	@echo '#' >> $(TESTS_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(TESTS_MAKEHEAD)
+	@echo '# library lists' >> $(TESTS_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(TESTS_MAKEHEAD)
+	$(GMAKE) makelib_list \
+		MAKENAME="$(TESTS_MAKEHEAD)"
 	
 	echo '#' > $(EXP_MAKEHEAD)
 	echo '# Makefile header for Calypso Dynamo example' >> $(EXP_MAKEHEAD)
 	echo '#' >> $(EXP_MAKEHEAD)
 	$(GMAKE) makeheaders \
+		MAKENAME="$(EXP_MAKEHEAD)"
+	@echo '#' >> $(EXP_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(EXP_MAKEHEAD)
+	@echo '# library lists' >> $(EXP_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(EXP_MAKEHEAD)
+	$(GMAKE) makelib_list \
 		MAKENAME="$(EXP_MAKEHEAD)"
 	
 	echo '#' > $(MAKENAME)
@@ -169,48 +181,29 @@ makemake:
 		 ) \
 	done
 	@echo '#' >> $(MAKENAME)
-	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
 	@echo '# target lists ' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'PROGRAMS= parallels utilities tests' >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'create excecute file list...'
-	@for dir in programs ; do \
-		( \
-		echo 'generate target list for ' $$dir ; \
-		cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		BUILDDIR='$(BUILDDIR)' \
-		MAKENAME='$(MAKENAME)' \
-		target_list; \
-		 ) \
-	done
-	@echo '#' >> $(MAKENAME)
 	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	$(GMAKE) maketarget_list 
+		MAKENAME="$(MAKENAME)"
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
 	@echo '# library lists' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'create library file name list...'
-	@for dir in  $(SUBDIRS) ; do \
-		( \
-		echo 'generate library list for ' $$dir ; \
-		cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)' \
-		lib_name; \
-		 ) \
-	done
-	@echo '#' >> $(MAKENAME)
 	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	$(GMAKE) makelib_list \
+		MAKENAME="$(MAKENAME)"
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
 	@echo '# objects list' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo 'create object module list...'
 	@for dir in $(SUBDIRS) ; do \
@@ -323,10 +316,41 @@ makeheaders:
 	@echo BUILDDIR = $(BUILDDIR) >> $(MAKENAME)
 	@echo MHDDIR =   $(MHDDIR)   >> $(MAKENAME)
 	@echo INSTDIR =  $(INSTDIR)  >> $(MAKENAME)
-	@echo EXPDIR =   $(EXPDIR)  >> $(MAKENAME)
+	@echo EXPDIR =   $(EXPDIR)   >> $(MAKENAME)
 	@echo TESTDIR =  $(TESTDIR)  >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 
+maketarget_list:
+	@echo 'PROGRAMS= parallels utilities tests' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'create excecute file list...'
+	@for dir in programs ; do \
+		( \
+		echo 'generate target list for ' $$dir ; \
+		cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		BUILDDIR='$(BUILDDIR)' \
+		MAKENAME='$(MAKENAME)' \
+		target_list; \
+		 ) \
+	done
+
+makelib_list:
+	@echo 'create library file name list...'
+	@for dir in  $(SUBDIRS) ; do \
+		( \
+		echo 'generate library list for ' $$dir ; \
+		cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKEDIR='$(MAKEDIR)' \
+		MAKENAME='$(MAKENAME)' \
+		lib_name; \
+		 ) \
+	done
 
 makeinstall:
 	@echo '#' >> $(MAKENAME)
