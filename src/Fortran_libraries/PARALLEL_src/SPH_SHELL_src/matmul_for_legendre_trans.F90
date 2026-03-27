@@ -8,21 +8,57 @@
 !!
 !!@verbatim
 !!      subroutine matmul_fwd_leg_trans(iflag_matmul, nkr, n_jk, nl_rtm,&
-!!     &          V_kl, P_lj, S_kj)
+!!     &                                V_kl, P_lj, S_kj)
+!!        integer(kind = kint), intent(in) :: iflag_matmul
+!!        integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
+!!        real(kind = kreal), intent(in) :: V_kl(nkr,nl_rtm)
+!!        real(kind = kreal), intent(in) :: P_lj(nl_rtm,n_jk)
+!!        real(kind = kreal), intent(inout) :: S_kj(nkr,n_jk)
 !!      subroutine matmul_bwd_leg_trans(iflag_matmul, nl_rtm, nkr, n_jk,&
-!!     &          P_lj, S_jk, V_lk)
+!!     &                                P_lj, S_jk, V_lk)
+!!        integer(kind = kint), intent(in) :: iflag_matmul
+!!        integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
+!!        real(kind = kreal), intent(in) :: P_lj(nl_rtm,n_jk)
+!!        real(kind = kreal), intent(in) :: S_jk(n_jk,nkr)
+!!        real(kind = kreal), intent(inout) :: V_lk(nl_rtm,nkr)
 !!
 !!      subroutine matmul_fwd_leg_trans_Pjl(iflag_matmul,               &
 !!     &          n_jk, nkr, nl_rtm, P_jl, V_lk, S_jk)
+!!        integer(kind = kint), intent(in) :: iflag_matmul
+!!        integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
+!!        real(kind = kreal), intent(in) :: P_jl(n_jk,nl_rtm)
+!!        real(kind = kreal), intent(in) :: V_lk(nl_rtm,nkr)
+!!        real(kind = kreal), intent(inout) :: S_jk(n_jk,nkr)
 !!      subroutine matmul_bwd_leg_trans_Pjl(iflag_matmul,               &
 !!     &          nkr, nl_rtm, n_jk, S_kj, P_jl, V_kl)
+!!        integer(kind = kint), intent(in) :: iflag_matmul
+!!        integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
+!!        real(kind = kreal), intent(in) :: S_kj(nkr,n_jk)
+!!        real(kind = kreal), intent(in) :: P_jl(n_jk,nl_rtm)
+!!        real(kind = kreal), intent(inout) :: V_kl(nkr,nl_rtm)
 !!
 !!      subroutine add_matmul_fwd_leg_trans(iflag_matmul,               &
 !!     &          nkr, n_jk, nl_rtm, V_kl, P_lj, coef, S_kj)
+!!        integer(kind = kint), intent(in) :: iflag_matmul
+!!        integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
+!!        real(kind = kreal), intent(in) :: coef
+!!        real(kind = kreal), intent(in) :: V_kl(nkr,nl_rtm)
+!!        real(kind = kreal), intent(in) :: P_lj(nl_rtm,n_jk)
+!!        real(kind = kreal), intent(inout) :: S_kj(nkr,n_jk)
 !!      subroutine add_matmul_bwd_leg_trans(iflag_matmul,               &
 !!     &          nl_rtm, nkr, n_jk, P_lj, S_jk, coef, V_lk)
+!!        integer(kind = kint), intent(in) :: iflag_matmul
+!!        integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
+!!        real(kind = kreal), intent(in) :: coef
+!!        real(kind = kreal), intent(in) :: P_lj(nl_rtm,n_jk)
+!!        real(kind = kreal), intent(in) :: S_jk(n_jk,nkr)
+!!        real(kind = kreal), intent(inout) :: V_lk(nl_rtm,nkr)
 !!
 !!      subroutine matmat_leg_trans(np1, np2, nab, Amat, Bmat, Prod)
+!!        integer(kind = kint), intent(in) :: nab, np2, np1
+!!        real(kind = kreal), intent(in) :: Amat(np1,nab)
+!!        real(kind = kreal), intent(in) :: Bmat(nab,np2)
+!!        real(kind = kreal), intent(inout) :: Prod(np1,np2)
 !!@endverbatim
 !!
 !!@param   nkr     Number of radial grid and field
@@ -55,7 +91,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine matmul_fwd_leg_trans(iflag_matmul, nkr, n_jk, nl_rtm,  &
-     &          V_kl, P_lj, S_kj)
+     &                                V_kl, P_lj, S_kj)
 !
       integer(kind = kint), intent(in) :: iflag_matmul
       integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
@@ -76,11 +112,10 @@
         n_jk4 =   int(n_jk)
         nl_rtm4 = int(nl_rtm)
         call DGEMM('N', 'N', nkr4, n_jk4, nl_rtm4, one,                 &
-     &      V_kl, nkr4, P_lj, nl_rtm4, zero, S_kj, nkr4)
+     &             V_kl, nkr4, P_lj, nl_rtm4, zero, S_kj, nkr4)
 #endif
       else
-        call matmat_leg_trans(nkr, n_jk, nl_rtm,                        &
-     &      V_kl, P_lj, S_kj)
+        call matmat_leg_trans(nkr, n_jk, nl_rtm, V_kl, P_lj, S_kj)
       end if
 !
       end subroutine matmul_fwd_leg_trans
@@ -88,7 +123,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine matmul_bwd_leg_trans(iflag_matmul, nl_rtm, nkr, n_jk,  &
-     &          P_lj, S_jk, V_lk)
+     &                                P_lj, S_jk, V_lk)
 !
       integer(kind = kint), intent(in) :: iflag_matmul
       integer(kind = kint), intent(in) :: n_jk, nkr, nl_rtm
@@ -112,7 +147,7 @@
         nkr4 =    int(nkr)
         n_jk4 =   int(n_jk)
         call DGEMM('N', 'N', nl_rtm4, nkr4, n_jk4, one,                 &
-     &      P_lj, nl_rtm4, S_jk, n_jk4, zero, V_lk, nl_rtm4)
+     &             P_lj, nl_rtm4, S_jk, n_jk4, zero, V_lk, nl_rtm4)
 #endif
       else
         call matmat_leg_trans(nl_rtm, nkr, n_jk, P_lj, S_jk, V_lk)
@@ -144,7 +179,7 @@
         n_jk4 =   int(n_jk)
         nl_rtm4 = int(nl_rtm)
         call DGEMM('N', 'N', n_jk4, nkr4, nl_rtm4, one,                 &
-     &      P_jl, n_jk4, V_lk, nl_rtm4, zero, S_jk, n_jk4)
+     &             P_jl, n_jk4, V_lk, nl_rtm4, zero, S_jk, n_jk4)
 #endif
       else
         call matmat_leg_trans(n_jk, nkr, nl_rtm, V_lk, P_jl, S_jk)
@@ -179,7 +214,7 @@
         nkr4 =    int(nkr)
         n_jk4 =   int(n_jk)
         call DGEMM('N', 'N', nkr4, nl_rtm4, n_jk4, one,                 &
-     &      S_kj, nkr4, P_jl, n_jk4, zero, V_kl, nkr4)
+     &             S_kj, nkr4, P_jl, n_jk4, zero, V_kl, nkr4)
 #endif
       else
         call matmat_leg_trans(nkr, nl_rtm, n_jk, S_kj, P_jl, V_kl)
@@ -214,11 +249,11 @@
         n_jk4 =   int(n_jk)
         nl_rtm4 = int(nl_rtm)
         call DGEMM('N', 'N', nkr4, n_jk4, nl_rtm4, one,                 &
-     &      V_kl, nkr4, P_lj, nl_rtm4, coef, S_kj, nkr4)
+     &             V_kl, nkr4, P_lj, nl_rtm4, coef, S_kj, nkr4)
 #endif
       else
-        call add_matmat_leg_trans(nkr, n_jk, nl_rtm,                    &
-     &      V_kl, P_lj, coef, S_kj)
+        call add_matmat_leg_trans(nkr, n_jk, nl_rtm, one,               &
+     &                            V_kl, P_lj, coef, S_kj)
       end if
 !
       end subroutine add_matmul_fwd_leg_trans
@@ -251,11 +286,11 @@
         nkr4 =    int(nkr)
         n_jk4 =   int(n_jk)
         call DGEMM('N', 'N', nl_rtm4, nkr4, n_jk4, one,                 &
-     &      P_lj, nl_rtm4, S_jk, n_jk4, coef, V_lk, nl_rtm4)
+     &             P_lj, nl_rtm4, S_jk, n_jk4, coef, V_lk, nl_rtm4)
 #endif
       else
-        call add_matmat_leg_trans(nl_rtm, nkr, n_jk,                    &
-     &      P_lj, S_jk, coef, V_lk)
+        call add_matmat_leg_trans(nl_rtm, nkr, n_jk, one,               &
+     &                            P_lj, S_jk, coef, V_lk)
       end if
 !
       end subroutine add_matmul_bwd_leg_trans
@@ -289,11 +324,11 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine add_matmat_leg_trans(np1, np2, nab,                    &
-     &          Amat, Bmat, coef, Prod)
+      subroutine add_matmat_leg_trans(np1, np2, nab, alpha,             &
+     &                                Amat, Bmat, beta, Prod)
 !
       integer(kind = kint), intent(in) :: nab, np2, np1
-      real(kind = kreal), intent(in) :: coef
+      real(kind = kreal), intent(in) :: alpha, beta
       real(kind = kreal), intent(in) :: Amat(np1,nab)
       real(kind = kreal), intent(in) :: Bmat(nab,np2)
 !
@@ -307,9 +342,9 @@
         do ll = 1, np1
           s = 0.0d0
           do jj = 1, nab
-            s = s + Amat(ll,jj) * Bmat(jj,kk)
+            s = s + alpha * Amat(ll,jj) * Bmat(jj,kk)
           end do
-          Prod(ll,kk) = coef * Prod(ll,kk) + s
+          Prod(ll,kk) = beta * Prod(ll,kk) + s
         end do
       end do
 !
