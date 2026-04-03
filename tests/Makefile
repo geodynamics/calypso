@@ -53,7 +53,7 @@ test:
 	@echo "#   Test in Gauss_point_test directory..."
 	@echo '# -----------------------------------------------------------'
 	@echo '#'
-	@cd Gauss_point_test; \
+	cd Gauss_point_test; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		TARGET_GAUSS_TEST="$(TARGET_GAUSS_TEST)" TARGET_CMP_GAUSS_TEST="$(TARGET_CMP_GAUSS_TEST)" \
 		test
@@ -63,7 +63,7 @@ test:
 	@echo "#   Test in FFT_test directory..."
 	@echo '# -----------------------------------------------------------'
 	@echo '#'
-	@cd FFT_test; \
+	cd FFT_test; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" TARGET_FFTPACK_TEST="$(TARGET_FFTPACK_TEST)" TARGET_FFW3_F_TEST="$(TARGET_FFW3_F_TEST)" \
 		TARGET_SGL_FFW3_TEST="$(TARGET_SGL_FFW3_TEST)" TARGET_CMPR_FFT_TEST="$(TARGET_CMPR_FFT_TEST)" \
@@ -74,7 +74,7 @@ test:
 	@echo "#   Tests in Communication_check directory..."
 	@echo '# -----------------------------------------------------------'
 	@echo '#'
-	@cd Communication_check; \
+	cd Communication_check; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_CHECK_SPH_GRID="$(TARGET_CHECK_SPH_GRID)" TARGET_TEST_SPH_GRID="$(TARGET_TEST_SPH_GRID)" \
@@ -84,7 +84,7 @@ test:
 	@echo "#   Tests in restart_assemble directory..."
 	@echo '# -----------------------------------------------------------'
 	@echo '#'
-	@cd restart_assemble; \
+	cd restart_assemble; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
 		TARGET_NEWSPH="$(TARGET_NEWSPH)" TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
@@ -95,7 +95,7 @@ test:
 	@echo "#   Test in Control_file_check directory..."
 	@echo '# -----------------------------------------------------------'
 	@echo '#'
-	@cd Control_file_check; \
+	cd Control_file_check; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" TARGET_CONTROL_MHD_CHECK="$(TARGET_CONTROL_MHD_CHECK)" \
 		test
@@ -105,7 +105,7 @@ test:
 	@echo "#   Tests in Dynamo_Benchmark directory..."
 	@echo '# -----------------------------------------------------------'
 	@echo '#'
-	@cd Dynamo_Benchmark; \
+	cd Dynamo_Benchmark; \
 		$(GMAKE) BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_SPH_MHD="$(TARGET_SPH_MHD)" \
 		TARGET_SPH_SNAP="$(TARGET_SPH_SNAP)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \
@@ -117,7 +117,7 @@ test:
 	@echo "#   Tests in Models directory..."
 	@echo '# -----------------------------------------------------------'
 	@echo '#'
-	@cd Models; \
+	cd Models; \
 		$(GMAKE) SRCDIR="$(SRCDIR)" BUILDDIR="$(BUILDDIR)" \
 		GMAKE="$(GMAKE)" MPIRUN="$(MPIRUN)"  TARGET_SPH_MHD="$(TARGET_SPH_MHD)" \
 		TARGET_SPH_SNAP="$(TARGET_SPH_SNAP)" TARGET_SPH_ENE_CHECK="$(TARGET_SPH_ENE_CHECK)" \

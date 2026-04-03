@@ -108,7 +108,7 @@
         if(ic_send .le. ntot_sr_rtp) then
           comm_sph_FFTW%kl_fftw(ic_send) = j
           comm_sph_FFTW%m_fftw(ic_send) =  m
-          comm_sph_FFTW%cnrm_sr_rtp(ic_send) = two * aNfft * ru
+          comm_sph_FFTW%cnrm_sr_rtp(ic_send) = aNfft * ru
         end if
 !        WS(ic_send) = two*aNfft * real(C_fft(ist_c))
       end do
@@ -261,7 +261,7 @@
           ist_c = Nfft_c + Nfft_c * (j-1)
           ic_rtp = j0_rtp + istep_rtp(3)
           ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
-          C_fft(ist_c,nd) = half * cmplx(WR(ic_recv), zero, kind(0d0))
+          C_fft(ist_c,nd) = cmplx(WR(ic_recv), zero, kind(0d0))
         end do
       end do
 !$omp end parallel do
@@ -309,15 +309,14 @@
             is_recv = ncomp_bwd * (irev_sr_rtp(is_rtp) - 1)
             ms = ((j-1) + (m-1)*num + ist*Nfft_c) * ncomp_bwd
             C_fft(ms+1:ms+ncomp_bwd)                                    &
-     &        = half*cmplx(WR(ic_recv+1:ic_recv+ncomp_bwd),             &
-     &                    -WR(is_recv+1:is_recv+ncomp_bwd),kind(0d0))
+     &        = half * cmplx(WR(ic_recv+1:ic_recv+ncomp_bwd),           &
+     &                      -WR(is_recv+1:is_recv+ncomp_bwd),kind(0d0))
           end do
           ic_rtp = j0_rtp + istep_rtp(3)
           ic_recv = ncomp_bwd * (irev_sr_rtp(ic_rtp) - 1)
           ms = ((j-1) + (Nfft_c-1)*num + ist*Nfft_c) * ncomp_bwd
           C_fft(ms+1:ms+ncomp_bwd)                                      &
-     &        = half * cmplx(WR(ic_recv+1:ic_recv+ncomp_bwd),           &
-     &                       zero, kind(0d0))
+     &        = cmplx(WR(ic_recv+1:ic_recv+ncomp_bwd), zero, kind(0d0))
         end do
       end do
 !$omp end parallel do
@@ -367,7 +366,7 @@
         ist_c = Nfft_c + Nfft_c * (j-1)
         ic_rtp = j0_rtp + istep_rtp(3)
         ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
-        C_fft(ist_c) = half * cmplx(WR(ic_recv), zero, kind(0d0))
+        C_fft(ist_c) = cmplx(WR(ic_recv), zero, kind(0d0))
       end do
 !$omp end parallel do
 !
@@ -428,7 +427,7 @@
           ic_rtp = j0_rtp + istep_rtp(3)
           ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
           i = j + (Nfft_c-1)*num + Nfft_c*ist
-          C_fft(i) = half * cmplx(WR(ic_recv), zero, kind(0d0))
+          C_fft(i) = cmplx(WR(ic_recv), zero, kind(0d0))
         end do
       end do
 !$omp end parallel do

@@ -414,7 +414,7 @@
       end do 
       ic_rtp = j0_rtp + istep_rtp(3)
       ic_send = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_fwd
-      WS(ic_send) = two*aNfft * real(C_fft(Nfft_c))
+      WS(ic_send) = aNfft * real(C_fft(Nfft_c))
 !
       end subroutine copy_single_FFTW_to_send
 !
@@ -451,7 +451,7 @@
       end do
       ic_rtp = j0_rtp + istep_rtp(3)
       ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
-      C_fft(Nfft_c) = half * cmplx(WR(ic_recv), zero, kind(0d0))
+      C_fft(Nfft_c) = cmplx(WR(ic_recv), zero, kind(0d0))
 !
       end subroutine copy_single_FFTW_from_recv
 !

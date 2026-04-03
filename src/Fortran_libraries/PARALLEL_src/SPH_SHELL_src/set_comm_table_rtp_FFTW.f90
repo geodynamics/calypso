@@ -106,7 +106,7 @@
             comm_sph_FFTW%ip_smp_fftw(ic_send) = ip
             comm_sph_FFTW%kl_fftw(ic_send) = j
             comm_sph_FFTW%m_fftw(ic_send) =  Nfft_c
-            comm_sph_FFTW%cnrm_sr_rtp(ic_send) = two * aNfft * ru
+            comm_sph_FFTW%cnrm_sr_rtp(ic_send) = aNfft * ru
           end if
 !          WS(ic_send) = two * aNfft * real(C_fft(i)*ru)
         end do

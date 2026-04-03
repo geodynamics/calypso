@@ -68,6 +68,8 @@
 !
       module t_FFT_selector
 !
+      use omp_lib
+!
       use m_precision
       use m_machine_parameter
       use m_FFT_selector
@@ -100,8 +102,11 @@
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
 !
       type(working_FFTs), intent(inout) :: WKS
+      real(kind = kreal) :: elapsed_init
 !
+      real(kind = kreal) :: start
 !
+      start = OMP_GET_WTIME()
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(id_rank .eq. 0) write(*,*) 'Use FFTW'
@@ -114,9 +119,9 @@
       end if
 #endif
 !
-        if(id_rank .eq. 0) write(*,*) 'Use FFTPACK'
-        call init_WK_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WKS%WK_FFTPACK)
-!
+      if(id_rank .eq. 0) write(*,*) 'Use FFTPACK'
+      call init_WK_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WKS%WK_FFTPACK)
+      elapsed_init = elapsed_init + OMP_GET_WTIME() - start
 !
       end subroutine initialize_FFT_select
 !
@@ -127,8 +132,11 @@
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       type(working_FFTs), intent(inout) :: WKS
+      real(kind = kreal) :: elapsed_init
 !
+      real(kind = kreal) :: start
 !
+      start = OMP_GET_WTIME()
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
@@ -141,8 +149,9 @@
       end if
 #endif
 !
-        if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTPACK'
-        call finalize_WK_FFTPACK_t(WKS%WK_FFTPACK)
+      if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTPACK'
+      call finalize_WK_FFTPACK_t(WKS%WK_FFTPACK)
+      elapsed_init = elapsed_init + OMP_GET_WTIME() - start
 !
       end subroutine finalize_FFT_sel_t
 !
@@ -188,6 +197,7 @@
 !
       real(kind = kreal), intent(inout) :: X(M, Nfft)
       type(working_FFTs), intent(inout) :: WKS
+      real(kind = kreal) :: elapsed_fft, elapsed_cpy
 !
 !
 #ifdef FFTW3
@@ -202,8 +212,8 @@
       end if
 #endif
 !
-        call CALYPSO_RFFTMF_t(Nsmp, Nstacksmp, M, Nfft, X,              &
-     &      WKS%WK_FFTPACK)
+      call CALYPSO_RFFTMF_t(Nsmp, Nstacksmp, M, Nfft, X,                &
+     &                      WKS%WK_FFTPACK, elapsed_fft, elapsed_cpy)
 !
       end subroutine forward_FFT_select
 !
@@ -218,6 +228,7 @@
 !
       real(kind = kreal), intent(inout) :: X(M,Nfft)
       type(working_FFTs), intent(inout) :: WKS
+      real(kind = kreal) :: elapsed_fft, elapsed_cpy
 !
 !
 #ifdef FFTW3
@@ -232,8 +243,8 @@
       end if
 #endif
 !
-        call CALYPSO_RFFTMB_t(Nsmp, Nstacksmp, M, Nfft, X,              &
-     &      WKS%WK_FFTPACK)
+      call CALYPSO_RFFTMB_t(Nsmp, Nstacksmp, M, Nfft, X,                &
+     &                      WKS%WK_FFTPACK, elapsed_fft, elapsed_cpy)
 !
       end subroutine backward_FFT_select
 !

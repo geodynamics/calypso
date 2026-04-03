@@ -365,13 +365,13 @@
           call prt_fwd_FFTW_to_send(sph_rtp, comm_rtp,                  &
      &        ncomp_fwd, n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_fld_FFTW)
         else
-          call rtp_fwd_FFTW_to_send(sph_rtp, comm_rtp,                  &
-     &        ncomp_fwd, n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_fld_FFTW)
+          call rtp_fwd_FFTW_to_send(sph_rtp, ncomp_fwd, n_WS,           &
+     &        v_rtp(1,1), WS(1), WK_FFTs%sph_fld_FFTW)
         end if
       else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_DOMAIN) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
-          call prt_field_fwd_FFTW_to_send(sph_rtp, comm_rtp,            &
-     &        ncomp_fwd, n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_fld_FFTW)
+          call prt_field_fwd_FFTW_to_send(sph_rtp, ncomp_fwd, n_WS,     &
+     &        v_rtp(1,1), WS(1), WK_FFTs%sph_fld_FFTW)
         else
           call rtp_field_fwd_FFTW_to_send(sph_rtp, comm_rtp,            &
      &        ncomp_fwd, n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_fld_FFTW)

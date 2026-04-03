@@ -414,7 +414,7 @@
       ic_send = ncomp_fwd * (irev_sr_rtp(ic_rtp)-1)
       ms =      ncomp_fwd * (Nfft_c-1)
       WS(ic_send+1:ic_send+ncomp_fwd)                                   &
-     &        = two*aNfft * real(C_fft(ms+1:ms+ncomp_fwd))
+     &        = aNfft * real(C_fft(ms+1:ms+ncomp_fwd))
 !
       end subroutine copy_comp_FFTW_to_send
 !
@@ -458,7 +458,7 @@
       ic_recv = ncomp_bwd * (irev_sr_rtp(ic_rtp) - 1)
       ms =      ncomp_bwd * (Nfft_c - 1)
       C_fft(ms+1:ms+ncomp_bwd)                                          &
-     &  = half * cmplx(WR(ic_recv+1:ic_recv+ncomp_bwd),zero, kind(0d0))
+     &        = cmplx(WR(ic_recv+1:ic_recv+ncomp_bwd),zero, kind(0d0))
 !
       end subroutine copy_comp_FFTW_from_recv
 !

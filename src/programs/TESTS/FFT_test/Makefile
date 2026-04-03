@@ -43,6 +43,7 @@ m_machine_parameter.o \
 FFTPACK5_wrapper.o \
 t_FFTPACK5_wrapper.o \
 \
+m_FFT_size.o      \
 t_fft_test_data.o \
 test_FFTPACK5.o
 
@@ -56,6 +57,7 @@ m_fftw_parameters.o \
 FFTW3_multi_wrapper.o \
 t_multi_FFTW_wrapper.o \
 \
+m_FFT_size.o      \
 t_fft_test_data.o \
 test_FFTW3.o
 
@@ -69,6 +71,7 @@ m_fftw_parameters.o \
 FFTW3_wrapper.o \
 t_FFTW_wrapper.o \
 \
+m_FFT_size.o      \
 t_fft_test_data.o \
 test_single_FFTW3.o
 
@@ -137,8 +140,8 @@ lib_name:
 mod_list:
 	@echo  MOD_FFTPACK_TEST=      \\  >> $(MAKENAME)
 	@echo  $(MOD_FFTPACK_TEST)        >> $(MAKENAME)
-	@echo  MOD_FFW3_F_TEST=      \\  >> $(MAKENAME)
-	@echo  $(MOD_FFW3_F_TEST)        >> $(MAKENAME)
+	@echo  MOD_FFW3_F_TEST=       \\  >> $(MAKENAME)
+	@echo  $(MOD_FFW3_F_TEST)         >> $(MAKENAME)
 	@echo  MOD_SGL_FFW3_TEST=      \\  >> $(MAKENAME)
 	@echo  $(MOD_SGL_FFW3_TEST)        >> $(MAKENAME)
 	@echo  MOD_CMPR_FFT_TEST=      \\  >> $(MAKENAME)
