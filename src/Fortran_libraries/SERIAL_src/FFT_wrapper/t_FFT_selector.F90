@@ -106,6 +106,7 @@
 !
       real(kind = kreal) :: start
 !
+      start = 0.0d0
       start = OMP_GET_WTIME()
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
@@ -136,6 +137,7 @@
 !
       real(kind = kreal) :: start
 !
+      start = 0.0d0
       start = OMP_GET_WTIME()
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
@@ -207,7 +209,7 @@
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_forward_type(Nsmp, Nstacksmp, M, Nfft, X,             &
-     &      WKS%WK_FFTW)
+     &                         WKS%WK_FFTW, elapsed_fft, elapsed_cpy)
         return
       end if
 #endif
@@ -238,7 +240,7 @@
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_backward_type(Nsmp, Nstacksmp, M, Nfft, X,            &
-     &      WKS%WK_FFTW)
+     &                          WKS%WK_FFTW, elapsed_fft, elapsed_cpy)
         return
       end if
 #endif

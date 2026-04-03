@@ -9,7 +9,7 @@
 !!@verbatim
 !! ------------------------------------------------------------------
 !!      subroutine init_4_FFTW_smp(Ncomp, Nfft,                         &
-!!     &          plan_forward, plan_backward,  aNfft, X_FFTW, C_FFTW)
+!!     &          plan_forward, plan_backward, X_FFTW, C_FFTW)
 !!
 !!   wrapper subroutine for initierize FFTW plans
 !! ------------------------------------------------------------------
@@ -21,7 +21,8 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine FFTW_forward_SMP(plan_forward, Nsmp, Nstacksmp,      &
-!!     &          Ncomp, Nfft, aNfft, X, X_FFTW, C_FFTW)
+!!     &          Ncomp, Nfft, aNfft, NFFT_c, X, X_FFTW, C_FFTW,        &
+!!     &          elapsed_fft, elapsed_cpy)
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
@@ -36,7 +37,8 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine FFTW_backward_SMP(plan_backward, Nsmp, Nstacksmp,    &
-!!     &          Ncomp, Nfft, X, X_FFTW, C_FFTW)
+!!     &          Ncomp, Nfft, NFFT_c, X, X_FFTW, C_FFTW,               &
+!!     &          elapsed_fft, elapsed_cpy)
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTW3
@@ -74,6 +76,8 @@
 !
       module FFTW3_wrapper
 !
+      use omp_lib
+!
       use m_precision
       use m_constants
       use m_fftw_parameters
@@ -86,18 +90,17 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_4_FFTW_smp(Ncomp, Nfft,                           &
-     &          plan_forward, plan_backward,  aNfft, X_FFTW, C_FFTW)
+      subroutine init_4_FFTW_smp(Ncomp, Nfft, NFFT_c,                   &
+     &          plan_forward, plan_backward, X_FFTW, C_FFTW)
 !
-      integer(kind = kint), intent(in) ::  Nfft
+      integer(kind = kint), intent(in) ::  Nfft, Nfft_c
       integer(kind = kint), intent(in) ::  Ncomp
 !
       integer(kind = fftw_plan), intent(inout) :: plan_forward(Ncomp)
       integer(kind = fftw_plan), intent(inout) :: plan_backward(Ncomp)
-      real(kind = kreal), intent(inout) :: aNfft
       real(kind = kreal), intent(inout) :: X_FFTW(Nfft,Ncomp)
       complex(kind = fftw_complex), intent(inout)                       &
-     &              :: C_FFTW(Nfft/2+1,Ncomp)
+     &                                  :: C_FFTW(Nfft_c,Ncomp)
 !
       integer(kind = kint) :: j
       integer :: Nfft4
@@ -110,7 +113,6 @@
         call dfftw_plan_dft_c2r_1d(plan_backward(j), Nfft4,             &
      &      C_FFTW(1,j), X_FFTW(1,j) , FFTW_KEMO_EST)
       end do
-      aNfft = one / dble(Nfft)
 !
       end subroutine init_4_FFTW_smp
 !
@@ -137,117 +139,158 @@
 ! ------------------------------------------------------------------
 !
       subroutine FFTW_forward_SMP(plan_forward, Nsmp, Nstacksmp,        &
-     &          Ncomp, Nfft, aNfft, X, X_FFTW, C_FFTW)
+     &          Ncomp, Nfft, aNfft, NFFT_c, X, X_FFTW, C_FFTW,          &
+     &          elapsed_fft, elapsed_cpy)
 !
       integer(kind = kint), intent(in) :: Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) :: Ncomp, Nfft
+      integer(kind = kint), intent(in) :: Ncomp, Nfft, NFFT_c
       integer(kind = fftw_plan), intent(in) :: plan_forward(Ncomp)
       real(kind = kreal), intent(in) :: aNfft
 !
       real(kind = kreal), intent(inout) :: X(Ncomp, Nfft)
       real(kind = kreal), intent(inout) :: X_FFTW(Nfft,Ncomp)
       complex(kind = fftw_complex), intent(inout)                       &
-     &              :: C_FFTW(Nfft/2+1,Ncomp)
+     &                                  :: C_FFTW(NFFT_c,Ncomp)
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
-      integer(kind = kint) ::  i, j, ip, ist, ied
-!      real :: dummy(Nsmp,3), rtmp(Nsmp,3)
+      real(kind = kreal) :: st_c, ed_c, st_f, ed_f
+      integer(kind = kint) ::  j, ip, ist, ied
 !
 !
-!$omp parallel do private(i,j,ist,ied)
+      ed_c = 0.0d0
+      ed_f = 0.0d0
+!$omp parallel do private(j,ist,ied,st_c,st_f) reduction(+:ed_c,ed_f)
       do ip = 1, Nsmp
         ist = Nstacksmp(ip-1) + 1
         ied = Nstacksmp(ip) 
 !
-!        call cpu_time(dummy(ip,1))
+        st_c = OMP_GET_WTIME()
         do j = ist, ied
           X_FFTW(1:Nfft,j) = X(j,1:Nfft)
         end do
-!        call cpu_time(rtmp(ip,1))
+        ed_c = OMP_GET_WTIME() - st_c
 !
-!        call cpu_time(dummy(ip,2))
+        st_f = OMP_GET_WTIME()
         do j = ist, ied
           call dfftw_execute(plan_forward(j))
         end do
-!        call cpu_time(rtmp(ip,2))
+        ed_f = OMP_GET_WTIME() - st_f
 !
 !   normalization
-!        call cpu_time(dummy(ip,3))
-        do j = ist, ied
-          i = (Nfft+1)/2 + 1
-          X(j,1) = aNfft * real(C_FFTW(1,j))
-          X(j,2) = aNfft * real(C_FFTW(i,j))
-          do i = 2, (Nfft+1)/2
-            X(j,2*i-1) = two * aNfft * real(C_FFTW(i,j))
-            X(j,2*i  ) = two * aNfft * real(C_FFTW(i,j)*iu)
-          end do 
-        end do
-!        call cpu_time(rtmp(ip,3))
+        st_c = OMP_GET_WTIME()
+        call normalize_fwd_r2c_fft_SMP(ist, ied, Ncomp, Nfft, NFFT_c,   &
+     &                                 aNfft, X, C_FFTW)
+        ed_c = ed_c + OMP_GET_WTIME() - st_c
       end do
 !$omp end parallel do
 !
-!      do ip = 1, Nsmp
-!        elapsed_fftw(1:3) = elapsed_fftw(1:3)                          &
-!     &                     + rtmp(ip,1:3) - dummy(ip,1:3)
-!      end do
+      elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
+      elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
       end subroutine FFTW_forward_SMP
 !
 ! ------------------------------------------------------------------
 !
       subroutine FFTW_backward_SMP(plan_backward, Nsmp, Nstacksmp,      &
-     &          Ncomp, Nfft, X, X_FFTW, C_FFTW)
+     &          Ncomp, Nfft, NFFT_c, X, X_FFTW, C_FFTW,                 &
+     &          elapsed_fft, elapsed_cpy)
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) :: Ncomp, Nfft
+      integer(kind = kint), intent(in) :: Ncomp, Nfft, NFFT_c
       integer(kind = fftw_plan), intent(in) :: plan_backward(Ncomp)
 !
       real(kind = kreal), intent(inout) :: X(Ncomp,Nfft)
       real(kind = kreal), intent(inout) :: X_FFTW(Nfft,Ncomp)
       complex(kind = fftw_complex), intent(inout)                       &
-     &              :: C_FFTW(Nfft/2+1,Ncomp)
+     &                                  :: C_FFTW(NFFT_c,Ncomp)
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
+      real(kind = kreal) :: st_c, ed_c, st_f, ed_f
       integer(kind = kint) :: i, j, ip, ist, ied
-!      real :: dummy(Nsmp,3), rtmp(Nsmp,3)
 !
 !
-!$omp parallel do private(i,j,ist,ied)
+      ed_c = 0.0d0
+      ed_f = 0.0d0
+!$omp parallel do private(i,j,ist,ied,st_c,st_f) reduction(+:ed_c,ed_f)
       do ip = 1, Nsmp
         ist = Nstacksmp(ip-1) + 1
         ied = Nstacksmp(ip)
 !
 !   normalization
-!        call cpu_time(dummy(ip,3))
-!   normalization
-        do j = ist, ied
-          C_FFTW(1,j) = cmplx(X(j,1), zero, kind(0d0))
-          do i = 2, (Nfft+1)/2
-            C_FFTW(i,j) = half * cmplx(X(j,2*i-1), -X(j,2*i),kind(0d0))
-          end do
-          i = (Nfft+1)/2 + 1
-          C_FFTW(i,j) = cmplx(X(j,2), zero, kind(0d0))
-        end do
-!        call cpu_time(rtmp(ip,3))
+        st_c = OMP_GET_WTIME()
+        call normalize_bwd_c2r_FFT_SMP(ist, ied, Ncomp, NFFT_c, Nfft,   &
+     &                                 C_FFTW, X)
+        ed_c = OMP_GET_WTIME() - st_c
 !
-!        call cpu_time(dummy(ip,2))
+        st_f = OMP_GET_WTIME()
         do j = ist, ied
           call dfftw_execute(plan_backward(j))
         end do
-!        call cpu_time(rtmp(ip,2))
+        ed_f = OMP_GET_WTIME() - st_f
 !
-!        call cpu_time(dummy(ip,1))
-        do j = ist, ied
-          X(j,1:Nfft) = X_FFTW(1:Nfft,j)
+        st_c = OMP_GET_WTIME()
+        do i = 1, Nfft
+          X(ist:ied,i) = X_FFTW(i,ist:ied)
         end do
-!        call cpu_time(rtmp(ip,1))
+        ed_c = ed_c + OMP_GET_WTIME() - st_c
       end do
 !$omp end parallel do
 !
-!      do ip = 1, Nsmp
-!        elapsed_fftw(1:3) = elapsed_fftw(1:3)                          &
-!     &                     + rtmp(ip,1:3) - dummy(ip,1:3)
-!      end do
+      elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
+      elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
       end subroutine FFTW_backward_SMP
+!
+! ------------------------------------------------------------------
+! ------------------------------------------------------------------
+!
+      subroutine normalize_fwd_r2c_fft_SMP(ist_nd, ied_nd,              &
+     &          Ncomp, Nfft, NFFT_c, aNfft, X, C_FFT)
+!
+      integer(kind = kint), intent(in) :: ist_nd, ied_nd
+      integer(kind = kint), intent(in) :: Ncomp, Nfft, NFFT_c
+      real(kind = kreal), intent(in) :: aNfft
+      complex(kind = kreal), intent(in) :: C_FFT(NFFT_c,Ncomp)
+!
+      real(kind = kreal), intent(inout) :: X(Ncomp,Nfft)
+!
+      integer(kind = kint) :: i
+!
+!
+      X(ist_nd:ied_nd,1) = aNfft * real(C_FFT(1,     ist_nd:ied_nd))
+      X(ist_nd:ied_nd,2) = aNfft * real(C_FFT(NFFT_c,ist_nd:ied_nd))
+      do i = 2, NFFT_c - 1
+        X(ist_nd:ied_nd,2*i-1)                                          &
+     &     = two * aNfft * real(C_FFT(i,ist_nd:ied_nd))
+        X(ist_nd:ied_nd,2*i  )                                          &
+     &     = two * aNfft * real(C_FFT(i,ist_nd:ied_nd)*iu)
+      end do 
+!
+      end subroutine normalize_fwd_r2c_fft_SMP
+!
+! ------------------------------------------------------------------
+!
+      subroutine normalize_bwd_c2r_FFT_SMP(ist_nd, ied_nd,              &
+     &          Ncomp, NFFT_c, Nfft, C_FFT, X)
+!
+      integer(kind = kint), intent(in) :: ist_nd, ied_nd
+      integer(kind = kint), intent(in) :: Ncomp, Nfft, NFFT_c
+      real(kind = kreal), intent(in) :: X(Ncomp,Nfft)
+!
+      complex(kind = kreal), intent(inout) :: C_FFT(NFFT_c,Ncomp)
+!
+      integer(kind = kint) :: i, nd
+!
+!
+      do nd = ist_nd, ied_nd
+        C_FFT(1,nd) = cmplx(X(nd,1), zero, kind(0d0))
+        do i = 2, NFFT_c - 1
+          C_FFT(i,nd) = half * cmplx(X(nd,2*i-1), -X(nd,2*i),kind(0d0))
+        end do
+        C_FFT(NFFT_c,nd) = cmplx(X(nd,2), zero, kind(0d0))
+      end do
+!
+      end subroutine normalize_bwd_c2r_FFT_SMP
 !
 ! ------------------------------------------------------------------
 !

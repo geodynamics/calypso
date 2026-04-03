@@ -15,7 +15,13 @@
 !!   wrapper subroutine for initierize FFT by FFTW
 !! ------------------------------------------------------------------
 !!
-!!      subroutine FFTW_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft, X, WK)
+!!      subroutine FFTW_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft,      &
+!!     &                             X, WK, elapsed_fft, elapsed_cpy)
+!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) :: Ncomp, Nfft
+!!        real(kind = kreal), intent(inout) :: X(Ncomp, Nfft)
+!!        type(working_FFTW), intent(inout) :: WK
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
@@ -30,7 +36,12 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine FFTW_backward_type(Nsmp, Nstacksmp, Ncomp, Nfft,     &
-!!                X, WK)
+!!     &                              X, WK, elapsed_fft, elapsed_cpy)
+!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) :: Ncomp, Nfft
+!!        real(kind = kreal), intent(inout) :: X(Ncomp,Nfft)
+!!        type(working_FFTW), intent(inout) :: WK
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTW3
@@ -78,7 +89,9 @@
 !>        plan ID for forward transform
         integer(kind = fftw_plan), allocatable :: plan_forward(:)
 !
-!>      normalization parameter for FFTW (= 1 / Nfft)
+!>        Complax data size
+        integer(kind = kint) :: NFFT_c
+!>        normalization parameter for FFTW (= 1 / Nfft)
         real(kind = kreal) :: aNfft
 !>        real data for multiple Fourier transform
         real(kind = kreal), allocatable :: X_FFTW(:,:)
@@ -104,8 +117,8 @@
 !
 !
       call alloc_work_4_FFTW_t(Ncomp, Ncomp, Nfft, WK)
-      call init_4_FFTW_smp(Ncomp, Nfft, WK%plan_forward,                &
-     &      WK%plan_backward, WK%aNfft, WK%X_FFTW, WK%C_FFTW)
+      call init_4_FFTW_smp(Ncomp, Nfft, WK%Nfft_c, WK%plan_forward,     &
+     &    WK%plan_backward, WK%X_FFTW, WK%C_FFTW)
 !
       end subroutine init_FFTW_type
 !
@@ -147,34 +160,39 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine FFTW_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft, X, WK)
+      subroutine FFTW_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft,        &
+     &                             X, WK, elapsed_fft, elapsed_cpy)
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: Ncomp, Nfft
 !
       real(kind = kreal), intent(inout) :: X(Ncomp, Nfft)
       type(working_FFTW), intent(inout) :: WK
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
       call FFTW_forward_SMP(WK%plan_forward, Nsmp, Nstacksmp,           &
-     &          Ncomp, Nfft, WK%aNfft, X, WK%X_FFTW, WK%C_FFTW)
+     &    Ncomp, Nfft, WK%aNfft, WK%NFFT_c, X, WK%X_FFTW, WK%C_FFTW,    &
+     &    elapsed_fft, elapsed_cpy)
 !
       end subroutine FFTW_forward_type
 !
 ! ------------------------------------------------------------------
 !
       subroutine FFTW_backward_type(Nsmp, Nstacksmp, Ncomp, Nfft,       &
-     &          X, WK)
+     &                              X, WK, elapsed_fft, elapsed_cpy)
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: Ncomp, Nfft
 !
       real(kind = kreal), intent(inout) :: X(Ncomp,Nfft)
       type(working_FFTW), intent(inout) :: WK
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
       call FFTW_backward_SMP(WK%plan_backward, Nsmp, Nstacksmp,         &
-     &    Ncomp, Nfft, X, WK%X_FFTW, WK%C_FFTW)
+     &    Ncomp, Nfft, WK%NFFT_c, X, WK%X_FFTW, WK%C_FFTW,              &
+     &    elapsed_fft, elapsed_cpy)
 !
       end subroutine FFTW_backward_type
 !
@@ -191,8 +209,10 @@
       allocate(WK%plan_backward(Nplan))
 !
       WK%iflag_fft_len = Nfft*Ncomp
+      WK%Nfft_c =        (Nfft+1)/2 + 1
+      WK%aNfft = one / dble(Nfft)
       allocate( WK%X_FFTW(Nfft,Ncomp) )
-      allocate( WK%C_FFTW(Nfft/2+1,Ncomp) )
+      allocate( WK%C_FFTW(WK%Nfft_c,Ncomp) )
       WK%X_FFTW = 0.0d0
       WK%C_FFTW = 0.0d0
 !

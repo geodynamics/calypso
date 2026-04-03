@@ -246,7 +246,7 @@
             X(j,i) = X_FFTPACK5(inod_c,ismp)
           end do
         end do
-        ed_c = OMP_GET_WTIME() - st_c
+        ed_c = ed_c + OMP_GET_WTIME() - st_c
       end do
 !$omp end parallel do
 !

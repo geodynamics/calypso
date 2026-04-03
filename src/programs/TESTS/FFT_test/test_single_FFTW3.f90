@@ -37,10 +37,9 @@
 !$omp end parallel workshare
         ft3%elapsed(3) = ft3%elapsed(3) + OMP_GET_WTIME() - ft3%start
 !
-        ft3%start = OMP_GET_WTIME()
         call FFTW_forward_type(np_smp, ft3%nstack,                      &
-     &      ft3%nfld, ft3%ngrd, ft3%s_k, WK_FFTW_t)
-        ft3%elapsed(2) = ft3%elapsed(2) + OMP_GET_WTIME() - ft3%start
+     &                         ft3%nfld, ft3%ngrd, ft3%s_k, WK_FFTW_t,  &
+     &                         ft3%elapsed(2), ft3%elapsed(3))
 !
         ft3%start = OMP_GET_WTIME()
 !$omp parallel workshare
@@ -48,10 +47,9 @@
 !$omp end parallel workshare
         ft3%elapsed(3) = ft3%elapsed(3) + OMP_GET_WTIME() - ft3%start
 !
-        ft3%start = OMP_GET_WTIME()
         call FFTW_backward_type(np_smp, ft3%nstack,                     &
-     &      ft3%nfld, ft3%ngrd, ft3%f_x, WK_FFTW_t)
-        ft3%elapsed(2) = ft3%elapsed(2) + OMP_GET_WTIME() - ft3%start
+     &                          ft3%nfld, ft3%ngrd, ft3%f_x, WK_FFTW_t, &
+     &                         ft3%elapsed(2), ft3%elapsed(3))
       end do
 !
       if(n_loop .eq. 1) call write_fft_test_data(sgl_fftw_test, ft3)
@@ -61,8 +59,8 @@
       write(*, '(a,3i6)')                                               &
      &        "Num (point, field, loop): ", ngrid, n_field, n_loop
       write(*, '("Initialize:      ",1pE16.6e3)') ft3%elapsed(1)
-      write(*, '("Wrapped FFTPACK: ",1pE16.6e3)') ft3%elapsed(2)
-      write(*, '("Data copy:       ",1pE16.6e3)') ft3%elapsed(3)
+      write(*, '("single FFTW:     ",1pE16.6e3)') ft3%elapsed(2)
+      write(*, '("Data normalize:  ",1pE16.6e3)') ft3%elapsed(3)
 !
       stop
       end program test_single_FFTW3
