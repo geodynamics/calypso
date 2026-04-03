@@ -54,6 +54,7 @@ m_machine_parameter.o \
 \
 skip_comment_f.o \
 m_fftw_parameters.o \
+normalize_for_FFTW.o \
 FFTW3_multi_wrapper.o \
 t_multi_FFTW_wrapper.o \
 \
@@ -68,6 +69,7 @@ m_machine_parameter.o \
 \
 skip_comment_f.o \
 m_fftw_parameters.o \
+normalize_for_FFTW.o \
 FFTW3_wrapper.o \
 t_FFTW_wrapper.o \
 \

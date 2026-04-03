@@ -14,7 +14,7 @@
       implicit none
 !
       character(len = kchara), parameter                                &
-     &                       :: file_name = 'mul_fftw_test.dat'
+     &                        :: file_name = 'mul_fftw_test.dat'
 !
       type(working_mul_FFTW) :: WK_MUL_FFTW_t
       type(fft_test_data) :: ft3
@@ -39,10 +39,9 @@
 !$omp end parallel workshare
         ft3%elapsed(3) = ft3%elapsed(3) + OMP_GET_WTIME() - ft3%start
 !
-        ft3%start = OMP_GET_WTIME()
         call FFTW_mul_forward_type(np_smp, ft3%nstack,                  &
-     &      ft3%nfld, ft3%ngrd, ft3%s_k, WK_MUL_FFTW_t)
-        ft3%elapsed(2) = ft3%elapsed(2) + OMP_GET_WTIME() - ft3%start
+     &      ft3%nfld, ft3%ngrd, ft3%s_k, WK_MUL_FFTW_t,                 &
+     &      ft3%elapsed(2), ft3%elapsed(3))
 !
         ft3%start = OMP_GET_WTIME()
 !$omp parallel workshare
@@ -50,10 +49,9 @@
 !$omp end parallel workshare
         ft3%elapsed(3) = ft3%elapsed(3) + OMP_GET_WTIME() - ft3%start
 !
-        ft3%start = OMP_GET_WTIME()
         call FFTW_mul_backward_type(np_smp, ft3%nstack,                 &
-     &      ft3%nfld, ft3%ngrd, ft3%f_x, WK_MUL_FFTW_t)
-        ft3%elapsed(2) = ft3%elapsed(2) + OMP_GET_WTIME() - ft3%start
+     &      ft3%nfld, ft3%ngrd, ft3%f_x, WK_MUL_FFTW_t,                 &
+     &      ft3%elapsed(2), ft3%elapsed(3))
       end do
 !
       ft3%start = OMP_GET_WTIME()

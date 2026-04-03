@@ -205,7 +205,7 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         call FFTW_mul_forward_type(Nsmp, Nstacksmp, M, Nfft, X,         &
-     &      WKS%WK_MUL_FFTW)
+     &      WKS%WK_MUL_FFTW, elapsed_fft, elapsed_cpy)
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_forward_type(Nsmp, Nstacksmp, M, Nfft, X,             &
@@ -236,7 +236,7 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         call FFTW_mul_backward_type(Nsmp, Nstacksmp, M, Nfft, X,        &
-     &      WKS%WK_MUL_FFTW)
+     &      WKS%WK_MUL_FFTW, elapsed_fft, elapsed_cpy)
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_backward_type(Nsmp, Nstacksmp, M, Nfft, X,            &
