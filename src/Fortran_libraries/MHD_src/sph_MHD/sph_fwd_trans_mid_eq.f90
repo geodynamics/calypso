@@ -8,7 +8,8 @@
 !!
 !!@verbatim
 !!      subroutine mid_eq_transfer_dynamobench                          &
-!!     &         (time, iflag_FFT, sph_rj, rj_fld, ipol, cdat, bench)
+!!     &         (time, iflag_FFT, sph_rj, rj_fld, ipol, cdat, bench,   &
+!!     &          elapsed_fft, elapsed_cpy)
 !!        real(kind=kreal), intent(in) :: time
 !!        integer(kind = kint), intent(in) :: iflag_FFT
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -16,6 +17,7 @@
 !!        type(phys_address), intent(in) :: ipol
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!        type(dynamobench_monitor), intent(inout) :: bench
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !!@endverbatim
 !
       module sph_fwd_trans_mid_eq
@@ -45,7 +47,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine mid_eq_transfer_dynamobench                            &
-     &         (time, iflag_FFT, sph_rj, rj_fld, ipol, cdat, bench)
+     &         (time, iflag_FFT, sph_rj, rj_fld, ipol, cdat, bench,     &
+     &          elapsed_fft, elapsed_cpy)
 !
       use field_at_mid_equator
       use circle_bwd_transfer_rj
@@ -57,11 +60,12 @@
       type(phys_address), intent(in) :: ipol
       type(circle_fld_maker), intent(inout) :: cdat
       type(dynamobench_monitor), intent(inout) :: bench
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !    spherical transfer
       call dbench_leg_bwd_trans_rj(iflag_FFT, sph_rj, rj_fld, ipol,     &
      &    bench%iphys_dbench, cdat%circle, cdat%leg_circ,               &
-     &    cdat%d_circle, cdat%WK_circle_fft)
+     &    cdat%d_circle, cdat%WK_circle_fft, elapsed_fft, elapsed_cpy)
 !
       if(iflag_debug.gt.0) then
         call check_mid_eq_trans_dbench(ipol, cdat%circle,               &
@@ -92,7 +96,8 @@
 !
       subroutine dbench_leg_bwd_trans_rj                                &
      &         (iflag_FFT, sph_rj, rj_fld, ipol, iphys_dbench,          &
-     &          circle, leg_circ, d_circle, WK_circle_fft)
+     &          circle, leg_circ, d_circle, WK_circle_fft,              &
+     &          elapsed_fft, elapsed_cpy)
 !
       use t_base_field_labels
       use t_FFT_selector
@@ -112,6 +117,7 @@
       type(circle_transform_spectr), intent(inout) :: leg_circ
 !
       type(working_FFTs), intent(inout) :: WK_circle_fft
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
       integer(kind = kint_gl) :: num64
       integer(kind = kint) :: i_comp
@@ -177,7 +183,7 @@
         call backward_FFT_select                                        &
      &     (iflag_FFT, np_smp, leg_circ%istack_circfft_smp, ione,       &
      &      circle%mphi_circle, d_circle%d_fld(1,i_comp),               &
-     &      WK_circle_fft)
+     &      WK_circle_fft, elapsed_fft, elapsed_cpy)
       end do
 !
       end subroutine dbench_leg_bwd_trans_rj

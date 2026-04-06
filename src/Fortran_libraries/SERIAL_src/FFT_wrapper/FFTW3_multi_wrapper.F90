@@ -229,8 +229,8 @@
 !
 !   normalization
         ed_c = OMP_GET_WTIME() - st_c
-        call normalize_fwd_r2c_fft_SMP(ist, ied, Ncomp, NFFT_c, C_FFTW, &
-     &                                 Nfft, aNfft, X)
+        call norm_swap_from_prt_fwd_FFT                                 &
+     &     (ist, ied, Ncomp, NFFT_c, C_FFTW, Nfft, aNfft, X)
         ed_c = ed_c + OMP_GET_WTIME() - st_c
       end do
 !$omp end parallel do
@@ -271,8 +271,8 @@
         ied = Nstacksmp(ip)
 !   normalization
         st_c = OMP_GET_WTIME()
-        call normalize_bwd_c2r_FFT_SMP(ist, ied, Ncomp, Nfft, X,        &
-     &                                 NFFT_c, C_FFTW)
+        call norm_swap_to_prt_bwd_FFT(ist, ied, Ncomp, Nfft, X,         &
+     &                                NFFT_c, C_FFTW)
         ed_c = OMP_GET_WTIME() - st_c
 !
         st_f = OMP_GET_WTIME()

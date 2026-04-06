@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine const_dynamobench_data                               &
 !!     &         (time_d, sph_params, sph_rj, sph_MHD_bc, trans_p, ipol,&
-!!     &          rj_fld, pwr, cdat, bench)
+!!     &          rj_fld, pwr, cdat, bench, elapsed_fft, elapsed_cpy)
 !!        type(time_data), intent(in) :: time_d
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
@@ -20,6 +20,7 @@
 !!        type(sph_mean_squares), intent(in) :: pwr
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!        type(dynamobench_monitor), intent(inout) :: bench
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !!@endverbatim
 !
       module const_data_4_dynamobench
@@ -39,7 +40,7 @@
 !
       subroutine const_dynamobench_data                                 &
      &         (time_d, sph_params, sph_rj, sph_MHD_bc, trans_p, ipol,  &
-     &          rj_fld, pwr, cdat, bench)
+     &          rj_fld, pwr, cdat, bench, elapsed_fft, elapsed_cpy)
 !
       use field_at_mid_equator
 !
@@ -73,6 +74,7 @@
 !
       type(circle_fld_maker), intent(inout) :: cdat
       type(dynamobench_monitor), intent(inout) :: bench
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
       integer(kind = kint) :: irank_copy
 !
@@ -81,7 +83,7 @@
 !
       if(iflag_debug.gt.0)  write(*,*) 'mid_eq_transfer_dynamobench'
       call mid_eq_transfer_dynamobench(time_d%time, trans_p%iflag_FFT,  &
-     &    sph_rj, rj_fld, ipol, cdat, bench)
+     &    sph_rj, rj_fld, ipol, cdat, bench, elapsed_fft, elapsed_cpy)
 !
       if(bench%ipwr_ocore .gt. 0) then
         irank_copy = pwr%v_spectr(bench%ipwr_ocore)%irank_m

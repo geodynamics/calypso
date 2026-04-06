@@ -11,16 +11,29 @@
 !!
 !!@verbatim
 !!      subroutine initialize_FFT_select(id_rank, iflag_FFT,            &
-!!     &          Nsmp, Nstacksmp, Nfft, WKS)
+!!     &          Nsmp, Nstacksmp, Nfft, WKS, elapsed_init)
 !!      subroutine finalize_FFT_sel_t(iflag_FFT, Nsmp, Nstacksmp, WKS)
 !!      subroutine verify_FFT_select                                    &
 !!     &         (iflag_FFT, Nsmp, Nstacksmp, Nfft, WKS)
+!!        integer, intent(in) :: id_rank
+!!        integer(kind = kint), intent(in) :: iflag_FFT
+!!        integer(kind = kint), intent(in) ::  Nfft
+!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        type(working_FFTs), intent(inout) :: WKS
+!!        real(kind = kreal), intent(inout) :: elapsed_init
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT for ISPACK
 !! ------------------------------------------------------------------
 !!
 !!      subroutine forward_FFT_select                                   &
-!!     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS)
+!!     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS,          &
+!!     &          elapsed_fft, elapsed_cpy)
+!!        integer(kind = kint), intent(in) :: iflag_FFT
+!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) :: M, Nfft
+!!        real(kind = kreal), intent(inout) :: X(M, Nfft)
+!!        type(working_FFTs), intent(inout) :: WKS
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !! ------------------------------------------------------------------
 !!
 !!   wrapper subroutine for FFT in ISPACK
@@ -35,7 +48,14 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine backward_FFT_select                                  &
-!!     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS)
+!!     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS,          &
+!!     &          elapsed_fft, elapsed_cpy)
+!!        integer(kind = kint), intent(in) :: iflag_FFT
+!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) :: M, Nfft
+!!        real(kind = kreal), intent(inout) :: X(M,Nfft)
+!!        type(working_FFTs), intent(inout) :: WKS
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !! ------------------------------------------------------------------
 !!
 !!   wrapper subroutine for backward FFT
@@ -94,7 +114,7 @@
 ! ------------------------------------------------------------------
 !
       subroutine initialize_FFT_select(id_rank, iflag_FFT,              &
-     &          Nsmp, Nstacksmp, Nfft, WKS)
+     &          Nsmp, Nstacksmp, Nfft, WKS, elapsed_init)
 !
       integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: iflag_FFT
@@ -102,7 +122,7 @@
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
 !
       type(working_FFTs), intent(inout) :: WKS
-      real(kind = kreal) :: elapsed_init
+      real(kind = kreal), intent(inout) :: elapsed_init
 !
       real(kind = kreal) :: start
 !
@@ -191,7 +211,8 @@
 ! ------------------------------------------------------------------
 !
       subroutine forward_FFT_select                                     &
-     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS)
+     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS,            &
+     &          elapsed_fft, elapsed_cpy)
 !
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -199,7 +220,7 @@
 !
       real(kind = kreal), intent(inout) :: X(M, Nfft)
       type(working_FFTs), intent(inout) :: WKS
-      real(kind = kreal) :: elapsed_fft, elapsed_cpy
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
 #ifdef FFTW3
@@ -222,7 +243,8 @@
 ! ------------------------------------------------------------------
 !
       subroutine backward_FFT_select                                    &
-     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS)
+     &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS,            &
+     &          elapsed_fft, elapsed_cpy)
 !
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -230,7 +252,7 @@
 !
       real(kind = kreal), intent(inout) :: X(M,Nfft)
       type(working_FFTs), intent(inout) :: WKS
-      real(kind = kreal) :: elapsed_fft, elapsed_cpy
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
 #ifdef FFTW3

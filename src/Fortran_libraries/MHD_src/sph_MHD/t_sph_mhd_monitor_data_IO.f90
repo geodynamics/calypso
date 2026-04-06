@@ -96,6 +96,12 @@
 !
 !>        Data on circles
         type(mul_fields_on_circle) :: mul_circle
+!         Elapsed time for Initialize FFT on circle
+        real(kind = kreal) :: elapsed_circle_init = 0.0d0
+!         Elapsed time for FFT on circle
+        real(kind = kreal) :: elapsed_circle_fft =  0.0d0
+!         Elapsed time for DAta copy on circle
+        real(kind = kreal) :: elapsed_circle_cpy =  0.0d0
 !
 !>        Structure of mean square data
         type(sph_mean_squares) :: lor_spectr

@@ -16,13 +16,15 @@
 !!        type(mul_fields_on_circle), intent(inout) :: mul_circle
 !!
 !!      subroutine init_circle_point_global(sph, comms_sph, trans_p,    &
-!!     &                                    cdat, SR_sig, SR_r)
+!!     &          cdat, elapsed_init, SR_sig, SR_r)
 !!        type(sph_grids), intent(in) ::  sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
+!!        real(kind = kreal), intent(inout) :: elapsed_init
+!!        real(kind = kreal), intent(inout) :: elapsed_init
 !!      subroutine dealloc_circle_point_global(cdat)
 !!        integer(kind = kint), intent(in) :: iflag_FFT
 !!        type(sph_grids), intent(in) ::  sph
@@ -123,7 +125,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine init_circle_point_global(sph, comms_sph, trans_p,      &
-     &                                    cdat, SR_sig, SR_r)
+     &          cdat, elapsed_init, SR_sig, SR_r)
 !
       use calypso_mpi
       use t_spheric_parameter
@@ -138,6 +140,7 @@
       type(circle_fld_maker), intent(inout) :: cdat
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
+      real(kind = kreal), intent(inout) :: elapsed_init
 !
       integer(kind = kint) :: m
       real(kind = kreal) :: delta
@@ -159,9 +162,9 @@
       end if
 !
       call initialize_circle_transform(trans_p%iflag_FFT,               &
-     &    cdat%circle, cdat%leg_circ, cdat%WK_circle_fft)
+     &    cdat%circle, cdat%leg_circ, cdat%WK_circle_fft, elapsed_init)
       call set_circle_point_global(sph%sph_rj, cdat%leg_circ,           &
-     &                            cdat%circle)
+     &                             cdat%circle)
 !
       call alloc_work_circle_transform(cdat%d_circle, cdat%leg_circ)
       call init_legendre_on_circle(sph, comms_sph, trans_p,             &
@@ -244,8 +247,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine initialize_circle_transform                            &
-     &          (iflag_FFT, circle, leg_circ, WK_circle_fft)
+      subroutine initialize_circle_transform(iflag_FFT, circle,         &
+     &          leg_circ, WK_circle_fft, elapsed_init)
 !
       use calypso_mpi
 !
@@ -254,6 +257,7 @@
 !
       type(circle_transform_spectr), intent(inout) :: leg_circ
       type(working_FFTs), intent(inout) :: WK_circle_fft
+      real(kind = kreal), intent(inout) :: elapsed_init
 !
 !
       call alloc_circle_transform(leg_circ)
@@ -276,7 +280,7 @@
 !
       call initialize_FFT_select                                        &
      &   (my_rank, iflag_FFT, np_smp, leg_circ%istack_circfft_smp,      &
-     &    circle%mphi_circle, WK_circle_fft)
+     &    circle%mphi_circle, WK_circle_fft, elapsed_init)
 !
       end subroutine initialize_circle_transform
 !

@@ -7,13 +7,15 @@
 !>@brief Evaluate dynamo benchmark results
 !!
 !!@verbatim
-!!      subroutine sph_forward_trans_on_circles(iflag_FFT,              &
-!!     &          sph_rj, rj_fld, num_circles, cdat)
+!!      subroutine sph_forward_trans_on_circles                         &
+!!     &         (iflag_FFT, sph_rj, rj_fld, num_circles, cdat,         &
+!!     &          elapsed_fft, elapsed_cpy)
 !!        integer(kind = kint), intent(in) :: iflag_FFT
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(phys_data), intent(in) :: rj_fld
 !!        integer(kind = kint), intent(in) :: num_circles
 !!        type(circle_fld_maker), intent(inout) :: cdat(num_circles)
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !!      subroutine check_mid_eq_trans_dbench(ipol, circle, leg_circ,    &
 !!     &                                     d_circle, bench)
 !!        type(phys_address), intent(in) :: ipol
@@ -48,8 +50,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_forward_trans_on_circles(iflag_FFT,                &
-     &          sph_rj, rj_fld, num_circles, cdat)
+      subroutine sph_forward_trans_on_circles                           &
+     &         (iflag_FFT, sph_rj, rj_fld, num_circles, cdat,           &
+     &          elapsed_fft, elapsed_cpy)
 !
       use calypso_mpi_real
       use transfer_to_long_integers
@@ -61,14 +64,16 @@
       integer(kind = kint), intent(in) :: num_circles
 !
       type(circle_fld_maker), intent(inout) :: cdat(num_circles)
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
       integer(kind = kint) :: i
 !
 !
       do i = 1, num_circles
         call circle_leg_bwd_trans_rj(iflag_FFT, sph_rj, rj_fld,         &
-     &    cdat(i)%ipol_circle_trns, cdat(i)%circle, cdat(i)%leg_circ,   &
-     &    cdat(i)%d_circle, cdat(i)%WK_circle_fft)
+     &      cdat(i)%ipol_circle_trns, cdat(i)%circle, cdat(i)%leg_circ, &
+     &      cdat(i)%d_circle, cdat(i)%WK_circle_fft,                    &
+     &      elapsed_fft, elapsed_cpy)
       end do
 !
       end subroutine sph_forward_trans_on_circles
@@ -78,7 +83,8 @@
 !
       subroutine circle_leg_bwd_trans_rj                                &
      &         (iflag_FFT, sph_rj, rj_fld, ipol_circle_trns,            &
-     &          circle, leg_circ, d_circle, WK_circle_fft)
+     &          circle, leg_circ, d_circle, WK_circle_fft,              &
+     &          elapsed_fft, elapsed_cpy)
 !
       use t_FFT_selector
       use calypso_mpi_real
@@ -96,6 +102,7 @@
       type(working_FFTs), intent(inout) :: WK_circle_fft
       integer(kind = kint), intent(in)                                  &
      &                      :: ipol_circle_trns(d_circle%num_phys_viz)
+      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
       integer(kind = kint) :: i_fld, num_comp, i_trns
       integer(kind = kint_gl) :: num64
@@ -150,7 +157,8 @@
       do i_fld = 1, d_circle%ntot_phys
         call backward_FFT_select                                        &
      &    (iflag_FFT, np_smp, leg_circ%istack_circfft_smp, ione,        &
-     &     circle%mphi_circle, d_circle%d_fld(1,i_fld), WK_circle_fft)
+     &     circle%mphi_circle, d_circle%d_fld(1,i_fld), WK_circle_fft,  &
+     &     elapsed_fft, elapsed_cpy)
       end do
 !
       end subroutine circle_leg_bwd_trans_rj

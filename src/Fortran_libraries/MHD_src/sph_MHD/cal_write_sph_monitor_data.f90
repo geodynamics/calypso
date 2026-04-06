@@ -124,6 +124,9 @@
       call open_sph_vol_rms_file_mhd(SPH_MHD%sph, sph_MHD_bc%sph_bc_U,  &
      &   SPH_MHD%ipol, SPH_MHD%fld, monitor, SR_sig)
 !
+      monitor%elapsed_circle_init = 0.0d0
+      monitor%elapsed_circle_fft =  0.0d0
+      monitor%elapsed_circle_cpy =  0.0d0
       if(monitor%bench%iflag_dynamobench .gt. 0) then
         call init_circle_field_name_dbench(SPH_MHD%ipol,                &
      &      monitor%circ_mid_eq%d_circle, monitor%bench)
@@ -132,7 +135,8 @@
      &      monitor%circ_mid_eq)
         call init_circle_point_global                                   &
      &     (SPH_MHD%sph, SPH_MHD%comms, trans_p,                        &
-     &      monitor%circ_mid_eq, SR_sig, SR_r)
+     &      monitor%circ_mid_eq, monitor%elapsed_circle_init,           &
+     &      SR_sig, SR_r)
         call alloc_dynamobench_monitor(monitor%circ_mid_eq%d_circle,    &
      &                                 monitor%bench)
       end if
@@ -142,7 +146,8 @@
      &     (nod_fld, monitor%mul_circle%cdat(i)%d_circle)
         call init_circle_point_global                                   &
      &     (SPH_MHD%sph, SPH_MHD%comms, trans_p,                        &
-     &      monitor%mul_circle%cdat(i), SR_sig, SR_r)
+     &      monitor%mul_circle%cdat(i), monitor%elapsed_circle_init,    &
+     &      SR_sig, SR_r)
         call set_circle_transfer_address(nod_fld, SPH_MHD%fld,          &
      &                                   monitor%mul_circle%cdat(i))
       end do
@@ -247,12 +252,13 @@
 !
       call const_dynamobench_data                                       &
      &  (time_d, sph%sph_params, sph%sph_rj, sph_MHD_bc, trans_p,       &
-     &   ipol, rj_fld, monitor%pwr, monitor%circ_mid_eq, monitor%bench)
+     &   ipol, rj_fld, monitor%pwr, monitor%circ_mid_eq, monitor%bench, &
+     &    monitor%elapsed_circle_fft, monitor%elapsed_circle_cpy)
 !
-      call sph_forward_trans_on_circles(trans_p%iflag_FFT,              &
-     &    sph%sph_rj, rj_fld, monitor%mul_circle%num_circles,           &
-     &    monitor%mul_circle%cdat(1))
-      
+      call sph_forward_trans_on_circles                                 &
+     &   (trans_p%iflag_FFT, sph%sph_rj, rj_fld,                        &
+     &    monitor%mul_circle%num_circles, monitor%mul_circle%cdat(1),   &
+     &    monitor%elapsed_circle_fft, monitor%elapsed_circle_cpy)
 !
       end subroutine cal_sph_monitor_data
 !
