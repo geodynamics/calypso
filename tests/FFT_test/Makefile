@@ -20,21 +20,21 @@ test:
 	make clean
 	
 	$(TARGET_FFTPACK_TEST)
-	$(TARGET_CMPR_FFT_TEST) < compare_FFTPACK.txt > log.txt
+	$(TARGET_CMPR_FFT_TEST) 'reference/fftpack_test.dat' 'fftpack_test.dat' > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed Gauss points check'; \
 		exit 1;\
 	fi
 	
 	$(TARGET_FFW3_F_TEST)
-	$(TARGET_CMPR_FFT_TEST) < compare_FFTW3.txt > log.txt
+	$(TARGET_CMPR_FFT_TEST) 'fftpack_test.dat' 'mul_fftw_test.dat' > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed FFTW3 check'; \
 		exit 1;\
 	fi
 	
 	$(TARGET_SGL_FFW3_TEST)
-	$(TARGET_CMPR_FFT_TEST) < compare_single_FFTW3.txt > log.txt
+	$(TARGET_CMPR_FFT_TEST) 'fftpack_test.dat' 'sgl_fftw_test.dat' > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed single FFTW3 check'; \
 		exit 1;\
