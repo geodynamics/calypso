@@ -255,7 +255,7 @@
 !
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
-      call copy_FFTW_field_from_recv                                    &
+      call copy_prt_FFTW_field_from_recv                                &
      &   (sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                          &
      &    sph_rtp%istack_rtp_rt_smp(np_smp), comm_rtp%irev_sr,          &
      &    ncomp_bwd, n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C(1))
