@@ -90,6 +90,7 @@ makemake: $(MAKE_MOD_DEP)
 	cd $(MHDDIR) ; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
+		SRCDIR="$(SRCDIR)" \
 		MAKEDIR="$(MAKEDIR)" \
 		BUILDDIR="$(BUILDDIR)" \
 		INSTDIR="$(INSTDIR)" \
@@ -129,6 +130,7 @@ test:
 	cd $(TESTDIR) ; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
+		SRCDIR="$(SRCDIR)" \
 		BUILDDIR="$(BUILDDIR)" \
 		TESTDIR="$(TESTDIR)" \
 		MHDDIR="$(MHDDIR)" \
@@ -147,7 +149,12 @@ clean:
 	done; \
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
+testclean:
+	@echo "# cleaning tests directory..."
+	@cd $(TESTDIR); $(GMAKE) clean
+
 distclean:
 	echo "# Back to initial package"; \
+	make testclean
 	rm -fr $(MAKEDIR) $(BUILDDIR) Makefile config.log
 	cd $(TESTDIR) ;  make distclean
