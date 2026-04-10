@@ -116,6 +116,8 @@
       subroutine initialize_FFT_select(id_rank, iflag_FFT,              &
      &          Nsmp, Nstacksmp, Nfft, WKS, elapsed_init)
 !
+      use calypso_multi_fftpack
+!
       integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nfft
@@ -135,7 +137,7 @@
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         if(id_rank .eq. 0) write(*,*) 'Use single transform in FFTW'
-        call init_FFTW_type(Nstacksmp(Nsmp), Nfft, WKS%WK_FFTW)
+        call init_FFTW_type(Nsmp, Nfft, WKS%WK_FFTW)
         return
       end if
 #endif
@@ -166,7 +168,7 @@
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize single FFTW'
-        call finalize_FFTW_type(Nstacksmp(Nsmp), WKS%WK_FFTW)
+        call finalize_FFTW_type(Nsmp, WKS%WK_FFTW)
         return
       end if
 #endif
@@ -181,6 +183,8 @@
 !
       subroutine verify_FFT_select                                      &
      &         (iflag_FFT, Nsmp, Nstacksmp, Nfft, WKS)
+!
+      use calypso_multi_fftpack
 !
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nfft
@@ -197,7 +201,7 @@
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         if(iflag_debug .gt. 0) write(*,*) 'Use single FFTW transforms'
-        call verify_wk_FFTW_type(Nstacksmp(Nsmp), Nfft, WKS%WK_FFTW)
+        call verify_wk_FFTW_type(Nsmp, Nfft, WKS%WK_FFTW)
         return
       end if
 #endif
@@ -213,6 +217,10 @@
       subroutine forward_FFT_select                                     &
      &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS,            &
      &          elapsed_fft, elapsed_cpy)
+!
+      use calypso_multi_fftpack
+      use calypso_multi_FFTW3
+      use calypso_single_FFTW3
 !
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -245,6 +253,10 @@
       subroutine backward_FFT_select                                    &
      &         (iflag_FFT, Nsmp, Nstacksmp, M, Nfft, X, WKS,            &
      &          elapsed_fft, elapsed_cpy)
+!
+      use calypso_multi_fftpack
+      use calypso_multi_FFTW3
+      use calypso_single_FFTW3
 !
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)

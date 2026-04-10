@@ -283,6 +283,7 @@
       integer(kind = kint) :: i, j, k
 !
 !
+      write(*,*) 'Save FFT test data into ', trim(file_name)
       open(15,file=file_name)
       write(15,'(a)') '# Num_of_field, Nlength'
       write(15,'(2i5)')  ftst%nfld, ftst%ngrd

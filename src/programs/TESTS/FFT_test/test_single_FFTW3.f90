@@ -10,6 +10,7 @@
 !
       use t_FFTW_wrapper
       use t_fft_test_data
+      use calypso_single_FFTW3
 !
       implicit none
 !
@@ -25,7 +26,7 @@
       call init_fft_test_data(n_field, ngrid, ft3)
 !
       ft3%start = OMP_GET_WTIME()
-      call init_FFTW_type(ft3%nstack(np_smp), ft3%ngrd, WK_FFTW_t)
+      call init_FFTW_type(np_smp, ft3%ngrd, WK_FFTW_t)
       ft3%elapsed(1) = ft3%elapsed(1) + OMP_GET_WTIME() - ft3%start
 !
       do iloop = 1, n_loop

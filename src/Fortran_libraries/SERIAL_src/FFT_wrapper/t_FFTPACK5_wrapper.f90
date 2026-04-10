@@ -9,53 +9,18 @@
 !!@verbatim
 !!  ------------------------------------------------------------------
 !!
-!!      subroutine init_WK_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WK)
 !!      subroutine finalize_WK_FFTPACK_t(WK)
 !!      subroutine verify_wk_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WK)
 !!        integer(kind = kint), intent(in) ::  Nfft
 !!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
 !!        type(working_FFTPACK), intent(inout) :: WK
+!!
+!!      subroutine alloc_work_4_FFTPACK_t(Nsmp, nmax_comp, Nfft, WK)
+!!      subroutine alloc_const_4_FFTPACK_t(nfft, WK)
+!!        integer(kind = kint), intent(in) :: Nsmp, nmax_comp, Nfft
+!!        type(working_FFTPACK), intent(inout) :: WK
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT
-!! ------------------------------------------------------------------
-!!
-!!      subroutine CALYPSO_RFFTMF_t(Nsmp, Nstacksmp, M, Nfft, X, WK,    &
-!!     &                            elapsed_fft, elapsed_cpy)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-!!        integer(kind = kint), intent(in) :: M, Nfft
-!!        real(kind = kreal), intent(inout) :: X(M, Nfft)
-!!        type(working_FFTPACK), intent(inout) :: WK
-!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
-!! ------------------------------------------------------------------
-!!
-!! wrapper subroutine for forward Fourier transform by FFTPACK5
-!!
-!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!          *  \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!          *  \cos (\frac{2\pi j k}{Nfft})
-!!
-!!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!    K = Nfft/2....
-!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!          * \cos (\frac{2\pi j k}{Nfft})
-!!
-!! ------------------------------------------------------------------
-!!
-!!      subroutine CALYPSO_RFFTMB_t(Nsmp, Nstacksmp, M, Nfft, X, WK,    &
-!!     &                            elapsed_fft, elapsed_cpy)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-!!        integer(kind = kint), intent(in) :: M, Nfft
-!!        real(kind = kreal), intent(inout) :: X(M,Nfft)
-!!        type(working_FFTPACK), intent(inout) :: WK
-!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
-!! ------------------------------------------------------------------
-!!
-!! wrapper subroutine for backward Fourier transform by FFTPACK5
-!!
-!!   x_{k} = a_{0} + (-1)^{j} a_{Nfft/2} + sum_{k=1}^{Nfft/2-1}
-!!          (a_{k} \cos(2\pijk/Nfft) + b_{k} \sin(2\pijk/Nfft))
-!!
 !! ------------------------------------------------------------------
 !!
 !!       i = 1:     a_{0}
@@ -105,40 +70,11 @@
         integer(kind = kint) :: iflag_fft_comp = -1
       end type working_FFTPACK
 !
-      private :: alloc_work_4_FFTPACK_t, alloc_const_4_FFTPACK_t
       private :: dealloc_work_4_FFTPACK_t, dealloc_const_FFTPACK_t
 !
 ! ------------------------------------------------------------------
 !
       contains
-!
-! ------------------------------------------------------------------
-!
-      subroutine init_WK_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WK)
-!
-      use FFTPACK5_wrapper
-!
-      integer(kind = kint), intent(in) ::  Nfft
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-!
-      type(working_FFTPACK), intent(inout) :: WK
-!
-      integer(kind = kint) :: ip
-!
-!
-      WK%Mmax_smp = Nstacksmp(1)
-      do ip = 1, Nsmp
-        WK%Mmax_smp                                                     &
-     &      = max(WK%Mmax_smp, (Nstacksmp(ip) - Nstacksmp(ip-1)) )
-      end do
-!
-      call alloc_const_4_FFTPACK_t(Nfft, WK)
-      call init_CALYPSO_FFTPACK                                         &
-     &   (Nfft,  WK%lsave_FFTPACK, WK%WSAVE_FFTPACK)
-!
-      call alloc_work_4_FFTPACK_t(Nsmp, Nfft, WK)
-!
-      end subroutine init_WK_FFTPACK_t
 !
 ! ------------------------------------------------------------------
 !
@@ -186,10 +122,10 @@
       end if
 !
       if(WK%iflag_fft_comp .lt. 0) then
-        call alloc_work_4_FFTPACK_t(Nsmp, Nfft, WK)
+        call alloc_work_4_FFTPACK_t(Nsmp, WK%Mmax_smp, Nfft, WK)
       else if( (WK%Mmax_smp*Nfft) .gt. WK%iflag_fft_comp ) then
         call dealloc_work_4_FFTPACK_t(WK)
-        call alloc_work_4_FFTPACK_t(Nsmp, Nfft, WK)
+        call alloc_work_4_FFTPACK_t(Nsmp, WK%Mmax_smp, Nfft, WK)
       end if
 !
       end subroutine verify_wk_FFTPACK_t
@@ -197,56 +133,13 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine CALYPSO_RFFTMF_t(Nsmp, Nstacksmp, M, Nfft, X, WK,      &
-     &                            elapsed_fft, elapsed_cpy)
+      subroutine alloc_work_4_FFTPACK_t(Nsmp, nmax_comp, Nfft, WK)
 !
-      use FFTPACK5_wrapper
-!
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) :: M, Nfft
-!
-      real(kind = kreal), intent(inout) :: X(M, Nfft)
-      type(working_FFTPACK), intent(inout) :: WK
-      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
-!
-!
-      call CALYPSO_RFFTMF_SMP(Nsmp, Nstacksmp, M, Nfft, X,              &
-     &    WK%X_FFTPACK5, WK%Mmax_smp, WK%lsave_FFTPACK,                 &
-     &    WK%WSAVE_FFTPACK, WK%WORK_FFTPACK, elapsed_fft, elapsed_cpy)
-!
-      end subroutine CALYPSO_RFFTMF_t
-!
-! ------------------------------------------------------------------
-!
-      subroutine CALYPSO_RFFTMB_t(Nsmp, Nstacksmp, M, Nfft, X, WK,      &
-     &                            elapsed_fft, elapsed_cpy)
-!
-      use FFTPACK5_wrapper
-!
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) :: M, Nfft
-!
-      real(kind = kreal), intent(inout) :: X(M,Nfft)
-      type(working_FFTPACK), intent(inout) :: WK
-      real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
-!
-!
-      call CALYPSO_RFFTMB_SMP(Nsmp, Nstacksmp, M, Nfft, X,              &
-     &    WK%X_FFTPACK5, WK%Mmax_smp, WK%lsave_FFTPACK,                 &
-     &    WK%WSAVE_FFTPACK, WK%WORK_FFTPACK, elapsed_fft, elapsed_cpy)
-!
-      end subroutine CALYPSO_RFFTMB_t
-!
-! ------------------------------------------------------------------
-! ------------------------------------------------------------------
-!
-      subroutine alloc_work_4_FFTPACK_t(Nsmp, Nfft, WK)
-!
-      integer(kind = kint), intent(in) :: Nsmp, Nfft
+      integer(kind = kint), intent(in) :: Nsmp, nmax_comp, Nfft
       type(working_FFTPACK), intent(inout) :: WK
 !
 !
-      WK%iflag_fft_comp = WK%Mmax_smp*Nfft
+      WK%iflag_fft_comp = WK%Mmax_smp * Nfft
       allocate( WK%X_FFTPACK5(WK%iflag_fft_comp,Nsmp) )
       allocate( WK%WORK_FFTPACK(WK%iflag_fft_comp,Nsmp) )
       WK%WORK_FFTPACK = 0.0d0

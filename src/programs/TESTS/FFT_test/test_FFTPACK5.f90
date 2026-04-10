@@ -11,6 +11,8 @@
       use t_fft_test_data
       use t_FFTPACK5_wrapper
 !
+      use calypso_multi_fftpack
+!
       implicit none
 !
       character(len = kchara), parameter                                &
