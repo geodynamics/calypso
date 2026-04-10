@@ -64,7 +64,12 @@
         call add_phys_name_ctl(pressure, field_ctl)
       end if
 !
-      if(check_field_list_ctl(buoyancy, field_ctl))                     &
+      if(check_field_list_ctl(buoyancy, field_ctl)) then
+        call add_phys_name_ctl(thermal_buoyancy,   field_ctl)
+        call add_phys_name_ctl(composite_buoyancy, field_ctl)
+      end if
+!
+      if(check_field_list_ctl(thermal_buoyancy, field_ctl))             &
         call add_phys_name_ctl(temperature, field_ctl)
       if(check_field_list_ctl(composite_buoyancy, field_ctl))           &
         call add_phys_name_ctl(composition, field_ctl)
@@ -132,6 +137,8 @@
 !
       if(check_field_list_ctl(rot_buoyancy, field_ctl))                 &
      &   call add_phys_name_ctl(buoyancy, field_ctl)
+      if(check_field_list_ctl(rot_thermal_buoyancy, field_ctl))         &
+     &   call add_phys_name_ctl(thermal_buoyancy, field_ctl)
       if(check_field_list_ctl(rot_composite_buoyancy, field_ctl))       &
      &   call add_phys_name_ctl(composite_buoyancy, field_ctl)
 !
@@ -156,10 +163,12 @@
       if(check_field_list_ctl(div_Lorentz_force, field_ctl))            &
      &   call add_phys_name_ctl(Lorentz_force, field_ctl)
 !
-      if(check_field_list_ctl(div_buoyancy, field_ctl))                 &
-        call add_phys_name_ctl(buoyancy, field_ctl)
+      if(check_field_list_ctl(div_thermal_buoyancy, field_ctl))         &
+        call add_phys_name_ctl(thermal_buoyancy, field_ctl)
       if(check_field_list_ctl(div_composite_buoyancy, field_ctl))       &
         call add_phys_name_ctl(composite_buoyancy, field_ctl)
+      if(check_field_list_ctl(div_buoyancy, field_ctl))                 &
+        call add_phys_name_ctl(buoyancy, field_ctl)
 !
       if(check_field_list_ctl(div_momentum_flux, field_ctl))            &
         call add_phys_name_ctl(momentum_flux, field_ctl)
@@ -169,11 +178,11 @@
         call add_phys_name_ctl(induction_tensor, field_ctl)
 !
       if(check_field_list_ctl(div_heat_flux, field_ctl))                &
-        call add_phys_name_ctl(div_pert_heat_flux, field_ctl)
-      if(check_field_list_ctl(pert_heat_flux, field_ctl))               &
-        call add_phys_name_ctl(div_composition_flux, field_ctl)
-      if(check_field_list_ctl(composite_flux, field_ctl))               &
-        call add_phys_name_ctl(induction_tensor, field_ctl)
+        call add_phys_name_ctl(heat_flux, field_ctl)
+      if(check_field_list_ctl(div_pert_heat_flux, field_ctl))           &
+        call add_phys_name_ctl(pert_heat_flux, field_ctl)
+      if(check_field_list_ctl(div_composition_flux, field_ctl))         &
+        call add_phys_name_ctl(composite_flux, field_ctl)
       if(check_field_list_ctl(div_pert_composition_flux, field_ctl))    &
         call add_phys_name_ctl(pert_comp_flux, field_ctl)
 !

@@ -203,6 +203,28 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
+      subroutine write_gz_multi_real(FPz_f, num, real_data, zbuf)
+!
+      use gzip_file_access
+!
+      character, pointer, intent(in) :: FPz_f
+      integer(kind = kint), intent(in) :: num
+      real(kind = kreal), intent(in) :: real_data(num)
+      type(buffer_4_gzip), intent(inout):: zbuf
+!
+      character(len=kchara) :: fmt_txt
+!
+!
+      if(num .le. 0) return
+      write(fmt_txt,'(a3,i2,a13)') '(1p', num, 'E25.15e3,2a1)'
+      write(zbuf%fixbuf(1),fmt_txt) real_data(1:num),                   &
+     &                             char(10), char(0)
+      call gz_write_textbuf_no_lf(FPz_f, zbuf)
+!
+      end subroutine write_gz_multi_real
+!
+!------------------------------------------------------------------
+!
       subroutine write_gz_surf_group                                    &
      &         (FPz_f, is1, ntot, istack, item_sf, zbuf)
 !
@@ -246,6 +268,7 @@
       character(len=kchara) :: fmt_txt
 !
 !
+      if(num .le. 0) return
       ist = 0
       do
         n = min(num-ist-ione,iseven) + 1
@@ -274,6 +297,7 @@
       character(len=kchara) :: fmt_txt
 !
 !
+      if(num .le. 0) return
       ist = 0
       do
         n = min(num-ist-ione,inine) + 1
@@ -302,6 +326,7 @@
       character(len=kchara) :: fmt_txt
 !
 !
+      if(num .le. 0) return
       ist = 0
       do
         n = min(num-ist-ione,inine) + 1

@@ -58,7 +58,7 @@
      &                 :: dipolarity_file_name = 'dipolarity.dat'
 !
 !>        Radial address for dipolarity
-        integer(kind = kint) :: krms_CMB
+        integer(kind = kint) :: kr_dip_CMB
 !>        Radius for dipolarity
         real(kind = kreal) :: rdip_CMB
 !
@@ -189,7 +189,7 @@
       sph_OUT%kr_ICB =  nlayer_ICB
       sph_OUT%kr_CMB =  nlayer_CMB
       sph_OUT%kr_inner = izero
-      sph_OUT%kr_outer = dip%krms_CMB
+      sph_OUT%kr_outer = dip%kr_dip_CMB
       sph_OUT%r_inner =  zero
       sph_OUT%r_outer =  dip%rdip_CMB
 !

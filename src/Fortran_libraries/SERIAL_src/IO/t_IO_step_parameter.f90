@@ -29,8 +29,8 @@
 !!      logical function iflag_viz_flex_step(time_d, IO_step)
 !!        type(time_data), intent(in) :: time_d
 !!        type(IO_step_param), intent(in) :: IO_step
-!!      integer(kind = kint) function istep_file_w_fix_dt               &
-!!     &                            (i_step, IO_step)
+!!      integer(kind = kint) function                                   &
+!!     &                    istep_file_w_fix_dt(i_step, IO_step)
 !!      integer(kind = kint) function                                   &
 !!     &                    istep_file_w_flex_dt(time_d, IO_step)
 !!        type(time_data), intent(in) :: time_d
@@ -205,8 +205,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      integer(kind = kint) function istep_file_w_fix_dt                 &
-     &                            (i_step, IO_step)
+      integer(kind = kint) function                                     &
+     &                    istep_file_w_fix_dt(i_step, IO_step)
 !
       integer(kind = kint), intent(in) :: i_step
       type(IO_step_param), intent(in) :: IO_step

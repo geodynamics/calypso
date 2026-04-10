@@ -7,15 +7,19 @@
 !>@brief  Update each field for MHD dynamo model
 !!
 !!@verbatim
-!!      subroutine cal_sol_velo_by_vort_sph_crank                       &
-!!     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, bcs_U,            &
+!!      subroutine cal_sol_velo_by_vort_sph_crank(dt, sph_rj, leg,      &
+!!     &          r_2nd, fl_prop, sph_bc_U, bc_fdms_U, bcs_U,           &
 !!     &          band_vp_evo, band_vt_evo, ipol, rj_fld)
+!!        real(kind = kreal), intent(in) :: dt
 !!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(fluid_property), intent(in) :: fl_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(sph_vector_boundary_data), intent(in) :: bcs_U
 !!        type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
-!!        type(band_matrices_type), intent(in) :: band_vp_evo, band_vt_evo
+!!        type(band_matrices_type), intent(in) :: band_vp_evo
+!!        type(band_matrices_type), intent(in) :: band_vt_evo
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(inout) :: rj_fld
 !!          Input address:    ipol%base%i_vort, ipol%base%i_vort+2
@@ -34,18 +38,24 @@
 !!        type(sph_boundary_type), intent(in) :: sph_bc_B
 !!        type(sph_vector_boundary_data), intent(in) :: bcs_B
 !!
-!!      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, property,       &
-!!     &         sph_bc, bcs_S, band_s_evo, band_s00_evo,               &
-!!     &         is_scalar, rj_fld, x00_w_center)
+!!
+!!      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,       &
+!!     &          ref_field, sph_bc_S, bcs_S, band_s_evo, band_s00_evo, &
+!!     &          is_scalar, rj_fld, x00_w_center)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
-!!        type(sph_boundary_type), intent(in) :: sph_bc
+!!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
-!!        type(scalar_property), intent(in) :: cp_prop
-!!        type(band_matrices_type), intent(in) :: band_comp_evo
-!!        type(phys_address), intent(in) :: ipol
+!!        type(band_matrices_type), intent(in) :: band_s_evo
+!!        type(band_matrix_type), intent(in) :: band_s00_evo
+!!        type(scalar_property), intent(in) :: scl_prop
+!!        type(phys_data), intent(in) :: ref_field
+!!        real(kind = kreal), intent(in) :: dt
+!!        integer(kind = kint), intent(in) :: is_scalar
 !!        type(phys_data), intent(inout) :: rj_fld
-!!        Input address:    ipol%base%i_light
-!!        Solution address: ipol%base%i_light
+!!        real(kind = kreal), intent(inout)                             &
+!!     &                   :: x00_w_center(0:sph_rj%nidx_rj(1))
+!!          Input address:    ipol%base%i_light
+!!          Solution address: ipol%base%i_light
 !!@endverbatim
 !!
 !!@n @param ntot_phys_rj   Total number of components
@@ -78,10 +88,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sol_velo_by_vort_sph_crank                         &
-     &         (sph_rj, r_2nd, sph_bc_U, bc_fdms_U, bcs_U,              &
+      subroutine cal_sol_velo_by_vort_sph_crank(dt, sph_rj, leg,        &
+     &          r_2nd, fl_prop, sph_bc_U, bc_fdms_U, bcs_U,             &
      &          band_vp_evo, band_vt_evo, ipol, rj_fld)
 !
+      use t_physical_property
+      use t_schmidt_poly_on_rtm
       use t_coef_sph_velocity_BCs
       use copy_field_smp
       use solve_sph_fluid_crank
@@ -89,13 +101,19 @@
       use set_evoluved_boundaries
       use select_exp_velocity_ICB
       use select_exp_velocity_CMB
+      use select_exp_viscosity_ICB
+      use select_exp_viscosity_CMB
 !
+      real(kind = kreal), intent(in) :: dt
       type(sph_rj_grid), intent(in) :: sph_rj
+      type(legendre_4_sph_trans), intent(in) :: leg
       type(fdm_matrices), intent(in) :: r_2nd
+      type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_vector_boundary_data), intent(in) :: bcs_U
       type(velocity_boundary_FDMs), intent(in) :: bc_fdms_U
-      type(band_matrices_type), intent(in) :: band_vp_evo, band_vt_evo
+      type(band_matrices_type), intent(in) :: band_vp_evo
+      type(band_matrices_type), intent(in) :: band_vt_evo
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
@@ -111,6 +129,13 @@
       call delete_zero_degree_vect                                      &
      &   (ipol%base%i_velo, sph_rj%idx_rj_degree_zero, rj_fld%n_point,  &
      &    sph_rj%nidx_rj, rj_fld%ntot_phys, rj_fld%d_fld)
+!
+      call sel_ICB_sph_wtor_evo_RHS(dt, sph_rj, leg%g_sph_rj, r_2nd,    &
+     &    fl_prop, sph_bc_U, bcs_U%ICB_Vspec, ipol%base%i_velo,         &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      call sel_CMB_sph_wtor_evo_RHS(dt, sph_rj, leg%g_sph_rj, r_2nd,    &
+     &    fl_prop, sph_bc_U, bcs_U%CMB_Vspec, ipol%base%i_velo,         &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call sel_ICB_grad_poloidal_moment(sph_rj, r_2nd, sph_bc_U,        &
      &    bcs_U%ICB_Vspec, bc_fdms_U%fdm2_free_ICB, ipol%base%i_velo,   &
@@ -196,11 +221,11 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, property,         &
-     &         sph_bc, bcs_S, band_s_evo, band_s00_evo,                 &
-     &         is_scalar, rj_fld, x00_w_center)
+      subroutine cal_sol_scalar_sph_crank(dt, sph_rj, scl_prop,         &
+     &          ref_field, sph_bc_S, bcs_S, band_s_evo, band_s00_evo,   &
+     &          is_scalar, rj_fld, x00_w_center)
 !
-      use t_physical_property
+      use t_scalar_property
       use t_sph_center_matrix
       use t_boundary_params_sph_MHD
       use solve_sph_fluid_crank
@@ -208,13 +233,16 @@
       use set_evoluved_boundaries
       use select_exp_scalar_ICB
       use select_exp_scalar_CMB
+      use sph_exp_fix_vector_ICB
 !
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(band_matrices_type), intent(in) :: band_s_evo
       type(band_matrix_type), intent(in) :: band_s00_evo
-      type(scalar_property), intent(in) :: property
+      type(scalar_property), intent(in) :: scl_prop
+      type(phys_data), intent(in) :: ref_field
+!
       real(kind = kreal), intent(in) :: dt
       integer(kind = kint), intent(in) :: is_scalar
 !
@@ -223,21 +251,34 @@
      &                   :: x00_w_center(0:sph_rj%nidx_rj(1))
 !
 !
-      call set_CMB_scalar_sph_crank(sph_rj, sph_bc, bcs_S%CMB_Sspec,    &
-     &    property%coef_advect, property%coef_diffuse,                  &
-     &    dt, property%coef_imp, is_scalar,                             &
+      call set_CMB_scalar_sph_crank                                     &
+     &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc_S, bcs_S%CMB_Sspec, &
+     &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
+     &    ref_field%d_fld(sph_bc_S%kr_out,scl_prop%ir_kappa),           &
+     &    ref_field%d_fld(sph_bc_S%kr_out,scl_prop%ir_dkappa_norm),     &
+     &    dt, scl_prop%coef_imp, is_scalar,                             &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      call set_ICB_scalar_sph_crank(sph_rj, sph_bc, bcs_S%ICB_Sspec,    &
-     &    property%coef_advect, property%coef_diffuse,                  &
-     &    property%diffusie_reduction_ICB, dt, property%coef_imp,       &
-     &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      call set_ICB_scalar_sph_crank                                     &
+     &   (scl_prop%flag_val_diffuse, sph_rj, sph_bc_S, bcs_S%ICB_Sspec, &
+     &    scl_prop%coef_advect, scl_prop%coef_diffuse,                  &
+     &    ref_field%d_fld(sph_bc_S%kr_in,scl_prop%ir_kappa),            &
+     &    ref_field%d_fld(sph_bc_S%kr_in,scl_prop%ir_dkappa_norm),      &
+     &    dt, scl_prop%coef_imp, is_scalar,                             &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call solve_scalar_sph_crank(sph_rj, band_s_evo, band_s00_evo,     &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld,    &
      &    x00_w_center)
 !
+!
+      if(sph_bc_S%iflag_icb .eq. iflag_sph_filter_center) then
+        call set_sph_filter_vect_to_center                              &
+     &     (sph_rj%nidx_rj, bcs_S%ICB_Sspec%S_BC,                       &
+     &      rj_fld%n_point, rj_fld%d_fld(1,is_scalar))
+      end if
+!
       call fill_scalar_at_external                                      &
-     &   (sph_bc, sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,     &
+     &   (sph_bc_S, sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,   &
      &    sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                         &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !

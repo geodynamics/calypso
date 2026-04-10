@@ -36,7 +36,15 @@
 !!   composition_from_CMB     [i_light_from_CMB]
 !!   entropy_from_CMB         [i_entropy_from_CMB]
 !!   density_from_CMB         [i_density_from_CMB]
+!!   pressure_from_CMB        [i_pressure_from_CMB]
 !!   aspherical_pressure      [i_asph_pressure]
+!!
+!!   sym_temp_from_CMB        [i_sym_temp_from_CMB]
+!!   sym_comp_from_CMB        [i_sym_light_from_CMB]
+!!   sym_entropy_from_CMB     [i_sym_entropy_from_CMB]
+!!   sym_density_from_CMB     [i_sym_density_from_CMB]
+!!   sym_pressure_from_CMB    [i_sym_pressure_from_CMB]
+!!   sym_aspherical_pressure  [i_sym_asph_pressure]
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -53,57 +61,85 @@
 !>       Structure for start address for field components
       type field_component_address
 !>        Start address for radial velocity @f$ u_{r} @f$
-        integer (kind=kint) :: i_velo_r  =           izero
+        integer(kind = kint) :: i_velo_r  =           izero
 !>        Start address for theta component of velocity
 !!         @f$ u_{\theta} @f$
-        integer (kind=kint) :: i_velo_t  =           izero
+        integer(kind = kint) :: i_velo_t  =           izero
 !>        Start address for phi-component of  velocity @f$ u_{\phi} @f$
-        integer (kind=kint) :: i_velo_p  =           izero
+        integer(kind = kint) :: i_velo_p  =           izero
 !>        Start address for cylindrical radial velocity @f$ u_{s} @f$
-        integer (kind=kint) :: i_velo_s  =           izero
+        integer(kind = kint) :: i_velo_s  =           izero
 !>        Start address for x-componennt of velocity @f$ u_{z} @f$
-        integer (kind=kint) :: i_velo_x  =           izero
+        integer(kind = kint) :: i_velo_x  =           izero
 !>        Start address for y-componennt of velocity @f$ u_{z} @f$
-        integer (kind=kint) :: i_velo_y  =           izero
+        integer(kind = kint) :: i_velo_y  =           izero
 !>        Start address for z-componennt of velocity @f$ u_{z} @f$
-        integer (kind=kint) :: i_velo_z  =           izero
+        integer(kind = kint) :: i_velo_z  =           izero
 !
 !>        Start address for radial magnetic field @f$ B_{r} @f$
-        integer (kind=kint) :: i_magne_r  =          izero
+        integer(kind = kint) :: i_magne_r  =          izero
 !>        Start address for theta component of magnetic field
 !!         @f$ B_{\theta} @f$
-        integer (kind=kint) :: i_magne_t  =          izero
+        integer(kind = kint) :: i_magne_t  =          izero
 !>        Start address for phi-component of  magnetic field 
 !!         @f$ B_{\phi} @f$
-        integer (kind=kint) :: i_magne_p  =          izero
+        integer(kind = kint) :: i_magne_p  =          izero
 !>        Start address for cylindrical radial magnetic field
 !!          @f$ B_{s} @f$
-        integer (kind=kint) :: i_magne_s  =          izero
+        integer(kind = kint) :: i_magne_s  =          izero
 !>        Start address for x-component of magnetic field
 !!          @f$ B_{x} @f$
-        integer (kind=kint) :: i_magne_x  =          izero
+        integer(kind = kint) :: i_magne_x  =          izero
 !>        Start address for x-component of magnetic field
 !!          @f$ B_{y} @f$
-        integer (kind=kint) :: i_magne_y  =          izero
+        integer(kind = kint) :: i_magne_y  =          izero
 !>        Start address for x-component of magnetic field
 !!          @f$ B_{z} @f$
-        integer (kind=kint) :: i_magne_z  =          izero
+        integer(kind = kint) :: i_magne_z  =          izero
 !
 !>        start address for temperature from CMB average
-!!         @f$ T-|T(r_{o})| @f$
-        integer (kind=kint) :: i_temp_from_CMB =      izero
+!!         @f$ T - |T(r_{o})| @f$
+        integer(kind = kint) :: i_temp_from_CMB =      izero
 !>        start address for light element from CMB average
-!!         @f$ C-|C(r_{o})| @f$
-        integer (kind=kint) :: i_light_from_CMB =      izero
+!!         @f$ C - |C(r_{o})| @f$
+        integer(kind = kint) :: i_light_from_CMB =      izero
 !>        start address for entropy from CMB average
-!!         @f$ S-|S(r_{o})| @f$
-        integer (kind=kint) :: i_entropy_from_CMB =    izero
+!!         @f$ S - |S(r_{o})| @f$
+        integer(kind = kint) :: i_entropy_from_CMB =    izero
 !>        start address for density from CMB average
-!!         @f$ \rho-|\rho(r_{o})| @f$
-        integer (kind=kint) :: i_density_from_CMB =    izero
+!!         @f$ \rho - |\rho(r_{o})| @f$
+        integer(kind = kint) :: i_density_from_CMB =    izero
+!>        start address for pressure from CMB average
+!!         @f$ P - |P(r_{o})| @f$
+        integer(kind = kint) :: i_pressure_from_CMB =   izero
 !>        start address for aspherical component of pressure
-!!         @f$ P-|\int P dS| @f$
-        integer (kind=kint) :: i_asph_pressure =       izero
+!!         @f$ P - |\int P dS| @f$
+        integer(kind = kint) :: i_asph_pressure =       izero
+!
+!>        start address for equatorially symmetric
+!!         temperature from CMB average
+!!         @f$ T_{sym} - |T(r_{o})| @f$
+        integer(kind = kint) :: i_sym_temp_from_CMB =     izero
+!>        start address for equatorially symmetric
+!!         composition from CMB average
+!!         @f$ C_{sym} - |C(r_{o})| @f$
+        integer(kind = kint) :: i_sym_light_from_CMB =    izero
+!>        start address for equatorially symmetric
+!!         entropy from CMB average
+!!         @f$ S_{sym} - |S(r_{o})| @f$
+        integer(kind = kint) :: i_sym_entropy_from_CMB =  izero
+!>        start address for equatorially symmetric
+!!         density from CMB average
+!!         @f$ \rho_{sym} - |\rho(r_{o})| @f$
+        integer(kind = kint) :: i_sym_density_from_CMB =  izero
+!>        start address for equatorially symmetric
+!!         pressure from CMB average
+!!         @f$ P_{sym} - |\rho(P_{o})| @f$
+        integer(kind = kint) :: i_sym_pressure_from_CMB = izero
+!>        start address for equatorially symmetric
+!!         aspherical component of pressure
+!!         @f$ P_{sym} - |\int P dS| @f$
+        integer(kind = kint) :: i_sym_asph_pressure =     izero
       end type field_component_address
 !
 ! ----------------------------------------------------------------------
@@ -157,16 +193,30 @@
           fld_cmp%i_magne_z =      i_phys
 !
         else if (field_name .eq. temperature_from_CMB%name) then
-          fld_cmp%i_temp_from_CMB =    i_phys
+          fld_cmp%i_temp_from_CMB =     i_phys
         else if (field_name .eq. composition_from_CMB%name) then
-          fld_cmp%i_light_from_CMB =   i_phys
+          fld_cmp%i_light_from_CMB =    i_phys
         else if (field_name .eq. entropy_from_CMB%name) then
-          fld_cmp%i_entropy_from_CMB = i_phys
+          fld_cmp%i_entropy_from_CMB =  i_phys
         else if (field_name .eq. density_from_CMB%name) then
-          fld_cmp%i_density_from_CMB = i_phys
-!
+          fld_cmp%i_density_from_CMB =  i_phys
+        else if (field_name .eq. pressure_from_CMB%name) then
+          fld_cmp%i_pressure_from_CMB = i_phys
         else if (field_name .eq. aspherical_pressure%name) then
-          fld_cmp%i_asph_pressure =    i_phys
+          fld_cmp%i_asph_pressure =     i_phys
+!
+        else if (field_name .eq. sym_temp_from_CMB%name) then
+          fld_cmp%i_sym_temp_from_CMB =     i_phys
+        else if (field_name .eq. sym_comp_from_CMB%name) then
+          fld_cmp%i_sym_light_from_CMB =    i_phys
+        else if (field_name .eq. sym_entropy_from_CMB%name) then
+          fld_cmp%i_sym_entropy_from_CMB =  i_phys
+        else if (field_name .eq. sym_density_from_CMB%name) then
+          fld_cmp%i_sym_density_from_CMB =  i_phys
+        else if (field_name .eq. sym_pressure_from_CMB%name) then
+          fld_cmp%i_sym_pressure_from_CMB = i_phys
+        else if (field_name .eq. sym_aspherical_pressure%name) then
+          fld_cmp%i_sym_asph_pressure =     i_phys
         end if
       end if  
 !

@@ -1,10 +1,12 @@
-!make_module_dependency.f90
-!
-!      subroutine alloc_mod_list
-!      subroutine make_module_dependency(dirname, filename)
-!
-!
-!> @brief      Constract module dependency for Makefile
+!>@file   make_module_dependency.f90
+!!        program make_multi_mod_dependency
+!!        module module_dependency
+!!
+!!@author H. Matsui
+!!@date   Programmed in 2008
+!!
+!!
+!>@brief      Constract module dependency for Makefile
 !>        Usage: kemo_module_dep MAKEFILE SOURCE_DIRECTORY SOURCE_FILES
 !>        for single file: kemo_module_dep MAKEFILE SOURCE_FILES
 !>        Output command list for source with .f90 extension
@@ -15,6 +17,8 @@
 !>
 !>     Warning: To use this program, module name
 !>              must be same as the file name!!
+!
+!   --------------------------------------------------------------------
 !
       module module_dependency
 !
@@ -28,10 +32,11 @@
       character(len=43), parameter, private :: command_cpp              &
      &   = '	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<'
 !
-      integer, parameter :: num_exclude = 3
+      integer, parameter :: num_exclude = 4
       character(len=31) ::  exclude_list(num_exclude)                   &
      &                    = (/'ISO_C_BINDING',                          &
      &                        'hdf5         ',                          &
+     &                        'omp_lib      ',                          &
      &                        'mpi          '/)
 !
       private :: num_exclude
@@ -356,5 +361,3 @@
       close(id_makefile)
 !
       end program make_multi_mod_dependency
-!
-!-----------------------------------------------------------------------

@@ -87,7 +87,7 @@
      &    femmesh_s%mesh, femmesh_s%group, sph_maker%gen_sph)
 !      call compare_mesh_type                                           &
 !     &   (my_rank, geofem%mesh%nod_comm, mesh%node, mesh%ele,          &
-!     &    femmesh_s%mesh)
+!     &    femmesh_s%mesh, diff_limit, diff_max, icount_error)
 !      call compare_mesh_groups(geofem%group, femmesh_s%group)
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_mesh_and_group'

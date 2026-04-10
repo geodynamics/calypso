@@ -8,25 +8,25 @@ SHELL           = /bin/sh
 #
 SRCDIR = /Users/matsui/src_kemo
 #
-MHDDIR =  $(SRCDIR)/MHD
-BUILDDIR= $(SRCDIR)/bin
-TESTDIR=  $(SRCDIR)/tests
+# Command settings
 #
-# MPI settings
-#
-MPICHDIR =    
-MPICHLIBDIR = $(MPICHDIR)/lib
-MPICHBINDIR = $(MPICHDIR)/bin
-MPICHINCDIR = 
-MPILIBS =      
+MPIRUN= mpirun   
+TARGET_GEN_SPH_GRID= $(SRCDIR)/bin/utilities/gen_sph_grids
+TARGET_NEWSPH= $(SRCDIR)/bin/utilities/assemble_sph
+TARGET_CMP_SPH_RST=  $(SRCDIR)/bin/tests/compare_sph_restart#
 #
 
 all: test
 
 test: 
-	rm -f *.dat restart/rst.*
-	$(MPIRUN) -np 6 $(BUILDDIR)/utilities/assemble_sph > log.txt
-	$(MPIRUN) -np 6 $(BUILDDIR)/tests/compare_sph_restart >> log.txt
+	rm -f *.dat *.txt rst.*
+	$(MPIRUN) -np 6 $(TARGET_NEWSPH)  >> log.txt
+	$(MPIRUN) -np 6 $(TARGET_CMP_SPH_RST) >> log.txt
+	@if [ `tail -n 1 flag.txt` != 0 ]; then\
+		echo 'Failed Merged gzipped BINARY Data assemble check'; \
+		exit 1;\
+	fi
+	@echo 'Merged gzipped BINARY Data assemble check finished'
 
 clean:
 	rm -f *.dat *.txt rst.*

@@ -40,7 +40,6 @@
 !!
 !!    begin temperature_define
 !!      filtered_advection_ctl       Off
-!!      ICB_diffusivity_reduction_ctl     0.1
 !!
 !!      ref_temp_ctl              spherical_shell
 !!      ref_field_file_name      'reference_temp.dat'
@@ -72,6 +71,7 @@
       use t_control_array_character
       use t_control_array_real
       use t_ctl_data_temp_model
+      use t_ctl_data_valuable_diffuse
       use skip_comment_f
 !
       implicit  none
@@ -80,8 +80,6 @@
 !
       character(len=kchara), parameter, private                         &
      &    :: hd_filterd_advection = 'filtered_advection_ctl'
-      character(len=kchara), parameter, private                         &
-     &    :: hd_diffusivity_reduction = 'ICB_diffusivity_reduction_ctl'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_ref_temp =       'ref_temp_ctl'
@@ -97,12 +95,8 @@
       character(len=kchara), parameter, private                         &
      &       :: hd_takepiro_ctl = 'takepiro_model_ctl'
 !
-!    5th level for higher temp position
-!
       character(len=kchara), parameter, private                         &
-     &       :: hd_position =  'depth'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_temp_value = 'temperature'
+     &       :: hd_thermal_diffusion_ctl = 'thermal_diffusivity_ctl'
 !
       private :: read_ref_temp_ctl, write_ref_temp_ctl
 !
@@ -137,6 +131,10 @@
         call read_takepiro_ctl(id_control, hd_takepiro_ctl,             &
      &      reft_ctl%takepiro_ctl, c_buf)
 !
+        call read_val_diffuse_ctl_data                                  &
+     &     (id_control, hd_thermal_diffusion_ctl,                       &
+     &      reft_ctl%valuable_diffusion_ctl, c_buf)
+!
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_filterd_advection, reft_ctl%filterd_advect_ctl)
         call read_chara_ctl_type                                        &
@@ -145,9 +143,6 @@
      &     (c_buf, hd_start_ctl, reft_ctl%stratified_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_ref_field_file, reft_ctl%ref_file_ctl)
-!
-        call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
-     &                          reft_ctl%ICB_diffuse_reduction_ctl)
       end do
       reft_ctl%i_temp_def = 1
 !
@@ -172,7 +167,6 @@
       if(reft_ctl%i_temp_def .le. 0) return
 !
       maxlen = len_trim(hd_filterd_advection)
-      maxlen = max(maxlen, len_trim(hd_diffusivity_reduction))
       maxlen = max(maxlen, len_trim(hd_ref_temp))
       maxlen = max(maxlen, len_trim(hd_start_ctl))
       maxlen = max(maxlen, len_trim(hd_ref_field_file))
@@ -181,8 +175,9 @@
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    reft_ctl%filterd_advect_ctl)
-      call write_real_ctl_type(id_control, level, maxlen,               &
-     &    reft_ctl%ICB_diffuse_reduction_ctl)
+!
+      call write_val_diffuse_ctl_data                                   &
+     &   (id_control, reft_ctl%valuable_diffusion_ctl, level)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    reft_ctl%reference_ctl)
@@ -215,6 +210,8 @@
       call init_ref_temp_ctl_label(hd_high_temp, reft_ctl%high_ctl)
       call init_takepiro_ctl_label(hd_takepiro_ctl,                     &
      &                             reft_ctl%takepiro_ctl)
+      call init_val_diffuse_ctl_label(hd_thermal_diffusion_ctl,         &
+     &                                reft_ctl%valuable_diffusion_ctl)
 !
         call init_chara_ctl_item_label                                  &
      &     (hd_filterd_advection, reft_ctl%filterd_advect_ctl)
@@ -225,78 +222,7 @@
         call init_chara_ctl_item_label                                  &
      &     (hd_ref_field_file, reft_ctl%ref_file_ctl)
 !
-        call init_real_ctl_item_label(hd_diffusivity_reduction,         &
-     &                          reft_ctl%ICB_diffuse_reduction_ctl)
-!
       end subroutine init_temp_model_ctl_label
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine read_ref_temp_ctl                                      &
-     &         (id_control, hd_block, ref_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(reference_point_control), intent(inout) :: ref_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(ref_ctl%i_referenced .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, hd_block, c_buf)
-        if(c_buf%iend .gt. 0) exit
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_real_ctl_type(c_buf, hd_position, ref_ctl%depth)
-        call read_real_ctl_type(c_buf, hd_temp_value, ref_ctl%value)
-      end do
-      ref_ctl%i_referenced = 1
-!
-      end subroutine read_ref_temp_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine write_ref_temp_ctl                                     &
-     &         (id_control, hd_block, ref_ctl, level)
-!
-      use write_control_elements
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      type(reference_point_control), intent(in) :: ref_ctl
-!
-      integer(kind = kint), intent(inout) :: level
-!
-      integer(kind = kint) :: maxlen = 0
-!
-!
-      if(ref_ctl%i_referenced .le. 0) return
-!
-      maxlen = len_trim(hd_position)
-      maxlen = max(maxlen, len_trim(hd_temp_value))
-!
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
-      call write_real_ctl_type(id_control, level, maxlen,               &
-     &    ref_ctl%depth)
-      call write_real_ctl_type(id_control, level, maxlen,               &
-     &    ref_ctl%value)
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
-!
-      end subroutine write_ref_temp_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine init_ref_temp_ctl_label(hd_block, ref_ctl)
-      character(len=kchara), intent(in) :: hd_block
-      type(reference_point_control), intent(inout) :: ref_ctl
-!
-      ref_ctl%block_name = hd_block
-        call init_real_ctl_item_label(hd_position, ref_ctl%depth)
-        call init_real_ctl_item_label(hd_temp_value, ref_ctl%value)
-      end subroutine init_ref_temp_ctl_label
 !
 !   --------------------------------------------------------------------
 !

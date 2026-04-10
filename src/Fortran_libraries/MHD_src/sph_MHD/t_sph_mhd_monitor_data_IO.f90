@@ -46,6 +46,7 @@
       use t_boundary_params_sph_MHD
       use t_field_on_circle
       use t_field_4_dynamobench
+      use t_CMB_average_data
 !
       use pickup_sph_spectr_data
 !
@@ -70,6 +71,8 @@
 !>        Structure for Nusselt number data
         type(nusselt_number_data) :: comp_Nusselt
 !
+!>        Structure for CMB average data
+        type(CMB_average_data) :: ave_CMB
 !>        Structure for dipolarity data
         type(dipolarity_data) :: dip
 !>        Structure for typical scale data
@@ -93,6 +96,12 @@
 !
 !>        Data on circles
         type(mul_fields_on_circle) :: mul_circle
+!         Elapsed time for Initialize FFT on circle
+        real(kind = kreal) :: elapsed_circle_init = 0.0d0
+!         Elapsed time for FFT on circle
+        real(kind = kreal) :: elapsed_circle_fft =  0.0d0
+!         Elapsed time for DAta copy on circle
+        real(kind = kreal) :: elapsed_circle_cpy =  0.0d0
 !
 !>        Structure of mean square data
         type(sph_mean_squares) :: lor_spectr
@@ -113,6 +122,7 @@
       use m_error_IDs
       use cal_rms_fields_by_sph
       use cal_CMB_dipolarity
+      use pick_CMB_average
       use write_picked_sph_spectr
       use t_solver_SR
 !
@@ -130,10 +140,12 @@
       call init_energy_labels_base(monitor%ene_labels)
       call init_sph_spectr_data_and_file(sph, rj_fld, monitor)
 !
+      call init_CMB_average_field_list(sph%sph_params, sph%sph_rj,      &
+     &    ipol, monitor%pwr, monitor%ave_CMB)
       call init_dipolarity_4_sph_spectr(sph%sph_params, monitor%pwr,    &
      &                                  monitor%dip)
 !
-      if ( iflag_debug.gt.0 ) write(*,*) 'init_sph_spec_4_monitor'
+      if(iflag_debug .gt. 0) write(*,*) 'init_sph_spec_4_monitor'
       call init_sph_spec_4_monitor(sph%sph_params, sph%sph_rj,          &
      &    rj_fld, monitor%pick_list, monitor%pick_coef)
       ierr_lc =  error_picked_spectr_files(sph%sph_params,              &

@@ -7,8 +7,8 @@
 !>@brief  control data for resolutions of spherical shell
 !!
 !!@verbatim
-!!      subroutine sel_read_ctl_gen_shell_grids                         &
-!!     &         (id_control, hd_block, file_name, psph_ctl, c_buf)
+!!      subroutine sel_read_ctl_gen_shell_grids(id_control, hd_block,   &
+!!     &          file_name, psph_ctl, c_buf, error_file)
 !!      subroutine read_ctl_file_gen_shell_grids(id_control, file_name, &
 !!     &          hd_block, psph_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -16,6 +16,7 @@
 !!        character(len = kchara), intent(inout) :: file_name
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!
 !!      subroutine sel_write_ctl_gen_shell_grids                        &
 !!     &         (id_control, file_name, psph_ctl, level)
@@ -79,8 +80,8 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine sel_read_ctl_gen_shell_grids                           &
-     &         (id_control, hd_block, file_name, psph_ctl, c_buf)
+      subroutine sel_read_ctl_gen_shell_grids(id_control, hd_block,     &
+     &          file_name, psph_ctl, c_buf, error_file)
 !
       use write_control_elements
 !
@@ -90,14 +91,16 @@
       character(len = kchara), intent(inout) :: file_name
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(psph_ctl%iflag_sph_shell .gt. 0) return
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
-        call write_one_ctl_file_message                                 &
-     &     (hd_block, c_buf%level, file_name)
+        call write_one_ctl_file_message(hd_block, c_buf%level,          &
+     &                                  file_name, error_file)
+        if(error_file) return
         call read_ctl_file_gen_shell_grids(id_control+2, file_name,     &
      &                                     hd_block, psph_ctl, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then

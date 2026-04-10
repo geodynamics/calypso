@@ -14,7 +14,7 @@
 !!      Evaluate product of 3-band matrices
 !!                (a_prod) = (a_left)(a_right)
 !!
-!!      subroutine cal_mat_product_3band_mul(n, mcomp, kr_st, kr_ed,    &
+!!      subroutine cal_mat_prod_3b5b_mul(n, mcomp, kr_st, kr_ed,        &
 !!     &          a3_left, a5_right, a7_prod)
 !!       Evaluate product of 3-band and 5-band matrix
 !!                (a7_prod) = (a3_left)(a5_right)
@@ -102,40 +102,34 @@
       end do
 !$omp end parallel do
 !
-!$omp parallel do private (k,j)
-        do j = 1, mcomp
-          k = kr_st
-          a_prod(3,k,  j) = one
-          a_prod(2,k+1,j) = zero
-          a_prod(1,k+2,j) = zero
+      k = kr_st + 1
+!$omp parallel do private(j)
+      do j = 1, mcomp
+!        a_prod(5,k-2,j) =  zero
+        a_prod(4,k-1,j) =  a_left(3,k-1,j) * a_right(2,k-1,j)           &
+     &                   + a_left(2,k  ,j) * a_right(3,k-1,j)
+        a_prod(3,k,  j) =  a_left(3,k-1,j) * a_right(1,k  ,j)           &
+     &                   + a_left(2,k  ,j) * a_right(2,k  ,j)           &
+     &                   + a_left(1,k+1,j) * a_right(3,k  ,j)
+        a_prod(2,k+1,j) =  a_left(2,k  ,j) * a_right(1,k+1,j)           &
+     &                   + a_left(1,k+1,j) * a_right(2,k+1,j)
+        a_prod(1,k+2,j)  = a_left(1,k+1,j) * a_right(1,k+2,j)
+      end do
+!$omp end parallel do
 !
-          k = kr_st + 1
-!          a_prod(5,k-2,j) =  zero
-          a_prod(4,k-1,j) =  a_left(3,k-1,j) * a_right(2,k-1,j)         &
-     &                     + a_left(2,k  ,j) * a_right(3,k-1,j)
-          a_prod(3,k,  j) =  a_left(3,k-1,j) * a_right(1,k  ,j)         &
-     &                     + a_left(2,k  ,j) * a_right(2,k  ,j)         &
-     &                     + a_left(1,k+1,j) * a_right(3,k  ,j)
-          a_prod(2,k+1,j) =  a_left(2,k  ,j) * a_right(1,k+1,j)         &
-     &                     + a_left(1,k+1,j) * a_right(2,k+1,j)
-          a_prod(1,k+2,j)  = a_left(1,k+1,j) * a_right(1,k+2,j)
-!
-          k = kr_ed - 1
-          a_prod(5,k-2,j) =  a_left(3,k-1,j) * a_right(3,k-2,j)
-          a_prod(4,k-1,j) =  a_left(3,k-1,j) * a_right(2,k-1,j)         &
-     &                     + a_left(2,k  ,j) * a_right(3,k-1,j)
-          a_prod(3,k,  j) =  a_left(3,k-1,j) * a_right(1,k  ,j)         &
-     &                     + a_left(2,k  ,j) * a_right(2,k  ,j)         &
-     &                     + a_left(1,k+1,j) * a_right(3,k  ,j)
-          a_prod(2,k+1,j) =  a_left(2,k  ,j) * a_right(1,k+1,j)         &
-     &                     + a_left(1,k+1,j) * a_right(2,k+1,j)
-!          a_prod(1,k+2,j) = zero
-!
-          k = kr_ed
-          a_prod(5,k-2,j) = zero
-          a_prod(4,k-1,j) = zero
-          a_prod(3,k,  j) = one
-        end do
+      k = kr_ed - 1
+!$omp parallel do private(j)
+      do j = 1, mcomp
+        a_prod(5,k-2,j) =  a_left(3,k-1,j) * a_right(3,k-2,j)
+        a_prod(4,k-1,j) =  a_left(3,k-1,j) * a_right(2,k-1,j)           &
+     &                   + a_left(2,k  ,j) * a_right(3,k-1,j)
+        a_prod(3,k,  j) =  a_left(3,k-1,j) * a_right(1,k  ,j)           &
+     &                   + a_left(2,k  ,j) * a_right(2,k  ,j)           &
+     &                   + a_left(1,k+1,j) * a_right(3,k  ,j)
+        a_prod(2,k+1,j) =  a_left(2,k  ,j) * a_right(1,k+1,j)           &
+     &                   + a_left(1,k+1,j) * a_right(2,k+1,j)
+!        a_prod(1,k+2,j) = zero
+      end do
 !$omp end parallel do
 !
       end subroutine cal_mat_product_3band_mul
@@ -177,7 +171,7 @@
       end do
 !$omp end parallel do
 !
-!$omp parallel do private (k,j)
+!$omp parallel do private (j)
         do j = 1, mcomp
           k = kr_st
           a7_prod(4,k,  j) =  a3_left(2,k  ,j) * a5_right(3,k  ,j)      &
@@ -187,8 +181,12 @@
           a7_prod(2,k+2,j) =  a3_left(2,k  ,j) * a5_right(1,k+2,j)      &
      &                      + a3_left(1,k+1,j) * a5_right(2,k+2,j)
           a7_prod(1,k+3,j) =  a3_left(1,k+1,j) * a5_right(1,k+3,j)
+        end do
+!$omp end parallel do
 !
-          k = kr_st+1
+        k = kr_st+1
+!$omp parallel do private (j)
+        do j = 1, mcomp
           a7_prod(5,k-1,j) =  a3_left(3,k-1,j) * a5_right(3,k-1,j)      &
      &                      + a3_left(2,k  ,j) * a5_right(4,k-1,j)      &
      &                      + a3_left(1,k+1,j) * a5_right(5,k-1,j)
@@ -201,8 +199,12 @@
           a7_prod(2,k+2,j) =  a3_left(2,k  ,j) * a5_right(1,k+2,j)      &
      &                      + a3_left(1,k+1,j) * a5_right(2,k+2,j)
           a7_prod(1,k+3,j) =  a3_left(1,k+1,j) * a5_right(1,k+3,j)
+        end do
+!$omp end parallel do
 !
-          k = kr_st+2
+        k = kr_st+2
+!$omp parallel do private (j)
+        do j = 1, mcomp
           a7_prod(6,k-2,j) =  a3_left(3,k-1,j) * a5_right(4,k-2,j)      &
      &                      + a3_left(2,k  ,j) * a5_right(5,k-2,j)
           a7_prod(5,k-1,j) =  a3_left(3,k-1,j) * a5_right(3,k-1,j)      &
@@ -217,10 +219,14 @@
           a7_prod(2,k+2,j) =  a3_left(2,k  ,j) * a5_right(1,k+2,j)      &
      &                      + a3_left(1,k+1,j) * a5_right(2,k+2,j)
           a7_prod(1,k+3,j) =  a3_left(1,k+1,j) * a5_right(1,k+3,j)
+        end do
+!$omp end parallel do
 !
 !
-          k = kr_ed - 2
-          a7_prod(7,k-3,j) =  a3_left(3,k-1,j) * a5_right(5,k-3,j) 
+        k = kr_ed - 2
+!$omp parallel do private (j)
+        do j = 1, mcomp
+          a7_prod(7,k-3,j) =  a3_left(3,k-1,j) * a5_right(5,k-3,j)
           a7_prod(6,k-2,j) =  a3_left(3,k-1,j) * a5_right(4,k-2,j)      &
      &                      + a3_left(2,k  ,j) * a5_right(5,k-2,j)
           a7_prod(5,k-1,j) =  a3_left(3,k-1,j) * a5_right(3,k-1,j)      &
@@ -234,11 +240,17 @@
      &                      + a3_left(1,k+1,j) * a5_right(3,k+1,j)
           a7_prod(2,k+2,j) =  a3_left(2,k  ,j) * a5_right(1,k+2,j)      &
      &                      + a3_left(1,k+1,j) * a5_right(2,k+2,j)
+        end do
+!$omp end parallel do
 !
-          k = kr_ed - 1
-          a7_prod(7,k-3,j) =  a3_left(3,k-1,j) * a5_right(5,k-3,j) 
+        k = kr_ed - 1
+!$omp parallel do private(j)
+        do j = 1, mcomp
+          a7_prod(7,k-3,j) =  a3_left(3,k-1,j) * a5_right(5,k-3,j)
           a7_prod(6,k-2,j) =  a3_left(3,k-1,j) * a5_right(4,k-2,j)      &
      &                      + a3_left(2,k  ,j) * a5_right(5,k-2,j)
+      
+
           a7_prod(5,k-1,j) =  a3_left(3,k-1,j) * a5_right(3,k-1,j)      &
      &                      + a3_left(2,k  ,j) * a5_right(4,k-1,j)      &
      &                      + a3_left(1,k+1,j) * a5_right(5,k-1,j)
@@ -248,9 +260,13 @@
           a7_prod(3,k+1,j) =  a3_left(3,k-1,j) * a5_right(1,k+1,j)      &
      &                      + a3_left(2,k  ,j) * a5_right(2,k+1,j)      &
      &                      + a3_left(1,k+1,j) * a5_right(3,k+1,j)
+        end do
+!$omp end parallel do
 !
-          k = kr_ed
-          a7_prod(7,k-3,j) =  a3_left(3,k-1,j) * a5_right(5,k-3,j) 
+        k = kr_ed
+!$omp parallel do private(j)
+        do j = 1, mcomp
+          a7_prod(7,k-3,j) =  a3_left(3,k-1,j) * a5_right(5,k-3,j)
           a7_prod(6,k-2,j) =  a3_left(3,k-1,j) * a5_right(4,k-2,j)      &
      &                      + a3_left(2,k  ,j) * a5_right(5,k-2,j)
           a7_prod(5,k-1,j) =  a3_left(3,k-1,j) * a5_right(3,k-1,j)      &

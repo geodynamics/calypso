@@ -8,12 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine init_psf_ctl_stract(psf_c)
-!!      subroutine s_read_psf_control_data                              &
-!!     &         (id_control, hd_block, psf_c, c_buf)
+!!      subroutine s_read_psf_control_data(id_control, hd_block,        &
+!!     &                                   psf_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(psf_ctl), intent(inout) :: psf_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout)  :: error_file
 !!      subroutine write_psf_control_data                               &
 !!     &         (id_control, hd_block, psf_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -25,8 +26,8 @@
 !!
 !!  begin cross_section_ctl
 !!    section_file_prefix    'psf'
-!!    psf_output_type         ucd
-!!  
+!!    section_file_format     ucd
+!!
 !!    begin surface_define
 !!      section_method    equation
 !!  
@@ -58,8 +59,9 @@
 !!  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  
-!!      psf_output_type:
-!!           ucd, VTK
+!!    section_file_format:
+!!           'VTK', 'VTK_gz', 'VTD', 'VTD_gz', 'PSF', 'PSF_gz',
+!!           'UCD', 'UCD_gz', 'UDT', 'UDT_gz', 'binary', 'binary_gz',
 !!
 !!    num_result_comp: number of fields
 !!    output_field: (Original name: color_comp and color_subcomp)
@@ -132,7 +134,6 @@
       use t_control_data_4_psf_def
       use t_control_data_4_fld_on_psf
       use t_control_data_4_psf
-      use calypso_mpi
 !
       implicit  none
 !
@@ -140,15 +141,17 @@
       character(len=kchara), parameter, private                         &
      &                  :: hd_psf_file_prefix = 'section_file_prefix'
       character(len=kchara), parameter, private                         &
-     &                  :: hd_psf_out_type =    'psf_output_type'
+     &                  :: hd_psf_file_format =  'section_file_format'
       character(len=kchara), parameter, private                         &
      &                  :: hd_surface_define =  'surface_define'
       character(len=kchara), parameter, private                         &
      &                  :: hd_output_field = 'output_field_define'
 !
 !       Deprecated flag
-      character(len=kchara), parameter                                  &
-     &                  :: hd_psf_file_head =   'psf_file_head'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_psf_file_head =  'psf_file_head'
+      character(len=kchara), parameter, private                         &
+     &                  :: hd_psf_out_type =   'psf_output_type'
 !
 !  ---------------------------------------------------------------------
 !
@@ -156,8 +159,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_read_psf_control_data                                &
-     &         (id_control, hd_block, psf_c, c_buf)
+      subroutine s_read_psf_control_data(id_control, hd_block,          &
+     &                                   psf_c, c_buf, error_file)
 !
       use ctl_file_section_def_IO
       use ctl_file_field_on_psf_IO
@@ -168,6 +171,7 @@
 !
       type(psf_ctl), intent(inout) :: psf_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout)  :: error_file
 !
 !
       if(psf_c%i_psf_ctl .gt. 0) return
@@ -183,19 +187,24 @@
      &       (hd_surface_define, izero, c_buf%level)
           call sel_read_ctl_pvr_section_def(id_control,                 &
      &        hd_surface_define, psf_c%fname_section_ctl,               &
-     &        psf_c%psf_def_c, c_buf)
+     &        psf_c%psf_def_c, c_buf, error_file)
+          if(error_file) return
         end if
 !
         call sel_read_ctl_field_on_psf_file                             &
      &     (id_control, hd_output_field, psf_c%fname_fld_on_psf,        &
-     &      psf_c%fld_on_psf_c, c_buf)
+     &      psf_c%fld_on_psf_c, c_buf, error_file)
+        if(error_file) return
 !
         call read_chara_ctl_type(c_buf, hd_psf_file_prefix,             &
-     &      psf_c%psf_file_head_ctl)
+     &      psf_c%psf_file_prefix_ctl)
+        call read_chara_ctl_type(c_buf, hd_psf_file_format,             &
+     &      psf_c%psf_file_format_ctl)
+!
         call read_chara_ctl_type(c_buf, hd_psf_file_head,               &
-     &      psf_c%psf_file_head_ctl)
+     &      psf_c%psf_file_prefix_ctl)
         call read_chara_ctl_type(c_buf, hd_psf_out_type,                &
-     &      psf_c%psf_output_type_ctl)
+     &      psf_c%psf_file_format_ctl)
       end do
       psf_c%i_psf_ctl = 1
 !
@@ -222,13 +231,13 @@
       if(psf_c%i_psf_ctl .le. 0) return
 !
       maxlen = len_trim(hd_psf_file_prefix)
-      maxlen = max(maxlen, len_trim(hd_psf_out_type))
+      maxlen = max(maxlen, len_trim(hd_psf_file_format))
 !
       level =  write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    psf_c%psf_file_head_ctl)
+     &    psf_c%psf_file_prefix_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    psf_c%psf_output_type_ctl)
+     &    psf_c%psf_file_format_ctl)
 !
       call sel_write_ctl_pvr_section_def(id_control, hd_surface_define, &
      &    psf_c%fname_section_ctl, psf_c%psf_def_c, level)
@@ -254,9 +263,9 @@
       call init_fld_on_psf_control(hd_output_field, psf_c%fld_on_psf_c)
 !
         call init_chara_ctl_item_label(hd_psf_file_prefix,              &
-     &      psf_c%psf_file_head_ctl)
-        call init_chara_ctl_item_label(hd_psf_out_type,                 &
-     &      psf_c%psf_output_type_ctl)
+     &      psf_c%psf_file_prefix_ctl)
+        call init_chara_ctl_item_label(hd_psf_file_format,              &
+     &      psf_c%psf_file_format_ctl)
 !
       end subroutine init_psf_ctl_stract
 !

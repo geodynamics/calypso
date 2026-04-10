@@ -140,7 +140,7 @@
 !
       ierr = 0
       call s_set_sections_file_ctl(default_psf_prefix,                  &
-     &    psf_c%psf_file_head_ctl, psf_c%psf_output_type_ctl,           &
+     &    psf_c%psf_file_prefix_ctl, psf_c%psf_file_format_ctl,         &
      &    psf_file_IO)
       if((psf_file_IO%iflag_format/iflag_single) .eq. 0) then
         psf_file_IO%iflag_format = psf_file_IO%iflag_format             &
@@ -153,8 +153,10 @@
         return
       end if
 !
-      call count_control_4_field_on_psf                                 &
-     &   (psf_c%fld_on_psf_c, num_nod_phys, phys_nod_name, psf_fld)
+      call count_control_4_field_on_psf(psf_c%fld_on_psf_c,             &
+     &    num_nod_phys, phys_nod_name, psf_fld, ierr)
+      if(ierr .gt. 0) return
+!
       call count_control_4_psf_define                                   &
      &   (psf_c%psf_def_c, ele_grp, psf_param, ierr)
 !

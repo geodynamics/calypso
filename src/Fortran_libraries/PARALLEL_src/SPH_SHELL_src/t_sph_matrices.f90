@@ -32,6 +32,13 @@
 !!        integer(kind = kint), intent(in) :: id_file
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(band_matrices_type), intent(in) :: smat
+!!      subroutine check_specific_radial_band_mat(my_rank, id_file,     &
+!!     &                                          l, m, sph_rj, smat)
+!!        integer, intent(in) :: my_rank
+!!        integer(kind = kint), intent(in) :: id_file
+!!        integer(kind = kint), intent(in) :: l, m
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(band_matrices_type), intent(in) :: smat
 !!@endverbatim
 !
       module t_sph_matrices
@@ -284,6 +291,45 @@
 !
 !
       end subroutine check_radial_band_mat
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_specific_radial_band_mat(my_rank, id_file,       &
+     &                                          l, m, sph_rj, smat)
+!
+      use t_spheric_rj_data
+      use check_single_radial_mat
+!
+      integer, intent(in) :: my_rank
+      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: l, m
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(band_matrices_type), intent(in) :: smat
+!
+      integer(kind = kint) :: j
+!
+!
+      j = find_local_sph_address(sph_rj, l, m)
+      if(j .le. 0) return
+!
+      write(id_file,'(a,4i6)') '(MPI_rank, global_j, l, m): ',          &
+     &                         my_rank, j, l, m
+!
+      if(smat%n_band .eq. ithree) then
+        call check_single_radial_3band_mat(id_file,                     &
+     &      smat%n_vect, sph_rj%radius_1d_rj_r, smat%mat(1,1,j))
+      else if(smat%n_band .eq. ifive) then
+        call check_single_radial_5band_mat(id_file,                     &
+     &      smat%n_vect, sph_rj%radius_1d_rj_r, smat%mat(1,1,j))
+      else if(smat%n_band .eq. iseven) then
+        call check_single_radial_7band_mat(id_file,                     &
+     &      smat%n_vect, sph_rj%radius_1d_rj_r, smat%mat(1,1,j))
+      else if(smat%n_band .eq. inine) then
+        call check_single_radial_9band_mat(id_file,                     &
+     &      smat%n_vect, sph_rj%radius_1d_rj_r, smat%mat(1,1,j))
+      end if
+!
+      end subroutine check_specific_radial_band_mat
 !
 ! -----------------------------------------------------------------------
 !

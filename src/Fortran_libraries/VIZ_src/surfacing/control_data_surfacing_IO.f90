@@ -8,12 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine init_surfacing_ctl_label(hd_block, surfacing_ctls)
-!!      subroutine s_read_surfacing_controls                            &
-!!     &         (id_control, hd_block, surfacing_ctls, c_buf)
-!!        integer(kind = kint), intent(in) :: id_control 
+!!      subroutine s_read_surfacing_controls(id_control, hd_block,      &
+!!     &          surfacing_ctls, c_buf, error_file)
+!!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(surfacing_controls), intent(inout) :: surfacing_ctls
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_surfacing_controls                             &
 !!     &         (id_control, hd_block, surfacing_ctls, level)
 !!        integer(kind = kint), intent(in) :: id_control 
@@ -45,7 +46,6 @@
 !
       use m_precision
       use m_machine_parameter
-      use calypso_mpi
 !
       use t_control_data_surfacings
       use t_control_data_sections
@@ -85,8 +85,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_read_surfacing_controls                              &
-     &         (id_control, hd_block, surfacing_ctls, c_buf)
+      subroutine s_read_surfacing_controls(id_control, hd_block,        &
+     &          surfacing_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use ctl_file_sections_IO
@@ -98,6 +98,7 @@
 !
       type(surfacing_controls), intent(inout) :: surfacing_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(surfacing_ctls%i_surfacing_control .gt. 0) return
@@ -113,9 +114,11 @@
 !
 !
         call read_files_4_psf_ctl(id_control, hd_section_ctl,           &
-     &      surfacing_ctls%psf_s_ctls, c_buf)
+     &      surfacing_ctls%psf_s_ctls, c_buf, error_file)
+        if(error_file) return
         call read_files_4_iso_ctl(id_control, hd_isosurf_ctl,           &
-     &      surfacing_ctls%iso_s_ctls, c_buf)
+     &      surfacing_ctls%iso_s_ctls, c_buf, error_file)
+        if(error_file) return
 !
         call read_real_ctl_type(c_buf, hd_delta_t_section,              &
      &      surfacing_ctls%delta_t_psf_s_ctl)

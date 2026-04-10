@@ -8,10 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine init_rms_sph_mhd_control(MHD_prop, sph_MHD_bc,       &
-!!     &          r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats, monitor,  &
-!!     &          SR_sig, SR_r)
+!!     &          refs, r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats,     &
+!!     &          monitor, SR_sig, SR_r)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!!        type(radial_reference_field), intent(in) :: refs
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(phys_data), intent(in) :: nod_fld
@@ -38,32 +39,6 @@
 !!      subroutine output_sph_mean_square_files                         &
 !!     &         (ene_labels, time_d, sph_params, sph_rj, pwr)
 !!        type(sph_mhd_monitor_data), intent(inout) :: monitor
-!!
-!!      subroutine cal_write_no_heat_sourse_Nu                          &
-!!     &         (is_scalar, is_source, is_grad_s, time_d, sph, sc_prop,&
-!!     &          sph_bc_S, sph_bc_U, bcs_S, fdm2_center, r_2nd,        &
-!!     &          band_s00_poisson_fixS, rj_fld, Nusselt)
-!!      subroutine cal_write_dipolarity(time_d, sph_params, sph_rj,     &
-!!     &          ipol, rj_fld, pwr, dip)
-!!      subroutine cal_write_typical_scale(time_d, sph_params, sph_rj,  &
-!!     &                                   sph_bc_U, rj_fld, pwr, tsl)
-!!        type(energy_label_param), intent(in) :: ene_labels
-!!        type(sph_shell_parameters), intent(in) :: sph_params
-!!        type(sph_grids), intent(in) :: sph
-!!        type(sph_boundary_type), intent(in) :: sph_bc_U
-!!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
-!!        type(legendre_4_sph_trans), intent(in) :: leg
-!!        type(band_matrix_type), intent(in) :: band_s00_poisson_fixS
-!!        type(phys_address), intent(in) :: ipol
-!!        type(phys_data), intent(in) :: rj_fld
-!!        type(sph_mean_squares), intent(inout) :: pwr
-!!        type(sph_mean_square_work), intent(inout) :: WK_pwr
-!!        type(picked_spectrum_data), intent(inout) :: pick_coef
-!!        type(picked_spectrum_data), intent(inout) :: gauss_coef
-!!        type(nusselt_number_data), intent(inout) :: Nusselt
-!!        type(dipolarity_data), intent(inout) :: dip
-!!        type(send_recv_status), intent(inout) :: SR_sig
-!!        type(typical_scale_data), intent(inout) :: tsl
 !!@endverbatim
 !
       module cal_write_sph_monitor_data
@@ -90,6 +65,7 @@
       use t_energy_label_parameters
       use t_fdm_coefs
       use t_physical_property
+      use t_radial_reference_field
       use t_radial_matrices_sph_MHD
       use t_sph_matrix
 !
@@ -104,8 +80,8 @@
 !  --------------------------------------------------------------------
 !
       subroutine init_rms_sph_mhd_control(MHD_prop, sph_MHD_bc,         &
-     &          r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats, monitor,    &
-     &          SR_sig, SR_r)
+     &          refs, r_2nd, trans_p, nod_fld, SPH_MHD, MHD_mats,       &
+     &          monitor, SR_sig, SR_r)
 !
       use t_solver_SR
       use cal_heat_source_Nu
@@ -114,6 +90,7 @@
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+      type(radial_reference_field), intent(in) :: refs
       type(fdm_matrices), intent(in) :: r_2nd
       type(parameters_4_sph_trans), intent(in) :: trans_p
       type(phys_data), intent(in) :: nod_fld
@@ -130,23 +107,26 @@
 !
      if(monitor%heat_Nusselt%iflag_Nusselt .eq. iflag_source_Nu) then
         write(mat_name,'(a)') 'Diffusive_Temperature'
-        call init_poisson_matrix_for_Nu                                 &
-     &     (mat_name, SPH_MHD%sph, r_2nd, MHD_prop%ht_prop,             &
-     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
-     &      MHD_mats%band_T00_poisson_fixT, monitor%heat_Nusselt)
+        call init_poisson_matrix_for_Nu(mat_name, SPH_MHD%sph, r_2nd,   &
+     &      MHD_prop%ht_prop, refs%ref_field, sph_MHD_bc%sph_bc_T,      &
+     &      sph_MHD_bc%fdm2_center, MHD_mats%band_T00_poisson_fixT,     &
+     &      monitor%heat_Nusselt)
       end if
 !
      if(monitor%comp_Nusselt%iflag_Nusselt .eq. iflag_source_Nu) then
         write(mat_name,'(a)') 'Diffusive_Composition'
-        call init_poisson_matrix_for_Nu                                 &
-     &     (mat_name, SPH_MHD%sph, r_2nd, MHD_prop%cp_prop,             &
-     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
-     &      MHD_mats%band_C00_poisson_fixC, monitor%comp_Nusselt)
+        call init_poisson_matrix_for_Nu(mat_name, SPH_MHD%sph, r_2nd,   &
+     &      MHD_prop%cp_prop, refs%ref_field, sph_MHD_bc%sph_bc_C,      &
+     &      sph_MHD_bc%fdm2_center, MHD_mats%band_C00_poisson_fixC,     &
+     &      monitor%comp_Nusselt)
       end if
 !
       call open_sph_vol_rms_file_mhd(SPH_MHD%sph, sph_MHD_bc%sph_bc_U,  &
      &   SPH_MHD%ipol, SPH_MHD%fld, monitor, SR_sig)
 !
+      monitor%elapsed_circle_init = 0.0d0
+      monitor%elapsed_circle_fft =  0.0d0
+      monitor%elapsed_circle_cpy =  0.0d0
       if(monitor%bench%iflag_dynamobench .gt. 0) then
         call init_circle_field_name_dbench(SPH_MHD%ipol,                &
      &      monitor%circ_mid_eq%d_circle, monitor%bench)
@@ -155,7 +135,8 @@
      &      monitor%circ_mid_eq)
         call init_circle_point_global                                   &
      &     (SPH_MHD%sph, SPH_MHD%comms, trans_p,                        &
-     &      monitor%circ_mid_eq, SR_sig, SR_r)
+     &      monitor%circ_mid_eq, monitor%elapsed_circle_init,           &
+     &      SR_sig, SR_r)
         call alloc_dynamobench_monitor(monitor%circ_mid_eq%d_circle,    &
      &                                 monitor%bench)
       end if
@@ -165,7 +146,8 @@
      &     (nod_fld, monitor%mul_circle%cdat(i)%d_circle)
         call init_circle_point_global                                   &
      &     (SPH_MHD%sph, SPH_MHD%comms, trans_p,                        &
-     &      monitor%mul_circle%cdat(i), SR_sig, SR_r)
+     &      monitor%mul_circle%cdat(i), monitor%elapsed_circle_init,    &
+     &      SR_sig, SR_r)
         call set_circle_transfer_address(nod_fld, SPH_MHD%fld,          &
      &                                   monitor%mul_circle%cdat(i))
       end do
@@ -216,6 +198,7 @@
       use cal_heat_source_Nu
       use cal_CMB_dipolarity
       use cal_typical_scale
+      use pick_CMB_average
       use const_data_4_dynamobench
       use sph_fwd_trans_on_circles
 !
@@ -254,6 +237,10 @@
      &      sph_MHD_bc%fdm2_center, MHD_mats%band_C00_poisson_fixC,     &
      &      rj_fld, monitor%comp_Nusselt)
       end if
+!!
+      if(iflag_debug.gt.0)  write(*,*) 's_pick_CMB_average'
+      call s_pick_CMB_average(sph%sph_rj, ipol, rj_fld,                 &
+     &                        monitor%ave_CMB)
 !
       if(iflag_debug.gt.0)  write(*,*) 's_cal_CMB_dipolarity'
       call s_cal_CMB_dipolarity(my_rank, rj_fld,                        &
@@ -265,12 +252,13 @@
 !
       call const_dynamobench_data                                       &
      &  (time_d, sph%sph_params, sph%sph_rj, sph_MHD_bc, trans_p,       &
-     &   ipol, rj_fld, monitor%pwr, monitor%circ_mid_eq, monitor%bench)
+     &   ipol, rj_fld, monitor%pwr, monitor%circ_mid_eq, monitor%bench, &
+     &    monitor%elapsed_circle_fft, monitor%elapsed_circle_cpy)
 !
-      call sph_forward_trans_on_circles(trans_p%iflag_FFT,              &
-     &    sph%sph_rj, rj_fld, monitor%mul_circle%num_circles,           &
-     &    monitor%mul_circle%cdat(1))
-      
+      call sph_forward_trans_on_circles                                 &
+     &   (trans_p%iflag_FFT, sph%sph_rj, rj_fld,                        &
+     &    monitor%mul_circle%num_circles, monitor%mul_circle%cdat(1),   &
+     &    monitor%elapsed_circle_fft, monitor%elapsed_circle_cpy)
 !
       end subroutine cal_sph_monitor_data
 !
@@ -327,6 +315,9 @@
      &      ipol%base%i_magne, monitor%dip)
       end if
 !
+      call write_CMB_average(time_d%i_time_step, time_d%time,           &
+     &    sph_params, sph_rj, monitor%ave_CMB)
+!
       call write_typical_scales(time_d%i_time_step, time_d%time,        &
      &    sph_params, sph_rj, sph_MHD_bc%sph_bc_U,                      &
      &    monitor%pwr, monitor%tsl)
@@ -362,8 +353,7 @@
       type(time_data), intent(in) :: time_d
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
-!
-      type(sph_mean_squares), intent(inout) :: pwr
+      type(sph_mean_squares), intent(in) :: pwr
 !
 !
       call write_sph_vol_ave_file                                       &
@@ -378,95 +368,6 @@
      &   (my_rank, ene_labels, time_d, sph_params, pwr)
 !
       end subroutine output_sph_mean_square_files
-!
-!  --------------------------------------------------------------------
-!  --------------------------------------------------------------------
-!
-      subroutine cal_write_no_heat_sourse_Nu                            &
-     &         (is_scalar, is_source, is_grad_s, time_d, sph, sc_prop,  &
-     &          sph_bc_S, sph_bc_U, bcs_S, fdm2_center, r_2nd,          &
-     &          band_s00_poisson_fixS, rj_fld, Nusselt)
-!
-      use pickup_gauss_coefficients
-      use cal_heat_source_Nu
-!
-      integer(kind = kint), intent(in) :: is_scalar, is_source
-      integer(kind = kint), intent(in) :: is_grad_s
-!
-      type(time_data), intent(in) :: time_d
-      type(sph_grids), intent(in) :: sph
-      type(fdm_matrices), intent(in) :: r_2nd
-      type(fdm2_center_mat), intent(in) :: fdm2_center
-      type(scalar_property), intent(in) :: sc_prop
-      type(sph_boundary_type), intent(in) :: sph_bc_S, sph_bc_U
-      type(sph_scalar_boundary_data), intent(in) :: bcs_S
-      type(phys_data), intent(in) :: rj_fld
-      type(band_matrix_type), intent(in) :: band_s00_poisson_fixS
-!
-      type(nusselt_number_data), intent(inout) :: Nusselt
-!
-!
-      if(Nusselt%iflag_Nusselt .eq. 0) return
-      call sel_Nusselt_routine(is_scalar, is_source, is_grad_s,         &
-     &    sph, r_2nd, sc_prop, sph_bc_S, sph_bc_U, bcs_S,               &
-     &    fdm2_center, band_s00_poisson_fixS, rj_fld, Nusselt)
-      call write_Nusselt_file(time_d%i_time_step, time_d%time,          &
-     &    sph%sph_params%l_truncation, sph%sph_rj%nidx_rj(1),           &
-     &    sph%sph_params%nlayer_ICB, sph%sph_params%nlayer_CMB,         &
-     &    sph%sph_rj%idx_rj_degree_zero, Nusselt)
-!
-      end subroutine cal_write_no_heat_sourse_Nu
-!
-!  --------------------------------------------------------------------
-!
-      subroutine cal_write_dipolarity(time_d, sph_params, sph_rj,       &
-     &          ipol, rj_fld, pwr, dip)
-!
-      use cal_CMB_dipolarity
-!
-      type(time_data), intent(in) :: time_d
-      type(sph_shell_parameters), intent(in) :: sph_params
-      type(sph_rj_grid), intent(in) :: sph_rj
-      type(phys_address), intent(in) :: ipol
-      type(phys_data), intent(in) :: rj_fld
-!
-      type(sph_mean_squares), intent(inout) :: pwr
-      type(dipolarity_data), intent(inout) :: dip
-!
-!
-      call s_cal_CMB_dipolarity(my_rank, rj_fld, pwr, dip)
-!
-      if(my_rank .eq. pwr%irank_l) then
-        call write_dipolarity(time_d%i_time_step, time_d%time,          &
-     &      sph_params%l_truncation, sph_rj%nidx_rj(1),                 &
-     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
-     &      ipol%base%i_magne, dip)
-      end if
-!
-      end subroutine cal_write_dipolarity
-!
-!  --------------------------------------------------------------------
-!
-      subroutine cal_write_typical_scale(time_d, sph_params, sph_rj,    &
-     &                                   sph_bc_U, pwr, tsl)
-!
-      use cal_typical_scale
-      use write_typical_scale
-!
-      type(time_data), intent(in) :: time_d
-      type(sph_shell_parameters), intent(in) :: sph_params
-      type(sph_rj_grid), intent(in) :: sph_rj
-      type(sph_boundary_type), intent(in) :: sph_bc_U
-      type(sph_mean_squares), intent(in) :: pwr
-!
-      type(typical_scale_data), intent(inout) :: tsl
-!
-!
-      call cal_typical_scales(pwr, tsl)
-      call write_typical_scales(time_d%i_time_step, time_d%time,        &
-     &    sph_params, sph_rj, sph_bc_U, pwr, tsl)
-!
-      end subroutine cal_write_typical_scale
 !
 !  --------------------------------------------------------------------
 !

@@ -23,6 +23,7 @@
       use t_phys_address
       use t_control_parameter
       use t_physical_property
+      use t_scalar_property
       use t_coef_parameters_list
       use calypso_mpi
 !
@@ -155,7 +156,7 @@
         if(fl_prop%flag_coriolis) write(*,*)                            &
      &         'coefficient for coriolis force:      ',                 &
      &              fl_prop%coef_cor
-        if(fl_prop%flag_lorentz) write(*,*)                          &
+        if(fl_prop%flag_lorentz) write(*,*)                             &
      &         'coefficient for Lorentz force:       ',                 &
      &              fl_prop%coef_lor
         end if

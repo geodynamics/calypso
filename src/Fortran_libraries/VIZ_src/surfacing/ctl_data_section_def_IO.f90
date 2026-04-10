@@ -46,9 +46,6 @@
 !!  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  
-!!      psf_output_type:
-!!           ucd, OpenDX
-!!
 !!    num_result_comp: number of fields
 !!    output_field: (Original name: color_comp and color_subcomp)
 !!         field and componenet name for output

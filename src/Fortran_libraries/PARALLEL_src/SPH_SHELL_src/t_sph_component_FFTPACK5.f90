@@ -74,11 +74,12 @@
 !
       module t_sph_component_FFTPACK5
 !
+      use omp_lib
+!
       use m_precision
       use m_constants
       use m_machine_parameter
       use m_elapsed_labels_SPH_TRNS
-      use calypso_mpi
 !
       use t_spheric_rtp_data
       use t_sph_trans_comm_tbl
@@ -98,9 +99,6 @@
         real(kind = 8), allocatable :: X(:,:)
 !>        Work area for FFTPACK
         real(kind = 8), allocatable :: WK(:,:)
-!
-!>        temporal area for time count
-        real(kind = kreal), allocatable :: t_omp(:,:)
       end type work_for_comp_fftpack
 !
       private :: alloc_work_comp_FFTPACK, alloc_const_comp_FFTPACK
@@ -131,9 +129,6 @@
       call alloc_work_comp_FFTPACK                                      &
      &   (sph_rtp%nidx_rtp(3), ncomp_bwd, ncomp_fwd,fftpack_t)
 !
-      allocate(fftpack_t%t_omp(np_smp,0:3))
-      fftpack_t%t_omp = 0.0d0
-!
       end subroutine init_sph_comp_FFTPACK5
 !
 ! ------------------------------------------------------------------
@@ -145,7 +140,6 @@
 !
       call dealloc_const_comp_FFTPACK(fftpack_t)
       call dealloc_work_comp_FFTPACK(fftpack_t)
-      deallocate(fftpack_t%t_omp)
 !
       end subroutine finalize_sph_comp_FFTPACK5
 !
@@ -209,54 +203,51 @@
 !
       type(work_for_comp_fftpack), intent(inout) :: fftpack_t
 !
+      real(kind = kreal) :: start = 0.0d0
+      real(kind = kreal) :: elps_smp(3)
       integer(kind = kint) :: j, ip, nsize, ist, ied, ierr
 !
 !
-      if(iflag_FFT_time) then
-!$omp parallel workshare
-        fftpack_t%t_omp(1:np_smp,0:3) = 0
-!$omp end parallel workshare
-      end if
+      if(iflag_FFT_time)  elps_smp(1:3) = 0.0d0
 !
-!$omp parallel do private(ip,j,ist,ied,nsize)
+!$omp parallel do private(ip,j,ist,ied,nsize,start)                     &
+!$omp& reduction(+:elps_smp)
       do ip = 1, np_smp
+        start = 0.0d0
         ist = sph_rtp%istack_rtp_rt_smp(ip-1) + 1
         ied = sph_rtp%istack_rtp_rt_smp(ip)
         nsize = ncomp_fwd*sph_rtp%nidx_rtp(3)
         do j = ist, ied
 !
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
+          if(iflag_FFT_time) start = OMP_GET_WTIME()
           call sel_copy_comp_rtp_to_FFT                                 &
      &       (j, sph_rtp%nnod_rtp, sph_rtp%istep_rtp(3),                &
      &        sph_rtp%istack_rtp_rt_smp(np_smp), sph_rtp%nidx_rtp(3),   &
      &        ncomp_fwd, X_rtp(1,1), fftpack_t%X(1,ip))
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,1)                      &
-     &                      = fftpack_t%t_omp(ip,1)                     &
-     &                       + MPI_WTIME() - fftpack_t%t_omp(ip,0)
+          if(iflag_FFT_time) elps_smp(1) = elps_smp(1)                  &
+     &                                  + OMP_GET_WTIME() - start
 !
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
+          if(iflag_FFT_time) start = OMP_GET_WTIME()
           call RFFTMF(ncomp_fwd, ione, sph_rtp%nidx_rtp(3), ncomp_fwd,  &
      &        fftpack_t%X(1,ip), nsize, fftpack_t%WSV, fftpack_t%NSV,   &
      &        fftpack_t%WK(1,ip), nsize, ierr)
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,2)                      &
-     &                      = fftpack_t%t_omp(ip,2)                     &
-     &                       + MPI_WTIME() - fftpack_t%t_omp(ip,0)
+          if(iflag_FFT_time) elps_smp(2) = elps_smp(2)                  &
+     &                                  + OMP_GET_WTIME() - start
 !
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
+          if(iflag_FFT_time) start = OMP_GET_WTIME()
           call copy_comp_RFFTMF_to_send(j, sph_rtp%nnod_rtp,            &
      &        sph_rtp%nidx_rtp(3), sph_rtp%istep_rtp, comm_rtp%irev_sr, &
      &        ncomp_fwd, fftpack_t%X(1,ip), n_WS, WS)
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,3)                      &
-     &                      = fftpack_t%t_omp(ip,3)                     &
-     &                       + MPI_WTIME() - fftpack_t%t_omp(ip,0)
-!
+          if(iflag_FFT_time) elps_smp(3) = elps_smp(3)                  &
+     &                                  + OMP_GET_WTIME() - start
         end do
       end do
 !$omp end parallel do
 !
       if(iflag_FFT_time) then
-        call sum_omp_elapsed_4_FFT(np_smp, fftpack_t%t_omp(1,1),        &
-     &      elps1%elapsed(ist_elapsed_FFT+4))
+        ist = ist_elapsed_FFT
+        elps1%elapsed(ist+4:ist+6) = elps1%elapsed(ist+4:ist+6)         &
+     &                              + elps_smp(1:3) / dble(np_smp)
       end if
 !
       end subroutine sph_comp_RFFTMF_to_send
@@ -280,54 +271,52 @@
 !
       type(work_for_comp_fftpack), intent(inout) :: fftpack_t
 !
+      real(kind = kreal) :: start = 0.0d0
+      real(kind = kreal) :: elps_smp(3)
       integer(kind = kint) ::  j, ip, inum, nsize, ist, ied, ierr
 !
 !
-      if(iflag_FFT_time) then
-!$omp parallel workshare
-        fftpack_t%t_omp(1:np_smp,0:3) = 0
-!$omp end parallel workshare
-      end if
+      if(iflag_FFT_time)  elps_smp(1:3) = 0.0d0
 !
-!$omp parallel do private(ip,j,ist,ied,inum,nsize)
+!$omp parallel do private(ip,j,ist,ied,inum,nsize,start)                &
+!$omp& reduction(+:elps_smp)
       do ip = 1, np_smp
+        start = 0.0d0
         ist = sph_rtp%istack_rtp_rt_smp(ip-1) + 1
         ied = sph_rtp%istack_rtp_rt_smp(ip)
         nsize = ncomp_bwd*sph_rtp%nidx_rtp(3)
         do j = ist, ied
 !
 !   normalization
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
+          if(iflag_FFT_time) start = OMP_GET_WTIME()
           call copy_comp_RFFTMB_from_recv(j, sph_rtp%nnod_rtp,          &
      &        sph_rtp%nidx_rtp(3), sph_rtp%istep_rtp, comm_rtp%irev_sr, &
      &        ncomp_bwd, n_WR, WR, fftpack_t%X(1,ip))
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,1)                      &
-     &                      = fftpack_t%t_omp(ip,1)                     &
-     &                       + MPI_WTIME() - fftpack_t%t_omp(ip,0)
+          if(iflag_FFT_time) elps_smp(1) = elps_smp(1)                  &
+     &                                  + OMP_GET_WTIME() - start
 !
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
+          if(iflag_FFT_time) start = OMP_GET_WTIME()
           call RFFTMB(ncomp_bwd, ione, sph_rtp%nidx_rtp(3), ncomp_bwd,  &
      &        fftpack_t%X(1,ip), nsize, fftpack_t%WSV, fftpack_t%NSV,   &
      &        fftpack_t%WK(1,ip), nsize, ierr)
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,2)                      &
-     &                      = fftpack_t%t_omp(ip,2)                     &
-     &                       + MPI_WTIME() - fftpack_t%t_omp(ip,0)
+          if(iflag_FFT_time) elps_smp(2) = elps_smp(2)                  &
+     &                                  + OMP_GET_WTIME() - start
 !
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
+          if(iflag_FFT_time) start = OMP_GET_WTIME()
           call sel_copy_comp_FFT_to_rtp                                 &
      &       (j, sph_rtp%nnod_rtp, sph_rtp%istep_rtp(3),                &
      &        sph_rtp%istack_rtp_rt_smp(np_smp), sph_rtp%nidx_rtp(3),   &
      &        ncomp_bwd, fftpack_t%X(1,ip), X_rtp(1,1))
-          if(iflag_FFT_time) fftpack_t%t_omp(ip,3)                      &
-     &                      = fftpack_t%t_omp(ip,3)                     &
-     &                       + MPI_WTIME() - fftpack_t%t_omp(ip,0)
+          if(iflag_FFT_time) elps_smp(3) = elps_smp(3)                  &
+     &                                  + OMP_GET_WTIME() - start
         end do
       end do
 !$omp end parallel do
 !
       if(iflag_FFT_time) then
-        call sum_omp_elapsed_4_FFT(np_smp, fftpack_t%t_omp(1,1),        &
-     &      elps1%elapsed(ist_elapsed_FFT+1))
+        ist = ist_elapsed_FFT
+        elps1%elapsed(ist+1:ist+3) = elps1%elapsed(ist+1:ist+3)         &
+     &                              + elps_smp(1:3) / dble(np_smp)
       end if
 !
       end subroutine sph_comp_RFFTMB_from_recv

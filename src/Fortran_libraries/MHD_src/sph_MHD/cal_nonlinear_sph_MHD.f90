@@ -39,23 +39,6 @@
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(base_field_address), intent(in) :: b_trns_base
 !!        type(base_force_address), intent(in) :: f_trns_frc
-!!      subroutine add_ref_advect_sph_MHD(sph_rj, sph_MHD_bc, MHD_prop, &
-!!     &          leg, refs, ipol, rj_fld)
-!!       Input ::  rj_fld(1,is_fld)
-!!               is_fld = i_velo, forces%i_h_advect, forces%i_c_advect
-!!       Output :: rj_fld(1,is_fld)
-!!               is_fld = forces%i_h_advect, forces%i_c_advect
-!!        type(sph_rj_grid), intent(in) ::  sph_rj
-!!        type(MHD_evolution_param), intent(in) :: MHD_prop
-!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!!        type(legendre_4_sph_trans), intent(in) :: leg
-!!        type(phys_address), intent(in) :: ipol
-!!        type(radial_reference_field), intent(in) :: refs
-!!        type(phys_data), intent(inout) :: rj_fld
-!!      subroutine add_reference_advect_sph                             &
-!!     &         (kr_in, kr_out, nidx_rj, ar_1d_rj, g_sph_rj,           &
-!!     &          coef_advect, is_h_advect, is_velo,                    &
-!!     &          nnod_rj, ntot_phys_rj, reftemp_rj, d_rj)
 !!@endverbatim
 !!
 !!@n @param kr_in       Radial ID for inner boundary
@@ -82,8 +65,6 @@
       use t_addresses_sph_transform
 !
       implicit none
-!
-      private :: add_reference_advect_sph
 !
 !-----------------------------------------------------------------------
 !
@@ -158,6 +139,7 @@
      &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_frc, frc_rtp)
 !
       use cal_products_smp
+      use cal_vector_products
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(base_field_address), intent(in) :: b_trns_base
@@ -169,7 +151,7 @@
       real(kind = kreal), intent(inout) :: frc_rtp(nnod,ntot_comp_frc)
 !
       if(f_trns_frc%i_m_advect .gt. 0) then
-        call cal_cross_prod_w_coef_smp                                  &
+        call cal_cross_product_w_coef                                   &
      &     (nnod, MHD_prop%fl_prop%coef_velo,                           &
      &      fld_rtp(1,b_trns_base%i_vort),                              &
      &      fld_rtp(1,b_trns_base%i_velo),                              &
@@ -177,14 +159,14 @@
       end if
 !
       if(f_trns_frc%i_lorentz .gt. 0) then
-        call cal_cross_prod_w_coef_smp                                  &
+        call cal_cross_product_w_coef                                   &
      &     (nnod, MHD_prop%fl_prop%coef_lor,                            &
      &      fld_rtp(1,b_trns_base%i_current),                           &
      &      fld_rtp(1,b_trns_base%i_magne),                             &
      &      frc_rtp(1,f_trns_frc%i_lorentz) )
 !
         if(b_trns_base%i_back_B .gt. 0) then
-          call add_cross_prod_w_coef_smp                                &
+          call add_cross_product_w_coef                                 &
      &       (nnod, MHD_prop%fl_prop%coef_lor,                          &
      &        fld_rtp(1,b_trns_base%i_current),                         &
      &        fld_rtp(1,b_trns_base%i_back_B),                          &
@@ -194,14 +176,14 @@
 !
 !
       if(f_trns_frc%i_vp_induct .gt. 0) then
-        call cal_cross_prod_w_coef_smp                                  &
+        call cal_cross_product_w_coef                                   &
      &     (nnod, MHD_prop%cd_prop%coef_induct,                         &
      &      fld_rtp(1,b_trns_base%i_velo),                              &
      &      fld_rtp(1,b_trns_base%i_magne),                             &
      &      frc_rtp(1,f_trns_frc%i_vp_induct) )
 !
         if(b_trns_base%i_back_B .gt. 0) then
-          call add_cross_prod_w_coef_smp                                &
+          call add_cross_product_w_coef                                 &
      &       (nnod, MHD_prop%cd_prop%coef_induct,                       &
      &        fld_rtp(1,b_trns_base%i_velo),                            &
      &        fld_rtp(1,b_trns_base%i_back_B),                          &
@@ -211,7 +193,7 @@
 !
 !
       if(f_trns_frc%i_h_flux .gt. 0) then
-        call cal_vec_scalar_prod_w_coef_smp                             &
+        call cal_vec_scalar_product_w_coef                              &
      &     (nnod, MHD_prop%ht_prop%coef_advect,                         &
      &      fld_rtp(1,b_trns_base%i_velo),                              &
      &      fld_rtp(1,b_trns_base%i_temp),                              &
@@ -219,7 +201,7 @@
       end if
 !
       if(f_trns_frc%i_c_flux .gt. 0) then
-        call cal_vec_scalar_prod_w_coef_smp                             &
+        call cal_vec_scalar_product_w_coef                              &
      &     (nnod, MHD_prop%cp_prop%coef_advect,                         &
      &      fld_rtp(1,b_trns_base%i_velo),                              &
      &      fld_rtp(1,b_trns_base%i_light),                             &
@@ -236,6 +218,7 @@
      &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_frc, frc_rtp)
 !
       use cal_products_smp
+      use cal_vector_products
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(base_field_address), intent(in) :: b_trns_base_1
@@ -249,7 +232,7 @@
 !
 !
       if(f_trns_frc%i_m_advect .gt. 0) then
-        call cal_cross_prod_w_coef_smp                                  &
+        call cal_cross_product_w_coef                                   &
      &     (nnod, MHD_prop%fl_prop%coef_velo,                           &
      &      fld_rtp(1,b_trns_base_1%i_vort),                            &
      &      fld_rtp(1,b_trns_base_2%i_velo),                            &
@@ -257,14 +240,14 @@
       end if
 !
       if(f_trns_frc%i_lorentz .gt. 0) then
-        call cal_cross_prod_w_coef_smp                                  &
+        call cal_cross_product_w_coef                                   &
      &     (nnod, MHD_prop%fl_prop%coef_lor,                            &
      &      fld_rtp(1,b_trns_base_1%i_current),                         &
      &      fld_rtp(1,b_trns_base_2%i_magne),                           &
      &      frc_rtp(1,f_trns_frc%i_lorentz) )
 !
         if(b_trns_base_2%i_back_B .gt. 0) then
-          call add_cross_prod_w_coef_smp                                &
+          call add_cross_product_w_coef                                 &
      &       (nnod, MHD_prop%fl_prop%coef_lor,                          &
      &        fld_rtp(1,b_trns_base_1%i_current),                       &
      &        fld_rtp(1,b_trns_base_2%i_back_B),                        &
@@ -274,14 +257,14 @@
 !
 !
       if(f_trns_frc%i_vp_induct .gt. 0) then
-        call cal_cross_prod_w_coef_smp                                  &
+        call cal_cross_product_w_coef                                   &
      &     (nnod, MHD_prop%cd_prop%coef_induct,                         &
      &      fld_rtp(1,b_trns_base_1%i_velo),                            &
      &      fld_rtp(1,b_trns_base_2%i_magne),                           &
      &      frc_rtp(1,f_trns_frc%i_vp_induct) )
 !
         if(b_trns_base_2%i_back_B .gt. 0) then
-          call add_cross_prod_w_coef_smp                                &
+          call add_cross_product_w_coef                                 &
      &       (nnod, MHD_prop%cd_prop%coef_induct,                       &
      &        fld_rtp(1,b_trns_base_1%i_velo),                          &
      &        fld_rtp(1,b_trns_base_2%i_back_B),                        &
@@ -291,7 +274,7 @@
 !
 !
       if(f_trns_frc%i_h_flux .gt. 0) then
-        call cal_vec_scalar_prod_w_coef_smp                             &
+        call cal_vec_scalar_product_w_coef                              &
      &     (nnod, MHD_prop%ht_prop%coef_advect,                         &
      &      fld_rtp(1,b_trns_base_1%i_velo),                            &
      &      fld_rtp(1,b_trns_base_2%i_temp),                            &
@@ -299,7 +282,7 @@
       end if
 !
       if(f_trns_frc%i_c_flux .gt. 0) then
-        call cal_vec_scalar_prod_w_coef_smp                             &
+        call cal_vec_scalar_product_w_coef                              &
      &     (nnod, MHD_prop%cp_prop%coef_advect,                         &
      &      fld_rtp(1,b_trns_base_1%i_velo),                            &
      &      fld_rtp(1,b_trns_base_2%i_light),                           &
@@ -307,78 +290,6 @@
       end if
 !
       end subroutine nonlinear_terms_on_node_w_sym
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine add_ref_advect_sph_MHD(sph_rj, sph_MHD_bc, MHD_prop,   &
-     &          leg, refs, ipol, rj_fld)
-!
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(phys_address), intent(in) :: ipol
-!
-      type(radial_reference_field), intent(in) :: refs
-!
-      type(phys_data), intent(inout) :: rj_fld
-!
-!
-!   ----  Lead advection of reference field
-        call add_reference_advect_sph(sph_MHD_bc%sph_bc_T,              &
-     &      MHD_prop%ht_prop, MHD_prop%ref_param_T,                     &
-     &      sph_rj%nidx_rj, sph_rj%ar_1d_rj, leg%g_sph_rj,              &
-     &      ipol%forces%i_h_advect, ipol%base%i_velo,                   &
-     &      refs%ref_field%d_fld(1,refs%iref_grad%i_grad_temp),         &
-     &      rj_fld)
-        call add_reference_advect_sph(sph_MHD_bc%sph_bc_C,              &
-     &      MHD_prop%cp_prop, MHD_prop%ref_param_C,                     &
-     &      sph_rj%nidx_rj, sph_rj%ar_1d_rj, leg%g_sph_rj,              &
-     &      ipol%forces%i_c_advect, ipol%base%i_velo,                   &
-     &      refs%ref_field%d_fld(1,refs%iref_grad%i_grad_composit),     &
-     &      rj_fld)
-!
-      end subroutine add_ref_advect_sph_MHD
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine add_reference_advect_sph                               &
-     &         (sph_bc_S, property, ref_param_S,                        &
-     &          nidx_rj, ar_1d_rj, g_sph_rj, is_h_advect, is_velo,      &
-     &          refgrad_r, rj_fld)
-!
-      integer(kind = kint), intent(in) :: nidx_rj(2)
-      integer(kind = kint), intent(in) :: is_h_advect, is_velo
-      real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)
-      real(kind = kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
-      real(kind = kreal), intent(in) :: refgrad_r(0:nidx_rj(1))
-      type(sph_boundary_type), intent(in) :: sph_bc_S
-      type(scalar_property), intent(in) :: property
-      type(reference_scalar_param), intent(in) :: ref_param_S
-!
-      type(phys_data), intent(inout) :: rj_fld
-!
-      integer(kind= kint) :: ist, ied, inod, j, k
-!
-!
-      if(ref_param_S%flag_ref_field .eqv. .FALSE.) return
-!
-      ist = (sph_bc_S%kr_in-1) * nidx_rj(2) + 1
-      ied =  sph_bc_S%kr_out * nidx_rj(2)
-!$omp parallel do private (inod,j,k)
-      do inod = ist, ied
-        j = mod((inod-1),nidx_rj(2)) + 1
-        k = 1 + (inod- j) / nidx_rj(2)
-!
-        rj_fld%d_fld(inod,is_h_advect) = rj_fld%d_fld(inod,is_h_advect) &
-     &           + property%coef_advect * g_sph_rj(j,3) * ar_1d_rj(k,2) &
-     &            * refgrad_r(k) * rj_fld%d_fld(inod,is_velo)
-      end do
-!$omp end parallel do
-!
-      end subroutine add_reference_advect_sph
 !
 !-----------------------------------------------------------------------
 !

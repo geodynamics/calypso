@@ -21,6 +21,7 @@
 !
       use t_control_array_character3
       use t_physical_property
+      use t_scalar_property
 !
       implicit  none
 !
@@ -103,9 +104,9 @@
         end if
 !   thermal buoyancy flag
         if(fl_prop%flag_thermal_buoyancy) then
-          call add_phys_name_ctl(buoyancy, field_ctl)
-          call add_phys_name_ctl(rot_buoyancy, field_ctl)
-          call add_phys_name_ctl(div_buoyancy, field_ctl)
+          call add_phys_name_ctl(thermal_buoyancy, field_ctl)
+          call add_phys_name_ctl(rot_thermal_buoyancy, field_ctl)
+          call add_phys_name_ctl(div_thermal_buoyancy, field_ctl)
         end if
 !   compositional buoyancy flag
         if(fl_prop%flag_comp_buoyancy) then

@@ -28,6 +28,7 @@
 !!        type(val_diffuse_ctl), intent(in) :: vdiffuse_c
 !!        type(val_diffuse_ctl), intent(inout) :: new_vdiffuse_c
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
 !!    begin viscosity_ctl
 !!      radial_variation_ctl      ON
 !!      variation_file_name    'viscous_variation.dat'
@@ -37,6 +38,10 @@
 !!        diffusivity_list_ctl      1.03846   1.05
 !!        diffusivity_list_ctl      1.53846   1.0
 !!      end array diffusivity_list_ctl
+!!!
+!!      ICB_reduction_radius    0.53846154
+!!      ICB_reduction_ratio     0.1
+!!      ICB_reduction_width     0.001
 !!    end   viscosity_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -49,6 +54,7 @@
       use m_machine_parameter
       use t_read_control_elements
       use t_control_array_character
+      use t_control_array_real
       use t_control_array_real2
       use skip_comment_f
 !
@@ -67,6 +73,13 @@
 !>        list of diffusivity
         type(ctl_array_r2) ::        diffusivity_list_ctl
 !
+!>        Latent heat point (Radius)
+        type(read_real_item) :: ICB_reduction_radius
+!>        Ratio of diffusivity reduction by the latent heat
+        type(read_real_item) :: ICB_reduction_ratio
+!>        Width of diffusivity reduction by the latent heat
+        type(read_real_item) :: ICB_reduction_width
+!
 !>        loaded flag
         integer (kind=kint) :: i_val_diffuse = 0
       end type val_diffuse_ctl
@@ -80,6 +93,17 @@
 !
       character(len=kchara), parameter, private                         &
      &                 :: hd_diffusivity_list = 'diffusivity_list_ctl'
+!
+      character(len=kchara), parameter, private                         &
+     &    :: hd_diff_reduce_radius = 'ICB_reduction_radius'
+      character(len=kchara), parameter, private                         &
+     &    :: hd_diff_reduce_ratio =  'ICB_reduction_ratio'
+      character(len=kchara), parameter, private                         &
+     &    :: hd_diff_reduce_width =  'ICB_reduction_width'
+!
+!    Deprecated label
+      character(len=kchara), parameter, private                         &
+     &    :: hd_diffusivity_reduction = 'ICB_diffusivity_reduction_ctl'
 !
 !  ---------------------------------------------------------------------
 !
@@ -112,6 +136,16 @@
 !
         call read_control_array_r2(id_control, hd_diffusivity_list,     &
      &      vdiffuse_ctl%diffusivity_list_ctl, c_buf)
+!
+        call read_real_ctl_type(c_buf, hd_diff_reduce_ratio,            &
+     &                          vdiffuse_ctl%ICB_reduction_ratio)
+        call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
+     &                          vdiffuse_ctl%ICB_reduction_ratio)
+!
+        call read_real_ctl_type(c_buf, hd_diff_reduce_width,            &
+     &                          vdiffuse_ctl%ICB_reduction_width)
+        call read_real_ctl_type(c_buf, hd_diff_reduce_radius,           &
+     &                          vdiffuse_ctl%ICB_reduction_radius)
       end do
       vdiffuse_ctl%i_val_diffuse = 1
 !
@@ -136,6 +170,9 @@
 !
       maxlen = len_trim(hd_r_variation)
       maxlen = max(maxlen, len_trim(hd_val_file_name))
+      maxlen = max(maxlen, len_trim(hd_diff_reduce_ratio))
+      maxlen = max(maxlen, len_trim(hd_diff_reduce_width))
+      maxlen = max(maxlen, len_trim(hd_diff_reduce_radius))
 !
       level = write_begin_flag_for_ctl(id_control, level,               &
      &                                 vdiffuse_ctl%block_name)
@@ -143,6 +180,13 @@
      &                          vdiffuse_ctl%r_variation_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &                          vdiffuse_ctl%variation_file_name)
+!
+      call write_real_ctl_type(id_control, level, maxlen,               &
+&                              vdiffuse_ctl%ICB_reduction_radius)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+&                              vdiffuse_ctl%ICB_reduction_ratio)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+&                              vdiffuse_ctl%ICB_reduction_width)
 !
       call write_control_array_r2(id_control, level,                    &
      &                            vdiffuse_ctl%diffusivity_list_ctl)
@@ -169,6 +213,13 @@
         call init_r2_ctl_array_label                                    &
      &     (hd_diffusivity_list, vdiffuse_ctl%diffusivity_list_ctl)
 !
+        call init_real_ctl_item_label(hd_diff_reduce_radius,            &
+     &      vdiffuse_ctl%ICB_reduction_radius)
+        call init_real_ctl_item_label(hd_diff_reduce_ratio,             &
+     &      vdiffuse_ctl%ICB_reduction_ratio)
+        call init_real_ctl_item_label(hd_diff_reduce_width,             &
+     &      vdiffuse_ctl%ICB_reduction_width)
+!
       end subroutine init_val_diffuse_ctl_label
 !
 !  ---------------------------------------------------------------------
@@ -186,6 +237,10 @@
      &  (vdiffuse_ctl%diffusivity_list_ctl)
       vdiffuse_ctl%diffusivity_list_ctl%num =  0
       vdiffuse_ctl%diffusivity_list_ctl%icou = 0
+!
+      vdiffuse_ctl%ICB_reduction_radius%iflag = 0
+      vdiffuse_ctl%ICB_reduction_ratio%iflag =  0
+      vdiffuse_ctl%ICB_reduction_width%iflag =  0
 !
       vdiffuse_ctl%i_val_diffuse =      0
 !

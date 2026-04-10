@@ -36,11 +36,12 @@
       implicit none
 !
       character(len = kchara), parameter, private                       &
-     &               :: ctl_file_name = 'control_assemble_sph'
+     &             :: ctl_file_name = 'control_assemble_sph'
 !
       type(control_param_assemble), save :: asbl_param_s
       type(spectr_data_4_assemble), save :: sph_asbl_s
       type(time_data), save :: init_t
+      real(kind = kreal) :: delta = TINY
 !
 ! ----------------------------------------------------------------------
 !
@@ -63,12 +64,18 @@
       type(control_data_4_merge) :: mgd_ctl_s
       type(sph_grid_maker_in_sim) :: sph_org_maker_s
       integer(kind = kint) :: istep_in
+      logical :: error_file = .FALSE.
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
 !
-      if(my_rank .eq. 0) call read_control_assemble_sph                 &
-     &                       (ctl_file_name, mgd_ctl_s)
+      error_file = .FALSE.
+      if(my_rank .eq. 0) then
+        call read_control_assemble_sph(ctl_file_name,                   &
+     &                                 mgd_ctl_s, error_file)
+        if(error_file) call calypso_mpi_abort(ierr_file,                &
+     &                                      "Missing control file")
+      end if
       call bcast_merge_control_data(mgd_ctl_s)
 !
       if(mgd_ctl_s%i_assemble .ne. 1) then
@@ -78,6 +85,7 @@
 !
       call set_control_4_newsph(mgd_ctl_s, asbl_param_s, sph_asbl_s,    &
      &    sph_org_maker_s, sph_asbl_s%new_sph_data)
+      delta = error_threshold_2_compare(mgd_ctl_s%delta_to_compare_ctl)
 !
       call alloc_spectr_data_4_assemble(sph_asbl_s)
 !
@@ -131,13 +139,17 @@
 !
       integer(kind = kint) :: istep, istep_in, istep_out
       integer(kind = kint) :: iflag, iflag_gl
+      character(len=kchara) :: charaint
 !
 !
 !     ---------------------
 !
       do istep = asbl_param_s%istep_start, asbl_param_s%istep_end
         if(mod(istep, asbl_param_s%increment_step) .ne. 0) cycle
+!
         istep_in = istep / asbl_param_s%increment_step
+        if(i_debug .gt. 0) write(my_rank+100,*)                         &
+     &                   'restart file step: ', istep_in
 !
 !     Load original spectr data
         call load_org_sph_data(istep_in, asbl_param_s%org_fld_file,     &
@@ -163,7 +175,7 @@
      &     (nprocs, my_rank, istep_out, asbl_param_s%new_fld_file,      &
      &      sph_asbl_s%fst_time_IO, sph_asbl_s%new_fst_IO)
 !
-        iflag = compare_assembled_sph_data(my_rank, init_t,             &
+        iflag = compare_assembled_sph_data(delta, init_t,               &
      &        sph_asbl_s%new_sph_data%sph, sph_asbl_s%new_sph_data%fld, &
      &        sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
 !
@@ -186,7 +198,13 @@
       call dealloc_spectr_data_4_assemble(sph_asbl_s)
 !
       call calypso_MPI_barrier
-      if (iflag_debug.eq.1) write(*,*) 'exit evolution'
+!
+      if(my_rank .eq. 0) then
+        open(999,file='flag.txt')
+        write(charaint,*) iflag_gl
+        write(999,'(a)') trim(ADJUSTL(charaint))
+        close(999)
+      end if
 !
       end subroutine analyze_compare_sph_restart
 !

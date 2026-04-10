@@ -7,11 +7,12 @@
 !>@brief  Set reference sources from field data
 !!
 !!@verbatim
-!!      subroutine cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
-!!        type(sph_grids), intent(in) :: sph
-!!        type(phys_address), intent(in) :: ipol
+!!      subroutine set_reference_source_from_rst                        &
+!!     &         (sph_rj, ipol_source, rj_fld, iref_source, ref_field)
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_data), intent(in) :: rj_fld
-!!        type(radial_reference_field), intent(inout) :: refs
+!!        integer(kind = kint), intent(in) :: ipol_source, iref_source
+!!        type(phys_data), intent(inout) :: ref_field
 !!@endverbatim
 !
       module reference_sources_from_d_rj
@@ -35,44 +36,29 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
+      subroutine set_reference_source_from_rst                          &
+     &         (sph_rj, ipol_source, rj_fld, iref_source, ref_field)
 !
-      type(sph_grids), intent(in) :: sph
-      type(phys_address), intent(in) :: ipol
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_data), intent(in) :: rj_fld
+      integer(kind = kint), intent(in) :: ipol_source, iref_source
 !
-      type(radial_reference_field), intent(inout) :: refs
-!
-      integer(kind = kint) :: icomp, jcomp
-      real(kind = kreal), allocatable :: ref_local(:)
+      type(phys_data), intent(inout) :: ref_field
 !
 !
-      allocate(ref_local(0:sph%sph_rj%nidx_rj(1)))
-!
-      icomp = ipol%base%i_heat_source
-      jcomp = refs%iref_base%i_heat_source
-      if((icomp*jcomp) .gt. 0) then
+      if(ref_field%iflag_update(iref_source) .gt. 0) return
+      if((ipol_source*iref_source) .eq. 0) return
         call set_reference_source_from_d_rj                             &
-     &     (sph%sph_rj, rj_fld%d_fld(1,icomp),                          &
-     &      refs%ref_field%d_fld(1,jcomp), ref_local(0))
-      end if
+     &     (sph_rj, rj_fld%d_fld(1,ipol_source),                        &
+     &      ref_field%d_fld(1,iref_source))
+        ref_field%iflag_update(iref_source) = 1
 !
-      icomp = ipol%base%i_light_source
-      jcomp = refs%iref_base%i_light_source
-      if((icomp*jcomp) .gt. 0) then
-        call set_reference_source_from_d_rj                             &
-     &     (sph%sph_rj, rj_fld%d_fld(1,icomp),                          &
-     &      refs%ref_field%d_fld(1,jcomp), ref_local(0))
-      end if
-!
-      deallocate(ref_local)
-!
-      end subroutine cal_ref_sources_from_d_rj
+      end subroutine set_reference_source_from_rst
 !
 ! -----------------------------------------------------------------------
 !
       subroutine set_reference_source_from_d_rj                         &
-     &         (sph_rj, d_rj, ref_global, ref_local)
+     &         (sph_rj, d_rj, ref_global)
 !
       use calypso_mpi_real
 !
@@ -81,13 +67,13 @@
 !
       real(kind = kreal), intent(inout)                                 &
      &                   :: ref_global(0:sph_rj%nidx_rj(1))
-      real(kind = kreal), intent(inout)                                 &
-     &                   :: ref_local(0:sph_rj%nidx_rj(1))
 !
+      real(kind = kreal), allocatable :: ref_local(:)
       integer(kind = kint) :: k, i
       integer(kind = kint_gl) :: num64
 !
 !
+      allocate(ref_local(0:sph_rj%nidx_rj(1)))
       do k = 0, sph_rj%nidx_rj(1)
         ref_local(k) = 0.0d0
       end do
@@ -111,6 +97,7 @@
       num64 = sph_rj%nidx_rj(1) + 1
       call calypso_mpi_allreduce_real(ref_local(0), ref_global(0),      &
      &                                num64, MPI_SUM)
+      deallocate(ref_local)
 !
       end subroutine set_reference_source_from_d_rj
 !

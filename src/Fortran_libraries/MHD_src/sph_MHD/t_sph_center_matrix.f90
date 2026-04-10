@@ -189,7 +189,7 @@
       subroutine check_center_band_matrix(id_file, sph_rj, smat)
 !
       use t_spheric_rj_data
-      use check_sph_radial_mat
+      use check_single_radial_mat
 !
       integer(kind = kint), intent(in) :: id_file
       type(sph_rj_grid), intent(in) ::  sph_rj

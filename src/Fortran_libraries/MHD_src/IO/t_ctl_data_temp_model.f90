@@ -8,7 +8,7 @@
 !!@n        Modified by H. Matsui on Oct., 2007
 !!
 !!@verbatim
-!!      subroutine reset_ref_scalar_ctl(refs_ctl)
+!!      subroutine dealloc_ref_scalar_ctl(refs_ctl)
 !!        type(reference_temperature_ctl), intent(inout) :: refs_ctl
 !!
 !!!!!!!!! model for stratification !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -16,6 +16,8 @@
 !!    ref_temp_ctl: none           (No reference of temperature)
 !!                  spherical_shell ( for spherical shell model)
 !!                  takepiro        ( takepiro model )
+!!                  numerical_solution ( Get numerical solution)
+!!                  file               ( Get numerical solution)
 !!                  numerical_solution ( Get numerical solution)
 !!                  linear_x        ( propotional to x-direction )
 !!                  linear_y        ( propotional to x-direction )
@@ -30,8 +32,6 @@
 !!
 !!    begin temperature_define
 !!      filtered_advection_ctl       Off
-!!
-!!      ICB_diffusivity_reduction_ctl     0.1
 !!
 !!      ref_temp_ctl              spherical_shell
 !!      ref_field_file_name      'reference_temp.dat'
@@ -85,20 +85,12 @@
       use t_control_array_character
       use t_control_array_real
       use t_ctl_data_stratified_model
+      use t_ctl_data_valuable_diffuse
+      use t_ctl_data_ref_point
       use skip_comment_f
 !
       implicit  none
 !
-!
-      type reference_point_control
-!>        Block name
-        character(len=kchara) :: block_name  = 'low_temp_ctl'
-
-        type(read_real_item) :: value
-        type(read_real_item) :: depth
-!
-        integer (kind=kint) :: i_referenced = 0
-      end type reference_point_control
 !
       type reference_temperature_ctl
 !>        Block name
@@ -110,16 +102,15 @@
         type(read_character_item) :: stratified_ctl
         type(read_character_item) :: ref_file_ctl
 !
-        type(read_real_item) :: ICB_diffuse_reduction_ctl
-!
         type(reference_point_control) :: low_ctl
         type(reference_point_control) :: high_ctl
         type(takepiro_model_control) :: takepiro_ctl
 !
+!>        Block for valuable diffusivity definision
+        type(val_diffuse_ctl) :: valuable_diffusion_ctl
+!
         integer (kind=kint) :: i_temp_def = 0
       end type reference_temperature_ctl
-!
-      private :: reset_ref_value_ctl
 !
 !   --------------------------------------------------------------------
 !
@@ -127,15 +118,17 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine reset_ref_scalar_ctl(refs_ctl)
+      subroutine dealloc_ref_scalar_ctl(refs_ctl)
 !
       type(reference_temperature_ctl), intent(inout) :: refs_ctl
+!
+      call dealloc_val_diffuse_ctl_data                                 &
+     &   (refs_ctl%valuable_diffusion_ctl)
 !
       call reset_ref_value_ctl(refs_ctl%low_ctl)
       call reset_ref_value_ctl(refs_ctl%high_ctl)
       call reset_takepiro_ctl(refs_ctl%takepiro_ctl)
 !
-      refs_ctl%ICB_diffuse_reduction_ctl%iflag = 0
       refs_ctl%filterd_advect_ctl%iflag =   0
       refs_ctl%reference_ctl%iflag =        0
       refs_ctl%stratified_ctl%iflag =       0
@@ -143,20 +136,7 @@
 !
       refs_ctl%i_temp_def = 0
 !
-      end subroutine reset_ref_scalar_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine reset_ref_value_ctl(ref_ctl)
-!
-      type(reference_point_control), intent(inout) :: ref_ctl
-!
-      ref_ctl%depth%iflag = 0
-      ref_ctl%value%iflag = 0
-!
-      ref_ctl%i_referenced = 0
-!
-      end subroutine reset_ref_value_ctl
+      end subroutine dealloc_ref_scalar_ctl
 !
 !   --------------------------------------------------------------------
 !

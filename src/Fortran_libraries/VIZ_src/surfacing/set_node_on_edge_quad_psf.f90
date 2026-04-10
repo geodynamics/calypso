@@ -209,19 +209,24 @@
               cycle
             end if
 !
+            if(abs(X1-one) .le. TINY) X1 =  one
+            if(abs(X1+one) .le. TINY) X1 = -one
+            if(abs(X2-one) .le. TINY) X2 =  one
+            if(abs(X2+one) .le. TINY) X2 = -one
+!
             if(X1 .ge. -one .and. X1 .le. one) then
               xi = X1
             else if(X2 .ge. -one .and. X2 .le. one) then
               xi = X2
             else
               ierr = 1
-              write(*,*) 'PSF solution is  wrong'
+              write(*,*) 'PSF solution is wrong in xi', X1, X2
               cycle
             end if
           else if(c_xi1 .ne. zero) then
             xi = -c_xi0 / c_xi1
           else
-            write(*,*) 'PSF solution is  wrong'
+            write(*,*) 'PSF solution is wrong in C_Xi', c_xi1, c_xi2
             cycle
           end if
 !

@@ -254,10 +254,11 @@
       picked_IO%num_mode =  sph_IN%ltr_sph
       picked_IO%num_field = sph_IN%nfield_sph_spec
       picked_IO%ntot_comp = sph_IN%ntot_sph_spec
-      write(*,*) 'picked_IO%num_layer', picked_IO%num_layer
-      write(*,*) 'picked_IO%num_mode', picked_IO%num_mode
-      write(*,*) 'picked_IO%num_field', picked_IO%num_field
-      write(*,*) 'picked_IO%ntot_comp', picked_IO%ntot_comp
+!
+!      write(*,*) 'picked_IO%num_layer', picked_IO%num_layer
+!      write(*,*) 'picked_IO%num_mode', picked_IO%num_mode
+!      write(*,*) 'picked_IO%num_field', picked_IO%num_field
+!      write(*,*) 'picked_IO%ntot_comp', picked_IO%ntot_comp
 !
       end subroutine read_pick_series_head
 !

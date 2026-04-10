@@ -106,9 +106,9 @@
             comm_sph_FFTW%ip_smp_fftw(ic_send) = ip
             comm_sph_FFTW%kl_fftw(ic_send) = j
             comm_sph_FFTW%m_fftw(ic_send) =  Nfft_c
-            comm_sph_FFTW%cnrm_sr_rtp(ic_send) = two * aNfft * ru
+            comm_sph_FFTW%cnrm_sr_rtp(ic_send) = aNfft * ru
           end if
-!          WS(ic_send) = two * aNfft * real(C_fft(i)*ru)
+!          WS(ic_send) = aNfft * real(C_fft(i)*ru)
         end do
       end do
 !$omp end parallel do
@@ -166,7 +166,7 @@
           ic_send = ncomp_fwd * (irev_sr_rtp(ic_rtp)-1)
           ms = ((j-1) + (Nfft_c-1)*num + ist*Nfft_c) * ncomp_fwd
           WS(ic_send+1:ic_send+ncomp_fwd)                               &
-     &        = two*aNfft * real(C_fft(ms+1:ms+ncomp_fwd))
+     &        = aNfft * real(C_fft(ms+1:ms+ncomp_fwd))
         end do
       end do
 !$omp end parallel do
@@ -227,7 +227,7 @@
           ic_rtp = j+ist + irt_rtp_smp_stack(np_smp)
           ic_send = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_fwd
           i = j + (Nfft_c-1)*num + Nfft_c*ist
-          WS(ic_send) = two * aNfft * real(C_fft(i))
+          WS(ic_send) = aNfft * real(C_fft(i))
         end do
       end do
 !$omp end parallel do

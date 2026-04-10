@@ -38,7 +38,15 @@
 !!   composition_from_CMB     [i_light_from_CMB]
 !!   entropy_from_CMB         [i_entropy_from_CMB]
 !!   density_from_CMB         [i_density_from_CMB]
+!!   pressure_from_CMB        [i_pressure_from_CMB]
 !!   aspherical_pressure      [i_asph_pressure]
+!!
+!!   sym_temp_from_CMB        [i_sym_temp_from_CMB]
+!!   sym_comp_from_CMB        [i_sym_light_from_CMB]
+!!   sym_entropy_from_CMB     [i_sym_entropy_from_CMB]
+!!   sym_density_from_CMB     [i_sym_density_from_CMB]
+!!   sym_pressure_from_CMB    [i_sym_pressure_from_CMB]
+!!   sym_aspherical_pressure  [i_sym_asph_pressure]
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -131,39 +139,84 @@
 !
 !
 !>        Field label for temperature from CMB average
-!!         @f$ T-|T(r_{o})| @f$
+!!         @f$ T - |T(r_{o})| @f$
       type(field_def), parameter :: temperature_from_CMB                &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'temperature_from_CMB',                    &
-     &                math = '$ T-|T(r_{o})| $')
-!
+     &                math = '$ T - |T(r_{o})| $')
 !>        Field label for light element from CMB average
-!!         @f$ C-|C(r_{o})| @f$
+!!         @f$ C - |C(r_{o})| @f$
       type(field_def), parameter :: composition_from_CMB                &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'composition_from_CMB',                    &
-     &                math = '$ C-|C(r_{o})| $')
-!
+     &                math = '$ C - |C(r_{o})| $')
 !>        Field label for entropy from CMB average
-!!         @f$ S-|S(r_{o})| @f$
+!!         @f$ S - |S(r_{o})| @f$
       type(field_def), parameter :: entropy_from_CMB                    &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'entropy_from_CMB',                        &
-     &                math = '$ S-|S(r_{o})| $')
-!
+     &                math = '$ S - |S(r_{o})| $')
 !>        Field label for density from CMB average
-!!         @f$ \rho-|\rho(r_{o})| @f$
+!!         @f$ \rho - |\rho(r_{o})| @f$
       type(field_def), parameter :: density_from_CMB                    &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'density_from_CMB',                        &
-     &                math = '$ \rho-|\rho(r_{o})| $')
-!
+     &                math = '$ \rho - |\rho(r_{o})| $')
+!>        Field label for pressure from CMB average
+!!         @f$ P - |\rho(P_{o})| @f$
+      type(field_def), parameter :: pressure_from_CMB                   &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'pressure_from_CMB',                       &
+     &                math = '$ P - |P(r_{o})| $')
 !>        Field label for aspherical component of pressure
-!!         @f$ P-|\int P dS| @f$
+!!         @f$ P - |\int P dS| @f$
       type(field_def), parameter :: aspherical_pressure                 &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'aspherical_pressure',                     &
-     &                math = '$ P-\int P dS| $')
+     &                math = '$ P - \int P dS| $')
+!
+!>        Field label for equatorially symmetric
+!!         temperature from CMB average
+!!         @f$ T_{sym} - |T(r_{o})| @f$
+      type(field_def), parameter :: sym_temp_from_CMB                   &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'sym_temp_from_CMB',                       &
+     &                math = '$ T_{sym} - |T(r_{o})| $')
+!>        Field label for equatorially symmetric
+!!         composition from CMB average
+!!         @f$ C_{sym} - |C(r_{o})| @f$
+      type(field_def), parameter :: sym_comp_from_CMB                   &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'sym_comp_from_CMB',                       &
+     &                math = '$ C_{sym} - |C(r_{o})| $')
+!>        Field label for equatorially symmetric
+!!         entropy from CMB average
+!!         @f$ S_{sym} - |S(r_{o})| @f$
+      type(field_def), parameter :: sym_entropy_from_CMB                &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'sym_entropy_from_CMB',                    &
+     &                math = '$ S_{sym} - |S(r_{o})| $')
+!>        Field label for equatorially symmetric
+!!         density from CMB average
+!!         @f$ \rho_{sym} - |\rho(r_{o})| @f$
+      type(field_def), parameter :: sym_density_from_CMB                &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'sym_density_from_CMB',                    &
+     &                math = '$ \rho_{sym} - |\rho(r_{o})| $')
+!>        Field label for equatorially symmetric
+!!         pressure from CMB average
+!!         @f$ P_{sym} - |\rho(P_{o})| @f$
+      type(field_def), parameter :: sym_pressure_from_CMB               &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'sym_pressure_from_CMB',                   &
+     &                math = '$ P_{sym} - |P(r_{o})| $')
+!>        Field label for equatorially symmetric
+!!         aspherical component of pressure
+!!         @f$ P_{sym} - |\int P dS| @f$
+      type(field_def), parameter :: sym_aspherical_pressure             &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'sym_aspherical_pressure',                 &
+     &                math = '$ P_{sym} - \int P dS| $')
 !
 ! ----------------------------------------------------------------------
 !
@@ -197,7 +250,15 @@
      &   .or. (field_name .eq. composition_from_CMB%name)               &
      &   .or. (field_name .eq. entropy_from_CMB%name)                   &
      &   .or. (field_name .eq. density_from_CMB%name)                   &
+     &   .or. (field_name .eq. pressure_from_CMB%name)                  &
      &   .or. (field_name .eq. aspherical_pressure%name)                &
+!
+     &   .or. (field_name .eq. sym_temp_from_CMB%name)                  &
+     &   .or. (field_name .eq. sym_comp_from_CMB%name)                  &
+     &   .or. (field_name .eq. sym_entropy_from_CMB%name)               &
+     &   .or. (field_name .eq. sym_density_from_CMB%name)               &
+     &   .or. (field_name .eq. sym_pressure_from_CMB%name)              &
+     &   .or. (field_name .eq. sym_aspherical_pressure%name)            &
      &      )   check_field_comp_list = .TRUE.
 !
       end function check_field_comp_list
@@ -229,11 +290,19 @@
       call set_field_label_to_ctl(y_magnetic_f,  array_c2i)
       call set_field_label_to_ctl(z_magnetic_f,  array_c2i)
 !
-      call set_field_label_to_ctl(temperature_from_CMB,     array_c2i)
-      call set_field_label_to_ctl(composition_from_CMB,     array_c2i)
-      call set_field_label_to_ctl(entropy_from_CMB,         array_c2i)
-      call set_field_label_to_ctl(density_from_CMB,         array_c2i)
-      call set_field_label_to_ctl(aspherical_pressure,      array_c2i)
+      call set_field_label_to_ctl(temperature_from_CMB,    array_c2i)
+      call set_field_label_to_ctl(composition_from_CMB,    array_c2i)
+      call set_field_label_to_ctl(entropy_from_CMB,        array_c2i)
+      call set_field_label_to_ctl(density_from_CMB,        array_c2i)
+      call set_field_label_to_ctl(pressure_from_CMB,       array_c2i)
+      call set_field_label_to_ctl(aspherical_pressure,     array_c2i)
+!
+      call set_field_label_to_ctl(sym_temp_from_CMB,       array_c2i)
+      call set_field_label_to_ctl(sym_comp_from_CMB,       array_c2i)
+      call set_field_label_to_ctl(sym_entropy_from_CMB,    array_c2i)
+      call set_field_label_to_ctl(sym_density_from_CMB,    array_c2i)
+      call set_field_label_to_ctl(sym_pressure_from_CMB,   array_c2i)
+      call set_field_label_to_ctl(sym_aspherical_pressure, array_c2i)
 !
       end subroutine set_field_component_names
 !

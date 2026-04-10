@@ -37,6 +37,15 @@
 !!   thermal_diffusivity           [diffusivity%i_T_diffusivity]:
 !!   chemical_diffusivity          [diffusivity%i_C_diffusivity]:
 !!
+!!   grad_viscosity                [grad_diffusivity%i_viscosity]:
+!!   grad_thermal_conductivity     [grad_diffusivity%i_T_conductivity]:
+!!   grad_chemical_conductivity    [grad_diffusivity%i_C_conductivity]:
+!!
+!!   grad_kinetic_viscosity        [grad_diffusivity%i_K_viscosity]:
+!!   grad_magnetic_diffusivity     [grad_diffusivity%i_B_diffusivity]:
+!!   grad_thermal_diffusivity      [grad_diffusivity%i_T_diffusivity]:
+!!   grad_chemical_diffusivity     [grad_diffusivity%i_C_diffusivity]:
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
 !!
@@ -167,6 +176,42 @@
       end if
 !
       end subroutine set_diffusivity_addresses
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_grad_diffusivity_addresses                         &
+     &         (i_phys, field_name, grad_diffusivity, flag)
+!
+      use m_diffusion_term_labels
+!
+      integer(kind = kint), intent(in) :: i_phys
+      character(len = kchara), intent(in) :: field_name
+!
+      type(diffusivity_adress), intent(inout) :: grad_diffusivity
+      logical, intent(inout) :: flag
+!
+!
+      flag = check_diffusivity(field_name)
+      if(flag) then
+        if     (field_name .eq. grad_kinetic_viscosity%name) then
+          grad_diffusivity%i_K_viscosity =    i_phys
+        else if(field_name .eq. grad_magnetic_diffusivity%name) then
+          grad_diffusivity%i_B_diffusivity =  i_phys
+        else if(field_name .eq. grad_thermal_diffusivity%name) then
+          grad_diffusivity%i_T_diffusivity =  i_phys
+        else if(field_name .eq. grad_chemical_diffusivity%name) then
+          grad_diffusivity%i_C_diffusivity =  i_phys
+!
+        else if(field_name .eq. grad_viscosity%name) then
+          grad_diffusivity%i_viscosity =      i_phys
+        else if(field_name .eq. grad_thermal_conductivity%name) then
+          grad_diffusivity%i_T_conductivity = i_phys
+        else if(field_name .eq. grad_chemical_conductivity%name) then
+          grad_diffusivity%i_C_conductivity = i_phys
+        end if
+      end if
+!
+      end subroutine set_grad_diffusivity_addresses
 !
 ! ----------------------------------------------------------------------
 !

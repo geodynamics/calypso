@@ -12,11 +12,16 @@ MPIBINDIR = $(MPICHDIR)/bin
 MPIINCDIR = $(MPICHDIR)/include
 #
 #
+SRCDIR=
 MAKEDIR= 
 BUILDDIR= 
 MHDDIR =
+EXPDIR=         $(SRCDIR)/examples
+TESTDIR=        $(SRCDIR)/tests
 
-MAKENAME= $(MAKEDIR)/Makefile
+MAKENAME=       $(MAKEDIR)/Makefile
+EXP_MAKEHEAD=   $(EXPDIR)/Makefile.header
+TESTS_MAKEHEAD= $(TESTDIR)/Makefile.header
 
 #
 #   zlib and libpng settings
@@ -35,8 +40,8 @@ programs
 
 
 
-F_INCLUDE = -I.
-C_INCLUDE = -I.
+F_INCLUDE = -I. -I$(MAKEDIR)
+C_INCLUDE = -I. -I$(MAKEDIR)
 
 CPP_FLAGS =
 
@@ -126,20 +131,138 @@ makemake:
 	
 	echo "# create module list"
 	$(GMAKE) \
-	GMAKE='$(GMAKE)' \
-	MHDDIR='$(MHDDIR)' \
-	MAKEDIR='$(MAKEDIR)' \
-	MAKENAME='$(MAKENAME)' \
-	CC="$(CC)"   \
-	MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
-	DEPFLAGS='$(DEPFLAGS)' \
-	OPTFLAGS='$(OPTFLAGS)' \
-	C_INCLUDE='$(C_INCLUDE)' \
-	depends
+		GMAKE='$(GMAKE)' \
+		MHDDIR='$(MHDDIR)' \
+		MAKEDIR='$(MAKEDIR)' \
+		MAKENAME='$(MAKENAME)' \
+		CC="$(CC)"   \
+		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
+		DEPFLAGS='$(DEPFLAGS)' \
+		OPTFLAGS='$(OPTFLAGS)' \
+		C_INCLUDE='$(C_INCLUDE)' \
+		depends
+	
+	echo '#' > $(TESTS_MAKEHEAD)
+	echo '# Makefile header for Calypso Dynamo tests' >> $(TESTS_MAKEHEAD)
+	echo '#' >> $(TESTS_MAKEHEAD)
+	$(GMAKE) makeheaders \
+		MAKENAME="$(TESTS_MAKEHEAD)"
+	@echo '#' >> $(TESTS_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(TESTS_MAKEHEAD)
+	@echo '# library lists' >> $(TESTS_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(TESTS_MAKEHEAD)
+	$(GMAKE) makelib_list \
+		MAKENAME="$(TESTS_MAKEHEAD)"
+	
+	echo '#' > $(EXP_MAKEHEAD)
+	echo '# Makefile header for Calypso Dynamo example' >> $(EXP_MAKEHEAD)
+	echo '#' >> $(EXP_MAKEHEAD)
+	$(GMAKE) makeheaders \
+		MAKENAME="$(EXP_MAKEHEAD)"
+	@echo '#' >> $(EXP_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(EXP_MAKEHEAD)
+	@echo '# library lists' >> $(EXP_MAKEHEAD)
+	@echo '# -----------------------------------------------------------' >> $(EXP_MAKEHEAD)
+	$(GMAKE) makelib_list \
+		MAKENAME="$(EXP_MAKEHEAD)"
 	
 	echo '#' > $(MAKENAME)
-	echo '# Makefile for Kemono Dynamo simulation' >> $(MAKENAME)
+	echo '# Makefile for Calypso Dynamo simulation package' >> $(MAKENAME)
 	echo '#' >> $(MAKENAME)
+	$(GMAKE) makeheaders \
+		MAKENAME="$(MAKENAME)"
+	
+	@echo '#' >> $(MAKENAME)
+	@echo 'create directory list...'
+	@for dir in $(SUBDIRS) ; do \
+		( \
+		echo 'generate diectory list for ' $$dir ; \
+		cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKEDIR='$(MAKEDIR)'          \
+		MAKENAME='$(MAKENAME)'        \
+		dir_list; \
+		 ) \
+	done
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '# target lists ' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	$(GMAKE) maketarget_list 
+		MAKENAME="$(MAKENAME)"
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '# library lists' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	$(GMAKE) makelib_list \
+		MAKENAME="$(MAKENAME)"
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '# objects list' >> $(MAKENAME)
+	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'create object module list...'
+	@for dir in $(SUBDIRS) ; do \
+		( cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		FFTW3_LIBS='$(FFTW3_LIBS)'   \
+		FFTW3_OMP_LIBS='$(FFTW3_OMP_LIBS)'   \
+		MAKEDIR='$(MAKEDIR)' \
+		MAKENAME='$(MAKENAME)'\
+		mod_list; \
+		 ) \
+	done
+	@echo '' >> $(MAKENAME)
+	@echo 'create excecution construct list...'
+	@echo '#' >> $(MAKENAME)
+	@echo 'all: $$(PROGRAMS)' >> $(MAKENAME)
+	@for dir in programs ; do \
+		( cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKENAME='$(MAKENAME)' \
+		target_task; \
+		) \
+	done
+	@echo 'create library construct list...'
+	@echo '#' >> $(MAKENAME)
+	@echo '# Rules for libralies' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	@for dir in $(SUBDIRS) ; do \
+		( cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKEDIR='$(MAKEDIR)' \
+		MAKENAME='$(MAKENAME)' \
+		lib_tasks; \
+		 ) \
+	done
+	@echo '' >> $(MAKENAME)
+	@echo 'Append compile list...'
+	@echo '#' >> $(MAKENAME)
+	@echo '# Rules for routines' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	cat $(MAKENAME).depends >> $(MAKENAME)
+	rm -f $(MAKEDIR)/Makefile.depends
+	
+	$(GMAKE) makeinstall \
+		MAKENAME="$(MAKENAME)"
+	$(GMAKE) makeclean \
+		MAKENAME="$(MAKENAME)"
+
+makeheaders:
 	@echo '#' >> $(MAKENAME)
 	@echo 'SHELL = /bin/sh' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
@@ -203,27 +326,11 @@ makemake:
 	@echo BUILDDIR = $(BUILDDIR) >> $(MAKENAME)
 	@echo MHDDIR =   $(MHDDIR)   >> $(MAKENAME)
 	@echo INSTDIR =  $(INSTDIR)  >> $(MAKENAME)
+	@echo EXPDIR =   $(EXPDIR)   >> $(MAKENAME)
+	@echo TESTDIR =  $(TESTDIR)  >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
-	>> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'create directory list...'
-	@for dir in $(SUBDIRS) ; do \
-		( \
-		echo 'generate diectory list for ' $$dir ; \
-		cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MAKEDIR='$(MAKEDIR)'          \
-		MAKENAME='$(MAKENAME)'        \
-		dir_list; \
-		 ) \
-	done
-	@echo '#' >> $(MAKENAME)
-	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# target lists ' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
+
+maketarget_list:
 	@echo 'PROGRAMS= parallels utilities tests' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
@@ -240,11 +347,8 @@ makemake:
 		target_list; \
 		 ) \
 	done
-	@echo '#' >> $(MAKENAME)
-	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# library lists' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
+
+makelib_list:
 	@echo 'create library file name list...'
 	@for dir in  $(SUBDIRS) ; do \
 		( \
@@ -257,60 +361,10 @@ makemake:
 		lib_name; \
 		 ) \
 	done
+
+makeinstall:
 	@echo '#' >> $(MAKENAME)
-	@echo '# -----------------------------------------------------------' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '# objects list' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'create object module list...'
-	@for dir in $(SUBDIRS) ; do \
-		( cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		FFTW3_LIBS='$(FFTW3_LIBS)'   \
-		FFTW3_OMP_LIBS='$(FFTW3_OMP_LIBS)'   \
-		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)'\
-		mod_list; \
-		 ) \
-	done
-	@echo '' >> $(MAKENAME)
-	@echo 'create excecution construct list...'
-	@echo '#' >> $(MAKENAME)
-	@echo 'all: $$(PROGRAMS)' >> $(MAKENAME)
-	@for dir in programs ; do \
-		( cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MAKENAME='$(MAKENAME)' \
-		target_task; \
-		) \
-	done
-	@echo 'create library construct list...'
-	@echo '#' >> $(MAKENAME)
-	@echo '# Rules for libralies' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
-	@for dir in $(SUBDIRS) ; do \
-		( cd $${dir};  \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)' \
-		lib_tasks; \
-		 ) \
-	done
-	@echo '' >> $(MAKENAME)
-	@echo 'Append compile list...'
-	@echo '#' >> $(MAKENAME)
-	@echo '# Rules for routines' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	cat $(MAKENAME).depends >> $(MAKENAME)
-	rm -f $(MAKEDIR)/Makefile.depends
-	@echo '#' >> $(MAKENAME)
-	@echo '# Rules for install' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
+	@echo '# ---  Rules for install  -------------------------------------' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo 'install:' >> $(MAKENAME)
 	@echo '	mkdir -p $$(INSTDIR)'              >> $(MAKENAME)
@@ -318,7 +372,12 @@ makemake:
 	@echo '	mkdir -p $$(INSTDIR)/bin'          >> $(MAKENAME)
 	@echo '	mkdir -p $$(INSTDIR)/include'      >> $(MAKENAME)
 	@echo '	cp $(BUILDDIR)/*  $$(INSTDIR)/bin' >> $(MAKENAME)
-	@echo ''       >> $(MAKENAME)
+	
+
+makeclean:
+	@echo '#' >> $(MAKENAME)
+	@echo '# --  Cleans  ----------------------------------' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
 	@echo 'clean:' >> $(MAKENAME)
 	@echo '	@rm -f m_*.o ;'     >> $(MAKENAME)
 	@echo '	@rm -f m_*.mod ;'   >> $(MAKENAME)

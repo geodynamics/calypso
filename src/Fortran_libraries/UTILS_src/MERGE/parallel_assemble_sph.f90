@@ -89,12 +89,11 @@
       type(sph_grids), intent(in) :: new_sph
       type(rj_assemble_tbl), intent(inout) :: j_table
 !
-      integer(kind = kint) :: j_org, j_gl, j_new
+      integer(kind = kint) :: j_org, j_new
       integer(kind = 4) :: l_gl, m_gl
 !
 !
       do j_org = 1, org_sph%sph_rj%nidx_rj(2)
-        j_gl =     org_sph%sph_rj%idx_gl_1d_rj_j(j_org,1)
         l_gl = int(org_sph%sph_rj%idx_gl_1d_rj_j(j_org,2))
         m_gl = int(org_sph%sph_rj%idx_gl_1d_rj_j(j_org,3))
         j_new = find_local_sph_address(new_sph%sph_rj, l_gl, m_gl)

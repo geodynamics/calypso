@@ -18,8 +18,9 @@
 !!   rot_inertia              [rot_forces%i_m_advect]
 !!   rot_Coriolis_force       [rot_forces%i_Coriolis]
 !!   rot_Lorentz_force        [rot_forces%i_lorentz]
-!!   rot_buoyancy             [rot_forces%i_buoyancy]
+!!   rot_thermal_buoyancy     [rot_forces%i_thrm_buo]
 !!   rot_composite_buoyancy   [rot_forces%i_comp_buo]
+!!   rot_buoyancy             [rot_forces%i_buoyancy]
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -55,11 +56,11 @@
      &                math = '$ e_{ijk} \partial_{j}'                   &
      &               // '\left(e_{kkm} J_{l} B_{m} \right) $')
 !
-!>        Field label for curl of filtered buoyancy
+!>        Field label for curl of thermal buoyancy
 !!        @f$ -e_{ijk} \partial_{j} \alpha_{T} T g_{k} @f$
-      type(field_def), parameter :: rot_buoyancy                        &
+      type(field_def), parameter :: rot_thermal_buoyancy                &
      &    = field_def(n_comp = n_vector,                                &
-     &                name = 'rot_buoyancy',                            &
+     &                name = 'rot_thermal_buoyancy',                    &
      &                math = '$-e_{ijk} \partial_{j} \alpha_{T}'        &
      &                    // ' T g_{k}$')
 !>        Field label for curl of compositional buoyancy
@@ -69,6 +70,13 @@
      &                name = 'rot_composite_buoyancy',                  &
      &                math = '$-e_{ijk} \partial_{j} \alpha_{C}'        &
      &                    // ' C g_{k}$')
+!>        Field label for curl of total buoyancy
+!!      @f$ -e_{ijk} \partial_{j} (\alpha_{T} T+\alpha_{C} C) g_{k} @f$
+      type(field_def), parameter :: rot_buoyancy                        &
+     &    = field_def(n_comp = n_vector,                                &
+     &                name = 'rot_buoyancy',                            &
+     &                math = '$-e_{ijk} \partial_{j} (\alpha_{T} T '    &
+     &                    // ' + \alpha_{C} C) g_{k}$')
 !
 ! ----------------------------------------------------------------------
 !
@@ -86,6 +94,7 @@
      &   .or. (field_name .eq. rot_Coriolis_force%name)                 &
      &   .or. (field_name .eq. rot_Lorentz_force%name)                  &
      &   .or. (field_name .eq. rot_buoyancy%name)                       &
+     &   .or. (field_name .eq. rot_thermal_buoyancy%name)               &
      &   .or. (field_name .eq. rot_composite_buoyancy%name)
 !
       end function check_rot_force
@@ -105,6 +114,7 @@
       call set_field_label_to_ctl(rot_Coriolis_force,     array_c2i)
       call set_field_label_to_ctl(rot_Lorentz_force,      array_c2i)
       call set_field_label_to_ctl(rot_buoyancy,           array_c2i)
+      call set_field_label_to_ctl(rot_thermal_buoyancy,   array_c2i)
       call set_field_label_to_ctl(rot_composite_buoyancy, array_c2i)
 !
       end subroutine set_rot_force_names

@@ -134,7 +134,7 @@
 !
       ierr = 0
       call s_set_isosurface_file_ctl(default_iso_prefix,                &
-     &    iso_c%iso_file_head_ctl, iso_c%iso_output_type_ctl,           &
+     &    iso_c%iso_file_head_ctl, iso_c%iso_file_format_ctl,           &
      &    iso_file_IO)
       if((iso_file_IO%iflag_format/iflag_single) .eq. 0) then
         iso_file_IO%iflag_format = iso_file_IO%iflag_format             &
@@ -151,7 +151,7 @@
 !
       call count_control_4_field_on_iso                                 &
      &   (iso_c%fld_on_iso_c, num_nod_phys, phys_nod_name,              &
-     &    iso_fld, iso_def)
+     &    iso_fld, iso_def, ierr)
 !
       end subroutine count_control_4_iso
 !

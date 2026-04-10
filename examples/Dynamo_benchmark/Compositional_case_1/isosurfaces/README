@@ -1,0 +1,11 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 1
+!      using compostional buoyancy instead of thermal buoyancy
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+ Isosurface data for visualization are stored in this directory.
+The following files are stored:
+
+README:                     This file     
+comp0_7.[isosurface step #].vtk.gz:    Isosurface data for visualization in compressed VTK data format

@@ -1,0 +1,10 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 1
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+ Resolution control data file is stored in this directory.
+The following files are ready:
+
+README:              This file     
+control_resolution:  Control file for spatial resolution

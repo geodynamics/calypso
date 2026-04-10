@@ -44,10 +44,13 @@
      &                                 mevo_ctl, evo_ctl, MHD_prop)
 !
       use calypso_mpi
+!
+      use m_base_field_labels
+      use m_property_flags
+!
       use t_ctl_data_mhd_evolution
       use t_ctl_data_temp_model
       use t_reference_scalar_param
-      use m_base_field_labels
       use set_reference_scalar_param
 !
       type(reference_temperature_ctl), intent(in) :: reft_ctl
@@ -131,25 +134,21 @@
 !
 !   set control for diffusion reduction by latent heating
 !
-      MHD_prop%cp_prop%diffusie_reduction_ICB = 1.0d0
-      MHD_prop%ht_prop%diffusie_reduction_ICB = 1.0d0
-      if(reft_ctl%ICB_diffuse_reduction_ctl%iflag .gt. 0) then
-        MHD_prop%ht_prop%diffusie_reduction_ICB                         &
-     &        = reft_ctl%ICB_diffuse_reduction_ctl%realvalue
-      end if
+      call set_diffusion_reduction_ctl(reft_ctl%valuable_diffusion_ctl, &
+     &                                 MHD_prop%ht_prop)
+      call set_diffusion_reduction_ctl(refc_ctl%valuable_diffusion_ctl, &
+     &                                 MHD_prop%cp_prop)
 !
 !   set control for reference temperature 
 !
-      write(tmpchara,'(a)') 'Reference temperature'
-      call set_reference_scalar_ctl(tmpchara, reft_ctl,                 &
+      call set_reference_scalar_ctl(temperature%name, reft_ctl,         &
      &    MHD_prop%ref_param_T, MHD_prop%takepito_T)
       call set_filtered_advection_ctl                                   &
      &   (reft_ctl%filterd_advect_ctl, MHD_prop%ht_prop)
 !
 !   set control for reference
 !
-      write(tmpchara,'(a)') 'Reference composition'
-      call set_reference_scalar_ctl(tmpchara, refc_ctl,                 &
+      call set_reference_scalar_ctl(composition%name, refc_ctl,         &
      &    MHD_prop%ref_param_C, MHD_prop%takepito_C)
       call set_filtered_advection_ctl                                   &
      &   (refc_ctl%filterd_advect_ctl, MHD_prop%cp_prop)
@@ -161,6 +160,9 @@
 !
       subroutine s_set_control_4_crank                                  &
      &         (mevo_ctl, fl_prop, cd_prop, ht_prop, cp_prop)
+!
+      use t_physical_property
+      use t_scalar_property
 !
       type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
       type(fluid_property), intent(inout) :: fl_prop

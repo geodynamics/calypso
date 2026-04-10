@@ -11,14 +11,14 @@
 !!
 !!@verbatim
 !!      subroutine set_reference_scalar_ctl                             &
-!!     &        (charaflag, ref_ctl, ref_param, takepiro)
-!!        type(read_character_item), intent(in) :: ref_temp_ctl
-!!        type(read_character_item), intent(in) :: stratified_ctl
-!!        type(reference_point_control), intent(in) :: low_temp_ctl
-!!        type(reference_point_control), intent(in) :: high_temp_ctl
-!!        type(reference_point_control), intent(in) :: takepiro_ctl
+!!     &        (scalar_name, ref_ctl, ref_param, takepiro)
+!!        character(len = kchara), intent(in) :: scalar_name
+!!        type(reference_temperature_ctl), intent(in) :: ref_ctl
 !!        type(reference_scalar_param), intent(inout) :: ref_param
 !!        type(takepiro_model_param), intent(inout) :: takepiro
+!!      subroutine set_ref_scalar_for_licv(MHD_step, ref_param)
+!!        type(MHD_step_param), intent(in) :: MHD_step
+!!        type(reference_scalar_param), intent(inout) :: ref_param
 !!@endverbatim
 !
       module set_reference_scalar_param
@@ -43,22 +43,20 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_reference_scalar_ctl                               &
-     &        (charaflag, ref_ctl, ref_param, takepiro)
+     &        (scalar_name, ref_ctl, ref_param, takepiro)
 !
       use calypso_mpi
       use t_ctl_data_temp_model
 !
-      character(len = kchara), intent(in) :: charaflag
+      character(len = kchara), intent(in) :: scalar_name
       type(reference_temperature_ctl), intent(in) :: ref_ctl
 !
       type(reference_scalar_param), intent(inout) :: ref_param
       type(takepiro_model_param), intent(inout) :: takepiro
 !
 !
-      if(iflag_debug .ge. iflag_routine_msg) write(*,*) trim(charaflag)
-!z
       call set_linear_ref_scalar_ctl                                    &
-     &   (ref_ctl%reference_ctl, ref_ctl%ref_file_ctl,                  &
+     &   (scalar_name, ref_ctl%reference_ctl, ref_ctl%ref_file_ctl,     &
      &    ref_ctl%low_ctl, ref_ctl%high_ctl, ref_param)
       call set_takepiro_scalar_ctl                                      &
      &   (ref_ctl%stratified_ctl, ref_ctl%takepiro_ctl,                 &
@@ -67,17 +65,37 @@
       end subroutine set_reference_scalar_ctl
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine set_ref_scalar_for_licv(MHD_step, ref_param)
+!
+      use t_MHD_step_parameter
+      use m_initial_field_control
+!
+      type(MHD_step_param), intent(in) :: MHD_step
+      type(reference_scalar_param), intent(inout) :: ref_param
+!
+!
+      if(MHD_step%iflag_restart_mode .eq. i_rst_licv) then
+        ref_param%iflag_reference = id_numerical_solution
+      end if
+!
+      end subroutine set_ref_scalar_for_licv
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_linear_ref_scalar_ctl(ref_temp_ctl, ref_file_ctl,  &
+      subroutine set_linear_ref_scalar_ctl                              &
+     &         (scalar_name, ref_temp_ctl, ref_file_ctl,                &
      &          low_temp_ctl, high_temp_ctl, ref_param)
 !
       use calypso_mpi
       use t_control_array_character
+      use t_ctl_data_ref_point
       use m_file_format_switch
       use m_error_IDs
       use delete_data_files
 !
+      character(len = kchara), intent(in) :: scalar_name
       type(read_character_item), intent(in) :: ref_temp_ctl
       type(read_character_item), intent(in) :: ref_file_ctl
       type(reference_point_control), intent(in) :: low_temp_ctl
@@ -94,22 +112,24 @@
         ref_param%iflag_reference = id_no_ref_temp
       else
         tmpchara = ref_temp_ctl%charavalue
-        if (cmp_no_case(tmpchara, label_sph_shell)) then
+        if     (cmp_no_case(tmpchara, label_sph_shell)) then
           ref_param%iflag_reference = id_sphere_ref_temp
-        else if (cmp_no_case(tmpchara, label_takepiro)) then
+        else if(cmp_no_case(tmpchara, label_takepiro)) then
           ref_param%iflag_reference = id_takepiro_temp
-        else if (cmp_no_case(tmpchara, label_sph_const_heat)) then
+        else if(cmp_no_case(tmpchara, label_sph_const_heat)) then
           ref_param%iflag_reference = id_linear_r_ref_temp
-        else if (cmp_no_case(tmpchara, label_linear_x)) then
+        else if(cmp_no_case(tmpchara, label_linear_x)) then
           ref_param%iflag_reference = id_x_ref_temp
-        else if (cmp_no_case(tmpchara, label_linear_y)) then
+        else if(cmp_no_case(tmpchara, label_linear_y)) then
           ref_param%iflag_reference = id_y_ref_temp
-        else if (cmp_no_case(tmpchara, label_linear_z)) then
+        else if(cmp_no_case(tmpchara, label_linear_z)) then
           ref_param%iflag_reference = id_z_ref_temp
-        else if (cmp_no_case(tmpchara, label_get_numerical)) then
+        else if(cmp_no_case(tmpchara, label_get_numerical)) then
           ref_param%iflag_reference = id_numerical_solution
-        else if (cmp_no_case(tmpchara, label_load_file)) then
-          ref_param%iflag_reference = id_read_file
+        else if(cmp_no_case(tmpchara, label_load_file)) then
+          ref_param%iflag_reference = id_ref_field_file
+        else if(cmp_no_case(tmpchara, label_load_rst)) then
+          ref_param%iflag_reference = id_ref_restart_file
         end if
       end if
 !
@@ -117,10 +137,11 @@
       if     (ref_param%iflag_reference .eq. id_sphere_ref_temp         &
      &   .or. ref_param%iflag_reference .eq. id_takepiro_temp           &
      &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
-     &   .or. ref_param%iflag_reference .eq. id_read_file               &
+     &   .or. ref_param%iflag_reference .eq. id_ref_field_file          &
+     &   .or. ref_param%iflag_reference .eq. id_ref_restart_file        &
      &   ) ref_param%flag_ref_field = .TRUE.
 !
-      if(ref_param%iflag_reference .eq. id_read_file) then
+      if(ref_param%iflag_reference .eq. id_ref_field_file) then
         ref_param%ref_file_IO%iflag_IO = 0
         ref_param%ref_file_IO%iflag_format = id_ascii_file_fmt
         if(ref_file_ctl%iflag .le. 0) then
@@ -134,41 +155,38 @@
      &               ref_param%ref_file_IO%file_prefix, ' is missing.'
             call calypso_mpi_abort(ierr_file, e_message)
           end if
+          ref_param%ref_file_IO%iflag_IO = 1
         end if
       end if
 !
-      iflag = low_temp_ctl%depth%iflag*low_temp_ctl%value%iflag
-      if (iflag .eq. 0) then
-        if(   ref_param%iflag_reference .eq. id_no_ref_temp             &
-     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
-     &     ) then
-          ref_param%low_value  =  0.0d0
-          ref_param%depth_top  =  0.0d0
-        else
-          e_message                                                     &
-     &          = 'Set lower temperature and its position'
-          call calypso_MPI_abort(ierr_fld, e_message)
-        end if
+      if(   ref_param%iflag_reference .eq. id_no_ref_temp               &
+     & .or. ref_param%iflag_reference .eq. id_numerical_solution        &
+     & .or. ref_param%iflag_reference .eq. id_ref_field_file            &
+     & .or. ref_param%iflag_reference .eq. id_ref_restart_file) then
+        ref_param%low_value  =    0.0d0
+        ref_param%depth_top  =    0.0d0
+        ref_param%high_value =    0.0d0
+        ref_param%depth_bottom =  0.0d0
       else
-        ref_param%low_value  = low_temp_ctl%value%realvalue
-        ref_param%depth_top  = low_temp_ctl%depth%realvalue
-      end if
+        iflag = low_temp_ctl%depth%iflag*low_temp_ctl%value%iflag
+        if (iflag .eq. 0) then
+          write(e_message,'(3a)') 'Set lower ', trim(scalar_name),      &
+     &                           ' and its position.'
+          call calypso_MPI_abort(ierr_fld, e_message)
+        else
+          ref_param%low_value  = low_temp_ctl%value%realvalue
+          ref_param%depth_top  = low_temp_ctl%depth%realvalue
+        end if
 !
-      iflag = high_temp_ctl%depth%iflag*high_temp_ctl%value%iflag
-      if (iflag .eq. 0) then
-        if(   ref_param%iflag_reference .eq. id_no_ref_temp             &
-     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
-     &     ) then
-          ref_param%high_value =  0.0d0
-          ref_param%depth_bottom =  0.0d0
-        else
-          e_message                                                     &
-     &         = 'Set lower temperature and its position'
+        iflag = high_temp_ctl%depth%iflag*high_temp_ctl%value%iflag
+        if (iflag .eq. 0) then
+          write(e_message,'(3a)') 'Set higher ', trim(scalar_name),     &
+     &                           ' and its position.'
           call calypso_MPI_abort(ierr_fld, e_message)
+        else
+          ref_param%high_value = high_temp_ctl%value%realvalue
+          ref_param%depth_bottom = high_temp_ctl%depth%realvalue
         end if
-      else
-        ref_param%high_value = high_temp_ctl%value%realvalue
-        ref_param%depth_bottom = high_temp_ctl%depth%realvalue
       end if
 !
       if (iflag_debug .ge. iflag_routine_msg) then

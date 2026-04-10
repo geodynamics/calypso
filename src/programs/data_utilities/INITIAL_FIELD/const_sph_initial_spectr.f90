@@ -8,13 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine sph_initial_spectrum(fst_file_IO, sph_MHD_bc,        &
-!!     &         SPH_MHD, MHD_step, rst_step, sph_fst_IO)
+!!     &                                SPH_MHD, MHD_step)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(field_IO_params), intent(in) :: fst_file_IO
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(phys_data), intent(inout) :: rj_fld
-!!        type(IO_step_param), intent(inout) :: rst_step
-!!        type(field_IO), intent(inout) :: sph_fst_IO
 !!
 !!       Sample program to generate initial field
 !!       This program generates initial condition
@@ -127,7 +125,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine sph_initial_spectrum(fst_file_IO, sph_MHD_bc,          &
-     &         SPH_MHD, MHD_step, rst_step, sph_fst_IO)
+     &                                SPH_MHD, MHD_step)
 !
       use m_initial_field_control
       use t_IO_step_parameter
@@ -139,8 +137,9 @@
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(MHD_step_param), intent(inout) :: MHD_step
-      type(IO_step_param), intent(inout) :: rst_step
-      type(field_IO), intent(inout) :: sph_fst_IO
+!
+!>      Structure of restart IO data
+      type(field_IO) :: sph_fst_IO
 !
       integer(kind = kint) :: i_step
 !
@@ -171,15 +170,16 @@
       call set_initial_heat_source_sph                                  &
      &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                        &
      &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
-!      call add_outer_core_heat_source                                  &
+!      call outer_core_heat_source                                      &
+!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
+!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld%n_point,              &
+!     &    SPH_MHD%fld)
+!      call inner_core_heat_source_temp                                 &
 !     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
 !     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
-!      call add_inner_core_heat_source                                  &
-!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
-!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
-!      call add_whole_core_heat_source                                  &
-!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
-!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+!      call whole_core_heat_source_temp                                 &
+!     &   (SPH_MHD%sph, sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,          &
+!     &    SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  Set light element source if light element is exist
       call set_initial_light_source_sph                                 &
@@ -197,7 +197,7 @@
         i_step = MHD_step%time_d%i_time_step
       end if
       call output_sph_restart_control(i_step, fst_file_IO,              &
-     &    MHD_step%time_d, SPH_MHD%fld, rst_step, sph_fst_IO)
+     &    MHD_step%time_d, SPH_MHD%fld, MHD_step%rst_step, sph_fst_IO)
 !
       end subroutine sph_initial_spectrum
 !

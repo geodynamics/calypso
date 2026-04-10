@@ -36,18 +36,20 @@
 !>      integer flag for fixed flux boundary
       integer(kind = kint), parameter :: iflag_fixed_flux =  1
 !>      integer flag for whole sphere model
-      integer(kind = kint), parameter :: iflag_sph_fill_center = 41
-!>      integer flag for whole sphere model
-      integer(kind = kint), parameter :: iflag_sph_fix_center =  42
+      integer(kind = kint), parameter :: iflag_sph_fill_center =   41
+!>      integer flag for fixed value at center
+      integer(kind = kint), parameter :: iflag_sph_fix_center =    42
+!>      integer flag for filtering toward center
+      integer(kind = kint), parameter :: iflag_sph_filter_center = 43
 !>      integer flag for fixed drifting boundary
-      integer(kind = kint), parameter :: iflag_evolve_field =    50
+      integer(kind = kint), parameter :: iflag_evolve_field =      50
 !>      integer flag for fixed drifting flux
-      integer(kind = kint), parameter :: iflag_evolve_flux =     51
+      integer(kind = kint), parameter :: iflag_evolve_flux =       51
 !
 !
-!>      integer flag for fixed velocity boundary at inner core
-      integer(kind = kint), parameter :: iflag_fixed_velo = 100
-!>      integer flag for free-slip boundary at inner core
+!>      integer flag for non-slip boundary condition
+      integer(kind = kint), parameter :: iflag_non_slip =   100
+!>      integer flag for free-slip boundary condition
       integer(kind = kint), parameter :: iflag_free_slip =  101
 !>      integer flag for rotatable inner core
       integer(kind = kint), parameter :: iflag_rotatable_ic = 110

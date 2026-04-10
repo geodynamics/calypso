@@ -53,12 +53,17 @@
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !
       integer(kind = kint) :: ierr = 0
+      logical :: error_file = .FALSE.
       type(buffer_for_control) :: c_buf1
 !
 !
+      error_file = .FALSE.
       c_buf1%level = 0
       if(my_rank .eq. 0) then
-        call read_control_4_const_shell(file_name, gen_SPH_ctl, c_buf1)
+        call read_control_4_const_shell(file_name, gen_SPH_ctl,         &
+     &                                  c_buf1, error_file)
+        if(error_file) call calypso_mpi_abort(ierr_file,                &
+     &                                        "Missing control file")
       end if
       call bcast_sph_shell_construct_ctl(gen_SPH_ctl)
 !

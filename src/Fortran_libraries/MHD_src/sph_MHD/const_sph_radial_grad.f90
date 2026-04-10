@@ -115,12 +115,12 @@
 !
       call cal_sph_nod_nobc_in_grad2                                    &
      &   (sph_rj%nidx_rj(2), g_sph_rj, sph_bc%kr_in,                    &
-     &    sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB, is_fld, is_grad,       &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB, rj_fld%n_point,        &
+     &    rj_fld%d_fld(1,is_fld), rj_fld%d_fld(1,is_grad))
       call cal_sph_nod_nobc_out_grad2                                   &
      &   (sph_rj%nidx_rj(2), g_sph_rj, sph_bc%kr_out,                   &
-     &    sph_bc%r_CMB, sph_bc%fdm2_fix_fld_CMB, is_fld, is_grad,       &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    sph_bc%r_CMB, sph_bc%fdm2_fix_fld_CMB, rj_fld%n_point,        &
+     &    rj_fld%d_fld(1,is_fld), rj_fld%d_fld(1,is_grad))
 !
       call cal_sph_nod_gradient_2(sph_bc%kr_in, sph_bc%kr_out,          &
      &    is_fld, is_grad, sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,       &

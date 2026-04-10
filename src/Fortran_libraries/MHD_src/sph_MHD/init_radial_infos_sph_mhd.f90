@@ -9,9 +9,11 @@
 !!        by finite difference method
 !!
 !!@verbatim
-!!      subroutine init_r_infos_sph_mhd_evo(bc_IO, sph_grps, MHD_BC,    &
-!!     &          ipol, sph, r_2nd, r_n2e_3rd, r_e2n_1st,               &
-!!     &          omega_sph, MHD_prop, radial_variation, sph_MHD_bc)
+!!      subroutine init_r_infos_sph_mhd_evo(ipol, sph,                  &
+!!     &          r_2nd, r_n2e_3rd, r_e2n_1st, omega_sph, MHD_prop)
+!!      subroutine init_bc_infos_sph_mhd_evo                            &
+!!     &         (bc_IO, sph_grps, MHD_BC, ipol, sph, r_2nd,            &
+!!     &          MHD_prop, radial_variation, sph_MHD_bc)
 !!      subroutine init_reference_fields(sph, ipol, r_2nd,              &
 !!     &          refs, rj_fld, MHD_prop, sph_MHD_bc)
 !!        type(boundary_spectra), intent(in) :: bc_IO
@@ -31,6 +33,15 @@
 !!      subroutine set_delta_r_4_sph_mhd(sph_params, sph_rj)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_shell_parameters), intent(in) :: sph_params
+!!      subroutine r_diffusivity_w_ICB_reduction(sph_params, scl_prop,  &
+!!     &          iref_radius, iref_diffusivity, iref_grad_diffuse,     &
+!!     &          ref_field)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(scalar_property), intent(inout) :: scl_prop
+!!        integer(kind = kint), intent(in) :: iref_radius
+!!        integer(kind = kint), intent(in) :: iref_diffusivity
+!!        integer(kind = kint), intent(in) :: iref_grad_diffuse
+!!        type(phys_data), intent(inout) :: ref_field
 !!@endverbatim
 !!
 !!@n @param r_hot        radius at highest temperature point
@@ -70,20 +81,14 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine init_r_infos_sph_mhd_evo(bc_IO, sph_grps, MHD_BC,      &
-     &          ipol, sph, r_2nd, r_n2e_3rd, r_e2n_1st,                 &
-     &          omega_sph, MHD_prop, radial_variation, sph_MHD_bc)
+      subroutine init_r_infos_sph_mhd_evo(ipol, sph,                    &
+     &          r_2nd, r_n2e_3rd, r_e2n_1st, omega_sph, MHD_prop)
 !
       use second_fdm_node_coefs
       use third_fdm_node_to_ele
       use first_fdm_ele_to_node
       use material_property
-      use init_sph_radius_variations
-      use set_bc_sph_mhd
 !
-      type(boundary_spectra), intent(in) :: bc_IO
-      type(sph_group_data), intent(in) :: sph_grps
-      type(MHD_BC_lists), intent(in) :: MHD_BC
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
 !
@@ -93,8 +98,6 @@
 !
       type(sph_rotation), intent(inout) :: omega_sph
       type(MHD_evolution_param), intent(inout) :: MHD_prop
-      type(phys_data), intent(inout) :: radial_variation
-      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !
       integer(kind = kint), parameter :: id_check = 50
 !
@@ -125,10 +128,30 @@
       call const_first_fdm_ele_to_node(id_check, sph%sph_rj, r_e2n_1st)
       if (iflag_debug.gt.0) write(*,*) 'const_third_fdm_node_to_ele'
       call const_third_fdm_node_to_ele(id_check, sph%sph_rj, r_n2e_3rd)
+      if(iflag_debug .ge. iflag_full_msg) close(id_check)
 !
-!*  ---------- Radial variations of density and diffusivities  -------
-      call init_radius_variations_sph_mhd(sph%sph_rj, r_2nd, MHD_prop,  &
-     &                                    radial_variation)
+      end subroutine init_r_infos_sph_mhd_evo
+!
+!  -------------------------------------------------------------------
+!
+      subroutine init_bc_infos_sph_mhd_evo                              &
+     &         (bc_IO, sph_grps, MHD_BC, ipol, sph, r_2nd,              &
+     &          MHD_prop, radial_variation, sph_MHD_bc)
+!
+      use set_bc_sph_mhd
+!
+      type(boundary_spectra), intent(in) :: bc_IO
+      type(sph_group_data), intent(in) :: sph_grps
+      type(MHD_BC_lists), intent(in) :: MHD_BC
+      type(phys_address), intent(in) :: ipol
+      type(sph_grids), intent(in) :: sph
+      type(fdm_matrices), intent(in) :: r_2nd
+      type(phys_data), intent(in) :: radial_variation
+!
+      type(MHD_evolution_param), intent(inout) :: MHD_prop
+      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
+!
+      integer(kind = kint), parameter :: id_check = 50
 !
 !*  ---------- boundary conditions  ---------------
       if(iflag_debug.gt.0) write(*,*) 'set_fdm_matrices_sph_mhd'
@@ -137,12 +160,13 @@
      &    MHD_prop, radial_variation, MHD_BC, sph_MHD_bc)
 !
       if(iflag_debug .ge. iflag_full_msg) then
-        call check_bc_sph_mhd(id_check, sph%sph_rj, MHD_prop,           &
-     &                        sph_MHD_bc)
+        open(id_check, file='FDM.dat', position='APPEND')
+        call check_bc_sph_mhd                                           &
+     &     (id_check, sph%sph_rj, MHD_prop, sph_MHD_bc)
+        close(id_check)
       end if
-      if(iflag_debug .ge. iflag_full_msg) close(id_check)
 !
-      end subroutine init_r_infos_sph_mhd_evo
+      end subroutine init_bc_infos_sph_mhd_evo
 !
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
@@ -168,12 +192,18 @@
       subroutine init_reference_fields(sph, ipol, r_2nd,                &
      &          refs, rj_fld, MHD_prop, sph_MHD_bc)
 !
+      use calypso_mpi
+      use calypso_mpi_int
+      use t_time_data
+      use t_file_IO_parameter
       use sph_mhd_rst_IO_control
       use reference_sources_from_d_rj
       use init_reference_scalar
       use init_external_magne_sph
       use radial_reference_field_IO
       use m_base_field_labels
+!
+      use field_file_IO
 !
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
@@ -189,33 +219,89 @@
       character(len=kchara), parameter                                  &
      &            :: cmat_name = 'reference_Composition'
       logical :: flag_write_ref
+      integer :: irank_local
 !
-!
-      call init_reft_rj_data(sph%sph_rj, ipol, refs)
-!
-      call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
-      call load_sph_reference_fields(refs)
-      call overwrite_sources_by_reference(sph%sph_rj, refs%iref_base,   &
-     &    ipol%base, refs%ref_field, rj_fld)
+      type(field_IO) :: radial_fld_IO
 !
 !
       flag_write_ref = .FALSE.
-      call s_init_reference_scalar                                      &
-     &   (MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
-     &    r_2nd, MHD_prop%ht_prop, sph_MHD_bc%sph_bc_T,                 &
-     &    sph_MHD_bc%fdm2_center, tmat_name, MHD_prop%ref_param_T,      &
-     &    refs%iref_radius, temperature%name,                           &
+      if((MHD_prop%fl_prop%ir_nu * MHD_prop%fl_prop%ir_dnu_norm)        &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
+      if((MHD_prop%cd_prop%ir_eta * MHD_prop%cd_prop%ir_deta_norm)      &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
+      if((MHD_prop%ht_prop%ir_kappa * MHD_prop%ht_prop%ir_dkappa_norm)  &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
+      if((MHD_prop%cp_prop%ir_kappa * MHD_prop%cp_prop%ir_dkappa_norm)  &
+     &                                  .gt. 0) flag_write_ref = .TRUE.
+!
+      refs%ref_field%iflag_update(1:refs%ref_field%ntot_phys) = 0
+!
+!
+      irank_local = 0
+      if(sph%sph_rj%idx_rj_degree_zero .gt. 0) irank_local = my_rank
+      call calypso_mpi_allreduce_one_int                                &
+     &   (irank_local, refs%irank_reference, MPI_SUM)
+!
+!       Set source term from restart
+      if(MHD_prop%ref_param_T%iflag_reference                           &
+     &               .eq. id_ref_restart_file) then
+        call set_reference_source_from_rst(sph%sph_rj,                  &
+     &      ipol%base%i_heat_source, rj_fld,                            &
+     &      refs%iref_base%i_heat_source, refs%ref_field)
+      end if
+      if(MHD_prop%ref_param_C%iflag_reference                           &
+     &               .eq. id_ref_restart_file) then
+        call set_reference_source_from_rst(sph%sph_rj,                  &
+     &      ipol%base%i_light_source, rj_fld,                           &
+     &      refs%iref_base%i_light_source, refs%ref_field)
+      end if
+!
+!       Load reference data from file defined in platform_ctl
+      if(refs%ref_input_IO%iflag_IO .gt. 0) then
+        if(iflag_debug .gt. 0) write(*,*) 'ref_input_IO%iflag_IO',      &
+     &                      refs%ref_input_IO%iflag_IO
+        call load_sph_reference_sources(refs%ref_input_IO, refs)
+        call overwrite_sources_by_reference(sph%sph_rj,                 &
+     &      refs%iref_base, ipol%base, refs%ref_field, rj_fld)
+      end if
+!
+      if(my_rank .eq. refs%irank_reference) then
+        if(MHD_prop%ref_param_T%iflag_reference                         &
+     &                    .eq. id_ref_field_file) then
+          call load_sph_reference_two_field                             &
+     &       (MHD_prop%ref_param_T%ref_file_IO, refs%iref_radius,       &
+     &        temperature%name, heat_source%name,                       &
+     &        refs%iref_base%i_temp, refs%iref_base%i_heat_source,      &
+     &        n_scalar, refs%r_itp, refs%ref_field)
+        end if
+        if(MHD_prop%ref_param_C%iflag_reference                         &
+     &                  .eq. id_ref_field_file) then
+          call load_sph_reference_two_field                             &
+     &       (MHD_prop%ref_param_C%ref_file_IO, refs%iref_radius,       &
+     &        composition%name, composition_source%name,                &
+     &        refs%iref_base%i_light, refs%iref_base%i_light_source,    &
+     &        n_scalar, refs%r_itp, refs%ref_field)
+        end if
+      end if
+!
+      call s_init_reference_scalar(refs%irank_reference,                &
+     &    MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
+     &    r_2nd, MHD_prop%ht_prop,                                      &
+     &    sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                  &
+     &    tmat_name, MHD_prop%ref_param_T,                              &
+     &    refs%iref_radius, temperature%name, heat_source%name,         &
      &    refs%iref_base%i_temp, refs%iref_grad%i_grad_temp,            &
-     &    refs%iref_base%i_heat_source, refs%r_itp, refs%ref_fld_IO,    &
+     &    refs%iref_base%i_heat_source, refs%r_itp,                     &
      &    refs%ref_field, sph_MHD_bc%bcs_T, flag_write_ref)
 !
-      call s_init_reference_scalar                                      &
-     &   (MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
-     &    r_2nd, MHD_prop%cp_prop, sph_MHD_bc%sph_bc_C,                 &
-     &    sph_MHD_bc%fdm2_center, cmat_name, MHD_prop%ref_param_C,      &
-     &    refs%iref_radius, composition%name,                           &
+      call s_init_reference_scalar(refs%irank_reference,                &
+     &    MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
+     &    r_2nd, MHD_prop%cp_prop,                                      &
+     &    sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                  &
+     &    cmat_name, MHD_prop%ref_param_C,                              &
+     &    refs%iref_radius, composition%name, composition_source%name,  &
      &    refs%iref_base%i_light, refs%iref_grad%i_grad_composit,       &
-     &    refs%iref_base%i_light_source, refs%r_itp, refs%ref_fld_IO,   &
+     &    refs%iref_base%i_light_source, refs%r_itp,                    &
      &    refs%ref_field, sph_MHD_bc%bcs_C, flag_write_ref)
 !
       call init_sph_contant_ext_magne(MHD_prop%cd_prop, sph%sph_rj,     &

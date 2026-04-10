@@ -19,7 +19,6 @@
 !!        type(conductive_property), intent(in) :: cd_prop
 !!        type(reference_scalar_param), intent(in) :: ref_param_T
 !!        type(reference_scalar_param), intent(in) :: ref_param_C
-!!        type(scalar_property), intent(in) :: ht_prop, cp_prop
 !!        type(phys_address), intent(in) :: f_trns
 !!        type(phys_address), intent(in) :: bs_trns, bs_difv
 !!        type(phys_address), intent(in) :: be_trns, fe_trns
@@ -67,7 +66,7 @@
      &          trns_f_eflux)
 !
       use const_wz_coriolis_rtp
-      use cal_buoyancy_flux_sph
+      use cal_buoyancy_flux_rtp
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(fluid_property), intent(in) :: fl_prop
@@ -109,11 +108,7 @@
      &    trns_b_eflux%ncomp, trns_b_eflux%fld_pole,                    &
      &    trns_f_eflux%ncomp, trns_f_eflux%fld_pole)
 !
-      call cal_buoyancy_flux_rtp                                        &
-     &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
-     &    bs_trns%base, bs_trns%base, fe_trns%ene_flux,                 &
-     &    trns_b_snap, trns_b_snap, trns_f_eflux)
-      call pole_buoyancy_flux_rtp                                       &
+      call s_cal_buoyancy_flux_rtp                                      &
      &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
      &    bs_trns%base, bs_trns%base, fe_trns%ene_flux,                 &
      &    trns_b_snap, trns_b_snap, trns_f_eflux)
@@ -128,7 +123,7 @@
      &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_frc, frc_rtp,   &
      &          ntot_comp_uxb, fub_rtp, ntot_comp_flx, flx_rtp)
 !
-      use cal_products_smp
+      use cal_vector_products
 !
       type(base_field_address), intent(in) :: bs_trns_base
       type(base_force_address), intent(in) :: f_trns_frc
@@ -145,21 +140,21 @@
       real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
 !
       if(fs_trns_eflux%i_ujb .gt. 0) then
-        call cal_dot_prod_no_coef_smp(nnod,                             &
+        call cal_dot_product_no_coef(nnod,                              &
      &      frc_rtp(1,f_trns_frc%i_lorentz),                            &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
      &      flx_rtp(1,fs_trns_eflux%i_ujb) )
       end if
 !
       if(fs_trns_eflux%i_nega_ujb .gt. 0) then
-        call cal_dot_prod_w_coef_smp(nnod, dminus,                      &
+        call cal_dot_product_w_coef(nnod, dminus,                       &
      &      frc_rtp(1,f_trns_frc%i_lorentz),                            &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
      &      flx_rtp(1,fs_trns_eflux%i_nega_ujb))
       end if
 !
       if(fs_trns_eflux%i_me_gen .gt. 0) then
-        call cal_dot_prod_no_coef_smp(nnod,                             &
+        call cal_dot_product_no_coef(nnod,                              &
      &      fub_rtp(1,be_trns_frc%i_induction),                         &
      &      fld_rtp(1,bs_trns_base%i_magne),                            &
      &      flx_rtp(1,fs_trns_eflux%i_me_gen))

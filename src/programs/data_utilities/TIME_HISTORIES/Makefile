@@ -4,8 +4,10 @@
 
 SPH_UTILS_DIR = $$(DATA_UTILS_DIR)/TIME_HISTORIES
 
-TARGET_TAVE_SPH_ENE_SPEC =  utilities/t_ave_monitor_data
-TARGET_SPH_ENE_CHECK =      tests/sph_ene_check
+TARGET_TAVE_SPH_ENE_SPEC =   utilities/t_ave_monitor_data
+TARGET_SPH_ENE_CHECK =       tests/sph_ene_check
+TARGET_SPH_PICK_MODE_CHECK = tests/sph_picked_mode_check
+TARGET_SPH_REF_CHECK =       tests/sph_ref_field_check
 
 SOURCES = $(shell ls *.f90 *.F90)
 
@@ -39,6 +41,19 @@ compare_sph_mean_square.o \
 old_sph_spectr_data_IO.o \
 gz_spl_sph_spectr_data_IO.o
 
+MOD_SPH_PICK_MODE_CHECK = \
+compare_sph_picked_mode.o \
+t_picked_sph_spectr_data_IO.o \
+t_pick_copy_monitor_data.o \
+picked_sph_spectr_data_IO.o \
+gz_spl_sph_spectr_data_IO.o \
+old_sph_spectr_data_IO.o \
+\
+count_monitor_time_series.o
+
+MOD_SPH_REF_CHECK= \
+sph_ref_field_check.o
+
 #
 #  ------------------------------------------------------------------
 #
@@ -47,15 +62,20 @@ dir_list:
 	@echo 'SPH_UTILS_DIR = $(SPH_UTILS_DIR)'     >> $(MAKENAME)
 
 target_list:
-	@echo 'TARGET_TAVE_SPH_ENE_SPEC = $$(BUILDDIR)/$(TARGET_TAVE_SPH_ENE_SPEC)' \
+	@echo 'TARGET_TAVE_SPH_ENE_SPEC =   $$(BUILDDIR)/$(TARGET_TAVE_SPH_ENE_SPEC)' \
 	>> $(MAKENAME)
-	@echo 'TARGET_SPH_ENE_CHECK = $$(BUILDDIR)/$(TARGET_SPH_ENE_CHECK)' \
+	@echo 'TARGET_SPH_ENE_CHECK =       $$(BUILDDIR)/$(TARGET_SPH_ENE_CHECK)' \
+	>> $(MAKENAME)
+	@echo 'TARGET_SPH_PICK_MODE_CHECK = $$(BUILDDIR)/$(TARGET_SPH_PICK_MODE_CHECK)' \
+	>> $(MAKENAME)
+	@echo 'TARGET_SPH_REF_CHECK =       $$(BUILDDIR)/$(TARGET_SPH_REF_CHECK)' \
 	>> $(MAKENAME)
 	@echo >> $(MAKENAME)
 
 target_task:
 	@echo sph_data_util: \
-	'$$(TARGET_TAVE_SPH_ENE_SPEC)  $$(TARGET_SPH_ENE_CHECK)' \
+	'$$(TARGET_TAVE_SPH_ENE_SPEC)    $$(TARGET_SPH_ENE_CHECK)' \
+	'$$(TARGET_SPH_PICK_MODE_CHECK)  $$(TARGET_SPH_REF_CHECK)' \
 	>> $(MAKENAME)
 	@echo >> $(MAKENAME)
 	@echo '$$(TARGET_TAVE_SPH_ENE_SPEC)': '$$(MOD_TAVE_SPH_ENE_SPEC)' \
@@ -76,14 +96,36 @@ target_task:
 	'-L. $$(LIBS_SPH_MHD)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
+	@echo '$$(TARGET_SPH_PICK_MODE_CHECK)': '$$(MOD_SPH_PICK_MODE_CHECK)' \
+	'$$(LIB_FILES_SPH_MHD)' \
+	>> $(MAKENAME)
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_SPH_PICK_MODE_CHECK)' \
+	'$$(MOD_SPH_PICK_MODE_CHECK)' \
+	'-L. $$(LIBS_SPH_MHD)' \
+	'$$(F90LIBS)' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	@echo '$$(TARGET_SPH_REF_CHECK)': '$$(MOD_SPH_REF_CHECK)' \
+	'$$(LIB_FILES_SPH_MHD)' \
+	>> $(MAKENAME)
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_SPH_REF_CHECK)' \
+	'$$(MOD_SPH_REF_CHECK)' \
+	'-L. $$(LIBS_SPH_MHD)' \
+	'$$(F90LIBS)' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
 
 lib_name:
 
 mod_list:
-	@echo  MOD_TAVE_SPH_ENE_SPEC=  \\  >> $(MAKENAME)
-	@echo  $(MOD_TAVE_SPH_ENE_SPEC)    >> $(MAKENAME)
-	@echo  MOD_SPH_ENE_CHECK=  \\     >> $(MAKENAME)
-	@echo  $(MOD_SPH_ENE_CHECK)       >> $(MAKENAME)
+	@echo  MOD_TAVE_SPH_ENE_SPEC=  \\     >> $(MAKENAME)
+	@echo  $(MOD_TAVE_SPH_ENE_SPEC)       >> $(MAKENAME)
+	@echo  MOD_SPH_ENE_CHECK=  \\         >> $(MAKENAME)
+	@echo  $(MOD_SPH_ENE_CHECK)           >> $(MAKENAME)
+	@echo  MOD_SPH_PICK_MODE_CHECK=  \\   >> $(MAKENAME)
+	@echo  $(MOD_SPH_PICK_MODE_CHECK)     >> $(MAKENAME)
+	@echo  MOD_SPH_REF_CHECK=  \\         >> $(MAKENAME)
+	@echo  $(MOD_SPH_REF_CHECK)           >> $(MAKENAME)
 
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(SPH_UTILS_DIR)' $(SOURCES)

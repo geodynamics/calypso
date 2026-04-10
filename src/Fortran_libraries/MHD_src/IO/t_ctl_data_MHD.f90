@@ -11,12 +11,14 @@
 !!@n        Modified by H. Matsui on Oct., 2012
 !!
 !!@verbatim
-!!      subroutine read_control_4_sph_MHD_noviz(file_name, MHD_ctl)
+!!      subroutine read_control_4_sph_MHD_noviz(file_name, MHD_ctl,     &
+!!     &                                        c_buf, error_file)
 !!        character(len=kchara), intent(in) :: file_name
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(mhd_simulation_control), intent(inout) :: MHD_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_control_4_sph_MHD_noviz(file_name, MHD_ctl)
 !!      subroutine write_sph_mhd_ctl_noviz                              &
 !!     &         (id_control, hd_block, MHD_ctl, level)
@@ -107,12 +109,13 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_control_4_sph_MHD_noviz                           &
-     &         (file_name, MHD_ctl, c_buf)
+      subroutine read_control_4_sph_MHD_noviz(file_name, MHD_ctl,       &
+     &                                        c_buf, error_file)
 !
       character(len=kchara), intent(in) :: file_name
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
       type(buffer_for_control), intent(inout) :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       c_buf%level = c_buf%level + 1
@@ -124,8 +127,9 @@
      &                                  hd_mhd_ctl, c_buf)
         if(c_buf%iend .gt. 0) exit
 !
-        call read_sph_mhd_ctl_noviz                                     &
-     &     (id_control_file, hd_mhd_ctl, MHD_ctl, c_buf)
+        call read_sph_mhd_ctl_noviz(id_control_file, hd_mhd_ctl,        &
+     &                              MHD_ctl, c_buf, error_file)
+        if(error_file) return
         if(MHD_ctl%i_mhd_ctl .gt. 0) exit
       end do
       close(id_control_file)
@@ -163,8 +167,8 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine read_sph_mhd_ctl_noviz                                 &
-     &         (id_control, hd_block, MHD_ctl, c_buf)
+      subroutine read_sph_mhd_ctl_noviz(id_control, hd_block,           &
+     &                                  MHD_ctl, c_buf, error_file)
 !
       use ctl_data_platforms_IO
       use ctl_data_sph_monitor_IO
@@ -176,6 +180,7 @@
 !
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(MHD_ctl%i_mhd_ctl .gt. 0) return
@@ -192,7 +197,8 @@
      &     (id_control, hd_org_data, MHD_ctl%org_plt, c_buf)
 !
         call sel_read_ctl_gen_shell_grids(id_control, hd_sph_shell,     &
-     &      MHD_ctl%fname_psph, MHD_ctl%psph_ctl, c_buf)
+     &      MHD_ctl%fname_psph, MHD_ctl%psph_ctl, c_buf, error_file)
+        if(error_file) return
 !
         call read_sph_mhd_model                                         &
      &     (id_control, hd_model, MHD_ctl%model_ctl, c_buf)

@@ -62,6 +62,9 @@
       call bcast_ctl_type_c1(smonitor_ctl%heat_Nusselt_file_format)
       call bcast_ctl_type_c1(smonitor_ctl%comp_Nusselt_file_prefix)
       call bcast_ctl_type_c1(smonitor_ctl%comp_Nusselt_file_format)
+!
+      call bcast_ctl_type_c1(smonitor_ctl%CMB_ave_file_prefix_ctl)
+      call bcast_ctl_type_c1(smonitor_ctl%CMB_ave_file_format_ctl)
       call bcast_ctl_type_c1(smonitor_ctl%typ_scale_file_prefix_ctl)
       call bcast_ctl_type_c1(smonitor_ctl%typ_scale_file_format_ctl)
 !
@@ -292,6 +295,7 @@
       type(dynamobench_control), intent(inout) :: dbench_ctl
 !
 !
+      call bcast_ctl_type_i1(dbench_ctl%ref_zonal_mode_ctl)
       call bcast_ctl_type_i1(dbench_ctl%nphi_mid_eq_ctl)
       call bcast_ctl_type_c1(dbench_ctl%dynamobench_file_ctl)
       call bcast_ctl_type_c1(dbench_ctl%dynamobench_format_ctl)

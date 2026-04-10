@@ -13,6 +13,8 @@
 !!      subroutine cal_diff_induction_MHD_euler                         &
 !!     &         (cd_prop, ipol_base, ipol_frc, ipol_dif, dt,           &
 !!     &          nnod_rj, ntot_phys_rj, d_rj)
+!!      subroutine sel_exp_static_induction_euler(ipol_base, ipol_frc,  &
+!!     &          nnod_rj, ntot_phys_rj, d_rj)
 !!      subroutine set_ini_adams_mag_induct                             &
 !!     &         (ipol_exp, ipol_frc, nnod_rj, ntot_phys_rj, d_rj)
 !!        type(conductive_property), intent(in) :: cd_prop
@@ -20,6 +22,9 @@
 !!        type(explicit_term_address), intent(in) :: ipol_exp
 !!        type(base_force_address), intent(in) :: ipol_frc
 !!        type(diffusion_address), intent(in) :: ipol_dif
+!!        real(kind = kreal), intent(in) :: dt
+!!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+!!        real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !!@endverbatim
 !
       module cal_explicit_terms
@@ -108,6 +113,26 @@
       end subroutine cal_diff_induction_MHD_euler
 !
 ! ----------------------------------------------------------------------
+!
+      subroutine sel_exp_static_induction_euler(ipol_base, ipol_frc,    &
+     &          nnod_rj, ntot_phys_rj, d_rj)
+!
+      type(base_field_address), intent(in) :: ipol_base
+      type(base_force_address), intent(in) :: ipol_frc
+      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+      real(kind = kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
+!
+!
+!$omp parallel workshare
+        d_rj(1:nnod_rj,ipol_base%i_magne  )                             &
+     &       = d_rj(1:nnod_rj,ipol_frc%i_induction  )
+        d_rj(1:nnod_rj,ipol_base%i_magne+2)                             &
+     &       = d_rj(1:nnod_rj,ipol_frc%i_induction+2)
+!$omp end parallel workshare
+!
+      end subroutine sel_exp_static_induction_euler
+!
+! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine set_ini_adams_mag_induct                               &
@@ -118,17 +143,13 @@
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
-      integer(kind = kint)  :: inod
 !
-!
-!$omp parallel do private (inod)
-      do inod = 1, nnod_rj
-        d_rj(inod,ipol_exp%i_pre_uxb  )                                 &
-     &        = d_rj(inod,ipol_frc%i_induction  )
-        d_rj(inod,ipol_exp%i_pre_uxb+2)                                 &
-     &        = d_rj(inod,ipol_frc%i_induction+2)
-      end do
-!$omp end parallel do
+!$omp parallel workshare
+      d_rj(1:nnod_rj,ipol_exp%i_pre_uxb  )                              &
+     &        = d_rj(1:nnod_rj,ipol_frc%i_induction  )
+      d_rj(1:nnod_rj,ipol_exp%i_pre_uxb+2)                              &
+     &        = d_rj(1:nnod_rj,ipol_frc%i_induction+2)
+!$omp end parallel workshare
 !
       end subroutine set_ini_adams_mag_induct
 !

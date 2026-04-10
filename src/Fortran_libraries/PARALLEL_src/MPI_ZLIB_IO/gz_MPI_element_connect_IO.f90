@@ -110,11 +110,13 @@
 !
       subroutine gz_mpi_read_element_info(IO_param, ele_IO)
 !
-      use set_nnod_4_ele_by_type
+      use calypso_mpi_int
+      use set_element_data_4_IO
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(element_data), intent(inout) :: ele_IO
 !
+      integer(kind = kint) :: nnod_ele_lc
       integer (kind = kint) :: i, num_tmp
 !
 !
@@ -122,12 +124,9 @@
       call gz_mpi_read_element_type                                     &
      &   (IO_param, iten, ele_IO%numele, ele_IO%elmtyp)
 !
-      ele_IO%nnod_4_ele = 0
-      do i = 1, ele_IO%numele
-        call s_set_nnod_4_ele_by_type                                   &
-     &     (ele_IO%elmtyp(i), ele_IO%nodelm(i))
-        ele_IO%nnod_4_ele = max(ele_IO%nnod_4_ele,ele_IO%nodelm(i))
-      end do
+      call find_max_nnod_4_ele_by_eletype(ele_IO, nnod_ele_lc)
+      call calypso_mpi_allreduce_one_int                                &
+     &   (nnod_ele_lc, ele_IO%nnod_4_ele, MPI_MAX)
 !
       call gz_mpi_read_num_of_data(IO_param, num_tmp)
       call alloc_ele_connectivity(ele_IO)

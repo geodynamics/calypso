@@ -76,7 +76,9 @@
 !>      boundary to connect center field
       integer(kind = kint), parameter :: iflag_sph_2_center =    501
 !>      boundary to fix center field
-      integer(kind = kint), parameter :: iflag_sph_clip_center = 502
+      integer(kind = kint), parameter :: iflag_fix_center =      502
+!>      boundary to filter toward center field
+      integer(kind = kint), parameter :: iflag_filter_center =   503
 !
 !>      pseudo vacuum boundary
       integer(kind = kint), parameter :: iflag_pseudo_vacuum =   400

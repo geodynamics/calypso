@@ -67,6 +67,8 @@
       use material_property
       use init_sphrical_transform_MHD
       use init_radial_infos_sph_mhd
+      use init_sph_radius_variations
+      use radial_reference_field_IO
       use const_radial_mat_4_sph
       use r_interpolate_sph_data
       use sph_mhd_rst_IO_control
@@ -90,11 +92,20 @@
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
-      call init_r_infos_sph_mhd_evo(SPH_model%bc_IO, SPH_MHD%groups,    &
+      call init_r_infos_sph_mhd_evo(SPH_MHD%ipol, SPH_MHD%sph,          &
+     &    SPH_WK%r_2nd, SPH_WK%r_n2e_3rd, SPH_WK%r_e2n_1st,             &
+     &    SPH_model%omega_sph, SPH_model%MHD_prop)
+!
+      call init_radial_reference_data(SPH_MHD%sph%sph_rj, SPH_MHD%ipol, &
+     &    SPH_model%MHD_prop, SPH_model%refs)
+      call init_radius_variations_sph_mhd(SPH_MHD%sph, SPH_WK%r_2nd,    &
+     &    SPH_model%MHD_prop, SPH_model%refs)
+!
+      if (iflag_debug.gt.0) write(*,*) 'init_bc_infos_sph_mhd_evo'
+      call init_bc_infos_sph_mhd_evo(SPH_model%bc_IO, SPH_MHD%groups,   &
      &    SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph, SPH_WK%r_2nd,    &
-     &    SPH_WK%r_n2e_3rd, SPH_WK%r_e2n_1st,                           &
-     &    SPH_model%omega_sph, SPH_model%MHD_prop,                      &
-     &    SPH_model%radial_variation, SPH_model%sph_MHD_bc)
+     &    SPH_model%MHD_prop, SPH_model%refs%ref_field,                 &
+     &    SPH_model%sph_MHD_bc)
 !
 !  -------------------------------
 !
@@ -134,7 +145,7 @@
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
       if(iflag_debug .gt. 0) write(*,*) 'init_rms_sph_mhd_control'
       call init_rms_sph_mhd_control                                     &
-     &   (SPH_model%MHD_prop, SPH_model%sph_MHD_bc,                     &
+     &   (SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_model%refs,     &
      &    SPH_WK%r_2nd, SPH_WK%trans_p, FEM_dat%field, SPH_MHD,         &
      &    SPH_WK%MHD_mats, SPH_WK%monitor, m_SR%SR_sig, m_SR%SR_r)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
@@ -180,20 +191,18 @@
 !
 !* obtain linear terms for starting
 !*
-      if(iflag_debug .gt. 0) write(*,*) 'set_MHD_evolved_boundaries'
-      call set_MHD_evolved_boundaries(MHD_step%time_d, SPH_MHD%sph,     &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
-!
       if(iflag_debug .gt. 0) write(*,*) 'set_sph_field_to_start'
-      call set_sph_field_to_start(SPH_MHD%sph%sph_rj, SPH_WK%r_2nd,     &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg, &
-     &    SPH_MHD%ipol, SPH_MHD%fld)
+      call set_sph_field_to_start                                       &
+     &   (MHD_step%time_d, SPH_MHD%sph, SPH_WK%r_2nd,                   &
+     &    SPH_model%MHD_prop, SPH_model%refs, SPH_model%sph_MHD_bc,     &
+     &    SPH_WK%trans_p%leg, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !*  ----------------lead nonlinear term ... ----------
 !*
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+4)
-      call nonlinear(SPH_WK%r_2nd, SPH_model, SPH_WK%trans_p,           &
-     &               SPH_WK%trns_WK, SPH_MHD, m_SR%SR_sig, m_SR%SR_r)
+      call nonlinear(SPH_MHD%sph, SPH_MHD%comms, SPH_WK%r_2nd,          &
+     &    SPH_model, SPH_WK%trans_p, SPH_MHD%ipol, SPH_WK%trns_WK,      &
+     &    SPH_MHD%fld, m_SR%SR_sig, m_SR%SR_r)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+4)
 !
 !* ----  Update fields after time evolution ------------------------=

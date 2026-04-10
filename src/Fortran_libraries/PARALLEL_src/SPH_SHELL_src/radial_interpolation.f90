@@ -13,18 +13,49 @@
 !!     &         (nri_org, r_org, nri_new, r_new,                       &
 !!     &          kr_inner_source, kr_outer_source,                     &
 !!     &          k_old2new_in, k_old2new_out, coef_old2new_in)
+!!        integer(kind = kint), intent(in) :: nri_org, nri_new
+!!        real(kind = kreal), intent(in) :: r_org(nri_org)
+!!        real(kind = kreal), intent(in) :: r_new(nri_new)
+!!        integer(kind = kint), intent(inout) :: kr_inner_source
+!!        integer(kind = kint), intent(inout) :: kr_outer_source
+!!        integer(kind = kint), intent(inout) :: k_old2new_in(nri_new)
+!!        integer(kind = kint), intent(inout) :: k_old2new_out(nri_new)
+!!        real (kind=kreal), intent(inout) :: coef_old2new_in(nri_new)
+!!
 !!      subroutine r_interpolate_sph_vector                             &
 !!     &         (nidx_rj, kr_inside, kr_outside, nri_new,              &
 !!     &          k_old2new_in, k_old2new_out, coef_old2new_in,         &
 !!     &          n_rj_org, d_rj_org, ncomp, n_point, d_rj)
+!!        integer(kind = kint), intent(in) :: ncomp
+!!        integer(kind = kint), intent(in) :: nidx_rj(2)
+!!        integer(kind = kint), intent(in) :: kr_inside, kr_outside
+!!        integer(kind = kint), intent(in) :: nri_new, n_rj_org
+!!        integer(kind = kint), intent(in) :: k_old2new_in(nri_new)
+!!        integer(kind = kint), intent(in) :: k_old2new_out(nri_new)
+!!        real (kind=kreal), intent(in) :: coef_old2new_in(nri_new)
+!!        real (kind=kreal), intent(in) :: d_rj_org(n_rj_org,6)
+!!        integer(kind = kint), intent(in) :: n_point
+!!        real (kind=kreal), intent(inout) :: d_rj(n_point,ncomp)
+!!
 !!      subroutine interpolate_radial_field                             &
 !!     &         (nri_new, k_old2new_in, k_old2new_out, coef_old2new_in,&
 !!     &          ncomp, n_rj_org, d_IO, d_r)
+!!        integer(kind = kint), intent(in) :: ncomp
+!!        integer(kind = kint), intent(in) :: nri_new, n_rj_org
+!!        integer(kind = kint), intent(in) :: k_old2new_in(nri_new)
+!!        integer(kind = kint), intent(in) :: k_old2new_out(nri_new)
+!!        real (kind=kreal), intent(in) :: coef_old2new_in(nri_new)
+!!        real (kind=kreal), intent(in) :: d_IO(n_rj_org,ncomp)
+!!        real (kind=kreal), intent(inout) :: d_r(nri_new,ncomp)
 !!
 !!      subroutine set_org_rj_phys_data_from_IO                         &
 !!     &          (j_fld, fld_IO, n_rj_org, d_rj_org)
 !!      subroutine set_org_radius_data_from_IO                          &
 !!     &          (j_fld, fld_IO, n_rj_org, d_rj_org)
+!!        integer(kind = kint), intent(in) :: j_fld
+!!        type(field_IO), intent(in) :: fld_IO
+!!        integer(kind = kint), intent(in) :: n_rj_org
+!!        real (kind=kreal), intent(inout) :: d_rj_org(n_rj_org,6)
 !!@endverbatim
 !
       module radial_interpolation
@@ -47,7 +78,7 @@
 !
       integer(kind = kint), intent(in) :: nri_org, nri_new
       real(kind = kreal), intent(in) :: r_org(nri_org)
-      real(kind = kreal), intent(in) :: r_new(nri_org)
+      real(kind = kreal), intent(in) :: r_new(nri_new)
 !
       logical :: flag
 !
@@ -78,7 +109,7 @@
 !
       integer(kind = kint), intent(in) :: nri_org, nri_new
       real(kind = kreal), intent(in) :: r_org(nri_org)
-      real(kind = kreal), intent(in) :: r_new(nri_org)
+      real(kind = kreal), intent(in) :: r_new(nri_new)
 !
       integer(kind = kint), intent(inout) :: kr_inner_source
       integer(kind = kint), intent(inout) :: kr_outer_source

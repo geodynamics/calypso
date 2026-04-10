@@ -19,6 +19,7 @@
       use m_error_IDs
       use m_machine_parameter
       use m_force_control_labels
+      use m_property_flags
 !
       implicit  none
 !
@@ -113,8 +114,9 @@
      &      .or. cmp_no_case(tmpchara, comp_gravity_e6)                 &
      &       ) fl_prop%flag_comp_buoyancy =  .TRUE.
 !
-          if(     cmp_no_case(tmpchara, Filtered_gravity_label)         &
+          if(     cmp_no_case(tmpchara, Filtered_thrm_gravity_label)    &
      &       .or. cmp_no_case(tmpchara, Filtered_gravity_e1)            &
+     &       .or. cmp_no_case(tmpchara, Filtered_gravity_e2)            &
      &       ) fl_prop%flag_filter_gravity =  .TRUE.
 !
           if(   cmp_no_case(tmpchara, Filtered_comp_gravity_label)      &

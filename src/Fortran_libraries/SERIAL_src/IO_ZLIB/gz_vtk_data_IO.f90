@@ -316,9 +316,11 @@
         ncomp_field = n_sym_tensor
       else if(vtk_fld_type .eq. 'VECTORS') then
         ncomp_field = n_vector
-      else
+      else if(vtk_fld_type .eq. 'SCALARS') then
         call get_one_line_text_from_gz(FPz_f, zbuf)
         ncomp_field = n_scalar
+      else
+        go to 99
       end if
       iflag_end = izero
       return
@@ -386,7 +388,7 @@
       call get_one_line_text_from_gz(FPz_f, zbuf)
 !
       call get_one_line_text_from_gz(FPz_f, zbuf)
-      read(zbuf%fixbuf(1),'(a,i16)')  tmpchara, nnod
+      read(zbuf%fixbuf(1),*)  tmpchara, nnod
 !
       end subroutine read_gz_vtk_node_head
 !

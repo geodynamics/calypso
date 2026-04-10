@@ -45,8 +45,9 @@
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
-!!    iso_output_type:
-!!           ucd, OpenDX
+!!    isosurface_file_format:
+!!           'VTK', 'VTK_gz', 'ISO', 'ISO_gz',
+!!           'UCD', 'UCD_gz', 'binary', 'binary_gz',
 !!
 !!    result_type:  (Original name: display_method)
 !!                   specified_fields

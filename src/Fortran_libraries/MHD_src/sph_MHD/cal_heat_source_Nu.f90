@@ -7,14 +7,15 @@
 !> @brief Evaluate Nusselt number without heat source
 !!
 !!@verbatim
-!!      subroutine init_poisson_matrix_for_Nu                           &
-!!     &         (mat_name, sph, r_2nd, sc_prop, sph_bc_S, fdm2_center, &
+!!      subroutine init_poisson_matrix_for_Nu(mat_name, sph, r_2nd,     &
+!!     &          sc_prop, ref_field, sph_bc_S, fdm2_center,            &
 !!     &          band_s00_poisson_fixS, Nu_type)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(scalar_property), intent(in) :: sc_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
+!!        type(phys_data), intent(in) :: ref_field
 !!        type(band_matrix_type), intent(inout) :: band_s00_poisson_fixS
 !!        type(nusselt_number_data), intent(inout) :: Nu_type
 !!      subroutine sel_Nusselt_routine(is_scalar, is_source, is_grad_s, &
@@ -45,7 +46,7 @@
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
       use t_no_heat_Nusselt
-      use t_physical_property
+      use t_scalar_property
       use t_fdm_coefs
       use t_sph_matrix
       use pickup_sph_spectr
@@ -60,13 +61,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_poisson_matrix_for_Nu                             &
-     &         (mat_name, sph, r_2nd, sc_prop, sph_bc_S, fdm2_center,   &
+      subroutine init_poisson_matrix_for_Nu(mat_name, sph, r_2nd,       &
+     &          sc_prop, ref_field, sph_bc_S, fdm2_center,              &
      &          band_s00_poisson_fixS, Nu_type)
 !
       use t_fdm_coefs
       use t_coef_fdm2_centre
-      use const_r_mat_4_scalar_sph
+      use const_sph_r_mat_ref_scalar
 !
       character(len=kchara), intent(in) :: mat_name
 !
@@ -75,6 +76,7 @@
       type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
+      type(phys_data), intent(in) :: ref_field
 !
       type(band_matrix_type), intent(inout) :: band_s00_poisson_fixS
       type(nusselt_number_data), intent(inout) :: Nu_type
@@ -82,9 +84,11 @@
 !
       if(Nu_type%iflag_Nusselt .eq. iflag_no_source_Nu) return
         call alloc_Nu_radial_reference(sph%sph_rj, Nu_type)
-        call const_r_mat00_scalar_sph                                   &
-     &     (my_rank+50, mat_name, sc_prop%diffusie_reduction_ICB,       &
-     &      sph%sph_params, sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,   &
+        call s_const_sph_r_mat_ref_scalar                               &
+     &     (my_rank+50, mat_name, sc_prop%flag_val_diffuse,             &
+     &      ref_field%d_fld(1,sc_prop%ir_kappa),                        &
+     &      ref_field%d_fld(1,sc_prop%ir_dkappa_norm),                  &
+     &      sph%sph_rj, r_2nd, sph_bc_S, fdm2_center,                   &
      &      band_s00_poisson_fixS)
 !
       end subroutine init_poisson_matrix_for_Nu

@@ -44,14 +44,15 @@
       kst = 1
       ked = nlayer_CMB
       do k = kst, ked
-        r_grid(k) = r_CMB * sin(half * pi * dble(k)/dble(nlayer_CMB))
+        r_grid(k)                                                       &
+     &     = r_CMB * cos(half * pi * dble(ked - k)/dble(ked))
       end do
 !
-      kst = nlayer_CMB + 1
+      kst = nlayer_CMB
       ked = min(num_layer, nlayer_CMB + nlayer_CMB/2)
-      do k = kst, ked
-        r_grid(k) = r_CMB + r_CMB * (one - sin(half*pi                  &
-     &                       * dble(k-nlayer_CMB)/dble(nlayer_CMB)) )
+      do k = kst+1, ked
+        r_grid(k)                                                       &
+     &     = r_CMB * (two - cos(half*pi * dble(k-kst)/dble(kst)))
       end do
       dr = r_grid(ked) - r_grid(ked-1)
 !
@@ -93,7 +94,6 @@
         r = r_CMB + r_CMB * (one - cos(half*pi*dble(k)/dble(nri)) )
         dr =  r_CMB * (-cos(half*pi*dble(k  )/dble(nri))                &
      &                 +cos(half*pi*dble(k-1)/dble(nri)) )
-!        write(*,*) k, r, dr
       end do
 !
 !
@@ -101,7 +101,6 @@
         if(r .ge. r_max) exit
         k = k + 1
         r = r + dr
-!        write(*,*) k, r, dr
       end do
 !
       if(k .le. 1) then
@@ -110,7 +109,7 @@
         ngrid_ext = k
       end if
 !
-      nlayer_ICB = 0
+      nlayer_ICB = 1
       nlayer_CMB = nri
       ntot_shell = nlayer_CMB + ngrid_ext
 !

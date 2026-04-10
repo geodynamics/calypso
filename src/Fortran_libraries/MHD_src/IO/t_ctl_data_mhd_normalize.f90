@@ -47,7 +47,7 @@
 !!
 !!    define
 !!     coef_4_termal_ctl:      time integration and advection of temp
-!!     coef_4_velocity_ctl:    time integration and advection of temperature
+!!     coef_4_velocity_ctl:    time integration and advection of velocity
 !!     coef_4_magnetic_ctl:    time integration and advection of magnetic f.
 !!     coef_4_composition_ctl: time integration and advection of composition
 !!
@@ -59,10 +59,12 @@
 !!     coef_4_m_diffuse_ctl:   coefficients for magnetic diffusion
 !!     coef_4_c_diffuse_ctl:   coefficients for compositional diffusion
 !!
-!!     coef_4_buoyancy_ctl:   coefficients for buoyancy
+!!     coef_4_thermal_buoyancy_ctl:
+!!                            coefficients for thermal buoyancy
 !!     coef_4_Coriolis_ctl:   coefficients for Coriolis force
 !!     coef_4_Lorentz_ctl:    coefficients for Lorantz force
-!!     coef_4_composit_buoyancy_ctl: coefficients for compositional buoyancy
+!!     coef_4_composit_buoyancy_ctl:
+!!                            coefficients for compositional buoyancy
 !!
 !!     One:  1, Zero (Ignore), Two:  2,   Radial_parameter: (1-ri/ro)
 !!     Radial_35: (1-0.35)

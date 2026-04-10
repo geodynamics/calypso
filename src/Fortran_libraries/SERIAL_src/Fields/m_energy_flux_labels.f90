@@ -18,16 +18,22 @@
 !!
 !!   inertia_work             [i_m_advect_work]:  Work of Reynolds stress
 !!                                           -u \cdot (\omega \times u)
+!!                                           -u \cdot (u \cdot \nambla) u
+!!   work_against_inertia     [i_nega_m_advect_wk]:  Work against Reynolds stress
+!!                                            u \cdot (\omega \times u)
+!!                                            u \cdot (u \cdot \nambla) u
 !!   Lorentz_work             [i_ujb]:  Work of Lorentz force
 !!                                            u \cdot (J \times B)
 !!   work_against_Lorentz     [i_nega_ujb]:  Work against Lorentz force
 !!                                           -u \cdot (J \times B)
 !!   mag_tension_work         [i_m_tension_wk]: Work of magnetic tension
 !!                                            u \cdot( (B \nabla) B)
-!!   buoyancy_flux            [i_buo_gen]:       Thermal buoyancy flux
-!!                                           -u \cdot (\alpha_{T} g T)
+!!   thermal_buoyancy_flux    [i_t_buo_gen]:  Thermal buoyancy flux
+!!                                           -\alpha_{T} T g \cdot u
 !!   composite_buoyancy_flux  [i_c_buo_gen]:  Compositional buoyancy flux
-!!                                           -u \cdot (\alpha_{C} g C)
+!!                                           -\alpha_{C} C g \cdot u
+!!   buoyancy_flux            [i_buoyancy_flux]:  Total buoyancy flux
+!!                          -(\alpha_{T} T + \alpha_{C} C) g \cdot u
 !!
 !!   magnetic_ene_generation  [i_me_gen]:
 !!           energy flux by magneitic induction
@@ -63,19 +69,25 @@
       implicit  none
 ! 
 !>        Field label of work of inertia
-!!         @f$ -u_{i} (e_{ijk} \omega_{j} u_{k}) @f$
+!!         @f$ -u_{i} \left(e_{ijk} \omega_{j} u_{k} \right) @f$
       type(field_def), parameter :: inertia_work                        &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'inertia_work',                            &
      &                math = '$ -u_{i} (e_{ijk} \omega_{j} u_{k}) $')
+!>        Field label of work against inertia
+!!         @f$  u_{i} \left(e_{ijk} \omega_{j} u_{k} \right) @f$
+      type(field_def), parameter :: work_against_inertia                &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'work_against_inertia',                    &
+     &                math = '$  u_{i} (e_{ijk} \omega_{j} u_{k}) $')
 !>        Field label of work against Lorentz force
-!!         @f$ - u_{i} (e_{ijk} J_{j} B_{k}) @f$
+!!         @f$ -u_{i} \left(e_{ijk} J_{j} B_{k} \right) @f$
       type(field_def), parameter :: work_against_Lorentz                &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'work_against_Lorentz',                    &
      &                math = '$ -u_{i} (e_{ijk} J_{j} B_{k}) $')
 !>        Field label of work of Lorentz force
-!!         @f$ u_{i} \left( e_{ijk} J_{j} B_{k} \right) @f$
+!!         @f$  u_{i} \left(e_{ijk} J_{j} B_{k} \right) @f$
       type(field_def), parameter :: Lorentz_work                        &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'Lorentz_work',                            &
@@ -88,17 +100,24 @@
      &                math = '$ u_{i} (B_{j} \partial_{j}) B_{i} $')
 !
 !>        Field label of buoyancy flux
-!!         @f$ -u_{i} \alpha_{T} g_{i} T @f$
-      type(field_def), parameter :: buoyancy_flux                       &
+!!         @f$ -u_{i} \alpha_{T} T g_{i} @f$
+      type(field_def), parameter :: thermal_buoyancy_flux               &
      &    = field_def(n_comp = n_scalar,                                &
-     &                name = 'buoyancy_flux',                           &
-     &                math = '$ -u_{i} \alpha_{T} g_{i} T $')
+     &                name = 'thermal_buoyancy_flux',                   &
+     &                math = '$ -u_{i} \alpha_{T} T g_{i} $')
 !>        Field label of compositional buoyancy flux
-!!         @f$ -u_{i} \alpha_{c} g_{i} C @f$
+!!         @f$ -u_{i} \alpha_{c} C g_{i} @f$
       type(field_def), parameter :: composite_buoyancy_flux             &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'composite_buoyancy_flux',                 &
-     &                math = '$ -u_{i} \alpha_{C} g_{i} C $')
+     &                math = '$ -u_{i} \alpha_{C} C g_{i} $')
+!>        Field label of buoyancy flux
+!!         @f$ -u_{i} \alpha_{T} T g_{i} @f$
+      type(field_def), parameter :: buoyancy_flux                       &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'buoyancy_flux',                           &
+     &                math = '$ -u_{i} (\alpha_{T} T '                  &
+     &                      // ' + \alpha_{C} C) g_{i} $')
 !!
 !>        Field label of magnetic energy flux
 !>       @f$ B_{i}e_{ijk} \partial_{j} (e_{klm}u_{l}B_{m}) @f$
@@ -174,11 +193,13 @@
 !
       check_enegy_fluxes = .FALSE.
       if (    (field_name .eq. inertia_work%name)                       &
+     &   .or. (field_name .eq. work_against_inertia%name)               &
      &   .or. (field_name .eq. work_against_Lorentz%name)               &
      &   .or. (field_name .eq. Lorentz_work%name)                       &
      &   .or. (field_name .eq. mag_tension_work%name)                   &
-     &   .or. (field_name .eq. buoyancy_flux%name)                      &
+     &   .or. (field_name .eq. thermal_buoyancy_flux%name)              &
      &   .or. (field_name .eq. composite_buoyancy_flux%name)            &
+     &   .or. (field_name .eq. buoyancy_flux%name)                      &
 !
      &   .or. (field_name .eq. magnetic_ene_generation%name)            &
      &   .or. (field_name .eq. magnetic_stretch_flux%name)              &
@@ -206,11 +227,13 @@
       call alloc_control_array_c2_i(array_c2i)
 !
       call set_field_label_to_ctl(inertia_work,             array_c2i)
+      call set_field_label_to_ctl(work_against_inertia,     array_c2i)
       call set_field_label_to_ctl(work_against_Lorentz,     array_c2i)
       call set_field_label_to_ctl(Lorentz_work,             array_c2i)
       call set_field_label_to_ctl(mag_tension_work,         array_c2i)
-      call set_field_label_to_ctl(buoyancy_flux,            array_c2i)
+      call set_field_label_to_ctl(thermal_buoyancy_flux,    array_c2i)
       call set_field_label_to_ctl(composite_buoyancy_flux,  array_c2i)
+      call set_field_label_to_ctl(buoyancy_flux,            array_c2i)
       call set_field_label_to_ctl(magnetic_ene_generation,  array_c2i)
       call set_field_label_to_ctl(magnetic_stretch_flux,    array_c2i)
       call set_field_label_to_ctl(temp_generation,          array_c2i)

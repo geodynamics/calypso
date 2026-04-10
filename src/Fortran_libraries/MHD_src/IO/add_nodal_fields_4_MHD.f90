@@ -26,7 +26,7 @@
 !
       use m_machine_parameter
       use t_control_parameter
-      use t_physical_property
+      use t_scalar_property
       use add_nodal_fields_ctl
       use calypso_mpi
 !
@@ -76,6 +76,9 @@
       call add_force_by_sym_sym_ctl(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &    'add_force_by_sym_sym_ctl end'
+      call add_field_ctl_4_sym_scl_comps(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_field_ctl_4_sym_scl_comps end'
 !
       call add_field_w_symmetry_ctl(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
@@ -213,9 +216,12 @@
 !
       if(fl_prop%iflag_FEM_gravity .eq. id_FORCE_at_node) then
         if(fl_prop%flag_thermal_buoyancy)                               &
-     &    call add_phys_name_ctl(buoyancy, field_ctl)
+     &    call add_phys_name_ctl(thermal_buoyancy, field_ctl)
         if(fl_prop%flag_comp_buoyancy)                                  &
      &    call add_phys_name_ctl(composite_buoyancy, field_ctl)
+        if(fl_prop%flag_thermal_buoyancy                                &
+     &       .or. fl_prop%flag_comp_buoyancy)                           &
+     &    call add_phys_name_ctl(buoyancy, field_ctl)
       end if
 !
       end subroutine add_ctl_4_forces

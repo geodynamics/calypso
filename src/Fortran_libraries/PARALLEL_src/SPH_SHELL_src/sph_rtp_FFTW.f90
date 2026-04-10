@@ -19,10 +19,9 @@
 !!   wrapper subroutine for initierize FFT by FFTW
 !! ------------------------------------------------------------------
 !!
-!!      subroutine rtp_fwd_FFTW_to_send                                 &
-!!     &         (sph_rtp, comm_rtp, ncomp_fwd, n_WS, X_rtp, WS, FFTW_f)
+!!      subroutine rtp_fwd_FFTW_to_send(sph_rtp, ncomp_fwd,             &
+!!     &                                n_WS, X_rtp, WS, FFTW_f)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(sph_comm_tbl), intent(in)  :: comm_rtp
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
@@ -178,14 +177,15 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine rtp_fwd_FFTW_to_send                                   &
-     &         (sph_rtp, comm_rtp, ncomp_fwd, n_WS, X_rtp, WS, FFTW_f)
+      subroutine rtp_fwd_FFTW_to_send(sph_rtp, ncomp_fwd,               &
+     &                                n_WS, X_rtp, WS, FFTW_f)
+!     &         (sph_rtp, comm_rtp, ncomp_fwd, n_WS, X_rtp, WS, FFTW_f)
 !
       use set_comm_table_rtp_FFTW
       use copy_rtp_data_to_FFTPACK
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_comm_tbl), intent(in)  :: comm_rtp
+!      type(sph_comm_tbl), intent(in)  :: comm_rtp
 !
       integer(kind = kint), intent(in) :: ncomp_fwd
       real(kind = kreal), intent(in)                                    &

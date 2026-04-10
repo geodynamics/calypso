@@ -6,16 +6,17 @@
 !>@brief control data for isosurfaces
 !!
 !!@verbatim
-!!      subroutine read_files_4_iso_ctl                                 &
-!!     &         (id_control, hd_block, iso_ctls, c_buf)
+!!      subroutine read_files_4_iso_ctl(id_control, hd_block,           &
+!!     &                                iso_ctls, c_buf, error_file)
 !!      subroutine sel_read_control_4_iso_file(id_control, hd_block,    &
-!!     &          file_name, iso_ctl_struct, c_buf)
+!!     &          file_name, iso_ctl_struct, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        character(len = kchara), intent(inout) :: file_name
 !!        type(isosurf_controls), intent(inout) :: iso_ctls
 !!        type(iso_ctl), intent(inout) :: iso_ctl_struct
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!
 !!      subroutine write_files_4_iso_ctl                                &
 !!     &         (id_control, hd_block, iso_ctls, level)
@@ -62,8 +63,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_files_4_iso_ctl                                   &
-     &         (id_control, hd_block, iso_ctls, c_buf)
+      subroutine read_files_4_iso_ctl(id_control, hd_block,             &
+     &                                iso_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use ctl_data_isosurface_IO
@@ -72,8 +73,10 @@
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(isosurf_controls), intent(inout) :: iso_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
       integer(kind = kint) :: n_append
 !
@@ -94,7 +97,9 @@
      &       (hd_block, iso_ctls%num_iso_ctl, c_buf%level)
           call sel_read_control_4_iso_file(id_control, hd_block,        &
      &        iso_ctls%fname_iso_ctl(iso_ctls%num_iso_ctl),             &
-     &        iso_ctls%iso_ctl_struct(iso_ctls%num_iso_ctl), c_buf)
+     &        iso_ctls%iso_ctl_struct(iso_ctls%num_iso_ctl),            &
+     &        c_buf, error_file)
+          if(error_file) return
         end if
       end do
 !
@@ -103,31 +108,38 @@
 !   --------------------------------------------------------------------
 !
       subroutine sel_read_control_4_iso_file(id_control, hd_block,      &
-     &          file_name, iso_ctl_struct, c_buf)
+     &          file_name, iso_ctl_struct, c_buf, error_file)
 !
       use t_read_control_elements
       use ctl_data_isosurface_IO
+      use write_control_elements
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       character(len = kchara), intent(inout) :: file_name
       type(iso_ctl), intent(inout) :: iso_ctl_struct
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
-        write(*,'(a)', ADVANCE='NO') ' is read from file... '
+        call check_write_ctl_file_message(file_name, error_file)
+        if(error_file) return
+!
         call read_control_4_iso_file((id_control+2), file_name,         &
-     &                               hd_block, iso_ctl_struct, c_buf)
+     &      hd_block, iso_ctl_struct, c_buf, error_file)
+        if(error_file) return
       else if(check_begin_flag(c_buf, hd_block)) then
         file_name = 'NO_FILE'
 !
         write(*,'(a)') ' is included'
         call s_read_iso_control_data(id_control, hd_block,              &
-     &                               iso_ctl_struct, c_buf)
+     &                               iso_ctl_struct, c_buf, error_file)
+        if(error_file) return
       end if
 !
       end subroutine sel_read_control_4_iso_file
@@ -135,7 +147,7 @@
 !   --------------------------------------------------------------------
 !
       subroutine read_control_4_iso_file(id_control, file_name,         &
-     &          hd_block, iso_ctl_struct, c_buf)
+     &          hd_block, iso_ctl_struct, c_buf, error_file)
 !
       use t_read_control_elements
       use t_control_data_4_iso
@@ -146,22 +158,27 @@
       character(len=kchara), intent(in) :: hd_block
       type(iso_ctl), intent(inout) :: iso_ctl_struct
       type(buffer_for_control), intent(inout) :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       c_buf%level = c_buf%level + 1
-      write(*,*) 'Isosurface control file: ', trim(file_name)
       open(id_control, file=file_name, status='old')
 !
       do
         call load_one_line_from_control(id_control, hd_block, c_buf)
         if(c_buf%iend .gt. 0) exit
 !
-        call s_read_iso_control_data                                    &
-     &     (id_control, hd_block, iso_ctl_struct, c_buf)
-        call s_read_iso_control_data                                    &
-     &     (id_control, hd_isosurf_ctl, iso_ctl_struct, c_buf)
-        call s_read_iso_control_data                                    &
-     &     (id_control, hd_iso_ctl, iso_ctl_struct, c_buf)
+        call s_read_iso_control_data(id_control, hd_block,              &
+     &                               iso_ctl_struct, c_buf, error_file)
+        if(error_file) return
+!
+        call s_read_iso_control_data(id_control, hd_isosurf_ctl,        &
+     &                               iso_ctl_struct, c_buf, error_file)
+        if(error_file) return
+!
+        call s_read_iso_control_data(id_control, hd_iso_ctl,            &
+     &                               iso_ctl_struct, c_buf, error_file)
+        if(error_file) return
         if(iso_ctl_struct%i_iso_ctl .gt. 0) exit
       end do
       close(id_control)

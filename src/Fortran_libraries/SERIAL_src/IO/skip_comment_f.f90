@@ -315,11 +315,10 @@
 !
       real(kind = kreal), intent(in) :: data, ref
 !
-      if(ref .eq. 0.0d0) then
-        compare_data = abs(data)
-      else
-        compare_data = abs((data - ref) / ref)
-      end if
+      compare_data = abs(data - ref)
+      if(compare_data .eq. 0.0d0) return
+!
+      compare_data = compare_data / max(abs(data), abs(ref))
 !
       end function compare_data
 !

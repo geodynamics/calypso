@@ -7,11 +7,14 @@
 !>@brief  Control data of node monitoring
 !!
 !!@verbatim
-!!      subroutine read_control_file_section_only(file_name,            &
-!!     &                                          sec_viz_ctl, c_buf)
+!!      subroutine read_control_file_section_only                       &
+!!     &         (file_name, sec_viz_ctl, c_buf, error_file)
 !!      subroutine write_control_file_section_only(file_name,           &
 !!     &                                           sec_viz_ctl)
-!!        character(len=kchara), intent(in) :: file_name
+!!        haracter(len=kchara), intent(in) :: file_name
+!!        type(control_data_section_only), intent(inout) :: sec_viz_ctl
+!!        type(buffer_for_control), intent(inout) :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine dealloc_section_control_data(sec_viz_ctl)
 !!        type(control_data_section_only), intent(inout) :: sec_viz_ctl
 !!
@@ -93,8 +96,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_control_file_section_only(file_name,              &
-     &                                          sec_viz_ctl, c_buf)
+      subroutine read_control_file_section_only                         &
+     &         (file_name, sec_viz_ctl, c_buf, error_file)
 !
       use skip_comment_f
       use t_control_data_surfacings
@@ -102,6 +105,7 @@
       character(len=kchara), intent(in) :: file_name
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
       type(buffer_for_control), intent(inout) :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       c_buf%level = c_buf%level + 1
@@ -113,7 +117,9 @@
         if(c_buf%iend .gt. 0) exit
 !
         call read_section_control_data                                  &
-     &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf)
+     &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl,           &
+     &      c_buf, error_file)
+        if(error_file) return
         if(sec_viz_ctl%i_viz_only_file .gt. 0) exit
       end do
       close(viz_ctl_file_code)
@@ -160,8 +166,8 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_section_control_data                              &
-     &         (id_control, hd_block, sec_viz_ctl, c_buf)
+      subroutine read_section_control_data(id_control, hd_block,        &
+     &          sec_viz_ctl, c_buf, error_file)
 !
       use skip_comment_f
       use ctl_data_platforms_IO
@@ -173,6 +179,7 @@
 !
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(sec_viz_ctl%i_viz_only_file .gt. 0) return
@@ -187,8 +194,9 @@
         call read_control_time_step_data                                &
      &     (id_control, hd_time_step, sec_viz_ctl%t_sect_ctl, c_buf)
 !
-        call s_read_surfacing_controls                                  &
-     &     (id_control, hd_viz_ctl, sec_viz_ctl%surfacing_ctls, c_buf)
+        call s_read_surfacing_controls(id_control, hd_viz_ctl,          &
+     &      sec_viz_ctl%surfacing_ctls, c_buf, error_file)
+        if(error_file) return
       end do
       sec_viz_ctl%i_viz_only_file = 1
 !

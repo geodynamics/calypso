@@ -1,0 +1,5 @@
+!-----------------------------------------------------------------------
+!     Example of static solution with heat and compositional source terms
+!-----------------------------------------------------------------------
+!
+ Restart data files are stored in this directory.

@@ -14,7 +14,7 @@
 !!     &         (nnod_4_ele, nnod_4_surf, nnod_4_edge)
 !!      subroutine set_3D_nnod_4_sfed_by_ele,                           &
 !!     &         (nnod_4_ele, nnod_4_surf, nnod_4_edge)
-!!      subroutine s_set_nnod_4_ele_by_type(itype, nnod_4_ele)
+!!      subroutine s_set_nnod_4_ele_by_eletype(itype, nnod_4_ele)
 !!
 !!      integer(kind = kint) function                                   &
 !!     &              set_cube_eletype_from_num(nnod_4_ele)
@@ -100,7 +100,7 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine s_set_nnod_4_ele_by_type(itype, nnod_4_ele)
+      subroutine s_set_nnod_4_ele_by_eletype(itype, nnod_4_ele)
 !
       use m_geometry_constants
 !
@@ -166,7 +166,7 @@
         nnod_4_ele =  8
       end if
 !
-      end subroutine s_set_nnod_4_ele_by_type
+      end subroutine s_set_nnod_4_ele_by_eletype
 !
 !------------------------------------------------------------------
 !

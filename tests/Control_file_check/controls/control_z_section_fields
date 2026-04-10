@@ -1,0 +1,14 @@
+!
+!     example of field linst for sectioning module
+!
+  begin output_field_define
+    array output_field
+      output_field  temperature           scalar
+      output_field  velocity              cylindrical_vector
+      output_field  vorticity             cylindrical_vector
+      output_field  magnetic_field        cylindrical_vector
+!
+      output_field  Lorentz_work         scalar
+      output_field  buoyancy_flux        scalar
+    end array output_field
+  end output_field_define

@@ -57,6 +57,7 @@
 !
       use skip_comment_f
       use set_sph_boundary_from_file
+      use set_each_sph_bc_IO_data
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -90,6 +91,7 @@
 !
       use skip_comment_f
       use set_sph_boundary_from_file
+      use set_each_sph_bc_IO_data
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -139,6 +141,7 @@
 !
       use skip_comment_f
       use set_sph_boundary_from_file
+      use set_each_sph_bc_IO_data
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -172,6 +175,7 @@
 !
       use skip_comment_f
       use set_sph_boundary_from_file
+      use set_each_sph_bc_IO_data
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -220,6 +224,7 @@
 !
       use skip_comment_f
       use set_sph_boundary_from_file
+      use set_each_sph_bc_IO_data
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -253,6 +258,7 @@
 !
       use skip_comment_f
       use set_sph_boundary_from_file
+      use set_each_sph_bc_IO_data
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj

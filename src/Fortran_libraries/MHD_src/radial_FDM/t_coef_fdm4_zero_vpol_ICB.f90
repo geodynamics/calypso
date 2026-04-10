@@ -211,7 +211,7 @@
      &    mat_fdm_noslip_ICB1_4, ierr)
 !
       if(ierr .eq. 1) then
-        write(*,*) 'singular matrix mat_fdm_noslip_ICB1_4 ',            &
+        write(*,*) 'singular matrix in mat_fdm_noslip_ICB1_4 ',         &
      &            r_from_ICB(0)
       end if
 !

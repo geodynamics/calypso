@@ -25,13 +25,6 @@
 !!        type(phys_data), intent(in) :: radial_variation
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        real(kind = kreal), intent(inout) :: h_rho_in, h_rho_out
-!!
-!!      subroutine check_bc_sph_mhd(id_file, sph_rj,                    &
-!!     &                            MHD_prop, sph_MHD_bc)
-!!        integer(kind = kint), intent(in) :: id_file
-!!        type(sph_rj_grid), intent(in) ::  sph_rj
-!!        type(MHD_evolution_param), intent(in) :: MHD_prop
-!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!@endverbatim
 !
       module set_bc_sph_mhd
@@ -88,7 +81,8 @@
 !
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_velo_sph'
-        call set_sph_bc_velo_sph(bc_IO, sph_rj, radial_rj_grp,          &
+        call set_sph_bc_velo_sph                                        &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      sph_params%radius_ICB, sph_params%radius_CMB,               &
      &      MHD_BC%velo_BC%nod_BC, MHD_BC%velo_BC%surf_BC,              &
      &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
@@ -105,7 +99,8 @@
 !
       if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_temp_sph'
-        call set_sph_bc_temp_sph(bc_IO, sph_rj, radial_rj_grp,          &
+        call set_sph_bc_temp_sph                                        &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      MHD_BC%temp_BC%nod_BC, MHD_BC%temp_BC%surf_BC,              &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T)
         call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_T)
@@ -113,8 +108,8 @@
 !
       if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 's_set_sph_bc_magne_sph'
-        call s_set_sph_bc_magne_sph(bc_IO, sph_rj, radial_rj_grp,       &
-     &      CTR_nod_grp_name, CTR_sf_grp_name,                          &
+        call s_set_sph_bc_magne_sph                                     &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      MHD_BC%magne_BC%nod_BC, MHD_BC%magne_BC%surf_BC,            &
      &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%bcs_B)
         call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_B)
@@ -122,7 +117,8 @@
 !
       if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_composition_sph'
-        call set_sph_bc_composition_sph(bc_IO, sph_rj, radial_rj_grp,   &
+        call set_sph_bc_composition_sph                                 &
+     &     (bc_IO, sph_params, sph_rj, radial_rj_grp,                   &
      &      MHD_BC%light_BC%nod_BC, MHD_BC%light_BC%surf_BC,            &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C)
         call cal_fdm_coefs_4_BCs(sph_rj, sph_MHD_bc%sph_bc_C)
@@ -164,74 +160,6 @@
       end if
 !
       end subroutine density_diff_at_boundaries
-!
-! -----------------------------------------------------------------------
-!
-      subroutine check_bc_sph_mhd(id_file, sph_rj,                      &
-     &                            MHD_prop, sph_MHD_bc)
-!
-      use m_base_field_labels
-!
-      use t_coef_fdm1_free_rotate_ICB
-      use t_coef_fdm1_free_rotate_CMB
-      use set_bc_flag_sph_velo
-      use set_bc_sph_scalars
-!
-      use set_sph_bc_magne_sph
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!
-!
-      if(iflag_debug .gt. 1) then
-        write(id_file,*) 'sph_bc_U%iflag_icb',                          &
-     &        sph_MHD_bc%sph_bc_U%kr_in,  sph_MHD_bc%sph_bc_U%iflag_icb
-        write(id_file,*) 'sph_bc_U%iflag_cmb',                          &
-     &        sph_MHD_bc%sph_bc_U%kr_out, sph_MHD_bc%sph_bc_U%iflag_cmb
-        write(id_file,*) 'sph_bc_T%iflag_icb',                          &
-     &        sph_MHD_bc%sph_bc_T%kr_in,  sph_MHD_bc%sph_bc_T%iflag_icb
-        write(id_file,*) 'sph_bc_T%iflag_cmb',                          &
-     &        sph_MHD_bc%sph_bc_T%kr_out, sph_MHD_bc%sph_bc_T%iflag_cmb
-        write(id_file,*) 'sph_bc_B%iflag_icb',                          &
-     &        sph_MHD_bc%sph_bc_B%kr_in,  sph_MHD_bc%sph_bc_B%iflag_icb
-        write(id_file,*) 'sph_bc_B%iflag_cmb',                          &
-     &        sph_MHD_bc%sph_bc_B%kr_out, sph_MHD_bc%sph_bc_B%iflag_cmb
-        write(id_file,*) 'sph_bc_C%iflag_icb',                          &
-     &        sph_MHD_bc%sph_bc_C%kr_in,  sph_MHD_bc%sph_bc_C%iflag_icb
-        write(id_file,*) 'sph_bc_C%iflag_cmb',                          &
-     &        sph_MHD_bc%sph_bc_C%kr_out, sph_MHD_bc%sph_bc_C%iflag_cmb
-      end if
-!
-      if (iflag_debug .eq. iflag_full_msg) then
-        if (MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
-          call check_fdm_coefs_4_BC2                                    &
-     &       (id_file, velocity%name, sph_MHD_bc%sph_bc_U)
-!
-          call check_sph_fdm_boundaries(id_file,                        &
-     &        sph_MHD_bc%sph_bc_U%kr_in, sph_MHD_bc%sph_bc_U%kr_out,    &
-     &        sph_rj, sph_MHD_bc%bc_fdms_U)
-        end if
-!
-        if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution)     &
-     &   then
-          call check_fdm_coefs_4_BC2                                    &
-     &       (id_file, magnetic_field%name, sph_MHD_bc%sph_bc_B)
-        end if
-        if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
-          call check_fdm_coefs_4_BC2                                    &
-     &       (id_file, temperature%name,  sph_MHD_bc%sph_bc_T)
-        end if
-        if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
-          call check_fdm_coefs_4_BC2                                    &
-     &       (id_file, composition%name, sph_MHD_bc%sph_bc_C)
-        end if
-!
-        call check_fdm2_coefs_centre(id_file, sph_MHD_bc%fdm2_center)
-      end if
-!
-      end subroutine check_bc_sph_mhd
 !
 ! -----------------------------------------------------------------------
 !

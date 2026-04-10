@@ -45,6 +45,9 @@
 !!    heat_Nusselt_number_format        'gzip'
 !!    comp_Nusselt_number_format        'gzip'
 !!
+!!    CMB_average_file_prefix         'CMB_average'
+!!    CMB_average_file_format         'gzip'
+!!
 !!    typical_scale_prefix         'typical_scale'
 !!    typical_scale_format         'gzip'
 !!
@@ -121,15 +124,15 @@
       character(len=kchara), parameter, private                         &
      &           :: hd_voume_rms_head = 'volume_pwr_spectr_prefix'
       character(len=kchara), parameter, private                         &
-     &            :: hd_vol_lor_wk = 'volume_work_spectr_prefix'
+     &            :: hd_vol_lor_wk =    'volume_work_spectr_prefix'
 !
       character(len=kchara), parameter, private                         &
      &           :: hd_voume_rms_format = 'volume_pwr_spectr_format'
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_degree_spectr_switch = 'degree_spectra_switch'
+     &           :: hd_degree_spectr_switch =  'degree_spectra_switch'
       character(len=kchara), parameter, private                         &
-     &           :: hd_order_spectr_switch = 'order_spectra_switch'
+     &           :: hd_order_spectr_switch =   'order_spectra_switch'
       character(len=kchara), parameter, private                         &
      &           :: hd_diff_lm_spectr_switch = 'diff_lm_spectra_switch'
       character(len=kchara), parameter, private                         &
@@ -138,24 +141,33 @@
       character(len=kchara), parameter, private                         &
      &           :: hd_Nusselt_file_head = 'nusselt_number_prefix'
       character(len=kchara), parameter, private                         &
-     &           :: hd_Nusselt_file_fmt = 'nusselt_number_format'
+     &           :: hd_Nusselt_file_fmt =  'nusselt_number_format'
+!
       character(len=kchara), parameter, private                         &
-     &           :: hd_typ_scale_file_head = 'typical_scale_prefix'
+     &           :: hd_typ_scale_file_head =   'typical_scale_prefix'
       character(len=kchara), parameter, private                         &
      &           :: hd_typ_scale_file_format = 'typical_scale_format'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_CMB_ave_file_prefix =  'CMB_average_file_prefix'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_CMB_ave_file_format =  'CMB_average_file_format'
 !
        character(len=kchara), parameter, private                        &
-     &    :: hd_heat_Nusselt_file_head = 'heat_Nusselt_number_prefix'
+     &    :: hd_thrm_Nu_file_head = 'thermal_Nusselt_number_prefix'
        character(len=kchara), parameter, private                        &
-     &    :: hd_comp_Nusselt_file_head = 'comp_Nusselt_number_prefix'
+     &    :: hd_thrm_Nu_file_fmt =  'thermal_Nusselt_number_format'
        character(len=kchara), parameter, private                        &
-     &    :: hd_heat_Nusselt_file_fmt = 'heat_Nusselt_number_format'
+     &    :: hd_comp_Nu_file_head = 'comp_Nusselt_number_prefix'
        character(len=kchara), parameter, private                        &
-     &    :: hd_comp_Nusselt_file_fmt = 'comp_Nusselt_number_format'
+     &    :: hd_comp_Nu_file_fmt =  'comp_Nusselt_number_format'
 !
 !     Deprecated labels
        character(len=kchara), parameter, private                        &
-     &            :: hd_mid_eq_monitor_ctl = 'mid_equator_monitor_ctl'
+     &    :: hd_mid_eq_monitor_ctl = 'mid_equator_monitor_ctl'
+       character(len=kchara), parameter, private                        &
+     &    :: hd_heat_Nu_file_head = 'heat_Nusselt_number_prefix'
+       character(len=kchara), parameter, private                        &
+     &    :: hd_heat_Nu_file_fmt = 'heat_Nusselt_number_format'
 !
 ! -----------------------------------------------------------------------
 !
@@ -204,24 +216,35 @@
         call read_volume_spectr_ctl                                     &
      &     (id_control, hd_vol_spec_block, smonitor_ctl, c_buf)
 !
+        call read_chara_ctl_type(c_buf, hd_thrm_Nu_file_head,           &
+     &      smonitor_ctl%heat_Nusselt_file_prefix)
+        call read_chara_ctl_type(c_buf, hd_heat_Nu_file_head,           &
+     &      smonitor_ctl%heat_Nusselt_file_prefix)
         call read_chara_ctl_type(c_buf, hd_Nusselt_file_head,           &
      &      smonitor_ctl%heat_Nusselt_file_prefix)
+!
+        call read_chara_ctl_type(c_buf, hd_thrm_Nu_file_fmt,            &
+     &      smonitor_ctl%heat_Nusselt_file_format)
+        call read_chara_ctl_type(c_buf, hd_heat_Nu_file_fmt,            &
+     &      smonitor_ctl%heat_Nusselt_file_format)
         call read_chara_ctl_type(c_buf, hd_Nusselt_file_fmt,            &
      &      smonitor_ctl%heat_Nusselt_file_format)
 !
-        call read_chara_ctl_type(c_buf, hd_heat_Nusselt_file_head,      &
-     &      smonitor_ctl%heat_Nusselt_file_prefix)
-        call read_chara_ctl_type(c_buf, hd_heat_Nusselt_file_fmt,       &
-     &      smonitor_ctl%heat_Nusselt_file_format)
-        call read_chara_ctl_type(c_buf, hd_comp_Nusselt_file_head,      &
+        call read_chara_ctl_type(c_buf, hd_comp_Nu_file_head,           &
      &      smonitor_ctl%comp_Nusselt_file_prefix)
-        call read_chara_ctl_type(c_buf, hd_comp_Nusselt_file_fmt,       &
+        call read_chara_ctl_type(c_buf, hd_comp_Nu_file_fmt,            &
      &      smonitor_ctl%comp_Nusselt_file_format)
 !
         call read_chara_ctl_type(c_buf, hd_typ_scale_file_head,         &
      &      smonitor_ctl%typ_scale_file_prefix_ctl)
         call read_chara_ctl_type(c_buf, hd_typ_scale_file_format,       &
      &      smonitor_ctl%typ_scale_file_format_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_CMB_ave_file_prefix,         &
+     &      smonitor_ctl%CMB_ave_file_prefix_ctl)
+        call read_chara_ctl_type(c_buf, hd_CMB_ave_file_format,         &
+     &      smonitor_ctl%CMB_ave_file_format_ctl)
+!
         call read_chara_ctl_type(c_buf, hd_voume_ave_head,              &
      &      smonitor_ctl%volume_average_prefix)
         call read_chara_ctl_type(c_buf, hd_voume_rms_head,              &
@@ -266,12 +289,14 @@
 !
       maxlen = len_trim(hd_Nusselt_file_head)
       maxlen = max(maxlen, len_trim(hd_Nusselt_file_fmt))
-      maxlen = max(maxlen, len_trim(hd_heat_Nusselt_file_head))
-      maxlen = max(maxlen, len_trim(hd_heat_Nusselt_file_fmt))
-      maxlen = max(maxlen, len_trim(hd_comp_Nusselt_file_head))
-      maxlen = max(maxlen, len_trim(hd_comp_Nusselt_file_fmt))
+      maxlen = max(maxlen, len_trim(hd_thrm_Nu_file_head))
+      maxlen = max(maxlen, len_trim(hd_thrm_Nu_file_fmt))
+      maxlen = max(maxlen, len_trim(hd_comp_Nu_file_head))
+      maxlen = max(maxlen, len_trim(hd_comp_Nu_file_fmt))
       maxlen = max(maxlen, len_trim(hd_typ_scale_file_head))
       maxlen = max(maxlen, len_trim(hd_typ_scale_file_format))
+      maxlen = max(maxlen, len_trim(hd_CMB_ave_file_prefix))
+      maxlen = max(maxlen, len_trim(hd_CMB_ave_file_format))
       maxlen = max(maxlen, len_trim(hd_voume_ave_head))
       maxlen = max(maxlen, len_trim(hd_voume_rms_head))
       maxlen = max(maxlen, len_trim(hd_vol_lor_wk))
@@ -330,6 +355,11 @@
      &                          smonitor_ctl%typ_scale_file_prefix_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &                          smonitor_ctl%typ_scale_file_format_ctl)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          smonitor_ctl%CMB_ave_file_prefix_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &                          smonitor_ctl%CMB_ave_file_format_ctl)
 !
       call write_ctl_data_dynamobench(id_control,                       &
      &                                smonitor_ctl%dbench_ctl, level)

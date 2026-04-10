@@ -8,12 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine compare_field_vector(n_point, numdir, fld_name,      &
-!!     &                                d_fld1, d_fld2, icount_error)
+!!     &          d_fld1, d_fld2, diff_limit, diff_max, icount_error)
 !!        character(len=kchara), intent(in) :: fld_name
 !!        integer(kind = kint), intent(in) :: n_point, numdir
 !!        real(kind = kreal), intent(in) :: d_fld1(n_point,numdir)
 !!        real(kind = kreal), intent(in) :: d_fld2(n_point,numdir)
+!!        real(kind = kreal), intent(in) :: diff_limit
 !!        integer(kind = kint), intent(inout) :: icount_error
+!!        real(kind = kreal), intent(inout) :: diff_max
 !!
 !!      integer(kind = kint) function                                   &
 !!     &                    check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
@@ -38,8 +40,6 @@
 !
       implicit none
 !
-      real(kind = kreal), parameter :: TINY = 1.0d-12
-!
 !------------------------------------------------------------------
 !
       contains
@@ -47,7 +47,7 @@
 !------------------------------------------------------------------
 !
       subroutine compare_field_vector(n_point, numdir, fld_name,        &
-     &                                d_fld1, d_fld2, icount_error)
+     &          d_fld1, d_fld2, diff_limit, diff_max, icount_error)
 !
       use m_machine_parameter
 !
@@ -57,8 +57,10 @@
       integer(kind = kint), intent(in) :: n_point, numdir
       real(kind = kreal), intent(in) :: d_fld1(n_point,numdir)
       real(kind = kreal), intent(in) :: d_fld2(n_point,numdir)
+      real(kind = kreal), intent(in) :: diff_limit
 !
       integer(kind = kint), intent(inout) :: icount_error
+      real(kind = kreal), intent(inout) :: diff_max
 !
       real(kind = kreal), allocatable :: vmin(:), vmax(:), size(:)
       real(kind = kreal) :: scale, diff
@@ -87,9 +89,11 @@
       do inod = 1, n_point
         do icomp = 1, numdir
           diff = d_fld2(inod,icomp) - d_fld1(inod,icomp)
-          if((abs(diff) / scale) .gt. TINY) then
-            write(*,*) icomp, '-component of ', trim(fld_name),     &
-     &                ' at ', inod, ' is different: ', diff
+          if(abs(diff) .gt. diff_max) diff_max = abs(diff)
+          if((abs(diff) / scale) .gt. diff_limit) then
+            write(*,*) icomp, '-component of ', trim(fld_name),         &
+     &                ' at ', inod, ' is different: ', diff, ' data: ', &
+     &               d_fld2(inod,icomp), d_fld1(inod,icomp)
             icount_error = icount_error + 1
           end if
         end do

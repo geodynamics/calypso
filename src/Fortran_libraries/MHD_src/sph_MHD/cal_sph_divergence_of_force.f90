@@ -64,7 +64,6 @@
 !
       use t_control_parameter
       use const_sph_divergence
-!      use div_self_buoyancies_sph
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -103,14 +102,6 @@
      &    sph_rj, r_2nd, sph_MHD_bc, g_sph_rj,                          &
      &    ipol_frc, ipol_div_frc, rj_fld)
 !
-!      call sel_div_buoyancies_sph_MHD                                  &
-!     &   (MHD_prop%fl_prop%flag_thermal_buoyancy,                      &
-!     &    MHD_prop%fl_prop%flag_comp_buoyancy,                         &
-!     &    sph_rj, ipol_base, ipol_grad, ipol_div_frc,                  &
-!     &    MHD_prop%fl_prop%coef_buo,  MHD_prop%fl_prop%coef_comp_buo,  &
-!     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                  &
-!     &    sph_MHD_bc%sph_bc_U, rj_fld)
-!
       end subroutine cal_div_of_forces_sph_2
 !
 ! -----------------------------------------------------------------------
@@ -137,7 +128,7 @@
       if(flag_thermal_buoyancy) then
         call const_sph_div_force                                        &
      &     (sph_rj, r_2nd, sph_MHD_bc%sph_bc_U, g_sph_rj,               &
-     &      ipol_frc%i_buoyancy, ipol_div_frc%i_buoyancy, rj_fld)
+     &      ipol_frc%i_thrm_buo, ipol_div_frc%i_thrm_buo, rj_fld)
       end if
 !
       if(flag_comp_buoyancy) then

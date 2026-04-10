@@ -40,9 +40,13 @@ m_precision.o \
 m_constants.o \
 m_machine_parameter.o \
 \
+normalize_for_FFTPACK.o \
+multi_pin_FFTPACK_smp.o \
 FFTPACK5_wrapper.o \
+calypso_multi_fftpack.o \
 t_FFTPACK5_wrapper.o \
 \
+m_FFT_size.o      \
 t_fft_test_data.o \
 test_FFTPACK5.o
 
@@ -53,9 +57,13 @@ m_machine_parameter.o \
 \
 skip_comment_f.o \
 m_fftw_parameters.o \
+normalize_for_FFTW.o \
+multi_pin_FFTW3_smp.o \
 FFTW3_multi_wrapper.o \
+calypso_multi_FFTW3.o \
 t_multi_FFTW_wrapper.o \
 \
+m_FFT_size.o      \
 t_fft_test_data.o \
 test_FFTW3.o
 
@@ -66,11 +74,24 @@ m_machine_parameter.o \
 \
 skip_comment_f.o \
 m_fftw_parameters.o \
+normalize_for_FFTW.o \
+single_pin_FFTW3_smp.o \
 FFTW3_wrapper.o \
+calypso_single_FFTW3.o \
 t_FFTW_wrapper.o \
 \
+m_FFT_size.o      \
 t_fft_test_data.o \
 test_single_FFTW3.o
+
+MOD_CMPR_FFT_TEST = \
+m_precision.o \
+m_constants.o \
+m_machine_parameter.o \
+\
+compare_FFT_test.o \
+m_FFT_size.o      \
+t_fft_test_data.o
 
 MOD_CMPR_FFT_TEST = \
 m_precision.o \
@@ -137,8 +158,8 @@ lib_name:
 mod_list:
 	@echo  MOD_FFTPACK_TEST=      \\  >> $(MAKENAME)
 	@echo  $(MOD_FFTPACK_TEST)        >> $(MAKENAME)
-	@echo  MOD_FFW3_F_TEST=      \\  >> $(MAKENAME)
-	@echo  $(MOD_FFW3_F_TEST)        >> $(MAKENAME)
+	@echo  MOD_FFW3_F_TEST=       \\  >> $(MAKENAME)
+	@echo  $(MOD_FFW3_F_TEST)         >> $(MAKENAME)
 	@echo  MOD_SGL_FFW3_TEST=      \\  >> $(MAKENAME)
 	@echo  $(MOD_SGL_FFW3_TEST)        >> $(MAKENAME)
 	@echo  MOD_CMPR_FFT_TEST=      \\  >> $(MAKENAME)

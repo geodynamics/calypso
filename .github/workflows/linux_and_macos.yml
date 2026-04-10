@@ -27,8 +27,13 @@ jobs:
     - name: build
       run: |
         sudo apt update
+<<<<<<< HEAD
         sudo apt install pkg-config git gfortran libopenmpi-dev \
           zlib1g zlib1g-dev libblas-dev libfftw3-dev libhdf5-openmpi-dev libpng-dev
+=======
+        sudo apt install pkg-config git libopenmpi-dev \
+          zlib1g zlib1g-dev libblas-dev libfftw3-dev libhdf5-openmpi-dev
+>>>>>>> refs/heads/Ver.2.0_alpha
 
         ./configure \
           --with-fftw3 \
@@ -43,12 +48,14 @@ jobs:
 
   Run-on-Mac:
     name: test-compile on Mac
-    runs-on: [macos-14]
+    runs-on: [macos-latest]
     steps:
     - uses: actions/checkout@v2
     - name: build
       run: |
+        brew reinstall gcc
         brew info gfortran
+<<<<<<< HEAD
         brew info open-mpi
         brew install gfortran
 
@@ -58,6 +65,10 @@ jobs:
         ln -s $a $c
 
         brew install open-mpi fftw hdf5-mpi libpng
+=======
+        brew install open-mpi fftw hdf5-mpi
+        brew info open-mpi
+>>>>>>> refs/heads/Ver.2.0_alpha
         
         mpicc -v
         mpif90 -v

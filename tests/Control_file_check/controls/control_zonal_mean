@@ -1,0 +1,35 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin cross_section_ctl
+  section_file_prefix        'sections/zm_y0'
+  section_file_format        PSF_gz
+!
+  file surface_define  'controls/control_surface_y0'
+!
+  begin output_field_define
+    array output_field
+      output_field  temperature                  scalar
+      output_field  velocity                     spherical_vector 
+      output_field  vorticity                    spherical_vector 
+      output_field  magnetic_field               spherical_vector 
+!
+      output_field  stream_pol_velocity          phi
+      output_field  stream_pol_magne             phi
+!
+      output_field  sym_temperature              scalar
+      output_field  asym_temperature             scalar
+      output_field  sym_magnetic_field           spherical_vector
+      output_field  asym_magnetic_field          spherical_vector
+!
+      output_field  sym_thermal_buoyancy_flux    scalar
+      output_field  asym_thermal_buoyancy_flux   scalar
+      output_field  us_d_js_x_ba                 scalar
+      output_field  us_d_ja_x_bs                 scalar
+      output_field  ua_d_ja_x_ba                 scalar
+      output_field  ua_d_js_x_bs                 scalar
+      output_field  -us_d_ws_x_ua                scalar
+    end array output_field
+  end output_field_define
+end cross_section_ctl

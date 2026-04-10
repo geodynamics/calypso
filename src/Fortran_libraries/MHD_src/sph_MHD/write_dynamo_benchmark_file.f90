@@ -52,13 +52,14 @@
      &                           hdr_ltr = 'truncation',                &
      &                           hdr_ICB_id = 'ICB_id',                 &
      &                           hdr_CMB_id = 'CMB_id',                 &
-     &                           hdr_kr_in =  'Not_used',               &
-     &                           hdr_r_in =   'Not_used',               &
+     &                           hdr_kr_in =  'Lower_boundary_ID',      &
+     &                           hdr_r_in =   'Lower_boundary_radius',  &
      &                           hdr_kr_out = 'Upper_boundary_ID',      &
      &                           hdr_r_out =  'Upper_boundary_radius',  &
      &                           hdr_num_field = 'Number_of_field',     &
      &                           hdr_num_comp = 'Number_of_components')
 !
+      private :: write_dynamobench_file
       private :: dup_dynamobench_header_to_IO
       private :: dup_detail_dbench_header_to_IO
 !
@@ -131,8 +132,8 @@
 !
       if(my_rank .ne. 0) return
 !
-      call dup_dynamobench_header_to_IO                                 &
-     &   (sph_params, sph_rj, ipol, sph_MHD_bc, v_pwr, sph_OUT_d)
+      call dup_dynamobench_header_to_IO(sph_params, sph_rj, ipol,       &
+     &    sph_MHD_bc, v_pwr, bench%m_bench, sph_OUT_d)
 !
       allocate(data_out(sph_OUT_d%ntot_sph_spec))
       call dup_dynamobench_monitor_data                                 &
@@ -189,8 +190,8 @@
       if(no_file_flag(bench%detail_bench_file_prefix)) return
       if(my_rank .ne. 0) return
 !
-      call dup_detail_dbench_header_to_IO                               &
-     &   (sph_params, sph_rj, ipol, sph_MHD_bc, v_pwr, sph_OUT_d)
+      call dup_detail_dbench_header_to_IO(sph_params, sph_rj, ipol,     &
+     &    sph_MHD_bc, v_pwr, bench%m_bench, sph_OUT_d)
 !
       allocate(detail_out(sph_OUT_d%ntot_sph_spec))
       call dup_detail_dbench_monitor_data                               &
@@ -215,8 +216,8 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine dup_dynamobench_header_to_IO                           &
-     &         (sph_params, sph_rj, ipol, sph_MHD_bc, v_pwr, sph_OUT)
+      subroutine dup_dynamobench_header_to_IO(sph_params, sph_rj,       &
+     &          ipol, sph_MHD_bc, v_pwr, m_bench, sph_OUT)
 !
       use dup_dynamobench_data_to_IO
 !
@@ -225,6 +226,7 @@
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(phys_address), intent(in) :: ipol
       type(sph_vol_mean_squares), intent(in) :: v_pwr
+      integer(kind = kint), intent(in) :: m_bench
 !
       type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
@@ -249,15 +251,15 @@
       call alloc_sph_espec_name(sph_OUT)
       call copy_dynamobench_monitor_name                                &
      &   (sph_MHD_bc%sph_bc_U, sph_MHD_bc%sph_bc_B, ipol%base,          &
-     &    sph_OUT%nfield_sph_spec, sph_OUT%num_labels,                  &
+     &    m_bench, sph_OUT%nfield_sph_spec, sph_OUT%num_labels,         &
      &    sph_OUT%ncomp_sph_spec, sph_OUT%ene_sph_spec_name)
 !
       end subroutine dup_dynamobench_header_to_IO
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dup_detail_dbench_header_to_IO                         &
-     &         (sph_params, sph_rj, ipol, sph_MHD_bc, v_pwr, sph_OUT)
+      subroutine dup_detail_dbench_header_to_IO(sph_params, sph_rj,     &
+     &          ipol, sph_MHD_bc, v_pwr, m_bench, sph_OUT)
 !
       use dup_detailed_dbench_to_IO
 !
@@ -266,6 +268,7 @@
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(phys_address), intent(in) :: ipol
       type(sph_vol_mean_squares), intent(in) :: v_pwr
+      integer(kind = kint), intent(in) :: m_bench
 !
       type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
@@ -284,13 +287,13 @@
 !
       call cnt_detail_dbench_monitor_name                               &
      &   (sph_MHD_bc%sph_bc_U, sph_MHD_bc%sph_bc_B, ipol%base,          &
-     &    sph_OUT%nfield_sph_spec, sph_OUT%ntot_sph_spec)
+     &    m_bench, sph_OUT%nfield_sph_spec, sph_OUT%ntot_sph_spec)
 !
       sph_OUT%num_time_labels = 2
       call alloc_sph_espec_name(sph_OUT)
       call copy_detail_dbench_monitor_name                              &
      &   (sph_MHD_bc%sph_bc_U, sph_MHD_bc%sph_bc_B, ipol%base,          &
-     &    sph_OUT%nfield_sph_spec, sph_OUT%num_labels,                  &
+     &    m_bench, sph_OUT%nfield_sph_spec, sph_OUT%num_labels,         &
      &    sph_OUT%ncomp_sph_spec, sph_OUT%ene_sph_spec_name)
 !
       end subroutine dup_detail_dbench_header_to_IO

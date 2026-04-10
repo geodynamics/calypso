@@ -21,6 +21,7 @@
 !
       use t_base_field_labels
       use m_field_w_symmetry_labels
+      use m_sym_ene_flux_labels
       use m_energy_flux_w_sym_labels
 !
       implicit  none
@@ -40,12 +41,13 @@
 !
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
-      if(     check_field_list_ctl(u_dot_wsym_x_usym, field_ctl)) then
+      if(     check_field_list_ctl(mns_ua_d_ws_x_us, field_ctl)         &
+     &   .or. check_field_list_ctl(ua_d_ws_x_us, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(wsym_x_usym, field_ctl)
       end if
-      if(check_field_list_ctl(rev_u_dot_Jsym_x_Bsym, field_ctl)         &
-     &   .or. check_field_list_ctl(u_dot_Jsym_x_Bsym, field_ctl)) then
+      if(     check_field_list_ctl(mns_ua_d_js_x_bs, field_ctl)         &
+     &   .or. check_field_list_ctl(ua_d_js_x_bs, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(Jsym_x_Bsym, field_ctl)
       end if
@@ -104,13 +106,13 @@
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
 !
-      if(check_field_list_ctl(u_dot_wasym_x_uasym, field_ctl)) then
+      if(     check_field_list_ctl(mns_ua_d_wa_x_ua, field_ctl)         &
+     &   .or. check_field_list_ctl(ua_d_wa_x_ua, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(wasym_x_uasym, field_ctl)
       end if
-      if(check_field_list_ctl(rev_u_dot_Jasym_x_Basym, field_ctl)       &
-     &   .or. check_field_list_ctl(u_dot_Jasym_x_Basym, field_ctl)      &
-     &   ) then
+      if(     check_field_list_ctl(mns_ua_d_ja_x_ba, field_ctl)         &
+     &   .or. check_field_list_ctl(ua_d_ja_x_ba, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(Jasym_x_Basym, field_ctl)
       end if
@@ -169,12 +171,13 @@
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
 !
-      if(     check_field_list_ctl(u_dot_wsym_x_uasym, field_ctl)) then
+      if(      check_field_list_ctl(mns_us_d_ws_x_ua, field_ctl)        &
+     &    .or. check_field_list_ctl(us_d_ws_x_ua, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(wsym_x_uasym, field_ctl)
       end if
-      if(check_field_list_ctl(rev_u_dot_Jsym_x_Basym, field_ctl)        &
-     &   .or. check_field_list_ctl(u_dot_Jsym_x_Basym, field_ctl)) then
+      if(check_field_list_ctl(mns_us_d_js_x_ba, field_ctl)              &
+     &   .or. check_field_list_ctl(us_d_js_x_ba, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(Jsym_x_Basym, field_ctl)
       end if
@@ -211,13 +214,14 @@
       end if
 !
 !
-      if(check_field_list_ctl(u_dot_wasym_x_usym, field_ctl)) then
+      if(      check_field_list_ctl(mns_us_d_wa_x_us, field_ctl)        &
+     &    .or. check_field_list_ctl(us_d_wa_x_us, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(wasym_x_usym, field_ctl)
       end if
 !
-      if(check_field_list_ctl(rev_u_dot_Jasym_x_Bsym, field_ctl)        &
-     &    .or.check_field_list_ctl(u_dot_Jasym_x_Bsym, field_ctl)) then
+      if(      check_field_list_ctl(mns_us_d_ja_x_bs, field_ctl)        &
+     &    .or. check_field_list_ctl(us_d_ja_x_bs, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)
         call add_phys_name_ctl(Jasym_x_Bsym, field_ctl)
       end if

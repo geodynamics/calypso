@@ -26,33 +26,33 @@
 !! example of control block
 !!
 !!  begin momentum
-!!    array coef_4_velocity_ctl            1
+!!    array coef_4_velocity_ctl
 !!      coef_4_velocity_ctl          One                        1.0
-!!    end array
-!!    array coef_4_press_ctl               1
+!!    end array coef_4_velocity_ctl
+!!    array coef_4_press_ctl
 !!      coef_4_press_ctl             Ekman_number              -1.0
-!!    end array
-!!    array coef_4_v_diffuse_ctl           1
+!!    end array coef_4_press_ctl
+!!    array coef_4_v_diffuse_ctl
 !!      coef_4_v_diffuse_ctl         One                        1.0
-!!    end array
-!!    array coef_4_buoyancy_ctl            3
-!!      coef_4_buoyancy_ctl          Radial_parameter           1.0
-!!      coef_4_buoyancy_ctl          modified_Rayleigh_number   1.0
-!!      coef_4_buoyancy_ctl          Ekman_number              -1.0
-!!    end array
-!!    array coef_4_Coriolis_ctl            2
+!!    end array coef_4_v_diffuse_ctl
+!!    array coef_4_thermal_buoyancy_ctl
+!!      coef_4_thermal_buoyancy_ctl  Radial_parameter           1.0
+!!      coef_4_thermal_buoyancy_ctl  modified_Rayleigh_number   1.0
+!!      coef_4_thermal_buoyancy_ctl  Ekman_number              -1.0
+!!    end array coef_4_thermal_buoyancy_ctl
+!!    array coef_4_Coriolis_ctl
 !!      coef_4_Coriolis_ctl          Two                        1.0
 !!      coef_4_Coriolis_ctl          Ekman_number              -1.0
-!!    end array
-!!    array coef_4_Lorentz_ctl             2
+!!    end array coef_4_Coriolis_ctl
+!!    array coef_4_Lorentz_ctl
 !!      coef_4_Lorentz_ctl           magnetic_Prandtl_number   -1.0
 !!      coef_4_Lorentz_ctl           Ekman_number              -1.0
-!!    end array
-!!    array coef_4_composit_buoyancy_ctl   3
+!!    end array coef_4_Lorentz_ctl
+!!    array coef_4_composit_buoyancy_ctl
 !!      coef_4_composit_buoyancy_ctl  Radial_parameter           1.0
 !!      coef_4_composit_buoyancy_ctl  Composite_Rayleigh_number  1.0
 !!      coef_4_composit_buoyancy_ctl  Ekman_number              -1.0
-!!    end array
+!!    end array coef_4_composit_buoyancy_ctl
 !!  end  momentum
 !!   --------------------------------------------------------------------
 !!@endverbatim
@@ -108,18 +108,25 @@
 !
 !   5th level for coefs for momentum
 !
-      character(len=kchara) :: hd_n_mom =    'coef_4_velocity_ctl'
-      character(len=kchara) :: hd_n_press =  'coef_4_press_ctl'
-      character(len=kchara) :: hd_n_v_diff = 'coef_4_v_diffuse_ctl'
-      character(len=kchara) :: hd_n_buo =    'coef_4_buoyancy_ctl'
-      character(len=kchara) :: hd_n_c_buo                               &
-     &                      = 'coef_4_composit_buoyancy_ctl'
-      character(len=kchara) :: hd_n_cor =    'coef_4_Coriolis_ctl'
-      character(len=kchara) :: hd_n_lor =    'coef_4_Lorentz_ctl'
+      character(len=kchara), private                                    &
+     &                  :: hd_n_mom =    'coef_4_velocity_ctl'
+      character(len=kchara), private                                    &
+     &                  :: hd_n_press =  'coef_4_press_ctl'
+      character(len=kchara), private                                    &
+     &                  :: hd_n_v_diff = 'coef_4_v_diffuse_ctl'
+      character(len=kchara), private                                    &
+     &                  :: hd_n_t_buo =  'coef_4_thermal_buoyancy_ctl'
+      character(len=kchara), private                                    &
+     &                  :: hd_n_c_buo =  'coef_4_composit_buoyancy_ctl'
+      character(len=kchara), private                                    &
+     &                  :: hd_n_cor =    'coef_4_Coriolis_ctl'
+      character(len=kchara), private                                    &
+     &                  :: hd_n_lor =    'coef_4_Lorentz_ctl'
 !
+!  Deprecated label
 !
-      private :: hd_n_mom, hd_n_press, hd_n_v_diff
-      private :: hd_n_buo, hd_n_c_buo, hd_n_cor, hd_n_lor
+      character(len=kchara), private                                    &
+     &                  :: hd_n_buo =    'coef_4_buoyancy_ctl'
 !
 ! -----------------------------------------------------------------------
 !
@@ -155,13 +162,16 @@
      &      hd_n_v_diff, mom_ctl%coef_4_viscous, c_buf)
 !
         call read_control_array_c_r(id_control,                         &
-     &      hd_n_buo, mom_ctl%coef_4_termal_buo, c_buf)
+     &      hd_n_t_buo, mom_ctl%coef_4_termal_buo, c_buf)
         call read_control_array_c_r(id_control,                         &
      &      hd_n_c_buo, mom_ctl%coef_4_comp_buo, c_buf)
         call read_control_array_c_r(id_control,                         &
      &      hd_n_cor, mom_ctl%coef_4_Coriolis, c_buf)
         call read_control_array_c_r(id_control,                         &
      &      hd_n_lor, mom_ctl%coef_4_Lorentz, c_buf)
+!
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_buo, mom_ctl%coef_4_termal_buo, c_buf)
       end do
       mom_ctl%i_momentum = 1
 !
@@ -223,7 +233,7 @@
      &     (hd_n_v_diff, mom_ctl%coef_4_viscous)
 !
         call init_c_r_ctl_array_label                                   &
-     &     (hd_n_buo, mom_ctl%coef_4_termal_buo)
+     &     (hd_n_t_buo, mom_ctl%coef_4_termal_buo)
         call init_c_r_ctl_array_label                                   &
      &     (hd_n_c_buo, mom_ctl%coef_4_comp_buo)
         call init_c_r_ctl_array_label                                   &

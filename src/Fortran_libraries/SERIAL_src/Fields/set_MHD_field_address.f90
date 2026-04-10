@@ -213,7 +213,7 @@
 !
 !
       if(field_name .eq. buoyancy_work%name) then
-        iphys%ene_flux%i_buo_gen =     i_fld
+        iphys%ene_flux%i_t_buo_gen =    i_fld
         flag = .TRUE.
       end if
       if(field_name .eq. geostrophic_balance%name) then

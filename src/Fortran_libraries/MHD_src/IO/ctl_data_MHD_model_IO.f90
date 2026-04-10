@@ -73,7 +73,7 @@
       character(len=kchara), parameter, private                         &
      &      :: hd_boundary_condition = 'boundary_condition'
       character(len=kchara), parameter, private                         &
-     &      :: hd_bc_4_surf =    'bc_4_surface'
+     &      :: hd_bc_4_surf =          'bc_4_surface'
 !
       character(len=kchara), parameter, private                         &
      &      :: hd_forces_ctl =   'forces_define'
@@ -106,8 +106,6 @@
      &      :: hd_viscosity_ctl =      'viscosity_ctl'
       character(len=kchara), parameter, private                         &
      &      :: hd_mag_diffusion_ctl =  'magnetic_diffusion_ctl'
-      character(len=kchara), parameter, private                         &
-     &      :: hd_thrm_diffusion_ctl = 'thermal_diffusion_ctl'
       character(len=kchara), parameter, private                         &
      &      :: hd_comp_diffusion_ctl = 'composition_diffusion_ctl'
 !
@@ -205,10 +203,6 @@
      &                                model_ctl%val_viscous_c)
       call init_val_diffuse_ctl_label(hd_mag_diffusion_ctl,             &
      &                                model_ctl%val_mag_diffuse_c)
-      call init_val_diffuse_ctl_label(hd_thrm_diffusion_ctl,            &
-     &                                model_ctl%val_thermal_diffuse_c)
-      call init_val_diffuse_ctl_label(hd_comp_diffusion_ctl,            &
-     &                                model_ctl%val_comp_diffuse_c)
 !
       end subroutine init_sph_mhd_model_label
 !
@@ -270,12 +264,6 @@
         call read_val_diffuse_ctl_data                                  &
      &     (id_control, hd_mag_diffusion_ctl,                           &
      &      model_ctl%val_mag_diffuse_c, c_buf)
-        call read_val_diffuse_ctl_data                                  &
-     &     (id_control, hd_thrm_diffusion_ctl,                          &
-     &      model_ctl%val_thermal_diffuse_c, c_buf)
-        call read_val_diffuse_ctl_data                                  &
-     &     (id_control, hd_comp_diffusion_ctl,                          &
-     &      model_ctl%val_comp_diffuse_c, c_buf)
 !
         call read_magneto_cv_ctl                                        &
      &     (id_control, hd_induction_ctl, model_ctl%mcv_ctl, c_buf)
@@ -335,10 +323,6 @@
      &   (id_control, model_ctl%val_viscous_c, level)
       call write_val_diffuse_ctl_data                                   &
      &   (id_control, model_ctl%val_mag_diffuse_c, level)
-      call write_val_diffuse_ctl_data                                   &
-     &   (id_control, model_ctl%val_thermal_diffuse_c, level)
-      call write_val_diffuse_ctl_data                                   &
-     &   (id_control, model_ctl%val_comp_diffuse_c, level)
 !
       end subroutine write_sph_mhd_model_items
 !

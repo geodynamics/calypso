@@ -1,0 +1,14 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 1
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+ Control data for visualization are stored in this directory.
+The following files are ready:
+
+README:                 This file     
+control_psf_mid_depth:  Section at the mid-depth of the fluid shell r = 27/26
+control_psf_eq:         Section at the equatorial plane             z = 0.0
+control_psf_z0.3:       Section at the plane at z = 0.3
+0control_psf_zm:         Meridional section for zonal mean
+control_snapshot:       Control file for data transform from restart data 

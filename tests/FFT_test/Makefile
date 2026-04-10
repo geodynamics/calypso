@@ -7,33 +7,42 @@ SHELL           = /bin/sh
 #  directories of Kemo's Dynamo toolkit
 #
 SRCDIR = /Users/matsui/src_kemo
-#
-MHDDIR =  $(SRCDIR)/MHD
 BUILDDIR= $(SRCDIR)/bin
-TESTDIR=  $(SRCDIR)/tests
 #
-# MPI settings
-#
-MPICHDIR =    
-MPICHLIBDIR = $(MPICHDIR)/lib
-MPICHBINDIR = $(MPICHDIR)/bin
-MPICHINCDIR = 
-MPILIBS =      
-#
+TARGET_FFTPACK_TEST =  $(BUILDDIR)/tests/test_FFTPACK
+TARGET_FFW3_F_TEST =   $(BUILDDIR)/tests/test_FFTW3_f
+TARGET_SGL_FFW3_TEST = $(BUILDDIR)/tests/test_single_FFTW3
+TARGET_CMPR_FFT_TEST = $(BUILDDIR)/tests/compare_fft_test
 
 all: test
 
 test: 
-	rm -f *.dat
-	$(BUILDDIR)/tests/test_FFTPACK
-	$(BUILDDIR)/tests/test_FFTW3_f
-	$(BUILDDIR)/tests/test_single_FFTW3
-	echo 'Compare section and isosurface data'
-	$(BUILDDIR)/tests/compare_fft_test < compare_FFTPACK.txt
-	$(BUILDDIR)/tests/compare_fft_test < compare_FFTW3.txt
-	$(BUILDDIR)/tests/compare_fft_test < compare_single_FFTW3.txt
+	make clean
+	
+	$(TARGET_FFTPACK_TEST)
+	$(TARGET_CMPR_FFT_TEST) 'reference/fftpack_test.dat' 'fftpack_test.dat' > log.txt
+	@if [ `tail -n 1 log.txt` != 0 ]; then\
+		echo 'Failed Gauss points check'; \
+		exit 1;\
+	fi
+	
+	$(TARGET_FFW3_F_TEST)
+	$(TARGET_CMPR_FFT_TEST) 'fftpack_test.dat' 'mul_fftw_test.dat' > log.txt
+	@if [ `tail -n 1 log.txt` != 0 ]; then\
+		echo 'Failed FFTW3 check'; \
+		exit 1;\
+	fi
+	
+	$(TARGET_SGL_FFW3_TEST)
+	$(TARGET_CMPR_FFT_TEST) 'fftpack_test.dat' 'sgl_fftw_test.dat' > log.txt
+	@if [ `tail -n 1 log.txt` != 0 ]; then\
+		echo 'Failed single FFTW3 check'; \
+		exit 1;\
+	fi
+	echo 'FFT check finished'
+
 
 clean:
-	rm -f *.dat
+	rm -f *.dat log.txt
 
 distclean: clean

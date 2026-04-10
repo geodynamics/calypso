@@ -67,7 +67,9 @@
 !!        integer(kind = kint), intent(inout) :: level
 !!
 !!      subroutine write_multi_ctl_file_message(label, num, level)
-!!      subroutine write_one_ctl_file_message(label, level, file_name)
+!!      subroutine write_one_ctl_file_message(label, level,             &
+!!     &                                      file_name, error_file)
+!!!     subroutine check_write_ctl_file_message(file_name, error_file)
 !!      subroutine write_included_message(label, level)
 !!        integer (kind=kint), intent(in) :: num, level
 !!        character(len=kchara), intent(in) :: label, file_name
@@ -733,17 +735,38 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine write_one_ctl_file_message(label, level, file_name)
+      subroutine write_one_ctl_file_message(label, level,               &
+     &                                      file_name, error_file)
       use write_control_items
-      integer (kind=kint), intent(in) :: level
+      integer(kind = kint), intent(in) :: level
       character(len=kchara), intent(in) :: label, file_name
+      logical, intent(inout) :: error_file
 !
-        write(id_monitor,'(a)',ADVANCE='NO') '! '
-        call write_space_4_parse(id_monitor, level)
-        write(id_monitor,'(4a)') 'Control for ', trim(label),           &
-     &                   ' is read from file... ', trim(file_name)
+      write(id_monitor,'(a)',ADVANCE='NO') '! '
+      call write_space_4_parse(id_monitor, level)
+      write(id_monitor,'(2a)',ADVANCE='NO')                             &
+     &                         'Control block ', trim(label)
+      call check_write_ctl_file_message(file_name, error_file)
 !
       end subroutine write_one_ctl_file_message
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine check_write_ctl_file_message(file_name, error_file)
+      use delete_data_files
+      character(len=kchara), intent(in) :: file_name
+      logical, intent(inout) :: error_file
+!
+      write(id_monitor,'(2a)') ' is read from: ', trim(file_name)
+!
+      error_file = .FALSE.
+      if(check_file_exist(file_name)) return
+!
+      error_file = .TRUE.
+      write(id_monitor,'(2a)') trim(file_name), ' does not exist!!'
+!
+      end subroutine check_write_ctl_file_message
 !
 !   --------------------------------------------------------------------
 !
@@ -759,7 +782,6 @@
 !
       end subroutine write_included_message
 !
-!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       end module write_control_elements

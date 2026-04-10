@@ -38,8 +38,9 @@
 !!  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  
-!!      psf_output_type:
-!!           ucd, OpenDX
+!!    section_file_format:
+!!           'VTK', 'VTK_gz', 'VTD', 'VTD_gz', 'PSF', 'PSF_gz',
+!!           'UCD', 'UCD_gz', 'UDT', 'UDT_gz', 'binary', 'binary_gz',
 !!
 !!    num_result_comp: number of fields
 !!    output_field: (Original name: color_comp and color_subcomp)

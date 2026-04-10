@@ -101,6 +101,7 @@
       use set_ctl_sph_spectr_w_dbench
       use cal_CMB_dipolarity
       use cal_typical_scale
+      use pick_CMB_average
 !
       type(sph_monitor_control), intent(in) :: smonitor_ctl
       type(MHD_BC_lists), intent(in) :: MHD_BC
@@ -148,6 +149,10 @@
       call set_ctl_typical_scale_params                                 &
      &   (smonitor_ctl%typ_scale_file_prefix_ctl,                       &
      &    smonitor_ctl%typ_scale_file_format_ctl, rj_fld, monitor%tsl)
+!
+      call set_ctl_CMB_average_params                                   &
+     &   (smonitor_ctl%CMB_ave_file_prefix_ctl,                         &
+     &    smonitor_ctl%CMB_ave_file_format_ctl, monitor%ave_CMB)
 !
       call set_control_circles_def(smonitor_ctl, monitor%mul_circle)
 !

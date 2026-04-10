@@ -7,12 +7,13 @@
 !!
 !!@verbatim
 !!      subroutine init_iso_ctl_stract(hd_block, iso_c)
-!!      subroutine s_read_iso_control_data                              &
-!!     &         (id_control, hd_block, iso_c, c_buf)
+!!      subroutine s_read_iso_control_data(id_control, hd_block,        &
+!!     &                                   iso_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(iso_ctl), intent(inout) :: iso_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_iso_control_data                               &
 !!     &         (id_control, hd_block, iso_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -25,7 +26,7 @@
 !!
 !!  begin isosurface_ctl
 !!    isosurface_file_prefix    'psf'
-!!    iso_output_type            ucd
+!!    isosurface_file_format     ucd
 !!
 !!    begin isosurf_define
 !!      isosurf_field        pressure
@@ -50,8 +51,9 @@
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
-!!    iso_output_type:
-!!           ucd, ucd_gz, iso
+!!    isosurface_file_format:
+!!           'VTK', 'VTK_gz', 'ISO', 'ISO_gz',
+!!           'UCD', 'UCD_gz', 'binary', 'binary_gz',
 !!
 !!    result_type:  (Original name: display_method)
 !!                   specified_fields
@@ -69,7 +71,8 @@
 !!    isosurf_comp: component for isosurface
 !!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
 !!    isosurf_value:  value for isosurface
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!@endverbatim
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!@endverbatim
 !
       module ctl_data_isosurface_IO
 !
@@ -82,7 +85,6 @@
       use t_control_array_character
       use t_control_data_4_iso_def
       use t_control_data_4_fld_on_psf
-      use calypso_mpi
 !
       implicit  none
 !
@@ -90,7 +92,7 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_isosurf_prefix = 'isosurface_file_prefix'
       character(len=kchara), parameter, private                         &
-     &             :: hd_iso_out_type =   'iso_output_type'
+     &             :: hd_isosurf_format = 'isosurface_file_format'
       character(len=kchara), parameter, private                         &
      &             :: hd_iso_define =     'isosurf_define'
       character(len=kchara), parameter, private                         &
@@ -101,6 +103,8 @@
       character(len=kchara), parameter, private                         &
      &             :: hd_iso_file_head = 'iso_file_head'
       character(len=kchara), parameter, private                         &
+     &             :: hd_iso_out_type =   'iso_output_type'
+      character(len=kchara), parameter, private                         &
      &             :: hd_iso_result = 'isosurf_result_define'
 !
 !  ---------------------------------------------------------------------
@@ -109,8 +113,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_read_iso_control_data                                &
-     &         (id_control, hd_block, iso_c, c_buf)
+      subroutine s_read_iso_control_data(id_control, hd_block,          &
+     &                                   iso_c, c_buf, error_file)
 !
       use skip_comment_f
       use ctl_file_field_on_psf_IO
@@ -119,6 +123,7 @@
       character(len=kchara), intent(in) :: hd_block
       type(iso_ctl), intent(inout) :: iso_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
@@ -130,20 +135,26 @@
 !
         call sel_read_ctl_field_on_psf_file                             &
      &     (id_control, hd_field_on_iso, iso_c%fname_fld_on_iso,        &
-     &      iso_c%fld_on_iso_c, c_buf)
+     &      iso_c%fld_on_iso_c, c_buf, error_file)
+        if(error_file) return
+!
         call sel_read_ctl_field_on_psf_file                             &
      &     (id_control, hd_iso_result, iso_c%fname_fld_on_iso,          &
-     &      iso_c%fld_on_iso_c, c_buf)
+     &      iso_c%fld_on_iso_c, c_buf, error_file)
+        if(error_file) return
 !
         call read_iso_define_data                                       &
      &     (id_control, hd_iso_define, iso_c%iso_def_c, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_isosurf_prefix,              &
      &      iso_c%iso_file_head_ctl)
+        call read_chara_ctl_type(c_buf, hd_isosurf_format,              &
+     &      iso_c%iso_file_format_ctl)
+!
         call read_chara_ctl_type(c_buf, hd_iso_file_head,               &
      &      iso_c%iso_file_head_ctl)
         call read_chara_ctl_type(c_buf, hd_iso_out_type,                &
-     &      iso_c%iso_output_type_ctl)
+     &      iso_c%iso_file_format_ctl)
       end do
       iso_c%i_iso_ctl = 1
 !
@@ -168,13 +179,13 @@
       if(iso_c%i_iso_ctl .le. 0) return
 !
       maxlen = len_trim(hd_isosurf_prefix)
-      maxlen = max(maxlen, len_trim(hd_iso_out_type))
+      maxlen = max(maxlen, len_trim(hd_isosurf_format))
 !
       level = write_begin_flag_for_ctl(id_control, level, hd_block)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    iso_c%iso_file_head_ctl)
       call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    iso_c%iso_output_type_ctl)
+     &    iso_c%iso_file_format_ctl)
 !
       call write_iso_define_data(id_control, hd_iso_define,             &
      &                           iso_c%iso_def_c, level)
@@ -200,8 +211,8 @@
      &      iso_c%iso_file_head_ctl)
         call init_chara_ctl_item_label(hd_iso_file_head,                &
      &      iso_c%iso_file_head_ctl)
-        call init_chara_ctl_item_label(hd_iso_out_type,                 &
-     &      iso_c%iso_output_type_ctl)
+        call init_chara_ctl_item_label(hd_isosurf_format,               &
+     &      iso_c%iso_file_format_ctl)
 !
       end subroutine init_iso_ctl_stract
 !

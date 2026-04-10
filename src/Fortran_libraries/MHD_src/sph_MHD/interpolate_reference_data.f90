@@ -15,21 +15,22 @@
 !!        integer(kind = kint), intent(in) :: ipol_source
 !!        type(phys_data), intent(inout) :: ref_field
 !!        type(phys_data), intent(inout) :: rj_fld
-!!      subroutine interpolate_ref_fields_IO(radius_name,              &
-!!     &         (iref_radius, ref_fld_IO, ref_field, r_itp)
+!!
+!!      subroutine const_radial_interpolate_table                       &
+!!     &        (radius_name, iref_radius, ref_fld_IO, ref_field, r_itp)
 !!        character(len = kchara), intent(in) :: radius_name
 !!        integer(kind = kint), intent(in) :: iref_radius
 !!        type(field_IO), intent(in) :: ref_fld_IO
-!!        type(phys_data), intent(inout) :: ref_field
+!!        type(phys_data), intent(in) :: ref_field
 !!        type(sph_radial_interpolate), intent(inout) :: r_itp
-!!      subroutine interpolate_one_ref_field_IO                         &
-!!     &         (radius_name, iref_radius, phys_name, iref_in, ncomp,  &
-!!     &          ref_fld_IO, ref_field, r_itp)
-!!        character(len = kchara), intent(in) :: radius_name, phys_name
-!!        integer(kind = kint), intent(in) :: iref_radius, iref_in, ncomp
-!!        type(field_IO), intent(in) :: ref_fld_IO
-!!        type(phys_data), intent(inout) :: ref_field
+!!      subroutine interepolate_one_ref_field(radial_fld_IO, r_itp,     &
+!!     &          nri_new, ncomp, phys_name, iflag_update, d_r)
+!!        character(len = kchara), intent(in) :: phys_name
+!!        type(field_IO), intent(in) :: radial_fld_IO
 !!        type(sph_radial_interpolate), intent(inout) :: r_itp
+!!        integer(kind = kint), intent(in) :: nri_new, ncomp
+!!        real(kind=kreal), intent(inout) :: d_r(nri_new,ncomp)
+!!        integer(kind = kint), intent(inout) :: iflag_update(ncomp)
 !!@endverbatim
 !!
 !!@n @param my_rank process ID
@@ -102,8 +103,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine interpolate_ref_fields_IO(radius_name,                 &
-     &          iref_radius, ref_fld_IO, ref_field, r_itp)
+      subroutine const_radial_interpolate_table                         &
+     &        (radius_name, iref_radius, ref_fld_IO, ref_field, r_itp)
 !
       use r_interpolate_sph_data
       use radial_interpolation
@@ -111,7 +112,7 @@
       character(len = kchara), intent(in) :: radius_name
       integer(kind = kint), intent(in) :: iref_radius
       type(field_IO), intent(in) :: ref_fld_IO
-      type(phys_data), intent(inout) :: ref_field
+      type(phys_data), intent(in) :: ref_field
 !
       type(sph_radial_interpolate), intent(inout) :: r_itp
 !
@@ -135,60 +136,7 @@
      &      ref_field%n_point, ref_field%d_fld(1,iref_radius), r_itp)
       end if
 !
-      call interepolate_reference_fields                                &
-     &   (radius_name, ref_fld_IO, r_itp, ref_field)
-      call dealloc_original_sph_data(r_itp)
-!
-      call dealloc_radial_interpolate(r_itp)
-      call dealloc_org_radius_interpolate(r_itp)
-!
-      end subroutine interpolate_ref_fields_IO
-!
-! -----------------------------------------------------------------------
-!
-      subroutine interpolate_one_ref_field_IO                           &
-     &         (radius_name, iref_radius, phys_name, iref_in, ncomp,    &
-     &          ref_fld_IO, ref_field, r_itp)
-!
-      use r_interpolate_sph_data
-      use radial_interpolation
-!
-      character(len = kchara), intent(in) :: radius_name, phys_name
-      integer(kind = kint), intent(in) :: iref_radius, iref_in, ncomp
-      type(field_IO), intent(in) :: ref_fld_IO
-      type(phys_data), intent(inout) :: ref_field
-!
-      type(sph_radial_interpolate), intent(inout) :: r_itp
-!
-!
-      call alloc_org_radius_interpolate(ref_fld_IO%nnod_IO, r_itp)
-      call alloc_radial_interpolate(ref_field%n_point, r_itp)
-      call alloc_original_sph_data(ref_fld_IO%nnod_IO, r_itp)
-      call copy_reference_radius_from_IO(ref_fld_IO,                    &
-     &                                   radius_name, r_itp)
-!
-      call cal_radial_interpolation_coef                                &
-     &   (r_itp%nri_source, r_itp%source_radius,                        &
-     &    ref_field%n_point, ref_field%d_fld(1,iref_radius),            &
-     &    r_itp%kr_inner_source, r_itp%kr_outer_source,                 &
-     &    r_itp%k_old2new_in, r_itp%k_old2new_out,                      &
-     &    r_itp%coef_old2new_in)
-!
-      if(iflag_debug .gt. 0) then
-        call check_sph_radial_interpolate                               &
-     &     (r_itp%nri_source, r_itp%source_radius,                      &
-     &      ref_field%n_point, ref_field%d_fld(1,iref_radius), r_itp)
-      end if
-!
-      call interepolate_one_ref_field(ref_fld_IO, r_itp,                &
-     &    ref_field%n_point, ncomp, phys_name,                          &
-     &    ref_field%iflag_update(iref_in), ref_field%d_fld(1,iref_in))
-      call dealloc_original_sph_data(r_itp)
-!
-      call dealloc_radial_interpolate(r_itp)
-      call dealloc_org_radius_interpolate(r_itp)
-!
-      end subroutine interpolate_one_ref_field_IO
+      end subroutine const_radial_interpolate_table
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -252,6 +200,7 @@
 !
       type(sph_radial_interpolate), intent(inout) :: r_itp
       integer(kind = kint), intent(in) :: nri_new, ncomp
+!
       real(kind=kreal), intent(inout) :: d_r(nri_new,ncomp)
       integer(kind = kint), intent(inout) :: iflag_update(ncomp)
 !

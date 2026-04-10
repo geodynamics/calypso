@@ -74,7 +74,7 @@
 !
       if(fl_prop%flag_thermal_buoyancy) then
         call add_each_force_to_forces                                   &
-     &     (ipol_exp%i_forces, ipol_force%i_buoyancy,                   &
+     &     (ipol_exp%i_forces, ipol_force%i_thrm_buo,                   &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
       if(fl_prop%flag_comp_buoyancy) then
@@ -108,7 +108,7 @@
       end if
       if(fl_prop%flag_thermal_buoyancy) then
         call add_each_force_to_forces                                   &
-     &     (ipol_exp%i_forces, ipol_force%i_buoyancy,                   &
+     &     (ipol_exp%i_forces, ipol_force%i_thrm_buo,                   &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
       if(fl_prop%flag_comp_buoyancy) then

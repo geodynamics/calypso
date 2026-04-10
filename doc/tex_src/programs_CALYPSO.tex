@@ -190,9 +190,12 @@ Block \verb|MHD_control|  (Top block of the control file)
 			\item Array \hyperref[href_t:coef_4_press_ctl]
 				{\tt coef\_4\_press\_ctl             [Name] [Power]}
 			\item Array \hyperref[href_t:coef_4_v_diffuse_ctl]
-                {\tt coef\_4\_v\_diffuse\_ctl         [Name] [Power]}
-			\item Array \hyperref[href_t:coef_4_buoyancy_ctl]
-				{\tt coef\_4\_buoyancy\_ctl          [Name] [Power]}
+				{\tt coef\_4\_v\_diffuse\_ctl         [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_thermal_buoyancy_ctl]
+				{\tt coef\_4\_buoyancy\_ctl [Name] [Power]}
+				{\color{red} (Deprecated)}
+			\item Array \hyperref[href_t:coef_4_thermal_buoyancy_ctl]
+				{\tt coef\_4\_thermal\_buoyancy\_ctl [Name] [Power]}
 			\item Array \hyperref[href_t:coef_4_Coriolis_ctl]
 				{\tt coef\_4\_Coriolis\_ctl          [Name] [Power]}
 			\item Array \hyperref[href_t:coef_4_Lorentz_ctl]
@@ -241,15 +244,27 @@ Block \verb|MHD_control|  (Top block of the control file)
 		\item \verb||
 				\hyperref[href_t:ref_field_file_name]{\tt ref\_field\_file\_name [File\_Name]}
 		\item Block \hyperref[href_t:low_temp_ctl]{\tt low\_temp\_ctl}
-			\begin{itemize}
-			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
-			\item \hyperref[href_t:temperature]{\tt temperature  [TEMPERATURE]}
+			\begin{itemize}  \label{href_i:low_temp_ctl}
+			\item \hyperref[href_t:l_depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:l_temperature]{\tt temperature  [TEMPERATURE]}
 			\end{itemize}
 %
 		\item Block \hyperref[href_t:high_temp_ctl]{\tt high\_temp\_ctl}
-			\begin{itemize}
-			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
-			\item \hyperref[href_t:temperature]{\tt temperature  [TEMPERATURE]}
+			\begin{itemize}  \label{href_i:high_temp_ctl}
+			\item \hyperref[href_t:h_depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:h_temperature]{\tt temperature  [TEMPERATURE]}
+			\end{itemize}
+%
+		\item Block \hyperref[href_t:thermal_diffusivity_ctl]{\tt thermal\_diffusivity\_ctl}
+			\begin{itemize}  \label{href_i:thermal_diffusivity_ctl}
+			\item \hyperref[href_t:radial_variation_ctl]{\tt radial\_variation\_ctl  [VARIATION\_TYPE]}
+			\item \hyperref[href_t:variation_file_name]{\tt variation\_file\_name  [FILE\_NAME]}
+			\item Array \hyperref[href_t:diffusivity_list_ctl]{\tt diffusivity\_list\_ctl  [RADIUS]  [RATIO]}
+
+%
+			\item \hyperref[href_t:ICB_reduction_radius]{\tt ICB\_reduction\_radius  [RADIUS]}
+			\item \hyperref[href_t:ICB_reduction_ratio]{\tt ICB\_reduction\_ratio   [RATIO]}
+			\item \hyperref[href_t:ICB_reduction_width]{\tt ICB\_reduction\_width   [WIDTH]}
 			\end{itemize}
 		\end{itemize}
 %
@@ -338,9 +353,22 @@ Block \verb|MHD_control|  (Top block of the control file)
 		{\tt axisymmetric\_power\_switch           [ON/OFF]}
 %
 	\item \hyperref[href_t:nusselt_number_prefix]
-			{\tt nusselt\_number\_prefix        [nusselt\_number\_prefix]}
+			{\tt nusselt\_number\_prefix        [file\_prefix]}
 	\item \hyperref[href_t:nusselt_number_format]
-			{\tt nusselt\_number\_format    [file\_format]}
+			{\tt nusselt\_number\_format        [file\_format]}
+%
+	\item \hyperref[href_t:nusselt_number_prefix]
+			{\tt thermal\_nusselt\_number\_prefix    [file\_prefix]}
+	\item \hyperref[href_t:nusselt_number_format]
+			{\tt thermal\_nusselt\_number\_format    [file\_format]}
+	\item \hyperref[href_t:comp_nusselt_number_prefix]
+			{\tt comp\_nusselt\_number\_prefix       [file\_prefix]}
+	\item \hyperref[href_t:comp_nusselt_number_format]
+			{\tt comp\_nusselt\_number\_format       [file\_format]}
+	\item \hyperref[href_t:CMB_average_file_prefix]
+			{\tt CMB\_average\_file\_prefix          [file\_prefix]}
+	\item \hyperref[href_t:CMB_average_file_format]
+			{\tt CMB\_average\_file\_format          [file\_format]}
 %
 	\item Array \hyperref[href_t:volume_spectrum_ctl]{\tt volume\_spectrum\_ctl}
 		\begin{itemize}
@@ -1059,8 +1087,10 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 \begin{itemize}
 	\item \hyperref[href_t:section_file_prefix]
 			{\tt section\_file\_prefix    [section\_prefix]}
-	\item \hyperref[href_t:psf_output_type]
-			{\tt psf\_output\_type        [file\_format]}
+	\item \hyperref[href_t:section_file_format]
+			{\tt section\_file\_format        [file\_format]}
+    \item \hyperref[href_t:psf_output_type]
+            {\tt psf\_output\_type        [file\_format]}         {\color{red}(Deprecated)}
 	\item File or Block \hyperref[href_t:surface_define]{\tt surface\_define    [File\_Name]}
 		\begin{itemize}
 			\item \hyperref[href_t:section_method]
@@ -1088,7 +1118,7 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 
 \paragraph{Output data format of sectioning module}
 \label{sec:PSF_data}
-Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|section_file_format| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|section_file_format|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format  and an example of data size and output time  for sectioning data}
@@ -1124,8 +1154,10 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 \begin{itemize}
 	\item \hyperref[href_t:isosurface_file_prefix]
 			{\tt isosurface\_file\_prefix    [file\_prefix]}
-	\item \hyperref[href_t:iso_output_type]
-			{\tt iso\_output\_type           [file\_format]}
+	\item \hyperref[href_t:isosurface_file_format]
+			{\tt isosurface\_file\_format    [file\_format]}
+    \item \hyperref[href_t:isosurface_file_format]
+            {\tt iso\_output\_type           [file\_format] {\color{red} (Deprecated)}}
 %
 	\item Block \hyperref[href_t:isosurf_define]{\tt isosurf\_define}
 		\begin{itemize}
@@ -1149,7 +1181,7 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 
 \paragraph{Output data format of isosurface module}
 \label{sec:PSF_data}
-Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|isosurface_file_format| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|isosurface_file_format|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format and an example of data size and output time for isosurface data}
@@ -1392,7 +1424,7 @@ Number_of_fields, Number_of_components
     3    1    3    1    3    3    1    1
 t_step    time    K_ene_pol    K_ene_tor    K_ene    temperature    vorticity_pol
     vorticity_tor    vorticity    pressure    M_ene_pol    M_ene_tor    M_ene
-    current_density_pol    current_density_tor    current_density    buoyancy_flux    
+    current_density_pol    current_density_tor    current_density    thermal_buoyancy_flux
     Lorentz_work    
              100  2.00000000000000E-004  3.08485175580558E+001  2.97052514317492E-001
   3.11455700723732E+001  8.37549401638792E-002  3.83545285358558E+001  
@@ -1574,9 +1606,9 @@ $
 \end{description}
 
 
-\subsubsection{Nusselt number data {\tt [nusselt\_number\_prefix].dat}}
+\subsubsection{(Thermal) Nusselt number data {\tt [nusselt\_number\_prefix].dat}}
 {\bf CAUTION: Nusselt number is not evaluated if heat source is exsist.}
-The Nusselt number Nu at CMB and ICB is written for each step in one line. The Nusselt number is evaluated by
+The thermal Nusselt number $Nu$ at CMB and ICB is written for each step in one line. The Nusselt number is evaluated by
 %
 \begin{eqnarray*}
 Nu = \frac{<\partial T / \partial r>}{\partial T_{diff}/ \partial r},
@@ -1590,6 +1622,26 @@ T_{diff} = \frac{r_{o}T_{o} - r_{i}T_{i}}{r_{o} - r_{i}}
 This diffusive temperature profile is for the case without heat source in the fluid. If simulation is performed including the heat source, this data file does not written.
 
 The header format is the same as the volume mean square data, but number of components are 2 for the Nusselt number for the inner and outer boundaries.
+
+\subsubsection{Compositional Nusselt number data {\tt [comp\_nusselt\_number\_prefix].dat}}
+{\bf CAUTION: Nusselt number is not evaluated if compositional source is exsist.}
+The compositional Nusselt number $Nu_{C}$ at CMB and ICB is written for each step in one line. As thermal Nusselt number, The compositional Nusselt number is evaluated by
+%
+\begin{eqnarray*}
+Nu_{C} = \frac{<\partial C / \partial r>}{\partial C_{diff}/ \partial r},
+\end{eqnarray*}
+where, $<\partial C / \partial r>$ and $C_{diff}$ are the horizontal average of the temperature gradient at ICB and CMB and diffusive composition profile, respectively. $C_{diff}$ is evaluated without heat source, as
+\begin{eqnarray*}
+C_{diff} = \frac{r_{o}C_{o} - r_{i}C_{i}}{r_{o} - r_{i}}
+    +  \frac{r_{o}r_{i}\left(C_{i} - C_{o}\right)}{r_{o} - r_{i}} \frac{1}{r}.
+\end{eqnarray*}
+%
+This diffusive composition profile is for the case without light element source in the fluid. If simulation is performed including the light element source, this data file does not written.
+
+The header format is the same as the volume mean square data, but number of components are 2 for the compositional Nusselt number for the inner and outer boundaries.
+
+\subsubsection{CMB average data {\tt [CMB\_average\_file\_prefix].dat}}
+Fields averaged over the outer boundary (CMB) $f_{CMB} = \int f(r=r_o) dS$ are written for each step in each line.
 
 \subsubsection{Dipolrity data {\tt [dipolarity\_file\_prefix].dat}}
 The dipolarity $f_{\rm dip}$ is evaluated the poloidal magnetic field at CMB is written for each step in one line. The dipolarity represents the relative strength of the axial dipole magnetic field, which is defined by the ration of the magnetic energy of the dipole component to the total magnetic energy at the CMB as

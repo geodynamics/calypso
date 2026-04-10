@@ -14,6 +14,11 @@
 !!        integer, intent(in) :: root
 !!        integer(kind = kint_gl), intent(in) :: count
 !!        logical, intent(inout) :: buffer(count)
+!!      subroutine calypso_mpi_allreduce_one_bin(bin_local, bin_global, &
+!!     &                                         operation)
+!!        integer, intent(in) :: operation
+!!        logical, intent(in) ::    bin_local
+!!        logical, intent(inout) :: bin_global
 !!@endverbatim
 !!
 !!@n @param  icode       error code
@@ -70,6 +75,25 @@
       end do
 !
       end subroutine calypso_mpi_bcast_logical
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_allreduce_one_bin(bin_local, bin_global,   &
+     &                                         operation)
+!
+      integer, intent(in) :: operation
+      logical, intent(in) ::    bin_local
+      logical, intent(inout) :: bin_global
+!
+      logical :: bin_lc(1), bin_gl(1)
+!
+!
+      bin_lc(1) = bin_local
+      call MPI_allREDUCE(bin_lc, bin_gl, 1, CALYPSO_LOGICAL,            &
+     &                   operation, CALYPSO_COMM, ierr_MPI)
+      bin_global = bin_gl(1)
+!
+      end subroutine calypso_mpi_allreduce_one_bin
 !
 !  ---------------------------------------------------------------------
 !

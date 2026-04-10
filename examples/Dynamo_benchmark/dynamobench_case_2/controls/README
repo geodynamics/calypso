@@ -1,0 +1,18 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 2
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+ Control data for visualization are stored in this directory.
+The following files are ready:
+
+README:                 This file     
+control_psf_CMB:        Section at the outer boudary of the shell   r = 20/13
+control_psf_ICB:        Section at the inner boudary of the shell   r =  7/13
+control_psf_mid_depth:  Section at the mid-depth of the fluid shell r = 27/26
+control_psf_eq:         Section at the equatorial plane             z = 0.0
+control_psf_z0.3:       Section at the plane at z = 0.3
+control_psf_s0.55:      Cylindrical section at  s = 0.55
+control_psf_zm:         Meridional section for zonal mean
+control_iso_temp:       Temperature isosurface for T = 0.7
+control_snapshot:       Control file for data transform from restart data 

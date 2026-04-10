@@ -132,7 +132,7 @@
      &         (calypso_mpi_seek_read_chara(IO_param%id_file,           &
      &                                      ioffset, ilength),          &
      &          int8_tmp, ione, rr(i))
-            id_r_global(i) = int8_tmp
+            id_r_global(i) = int(int8_tmp)
           end do
         end if
       end if
@@ -154,14 +154,17 @@
       real(kind=kreal), intent(in) :: xx(nnod, numdir)
 !
       integer(kind = kint_gl) :: inod, led
-      integer(kind = kint) :: i
       real(kind = kreal) :: xx_tmp(numdir)
       integer(kind = MPI_OFFSET_KIND) :: ioffset
       integer :: ilength
 !
 !
       ilength = len_int8_and_vector_textline(numdir)
-      led = nnod * len_int8_and_vector_textline(numdir)
+      if(nnod .le. 0) then
+        led = 1
+      else
+        led = nnod * len_int8_and_vector_textline(numdir)
+      end if
       call mpi_write_stack_over_domain(IO_param, led)
 !
       ioffset = IO_param%ioff_gl                                        &
@@ -202,7 +205,11 @@
 !
 !
       ilength = len_int8_and_vector_textline(ione)
-      led = nri * len_int8_and_vector_textline(ione)
+      if(nri .le. 0) then
+        led = 1
+      else
+        led = nri * len_int8_and_vector_textline(ione)
+      end if
       call mpi_write_stack_over_domain(IO_param, led)
 !
       ioffset = IO_param%ioff_gl                                        &

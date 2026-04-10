@@ -33,10 +33,10 @@
 !!      gravity_type_ctl          radial
 !!
 !! !!!! direction of gravity (opposite direction to that of buoyancy)
-!!      array gravity_vec  3
-!!        gravity_vec  x     0.000   end
-!!        gravity_vec  y     0.000   end
-!!        gravity_vec  z     -1.000   end
+!!      array gravity_vec
+!!        gravity_vec  x     0.000
+!!        gravity_vec  y     0.000
+!!        gravity_vec  z     -1.000
 !!      end array gravity_vec
 !!    end  gravity_define
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

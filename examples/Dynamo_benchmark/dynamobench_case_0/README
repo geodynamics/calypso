@@ -1,0 +1,36 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 0
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+ Here is the input files for the dynamo benchmark case 1 with 6 MPI processes.
+This example consists of the following files and directories
+
+README:               This file
+clean.sh:             Shell script for cleaning data 
+control_MHD:          Control file for simulation
+
+controls:             Directory for visualization controls
+monitor:              Directory for time series data
+rst_6:                Directory for restart files
+field:                Directory for visualization data
+sections:             Directory for cross sections data
+
+radial_point.dat:     Radial grid point data 
+reference_fields.dat: Radial data for reference temperature
+time_total.dat:       Elapsed time data
+
+
+
+
+The command to invoke the simulation is 
+[dynamobench_case_0]$ mpirun -np 6 [CALYPSO_DIR]/bin/sph_mhd
+
+To continue the simulation change rst_ctl in control_MHD from
+      rst_ctl                dynamo_benchmark_0
+   to
+      rst_ctl                start_from_rst_file
+   And, start simulation again by 2.
+
+Enjoy!!
+

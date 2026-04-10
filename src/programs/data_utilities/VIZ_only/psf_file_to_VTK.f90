@@ -20,19 +20,19 @@
 !
       character(len = kchara) :: file_ext, tmpchara
 !
-      if(iargc_kemo() .lt. 5) then
+      if(command_argument_count() .lt. 5) then
         write(*,*) 'section_to_VTK ',                                   &
      &    'FILE_PREFIX EXTENSION_WITH_GZ START_STEP END_STEP INCREMENT'
         stop
       end if
-      call getarg_k(1, ucd_param%file_prefix)
-      call getarg_k(2, file_ext)
+      call get_command_argument(1, ucd_param%file_prefix)
+      call get_command_argument(2, file_ext)
 !
-      call getarg_k(3, tmpchara)
+      call get_command_argument(3, tmpchara)
       read(tmpchara,*) istart
-      call getarg_k(4, tmpchara)
+      call get_command_argument(4, tmpchara)
       read(tmpchara,*) iend
-      call getarg_k(5, tmpchara)
+      call get_command_argument(5, tmpchara)
       read(tmpchara,*) increment
 !
       ifmt_input = psf_to_vtk_format_id_from_input(file_ext)
@@ -54,39 +54,5 @@
       end do
 !
       stop 'Convert finished'
-!
-!   --------------------------------------------------------------------
-!
-      contains
-!
-!   --------------------------------------------------------------------
-!
-      subroutine getarg_k(i, argc)
-!
-      integer, intent(in) :: i
-      character(len=*), intent(out) :: argc
-!
-      call getarg(0, argc)
-      if(argc == "") then
-        call getarg(i + 1, argc)
-      else
-        call getarg(i, argc)
-      end if
-      end subroutine getarg_k
-!
-!   --------------------------------------------------------------------
-!
-      integer function iargc_kemo() result(oresult)
-!
-      integer :: iargc
-      character(len=8) :: argc
-      oresult = iargc()
-      call getarg(0, argc)
-      if(argc == "") then
-        oresult = oresult - 1
-      end if
-      end function iargc_kemo
-!
-!   --------------------------------------------------------------------
 !
       end program psf_file_to_VTK
