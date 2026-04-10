@@ -6,10 +6,26 @@
 !>@brief find point in one element and return local coordinate
 !!
 !!@verbatim
+!!      subroutine cal_position_and_gradient(nnod_ele, xx_z,            &
+!!     &          dnxi, dnei, dnzi, x_local_ele, xi)
+!!        integer (kind = kint), intent(in) :: nnod_ele
+!!        real(kind = kreal), intent(in) :: x_local_ele(nnod_ele,3)
+!!        real(kind = kreal), intent(in) :: xi(3)
+!!        real(kind=kreal), intent(inout) :: xx_z(3)
+!!        real(kind=kreal), intent(inout) :: dnxi(3), dnei(3), dnzi(3)
 !!      subroutine cal_position_and_grad_surf(nnod_sf, xx_z, dnxi, dnei,&
-!!     &          x_local_ele, xi)
+!!     &                                      x_local_ele, xi)
+!!        integer (kind = kint), intent(in) :: nnod_sf
+!!        real(kind = kreal), intent(in) :: x_local_ele(nnod_sf,3)
+!!        real(kind = kreal), intent(in) :: xi(2)
+!!        real(kind=kreal), intent(inout) :: xx_z(3)
+!!        real(kind=kreal), intent(inout) :: dnxi(3), dnei(3)
 !!      subroutine cal_position_and_grad_edge(nnod_ed, xx_z,  dnxi,     &
-!!     &          x_local_ele, xi)
+!!     &                                      x_local_ele, xi)
+!!        integer (kind = kint), intent(in) :: nnod_ed
+!!        real(kind = kreal), intent(in) :: x_local_ele(nnod_ed,3)
+!!        real(kind = kreal), intent(in) :: xi(1)
+!!        real(kind=kreal), intent(inout) :: xx_z(3), dnxi(3)
 !!@endverbatim
 !
       module cal_position_and_grad
@@ -34,7 +50,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine cal_position_and_gradient(nnod_ele, xx_z,              &
-     &      dnxi, dnei, dnzi, x_local_ele, xi)
+     &          dnxi, dnei, dnzi, x_local_ele, xi)
 !
       integer (kind = kint), intent(in) :: nnod_ele
       real(kind = kreal), intent(in) :: x_local_ele(nnod_ele,3)
@@ -46,13 +62,13 @@
 !
         if (nnod_ele .eq. num_t_linear) then
           call cal_position_and_grad_8(xx_z, dnxi, dnei, dnzi,          &
-     &          x_local_ele, xi)
+     &                                 x_local_ele, xi)
         else if (nnod_ele .eq. num_t_quad) then
           call cal_position_and_grad_20(xx_z, dnxi, dnei, dnzi,         &
-     &          x_local_ele, xi)
+     &                                  x_local_ele, xi)
         else if (nnod_ele .eq. num_t_lag) then
           call cal_position_and_grad_27(xx_z, dnxi, dnei, dnzi,         &
-     &          x_local_ele, xi)
+     &                                  x_local_ele, xi)
         end if
 !
       end subroutine cal_position_and_gradient
@@ -60,21 +76,25 @@
 !-----------------------------------------------------------------------
 !
       subroutine cal_position_and_grad_surf(nnod_sf, xx_z, dnxi, dnei,  &
-     &          x_local_ele, xi)
+     &                                      x_local_ele, xi)
 !
       integer (kind = kint), intent(in) :: nnod_sf
       real(kind = kreal), intent(in) :: x_local_ele(nnod_sf,3)
       real(kind = kreal), intent(in) :: xi(2)
 !
-      real(kind=kreal), intent(inout) :: xx_z(3), dnxi(3), dnei(3)
+      real(kind=kreal), intent(inout) :: xx_z(3)
+      real(kind=kreal), intent(inout) :: dnxi(3), dnei(3)
 !
 !
       if (nnod_sf .eq. num_linear_sf) then
-        call cal_position_and_grad_4(xx_z, dnxi, dnei, x_local_ele, xi)
+        call cal_position_and_grad_4(xx_z, dnxi, dnei,                  &
+     &                               x_local_ele, xi)
       else if (nnod_sf .eq. num_quad_sf) then
-        call cal_position_and_grad_sf8(xx_z, dnxi, dnei, x_local_ele, xi)
+        call cal_position_and_grad_sf8(xx_z, dnxi, dnei,                &
+     &                                 x_local_ele, xi)
       else if (nnod_sf .eq. num_lag_sf) then
-        call cal_position_and_grad_9(xx_z, dnxi, dnei, x_local_ele, xi)
+        call cal_position_and_grad_9(xx_z, dnxi, dnei,                  &
+     &                               x_local_ele, xi)
       end if
 !
       end subroutine cal_position_and_grad_surf
@@ -83,7 +103,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine cal_position_and_grad_edge(nnod_ed, xx_z,  dnxi,       &
-     &          x_local_ele, xi)
+     &                                      x_local_ele, xi)
 !
       integer (kind = kint), intent(in) :: nnod_ed
       real(kind = kreal), intent(in) :: x_local_ele(nnod_ed,3)

@@ -92,7 +92,7 @@
 !!
 !!    begin colorbar_ctl
 !!      colorbar_switch_ctl    ON
-!!      colorbar_position_ctl  'left' or 'bottom'
+!!      colorbar_position_ctl  'side' or 'bottom'
 !!      colorbar_scale_ctl     ON
 !!      zeromarker_switch      ON
 !!      colorbar_range     0.0   1.0
@@ -100,6 +100,7 @@
 !!      num_grid_ctl          4
 !!!
 !!      axis_label_switch      ON
+!!      time_label_switch      ON
 !!    end colorbar_ctl
 !!  end  cross_section_ctl
 !!  

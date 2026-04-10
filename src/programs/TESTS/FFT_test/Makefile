@@ -158,8 +158,8 @@ lib_name:
 mod_list:
 	@echo  MOD_FFTPACK_TEST=      \\  >> $(MAKENAME)
 	@echo  $(MOD_FFTPACK_TEST)        >> $(MAKENAME)
-	@echo  MOD_FFW3_F_TEST=       \\  >> $(MAKENAME)
-	@echo  $(MOD_FFW3_F_TEST)         >> $(MAKENAME)
+	@echo  MOD_FFW3_F_TEST=      \\  >> $(MAKENAME)
+	@echo  $(MOD_FFW3_F_TEST)        >> $(MAKENAME)
 	@echo  MOD_SGL_FFW3_TEST=      \\  >> $(MAKENAME)
 	@echo  $(MOD_SGL_FFW3_TEST)        >> $(MAKENAME)
 	@echo  MOD_CMPR_FFT_TEST=      \\  >> $(MAKENAME)

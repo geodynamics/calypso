@@ -70,6 +70,7 @@
       subroutine s_set_pvr_controls(group, nod_fld, tracer, fline,      &
      &                              pvr_ctl_type, pvr_param)
 !
+      use m_error_IDs
       use t_group_data
       use t_phys_data
       use t_particle_trace
@@ -91,13 +92,15 @@
       type(PVR_control_params), intent(inout) :: pvr_param
 !
       integer(kind = kint) :: icheck_ncomp(1)
+      integer(kind = kint) :: n_field
 !
 !
       call s_set_control_pvr_movie(pvr_ctl_type%movie,                  &
      &                             pvr_param%movie_def)
 !
-      call check_pvr_field_control(pvr_ctl_type,                        &
-     &                             nod_fld%num_phys, nod_fld%phys_name)
+      n_field = check_pvr_field_control(pvr_ctl_type, nod_fld%num_phys, &
+     &                                  nod_fld%phys_name)
+      if(n_field .le. 0) call calypso_MPI_abort(ierr_PVR, e_message)
 !
       call set_control_field_4_pvr                                      &
      &   (pvr_ctl_type%pvr_field_ctl, pvr_ctl_type%pvr_comp_ctl,        &

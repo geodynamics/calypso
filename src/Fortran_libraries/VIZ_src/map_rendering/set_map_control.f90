@@ -211,6 +211,9 @@
      &     psf_fld%phys_name(1))
         if(psf_fld%num_component(1) .gt. 1)                             &
      &     call calypso_MPI_abort(ierr_VIZ, 'set scalar for rendering')
+        if(psf_fld%num_component(2) .lt. 0)                             &
+     &     call calypso_MPI_abort(ierr_VIZ,                             &
+     &                            'field for map rendering is missing')
       end if
 !
       if((map_c%isoline_field_ctl%iflag*map_c%isoline_comp_ctl%iflag)   &
@@ -223,6 +226,9 @@
      &     psf_fld%phys_name(2))
         if(psf_fld%num_component(2) .gt. 1)                             &
      &     call calypso_MPI_abort(ierr_VIZ, 'set scalar for isolines')
+        if(psf_fld%num_component(2) .lt. 0)                             &
+     &     call calypso_MPI_abort(ierr_VIZ,                             &
+     &                            'field for isoline is missing')
       end if
 !
       if(psf_param%id_output(1) .le. 0                                  &

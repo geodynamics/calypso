@@ -9,12 +9,13 @@
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!      subroutine init_pvr_rotation_ctl_label(hd_block, movie)
-!!      subroutine read_pvr_rotation_ctl                                &
-!!     &         (id_control, hd_block, movie, c_buf)
+!!      subroutine read_pvr_rotation_ctl(id_control, hd_block,          &
+!!     &                                  movie, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_movie_ctl), intent(inout) :: movie
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_pvr_rotation_ctl                               &
 !!     &         (id_control, hd_block, movie, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -56,7 +57,6 @@
       module ctl_data_pvr_movie_IO
 !
       use m_precision
-      use calypso_mpi
 !
       use m_machine_parameter
       use t_read_control_elements
@@ -71,8 +71,6 @@
       use skip_comment_f
 !
       implicit  none
-!
-!
 !
 !     3rd level for movie
 !
@@ -104,8 +102,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_pvr_rotation_ctl                                  &
-     &         (id_control, hd_block, movie, c_buf)
+      subroutine read_pvr_rotation_ctl(id_control, hd_block,            &
+     &                                  movie, c_buf, error_file)
 !
       use ctl_file_pvr_modelview_IO
       use write_control_elements
@@ -113,8 +111,10 @@
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(pvr_movie_ctl), intent(inout) :: movie
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(movie%i_pvr_rotation.gt.0) return
@@ -126,10 +126,14 @@
 !
         call sel_read_ctl_modelview_file                                &
      &     (id_control, hd_start_view_control, izero,                   &
-     &      movie%fname_view_start_ctl, movie%view_start_ctl, c_buf)
+     &      movie%fname_view_start_ctl, movie%view_start_ctl,           &
+     &      c_buf, error_file)
+        if(error_file) return
         call sel_read_ctl_modelview_file                                &
      &     (id_control, hd_end_view_control, izero,                     &
-     &      movie%fname_view_end_ctl, movie%view_end_ctl, c_buf)
+     &      movie%fname_view_end_ctl, movie%view_end_ctl,               &
+     &      c_buf, error_file)
+        if(error_file) return
 !
         call read_chara_ctl_type(c_buf, hd_movie_mode,                  &
      &      movie%movie_mode_ctl)
@@ -146,8 +150,9 @@
         call read_real2_ctl_type(c_buf, hd_LIC_kernel_peak,             &
      &      movie%LIC_kernel_peak_range_ctl)
 !
-        call read_mul_view_transfer_ctl                                 &
-     &     (id_control, hd_mview_transform, movie%mul_mmats_c, c_buf)
+        call read_mul_view_transfer_ctl(id_control, hd_mview_transform, &
+     &      movie%mul_mmats_c, c_buf, error_file)
+        if(error_file) return
       end do
       movie%i_pvr_rotation = 1
 !

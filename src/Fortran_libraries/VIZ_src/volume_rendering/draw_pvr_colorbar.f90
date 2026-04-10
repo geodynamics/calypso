@@ -192,6 +192,7 @@
 !
       use set_color_4_pvr
       use set_rgba_4_each_pixel
+      use phong_reflection
       use draw_pvr_colorbar_nums
 !
       integer(kind = kint), intent(in) :: iflag_opacity
@@ -276,6 +277,7 @@
 !
       use set_color_4_pvr
       use set_rgba_4_each_pixel
+      use phong_reflection
       use draw_pvr_colorbar_nums
 !
       integer(kind = kint), intent(in) :: iflag_opacity

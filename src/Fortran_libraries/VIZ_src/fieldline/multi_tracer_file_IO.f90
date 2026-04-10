@@ -8,43 +8,45 @@
 !!
 !!@verbatim
 !!      subroutine output_tracer_restarts(time_d, finish_d, rst_step,   &
-!!     &                                  num_fline, fln_prm, fline_lc)
+!!     &                                  num_fline, fln_prm, fln_tce)
 !!        type(time_data), intent(in) :: time_d
 !!        type(finish_data), intent(in) :: finish_d
 !!        type(IO_step_param), intent(in) :: rst_step
 !!        integer(kind = kint), intent(in) :: num_fline
 !!        type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
-!!        type(local_fieldline), intent(inout) :: fline_lc(num_fline)
+!!        type(each_fieldline_trace), intent(in) :: fln_tce(num_fline)
 !!      subroutine input_tracer_restarts(init_d, rst_step, num_fline,   &
-!!     &                                 fln_prm, fline_lc)
-!!        type(time_data), intent(in) :: init_d
-!!        type(IO_step_param), intent(in) :: rst_step
-!!        integer(kind = kint), intent(in) :: num_fline
-!!        type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
-!!        type(local_fieldline), intent(inout) :: fline_lc(num_fline)
-!!      subroutine sel_input_tracer_restarts(init_d, rst_step,          &
-!!     &          num_fline, fln_prm, fln_tce, fline_lc)
+!!     &                                 fln_prm, fln_tce)
 !!        type(time_data), intent(in) :: init_d
 !!        type(IO_step_param), intent(in) :: rst_step
 !!        integer(kind = kint), intent(in) :: num_fline
 !!        type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
 !!        type(each_fieldline_trace), intent(inout) :: fln_tce(num_fline)
-!!        type(local_fieldline), intent(inout) :: fline_lc(num_fline)
-!!
-!!      subroutine output_tracer_viz_files(istep_file, time_d,          &
-!!     &                                   num_fline,fln_prm, fline_lc)
-!!        integer(kind = kint), intent(in) :: istep_file
-!!        type(time_data), intent(in) :: time_d
+!!      subroutine sel_input_tracer_restarts(init_d, rst_step,          &
+!!     &          num_fline, fln_prm, fln_tce)
+!!        type(time_data), intent(in) :: init_d
+!!        type(IO_step_param), intent(in) :: rst_step
 !!        integer(kind = kint), intent(in) :: num_fline
 !!        type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
-!!        type(local_fieldline), intent(in) ::    fline_lc(num_fline)
-!!      subroutine output_field_lines(istep_file, time_d,               &
+!!        type(each_fieldline_trace), intent(inout) :: fln_tce(num_fline)
+!!
+!!      subroutine output_tracer_viz_files(istep_file, time_d,          &
+!!     &          mesh, nod_fld, num_fline, fln_prm, fln_tce)
+!!        integer(kind = kint), intent(in) :: istep_file
+!!        type(time_data), intent(in) :: time_d
+!!        type(mesh_geometry), intent(in) :: mesh
+!!        type(phys_data), intent(in) :: nod_fld
+!!        integer(kind = kint), intent(in) :: num_fline
+!!        type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
+!!       type(each_fieldline_trace), intent(inout) :: fln_tce(num_fline)
+!!      subroutine output_field_lines(istep_file, time_d, mesh, nod_fld,&
 !!     &                              num_fline, fln_prm, fline_lc)
 !!        integer(kind = kint), intent(in) :: istep_file
 !!        type(time_data), intent(in) :: time_d
 !!        integer(kind = kint), intent(in) :: num_fline
 !!        type(fieldline_paramter), intent(inout) :: fln_prm(num_fline)
-!!        type(local_fieldline), intent(inout) :: fline_lc(num_fline)
+!!        type(local_fieldline), intent(inout)                          &
+!!     &                      :: fline_lc(np_smp,num_fline)
 !!@endverbatim
 !
       module multi_tracer_file_IO
@@ -56,7 +58,7 @@
       use t_time_data
       use t_mesh_data
       use t_phys_data
-      use t_paralell_surface_indices
+      use t_parallel_surface_indices
       use t_control_params_4_fline
       use t_source_of_filed_line
       use t_trace_data_send_recv
@@ -75,7 +77,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine output_tracer_restarts(time_d, finish_d, rst_step,     &
-     &                                  num_fline, fln_prm, fline_lc)
+     &                                  num_fline, fln_prm, fln_tce)
 !
       use tracer_restart_file_IO
 !
@@ -85,24 +87,22 @@
 !
       integer(kind = kint), intent(in) :: num_fline
       type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
-      type(local_fieldline), intent(inout) :: fline_lc(num_fline)
+      type(each_fieldline_trace), intent(in) :: fln_tce(num_fline)
 !
-      integer(kind = kint) :: i_fln, istep_rst
+      integer(kind = kint) :: i_tcr, istep_rst
 !
       if(output_IO_flag(time_d%i_time_step, rst_step)) then
         istep_rst = set_IO_step(time_d%i_time_step, rst_step)
-        do i_fln = 1, num_fline
-          call output_tracer_restart(fln_prm(i_fln)%fline_rst_IO,       &
-     &        istep_rst, time_d, fln_prm(i_fln)%fline_fields,           &
-     &        fline_lc(i_fln))
+        do i_tcr = 1, num_fline
+          call output_tracer_restart(fln_prm(i_tcr)%tracer_rst_IO,      &
+     &                               istep_rst, time_d, fln_tce(i_tcr))
         end do
       end if
 !
       if(finish_d%flag_terminate_by_elapsed) then
-        do i_fln = 1, num_fline
-          call output_tracer_restart(fln_prm(i_fln)%fline_rst_IO,       &
-     &        -1, time_d, fln_prm(i_fln)%fline_fields,                  &
-     &        fline_lc(i_fln))
+        do i_tcr = 1, num_fline
+          call output_tracer_restart(fln_prm(i_tcr)%tracer_rst_IO,      &
+     &                               -1, time_d, fln_tce(i_tcr))
         end do
       end if
 !
@@ -111,36 +111,8 @@
 !  ---------------------------------------------------------------------
 !
       subroutine input_tracer_restarts(init_d, rst_step, num_fline,     &
-     &                                 fln_prm, fline_lc)
+     &                                 fln_prm, fln_tce)
 !
-      use trace_particle
-      use tracer_restart_file_IO
-!
-      type(time_data), intent(in) :: init_d
-      type(IO_step_param), intent(in) :: rst_step
-!
-      integer(kind = kint), intent(in) :: num_fline
-      type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
-      type(local_fieldline), intent(inout) :: fline_lc(num_fline)
-!
-      integer(kind = kint) :: i_fln, istep_rst
-!
-!
-      istep_rst = set_IO_step(init_d%i_time_step, rst_step)
-      do i_fln = 1, num_fline
-        call input_tracer_restart(fln_prm(i_fln)%fline_rst_IO,          &
-     &      istep_rst, init_d, fln_prm(i_fln)%fline_fields,             &
-     &      fline_lc(i_fln))
-      end do
-!
-      end subroutine input_tracer_restarts
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine sel_input_tracer_restarts(init_d, rst_step,            &
-     &          num_fline, fln_prm, fln_tce, fline_lc)
-!
-      use trace_particle
       use tracer_restart_file_IO
 !
       type(time_data), intent(in) :: init_d
@@ -149,27 +121,46 @@
       integer(kind = kint), intent(in) :: num_fline
       type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
       type(each_fieldline_trace), intent(inout) :: fln_tce(num_fline)
-      type(local_fieldline), intent(inout) :: fline_lc(num_fline)
 !
-      integer(kind = kint) :: i_fln, istep_rst, ntot_comp
+      integer(kind = kint) :: i_tcr, istep_rst
 !
 !
       istep_rst = set_IO_step(init_d%i_time_step, rst_step)
-      write(*,*) 'istep_rst', istep_rst, init_d%i_time_step
-      do i_fln = 1, num_fline
-        ntot_comp = fln_prm(i_fln)%fline_fields%ntot_color_comp
+      do i_tcr = 1, num_fline
+        call input_tracer_restart(fln_prm(i_tcr)%tracer_rst_IO,         &
+     &                            istep_rst, init_d, fln_tce(i_tcr))
+      end do
 !
-        if(fln_prm(i_fln)%id_fline_seed_type                            &
+      end subroutine input_tracer_restarts
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine sel_input_tracer_restarts(init_d, rst_step,            &
+     &          num_fline, fln_prm, fln_tce)
+!
+      use calypso_mpi
+      use tracer_restart_file_IO
+      use field_at_each_seed_point
+!
+      type(time_data), intent(in) :: init_d
+      type(IO_step_param), intent(in) :: rst_step
+!
+      integer(kind = kint), intent(in) :: num_fline
+      type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
+      type(each_fieldline_trace), intent(inout) :: fln_tce(num_fline)
+!
+      integer(kind = kint) :: i_tcr, istep_rst
+!
+!
+      istep_rst = set_IO_step(init_d%i_time_step, rst_step)
+      do i_tcr = 1, num_fline
+        if(fln_prm(i_tcr)%id_fline_seed_type                            &
      &                       .eq. iflag_read_reastart) then
-          call input_tracer_restart(fln_prm(i_fln)%fline_rst_IO,        &
-     &        istep_rst, init_d, fln_prm(i_fln)%fline_fields,           &
-     &        fline_lc(i_fln))
+          call input_tracer_restart(fln_prm(i_tcr)%tracer_rst_IO,       &
+     &                              istep_rst, init_d, fln_tce(i_tcr))
         else
-          call local_tracer_from_seeds(fln_prm(i_fln), fln_tce(i_fln),  &
-     &                                 fline_lc(i_fln))
-          call output_tracer_restart(fln_prm(i_fln)%fline_rst_IO,       &
-     &        istep_rst, init_d, fln_prm(i_fln)%fline_fields,           &
-     &        fline_lc(i_fln))
+          call output_tracer_restart(fln_prm(i_tcr)%tracer_rst_IO,      &
+     &        istep_rst, init_d, fln_tce(i_tcr))
         end if
       end do
 !
@@ -179,30 +170,35 @@
 !  ---------------------------------------------------------------------
 !
       subroutine output_tracer_viz_files(istep_file, time_d,            &
-     &                                   num_fline,fln_prm, fline_lc)
+     &          mesh, nod_fld, num_fline, fln_prm, fln_tce)
 !
       use t_mesh_SR
       use collect_fline_data
       use parallel_ucd_IO_select
+      use field_at_each_seed_point
 !
       integer(kind = kint), intent(in) :: istep_file
       type(time_data), intent(in) :: time_d
-!
+      type(mesh_geometry), intent(in) :: mesh
+      type(phys_data), intent(in) :: nod_fld
       integer(kind = kint), intent(in) :: num_fline
       type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
-      type(local_fieldline), intent(in) ::    fline_lc(num_fline)
+!
+      type(each_fieldline_trace), intent(inout) :: fln_tce(num_fline)
 !
       type(time_data) :: t_IO
       type(ucd_data) :: fline_ucd
-      integer(kind = kint) :: i_fln
+      integer(kind = kint) :: i_tcr
 !
 !
-      do i_fln = 1, num_fline
+      do i_tcr = 1, num_fline
         call copy_time_step_size_data(time_d, t_IO)
-        call copy_local_particles_to_IO                                 &
-     &     (fln_prm(i_fln)%fline_fields, fline_lc(i_fln), fline_ucd)
+        call copy_local_particles_to_IO(mesh%ele, nod_fld,              &
+     &      fln_prm(i_tcr)%fline_fields, fln_tce(i_tcr), fline_ucd)
+        call calypso_mpi_barrier()
         call sel_write_parallel_ucd_file                                &
-     &     (istep_file, fln_prm(i_fln)%fline_file_IO, t_IO, fline_ucd)
+     &     (istep_file, fln_prm(i_tcr)%fline_file_IO, t_IO, fline_ucd)
+        call calypso_mpi_barrier()
         call deallocate_parallel_ucd_mesh(fline_ucd)
       end do
 !
@@ -210,7 +206,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine output_field_lines(istep_file, time_d,                 &
+      subroutine output_field_lines(istep_file, time_d, mesh, nod_fld,  &
      &                              num_fline, fln_prm, fline_lc)
 !
       use set_fields_for_fieldline
@@ -221,19 +217,22 @@
 !
       integer(kind = kint), intent(in) :: istep_file
       type(time_data), intent(in) :: time_d
+      type(mesh_geometry), intent(in) :: mesh
+      type(phys_data), intent(in) :: nod_fld
       integer(kind = kint), intent(in) :: num_fline
-      type(fieldline_paramter), intent(inout) :: fln_prm(num_fline)
-      type(local_fieldline), intent(inout) :: fline_lc(num_fline)
+      type(fieldline_paramter), intent(in) :: fln_prm(num_fline)
+      type(local_fieldline), intent(inout)                              &
+     &                      :: fline_lc(np_smp,num_fline)
 !
       type(time_data) :: t_IO
       type(ucd_data) :: fline_ucd
       integer(kind = kint) :: i_fln
-!  
+!
 !
       do i_fln = 1, num_fline
         call copy_time_step_size_data(time_d, t_IO)
-        call copy_local_fieldline_to_IO(fln_prm(i_fln)%fline_fields,    &
-     &                                  fline_lc(i_fln), fline_ucd)
+        call copy_local_fieldline_to_IO(mesh%ele, nod_fld,              &
+     &      fln_prm(i_fln)%fline_fields, fline_lc(1,i_fln), fline_ucd)
         call sel_write_parallel_ucd_file                                &
      &     (istep_file, fln_prm(i_fln)%fline_file_IO, t_IO, fline_ucd)
         call deallocate_parallel_ucd_mesh(fline_ucd)

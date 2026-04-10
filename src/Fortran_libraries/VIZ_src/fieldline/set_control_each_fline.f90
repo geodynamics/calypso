@@ -8,7 +8,6 @@
 !!
 !!@verbatim
 !!      subroutine count_control_4_fline(fln, ele_grp, sf_grp, fln_prm)
-!!      subroutine set_control_4_fline(fln, ele_grp, nod_fld, fln_prm)
 !!        type(group_data), intent(in) :: ele_grp
 !!        type(surface_group_data), intent(in) :: sf_grp
 !!        type(phys_data), intent(in) :: nod_fld
@@ -16,12 +15,30 @@
 !!        type(fline_ctl), intent(inout) :: fln
 !!        type(fieldline_paramter), intent(inout) :: fln_prm
 !!        integer(kind = kint), intent(inout) :: ierr
+!!
+!!      integer(kind = kint) function                                   &
+!!     &              set_ctl_fieldline_field(fline_field_ctl, nod_fld)
+!!        type(read_character_item), intent(in) :: fline_field_ctl
+!!        type(phys_data), intent(in) :: nod_fld
+!!      integer(kind = kint) function                                   &
+!!     &                    set_ctl_field_to_trace(field_name, nod_fld)
+!!        character(len=kchara), intent(in) :: field_name
+!!        type(phys_data), intent(in) :: nod_fld
+!!
+!!      subroutine set_control_tracer_density(fln, nod_fld, fln_prm)
+!!        type(phys_data), intent(in) :: nod_fld
+!!        type(fline_ctl), intent(in) :: fln
+!!        type(fieldline_paramter), intent(inout) :: fln_prm
 !!      subroutine set_fline_ctl_4_tracer_seed(num_tracer, tracer_prm,  &
 !!     &                                       fln, fln_prm)
 !!        integer(kind = kint), intent(in) :: num_tracer
 !!        type(fieldline_paramter), intent(in) :: tracer_prm(num_tracer)
 !!        type(fline_ctl), intent(in) :: fln
 !!        type(fieldline_paramter), intent(inout) :: fln_prm
+!!
+!!      integer(kind = kint) function                                   &
+!!     &            set_ctl_fieldline_direction(line_direction_ctl)
+!!        type(read_character_item), intent(in) :: line_direction_ctl
 !!@endverbatim
 !
       module set_control_each_fline
@@ -36,10 +53,7 @@
       use t_ctl_data_field_line
       use t_geometry_data
       use t_group_data
-!
-      use set_area_4_viz
-      use set_field_comp_for_viz
-      use set_fields_for_fieldline
+      use t_phys_data
 !
       implicit  none
 !
@@ -96,11 +110,6 @@
      &      = sel_iso_file_format(fln%fline_output_type_ctl%charavalue)
       end if
 !
-      call set_ctl_parallel_file_w_def(default_tracer_prefix,           &
-     &    fln%fline_rst_prefix_ctl, fln%fline_rst_format_ctl,           &
-     &    fln_prm%fline_rst_IO)
-!
-!
       call count_area_4_viz(ele_grp%num_grp, ele_grp%grp_name,          &
      &    fln%fline_area_grp_ctl%num, fln%fline_area_grp_ctl%c_tbl,     &
      &    fln_prm%nele_grp_area_fline)
@@ -126,16 +135,6 @@
         fln_prm%id_fline_seed_type =  iflag_spray_in_domain
       else if(cmp_no_case(character_256, cflag_seed_from_tracer)) then 
         fln_prm%id_fline_seed_type =  iflag_tracer_seeds
-      end if
-!
-!
-      character_256 = fln%line_direction_ctl%charavalue
-      if     (cmp_no_case(character_256, cflag_forward_trace)) then
-        fln_prm%id_fline_direction =  iflag_forward_trace
-      else if(cmp_no_case(character_256, cflag_backward_trace)) then 
-        fln_prm%id_fline_direction =  iflag_backward_trace
-      else if(cmp_no_case(character_256, cflag_both_trace)) then 
-        fln_prm%id_fline_direction =  iflag_both_trace
       end if
 !
 !
@@ -190,18 +189,61 @@
       end subroutine count_control_4_fline
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
 !
-      subroutine set_control_4_fline(fln, ele_grp, nod_fld, fln_prm)
+      integer(kind = kint) function                                     &
+     &              set_ctl_fieldline_field(fline_field_ctl, nod_fld)
 !
-      use t_source_of_filed_line
-      use set_components_flags
-      use set_area_4_viz
-      use coordinate_converter
-!
-      type(group_data), intent(in) :: ele_grp
+      type(read_character_item), intent(in) :: fline_field_ctl
       type(phys_data), intent(in) :: nod_fld
 !
-      type(fline_ctl), intent(inout) :: fln
+      set_ctl_fieldline_field                                           &
+     &    = set_ctl_field_to_trace(fline_field_ctl%charavalue, nod_fld)
+!
+      end function set_ctl_fieldline_field
+!
+!  ---------------------------------------------------------------------
+!
+      integer(kind = kint) function                                     &
+     &                    set_ctl_field_to_trace(field_name, nod_fld)
+!
+      use set_components_flags
+      use set_field_comp_for_viz
+!
+      character(len=kchara), intent(in) :: field_name
+      type(phys_data), intent(in) :: nod_fld
+!
+      integer(kind = kint) :: ncomp(1), ncomp_org(1)
+      integer(kind = kint) :: ifield_tmp(1), icomp_tmp(1)
+      character(len=kchara) :: tmpfield(1)
+      character(len=kchara) :: tmpcomp(1)
+      character(len=kchara) :: tmpchara(1)
+!
+!
+      tmpfield(1) = field_name
+      tmpcomp(1) =  'vector'
+      call set_components_4_viz                                         &
+     &   (nod_fld%num_phys, nod_fld%phys_name, ione, tmpfield, tmpcomp, &
+     &    ione, ifield_tmp, icomp_tmp, ncomp, ncomp_org, tmpchara)
+!
+      if(icomp_tmp(1) .ne. icomp_VECTOR) then
+        call calypso_MPI_abort(ierr_fld,                                &
+     &      'Choose vector field for field line')
+      end if
+      set_ctl_field_to_trace                                            &
+     &       = nod_fld%istack_component(ifield_tmp(1)-1) + 1
+!
+      end function set_ctl_field_to_trace
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_control_tracer_density(fln, nod_fld, fln_prm)
+!
+      use t_source_of_filed_line
+      use set_field_comp_for_viz
+!
+      type(phys_data), intent(in) :: nod_fld
+      type(fline_ctl), intent(in) :: fln
 !
       type(fieldline_paramter), intent(inout) :: fln_prm
 !
@@ -212,20 +254,6 @@
       character(len=kchara) :: tmpchara(1)
 !
 !
-      tmpfield(1) = fln%fline_field_ctl%charavalue
-      tmpcomp(1) =  'vector'
-      call set_components_4_viz                                         &
-     &   (nod_fld%num_phys, nod_fld%phys_name, ione, tmpfield, tmpcomp, &
-     &    ione, ifield_tmp, icomp_tmp, ncomp, ncomp_org, tmpchara)
-!
-      if(icomp_tmp(1) .ne. icomp_VECTOR) then
-        call calypso_MPI_abort(ierr_fld,                                &
-     &      'Choose vector field for field line')
-      end if
-      fln_prm%iphys_4_fline                                             &
-     &       = nod_fld%istack_component(ifield_tmp(1)-1) + 1
-!
-!
       tmpfield(1) = fln%seed_ref_field_ctl%charavalue
       tmpcomp(1) =  fln%seed_ref_comp_ctl%charavalue
       call set_components_4_viz                                         &
@@ -234,14 +262,7 @@
       fln_prm%ifield_4_density = ifield_tmp(1)
       fln_prm%icomp_4_density =  icomp_tmp(1)
 !
-      call set_ctl_params_viz_fields(fln%fline_field_output_ctl,        &
-     &                               nod_fld, fln_prm%fline_fields)
-!
-      call s_set_area_4_viz(ele_grp%num_grp, ele_grp%grp_name,          &
-     &    fln%fline_area_grp_ctl%num, fln%fline_area_grp_ctl%c_tbl,     &
-     &    fln_prm%nele_grp_area_fline, fln_prm%id_ele_grp_area_fline)
-!
-      end subroutine set_control_4_fline
+      end subroutine set_control_tracer_density
 !
 !  ---------------------------------------------------------------------
 !
@@ -280,6 +301,34 @@
       end if
 !
       end subroutine set_fline_ctl_4_tracer_seed
+!
+!  ---------------------------------------------------------------------
+!
+      integer(kind = kint) function                                     &
+     &            set_ctl_fieldline_direction(line_direction_ctl)
+!
+      use m_control_fline_flags
+      use t_control_array_character
+      use skip_comment_f
+!
+      type(read_character_item), intent(in) :: line_direction_ctl
+!
+      character(len=kchara) :: character_256
+!
+!
+      set_ctl_fieldline_direction =  iflag_forward_trace
+      if(line_direction_ctl%iflag .le. 0) return
+!
+      character_256 = line_direction_ctl%charavalue
+      if     (cmp_no_case(character_256, cflag_forward_trace)) then
+        set_ctl_fieldline_direction =  iflag_forward_trace
+      else if(cmp_no_case(character_256, cflag_backward_trace)) then 
+        set_ctl_fieldline_direction =  iflag_backward_trace
+      else if(cmp_no_case(character_256, cflag_both_trace)) then 
+        set_ctl_fieldline_direction =  iflag_both_trace
+      end if
+!
+      end function set_ctl_fieldline_direction
 !
 !  ---------------------------------------------------------------------
 !

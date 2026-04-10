@@ -13,12 +13,13 @@
 !!      subroutine init_pvr_sections_ctl(hd_block, pvr_scts_c)
 !!        type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
 !!
-!!      subroutine read_pvr_sections_ctl                                &
-!!     &         (id_control, hd_block, pvr_scts_c, c_buf)
+!!      subroutine read_pvr_sections_ctl(id_control, hd_block,          &
+!!     &                                 pvr_scts_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_pvr_sections_ctl                               &
 !!     &         (id_control, hd_block, pvr_scts_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -128,13 +129,15 @@
 ! -----------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine read_pvr_sections_ctl                                  &
-     &         (id_control, hd_block, pvr_scts_c, c_buf)
+      subroutine read_pvr_sections_ctl(id_control, hd_block,            &
+     &                                 pvr_scts_c, c_buf, error_file)
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(pvr_sections_ctl), intent(inout) :: pvr_scts_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
       integer(kind = kint) :: n_append
 !
@@ -154,7 +157,8 @@
           call read_pvr_section_ctl                                     &
      &       (id_control, hd_block, pvr_scts_c%num_pvr_sect_ctl,        &
      &        pvr_scts_c%pvr_sect_ctl(pvr_scts_c%num_pvr_sect_ctl),     &
-     &        c_buf)
+     &        c_buf, error_file)
+          if(error_file) return
         end if
       end do
 !

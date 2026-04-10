@@ -24,17 +24,20 @@
       type(mhd_simulation_control) :: MHD_ctl1
       type(add_vizs_sph_mhd_ctl) :: add_VMHD_ctl1
       type(buffer_for_control) :: c_buf1
+      logical :: error_file = .FALSE.
 !
 !
-      if(iargc_kemo() .le. 0) then
+      if(command_argument_count() .le. 0) then
         write(*,*) 'check_control_mhd CONTROL_FILE_NAME'
         stop
       end if
-      call getarg_k(1, MHD_ctl_name)
+      call get_command_argument(1, MHD_ctl_name)
 !
+      error_file = .FALSE.
       c_buf1%level = 0
-      call read_control_4_sph_MHD_w_vizs(MHD_ctl_name,                  &
-     &                                MHD_ctl1, add_VMHD_ctl1, c_buf1)
+      call read_control_4_sph_MHD_w_vizs(MHD_ctl_name, MHD_ctl1,        &
+     &    add_VMHD_ctl1, c_buf1, error_file)
+      if(error_file) stop 'No control file'
       if(c_buf1%iend .gt. 0) stop 'Error in control file'
 !
 !
@@ -45,39 +48,5 @@
      &    MHD_ctl1, add_VMHD_ctl1, c_buf1%level)
 !
       stop '***** program finished *****'
-!
-!   --------------------------------------------------------------------
-!
-      contains
-!
-!   --------------------------------------------------------------------
-!
-      subroutine getarg_k(i, argc)
-!
-      integer, intent(in) :: i
-      character(len=*), intent(out) :: argc
-!
-      call getarg(0, argc)
-      if(argc == "") then
-        call getarg(i + 1, argc)
-      else
-        call getarg(i, argc)
-      end if
-      end subroutine getarg_k
-!
-!   --------------------------------------------------------------------
-!
-      integer function iargc_kemo() result(oresult)
-!
-      integer :: iargc
-      character(len=8) :: argc
-      oresult = iargc()
-      call getarg(0, argc)
-      if(argc == "") then
-        oresult = oresult - 1
-      end if
-      end function iargc_kemo
-!
-!   --------------------------------------------------------------------
 !
       end program control_MHD_w_viz_check

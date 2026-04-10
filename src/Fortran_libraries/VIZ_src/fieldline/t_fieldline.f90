@@ -32,7 +32,7 @@
       use t_time_data
       use t_mesh_data
       use t_phys_data
-      use t_paralell_surface_indices
+      use t_parallel_surface_indices
       use t_control_params_4_fline
       use t_source_of_filed_line
       use t_trace_data_send_recv
@@ -51,13 +51,14 @@
 !
         type(each_fieldline_source), allocatable :: fln_src(:)
         type(each_fieldline_trace), allocatable :: fln_tce(:)
-        type(local_fieldline), allocatable  :: fline_lc(:)
+        type(local_fieldline), allocatable  :: fline_lc(:,:)
         type(broadcast_trace_data), allocatable :: fln_bcast(:)
         type(trace_data_send_recv), allocatable :: fln_SR(:)
 !
         type(ucd_data) :: fline_ucd
       end type fieldline_module
 !
+      private :: alloc_FLINE_modules
       private :: set_fline_controls, s_const_field_lines
 !
 !  ---------------------------------------------------------------------
@@ -95,27 +96,12 @@
       call dealloc_fline_ctl_struct(fline_ctls)
 !
       call alloc_each_FLINE_data                                        &
-     &   (fline%num_fline, fline%fln_prm, fline%fln_src, fline%fln_tce, &
+     &   (geofem%mesh, fline%num_fline, fline%fln_prm, fline%fln_tce,   &
      &    fline%fline_lc, fline%fln_SR, fline%fln_bcast)
       call set_fixed_FLINE_seed_points(geofem%mesh, fline%num_fline,    &
      &    fline%fln_prm, fline%fln_src)
 !
       end subroutine FLINE_initialize
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine alloc_FLINE_modules(fline)
-!
-      type(fieldline_module), intent(inout) :: fline
-!
-      allocate(fline%fln_prm(fline%num_fline))
-      allocate(fline%fln_src(fline%num_fline))
-      allocate(fline%fln_tce(fline%num_fline))
-      allocate(fline%fln_SR(fline%num_fline))
-      allocate(fline%fln_bcast(fline%num_fline))
-      allocate(fline%fline_lc(fline%num_fline))
-!
-      end subroutine alloc_FLINE_modules
 !
 !  ---------------------------------------------------------------------
 !
@@ -149,8 +135,9 @@
 !
       if(elps_fline%flag_elapsed)                                       &
      &         call start_elapsed_time(elps_fline%ist_elapsed+4)
-      call output_field_lines(istep_fline, time_d, fline%num_fline,     &
-     &                         fline%fln_prm, fline%fline_lc)
+      call output_field_lines                                           &
+     &   (istep_fline, time_d, geofem%mesh, nod_fld,                    &
+     &    fline%num_fline, fline%fln_prm, fline%fline_lc)
       if(elps_fline%flag_elapsed)                                       &
      &         call end_elapsed_time(elps_fline%ist_elapsed+4)
 !
@@ -169,14 +156,29 @@
 !
 !
       call dealloc_each_FLINE_data(fline%num_fline, fline%fln_prm,      &
-     &    fline%fln_src, fline%fln_tce, fline%fline_lc,                 &
-     &    fline%fln_SR, fline%fln_bcast)           
+     &                             fline%fln_tce, fline%fline_lc,       &
+     &                             fline%fln_SR, fline%fln_bcast)
       deallocate(fline%fln_src, fline%fline_lc, fline%fln_bcast)
       deallocate(fline%fln_tce, fline%fln_prm, fline%fln_SR)
 !
       end subroutine FLINE_finalize
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_FLINE_modules(fline)
+!
+      type(fieldline_module), intent(inout) :: fline
+!
+      allocate(fline%fln_prm(fline%num_fline))
+      allocate(fline%fln_src(fline%num_fline))
+      allocate(fline%fln_tce(fline%num_fline))
+      allocate(fline%fln_SR(fline%num_fline))
+      allocate(fline%fln_bcast(fline%num_fline))
+      allocate(fline%fline_lc(np_smp,fline%num_fline))
+!
+      end subroutine alloc_FLINE_modules
+!
 !  ---------------------------------------------------------------------
 !
       subroutine set_fline_controls(mesh, group, nod_fld, tracer,       &
@@ -227,7 +229,8 @@
       type(fieldline_paramter), intent(inout) :: fln_prm(num_fline)
       type(each_fieldline_source), intent(inout) :: fln_src(num_fline)
       type(each_fieldline_trace), intent(inout) :: fln_tce(num_fline)
-      type(local_fieldline), intent(inout) ::      fline_lc(num_fline)
+      type(local_fieldline), intent(inout)                              &
+     &                      :: fline_lc(np_smp,num_fline)
       type(trace_data_send_recv), intent(inout) :: fln_SR(num_fline)
       type(broadcast_trace_data), intent(inout) :: fln_bcast(num_fline)
       type(mesh_SR), intent(inout) :: m_SR
@@ -239,20 +242,17 @@
      &         call start_elapsed_time(elps_fline%ist_elapsed+1)
         if(fln_prm(i_fln)%id_fline_seed_type                            &
      &                       .eq. iflag_tracer_seeds) then
-          call const_fline_seed_from_tracer(mesh%node, mesh%ele,        &
-     &        nod_fld, tracer%num_trace, tracer%fln_tce,                &
-     &        fln_prm(i_fln), fln_tce(i_fln))
+          call const_fline_seed_from_tracer(mesh%ele, fln_prm(i_fln),   &
+     &        tracer%num_trace, tracer%fln_tce, fln_tce(i_fln))
         else if(fln_prm(i_fln)%id_fline_seed_type                       &
      &                       .eq. iflag_position_list) then
-          call count_FLINE_seed_from_list                               &
+          call const_FLINE_seed_from_list                               &
      &       (fln_prm(i_fln), fln_src(i_fln), fln_tce(i_fln))
-          call set_FLINE_seed_field_from_list                           &
-     &       (mesh%node, mesh%ele, nod_fld,                             &
-     &        fln_prm(i_fln), fln_src(i_fln), fln_tce(i_fln))
         else
           call s_set_fields_for_fieldline                               &
      &       (mesh, group, para_surf, nod_fld,                          &
-     &        fln_prm(i_fln), fln_src(i_fln), fln_tce(i_fln))
+     &        fln_src(i_fln)%num_line_local,                            &
+     &        fln_prm(i_fln), fln_tce(i_fln))
         end if
         if(elps_fline%flag_elapsed)                                     &
      &         call end_elapsed_time(elps_fline%ist_elapsed+1)
@@ -260,7 +260,7 @@
 !
         call const_each_field_line(elps_fline, mesh, para_surf,         &
      &      nod_fld, fln_prm(i_fln), fln_tce(i_fln), fln_SR(i_fln),     &
-     &      fln_bcast(i_fln), fline_lc(i_fln), m_SR)
+     &      fln_bcast(i_fln), fline_lc(1,i_fln), m_SR)
         call calypso_mpi_barrier()
       end do
 !

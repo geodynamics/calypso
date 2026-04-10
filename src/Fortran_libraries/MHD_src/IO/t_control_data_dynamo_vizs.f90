@@ -8,12 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine init_dynamo_viz_control(hd_block, zm_ctls)
-!!      subroutine read_dynamo_viz_control                              &
-!!     &         (id_control, hd_block, zm_ctls, c_buf)
+!!      subroutine read_dynamo_viz_control(id_control, hd_block,        &
+!!     &                                   zm_ctls, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_dynamo_viz_control(id_control, zm_ctls, level)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        type(sph_dynamo_viz_controls), intent(in) :: zm_ctls
@@ -99,6 +100,7 @@
 !
       private :: hd_zm_section, hd_zRMS_section
       private :: hd_crustal_filtering
+      private :: read_single_section_ctl
 !
 !   --------------------------------------------------------------------
 !
@@ -106,8 +108,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_dynamo_viz_control                                &
-     &         (id_control, hd_block, zm_ctls, c_buf)
+      subroutine read_dynamo_viz_control(id_control, hd_block,          &
+     &                                   zm_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use skip_comment_f
@@ -115,8 +117,10 @@
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(zm_ctls%i_viz_ctl .gt. 0) return
@@ -131,14 +135,18 @@
      &      zm_ctls%crust_filter_ctl, c_buf)
 !
         call read_single_section_ctl(id_control, hd_zm_section,         &
-     &      zm_ctls%zm_psf_ctls, c_buf)
+     &      zm_ctls%zm_psf_ctls, c_buf, error_file)
+        if(error_file) return
         call read_single_section_ctl(id_control, hd_zRMS_section,       &
-     &      zm_ctls%zRMS_psf_ctls, c_buf)
+     &      zm_ctls%zRMS_psf_ctls, c_buf, error_file)
+        if(error_file) return
 !
         call read_files_4_map_ctl(id_control, hd_zm_rendering,          &
-     &                            zm_ctls%zm_map_ctls, c_buf)
+     &      zm_ctls%zm_map_ctls, c_buf, error_file)
+        if(error_file) return
         call read_files_4_map_ctl(id_control, hd_zRMS_rendering,        &
-     &                            zm_ctls%zRMS_map_ctls, c_buf)
+     &      zm_ctls%zRMS_map_ctls, c_buf, error_file)
+        if(error_file) return
       end do
       zm_ctls%i_viz_ctl = 1
 !
@@ -219,8 +227,8 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_single_section_ctl                                &
-     &          (id_control, hd_section, psf_ctls, c_buf)
+      subroutine read_single_section_ctl(id_control, hd_section,        &
+     &                                   psf_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use t_control_data_sections
@@ -231,8 +239,10 @@
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: hd_section
+!
       type(section_controls), intent(inout) :: psf_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(psf_ctls%num_psf_ctl .gt. 0) return
@@ -247,9 +257,12 @@
 !
         call write_multi_ctl_file_message                               &
      &     (hd_section, psf_ctls%num_psf_ctl, c_buf%level)
+!
         call sel_read_control_4_psf_file(id_control, hd_section,        &
      &      psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl),               &
-     &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl), c_buf)
+     &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl),              &
+     &      c_buf, error_file)
+        if(error_file) return
       end if
 !
       end subroutine read_single_section_ctl

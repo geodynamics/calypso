@@ -219,6 +219,7 @@
       subroutine read_ctl_pvr_files_4_update(id_control,                &
      &                                       pvr_ctls, iflag_failed)
 !
+      use m_error_IDs
       use t_read_control_elements
       use skip_comment_f
       use ctl_file_each_pvr_IO
@@ -227,21 +228,28 @@
       type(volume_rendering_controls), intent(inout) :: pvr_ctls
       integer(kind = kint), intent(inout) :: iflag_failed
 !
+      logical :: error_file = .FALSE.
       integer(kind = kint) :: i_pvr
       type(buffer_for_control) :: c_buf1
 !
 !
+      error_file = .FALSE.
       iflag_failed = 0
       if(my_rank .ne. 0) return
+!
       c_buf1%level = 0
       do i_pvr = 1, pvr_ctls%num_pvr_ctl
         if(.not. no_file_flag(pvr_ctls%fname_pvr_ctl(i_pvr))) then
           call read_control_pvr_file                                    &
      &     (id_control, pvr_ctls%fname_pvr_ctl(i_pvr), hd_pvr_ctl,      &
-     &      pvr_ctls%pvr_ctl_type(i_pvr), c_buf1)
+     &      pvr_ctls%pvr_ctl_type(i_pvr), c_buf1, error_file)
+          if(error_file) exit
           iflag_failed = pvr_ctls%pvr_ctl_type(i_pvr)%i_pvr_ctl
         end if
       end do
+!
+      if(error_file) call calypso_mpi_abort(ierr_file,                  &
+     &                                      "Missing control file")
 !
       end subroutine read_ctl_pvr_files_4_update
 !

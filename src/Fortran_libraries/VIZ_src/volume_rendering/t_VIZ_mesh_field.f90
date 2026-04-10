@@ -34,7 +34,7 @@
       use t_jacobians
       use t_VIZ_step_parameter
       use t_para_double_numbering
-      use t_paralell_surface_indices
+      use t_parallel_surface_indices
       use t_elapsed_labels_4_VIZ
 !
       implicit none

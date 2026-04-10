@@ -46,6 +46,7 @@
       subroutine s_input_control_four_vizs                              &
      &         (ctl_file_name, viz4_ctl, FEM_viz, t_viz_param)
 !
+      use m_error_IDs
       use t_read_control_elements
 !
       character(len = kchara), intent(in) :: ctl_file_name
@@ -54,13 +55,17 @@
       type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !
       integer(kind = kint) :: ierr
+      logical :: error_file = .FALSE.
       type(buffer_for_control) :: c_buf1
 !
 !
+      error_file = .FALSE.
       c_buf1%level = 0
       if(my_rank .eq. 0) then
-        call read_control_file_four_vizs(ctl_file_name,                 &
-     &                                   viz4_ctl, c_buf1)
+        call read_control_file_four_vizs(ctl_file_name, viz4_ctl,       &
+     &                                   c_buf1, error_file)
+        if(error_file) call calypso_mpi_abort(ierr_file,                &
+     &                                        "Missing control file")
       end if
       call bcast_four_vizs_control_data(viz4_ctl)
 !

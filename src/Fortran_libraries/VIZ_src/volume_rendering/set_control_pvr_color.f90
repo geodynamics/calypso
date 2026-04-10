@@ -127,7 +127,7 @@
 !
       use t_ctl_data_pvr_colormap
       use set_color_4_pvr
-      use set_rgba_4_each_pixel
+      use phong_reflection
 !
       type(pvr_colormap_ctl), intent(in) :: color
 !

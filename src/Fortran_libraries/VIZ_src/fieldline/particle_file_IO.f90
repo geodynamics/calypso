@@ -77,14 +77,6 @@
       call read_element_info(input_file_code, particle_IO%ele, ierr)
       if(ierr .ne. 0) go to 99
 !
-      call read_vector_in_element(input_file_code, particle_IO%node,    &
-     &                            particle_IO%sfed, ierr)
-      if(ierr .ne. 0) go to 99
-!
-      call read_scalar_in_element(input_file_code, particle_IO%node,    &
-     &                            particle_IO%sfed, ierr)
-      if(ierr .ne. 0) go to 99
-!
       call read_step_data(input_file_code, t_IO, ierr)
 
   99  continue
@@ -114,21 +106,14 @@
       open(input_file_code, file = file_name, form = 'formatted')
 !
       write(input_file_code,'(a)', advance='NO') hd_fem_para()
-      call write_domain_info(input_file_code, id_rank, particle_IO%comm)
+      call write_domain_info(input_file_code, id_rank,                  &
+     &                       particle_IO%comm)
 !
       write(input_file_code,'(a)', advance='NO') hd_fem_node()
       call write_geometry_info(input_file_code, particle_IO%node)
 !
       write(input_file_code,'(a)', advance='NO') hd_particle_connect()
       call write_element_info(input_file_code, particle_IO%ele)
-!
-      write(input_file_code,'(a)', advance='NO') hd_particle_velocity()
-      call write_vector_in_element(input_file_code, particle_IO%node,   &
-     &                             particle_IO%sfed)
-!
-      write(input_file_code,'(a)', advance='NO') hd_particle_marker()
-      call write_scalar_in_element(input_file_code, particle_IO%node,   &
-     &                            particle_IO%sfed)
 !
       call write_step_data(input_file_code, id_rank, t_IO)
 !

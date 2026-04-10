@@ -8,14 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine s_start_surface_by_flux(ele, surf, sf_grp, nod_fld,  &
-!!     &                                   fln_prm, fln_src, fln_tce)
+!!     &          fln_prm, fln_tce, num_line_local)
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(in) :: surf
 !!        type(surface_group_data), intent(in) :: sf_grp
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(fieldline_paramter), intent(inout) :: fln_prm
-!!        type(each_fieldline_source), intent(inout) :: fln_src
 !!        type(each_fieldline_trace), intent(inout) :: fln_tce
+!!        integer(kind = kint), intent(inout) :: num_line_local
 !!@endverbatim
 !
       module start_surface_by_flux
@@ -31,7 +31,6 @@
       use t_surface_data
       use t_group_data
       use t_control_params_4_fline
-      use t_source_of_filed_line
       use t_tracing_data
       use t_fline_seeds_surf_group
 !
@@ -46,7 +45,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine s_start_surface_by_flux(ele, surf, sf_grp, nod_fld,    &
-     &                                   fln_prm, fln_src, fln_tce)
+     &          fln_prm, fln_tce, num_line_local)
 !
       use calypso_mpi_real
       use extend_field_line
@@ -59,17 +58,18 @@
       type(phys_data), intent(in) :: nod_fld
 !
       type(fieldline_paramter), intent(inout) :: fln_prm
-      type(each_fieldline_source), intent(inout) :: fln_src
       type(each_fieldline_trace), intent(inout) :: fln_tce
+      integer(kind = kint), intent(inout) :: num_line_local
 !
       type(fieldline_seeds_surf_group) :: seed_sf_grp
 !
       integer(kind = kint) :: ip, i
-      integer(kind = kint) :: num_sf
 !
       real(kind = kreal) :: tot_flux_start, tot_flux_start_l
       real(kind = kreal) :: abs_flux_start, abs_flux_start_l
       real(kind = kreal) :: flux_4_each_line
+!
+      real(kind = kreal),   allocatable :: flux_stack_fline(:)
 !
 !
       call init_flux_on_seed_surface(ele, surf, sf_grp, nod_fld,        &
@@ -84,43 +84,44 @@
      &            = tot_flux_start_l + seed_sf_grp%flux_start(i)
       end do
 !
+      allocate(flux_stack_fline(0:nprocs))
+      flux_stack_fline(0:nprocs) = 0.0d0
+!
       call calypso_mpi_allreduce_one_real                               &
      &   (tot_flux_start_l, tot_flux_start, MPI_SUM)
       call calypso_mpi_allgather_one_real                               &
-     &   (abs_flux_start_l, fln_src%flux_stack_fline(1))
+     &   (abs_flux_start_l, flux_stack_fline(1))
 !
-      fln_src%flux_stack_fline(0) = 0.0d0
+      flux_stack_fline(0) = 0.0d0
       do ip = 1, nprocs
-        fln_src%flux_stack_fline(ip)                                    &
-     &                         = fln_src%flux_stack_fline(ip-1)         &
-     &                          + fln_src%flux_stack_fline(ip)
+        flux_stack_fline(ip) = flux_stack_fline(ip-1)                   &
+     &                        + flux_stack_fline(ip)
       end do
-      abs_flux_start = fln_src%flux_stack_fline(nprocs)
+      abs_flux_start = flux_stack_fline(nprocs)
       flux_4_each_line                                                  &
      &      = abs_flux_start / dble(fln_prm%num_each_field_line)
 !
       fln_tce%istack_current_fline(0) = 0
       do ip = 1, nprocs
         fln_tce%istack_current_fline(ip)                                &
-     &     = nint((fln_src%flux_stack_fline(ip)                         &
-     &      - fln_src%flux_stack_fline(ip-1)) / flux_4_each_line)
+     &     = nint((flux_stack_fline(ip) - flux_stack_fline(ip-1))       &
+     &      / flux_4_each_line)
       end do
-      fln_src%num_line_local                                            &
-     &     = fln_tce%istack_current_fline(my_rank+1)
+      num_line_local = fln_tce%istack_current_fline(my_rank+1)
+!
+      deallocate(flux_stack_fline)
 !
       if(i_debug .gt. 0) then
         write(my_rank+50,*)  'abs_flux_start',                          &
      &                      abs_flux_start_l, abs_flux_start
         write(my_rank+50,*)  'tot_flux_start',                          &
      &                      tot_flux_start_l, tot_flux_start
-        write(my_rank+50,*)  'original num_line_local',                 &
-     &                      fln_src%num_line_local
+        write(my_rank+50,*)  'original num_line_local', num_line_local
         write(my_rank+50,*)  'flux_4_each_line', flux_4_each_line
       end if
 !
-      if(fln_src%num_line_local .gt. 0) then
-        flux_4_each_line                                                &
-     &       = abs_flux_start_l / dble(fln_src%num_line_local)
+      if(num_line_local .gt. 0) then
+        flux_4_each_line = abs_flux_start_l / dble(num_line_local)
       end if
       write(my_rank+50,*)  'adjusted flux_4_each_line',                 &
      &                     flux_4_each_line
@@ -128,12 +129,12 @@
       if(fln_prm%num_each_field_line .gt. 0) then
         if(fln_prm%id_seed_distribution  .eq. iflag_no_random) then
           call start_surface_witout_random                              &
-     &       (seed_sf_grp, abs_flux_start_l, fln_src%num_line_local,    &
+     &       (seed_sf_grp, abs_flux_start_l, num_line_local,            &
      &        fln_prm%num_each_field_line, fln_prm%id_surf_start_fline)
         else
           if(iflag_debug .gt. 0) write(*,*) 'start_surface_by_random'
           call start_surface_by_random                                  &
-     &       (seed_sf_grp, abs_flux_start_l, fln_src%num_line_local,    &
+     &       (seed_sf_grp, abs_flux_start_l, num_line_local,            &
      &        fln_prm%num_each_field_line, fln_prm%id_surf_start_fline)
         end if
       end if

@@ -72,17 +72,16 @@
       call read_domain_info_b(id_rank, bbuf_p, particle_IO%comm)
       if(bbuf_p%ierr_bin .ne. 0) go to 99
 !
+      call read_number_of_node_b(bbuf_p, particle_IO%node)
+      if(bbuf_p%ierr_bin .gt. 0) go to 99
+!
       call read_geometry_info_b(bbuf_p, particle_IO%node)
       if(bbuf_p%ierr_bin .ne. 0) go to 99
 !
-      call read_element_info_b(bbuf_p, particle_IO%ele)
+      call read_number_of_element_b(bbuf_p, particle_IO%ele)
       if(bbuf_p%ierr_bin .ne. 0) go to 99
 !
-      call read_vector_in_element_b(bbuf_p, particle_IO%node,           &
-     &                              particle_IO%sfed)
-      if(bbuf_p%ierr_bin .ne. 0) go to 99
-      call read_scalar_in_element_b(bbuf_p, particle_IO%node,           &
-     &                              particle_IO%sfed)
+      call read_element_info_b(bbuf_p, particle_IO%ele)
       if(bbuf_p%ierr_bin .ne. 0) go to 99
 !
       call read_step_data_b(bbuf_p, t_IO)
@@ -122,13 +121,6 @@
       if(bbuf_p%ierr_bin .ne. 0) go to 99
 !
       call write_element_info_b(particle_IO%ele, bbuf_p)
-      if(bbuf_p%ierr_bin .ne. 0) go to 99
-!
-      call write_vector_in_element_b(particle_IO%node,                  &
-     &                               particle_IO%sfed, bbuf_p)
-      if(bbuf_p%ierr_bin .ne. 0) go to 99
-      call write_scalar_in_element_b(particle_IO%node,                  &
-     &                               particle_IO%sfed, bbuf_p)
       if(bbuf_p%ierr_bin .ne. 0) go to 99
 !
       call write_step_data_b(id_rank, t_IO, bbuf_p)

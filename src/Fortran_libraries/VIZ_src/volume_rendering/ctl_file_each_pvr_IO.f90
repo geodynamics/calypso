@@ -7,9 +7,9 @@
 !!
 !!@verbatim
 !!      subroutine sel_read_control_pvr(id_control, hd_pvr_ctl,         &
-!!     &          fname_pvr_ctl, pvr_ctl_type, c_buf)
+!!     &          fname_pvr_ctl, pvr_ctl_type, c_buf, error_file)
 !!      subroutine read_control_pvr_file(id_control, fname_pvr_ctl,     &
-!!     &          hd_pvr_ctl, pvr_ctl_type, c_buf)
+!!     &          hd_pvr_ctl, pvr_ctl_type, c_buf, error_file)
 !!      subroutine read_control_pvr_update(id_control, fname_pvr_ctl,   &
 !!     &                                   hd_pvr_ctl, pvr_ctl_type)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -17,6 +17,7 @@
 !!        character(len = kchara), intent(inout) :: fname_pvr_ctl
 !!        type(pvr_parameter_ctl), intent(inout) :: pvr_ctl_type
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine sel_write_control_pvr(id_control, hd_pvr_ctl,        &
 !!     &          fname_pvr_ctl, pvr_ctl_type, level)
 !!      subroutine write_control_pvr_file(id_control, fname_pvr_ctl,    &
@@ -43,28 +44,35 @@
 !  ---------------------------------------------------------------------
 !
       subroutine sel_read_control_pvr(id_control, hd_pvr_ctl,           &
-     &          fname_pvr_ctl, pvr_ctl_type, c_buf)
+     &          fname_pvr_ctl, pvr_ctl_type, c_buf, error_file)
 !
       use ctl_data_each_pvr_IO
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: hd_pvr_ctl
+!
       character(len = kchara), intent(inout) :: fname_pvr_ctl
       type(pvr_parameter_ctl), intent(inout) :: pvr_ctl_type
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_file_flag(c_buf, hd_pvr_ctl)) then
         fname_pvr_ctl = third_word(c_buf)
 !
-        write(*,'(2a)') ' is read from ', trim(fname_pvr_ctl)
+        call check_write_ctl_file_message(fname_pvr_ctl, error_file)
+        if(error_file) return
         call read_control_pvr_file(id_control+2, fname_pvr_ctl,         &
-     &                             hd_pvr_ctl, pvr_ctl_type, c_buf)
+     &      hd_pvr_ctl, pvr_ctl_type, c_buf, error_file)
+        if(error_file) return
       else if(check_begin_flag(c_buf, hd_pvr_ctl)) then
         fname_pvr_ctl = 'NO_FILE'
 !
         write(*,*) 'is included.'
-        call read_pvr_ctl(id_control, hd_pvr_ctl, pvr_ctl_type, c_buf)
+        call read_pvr_ctl(id_control, hd_pvr_ctl,                       &
+     &                    pvr_ctl_type, c_buf, error_file)
+        if(error_file) return
       end if
 !
       end subroutine sel_read_control_pvr
@@ -72,7 +80,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_control_pvr_file(id_control, fname_pvr_ctl,       &
-     &          hd_pvr_ctl, pvr_ctl_type, c_buf)
+     &          hd_pvr_ctl, pvr_ctl_type, c_buf, error_file)
 !
       use ctl_data_each_pvr_IO
 !
@@ -81,6 +89,7 @@
       character(len = kchara), intent(in) :: hd_pvr_ctl
       type(pvr_parameter_ctl), intent(inout) :: pvr_ctl_type
       type(buffer_for_control), intent(inout) :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       c_buf%level = c_buf%level + 1
@@ -90,7 +99,8 @@
         if(c_buf%iend .gt. 0) exit
 !
         call read_pvr_ctl(id_control, hd_pvr_ctl,                       &
-     &                    pvr_ctl_type, c_buf)
+     &                    pvr_ctl_type, c_buf, error_file)
+        if(error_file) return
         if(pvr_ctl_type%i_pvr_ctl .gt. 0) exit
       end do
       close(id_control)

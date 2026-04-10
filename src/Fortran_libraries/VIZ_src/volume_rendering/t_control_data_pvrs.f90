@@ -13,12 +13,13 @@
 !!        character(len = kchara), intent(in) :: hd_pvr_ctl
 !!        type(volume_rendering_controls), intent(inout) :: pvr_ctls
 !!
-!!      subroutine read_files_4_pvr_ctl                                 &
-!!     &         (id_control, hd_pvr_ctl, pvr_ctls, c_buf)
+!!      subroutine read_files_4_pvr_ctl(id_control, hd_pvr_ctl,         &
+!!     &                                pvr_ctls, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len = kchara), intent(in) :: hd_pvr_ctl
 !!        type(volume_rendering_controls), intent(inout) :: pvr_ctls
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_files_4_pvr_ctl                                &
 !!     &         (id_control, hd_pvr_ctl, pvr_ctls, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -112,8 +113,8 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine read_files_4_pvr_ctl                                   &
-     &         (id_control, hd_pvr_ctl, pvr_ctls, c_buf)
+      subroutine read_files_4_pvr_ctl(id_control, hd_pvr_ctl,           &
+     &                                pvr_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use skip_comment_f
@@ -125,6 +126,7 @@
 !
       type(volume_rendering_controls), intent(inout) :: pvr_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
       integer(kind = kint) :: n_append
 !
@@ -147,7 +149,9 @@
      &       (hd_pvr_ctl, pvr_ctls%num_pvr_ctl, c_buf%level)
           call sel_read_control_pvr(id_control, hd_pvr_ctl,             &
      &        pvr_ctls%fname_pvr_ctl(pvr_ctls%num_pvr_ctl),             &
-     &        pvr_ctls%pvr_ctl_type(pvr_ctls%num_pvr_ctl), c_buf)
+     &        pvr_ctls%pvr_ctl_type(pvr_ctls%num_pvr_ctl),              &
+     &        c_buf, error_file)
+          if(error_file) return
         end if
       end do
 !

@@ -6,11 +6,9 @@
 !>@brief control parameters for each field line
 !!
 !!@verbatim
-!!      subroutine const_fline_seed_from_tracer(node, ele, nod_fld,     &
-!!     &          num_tracer, tracer_tce, fln_prm, fln_tce)
-!!        type(node_data), intent(in) :: node
+!!      subroutine const_fline_seed_from_tracer(ele, fln_prm,           &
+!!     &          num_tracer, tracer_tce, fln_tce)
 !!        type(element_data), intent(in) :: ele
-!!        type(phys_data), intent(in) :: nod_fld
 !!        type(fieldline_paramter), intent(in) :: fln_prm
 !!        integer(kind = kint), intent(in) :: num_tracer
 !!      type(each_fieldline_trace), intent(in)                          &
@@ -37,12 +35,10 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine const_fline_seed_from_tracer(node, ele, nod_fld,       &
-     &          num_tracer, tracer_tce, fln_prm, fln_tce)
+      subroutine const_fline_seed_from_tracer(ele, fln_prm,             &
+     &          num_tracer, tracer_tce, fln_tce)
 !
-      type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
-      type(phys_data), intent(in) :: nod_fld
       type(fieldline_paramter), intent(in) :: fln_prm
       integer(kind = kint), intent(in) :: num_tracer
       type(each_fieldline_trace), intent(in)                            &
@@ -50,13 +46,17 @@
 !
       type(each_fieldline_trace), intent(inout) :: fln_tce
 !
+      integer(kind = kint) :: num_fline
 !
-      fln_tce%num_current_fline = count_fline_seed_from_tracer          &
-     &                (tracer_tce(fln_prm%id_tracer_for_seed), fln_prm)
-      call resize_line_start_fline(fln_tce%num_current_fline,           &
-     &                             fln_prm%fline_fields, fln_tce)
-      call s_set_fline_seed_from_tracer(node, ele, nod_fld,             &
-     &    tracer_tce(fln_prm%id_tracer_for_seed), fln_prm, fln_tce)
+!
+      num_fline = count_fline_seed_from_tracer                          &
+     &             (tracer_tce(fln_prm%id_tracer_for_seed), fln_prm)
+      call count_parallel_current_fline(num_fline, fln_tce)
+
+      call resize_line_start_fline(fln_tce%num_current_fline, fln_tce)
+      call s_set_fline_seed_from_tracer                                 &
+     &   (ele, tracer_tce(fln_prm%id_tracer_for_seed),                  &
+     &    fln_prm, fln_tce)
 !
       end subroutine const_fline_seed_from_tracer
 !
@@ -81,14 +81,12 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_set_fline_seed_from_tracer(node, ele, nod_fld,       &
-     &          org_fln_tce, fln_prm, fln_tce)
+      subroutine s_set_fline_seed_from_tracer(ele, org_fln_tce,         &
+     &                                        fln_prm, fln_tce)
 !
-      use set_fline_seeds_from_list
+      use t_find_interpolate_in_ele
 !
-      type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
-      type(phys_data), intent(in) :: nod_fld
       type(fieldline_paramter), intent(in) :: fln_prm
       type(each_fieldline_trace), intent(in) :: org_fln_tce
 !
@@ -107,12 +105,6 @@
      &             = org_fln_tce%isf_dbl_start(1:3,inum)
         fln_tce%xx_fline_start(1:4,icou)                                &
      &             = org_fln_tce%xx_fline_start(1:4,icou)
-        call set_field_at_each_seed_point(node, ele, nod_fld,           &
-     &      fln_prm%fline_fields, fln_prm%iphys_4_fline,                &
-     &      fln_tce%isf_dbl_start(2,inum),                              &
-     &      fln_tce%xx_fline_start(1,inum),                             &
-     &      fln_tce%v_fline_start(1,inum),                              &
-     &      fln_tce%c_fline_start(1,inum))
 !
         fln_tce%trace_length(icou) = 0.0d0
         fln_tce%icount_fline(icou) = 0
@@ -124,8 +116,7 @@
           fln_tce%iline_original(icou) = fln_tce%iline_original(icou-1)
           fln_tce%isf_dbl_start(1:3,icou)                               &
      &             = org_fln_tce%isf_dbl_start(1:3,icou-1)
-          call copy_global_start_fline(icou, (icou-1),                  &
-     &                                 fln_prm%fline_fields, fln_tce)
+          call copy_global_start_fline(icou, (icou-1), fln_tce)
 !
           fln_tce%trace_length(icou) = 0.0d0
           fln_tce%icount_fline(icou) = 0

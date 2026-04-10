@@ -9,13 +9,15 @@
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!      subroutine init_pvr_ctl_label(hd_block, pvr_ctl)
-!!      subroutine read_pvr_ctl(id_control, hd_block, pvr_ctl, c_buf)
+!!      subroutine read_pvr_ctl(id_control, hd_block,                   &
+!!     &                        pvr_ctl, c_buf, error_file)
 !!      subroutine read_pvr_update_flag                                 &
 !!     &         (id_control, hd_block, pvr_ctl, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_parameter_ctl), intent(inout) :: pvr_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_pvr_ctl                                        &
 !!     &         (id_control, hd_block, pvr_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -89,7 +91,6 @@
       module ctl_data_each_pvr_IO
 !
       use m_precision
-      use calypso_mpi
 !
       use m_machine_parameter
       use t_read_control_elements
@@ -180,7 +181,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_pvr_ctl(id_control, hd_block, pvr_ctl, c_buf)
+      subroutine read_pvr_ctl(id_control, hd_block,                     &
+     &                        pvr_ctl, c_buf, error_file)
 !
       use ctl_file_pvr_modelview_IO
       use ctl_file_pvr_light_IO
@@ -192,6 +194,7 @@
 !
       type(pvr_parameter_ctl), intent(inout) :: pvr_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(pvr_ctl%i_pvr_ctl .gt. 0) return
@@ -203,16 +206,25 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call sel_read_ctl_modelview_file(id_control, hd_view_transform, &
-     &      izero, pvr_ctl%fname_mat_ctl, pvr_ctl%mat, c_buf)
+        call sel_read_ctl_modelview_file                                &
+     &     (id_control, hd_view_transform, izero,                       &
+     &      pvr_ctl%fname_mat_ctl, pvr_ctl%mat, c_buf, error_file)
+        if(error_file) return
+!
         call sel_read_ctl_pvr_colormap_file                             &
      &     (id_control, hd_colormap_file, pvr_ctl%fname_cmap_cbar_c,    &
-     &      pvr_ctl%cmap_cbar_c, c_buf)
-        call sel_read_ctl_pvr_light_file(id_control, hd_pvr_lighting,   &
-     &      pvr_ctl%fname_pvr_light_c, pvr_ctl%light, c_buf)
+     &      pvr_ctl%cmap_cbar_c, c_buf, error_file)
+        if(error_file) return
+!
+        call sel_read_ctl_pvr_light_file                                &
+     &     (id_control, hd_pvr_lighting, pvr_ctl%fname_pvr_light_c,     &
+     &      pvr_ctl%light, c_buf, error_file)
+        if(error_file) return
 !
         call read_pvr_sections_ctl(id_control, hd_pvr_sections,         &
-     &                             pvr_ctl%pvr_scts_c, c_buf)
+     &      pvr_ctl%pvr_scts_c, c_buf, error_file)
+        if(error_file) return
+!
         call read_pvr_isosurfs_ctl(id_control, hd_pvr_isosurf,          &
      &                             pvr_ctl%pvr_isos_c, c_buf)
 !
@@ -224,11 +236,15 @@
         call read_pvr_render_area_ctl(id_control, hd_plot_area,         &
      &                                pvr_ctl%render_area_c, c_buf)
         call read_quilt_image_ctl(id_control, hd_quilt_image,           &
-     &                            pvr_ctl%quilt_c, c_buf)
+     &                            pvr_ctl%quilt_c, c_buf, error_file)
+        if(error_file) return
+!
         call read_pvr_rotation_ctl(id_control, hd_snapshot_movie,       &
-     &                              pvr_ctl%movie, c_buf)
+     &                             pvr_ctl%movie, c_buf, error_file)
+        if(error_file) return
         call read_pvr_rotation_ctl(id_control, hd_pvr_rotation,         &
-     &                             pvr_ctl%movie, c_buf)
+     &                             pvr_ctl%movie, c_buf, error_file)
+        if(error_file) return
 !
 !
         call read_chara_ctl_type                                        &

@@ -166,7 +166,7 @@
      &         (img_stack, npixel_recved, rgba_subdomain,               &
      &          npixel_stacked, rgba_composit)
 !
-      use set_rgba_4_each_pixel
+      use phong_reflection
 !
       type(pvr_image_stack_table), intent(in) :: img_stack
       integer(kind = kint), intent(in) :: npixel_recved, npixel_stacked
@@ -197,7 +197,7 @@
      &          img_stack, npixel_recved, rgba_subdomain,               &
      &          npixel_stacked, rgba_composit)
 !
-      use set_rgba_4_each_pixel
+      use phong_reflection
 !
       integer(kind = kint), intent(in) :: id_file, i_ref
       type(pvr_image_stack_table), intent(in) :: img_stack

@@ -1,15 +1,19 @@
-!start_surface_by_gl_table.f90
+!>@file   start_surface_by_gl_table.f90
+!!@brief  module start_surface_by_gl_table
+!!
+!!@author H. Matsui
+!!@date Programmed in Aug., 2011
 !
-!      module start_surface_by_gl_table
-!
-!      Written by H. Matsui on Aug., 2011
-!
+!> @brief Set seed points by global surface ID list
+!!
+!!@verbatim
 !!      subroutine s_start_surface_by_gl_table                          &
-!!     &         (ele, ele_grp, fln_prm, fln_src)
+!!     &         (ele, ele_grp, fln_prm, num_line_local)
 !!        type(element_data), intent(in) :: ele
 !!        type(group_data), intent(in) :: ele_grp
 !!        type(fieldline_paramter), intent(in) :: fln_prm
-!!        type(each_fieldline_source), intent(inout) :: fln_src
+!!        integer(kind = kint), intent(inout) :: num_line_local
+!!@endverbatim
 !
       module start_surface_by_gl_table
 !
@@ -22,7 +26,6 @@
       use t_geometry_data
       use t_group_data
       use t_control_params_4_fline
-      use t_source_of_filed_line
 !
       implicit  none
 !
@@ -36,7 +39,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine s_start_surface_by_gl_table                            &
-     &         (ele, ele_grp, fln_prm, fln_src)
+     &         (ele, ele_grp, fln_prm, num_line_local)
 !
       use extend_field_line
       use cal_field_on_surf_viz
@@ -46,10 +49,10 @@
       type(group_data), intent(in) :: ele_grp
 !
       type(fieldline_paramter), intent(inout) :: fln_prm
-      type(each_fieldline_source), intent(inout) :: fln_src
+      integer(kind = kint), intent(inout) :: num_line_local
 !
 !
-      fln_src%num_line_local                                            &
+      num_line_local                                                    &
      &   = cnt_start_surface_by_gl_table(ele%numele, ele%iele_global,   &
      &    ele%interior_ele, ele_grp%num_grp, ele_grp%num_item,          &
      &    ele_grp%istack_grp, ele_grp%item_grp, fln_prm)

@@ -9,12 +9,13 @@
 !!@verbatim
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!      subroutine init_quilt_image_ctl_label(hd_block, quilt_c)
-!!      subroutine read_quilt_image_ctl                                 &
-!!     &         (id_control, hd_block, quilt_c, c_buf)
+!!      subroutine read_quilt_image_ctl(id_control, hd_block,           &
+!!     &                                quilt_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(quilt_image_ctl), intent(inout) :: quilt_c
-!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        type(buffer_for_control), intent(inout) :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_quilt_image_ctl                                &
 !!     &         (id_control, hd_block, quilt_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -90,15 +91,17 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_quilt_image_ctl                                   &
-     &         (id_control, hd_block, quilt_c, c_buf)
+      subroutine read_quilt_image_ctl(id_control, hd_block,             &
+     &                                quilt_c, c_buf, error_file)
 !
       use ctl_file_pvr_modelview_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(quilt_image_ctl), intent(inout) :: quilt_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if (quilt_c%i_quilt_image.gt.0) return
@@ -114,8 +117,9 @@
         call read_integer2_ctl_type(c_buf, hd_row_column,               &
      &      quilt_c%num_row_column_ctl)
 !
-        call read_mul_view_transfer_ctl                                 &
-     &     (id_control, hd_qview_transform, quilt_c%mul_qmats_c, c_buf)
+        call read_mul_view_transfer_ctl(id_control, hd_qview_transform, &
+     &      quilt_c%mul_qmats_c, c_buf, error_file)
+        if(error_file) return
       end do
       quilt_c%i_quilt_image = 1
 !

@@ -8,12 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine init_map_control_label(hd_block, map_c)
-!!      subroutine s_read_map_control_data                              &
-!!     &         (id_control, hd_block, map_c, c_buf)
+!
+!!      subroutine s_read_map_control_data(id_control, hd_block,        &
+!!     &                                   map_c, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(map_ctl), intent(inout) :: map_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_map_control_data                               &
 !!     &         (id_control, hd_block, map_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -79,7 +81,7 @@
 !!
 !!    begin colorbar_ctl
 !!      colorbar_switch_ctl    ON
-!!      colorbar_position_ctl  'left' or 'bottom'
+!!      colorbar_position_ctl  'side' or 'bottom'
 !!      colorbar_scale_ctl     ON
 !!      zeromarker_switch      ON
 !!      colorbar_range     0.0   1.0
@@ -87,6 +89,7 @@
 !!      num_grid_ctl     4
 !!!
 !!      axis_label_switch      ON
+!!      time_label_switch      ON
 !!    end colorbar_ctl
 !!  end  cross_section_ctl
 !!  
@@ -164,7 +167,6 @@
       use t_control_array_charareal
       use t_control_data_4_map
       use t_ctl_data_pvr_section
-      use calypso_mpi
 !
       implicit  none
 !
@@ -196,8 +198,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_read_map_control_data                                &
-     &         (id_control, hd_block, map_c, c_buf)
+      subroutine s_read_map_control_data(id_control, hd_block,          &
+     &                                   map_c, c_buf, error_file)
 !
       use t_ctl_data_pvr_colormap_bar
       use ctl_file_pvr_modelview_IO
@@ -209,6 +211,7 @@
 !
       type(map_ctl), intent(inout) :: map_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(map_c%i_map_ctl .gt. 0) return
@@ -219,13 +222,17 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call sel_read_ctl_modelview_file(id_control, hd_map_projection, &
-     &      izero, map_c%fname_mat_ctl, map_c%mat, c_buf)
+     &      izero, map_c%fname_mat_ctl, map_c%mat, c_buf, error_file)
+        if(error_file) return
+!
         call sel_read_ctl_pvr_colormap_file                             &
      &     (id_control, hd_map_colormap_file, map_c%fname_cmap_cbar_c,  &
-     &      map_c%cmap_cbar_c, c_buf)
+     &      map_c%cmap_cbar_c, c_buf, error_file)
+        if(error_file) return
 !
         call read_map_section_ctl(id_control, hd_section_ctl,           &
-     &                            izero, map_c%map_define_ctl, c_buf)
+     &      izero, map_c%map_define_ctl, c_buf, error_file)
+        if(error_file) return
 !
         call read_chara_ctl_type(c_buf, hd_map_image_prefix,            &
      &      map_c%map_image_prefix_ctl)

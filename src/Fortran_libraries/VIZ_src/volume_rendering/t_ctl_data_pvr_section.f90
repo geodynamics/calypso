@@ -14,12 +14,13 @@
 !!        type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
 !!
 !!      subroutine init_pvr_section_ctl_label(hd_block, pvr_sect_ctl)
-!!      subroutine read_pvr_section_ctl                                 &
-!!     &         (id_control, hd_block, icou, pvr_sect_ctl, c_buf)
+!!      subroutine read_pvr_section_ctl(id_control, hd_block, icou,     &
+!!     &          pvr_sect_ctl, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_pvr_section_ctl                                &
 !!     &         (id_control, hd_block, pvr_sect_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -132,16 +133,18 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine read_pvr_section_ctl                                   &
-     &         (id_control, hd_block, icou, pvr_sect_ctl, c_buf)
+      subroutine read_pvr_section_ctl(id_control, hd_block, icou,       &
+     &          pvr_sect_ctl, c_buf, error_file)
 !
       use ctl_file_section_def_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control, icou
       character(len=kchara), intent(in) :: hd_block
+!
       type(pvr_section_ctl), intent(inout) :: pvr_sect_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(pvr_sect_ctl%i_pvr_sect_ctl .gt. 0) return
@@ -157,7 +160,8 @@
      &       (hd_block, icou, c_buf%level)
           call sel_read_ctl_pvr_section_def(id_control,                 &
      &        hd_surface_define, pvr_sect_ctl%fname_sect_ctl,           &
-     &        pvr_sect_ctl%psf_def_c, c_buf)
+     &        pvr_sect_ctl%psf_def_c, c_buf, error_file)
+          if(error_file) return
         end if
 !
         call read_real_ctl_type                                         &

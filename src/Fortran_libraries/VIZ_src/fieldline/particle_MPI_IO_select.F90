@@ -7,17 +7,19 @@
 !>@brief  Choose mesh file to read
 !!
 !!@verbatim
-!!      subroutine sel_mpi_read_particle_file(mesh_file, istep_file,    &
+!!      logical function check_particle_file_exist(tracer_file,         &
+!!     &                                           istep_file)
+!!      subroutine sel_mpi_read_particle_file(tracer_file, istep_file,  &
 !!     &                                      t_IO, particle_IO)
 !!        integer(kind = kint), intent(in) :: istep_file
-!!        type(field_IO_params), intent(in) ::  mesh_file
+!!        type(field_IO_params), intent(in) ::  tracer_file
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(surf_edge_IO_file), intent(inout) :: particle_IO
 !!
-!!      subroutine sel_mpi_write_particle_file(mesh_file, istep_file,   &
+!!      subroutine sel_mpi_write_particle_file(tracer_file, istep_file, &
 !!     &                                       t_IO, particle_IO)
 !!        integer(kind = kint), intent(in) :: istep_file
-!!        type(field_IO_params), intent(in) ::  mesh_file
+!!        type(field_IO_params), intent(in) ::  tracer_file
 !!        type(time_data), intent(in) :: t_IO
 !!        type(surf_edge_IO_file), intent(in) :: particle_IO
 !!@endverbatim
@@ -46,20 +48,39 @@
 !
       implicit none
 !
-!  ---------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       contains
 !
 !-----------------------------------------------------------------------
+!
+      logical function check_particle_file_exist(tracer_file,           &
+     &                                           istep_file)
+!
+      use delete_data_files
+!
+      integer(kind = kint), intent(in) :: istep_file
+      type(field_IO_params), intent(in) ::  tracer_file
+!
+      character(len=kchara) :: file_name
+!
+!
+      file_name = set_tracer_file_name(tracer_file%file_prefix,         &
+     &                                 tracer_file%iflag_format,        &
+     &                                 my_rank, istep_file)
+      check_particle_file_exist = check_file_exist(file_name)
+!
+      end function check_particle_file_exist
+!
 !-----------------------------------------------------------------------
 !
-      subroutine sel_mpi_read_particle_file(mesh_file, istep_file,      &
+      subroutine sel_mpi_read_particle_file(tracer_file, istep_file,    &
      &                                      t_IO, particle_IO)
 !
       use set_element_mesh_file_names
 !
       integer(kind = kint), intent(in) :: istep_file
-      type(field_IO_params), intent(in) ::  mesh_file
+      type(field_IO_params), intent(in) ::  tracer_file
       type(time_data), intent(inout) :: t_IO
       type(surf_edge_IO_file), intent(inout) :: particle_IO
 !
@@ -67,31 +88,31 @@
       integer(kind = kint) :: ierr = 0
 !
 !
-      file_name = set_tracer_file_name(mesh_file%file_prefix,           &
-     &                                 mesh_file%iflag_format,          &
+      file_name = set_tracer_file_name(tracer_file%file_prefix,         &
+     &                                 tracer_file%iflag_format,        &
      &                                 my_rank, istep_file)
 !
-      if(mesh_file%iflag_format                                         &
+      if(tracer_file%iflag_format                                       &
      &     .eq. iflag_single+id_binary_file_fmt) then
         call mpi_read_particle_file_b                                   &
      &     (nprocs, my_rank, file_name, t_IO, particle_IO)
-      else if(mesh_file%iflag_format .eq. iflag_single) then
+      else if(tracer_file%iflag_format .eq. iflag_single) then
         call mpi_read_perticle_file                                     &
      &     (nprocs, my_rank, file_name, t_IO, particle_IO)
 !
 #ifdef ZLIB_IO
-      else if(mesh_file%iflag_format                                    &
+      else if(tracer_file%iflag_format                                  &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
         call gz_mpi_read_particle_file_b(nprocs, my_rank, file_name,    &
      &                                   t_IO, particle_IO)
-      else if(mesh_file%iflag_format                                    &
+      else if(tracer_file%iflag_format                                  &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
         call gz_mpi_read_particle_file(nprocs, my_rank,                 &
      &                                 file_name, t_IO, particle_IO)
 #endif
 !
       else
-        call sel_read_particle_file(mesh_file, my_rank, istep_file,     &
+        call sel_read_particle_file(tracer_file, my_rank, istep_file,   &
      &                              t_IO, particle_IO, ierr)
       end if 
 !
@@ -103,39 +124,39 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine sel_mpi_write_particle_file(mesh_file, istep_file,     &
+      subroutine sel_mpi_write_particle_file(tracer_file, istep_file,   &
      &                                       t_IO, particle_IO)
 !
       use set_element_mesh_file_names
 !
       integer(kind = kint), intent(in) :: istep_file
-      type(field_IO_params), intent(in) ::  mesh_file
+      type(field_IO_params), intent(in) ::  tracer_file
       type(time_data), intent(in) :: t_IO
       type(surf_edge_IO_file), intent(in) :: particle_IO
 !
       character(len=kchara) :: file_name
 !
-      file_name = set_tracer_file_name(mesh_file%file_prefix,           &
-     &                                 mesh_file%iflag_format,          &
+      file_name = set_tracer_file_name(tracer_file%file_prefix,         &
+     &                                 tracer_file%iflag_format,        &
      &                                 my_rank, istep_file)
 !
-      if(mesh_file%iflag_format                                         &
+      if(tracer_file%iflag_format                                       &
      &     .eq. iflag_single+id_binary_file_fmt) then
         call mpi_write_particle_file_b(file_name, t_IO, particle_IO)
-      else if(mesh_file%iflag_format .eq. iflag_single) then
+      else if(tracer_file%iflag_format .eq. iflag_single) then
         call mpi_write_perticle_file(file_name, t_IO, particle_IO)
 !
 #ifdef ZLIB_IO
-      else if(mesh_file%iflag_format                                    &
+      else if(tracer_file%iflag_format                                  &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
         call gz_mpi_write_particle_file_b(file_name, t_IO, particle_IO)
-      else if(mesh_file%iflag_format                                    &
+      else if(tracer_file%iflag_format                                  &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
         call gz_mpi_write_particle_file(file_name, t_IO, particle_IO)
 #endif
 !
       else
-        call sel_write_particle_file(mesh_file, my_rank, istep_file,    &
+        call sel_write_particle_file(tracer_file, my_rank, istep_file,  &
      &                               t_IO, particle_IO)
       end if
 !

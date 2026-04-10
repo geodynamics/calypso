@@ -40,7 +40,7 @@
       x = rnorm
       if (x .lt. zero) then
         r = zero
-      else if(r .lt. c_g1) then
+      else if(x .lt. c_g1) then
         r = x * r_mul
       else
         r = one
@@ -48,7 +48,7 @@
 !
       if (x .lt. c_g1) then
         g = zero
-      else if(r .lt. one) then
+      else if(x .lt. one) then
         g = (x - c_g1) * g_mul
       else
         g = one

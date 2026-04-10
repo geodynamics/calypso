@@ -6,16 +6,17 @@
 !>@brief control data for cross sections
 !!
 !!@verbatim
-!!      subroutine read_files_4_map_ctl                                 &
-!!     &         (id_control, hd_block, map_ctls, c_buf)
+!!      subroutine read_files_4_map_ctl(id_control, hd_block,           &
+!!     &                                map_ctls, c_buf, error_file)
 !!      subroutine sel_read_control_4_map_file(id_control, hd_block,    &
-!!     &          file_name, map_ctl_struct, c_buf)
+!!     &          file_name, map_ctl_struct, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        character(len = kchara), intent(inout) :: file_name
 !!        type(map_rendering_controls), intent(inout) :: map_ctls
 !!        type(map_ctl), intent(inout) :: map_ctl_struct
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!
 !!      subroutine write_files_4_map_ctl                                &
 !!     &         (id_control, hd_block, map_ctls, level)
@@ -59,8 +60,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_files_4_map_ctl                                   &
-     &         (id_control, hd_block, map_ctls, c_buf)
+      subroutine read_files_4_map_ctl(id_control, hd_block,             &
+     &                                map_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use ctl_data_section_IO
@@ -69,8 +70,10 @@
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(map_rendering_controls), intent(inout) :: map_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
       integer(kind = kint) :: n_append
 !
@@ -93,7 +96,9 @@
      &       (hd_block, map_ctls%num_map_ctl, c_buf%level)
           call sel_read_control_4_map_file(id_control, hd_block,        &
      &        map_ctls%fname_map_ctl(map_ctls%num_map_ctl),             &
-     &        map_ctls%map_ctl_struct(map_ctls%num_map_ctl), c_buf)
+     &        map_ctls%map_ctl_struct(map_ctls%num_map_ctl),            &
+     &        c_buf, error_file)
+          if(error_file) return
         end if
       end do
 !
@@ -102,31 +107,38 @@
 !   --------------------------------------------------------------------
 !
       subroutine sel_read_control_4_map_file(id_control, hd_block,      &
-     &          file_name, map_ctl_struct, c_buf)
+     &          file_name, map_ctl_struct, c_buf, error_file)
 !
       use t_read_control_elements
       use ctl_data_map_rendering_IO
+      use write_control_elements
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       character(len = kchara), intent(inout) :: file_name
       type(map_ctl), intent(inout) :: map_ctl_struct
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
-        write(*,'(2a)') ' is read file from ... ',  trim(file_name)
+        call check_write_ctl_file_message(file_name, error_file)
+        if(error_file) return
+!
         call read_control_4_map_file((id_control+2), file_name,         &
-     &                               hd_block, map_ctl_struct, c_buf)
+     &      hd_block, map_ctl_struct, c_buf, error_file)
+        if(error_file) return
       else if(check_begin_flag(c_buf, hd_block)) then
         file_name = 'NO_FILE'
 !
         write(*,'(a)') ' is included.'
         call s_read_map_control_data(id_control, hd_block,              &
-     &                               map_ctl_struct, c_buf)
+     &      map_ctl_struct, c_buf, error_file)
+        if(error_file) return
       end if
 !
       end subroutine sel_read_control_4_map_file
@@ -134,7 +146,7 @@
 !   --------------------------------------------------------------------
 !
       subroutine read_control_4_map_file(id_control, file_name,         &
-     &          hd_block, map_ctl_struct, c_buf)
+     &          hd_block, map_ctl_struct, c_buf, error_file)
 !
       use t_read_control_elements
       use t_control_data_4_map
@@ -146,6 +158,7 @@
       character(len=kchara), intent(in) :: hd_block
       type(map_ctl), intent(inout) :: map_ctl_struct
       type(buffer_for_control), intent(inout) :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       c_buf%level = c_buf%level + 1
@@ -156,9 +169,11 @@
         if(c_buf%iend .gt. 0) exit
 !
         call s_read_map_control_data(id_control, hd_block,              &
-     &      map_ctl_struct, c_buf)
+     &      map_ctl_struct, c_buf, error_file)
+        if(error_file) return
         call s_read_map_control_data(id_control, hd_map_rendering,      &
-     &      map_ctl_struct, c_buf)
+     &      map_ctl_struct, c_buf, error_file)
+        if(error_file) return
         if(map_ctl_struct%i_map_ctl .gt. 0) exit
       end do
       close(id_control)

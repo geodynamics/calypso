@@ -110,7 +110,7 @@ void read_png_file_c(const char *fhead, int *num_x, int *num_y, int *iflag_rgba)
 	png_uint_32     i;
 	png_uint_32 width;
 	png_uint_32 height;
-	double      file_gamma;
+/*	double      file_gamma; */
 	png_structp png_ptr;
 	png_infop   info_ptr;
 	double	display_gamma = 1.0;

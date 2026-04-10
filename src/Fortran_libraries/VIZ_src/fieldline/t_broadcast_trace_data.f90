@@ -8,13 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine alloc_broadcast_trace_data(num_each_field_line,      &
-!!     &                                      viz_fields, fln_bcast)
+!!     &                                      fln_bcast)
 !!      subroutine dealloc_broadcast_trace_data(fln_bcast)
-!!        type(ctl_params_viz_fields), intent(in) :: viz_fields
 !!        type(broadcast_trace_data), intent(inout) :: fln_bcast
 !!
-!!      subroutine s_broadcast_trace_data(fln_prm, fln_tce,             &
-!!     &                                  fln_bcast, nline_global)
+!!      subroutine s_broadcast_trace_data(fln_tce, fln_bcast,           &
+!!     &                                  nline_global)
 !!        type(each_fieldline_trace), intent(inout) :: fln_tce
 !!        type(broadcast_trace_data), intent(inout) :: fln_bcast
 !!        type(element_data), intent(in) :: ele
@@ -44,9 +43,9 @@
 !
       integer(kind= kint), parameter, private :: nitem8_bcast = 1
       integer(kind= kint), parameter, private :: nitem_bcast =  6
+      integer(kind= kint), parameter, private :: ncomp_bcast =  5
 !
       type broadcast_trace_data
-        integer(kind= kint) :: ncomp_bcast
         integer(kind= kint_gl), allocatable :: igl_fline_export(:,:)
         integer(kind= kint), allocatable :: id_fline_export(:,:)
         real(kind = kreal), allocatable ::  fline_export(:,:)
@@ -61,22 +60,20 @@
 !  ---------------------------------------------------------------------
 !
       subroutine alloc_broadcast_trace_data(num_each_field_line,        &
-     &                                      viz_fields, fln_bcast)
+     &                                      fln_bcast)
 !
       use t_ctl_params_viz_fields
 !
       integer(kind = kint), intent(in) :: num_each_field_line
-      type(ctl_params_viz_fields), intent(in) :: viz_fields
       type(broadcast_trace_data), intent(inout) :: fln_bcast
 !
       integer(kind = kint) :: num
 !
 !
       num = 2 * num_each_field_line
-      fln_bcast%ncomp_bcast = 9 + viz_fields%ntot_color_comp
       allocate(fln_bcast%igl_fline_export(nitem8_bcast,num))
       allocate(fln_bcast%id_fline_export(nitem_bcast,num))
-      allocate(fln_bcast%fline_export(fln_bcast%ncomp_bcast,num))
+      allocate(fln_bcast%fline_export(ncomp_bcast,num))
       fln_bcast%id_fline_export = 0
       fln_bcast%fline_export = 0.0d0
 !
@@ -97,16 +94,14 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine s_broadcast_trace_data(fln_prm, fln_tce,               &
-     &                                  fln_bcast, nline_global)
+      subroutine s_broadcast_trace_data(fln_tce, fln_bcast,             &
+     &                                  nline_global)
 !
       use t_tracing_data
       use calypso_mpi_real
       use calypso_mpi_int
       use calypso_mpi_int8
       use transfer_to_long_integers
-!
-      type(fieldline_paramter), intent(in) :: fln_prm
 !
       type(each_fieldline_trace), intent(inout) :: fln_tce
       type(broadcast_trace_data), intent(inout) :: fln_bcast
@@ -121,25 +116,24 @@
         call set_fline_start_2_bcast(inum, fln_tce, fln_bcast)
       end do
 !
-        do ip = 1, nprocs
-          src_rank = int(ip - 1)
-          ist = fln_tce%istack_current_fline(ip-1)
-          num64 = fln_tce%istack_current_fline(ip) - ist
-          if(num64 .le. 0) cycle
-            call calypso_mpi_bcast_int8                                 &
-     &         (fln_bcast%igl_fline_export(1,ist+1),                    &
-     &          (num64*nitem8_bcast), src_rank)
-            call calypso_mpi_bcast_int                                  &
-     &         (fln_bcast%id_fline_export(1,ist+1),                     &
-     &          (num64*nitem_bcast), src_rank)
-            call calypso_mpi_bcast_real                                 &
-     &         (fln_bcast%fline_export(1,ist+1),                        &
-     &          (num64*fln_bcast%ncomp_bcast), src_rank)
-        end do
+      do ip = 1, nprocs
+        src_rank = int(ip - 1)
+        ist = fln_tce%istack_current_fline(ip-1)
+        num64 = fln_tce%istack_current_fline(ip) - ist
+        if(num64 .le. 0) cycle
+          call calypso_mpi_bcast_int8                                   &
+     &       (fln_bcast%igl_fline_export(1,ist+1),                      &
+     &        (num64*nitem8_bcast), src_rank)
+          call calypso_mpi_bcast_int                                    &
+     &       (fln_bcast%id_fline_export(1,ist+1),                       &
+     &        (num64*nitem_bcast), src_rank)
+          call calypso_mpi_bcast_real(fln_bcast%fline_export(1,ist+1),  &
+     &                                (num64*ncomp_bcast), src_rank)
+      end do
 !
-        call set_fline_start_from_neib(fln_bcast, fln_prm, fln_tce)
+      call set_fline_start_from_neib(fln_bcast, fln_tce)
 !
-        nline_global = fln_tce%istack_current_fline(nprocs)             &
+      nline_global = fln_tce%istack_current_fline(nprocs)               &
      &               - fln_tce%istack_current_fline(0)
 !
       end subroutine s_broadcast_trace_data
@@ -171,28 +165,22 @@
 !
         fln_bcast%fline_export(1:4,i+ist)                               &
      &               = fln_tce%xx_fline_start(1:4,i)
-        fln_bcast%fline_export(5:8,i+ist)                               &
-     &               = fln_tce%v_fline_start(1:4,i)
-        fln_bcast%fline_export(9,i+ist) =   fln_tce%trace_length(i)
-        fln_bcast%fline_export(9+1:fln_bcast%ncomp_bcast,i+ist)         &
-    &         = fln_tce%c_fline_start(1:fln_bcast%ncomp_bcast-9,i)
+        fln_bcast%fline_export(5,i+ist) =   fln_tce%trace_length(i)
       else
         fln_bcast%id_fline_export(1:6,i+ist) = izero
         fln_bcast%id_fline_export(4,i+ist) =  -ione
-        fln_bcast%fline_export(1:fln_bcast%ncomp_bcast,i+ist) = zero
+        fln_bcast%fline_export(1:ncomp_bcast,i+ist) = zero
       end if
 !
       end subroutine set_fline_start_2_bcast
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_fline_start_from_neib(fln_bcast, fln_prm, fln_tce)
+      subroutine set_fline_start_from_neib(fln_bcast, fln_tce)
 !
-      use calypso_mpi_int
       use t_tracing_data
 !
       type(broadcast_trace_data), intent(in) :: fln_bcast
-      type(fieldline_paramter), intent(in) :: fln_prm
       type(each_fieldline_trace), intent(inout) :: fln_tce
 !
       integer(kind = kint) :: ied_lin, i, icou, ip
@@ -206,19 +194,9 @@
 !
         icou = icou + 1
       end do
-      fln_tce%num_current_fline = icou
-      call resize_line_start_fline(fln_tce%num_current_fline,           &
-     &                             fln_prm%fline_fields, fln_tce)
 !
-      fln_tce%istack_current_fline(0) = 0
-      call calypso_mpi_allgather_one_int(fln_tce%num_current_fline,     &
-     &                                 fln_tce%istack_current_fline(1))
-!
-      do ip = 1, nprocs
-        fln_tce%istack_current_fline(ip)                                &
-     &                   = fln_tce%istack_current_fline(ip-1)           &
-     &                    + fln_tce%istack_current_fline(ip)
-      end do
+      call count_parallel_current_fline(icou, fln_tce)
+      call resize_line_start_fline(fln_tce%num_current_fline, fln_tce)
 !
       icou = 0
       do i = 1, ied_lin
@@ -235,11 +213,7 @@
 !
           fln_tce%xx_fline_start(1:4,icou)                              &
      &                               = fln_bcast%fline_export(1:4,i)
-          fln_tce%v_fline_start(1:4,icou)                               &
-     &                               = fln_bcast%fline_export(5:8,i)
-          fln_tce%trace_length(icou) = fln_bcast%fline_export(9,i)
-          fln_tce%c_fline_start(1:fln_bcast%ncomp_bcast-9,icou)         &
-     &            = fln_bcast%fline_export(9+1:fln_bcast%ncomp_bcast,i)
+          fln_tce%trace_length(icou) = fln_bcast%fline_export(5,i)
       end do
 !
       end subroutine set_fline_start_from_neib

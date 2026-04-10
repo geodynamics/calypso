@@ -12,12 +12,13 @@
 !!      subroutine add_flds_4_tracers_to_fld_ctl(tracer_ctls, field_ctl)
 !!        type(tracers_control), intent(in) :: tracer_ctls
 !!        type(ctl_array_c3), intent(inout) :: field_ctl
-!!      subroutine read_tracer_controls                                 &
-!!     &         (id_control, hd_block, tracer_ctls, c_buf)
-!!        integer(kind = kint), intent(in) :: id_control 
+!!      subroutine read_tracer_controls(id_control, hd_block,           &
+!!     &                                tracer_ctls, c_buf, error_file)
+!!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(tracers_control), intent(inout) :: tracer_ctls
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_tracer_controls(id_control, tracer_ctls, level)
 !!        integer(kind = kint), intent(in) :: id_control 
 !!        type(tracers_control), intent(in) :: tracer_ctls
@@ -34,7 +35,6 @@
 !!        ...
 !!      end   tracer_ctl
 !!    end array tracer_ctl
-!!  end  tracers_control
 !!
 !!    delta_t_tracer_output            1.0e-1
 !!    i_step_tracer_output             400
@@ -117,8 +117,8 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine read_tracer_controls                                   &
-     &         (id_control, hd_block, tracer_ctls, c_buf)
+      subroutine read_tracer_controls(id_control, hd_block,             &
+     &                                tracer_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use ctl_file_fieldlines_IO
@@ -129,6 +129,7 @@
 !
       type(tracers_control), intent(inout) :: tracer_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(tracer_ctls%i_tracers_control .gt. 0) return
@@ -142,7 +143,8 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_files_4_fline_ctl(id_control, hd_tracer_ctl,          &
-     &                              tracer_ctls%tracer_controls, c_buf)
+     &      tracer_ctls%tracer_controls, c_buf, error_file)
+        if(error_file) return
 !
         call read_integer_ctl_type(c_buf, hd_i_step_tracer,             &
      &                             tracer_ctls%i_step_tracer_out_ctl)

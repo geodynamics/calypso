@@ -8,20 +8,18 @@
 !!
 !!@verbatim
 !!      subroutine output_tracer_restart(tracer_file_prm, istep_rst,    &
-!!     &         time_d, rst_step, viz_fields, fline_lc)
+!!     &                                 time_d, rst_step, fln_tce)
 !!        integer(kind = kint), intent(in) :: istep_rst
 !!        type(field_IO_params), intent(in) :: tracer_file_prm
 !!        type(time_data), intent(in) :: time_d
 !!        type(IO_step_param), intent(in) :: rst_step
-!!        type(ctl_params_viz_fields), intent(in) :: viz_fields
-!!        type(local_fieldline), intent(inout) :: fline_lc
+!!        type(each_fieldline_trace), intent(in) :: fln_tce
 !!      subroutine input_tracer_restart(tracer_file_prm, init_d,        &
-!!     &          rst_step, viz_fields, fline_lc)
+!!     &                                rst_step, fln_tce)
 !!        type(field_IO_params), intent(in) :: tracer_file_prm
 !!        type(time_data), intent(inout) :: init_d
 !!        type(IO_step_param), intent(inout) :: rst_step
-!!        type(ctl_params_viz_fields), intent(in) :: viz_fields
-!!        type(local_fieldline), intent(inout) :: fline_lc
+!!        type(each_fieldline_trace), intent(inout) :: fln_tce
 !!@endverbatim
 !
       module tracer_restart_file_IO
@@ -30,10 +28,9 @@
       use t_time_data
       use t_file_IO_parameter
       use t_IO_step_parameter
-      use t_ctl_params_viz_fields
-      use t_local_fline
       use t_read_mesh_data
       use t_field_data_IO
+      use t_tracing_data
 !
       implicit none
 !
@@ -44,11 +41,9 @@
 !  ---------------------------------------------------------------------
 !
       subroutine output_tracer_restart(tracer_file_prm, istep_rst,      &
-     &          time_d, viz_fields, fline_lc)
+     &                                 time_d, fln_tce)
 !
       use set_sph_restart_IO
-      use field_IO_select
-      use local_fline_restart_IO
       use particle_MPI_IO_select
       use local_fline_restart_IO
       use const_global_element_ids
@@ -56,38 +51,23 @@
       integer(kind = kint), intent(in) :: istep_rst
       type(field_IO_params), intent(in) :: tracer_file_prm
       type(time_data), intent(in) :: time_d
-      type(ctl_params_viz_fields), intent(in) :: viz_fields
-      type(local_fieldline), intent(inout) :: fline_lc
+      type(each_fieldline_trace), intent(in) :: fln_tce
 !
       type(surf_edge_IO_file) :: particle_IO
-      type(field_IO) :: fld_IO
       type(time_data) :: time_IO
 !
 !
+!      call check_tracer_restart(fln_tce)
+!
       call copy_time_step_size_data(time_d, time_IO)
-      call copy_local_tracer_to_IO(fline_lc, particle_IO)
+      call copy_restart_tracer_to_IO(fln_tce, particle_IO)
 
       call sel_mpi_write_particle_file(tracer_file_prm, istep_rst,      &
      &                                 time_IO, particle_IO)
+      call calypso_mpi_barrier()
       call dealloc_neib_id(particle_IO%comm)
-      call dealloc_surf_geometry_data(particle_IO)
       call dealloc_ele_connect(particle_IO%ele)
-!
-!
-      if(viz_fields%num_color_fields .le. 1) return
-!
-      call field_on_local_tracer_to_IO(viz_fields, fline_lc, fld_IO)
-!
-      call alloc_merged_field_stack(nprocs, fld_IO)
-      call count_number_of_node_stack                                   &
-     &   (fld_IO%nnod_IO, fld_IO%istack_numnod_IO)
-!
-      call sel_write_step_FEM_field_file                                &
-     &   (istep_rst, tracer_file_prm, time_IO, fld_IO)
-!
-      call dealloc_merged_field_stack(fld_IO)
-      call dealloc_phys_data_IO(fld_IO)
-      call dealloc_phys_name_IO(fld_IO)
+      call dealloc_node_geometry_base(particle_IO%node)
 !
       end subroutine output_tracer_restart
 !
@@ -95,10 +75,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine input_tracer_restart(tracer_file_prm, istep_rst,       &
-     &          init_d, viz_fields, fline_lc)
+     &                                init_d, fln_tce)
 !
       use set_sph_restart_IO
-      use field_IO_select
       use local_fline_restart_IO
       use particle_MPI_IO_select
 !
@@ -106,30 +85,21 @@
 !
       integer(kind = kint), intent(in) :: istep_rst
       type(time_data), intent(in) :: init_d
-      type(ctl_params_viz_fields), intent(in) :: viz_fields
-      type(local_fieldline), intent(inout) :: fline_lc
+      type(each_fieldline_trace), intent(inout) :: fln_tce
 !
       type(surf_edge_IO_file) :: particle_IO
       type(time_data) :: time_IO
-      type(field_IO) :: fld_IO
 !
 !
       call sel_mpi_read_particle_file(tracer_file_prm, istep_rst,       &
      &                                time_IO, particle_IO)
-      call copy_local_tracer_from_IO(particle_IO, fline_lc)
+      call calypso_mpi_barrier()
+      call copy_restart_tracer_from_IO(particle_IO, fln_tce)
       call dealloc_neib_id(particle_IO%comm)
       call dealloc_ele_connect(particle_IO%ele)
-      call dealloc_surf_geometry_data(particle_IO)
+      call dealloc_node_geometry_base(particle_IO%node)
 !
-      if(viz_fields%num_color_fields .le. 1) return
-!
-      call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
-     &    istep_rst, tracer_file_prm, time_IO, fld_IO)
-      call field_on_local_tracer_from_IO(fld_IO, viz_fields, fline_lc)
-
-!      call copy_time_step_data(time_IO, init_d)
-      call dealloc_phys_data_IO(fld_IO)
-      call dealloc_phys_name_IO(fld_IO)
+!      call check_tracer_restart(fln_tce)
 !
       if(my_rank .ne. 0) return
       if(init_d%i_time_step .ne. time_IO%i_time_step) then

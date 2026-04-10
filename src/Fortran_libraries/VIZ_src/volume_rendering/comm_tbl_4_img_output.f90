@@ -173,13 +173,13 @@
         do ip = 1, nprocs
           ist = istack_recv_image(ip-1)
           num = istack_recv_image(ip) - istack_recv_image(ip-1)
-          ipix = item_recv_image(ist+1)
+          if(num .le. 0) cycle
 !
-          if(num .gt. 0) then
-            icou = icou + 1
-            istack_recv_pixel_output(icou) = istack_recv_image(ip)
-            irank_recv_pixel_output(icou) = irank_4_composit(ipix)
-          end if
+          icou = icou + 1
+          ipix = item_recv_image(ist+1)
+          istack_recv_pixel_output(icou) = istack_recv_image(ip)
+          irank_recv_pixel_output(icou) = irank_4_composit(ipix)
+!
           if(irank_4_composit(ipix) .eq. irank_image_file) then
             iself_pixel_output = 1
           end if

@@ -6,8 +6,8 @@
 !>@brief control data for cross sections
 !!
 !!@verbatim
-!!      subroutine read_files_4_fline_ctl                               &
-!!     &         (id_control, hd_block, fline_ctls, c_buf)
+!!      subroutine read_files_4_fline_ctl(id_control, hd_block,         &
+!!     &                                  fline_ctls, c_buf, error_file)
 !!      subroutine sel_read_fline_control(id_control, hd_block,         &
 !!     &          file_name, fline_ctl_struct, c_buf)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -16,6 +16,7 @@
 !!        type(fieldline_controls), intent(inout) :: fline_ctls
 !!        type(fline_ctl), intent(inout)  :: fline_ctl_struct
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!
 !!      subroutine write_files_4_fline_ctl(id_control, hd_block,        &
 !!     &                                   fline_ctls, level)
@@ -55,8 +56,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_files_4_fline_ctl                                 &
-     &         (id_control, hd_block, fline_ctls, c_buf)
+      subroutine read_files_4_fline_ctl(id_control, hd_block,           &
+     &                                  fline_ctls, c_buf, error_file)
 !
       use t_read_control_elements
       use skip_comment_f
@@ -65,8 +66,10 @@
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(fieldline_controls), intent(inout) :: fline_ctls
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
       integer(kind = kint) :: n_append
 !
@@ -89,7 +92,8 @@
           call sel_read_fline_control(id_control, hd_block,             &
      &        fline_ctls%fname_fline_ctl(fline_ctls%num_fline_ctl),     &
      &        fline_ctls%fline_ctl_struct(fline_ctls%num_fline_ctl),    &
-     &        c_buf)
+     &        c_buf, error_file)
+          if(error_file) return
         end if
       end do
 !
@@ -98,21 +102,24 @@
 !   --------------------------------------------------------------------
 !
       subroutine sel_read_fline_control(id_control, hd_block,           &
-     &          file_name, fline_ctl_struct, c_buf)
+     &          file_name, fline_ctl_struct, c_buf, error_file)
 !
       use ctl_data_field_line_IO
+      use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
       character(len = kchara), intent(inout) :: file_name
       type(fline_ctl), intent(inout)  :: fline_ctl_struct
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
-        write(*,'(3a,i4,a)', ADVANCE='NO') 'is read from '
+        call check_write_ctl_file_message(file_name, error_file)
+        if(error_file) return
         call read_fline_control_file((id_control+2), file_name,         &
      &                               hd_block, fline_ctl_struct, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then
@@ -140,7 +147,6 @@
 !
 !
       c_buf%level = c_buf%level + 1
-      write(*,*) 'Control file: ', trim(file_name)
       call reset_fline_control_flags(fline_ctl_struct)
       open(id_control, file=file_name, status='old')
 !

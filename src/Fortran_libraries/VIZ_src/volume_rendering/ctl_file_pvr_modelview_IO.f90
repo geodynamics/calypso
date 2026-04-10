@@ -7,8 +7,8 @@
 !>@brief Control inputs for PVR view parameter
 !!
 !!@verbatim
-!!      subroutine sel_read_ctl_modelview_file                          &
-!!     &         (id_control, hd_block, icou, file_name, mat, c_buf)
+!!      subroutine sel_read_ctl_modelview_file(id_control, hd_block,    &
+!!     &          icou, file_name, mat, c_buf, error_file)
 !!      subroutine sel_write_ctl_modelview_file                         &
 !!     &         (id_control, hd_block, file_name, mat, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -16,6 +16,7 @@
 !!        type(modeview_ctl), intent(in) :: mat
 !!        character(len = kchara), intent(inout) :: file_name
 !!        integer(kind = kint), intent(inout) :: level
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_control_modelview_file(id_control, file_name,  &
 !!     &                                        hd_block, mat)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -131,24 +132,28 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine sel_read_ctl_modelview_file                            &
-     &         (id_control, hd_block, icou, file_name, mat, c_buf)
+      subroutine sel_read_ctl_modelview_file(id_control, hd_block,      &
+     &          icou, file_name, mat, c_buf, error_file)
 !
       use ctl_data_view_transfer_IO
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control, icou
       character(len=kchara), intent(in) :: hd_block
+!
       character(len = kchara), intent(inout) :: file_name
       type(modeview_ctl), intent(inout) :: mat
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(check_file_flag(c_buf, hd_block)) then
         file_name = third_word(c_buf)
 !
         call write_multi_ctl_file_message(hd_block, icou, c_buf%level)
-        write(*,'(2a)') ' is read from ... ', trim(file_name)
+        call check_write_ctl_file_message(file_name, error_file)
+        if(error_file) return
+!
         call read_control_modelview_file(id_control+2, file_name,       &
      &                                   hd_block, mat, c_buf)
       else if(check_begin_flag(c_buf, hd_block)) then

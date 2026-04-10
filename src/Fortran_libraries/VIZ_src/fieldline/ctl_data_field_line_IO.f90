@@ -26,16 +26,19 @@
 !!    fline_file_prefix    'fline'
 !!    fline_output_format   ucd
 !!
+!!    tracer_restart_prefix   'tracer'
+!!    tracer_restart_format   'merged_bin'
+!!
 !!    field_line_field_ctl      magnetic_field
-!!    coloring_field_ctl        magnetic_field   end
-!!    coloring_comp_ctl          radial   end
+!!    coloring_field_ctl        magnetic_field
+!!    coloring_component_ctl    radial
 !!    array output_field
 !!      output_field    velocity         vector
 !!      output_field    magnetic_field   radial
 !!    end array output_field
 !!
 !!    array chosen_ele_grp_ctl
-!!      chosen_ele_grp_ctl   outer_core   end
+!!      chosen_ele_grp_ctl   outer_core
 !!    end array chosen_ele_grp_ctl
 !!
 !!    starting_type:    position_list, surface_list,
@@ -100,16 +103,16 @@
      &      :: hd_fline_output_format = 'fline_output_format'
 !
       character(len=kchara), parameter, private                         &
-     &      :: hd_fline_rst_prefix =   'tracer_restart_prefix'
+     &      :: hd_tracer_rst_prefix =   'tracer_restart_prefix'
       character(len=kchara), parameter, private                         &
-     &      :: hd_fline_rst_format =   'tracer_restart_format'
+     &      :: hd_tracer_rst_format =   'tracer_restart_format'
 !
       character(len=kchara), parameter, private                         &
-     &      :: hd_field_line_field =  'field_line_field_ctl'
+     &      :: hd_field_line_field =   'field_line_field_ctl'
       character(len=kchara), parameter, private                         &
-     &      :: hd_coloring_field = 'coloring_field_ctl'
+     &      :: hd_coloring_field =     'coloring_field_ctl'
       character(len=kchara), parameter, private                         &
-     &      :: hd_coloring_comp =  'coloring_comp_ctl'
+     &      :: hd_coloring_comp =      'coloring_component_ctl'
       character(len=kchara), parameter                                  &
      &      :: hd_fline_result_field = 'output_field'
 !
@@ -197,10 +200,10 @@
         call read_chara_ctl_type(c_buf, hd_fline_output_format,         &
      &                           fln%fline_output_type_ctl)
 !
-        call read_chara_ctl_type(c_buf, hd_fline_rst_prefix,            &
-     &                           fln%fline_rst_prefix_ctl)
-        call read_chara_ctl_type(c_buf, hd_fline_rst_format,            &
-     &                           fln%fline_rst_format_ctl)
+        call read_chara_ctl_type(c_buf, hd_tracer_rst_prefix,           &
+     &                           fln%tracer_rst_prefix_ctl)
+        call read_chara_ctl_type(c_buf, hd_tracer_rst_format,           &
+     &                           fln%tracer_rst_format_ctl)
 !
         call read_chara_ctl_type(c_buf, hd_field_line_field,            &
      &                           fln%fline_field_ctl)
@@ -272,8 +275,8 @@
 !
       maxlen = len_trim(hd_fline_file_prefix)
       maxlen = max(maxlen, len_trim(hd_fline_output_format))
-      maxlen = max(maxlen, len_trim(hd_fline_rst_prefix))
-      maxlen = max(maxlen, len_trim(hd_fline_rst_format))
+      maxlen = max(maxlen, len_trim(hd_tracer_rst_prefix))
+      maxlen = max(maxlen, len_trim(hd_tracer_rst_format))
       maxlen = max(maxlen, len_trim(hd_field_line_field))
       maxlen = max(maxlen, len_trim(hd_coloring_field))
       maxlen = max(maxlen, len_trim(hd_coloring_comp))
@@ -366,10 +369,10 @@
         call init_chara_ctl_item_label(hd_fline_output_format,          &
      &                                 fln%fline_output_type_ctl)
 !
-        call init_chara_ctl_item_label(hd_fline_rst_prefix,             &
-     &                                 fln%fline_rst_prefix_ctl)
-        call init_chara_ctl_item_label(hd_fline_rst_format,             &
-     &                                 fln%fline_rst_format_ctl)
+        call init_chara_ctl_item_label(hd_tracer_rst_prefix,            &
+     &                                 fln%tracer_rst_prefix_ctl)
+        call init_chara_ctl_item_label(hd_tracer_rst_format,            &
+     &                                 fln%tracer_rst_format_ctl)
 !
         call init_chara_ctl_item_label(hd_field_line_field,             &
      &                                 fln%fline_field_ctl)

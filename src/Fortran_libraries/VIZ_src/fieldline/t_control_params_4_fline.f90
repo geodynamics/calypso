@@ -35,10 +35,11 @@
 !        integer(kind = kint) :: num_fline
 !
       type fieldline_paramter
+!>        File parameters for tracer restart file
+        type(field_IO_params) :: tracer_rst_IO
+!
 !>        File parameters for field line data file
         type(field_IO_params) :: fline_file_IO
-!>        File parameters for tracer restart file
-        type(field_IO_params) :: fline_rst_IO
 !
 !>        flag to use MPI_Bcast for data communication
         logical :: flag_use_broadcast

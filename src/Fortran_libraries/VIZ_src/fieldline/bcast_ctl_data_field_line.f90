@@ -80,8 +80,8 @@
       call bcast_ctl_type_c1(fln%fline_file_head_ctl)
       call bcast_ctl_type_c1(fln%fline_output_type_ctl)
 !
-      call bcast_ctl_type_c1(fln%fline_rst_prefix_ctl)
-      call bcast_ctl_type_c1(fln%fline_rst_format_ctl)
+      call bcast_ctl_type_c1(fln%tracer_rst_prefix_ctl)
+      call bcast_ctl_type_c1(fln%tracer_rst_format_ctl)
 !
       call bcast_ctl_type_c1(fln%fline_field_ctl)
       call bcast_ctl_type_c1(fln%fline_color_field_ctl)

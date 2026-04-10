@@ -68,11 +68,6 @@
       call gz_mpi_read_geometry_info_b(IO_param, particle_IO%node)
 !  ----  read element data -------
       call gz_mpi_read_ele_info_b(IO_param, particle_IO%ele)
-
-      call gz_mpi_read_vect_in_ele_b(IO_param, particle_IO%node,        &
-     &                               particle_IO%sfed)
-      call gz_mpi_read_scl_in_ele_b(IO_param, particle_IO%node,         &
-     &                              particle_IO%sfed)
 !
       call gz_read_step_data_mpi_b(IO_param,                            &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt)
@@ -105,11 +100,6 @@
 !
       call gz_mpi_write_geometry_info_b(IO_param, particle_IO%node)
       call gz_mpi_write_element_info_b(IO_param, particle_IO%ele)
-!
-      call gz_mpi_write_vect_in_ele_b(IO_param, particle_IO%node,      &
-     &                                particle_IO%sfed)
-      call gz_mpi_write_scl_in_ele_b(IO_param, particle_IO%node,       &
-     &                               particle_IO%sfed)
 !
       call gz_write_field_time_mpi_b(IO_param,                          &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt)

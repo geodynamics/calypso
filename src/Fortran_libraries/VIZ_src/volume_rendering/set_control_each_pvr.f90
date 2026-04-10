@@ -6,11 +6,14 @@
 !>@brief Set each PVR parameters from control
 !!
 !!@verbatim
-!!      subroutine check_pvr_field_control                              &
-!!     &         (pvr_ctl, num_nod_phys, phys_nod_name)
+!!      integer(kind = kint) function                                   &
+!!     &   check_pvr_field_control(pvr_ctl, num_nod_phys, phys_name)
+!!        integer(kind = kint), intent(in) :: num_nod_phys
+!!        character(len=kchara), intent(in) :: phys_name(num_nod_phys)
+!!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl
 !!
 !!      subroutine set_control_field_4_pvr(field_ctl, comp_ctl,         &
-!!     &          num_nod_phys, phys_nod_name, fld_param, icheck_ncomp)
+!!     &          num_nod_phys, phys_name, fld_param, icheck_ncomp)
 !!      subroutine set_control_pvr                                      &
 !!     &         (pvr_ctl, ele_grp, surf_grp, tracer, fline,            &
 !!     &          pvr_area, draw_param, color_param, cbar_param)
@@ -32,6 +35,7 @@
       use m_precision
 !
       use m_constants
+      use m_machine_parameter
       use m_error_IDs
       use t_control_data_4_pvr
       use calypso_mpi
@@ -49,14 +53,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine check_pvr_field_control                                &
-     &         (pvr_ctl, num_nod_phys, phys_nod_name)
+      integer(kind = kint) function                                     &
+     &   check_pvr_field_control(pvr_ctl, num_nod_phys, phys_name)
 !
       use t_control_params_4_pvr
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: num_nod_phys
-      character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
+      character(len=kchara), intent(in) :: phys_name(num_nod_phys)
 !
       type(pvr_parameter_ctl), intent(in) :: pvr_ctl
 !
@@ -65,25 +69,28 @@
 !
 !
       tmpfield(1) = pvr_ctl%pvr_field_ctl%charavalue
-      call check_field_4_viz(num_nod_phys, phys_nod_name,               &
-     &    ione, tmpfield, num_field, num_phys_viz)
-      if(num_field .eq. 0) then
-        call calypso_MPI_abort(ierr_PVR,'set correct field name')
+      num_field = count_field_4_viz(num_nod_phys, phys_name,            &
+     &                              ione, tmpfield)
+      num_phys_viz = num_field
+      if(num_field .le. 0) then
+        write(e_message,*) 'Field ', trim(tmpfield(1)),                 &
+     &                       ' is not in the field list.'
       end if
+      check_pvr_field_control = num_field
 !
-      end subroutine check_pvr_field_control
+      end function check_pvr_field_control
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_field_4_pvr(field_ctl, comp_ctl,           &
-     &          num_nod_phys, phys_nod_name, fld_param, icheck_ncomp)
+     &          num_nod_phys, phys_name, fld_param, icheck_ncomp)
 !
       use t_control_array_character
       use t_control_params_4_pvr
 !
       integer(kind = kint), intent(in) :: num_nod_phys
-      character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
+      character(len=kchara), intent(in) :: phys_name(num_nod_phys)
       type(read_character_item), intent(in) :: field_ctl
       type(read_character_item), intent(in) :: comp_ctl
 !
@@ -98,7 +105,7 @@
       tmpfield(1) = field_ctl%charavalue
       tmpcomp(1) =  comp_ctl%charavalue
       call set_components_4_viz                                         &
-     &   (num_nod_phys, phys_nod_name, ione, tmpfield, tmpcomp, ione,   &
+     &   (num_nod_phys, phys_name, ione, tmpfield, tmpcomp, ione,       &
      &    ifld_tmp, icomp_tmp, icheck_ncomp, ncomp_tmp, fldname_tmp)
       fld_param%id_field =          ifld_tmp(1)
       fld_param%id_component =      icomp_tmp(1)

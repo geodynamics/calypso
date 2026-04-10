@@ -56,25 +56,29 @@
       subroutine load_control_4_sph_MHD_w_vizs(file_name, MHD_ctl,      &
      &                                         add_VMHD_ctl)
 !
+      use m_error_IDs
       use t_ctl_data_MHD
       use t_ctl_data_sph_MHD_w_vizs
       use t_read_control_elements
       use bcast_control_sph_MHD
       use bcast_ctl_data_viz4
       use bcast_dynamo_viz_control
-
 !
       character(len=kchara), intent(in) :: file_name
       type(mhd_simulation_control), intent(inout) :: MHD_ctl
       type(add_vizs_sph_mhd_ctl), intent(inout) :: add_VMHD_ctl
 !
+      logical :: error_file = .FALSE.
       type(buffer_for_control) :: c_buf1
 !
 !
+      error_file = .FALSE.
       c_buf1%level = 0
       if(my_rank .eq. 0) then
         call read_control_4_sph_MHD_w_vizs(file_name, MHD_ctl,          &
-     &                                     add_VMHD_ctl, c_buf1)
+     &      add_VMHD_ctl, c_buf1, error_file)
+        if(error_file) call calypso_mpi_abort(ierr_file,                &
+     &                                        "Missing control file")
       end if
 !
       if(c_buf1%iend .gt. 0) then

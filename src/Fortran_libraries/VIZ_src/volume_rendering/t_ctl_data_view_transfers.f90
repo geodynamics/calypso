@@ -12,9 +12,10 @@
 !!      subroutine init_multi_modeview_ctl(hd_block, mul_mats_c)
 !!
 !!      subroutine read_mul_view_transfer_ctl                           &
-!!     &         (id_control, hd_block, mul_mats_c, c_buf)
+!!     &         (id_control, hd_block, mul_mats_c, c_buf, error_file)
 !!        type(multi_modelview_ctl), intent(inout) :: mul_mats_c
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_mul_view_transfer_ctl                          &
 !!     &         (id_control, hd_block, mul_mats_c, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -120,15 +121,17 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_mul_view_transfer_ctl                             &
-     &         (id_control, hd_block, mul_mats_c, c_buf)
+     &         (id_control, hd_block, mul_mats_c, c_buf, error_file)
 !
       use ctl_file_pvr_modelview_IO
       use ctl_data_view_transfer_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
+!
       type(multi_modelview_ctl), intent(inout) :: mul_mats_c
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
       integer(kind = kint) :: n_append
 !
@@ -151,7 +154,9 @@
           call sel_read_ctl_modelview_file                              &
      &       (id_control, hd_block, mul_mats_c%num_modelviews_c,        &
      &        mul_mats_c%fname_mat_ctl(mul_mats_c%num_modelviews_c),    &
-     &        mul_mats_c%matrices(mul_mats_c%num_modelviews_c), c_buf)
+     &        mul_mats_c%matrices(mul_mats_c%num_modelviews_c),         &
+     &        c_buf, error_file)
+          if(error_file) return
         end if
       end do
 !

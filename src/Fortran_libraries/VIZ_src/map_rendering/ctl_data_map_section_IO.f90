@@ -8,12 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine init_map_section_ctl_label(hd_block, map_sect_ctl)
-!!      subroutine read_map_section_ctl                                 &
-!!     &         (id_control, hd_block, icou, map_sect_ctl, c_buf)
+!!      subroutine read_map_section_ctl(id_control, hd_block, icou,     &
+!!     &                                map_sect_ctl, c_buf, error_file)
 !!        integer(kind = kint), intent(in) :: id_control
 !!        character(len=kchara), intent(in) :: hd_block
 !!        type(map_section_ctl), intent(inout) :: map_sect_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!        logical, intent(inout) :: error_file
 !!      subroutine write_map_section_ctl                                &
 !!     &         (id_control, map_sect_ctl, level)
 !!        integer(kind = kint), intent(in) :: id_control
@@ -87,8 +88,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_map_section_ctl                                   &
-     &         (id_control, hd_block, icou, map_sect_ctl, c_buf)
+      subroutine read_map_section_ctl(id_control, hd_block, icou,       &
+     &                                map_sect_ctl, c_buf, error_file)
 !
       use ctl_file_section_def_IO
       use write_control_elements
@@ -97,6 +98,7 @@
       character(len=kchara), intent(in) :: hd_block
       type(map_section_ctl), intent(inout) :: map_sect_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
+      logical, intent(inout) :: error_file
 !
 !
       if(map_sect_ctl%i_map_sect_ctl .gt. 0) return
@@ -112,7 +114,8 @@
      &       (hd_block, icou, c_buf%level)
           call sel_read_ctl_pvr_section_def(id_control,                 &
      &        hd_surface_define, map_sect_ctl%fname_sect_ctl,           &
-     &        map_sect_ctl%psf_def_c, c_buf)
+     &        map_sect_ctl%psf_def_c, c_buf, error_file)
+          if(error_file) return
         end if
 !
         call read_chara_ctl_type(c_buf, hd_pvr_sec_zeroline,            &

@@ -9,16 +9,23 @@
 !!@verbatim
 !!      integer(kind = kint) function count_fline_start_surf            &
 !!     &                            (node, ele, surf, isf_4_ele_dbl,    &
-!!     &                             nod_fld, fln_prm, fln_src)
-!!      subroutine set_fline_start_surf(node, ele, surf, isf_4_ele_dbl, &
-!!     &          nod_fld, fln_prm, fln_src, fln_tce)
+!!     &                             nod_fld, fln_prm, num_line_local,  &
+!!     &                             iflag_outward_flux_fline,          &
+!!     &                             xx4_initial_fline)
+!!      subroutine set_fline_start_surf                                 &
+!!     &         (node, ele, surf, isf_4_ele_dbl, nod_fld, fln_prm,     &
+!!     &          num_line_local, iflag_outward_flux_fline, fln_tce)
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(in) :: surf
 !!        type(phys_data), intent(in) :: nod_fld
 !!        integer(kind = kint), intent(in)                              &
 !!     &               :: isf_4_ele_dbl(ele%numele,nsurf_4_ele,2)
 !!        type(fieldline_paramter), intent(in) :: fln_prm
-!!        type(each_fieldline_source), intent(in) :: fln_src
+!!        integer(kind = kint), intent(in) :: num_line_local
+!!        integer(kind = kint), intent(inout)                           &
+!!     &         :: iflag_outward_flux_fline(fln_prm%num_each_field_line)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &         :: xx4_initial_fline(4,fln_prm%num_each_field_line)
 !!        type(each_fieldline_trace), intent(inout) :: fln_tce
 !!@endverbatim
 !
@@ -43,13 +50,14 @@
 !
       integer(kind = kint) function count_fline_start_surf              &
      &                            (node, ele, surf, isf_4_ele_dbl,      &
-     &                             nod_fld, fln_prm, fln_src)
+     &                             nod_fld, fln_prm, num_line_local,    &
+     &                             iflag_outward_flux_fline,            &
+     &                             xx4_initial_fline)
 !
       use m_constants
       use m_geometry_constants
       use t_phys_data
       use t_control_params_4_fline
-      use t_source_of_filed_line
       use cal_field_on_surf_viz
 !
       type(node_data), intent(in) :: node
@@ -59,7 +67,12 @@
      &               :: isf_4_ele_dbl(ele%numele,nsurf_4_ele,2)
       type(phys_data), intent(in) :: nod_fld
       type(fieldline_paramter), intent(in) :: fln_prm
-      type(each_fieldline_source), intent(inout) :: fln_src
+      integer(kind = kint), intent(in) :: num_line_local
+!
+      integer(kind = kint), intent(inout)                               &
+     &         :: iflag_outward_flux_fline(fln_prm%num_each_field_line)
+      real(kind = kreal), intent(inout)                                 &
+     &         :: xx4_initial_fline(4,fln_prm%num_each_field_line)
 !
       integer(kind = kint)  :: icou
       integer(kind = kint)  :: i, iele, isf_1ele, isurf
@@ -68,12 +81,12 @@
 !
 !
       icou = 0
-      do i = 1, fln_src%num_line_local
+      do i = 1, num_line_local
         iele =     fln_prm%id_surf_start_fline(1,i)
         isf_1ele = fln_prm%id_surf_start_fline(2,i)
         isurf = abs(surf%isf_4_ele(iele,isf_1ele))
-        fln_src%xx4_initial_fline(1:3,i) = surf%x_surf(isurf,1:3)
-        fln_src%xx4_initial_fline(4,i) =   1.0d0
+        xx4_initial_fline(1:3,i) = surf%x_surf(isurf,1:3)
+        xx4_initial_fline(4,i) =   1.0d0
 !
         call cal_field_on_surf_vector                                   &
      &     (node%numnod, surf%numsurf, surf%nnod_4_surf, surf%ie_surf,  &
@@ -85,23 +98,23 @@
      &        + vec_surf(3) * surf%vnorm_surf(isurf,3))                 &
      &         * dble(surf%isf_4_ele(iele,isf_1ele) / isurf)
         if(flux .eq. zero) then
-           fln_src%iflag_outward_flux_fline(i) =  1
+           iflag_outward_flux_fline(i) =  1
         else
-           fln_src%iflag_outward_flux_fline(i) =  int(flux / abs(flux))
+           iflag_outward_flux_fline(i) =  int(flux / abs(flux))
         end if
 !
         if(fln_prm%id_fline_direction .ne. iflag_both_trace) then
           icou = icou + check_fline_start_surf                          &
-     &                       (fln_src%iflag_outward_flux_fline(i),      &
+     &                       (iflag_outward_flux_fline(i),              &
      &                       iele, isf_1ele, isurf, ele, surf,          &
      &                       isf_4_ele_dbl, fln_prm%id_fline_direction)
         else
           icou = icou + check_fline_start_surf                          &
-     &                      (fln_src%iflag_outward_flux_fline(i),       &
+     &                      (iflag_outward_flux_fline(i),               &
      &                       iele, isf_1ele, isurf, ele, surf,          &
      &                       isf_4_ele_dbl, iflag_forward_trace)
           icou = icou + check_fline_start_surf                          &
-     &                      (fln_src%iflag_outward_flux_fline(i),       &
+     &                      (iflag_outward_flux_fline(i),               &
      &                       iele, isf_1ele, isurf, ele, surf,          &
      &                       isf_4_ele_dbl, iflag_backward_trace)
         end if
@@ -112,14 +125,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_fline_start_surf(node, ele, surf, isf_4_ele_dbl,   &
-     &          nod_fld, fln_prm, fln_src, fln_tce)
+      subroutine set_fline_start_surf                                   &
+     &         (node, ele, surf, isf_4_ele_dbl, nod_fld, fln_prm,       &
+     &          num_line_local, iflag_outward_flux_fline, fln_tce)
 !
       use m_constants
       use m_geometry_constants
       use t_phys_data
       use t_control_params_4_fline
-      use t_source_of_filed_line
 !
       use cal_field_on_surf_viz
       use trace_in_element
@@ -132,7 +145,10 @@
      &               :: isf_4_ele_dbl(ele%numele,nsurf_4_ele,2)
       type(phys_data), intent(in) :: nod_fld
       type(fieldline_paramter), intent(in) :: fln_prm
-      type(each_fieldline_source), intent(in) :: fln_src
+!
+      integer(kind = kint), intent(in) :: num_line_local
+      integer(kind = kint), intent(in)                                  &
+     &         :: iflag_outward_flux_fline(fln_prm%num_each_field_line)
 !
       type(each_fieldline_trace), intent(inout) :: fln_tce
 !
@@ -146,7 +162,7 @@
 !
 !
       icou = 0
-      do i = 1, fln_src%num_line_local
+      do i = 1, num_line_local
         iele =     fln_prm%id_surf_start_fline(1,i)
         isf_1ele = fln_prm%id_surf_start_fline(2,i)
         isurf = abs(surf%isf_4_ele(iele,isf_1ele))
@@ -160,8 +176,7 @@
         vec_surf(4) = one
 !
         if(fln_prm%id_fline_direction .ne. iflag_both_trace) then
-          call choose_fline_start_surf                                  &
-     &       (fln_src%iflag_outward_flux_fline(i),                      &
+          call choose_fline_start_surf(iflag_outward_flux_fline(i),     &
      &        iele, isf_1ele, isurf, ele, surf, isf_4_ele_dbl,          &
      &        fln_prm%id_fline_direction, isf_dbl_st_tmp)
           if(isf_dbl_st_tmp(2) .le. 0) cycle
@@ -174,18 +189,12 @@
           fln_tce%isf_dbl_start(2,icou) = isf_dbl_st_tmp(1)
           fln_tce%isf_dbl_start(3,icou) = isf_dbl_st_tmp(2)
           fln_tce%xx_fline_start(1:4,icou) = xyz_surf(1:4)
-          fln_tce%v_fline_start(1:4,icou) =  vec_surf(1:4)
           fln_tce%trace_length(icou) = 0.0d0
           fln_tce%icount_fline(icou) = 0
-!
-          call cal_fields_on_line(isurf, xi, xyz_surf(1),               &
-     &                          surf, nod_fld, fln_prm%fline_fields,    &
-     &                          fln_tce%c_fline_start(1,icou))
         else
           fln_tce%iflag_direction(icou) = iflag_forward_trace
 !
-          call choose_fline_start_surf                                  &
-     &       (fln_src%iflag_outward_flux_fline(i),                      &
+          call choose_fline_start_surf(iflag_outward_flux_fline(i),     &
      &        iele, isf_1ele, isurf, ele, surf, isf_4_ele_dbl,          &
      &        iflag_forward_trace, isf_dbl_st_tmp)
 !
@@ -198,17 +207,11 @@
             fln_tce%isf_dbl_start(2,icou) = isf_dbl_st_tmp(1)
             fln_tce%isf_dbl_start(3,icou) = isf_dbl_st_tmp(2)
             fln_tce%xx_fline_start(1:4,icou) = xyz_surf(1:4)
-            fln_tce%v_fline_start(1:4,icou) =  vec_surf(1:4)
             fln_tce%trace_length(icou) = 0.0d0
             fln_tce%icount_fline(icou) = 0
-!
-            call cal_fields_on_line(isurf, xi, xyz_surf(1),             &
-     &                          surf, nod_fld, fln_prm%fline_fields,    &
-     &                          fln_tce%c_fline_start(1,icou))
           end if
 !
-          call choose_fline_start_surf                                  &
-     &        (fln_src%iflag_outward_flux_fline(i),                     &
+          call choose_fline_start_surf(iflag_outward_flux_fline(i),     &
      &         iele, isf_1ele, isurf, ele, surf, isf_4_ele_dbl,         &
      &         iflag_backward_trace, isf_dbl_st_tmp)
           if(isf_dbl_st_tmp(2) .le. 0) cycle
@@ -220,8 +223,7 @@
           fln_tce%isf_dbl_start(3,icou) = isf_dbl_st_tmp(2)
           fln_tce%trace_length(icou) = 0.0d0
           fln_tce%icount_fline(icou) = 0
-          call copy_global_start_fline(icou, (icou-1),                  &
-     &                                 fln_prm%fline_fields, fln_tce)
+          call copy_global_start_fline(icou, (icou-1), fln_tce)
         end if
       end do
 !
@@ -269,8 +271,8 @@
      &               :: isf_4_ele_dbl(ele%numele,nsurf_4_ele,2)
       integer(kind = kint), intent(in) :: iflag_outward_flux
       integer(kind = kint), intent(in) :: iele, isf_1ele, isurf
-!
       integer(kind = kint), intent(in) :: iflag_direction
+!
       integer(kind = kint), intent(inout) :: isf_dbl_start(2)
 !
 !

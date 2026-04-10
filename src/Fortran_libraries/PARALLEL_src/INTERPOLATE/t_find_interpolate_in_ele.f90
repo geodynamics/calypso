@@ -59,8 +59,8 @@
       integer(kind = kint), intent(in) :: nnod_4_ele
       type(cal_interpolate_coefs_work), intent(inout) :: itp_ele_work
 !
-      allocate( itp_ele_work%coefs_by_tet(nnod_4_ele) )
-      allocate( itp_ele_work%x_local_ele(nnod_4_ele,3) )
+      allocate(itp_ele_work%coefs_by_tet(nnod_4_ele))
+      allocate(itp_ele_work%x_local_ele(nnod_4_ele,3))
 !
       itp_ele_work%coefs_by_tet = 0.0d0
       itp_ele_work%x_local_ele = 0.0d0

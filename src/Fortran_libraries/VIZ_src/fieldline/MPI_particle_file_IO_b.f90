@@ -69,11 +69,6 @@
       call mpi_read_geometry_info_b(IO_param, particle_IO%node)
       call mpi_read_element_info_b(IO_param, particle_IO%ele)
 
-      call mpi_read_vect_in_ele_b(IO_param, particle_IO%node,           &
-     &                            particle_IO%sfed)
-      call mpi_read_scl_in_ele_b(IO_param, particle_IO%node,            &
-     &                           particle_IO%sfed)
-!
       call read_field_time_mpi_b(num_pe, IO_param, t_IO)
       call close_mpi_file(IO_param)
 !
@@ -105,11 +100,6 @@
 !
       call mpi_write_geometry_info_b(IO_param, particle_IO%node)
       call mpi_write_element_info_b(IO_param, particle_IO%ele)
-!
-      call mpi_write_vect_in_ele_b(IO_param, particle_IO%node,          &
-     &                             particle_IO%sfed)
-      call mpi_write_scl_in_ele_b(IO_param, particle_IO%node,           &
-     &                            particle_IO%sfed)
 !
       call write_field_time_mpi_b(IO_param,                             &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt)

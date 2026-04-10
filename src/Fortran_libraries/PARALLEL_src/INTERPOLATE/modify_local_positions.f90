@@ -92,8 +92,8 @@
         xi(1:3) = xi(1:3) - s_correct(1:3)
 !
         do nd = 1, 3
-          if ( xi(nd) .gt.  1.0d0 ) xi(nd) = 1.0d0
-          if ( xi(nd) .lt. -1.0d0 ) xi(nd) =-1.0d0
+          if(xi(nd) .gt.  1.0d0) xi(nd) = 1.0d0
+          if(xi(nd) .lt. -1.0d0) xi(nd) =-1.0d0
         end do
 !
       end do
