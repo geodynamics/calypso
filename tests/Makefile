@@ -26,21 +26,19 @@ TARGET_SPH_REF_CHECK =       $(BUILDDIR)/tests/sph_ref_field_check
 TARGET_GAUSS_TEST =          $(BUILDDIR)/tests/gauss_points
 TARGET_CMP_GAUSS_TEST =      $(BUILDDIR)/tests/compare_gauss_points
 #
-#  -------------------------------------------------------------------------
-#
-SUBDIRS = \
-Gauss_point_test \
-FFT_test \
-\
-Communication_check \
-restart_assemble \
-\
-Dynamobench_case1 \
-Dynamobench_case2 \
-Dynamobench_case2_cont \
-snapshot_test \
-heterogineous_temp \
-Rendering_tests
+TARGET_FFTPACK_TEST =        $(BUILDDIR)/tests/test_FFTPACK
+TARGET_FFW3_F_TEST =         $(BUILDDIR)/tests/test_FFTW3_f
+TARGET_SGL_FFW3_TEST =       $(BUILDDIR)/tests/test_single_FFTW3
+TARGET_CMPR_FFT_TEST =       $(BUILDDIR)/tests/compare_fft_test
+
+TARGET_GEN_SPH_GRID =        $(BUILDDIR)/utilities/gen_sph_grids
+TARGET_CHECK_SPH_GRID =      $(BUILDDIR)/tests/check_sph_grids
+TARGET_TEST_SPH_GRID =       $(BUILDDIR)/tests/check_sph_comms
+
+TARGET_NEWSPH=               $(BUILDDIR)/utilities/assemble_sph
+TARGET_CMP_SPH_RST=          $(BUILDDIR)/tests/compare_sph_restart
+
+TARGET_CONTROL_MHD_CHECK =   $(BUILDDIR)/utilities/check_control_mhd
 
 #
 #  -------------------------------------------------------------------------
