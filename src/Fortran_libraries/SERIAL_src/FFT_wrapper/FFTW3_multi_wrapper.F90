@@ -229,7 +229,7 @@
 !
 !   normalization
         start = OMP_GET_WTIME()
-        call norm_swap_from_prt_fwd_FFT                                 &
+        call norm_swap_from_prt_fwd_FFTW                                &
      &     (ist, num, Ncomp, NFFT_c, C_FFTW(1,ist+1), Nfft, aNfft, X)
         ed_c = ed_c + OMP_GET_WTIME() - start
       end do
@@ -271,8 +271,8 @@
         num = Nstacksmp(ip) - ist
 !   normalization
         start = OMP_GET_WTIME()
-        call norm_swap_to_prt_bwd_FFT(ist, num, Ncomp, Nfft, X,         &
-     &                                NFFT_c, C_FFTW(1,ist+1))
+        call norm_swap_to_prt_bwd_FFTW(ist, num, Ncomp, Nfft, X,        &
+     &                                 NFFT_c, C_FFTW(1,ist+1))
         ed_c = ed_c + OMP_GET_WTIME() - start
 !
         start = OMP_GET_WTIME()

@@ -32,6 +32,11 @@ C_INCLUDE = -I. -I/Users/matsui/Calypso_test/work $(ZLIB_CFLAGS)  $(FFTW3_CFLAGS
 ZLIB_CFLAGS = 
 ZLIB_LIBS =   -lz
 #
+# libpng settings
+#
+PNG_CFLAGS = 
+PNG_LIBS =    
+#
 # BLAS settings
 #
 BLAS_LIBS =   -lblas

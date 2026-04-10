@@ -128,8 +128,8 @@
 !
 !   normalization
         ed_c = OMP_GET_WTIME() - st_c
-        call norm_copy_from_prt_fwd_FFT(num, NFFT_c, C_FFTW(1,ist+1),   &
-     &                                  Nfft, aNfft, X(1,ist+1))
+        call norm_copy_from_prt_fwd_FFTW(num, NFFT_c, C_FFTW(1,ist+1),  &
+     &                                   Nfft, aNfft, X(1,ist+1))
         ed_c = ed_c + OMP_GET_WTIME() - st_c
       end do
 !$omp end parallel do
@@ -169,8 +169,8 @@
         num = Nstacksmp(ip) - ist
 !   normalization
         st_c = OMP_GET_WTIME()
-        call norm_copy_to_prt_bwd_FFT(num, Nfft, X(1,ist+1),            &
-     &                                NFFT_c, C_FFTW(1,ist+1))
+        call norm_copy_to_prt_bwd_FFTW(num, Nfft, X(1,ist+1),           &
+     &                                 NFFT_c, C_FFTW(1,ist+1))
         ed_c = ed_c + OMP_GET_WTIME() - st_c
 !
         st_f = OMP_GET_WTIME()
