@@ -7,12 +7,12 @@
 !>@brief  communication table from FFTW
 !!
 !!@verbatim
-!!      subroutine set_comm_item_rtp_4_FFTW                             &
+!!      subroutine set_comm_item_pout_FFTW_smp                          &
 !!     &         (nnod_rtp, ntot_sr_rtp, irev_sr_rtp,                   &
 !!     &          irt_rtp_smp_stack, Nfft_c, aNfft, comm_sph_FFTW)
 !!        type(comm_tbl_from_FFTW), intent(inout) :: comm_sph_FFTW
 !!
-!!      subroutine copy_rtp_field_FFTW_to_send                          &
+!!      subroutine pout_FFTW_smp_fields_to_send                         &
 !!     &         (nnod_rtp, irev_sr_rtp, irt_rtp_smp_stack,             &
 !!     &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !!      subroutine copy_rtp_comp_FFTW_to_send                           &
@@ -35,7 +35,7 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine set_comm_item_rtp_4_FFTW                               &
+      subroutine set_comm_item_pout_FFTW_smp                            &
      &         (nnod_rtp, ntot_sr_rtp, irev_sr_rtp,                     &
      &          irt_rtp_smp_stack, Nfft_c, aNfft, comm_sph_FFTW)
 !
@@ -113,12 +113,12 @@
       end do
 !$omp end parallel do
 !
-      end subroutine set_comm_item_rtp_4_FFTW
+      end subroutine set_comm_item_pout_FFTW_smp
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine copy_rtp_field_FFTW_to_send                            &
+      subroutine pout_FFTW_smp_fields_to_send                           &
      &         (nnod_rtp, irev_sr_rtp, irt_rtp_smp_stack,               &
      &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !
@@ -171,7 +171,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine copy_rtp_field_FFTW_to_send
+      end subroutine pout_FFTW_smp_fields_to_send
 !
 ! ------------------------------------------------------------------
 !

@@ -36,25 +36,52 @@
       character(len = kchara), parameter                                &
      &          :: hd_search_fastest_fft = 'Search_fastest'
 !
+!>      Character flag to use test FFT
+      character(len = kchara), parameter :: hd_FFT_TEST =  'TEST'
+!
 !>      Character flag to use FFTPACK5
       character(len = kchara), parameter :: hd_FFTPACK = 'FFTPACK'
-!>      Character flag to use single FFTPACK5
-      character(len = kchara), parameter, private                       &
-     &          :: hd_FFTPACK_S = 'FFTPACK_SINGLE'
-!>      Character flag to use FFTPACK5 for each component
-      character(len = kchara), parameter, private                       &
-     &          :: hd_FFTPACK_C = 'FFTPACK_COMPONENT'
-!>      Character flag to use FFTPACK5 for each domain
-      character(len = kchara), parameter, private                       &
-     &          :: hd_FFTPACK_D = 'FFTPACK_DOMAIN'
-!>      Character flag to use FFTPACK5 at once
-      character(len = kchara), parameter, private                       &
-     &          :: hd_FFTPACK_O = 'FFTPACK_ONCE'
 !
 !>      Character flag to use FFTW3
       character(len = kchara), parameter :: hd_FFTW =     'FFTW'
 !>      Character flag to use FFTW3
-      character(len = kchara), parameter :: hd_FFTW3 =    'fftw3'
+      character(len = kchara), parameter :: hd_FFTW3 =    'FFTW3'
+!>      Character flag to use FFTW3 for each component
+      character(len = kchara), parameter :: hd_OMP_FFTW =  'OMP_FFTW'
+!>      Character flag to use FFTW3 for each component
+      character(len = kchara), parameter :: hd_OMP_FFTW3 = 'OMP_FFTW3'
+!
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter :: hd_ISPACK =   'ISPACK'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter :: hd_ISPACK3 =  'ISPACK3'
+!
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_rocFFT = 'rocFFT'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_rocFFT_c2r = 'rocFFT_complex'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_rocFFT_r2r = 'rocFFT_real'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_OMP_rocFFT = 'OpenMP_rocFFT'
+!
+!>      Character flag to use single FFTPACK5
+      character(len = kchara), parameter, private                       &
+     &                            :: hd_FFTPACK_S = 'FFTPACK_SINGLE'
+!>      Character flag to use FFTPACK5 for each component
+      character(len = kchara), parameter, private                       &
+     &                            :: hd_FFTPACK_C = 'FFTPACK_COMPONENT'
+!>      Character flag to use FFTPACK5 for each domain
+      character(len = kchara), parameter, private                       &
+     &                            :: hd_FFTPACK_D = 'FFTPACK_DOMAIN'
+!>      Character flag to use FFTPACK5 at once
+      character(len = kchara), parameter, private                       &
+     &                            :: hd_FFTPACK_O = 'FFTPACK_ONCE'
+!
 !>      Character flag to use FFTW3 for each component
       character(len = kchara), parameter :: hd_FFTW_D =  'FFTW_DOMAIN'
 !>      Character flag to use FFTW3 for each component
@@ -65,54 +92,43 @@
       character(len = kchara), parameter :: hd_FFTW3_S = 'fftw3_single'
 !>      Character flag to use FFTW3 for all components
       character(len = kchara), parameter, private                       &
-     &          :: hd_FFTW_C =   'FFTW_COMPONENT'
+     &                               :: hd_FFTW_C =   'FFTW_COMPONENT'
 !>      Character flag to use FFTW3 for all components
       character(len = kchara), parameter, private                       &
-     &          :: hd_FFTW3_C =  'fftw3_component'
+     &                               :: hd_FFTW3_C =  'fftw3_component'
 !>      Character flag to use FFTW3 for all components
       character(len = kchara), parameter, private                       &
-     &          :: hd_FFTW_O =   'FFTW_ONCE'
+     &                               :: hd_FFTW_O =   'FFTW_ONCE'
 !>      Character flag to use FFTW3 for all components
       character(len = kchara), parameter, private                       &
-     &          :: hd_FFTW3_O =  'fftw3_once'
+     &                               :: hd_FFTW3_O =  'FFTW3_ONCE'
 !
 !>      Character flag to use FFTW3 for each component
-      character(len = kchara), parameter :: hd_OMP_FFTW =  'OMP_FFTW'
-!>      Character flag to use FFTW3 for each component
-      character(len = kchara), parameter :: hd_OMP_FFTW3 = 'omp_fftw3'
+      character(len = kchara), parameter                                &
+     &                           :: hd_OMP_FFTW_D =  'OMP_FFTW_DOMAIN'
 !>      Character flag to use FFTW3 for each component
       character(len = kchara), parameter                                &
-     &          :: hd_OMP_FFTW_D =  'OMP_FFTW_DOMAIN'
-!>      Character flag to use FFTW3 for each component
-      character(len = kchara), parameter                                &
-     &          :: hd_OMP_FFTW3_D = 'omp_fftw3_domain'
+     &                           :: hd_OMP_FFTW3_D = 'OMP_FFTW3_DOMAIN'
 !
-!>      Character flag to use ISPACK
-      character(len = kchara), parameter :: hd_ISPACK =   'ISPACK'
 !>      Character flag to use ISPACK for domain
       character(len = kchara), parameter, private                       &
-     &          :: hd_ISPACK_D =  'ISPACK_DOMAIN'
+     &                               :: hd_ISPACK_D =  'ISPACK_DOMAIN'
 !>      Character flag to use ISPACK at once
       character(len = kchara), parameter, private                       &
-     &          :: hd_ISPACK_O =  'ISPACK_ONCE'
+     &                               :: hd_ISPACK_O =  'ISPACK_ONCE'
 !
-!>      Character flag to use ISPACK
-      character(len = kchara), parameter :: hd_ISPACK3 =  'ISPACK3'
 !>      Character flag to use ISPACK for domain
       character(len = kchara), parameter, private                       &
-     &          :: hd_ISPACK3_D =  'ISPACK3_DOMAIN'
+     &                           :: hd_ISPACK3_D =  'ISPACK3_DOMAIN'
 !>      Character flag to use ISPACK for component
       character(len = kchara), parameter, private                       &
-     &          :: hd_ISPACK3_C =  'ISPACK3_COMPONENT'
+     &                           :: hd_ISPACK3_C =  'ISPACK3_COMPONENT'
 !>      Character flag to use single ISPACK
       character(len = kchara), parameter, private                       &
-     &          :: hd_ISPACK3_S =  'ISPACK3_SINGLE'
+     &                           :: hd_ISPACK3_S =  'ISPACK3_SINGLE'
 !>      Character flag to use ISPACK at once
       character(len = kchara), parameter, private                       &
-     &          :: hd_ISPACK3_O =  'ISPACK3_ONCE'
-!
-!>      Character flag to use test FFT
-      character(len = kchara), parameter :: hd_FFT_TEST =  'TEST'
+     &                           :: hd_ISPACK3_O =  'ISPACK3_ONCE'
 !
 !!>      integer flag for undefined FFT routine
 !      integer(kind = kint), parameter :: iflag_UNDEFINED_FFT =   -999
@@ -120,41 +136,41 @@
       integer(kind = kint), parameter :: iflag_SEARCH_FASTEST_FFT = -1
 !
 !>      integer flag to use FFTPACK5
-      integer(kind = kint), parameter :: iflag_FFTPACK_ONCE =      1
+      integer(kind = kint), parameter :: iflag_FFTPACK_ONCE =        1
 !>      integer flag to use FFTPACK5
-      integer(kind = kint), parameter :: iflag_FFTPACK_SINGLE =    2
+      integer(kind = kint), parameter :: iflag_FFTPACK_SINGLE =      2
 !>      integer flag to use FFTPACK5
-      integer(kind = kint), parameter :: iflag_FFTPACK_COMPONENT = 3
+      integer(kind = kint), parameter :: iflag_FFTPACK_COMPONENT =   3
 !>      integer flag to use FFTPACK5
-      integer(kind = kint), parameter :: iflag_FFTPACK_DOMAIN =    4
+      integer(kind = kint), parameter :: iflag_FFTPACK_DOMAIN =      4
 !
 !>      integer flag to use FFTW3
-      integer(kind = kint), parameter :: iflag_FFTW_ONCE =      11
+      integer(kind = kint), parameter :: iflag_FFTW_ONCE =          11
 !>      integer flag to use single transforms in FFTW3
-      integer(kind = kint), parameter :: iflag_FFTW_SINGLE =    12
+      integer(kind = kint), parameter :: iflag_FFTW_SINGLE =        12
 !>      integer flag to use single transforms in FFTW3
-      integer(kind = kint), parameter :: iflag_FFTW_COMPONENT = 13
+      integer(kind = kint), parameter :: iflag_FFTW_COMPONENT =     13
 !>      integer flag to use FFTW3 for each component
-      integer(kind = kint), parameter :: iflag_FFTW_DOMAIN =    14
+      integer(kind = kint), parameter :: iflag_FFTW_DOMAIN =        14
 !
 !>      integer flag to use FFTW3 with OopenMP at once
-      integer(kind = kint), parameter :: iflag_OMP_FFTW_ONCE =   41
+      integer(kind = kint), parameter :: iflag_OMP_FFTW_ONCE =      41
 !>      integer flag to use FFTW3 with OopenMP for domain
-      integer(kind = kint), parameter :: iflag_OMP_FFTW_DOMAIN = 42
+      integer(kind = kint), parameter :: iflag_OMP_FFTW_DOMAIN =    42
 !
 !>      integer flag to use ISPACK Ver.0.93 at once
-      integer(kind = kint), parameter :: iflag_ISPACK1_ONCE =   21
+      integer(kind = kint), parameter :: iflag_ISPACK1_ONCE =       21
 !>      integer flag to use ISPACK Ver.0.93 for domain
-      integer(kind = kint), parameter :: iflag_ISPACK1_DOMAIN = 22
+      integer(kind = kint), parameter :: iflag_ISPACK1_DOMAIN =     22
 !
 !>      integer flag to use ISPACK Ver. 3.01
-      integer(kind = kint), parameter :: iflag_ISPACK3_ONCE =      31
+      integer(kind = kint), parameter :: iflag_ISPACK3_ONCE =       31
 !>      integer flag to use ISPACK Ver. 3.01 for domain
-      integer(kind = kint), parameter :: iflag_ISPACK3_DOMAIN =    32
+      integer(kind = kint), parameter :: iflag_ISPACK3_DOMAIN =     32
 !>      integer flag to use ISPACK Ver. 3.01 for domain
-      integer(kind = kint), parameter :: iflag_ISPACK3_COMPONENT = 33
+      integer(kind = kint), parameter :: iflag_ISPACK3_COMPONENT =  33
 !>      integer flag to use ISPACK Ver. 3.01 for domain
-      integer(kind = kint), parameter :: iflag_ISPACK3_SINGLE =    34
+      integer(kind = kint), parameter :: iflag_ISPACK3_SINGLE =     34
 !
 !>      integer flag to use test FFT
       integer(kind = kint), parameter :: iflag_FFT_TEST =    99

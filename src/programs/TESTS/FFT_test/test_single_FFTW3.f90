@@ -8,7 +8,7 @@
       use m_machine_parameter
       use m_FFT_size
 !
-      use t_FFTW_wrapper
+      use t_single_FFTW_wrapper
       use t_fft_test_data
       use calypso_single_FFTW3
 !

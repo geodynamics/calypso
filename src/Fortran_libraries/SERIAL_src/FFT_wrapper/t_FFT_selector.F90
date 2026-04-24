@@ -39,7 +39,7 @@
 !!   wrapper subroutine for FFT in ISPACK
 !!
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -95,7 +95,7 @@
       use m_FFT_selector
       use t_FFTPACK5_wrapper
 !
-      use t_FFTW_wrapper
+      use t_single_FFTW_wrapper
       use t_multi_FFTW_wrapper
 !
       implicit none
@@ -117,6 +117,8 @@
      &          Nsmp, Nstacksmp, Nfft, WKS, elapsed_init)
 !
       use calypso_multi_fftpack
+      use calypso_multi_FFTW3
+      use calypso_single_FFTW3
 !
       integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: iflag_FFT
@@ -152,6 +154,9 @@
 !
       subroutine finalize_FFT_sel_t(iflag_FFT, Nsmp, Nstacksmp, WKS)
 !
+      use calypso_multi_FFTW3
+      use calypso_single_FFTW3
+!
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       type(working_FFTs), intent(inout) :: WKS
@@ -185,6 +190,8 @@
      &         (iflag_FFT, Nsmp, Nstacksmp, Nfft, WKS)
 !
       use calypso_multi_fftpack
+      use calypso_multi_FFTW3
+      use calypso_single_FFTW3
 !
       integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) ::  Nfft
@@ -233,7 +240,7 @@
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
-        call FFTW_mul_forward_type(Nsmp, Nstacksmp, M, Nfft, X,         &
+        call calypso_multi_pout_fwd_FFTW3(Nsmp, Nstacksmp, M, Nfft, X,  &
      &      WKS%WK_MUL_FFTW, elapsed_fft, elapsed_cpy)
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
@@ -269,7 +276,7 @@
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW_ONCE) then
-        call FFTW_mul_backward_type(Nsmp, Nstacksmp, M, Nfft, X,        &
+        call calypso_multi_pout_bwd_FFTW3(Nsmp, Nstacksmp, M, Nfft, X,  &
      &      WKS%WK_MUL_FFTW, elapsed_fft, elapsed_cpy)
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then

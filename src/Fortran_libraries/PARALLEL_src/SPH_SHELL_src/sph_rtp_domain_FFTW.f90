@@ -26,7 +26,7 @@
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -137,7 +137,7 @@
 !
       call alloc_comm_table_sph_FFTW                                    &
      &   (comm_rtp%ntot_item_sr, FFTW_f%comm_sph_FFTW)
-      call set_comm_item_rtp_4_FFTW                                     &
+      call set_comm_item_pout_FFTW_smp                                  &
      &   (sph_rtp%nnod_rtp, comm_rtp%ntot_item_sr, comm_rtp%irev_sr,    &
      &    sph_rtp%istack_rtp_rt_smp, FFTW_f%Nfft_c, FFTW_f%aNfft,       &
      &    FFTW_f%comm_sph_FFTW)
@@ -192,7 +192,7 @@
 !
       do nd = 1, ncomp_fwd
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+4)
-          call copy_FFTPACK_from_rtp_comp                               &
+          call pout_FFT_from_rtp_comp                                   &
      &       (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,                       &
      &        sph_rtp%istack_rtp_rt_smp, X_rtp(1,nd), FFTW_f%X)
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+4)
@@ -261,8 +261,7 @@
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+2)
 !
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+3)
-        call copy_FFTPACK_to_rtp_comp                                   &
-     &     (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,                         &
+        call pout_FFT_to_rtp_comp(sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,   &
      &      sph_rtp%istack_rtp_rt_smp, FFTW_f%X, X_rtp(1,nd))
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+3)
       end do

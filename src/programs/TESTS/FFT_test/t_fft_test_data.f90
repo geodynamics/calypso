@@ -361,21 +361,21 @@
         do i = 1, ftst_2%ngrd
           diff = ftst_2%org(j,i) - ftst_1%org(j,i)
           if(abs(diff) .gt. TINY) then
-            write(*,*) 'Inconsistent result_back in ',                  &
+            write(*,*) 'Inconsistent input data in ',                   &
      &                j, '-th field at ', i
             compare_FFT_tests = 1
           end if
 !
           diff = ftst_2%s_k(j,i) - ftst_1%s_k(j,i)
           if(abs(diff) .gt. TINY) then
-            write(*,*) 'Inconsistent result_fw in ',                    &
+            write(*,*) 'Inconsistent result spectr in ',                &
      &                j, '-th field at ', i
             compare_FFT_tests = 1
           end if
 !
           diff = ftst_2%f_x(j,i) - ftst_1%f_x(j,i)
           if(abs(diff) .gt. TINY) then
-            write(*,*) 'Inconsistent input data in ',                   &
+            write(*,*) 'Inconsistent backward tranfer in ',             &
      &                j, '-th field at ', i
             compare_FFT_tests = 1
           end if

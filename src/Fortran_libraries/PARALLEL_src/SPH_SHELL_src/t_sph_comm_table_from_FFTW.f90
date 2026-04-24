@@ -11,15 +11,14 @@
 !!      subroutine dealloc_comm_table_sph_FFTW(comm_sph_FFTW)
 !!        type(comm_tbl_from_FFTW), intent(inout) :: comm_sph_FFTW
 !!
-!!      subroutine copy_all_prt_FFTW_to_send(nnod_rt, ncomp_fwd,        &
-!!     &          Nfft_c, C_fft, comm_sph_FFTW, n_WS, WS)
-!!      subroutine copy_all_rtp_FFTW_to_send_smp                        &
-!!     &         (irt_rtp_smp_stack, Nfft_c, ncomp_fwd, C_fft,          &
-!!     &          comm_sph_FFTW, n_WS, WS)
-!!
-!!      subroutine copy_all_rtp_FFTW_to_send                            &
+!!      subroutine pout_OMP_FFTW_all_field_to_send                      &
 !!     &         (nnod_rtp, irt_rtp_smp_stack, ncomp_fwd,               &
 !!     &          X_FFT, comm_sph_FFTW, n_WS, WS)
+!!      subroutine pout_FFTW_smp_all_field_to_send                      &
+!!     &         (irt_rtp_smp_stack, Nfft_c, ncomp_fwd, C_fft,          &
+!!     &          comm_sph_FFTW, n_WS, WS)
+!!      subroutine pin_FFTW_all_field_to_send(nnod_rt, ncomp_fwd,       &
+!!     &          Nfft_c, C_fft, comm_sph_FFTW, n_WS, WS)
 !!      subroutine copy_1comp_rtp_FFTW_to_send(nd, nnod_rt, Nfft_c,     &
 !!     &          ncomp_fwd, C_fft, comm_sph_FFTW, n_WS, WS)
 !!        type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
@@ -92,7 +91,39 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine copy_all_rtp_FFTW_to_send_smp                          &
+      subroutine pout_OMP_FFTW_all_field_to_send(nnod_rt, Nfft_c,       &
+     &          ncomp_fwd, C_fft, comm_sph_FFTW, n_WS, WS)
+!
+      integer(kind = kint), intent(in) :: nnod_rt, Nfft_c
+      integer(kind = kint), intent(in) :: ncomp_fwd
+!
+      complex(kind = fftw_complex), intent(in)                          &
+     &                             :: C_fft(ncomp_fwd,nnod_rt,Nfft_c)
+      type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
+!
+      integer(kind = kint), intent(in) :: n_WS
+      real (kind=kreal), intent(inout):: WS(n_WS)
+!
+      integer(kind = kint) :: kl, m, inum, ic_send
+!
+!
+!$omp parallel do private(inum,kl,m,ic_send)
+      do inum = 1, comm_sph_FFTW%ntot_item
+        kl = comm_sph_FFTW%kl_fftw(inum)
+        m =  comm_sph_FFTW%m_fftw(inum)
+!
+        ic_send = (inum-1) * ncomp_fwd
+        WS(ic_send+1:ic_send+ncomp_fwd)                                 &
+     &       = real(comm_sph_FFTW%cnrm_sr_rtp(inum)                     &
+     &              * C_fft(1:ncomp_fwd,kl,m))
+      end do
+!$end parallel do
+!
+      end subroutine pout_OMP_FFTW_all_field_to_send
+!
+! ------------------------------------------------------------------
+!
+      subroutine pout_FFTW_smp_all_field_to_send                        &
      &         (irt_rtp_smp_stack, Nfft_c, ncomp_fwd, C_fft,            &
      &          comm_sph_FFTW, n_WS, WS)
 !
@@ -126,12 +157,12 @@
       end do
 !$end parallel do
 !
-      end subroutine copy_all_rtp_FFTW_to_send_smp
+      end subroutine pout_FFTW_smp_all_field_to_send
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine copy_all_prt_FFTW_to_send(nnod_rt, ncomp_fwd,          &
+      subroutine pin_FFTW_all_field_to_send(nnod_rt, ncomp_fwd,         &
      &          Nfft_c, C_fft, comm_sph_FFTW, n_WS, WS)
 !
       integer(kind = kint), intent(in) :: nnod_rt, Nfft_c
@@ -160,39 +191,7 @@
       end do
 !$end parallel do
 !
-      end subroutine copy_all_prt_FFTW_to_send
-!
-! ------------------------------------------------------------------
-!
-      subroutine copy_all_rtp_FFTW_to_send(nnod_rt, Nfft_c,             &
-     &          ncomp_fwd, C_fft, comm_sph_FFTW, n_WS, WS)
-!
-      integer(kind = kint), intent(in) :: nnod_rt, Nfft_c
-      integer(kind = kint), intent(in) :: ncomp_fwd
-!
-      complex(kind = fftw_complex), intent(in)                          &
-     &                             :: C_fft(ncomp_fwd,nnod_rt,Nfft_c)
-      type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
-!
-      integer(kind = kint), intent(in) :: n_WS
-      real (kind=kreal), intent(inout):: WS(n_WS)
-!
-      integer(kind = kint) :: kl, m, inum, ic_send
-!
-!
-!$omp parallel do private(inum,kl,m,ic_send)
-      do inum = 1, comm_sph_FFTW%ntot_item
-        kl = comm_sph_FFTW%kl_fftw(inum)
-        m =  comm_sph_FFTW%m_fftw(inum)
-!
-        ic_send = (inum-1) * ncomp_fwd
-        WS(ic_send+1:ic_send+ncomp_fwd)                                 &
-     &       = real(comm_sph_FFTW%cnrm_sr_rtp(inum)                     &
-     &              * C_fft(1:ncomp_fwd,kl,m))
-      end do
-!$end parallel do
-!
-      end subroutine copy_all_rtp_FFTW_to_send
+      end subroutine pin_FFTW_all_field_to_send
 !
 ! ------------------------------------------------------------------
 !

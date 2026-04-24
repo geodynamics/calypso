@@ -1,5 +1,5 @@
-!>@file   FFTW3_wrapper.F90
-!!@brief  module FFTW3_wrapper
+!>@file   single_pout_FFTW3_smp.f90
+!!@brief  module single_pout_FFTW3_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in April, 2013
@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !! ------------------------------------------------------------------
-!!      subroutine init_4_FFTW_smp(Ncomp, Nfft,                         &
+!!      subroutine init_single_FFTW_smp(Ncomp, Nfft,                    &
 !!     &          plan_forward, plan_backward, X_FFTW, C_FFTW)
 !!        integer(kind = kint), intent(in) ::  Nfft, Nfft_c
 !!        integer(kind = kint), intent(in) ::  Nsmp
@@ -20,22 +20,27 @@
 !!
 !!   wrapper subroutine for initierize FFTW plans
 !! ------------------------------------------------------------------
-!!      subroutine destroy_FFTW_smp(Nsmp, plan_forward, plan_backward)
+!!      subroutine destroy_single_FFTW_smp                              &
+!!     &         (Nsmp, plan_forward, plan_backward)
+!!        integer(kind = kint), intent(in) ::  Nsmp
+!!        integer(kind = fftw_plan), intent(in) :: plan_forward(Nsmp)
+!!        integer(kind = fftw_plan), intent(in) :: plan_backward(Nsmp)
+!!
 !!        CAUTION!!  dfftw_destroy_plan oftern makes SEGMENTAION FAULT!!
 !!
 !!
 !!   wrapper subroutine for clear FFTW plans
 !! ------------------------------------------------------------------
 !!
-!!      subroutine FFTW_forward_SMP(plan_forward, Nsmp, Nstacksmp,      &
-!!     &          Ncomp, Nfft, aNfft, NFFT_c, X, X_FFTW, C_FFTW,        &
-!!     &          elapsed_fft, elapsed_cpy)
+!!      subroutine single_pout_fwd_FFTW3_smp(plan_forward,              &
+!!     &          Nsmp, Nstacksmp, Ncomp, Nfft, aNfft, NFFT_c,          &
+!!     &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -43,9 +48,17 @@
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine FFTW_backward_SMP(plan_backward, Nsmp, Nstacksmp,    &
-!!     &          Ncomp, Nfft, NFFT_c, X, X_FFTW, C_FFTW,               &
-!!     &          elapsed_fft, elapsed_cpy)
+!!      subroutine single_pout_bwd_FFTW3_smp(plan_backward,             &
+!!     &          Nsmp, Nstacksmp, Ncomp, Nfft, NFFT_c,                 &
+!!     &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
+!!        integer(kind = kint), intent(in) :: Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) :: Ncomp, Nfft, NFFT_c
+!!        integer(kind = fftw_plan), intent(in) :: plan_backward(Ncomp)
+!!        real(kind = kreal), intent(inout) :: X(Ncomp,Nfft)
+!!        real(kind = kreal), intent(inout) :: X_FFTW(Nfft,Nsmp)
+!!        complex(kind = fftw_complex), intent(inout)                   &
+!!     &                                  :: C_FFTW(NFFT_c,Nsmp)
+!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTW3
@@ -81,7 +94,7 @@
 !!@n @param X_FFTW      real data for multiple Fourier transform
 !!@n @param C_FFTW      spectrum data for multiple Fourier transform
 !
-      module FFTW3_wrapper
+      module single_pout_FFTW3_smp
 !
       use omp_lib
 !
@@ -97,7 +110,7 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_4_FFTW_smp(Nsmp, Nfft, NFFT_c,                    &
+      subroutine init_single_FFTW_smp(Nsmp, Nfft, NFFT_c,               &
      &          plan_forward, plan_backward, X_FFTW, C_FFTW)
 !
       integer(kind = kint), intent(in) ::  Nfft, Nfft_c
@@ -121,11 +134,12 @@
      &      C_FFTW(1,j), X_FFTW(1,j), FFTW_KEMO_EST)
       end do
 !
-      end subroutine init_4_FFTW_smp
+      end subroutine init_single_FFTW_smp
 !
 ! ------------------------------------------------------------------
 !
-      subroutine destroy_FFTW_smp(Nsmp, plan_forward, plan_backward)
+      subroutine destroy_single_FFTW_smp                                &
+     &         (Nsmp, plan_forward, plan_backward)
 !
       integer(kind = kint), intent(in) ::  Nsmp
 !
@@ -141,13 +155,13 @@
         call dfftw_cleanup
       end do
 !
-      end subroutine destroy_FFTW_smp
+      end subroutine destroy_single_FFTW_smp
 !
 ! ------------------------------------------------------------------
 !
-      subroutine FFTW_forward_SMP(plan_forward, Nsmp, Nstacksmp,        &
-     &          Ncomp, Nfft, aNfft, NFFT_c, X, X_FFTW, C_FFTW,          &
-     &          elapsed_fft, elapsed_cpy)
+      subroutine single_pout_fwd_FFTW3_smp(plan_forward,                &
+     &          Nsmp, Nstacksmp, Ncomp, Nfft, aNfft, NFFT_c,            &
+     &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
 !
       use normalize_for_FFTW
 !
@@ -195,13 +209,13 @@
       elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
       elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
-      end subroutine FFTW_forward_SMP
+      end subroutine single_pout_fwd_FFTW3_smp
 !
 ! ------------------------------------------------------------------
 !
-      subroutine FFTW_backward_SMP(plan_backward, Nsmp, Nstacksmp,      &
-     &          Ncomp, Nfft, NFFT_c, X, X_FFTW, C_FFTW,                 &
-     &          elapsed_fft, elapsed_cpy)
+      subroutine single_pout_bwd_FFTW3_smp(plan_backward,               &
+     &          Nsmp, Nstacksmp, Ncomp, Nfft, NFFT_c,                   &
+     &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
 !
       use normalize_for_FFTW
 !
@@ -250,8 +264,8 @@
       elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
       elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
-      end subroutine FFTW_backward_SMP
+      end subroutine single_pout_bwd_FFTW3_smp
 !
 ! ------------------------------------------------------------------
 !
-      end module FFTW3_wrapper
+      end module single_pout_FFTW3_smp

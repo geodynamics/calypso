@@ -9,25 +9,29 @@
 !!
 !!@verbatim
 !! ------------------------------------------------------------------
-!!      subroutine init_rtp_FFTW(sph_rtp, comm_rtp,                     &
-!!     &                         ncomp_bwd, ncomp_fwd, FFTW_f)
-!!      subroutine verify_rtp_FFTW(sph_rtp, comm_rtp,                   &
-!!     &                           ncomp_bwd, ncomp_fwd, FFTW_f)
+!!     Field data order:
+!!         Grid:   X(r,theta,phi,field)
+!!
+!! ------------------------------------------------------------------
+!!      subroutine init_rtp_FFTW_smp(sph_rtp, comm_rtp,                 &
+!!     &                             ncomp_bwd, ncomp_fwd, FFTW_f)
+!!      subroutine verify_rtp_FFTW_smp(sph_rtp, comm_rtp,               &
+!!     &                               ncomp_bwd, ncomp_fwd, FFTW_f)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in)  :: comm_rtp
 !!
 !!   wrapper subroutine for initierize FFT by FFTW
 !! ------------------------------------------------------------------
 !!
-!!      subroutine rtp_fwd_FFTW_to_send(sph_rtp, ncomp_fwd,             &
-!!     &                                n_WS, X_rtp, WS, FFTW_f)
+!!      subroutine rtp_fwd_FFTW_smp_to_send(sph_rtp, ncomp_fwd,         &
+!!     &                                    n_WS, X_rtp, WS, FFTW_f)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -35,7 +39,7 @@
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine rtp_back_FFTW_from_recv                              &
+!!      subroutine rtp_back_FFTW_smp_from_recv                          &
 !!     &         (sph_rtp, comm_rtp, ncomp_bwd, n_WR, WR, X_rtp, FFTW_f)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in)  :: comm_rtp
@@ -90,8 +94,8 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_rtp_FFTW(sph_rtp, comm_rtp,                       &
-     &                         ncomp_bwd, ncomp_fwd, FFTW_f)
+      subroutine init_rtp_FFTW_smp(sph_rtp, comm_rtp,                   &
+     &                             ncomp_bwd, ncomp_fwd, FFTW_f)
 !
       use set_comm_table_rtp_FFTW
 !
@@ -141,17 +145,17 @@
 !
       call alloc_comm_table_sph_FFTW                                    &
      &   (comm_rtp%ntot_item_sr, FFTW_f%comm_sph_FFTW)
-      call set_comm_item_rtp_4_FFTW                                     &
+      call set_comm_item_pout_FFTW_smp                                  &
      &   (sph_rtp%nnod_rtp, comm_rtp%ntot_item_sr, comm_rtp%irev_sr,    &
      &    sph_rtp%istack_rtp_rt_smp, FFTW_f%Nfft_c, FFTW_f%aNfft,       &
      &    FFTW_f%comm_sph_FFTW)
 !
-      end subroutine init_rtp_FFTW
+      end subroutine init_rtp_FFTW_smp
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_rtp_FFTW(sph_rtp, comm_rtp,                     &
-     &                           ncomp_bwd, ncomp_fwd, FFTW_f)
+      subroutine verify_rtp_FFTW_smp(sph_rtp, comm_rtp,                 &
+     &                               ncomp_bwd, ncomp_fwd, FFTW_f)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in)  :: comm_rtp
@@ -161,24 +165,24 @@
 !
 !
       if(allocated(FFTW_f%X) .eqv. .false.) then
-        call init_rtp_FFTW(sph_rtp, comm_rtp,                           &
-     &                     ncomp_bwd, ncomp_fwd, FFTW_f)
+        call init_rtp_FFTW_smp(sph_rtp, comm_rtp,                       &
+     &                         ncomp_bwd, ncomp_fwd, FFTW_f)
         return
       end if
 !
       if(size(FFTW_f%X) .ne. sph_rtp%nnod_rtp) then
         call finalize_sph_field_FFTW(FFTW_f)
-        call init_rtp_FFTW(sph_rtp, comm_rtp,                           &
-     &                     ncomp_bwd, ncomp_fwd, FFTW_f)
+        call init_rtp_FFTW_smp(sph_rtp, comm_rtp,                       &
+     &                         ncomp_bwd, ncomp_fwd, FFTW_f)
       end if
 !
-      end subroutine verify_rtp_FFTW
+      end subroutine verify_rtp_FFTW_smp
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine rtp_fwd_FFTW_to_send(sph_rtp, ncomp_fwd,               &
-     &                                n_WS, X_rtp, WS, FFTW_f)
+      subroutine rtp_fwd_FFTW_smp_to_send(sph_rtp, ncomp_fwd,           &
+     &                                    n_WS, X_rtp, WS, FFTW_f)
 !     &         (sph_rtp, comm_rtp, ncomp_fwd, n_WS, X_rtp, WS, FFTW_f)
 !
       use set_comm_table_rtp_FFTW
@@ -199,7 +203,7 @@
 !
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+4)
-      call copy_FFTPACK_from_rtp_field                                  &
+      call pout_FFT_from_rtp_field                                      &
      &   (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,                           &
      &    sph_rtp%istack_rtp_rt_smp, ncomp_fwd, X_rtp, FFTW_f%X)
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+1)
@@ -218,20 +222,20 @@
 !
 !   normalization
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+6)
-!      call copy_rtp_field_FFTW_to_send                                &
-!     &   (sph_rtp%nnod_rtp, comm_rtp%irev_sr,                         &
-!     &    sph_rtp%istack_rtp_rt_smp, ncomp_fwd,                       &
+!      call pout_FFTW_smp_fields_to_send                                &
+!     &   (sph_rtp%nnod_rtp, comm_rtp%irev_sr,                          &
+!     &    sph_rtp%istack_rtp_rt_smp, ncomp_fwd,                        &
 !     &    FFTW_f%Nfft_c, FFTW_f%aNfft, FFTW_f%C, n_WS, WS)
-      call copy_all_rtp_FFTW_to_send_smp                                &
+      call pout_FFTW_smp_all_field_to_send                              &
      &   (sph_rtp%istack_rtp_rt_smp, FFTW_f%Nfft_c, ncomp_fwd,          &
      &    FFTW_f%C, FFTW_f%comm_sph_FFTW, n_WS, WS)
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+6)
 !
-      end subroutine rtp_fwd_FFTW_to_send
+      end subroutine rtp_fwd_FFTW_smp_to_send
 !
 ! ------------------------------------------------------------------
 !
-      subroutine rtp_back_FFTW_from_recv                                &
+      subroutine rtp_back_FFTW_smp_from_recv                            &
      &         (sph_rtp, comm_rtp, ncomp_bwd, n_WR, WR, X_rtp, FFTW_f)
 !
       use set_comm_table_prt_FFTW
@@ -253,10 +257,10 @@
 !
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
-        call copy_FFTW_field_from_recv_smp                              &
-     &     (sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                        &
-     &      sph_rtp%istack_rtp_rt_smp, comm_rtp%irev_sr, ncomp_bwd,     &
-     &      n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C)
+      call pout_FFTW_smp_fields_from_recv                               &
+     &   (sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                          &
+     &    sph_rtp%istack_rtp_rt_smp, comm_rtp%irev_sr, ncomp_bwd,       &
+     &    n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C)
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+1)
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+2)
@@ -272,12 +276,12 @@
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+2)
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+3)
-      call copy_FFTPACK_to_rtp_field                                    &
+      call pout_FFT_to_rtp_field                                        &
      &  (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp, sph_rtp%istack_rtp_rt_smp, &
      &   ncomp_bwd, FFTW_f%X, X_rtp(1,1))
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+3)
 !
-      end subroutine rtp_back_FFTW_from_recv
+      end subroutine rtp_back_FFTW_smp_from_recv
 !
 ! ------------------------------------------------------------------
 !

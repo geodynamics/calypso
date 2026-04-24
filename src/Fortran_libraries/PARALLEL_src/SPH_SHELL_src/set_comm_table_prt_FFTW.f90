@@ -12,17 +12,17 @@
 !!     &         Nfft_c, aNfft, comm_sph_FFTW)
 !!        type(comm_tbl_from_FFTW), intent(inout) :: comm_sph_FFTW
 !!
-!!      subroutine copy_prt_field_FFTW_to_send                          &
+!!      subroutine pin_FFTW_fields_to_send                              &
 !!     &         (nnod_rtp, irev_sr_rtp, nnod_rt,                       &
 !!     &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !!      subroutine copy_prt_comp_FFTW_to_send                           &
 !!     &         (nd, nnod_rtp, irev_sr_rtp, nnod_rt,                   &
 !!     &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !!
-!!      subroutine copy_prt_FFTW_field_from_recv                        &
+!!      subroutine pin_FFTW_fields_from_recv                            &
 !!     &         (nnod_rtp, istep_rtp, nnod_rt, irev_sr_rtp,            &
 !!     &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
-!!      subroutine copy_FFTW_field_from_recv_smp                        &
+!!      subroutine pout_FFTW_smp_fields_from_recv                       &
 !!     &         (nnod_rtp, istep_rtp, irt_rtp_smp_stack, irev_sr_rtp,  &
 !!     &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
 !!
@@ -119,7 +119,7 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine copy_prt_field_FFTW_to_send                            &
+      subroutine pin_FFTW_fields_to_send                                &
      &         (nnod_rtp, irev_sr_rtp, nnod_rt,                         &
      &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !
@@ -167,7 +167,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine copy_prt_field_FFTW_to_send
+      end subroutine pin_FFTW_fields_to_send
 !
 ! ------------------------------------------------------------------
 !
@@ -221,7 +221,7 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine copy_prt_FFTW_field_from_recv                          &
+      subroutine pin_FFTW_fields_from_recv                              &
      &         (nnod_rtp, istep_rtp, nnod_rt, irev_sr_rtp,              &
      &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
 !
@@ -263,11 +263,11 @@
       end do
 !$omp end parallel do
 !
-      end subroutine copy_prt_FFTW_field_from_recv
+      end subroutine pin_FFTW_fields_from_recv
 !
 ! ------------------------------------------------------------------
 !
-      subroutine copy_FFTW_field_from_recv_smp                          &
+      subroutine pout_FFTW_smp_fields_from_recv                         &
      &         (nnod_rtp, istep_rtp, irt_rtp_smp_stack, irev_sr_rtp,    &
      &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
 !
@@ -318,7 +318,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine copy_FFTW_field_from_recv_smp
+      end subroutine pout_FFTW_smp_fields_from_recv
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------

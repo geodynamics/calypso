@@ -1,5 +1,5 @@
-!>@file   FFTW3_multi_wrapper.F90
-!!@brief  module FFTW3_multi_wrapper
+!>@file   multi_pout_FFTW3_smp.f90
+!!@brief  module multi_pout_FFTW3_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in April, 2013
@@ -31,7 +31,7 @@
 !!   wrapper subroutine for clear FFTW plans
 !! ------------------------------------------------------------------
 !!
-!!      subroutine FFTW_mul_forward_SMP(plan_forward_smp,               &
+!!      subroutine multi_pout_fwd_FFTW3_smp(plan_forward_smp,           &
 !!     &          Nsmp, Nstacksmp, Ncomp, Nfft, aNfft, Nfft_c,          &
 !!     &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
 !!        integer(kind = kint), intent(in) :: Nsmp, Nstacksmp(0:Nsmp)
@@ -48,7 +48,7 @@
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -56,7 +56,7 @@
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine FFTW_mul_backward_SMP(plan_backward_smp,             &
+!!      subroutine multi_pout_bwd_FFTW3_smp(plan_backward_smp,          &
 !!     &          Nsmp, Nstacksmp, Ncomp, Nfft, Nfft_c,                 &
 !!     &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
 !!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -102,7 +102,7 @@
 !!@n @param X_FFTW      real data for multiple Fourier transform
 !!@n @param C_FFTW      spectrum data for multiple Fourier transform
 !
-      module FFTW3_multi_wrapper
+      module multi_pout_FFTW3_smp
 !
       use omp_lib
 !
@@ -187,7 +187,7 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine FFTW_mul_forward_SMP(plan_forward_smp,                 &
+      subroutine multi_pout_fwd_FFTW3_smp(plan_forward_smp,             &
      &          Nsmp, Nstacksmp, Ncomp, Nfft, aNfft, Nfft_c,            &
      &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
 !
@@ -238,11 +238,11 @@
       elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
       elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
-      end subroutine FFTW_mul_forward_SMP
+      end subroutine multi_pout_fwd_FFTW3_smp
 !
 ! ------------------------------------------------------------------
 !
-      subroutine FFTW_mul_backward_SMP(plan_backward_smp,               &
+      subroutine multi_pout_bwd_FFTW3_smp(plan_backward_smp,            &
      &          Nsmp, Nstacksmp, Ncomp, Nfft, Nfft_c,                   &
      &          X, X_FFTW, C_FFTW, elapsed_fft, elapsed_cpy)
 !
@@ -291,8 +291,8 @@
       elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
       elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
-      end subroutine FFTW_mul_backward_SMP
+      end subroutine multi_pout_bwd_FFTW3_smp
 !
 ! ------------------------------------------------------------------
 !
-      end module FFTW3_multi_wrapper
+      end module multi_pout_FFTW3_smp

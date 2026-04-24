@@ -4,25 +4,29 @@
 !!@author H. Matsui
 !!@date Programmed in Oct., 2012
 !
-!>@brief  Fourier transform using FFTW Ver.3
+!>@brief  Work area for multiple FFTW Ver.3
 !!
 !!@verbatim
 !! ------------------------------------------------------------------
-!!      subroutine init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
-!!      subroutine finalize_FFTW_mul_type(Nsmp, WK)
-!!      subroutine verify_wk_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
-!!
-!!   wrapper subroutine for initierize FFT by FFTW
-!! ------------------------------------------------------------------
-!!
-!!      subroutine FFTW_mul_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft,  &
-!!     &          X, WK, elapsed_fft, elapsed_cpy)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-!!        integer(kind = kint), intent(in) :: Ncomp, Nfft
-!!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
-!!        real(kind = kreal), intent(inout) :: X(Ncomp, Nfft)
+!!      subroutine alloc_mul_FFTW_plan_t(Nplan, Ncomp, Nfft, WK)
+!!      subroutine dealloc_mul_FFTW_plan_t(WK)
+!!        integer(kind = kint), intent(in) :: Nplan, Ncomp, Nfft
 !!        type(working_mul_FFTW), intent(inout) :: WK
+!!
 !! ------------------------------------------------------------------
+!!
+!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
+!!
+!!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
+!!    K = Nfft/2....
+!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!
+!! ------------------------------------------------------------------
+!! ------------------------------------------------------------------
+!!
+!!   x_{k} = a_{0} + (-1)^{j} a_{Nfft/2} + sum_{k=1}^{Nfft/2-1}
+!!          (a_{k} \cos(2\pijk/Nfft) + b_{k} \sin(2\pijk/Nfft))
 !!
 !! ------------------------------------------------------------------
 !!
@@ -53,7 +57,7 @@
       use m_constants
       use m_fftw_parameters
 !
-      use FFTW3_multi_wrapper
+      use multi_pout_FFTW3_smp
 !
       implicit none
 !
@@ -76,68 +80,10 @@
         integer(kind = kint) :: iflag_fft_mul_len =  -1
       end type working_mul_FFTW
 !
-      private :: alloc_mul_FFTW_plan_t, dealloc_mul_FFTW_plan_t
-!
 ! ------------------------------------------------------------------
 !
       contains
 !
-! ------------------------------------------------------------------
-!
-      subroutine init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
-!
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) ::  Nfft
-!
-      type(working_mul_FFTW), intent(inout) :: WK
-!
-!
-      call alloc_mul_FFTW_plan_t(Nsmp, Nstacksmp(Nsmp), Nfft, WK)
-      call init_4_FFTW_mul_smp                                          &
-     &   (Nsmp, Nstacksmp, Nstacksmp(Nsmp), Nfft, WK%Nfft_c,            &
-     &    WK%plan_fowd_mul, WK%plan_back_mul,                           &
-     &    WK%X_FFTW_mul, WK%C_FFTW_mul)
-!
-      end subroutine init_FFTW_mul_type
-!
-! ------------------------------------------------------------------
-!
-      subroutine finalize_FFTW_mul_type(Nsmp, WK)
-!
-      integer(kind = kint), intent(in) ::  Nsmp
-!
-      type(working_mul_FFTW), intent(inout) :: WK
-!
-!
-      call destroy_FFTW_mul_smp                                         &
-     &   (Nsmp, WK%plan_fowd_mul, WK%plan_back_mul)
-      call dealloc_mul_FFTW_plan_t(WK)
-!
-      end subroutine finalize_FFTW_mul_type
-!
-! ------------------------------------------------------------------
-!
-      subroutine verify_wk_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
-!
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) :: Nfft
-!
-      type(working_mul_FFTW), intent(inout) :: WK
-!
-!
-      if(WK%iflag_fft_mul_len .lt. 0) then
-        call init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
-        return
-      end if
-!
-      if( WK%iflag_fft_mul_len .ne. Nfft*Nstacksmp(Nsmp)) then
-        call finalize_FFTW_mul_type(Nsmp, WK)
-        call init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
-      end if
-!
-      end subroutine verify_wk_FFTW_mul_type
-!
-! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
       subroutine alloc_mul_FFTW_plan_t(Nplan, Ncomp, Nfft, WK)
