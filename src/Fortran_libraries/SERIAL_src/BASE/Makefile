@@ -13,6 +13,8 @@ MOD_BASE = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'BASEDIR = $(BASEDIR)'  >> $(MAKENAME)
 
+lib_name:
+
 libtarget:
 
 lib_archve: libtarget
@@ -20,8 +22,10 @@ lib_archve: libtarget
 
 
 mod_list:
-	@echo  MOD_BASE=  \\ >> $(MAKENAME)
-	@echo  $(MOD_BASE) >> $(MAKENAME)
+	@echo  'MOD_CORE+= $$(MOD_BASE)' >> $(MAKENAME)
+	@echo  '#'  >> $(MAKENAME)
+	@echo  'MOD_BASE=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_BASE)' >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 

@@ -62,15 +62,6 @@ lib_archve:
 mod_list:
 	@echo  MOD_CORE= \\ >> $(MAKENAME)
 	@echo  \
-	'$$(MOD_F2003)'       \
-	'$$(MOD_BASE)'     \
-	'$$(MOD_IO)'       \
-	'$$(MOD_BINARY_IO)'  \
-	'$$(MOD_ZLIB_IO)'    \
-	'$$(MOD_MPI_IO)'     \
-	'$$(MOD_FIELDS)'     \
-	'$$(MOD_GAUSS)'    \
-	'$$(MOD_SPH)'      \
 	'$$(MOD_FFT_WRAP)' \
 	'$$(MOD_SPH_SPECTR)' \
 	>> $(MAKENAME)

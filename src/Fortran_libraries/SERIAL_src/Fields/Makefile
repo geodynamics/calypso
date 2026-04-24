@@ -13,6 +13,8 @@ MOD_FIELDS = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'FIELDIR = $(FIELDIR)'  >> $(MAKENAME)
 
+lib_name:
+
 libtarget:
 
 lib_archve: libtarget
@@ -20,8 +22,10 @@ lib_archve: libtarget
 
 
 mod_list:
-	@echo  MOD_FIELDS=  \\ >> $(MAKENAME)
-	@echo  $(MOD_FIELDS) >> $(MAKENAME)
+	@echo  'MOD_CORE+= $$(MOD_FIELDS)' >> $(MAKENAME)
+	@echo  '#'  >> $(MAKENAME)
+	@echo  'MOD_FIELDS= '  \\ >> $(MAKENAME)
+	@echo  '$(MOD_FIELDS)' >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

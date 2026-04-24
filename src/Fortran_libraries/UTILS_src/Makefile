@@ -67,7 +67,6 @@ mod_list:
 	@echo '' >> $(MAKENAME)
 	@echo MOD_KEMO_UTILS=  \\ >> $(MAKENAME)
 	@echo  \
-	'$$(MOD_MESH)'         \
 	'$$(MOD_MERGE)'        >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \

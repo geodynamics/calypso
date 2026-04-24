@@ -13,6 +13,8 @@ MOD_F2003 = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'F2003DIR = $(F2003DIR)'  >> $(MAKENAME)
 
+lib_name:
+
 libtarget:
 
 lib_archve: libtarget
@@ -20,8 +22,10 @@ lib_archve: libtarget
 
 
 mod_list:
-	@echo  MOD_F2003=  \\ >> $(MAKENAME)
-	@echo  $(MOD_F2003) >> $(MAKENAME)
+	@echo  'MOD_CORE+= $$(MOD_F2003)' >> $(MAKENAME)
+	@echo  '#'  >> $(MAKENAME)
+	@echo  'MOD_F2003=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_F2003)' >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

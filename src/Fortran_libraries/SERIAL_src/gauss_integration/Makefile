@@ -14,14 +14,18 @@ MOD_GAUSS = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'GAUSSDIR = $(GAUSSDIR)'  >> $(MAKENAME)
 
+lib_name:
+
 libtarget:
 
 lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_GAUSS)' >> $(MAKENAME)
 
 mod_list:
-	@echo  MOD_GAUSS=  \\ >> $(MAKENAME)
-	@echo  $(MOD_GAUSS) >> $(MAKENAME)
+	@echo  'MOD_CORE+= $$(MOD_GAUSS)' >> $(MAKENAME)
+	@echo  '#'  >> $(MAKENAME)
+	@echo  'MOD_GAUSS= '  \\ >> $(MAKENAME)
+	@echo  '$(MOD_GAUSS)' >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:
