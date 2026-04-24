@@ -21,8 +21,9 @@ lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_FFT_WRAP)' >> $(MAKENAME)
 
 mod_list:
-	@echo MOD_FFT_WRAP=  \\ >> $(MAKENAME)
-	@echo $(MOD_FFT_WRAP) >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$(MOD_FFT_WRAP)' >> $(MAKENAME)
+	@echo  'MOD_FFT_WRAP= '  \\ >> $(MAKENAME)
+	@echo  '$(MOD_FFT_WRAP)'    >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
 depends:

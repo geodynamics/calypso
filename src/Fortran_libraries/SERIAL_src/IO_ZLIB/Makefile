@@ -21,10 +21,9 @@ lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_ZLIB_IO)' >> $(MAKENAME)
 
 mod_list:
-	@echo  'MOD_CORE+= $$(MOD_ZLIB_IO)' >> $(MAKENAME)
-	@echo  '#'  >> $(MAKENAME)
-	@echo  'MOD_ZLIB_IO=  '  \\ >> $(MAKENAME)
-	@echo  '$(MOD_ZLIB_IO)'   >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$(MOD_ZLIB_IO)' >> $(MAKENAME)
+	@echo  'MOD_ZLIB_IO=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_ZLIB_IO)'    >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

@@ -21,8 +21,9 @@ lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_SPH_SPECTR)' >> $(MAKENAME)
 
 mod_list:
-	@echo  MOD_SPH_SPECTR=  \\ >> $(MAKENAME)
-	@echo  $(MOD_SPH_SPECTR) >> $(MAKENAME)
+	@echo  'MOD_CORE+= $$(MOD_SPH_SPECTR)' >> $(MAKENAME)
+	@echo  'MOD_SPH_SPECTR= '  \\ >> $(MAKENAME)
+	@echo  '$(MOD_SPH_SPECTR)'    >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

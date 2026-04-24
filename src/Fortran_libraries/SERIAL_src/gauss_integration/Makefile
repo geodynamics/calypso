@@ -22,10 +22,9 @@ lib_archve: libtarget
 	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_GAUSS)' >> $(MAKENAME)
 
 mod_list:
-	@echo  'MOD_CORE+= $$(MOD_GAUSS)' >> $(MAKENAME)
-	@echo  '#'  >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$(MOD_GAUSS)' >> $(MAKENAME)
 	@echo  'MOD_GAUSS= '  \\ >> $(MAKENAME)
-	@echo  '$(MOD_GAUSS)' >> $(MAKENAME)
+	@echo  '$(MOD_GAUSS)'    >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:
