@@ -7,6 +7,8 @@ MHD_SRCDIR = $$(F_SRCDIR)/MHD_src
 LIB_MHD=       -lcalypso_MHD
 LIB_MHD_FILE= libcalypso_MHD.a
 
+UPPER_MODULES= MOD_MHD
+
 SUBDIRS = \
 IO \
 initial_data \
@@ -53,12 +55,7 @@ lib_archve:
 	done
 
 mod_list:
-	@echo MOD_MHD= \\ >> $(MAKENAME)
-	@echo '$$(MOD_MHD_IO)'       \\  >> $(MAKENAME)
-	@echo '$$(MOD_SPH_MHD_FDM)'  \\  >> $(MAKENAME)
-	@echo '$$(MOD_SPH_MHD)'      \\  >> $(MAKENAME)
-	@echo '$$(MOD_SPH_SNAPSHOT)' \\  >> $(MAKENAME)
-	@echo '$$(MOD_INITIAL)'      \\  >> $(MAKENAME)
+	@echo '$(UPPER_MODULES)= '  >> $(MAKENAME)
 	@echo >> $(MAKENAME)
 	
 	@for dir in $(SUBDIRS); do \
@@ -66,6 +63,7 @@ mod_list:
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES='$(UPPER_MODULES)' \
 		mod_list; \
 		) \
 	done

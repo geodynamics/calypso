@@ -20,8 +20,9 @@ lib_archve: libtarget
 	>> $(MAKENAME)
 
 mod_list:
-	@echo MOD_SPH_MHD_FDM=  \\ >> $(MAKENAME)
-	@echo $(MOD_SPH_MHD_FDM) >> $(MAKENAME)
+	@echo '$(UPPER_MODULES)+= $$(MOD_SPH_MHD_FDM)' >> $(MAKENAME)
+	@echo 'MOD_SPH_MHD_FDM=  ' \\ >> $(MAKENAME)
+	@echo '$(MOD_SPH_MHD_FDM)'    >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 
 depends:
