@@ -14,6 +14,27 @@
 !!      subroutine write_elapsed_4_FFT(i_mode, etime_fft)
 !!      character(len = kchara) function chosen_fft_name(i_mode)
 !|
+!!   ------------------------------------------------------------------
+!!      FFT Package lists
+!!
+!|      FFTPACK:                 FFTPACK5.11d
+!!      ISPACK:                  ISPACK Ver.1
+!!      ISPACK3:                 ISPACK Ver.3
+!!      FFTW,     FFTW3:         FFTW3
+!!      OMP_FFTW, OMP_FFTW3:     FFTW3 with OopenMP parallelization
+!!      rocFFT, rocFFT_complex:  AMD rocFFT
+!!      rocFFT_real:             AMD rocFFT with real data only
+!!      OpenMP_rocFFT:           AMD rocFFT with OpenMP offloading
+!!   ------------------------------------------------------------------
+!!      FFT size flags
+!!
+!|      once:         Call FFT once for all data transform
+!|      domain:       Call FFT once for each spherical harmonic mode
+!|      component:    Call FFT once for each components
+!|      single:       Call FFT for each transform
+!|
+!!   ------------------------------------------------------------------
+!!
 !!       Current broken mode:
 !!     FFT_library_ctl    'FFTW_COMPONENT'
 !!     FFT_library_ctl    'FFTW_SINGLE'
@@ -58,7 +79,7 @@
 !
 !>      Character flag to use ISPACK
       character(len = kchara), parameter, private                       &
-     &                              :: hd_rocFFT = 'rocFFT'
+     &                              :: hd_rocFFT =     'rocFFT'
 !>      Character flag to use ISPACK
       character(len = kchara), parameter, private                       &
      &                              :: hd_rocFFT_c2r = 'rocFFT_complex'
@@ -68,6 +89,20 @@
 !>      Character flag to use ISPACK
       character(len = kchara), parameter, private                       &
      &                              :: hd_OMP_rocFFT = 'OpenMP_rocFFT'
+!
+!>      Character flag for at once transeform
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_at_once =       'once'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_once_for_comp = 'component'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_once_for_mode = 'domain'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter, private                       &
+     &                              :: hd_single_FFT =    'single'
+!
 !
 !>      Character flag to use single FFTPACK5
       character(len = kchara), parameter, private                       &
@@ -136,6 +171,33 @@
       integer(kind = kint), parameter :: iflag_SEARCH_FASTEST_FFT = -1
 !
 !>      integer flag to use FFTPACK5
+      integer(kind = kint), parameter :: iflag_FFTPACK =      50
+!>      integer flag to use FFTW3
+      integer(kind = kint), parameter :: iflag_FFTW =         10
+!>      integer flag to use FFTW3 with OopenMP
+      integer(kind = kint), parameter :: iflag_OMP_FFTW =     40
+!>      integer flag to use ISPACK Ver.0.93
+      integer(kind = kint), parameter :: iflag_ISPACK1 =      20
+!>      integer flag to use ISPACK Ver.3
+      integer(kind = kint), parameter :: iflag_ISPACK3 =      30
+!>      integer flag to use rocFFT
+      integer(kind = kint), parameter :: iflag_rocFFT =       60
+!>      integer flag to use rocFFT only with real value
+      integer(kind = kint), parameter :: iflag_real_rocFFT =  70
+!>      integer flag to use rocFFT with OopenMP
+      integer(kind = kint), parameter :: iflag_OMP_rocFFT =   80
+!
+!>      integer flag to use FFTPACK5
+      integer(kind = kint), parameter :: iflag_once_fft =       1
+!>      integer flag to use FFTPACK5
+      integer(kind = kint), parameter :: iflag_single_fft =     2
+!>      integer flag to use FFTPACK5
+      integer(kind = kint), parameter :: iflag_component_once = 3
+!>      integer flag to use FFTPACK5
+      integer(kind = kint), parameter :: iflag_domain_once =    4
+!
+!
+!>      integer flag to use FFTPACK5
       integer(kind = kint), parameter :: iflag_FFTPACK_ONCE =        1
 !>      integer flag to use FFTPACK5
       integer(kind = kint), parameter :: iflag_FFTPACK_SINGLE =      2
@@ -185,6 +247,9 @@
 ! ------------------------------------------------------------------
 !
       contains
+!
+! ------------------------------------------------------------------
+!
 !
 ! ------------------------------------------------------------------
 !

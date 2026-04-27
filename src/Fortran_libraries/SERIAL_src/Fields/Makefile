@@ -4,7 +4,10 @@
 
 FIELDIR = $$(CORE_SRCDIR)/Fields
 SOURCES = $(shell ls *.f90)
+
 MOD_FIELDS = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_FIELDS'
+UPPER_MODULES=
 
 #
 #  -------------------------------------------------------------------------
@@ -18,13 +21,13 @@ lib_name:
 libtarget:
 
 lib_archve: libtarget
-	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_FIELDS)' >> $(MAKENAME)
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 
 mod_list:
-	@echo  '$(UPPER_MODULES)+= $$(MOD_FIELDS)' >> $(MAKENAME)
-	@echo  'MOD_FIELDS= '  \\ >> $(MAKENAME)
-	@echo  '$(MOD_FIELDS)'    >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_FIELDS)'        >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

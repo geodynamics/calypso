@@ -4,7 +4,10 @@
 
 ZLIB_IO_DIR = $$(CORE_SRCDIR)/IO_ZLIB
 SOURCES = $(shell ls *.f90 *.F90)
+
 MOD_ZLIB_IO = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_ZLIB_IO'
+UPPER_MODULES=
 
 #
 #  -------------------------------------------------------------------------
@@ -18,12 +21,12 @@ lib_name:
 libtarget:
 
 lib_archve: libtarget
-	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_ZLIB_IO)' >> $(MAKENAME)
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 mod_list:
-	@echo  '$(UPPER_MODULES)+= $$(MOD_ZLIB_IO)' >> $(MAKENAME)
-	@echo  'MOD_ZLIB_IO=  ' \\ >> $(MAKENAME)
-	@echo  '$(MOD_ZLIB_IO)'    >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_ZLIB_IO)'       >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

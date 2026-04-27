@@ -7,6 +7,9 @@ PARA_SRCDIR =   $$(F_SRCDIR)/PARALLEL_src
 LIB_PARA =       -lcalypso_parallel
 LIB_PARA_FILE = libcalypso_parallel.a
 
+MODULE_LIST=   'MOD_PARALLEL'
+UPPER_MODULES=
+
 SUBDIRS = \
 COMM_src        \
 MPI_IO          \
@@ -41,7 +44,7 @@ lib_tasks: libtarget lib_archve
 
 libtarget:
 	@echo '' >> $(MAKENAME)
-	@echo  '$$(LIB_PARA_FILE):  $$(MOD_PARALLEL) ' >> $(MAKENAME)
+	@echo  '$$(LIB_PARA_FILE):  $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -54,16 +57,13 @@ lib_archve:
 	done
 
 mod_list:
-	@echo  MOD_PARALLEL= \\ >> $(MAKENAME)
-	@echo  \
-	'$$(MOD_COMM)'                          \
-	'$$(MOD_MPI_IO)    $$(MOD_MPI_ZLIB_IO)' \
-	'$$(MOD_COMM_SPH)  $$(MOD_SPH_GRID)'    >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)= ' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES=$(MODULE_LIST) \
 		mod_list; \
 		) \
 	done

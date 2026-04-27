@@ -6,6 +6,8 @@ GAUSSDIR = $$(CORE_SRCDIR)/gauss_integration
 
 SOURCES = $(shell ls *.f90)
 MOD_GAUSS = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_GAUSS'
+UPPER_MODULES=
 
 #
 #  -------------------------------------------------------------------------
@@ -19,12 +21,12 @@ lib_name:
 libtarget:
 
 lib_archve: libtarget
-	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_GAUSS)' >> $(MAKENAME)
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 mod_list:
-	@echo  '$(UPPER_MODULES)+= $$(MOD_GAUSS)' >> $(MAKENAME)
-	@echo  'MOD_GAUSS= '  \\ >> $(MAKENAME)
-	@echo  '$(MOD_GAUSS)'    >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_GAUSS)'         >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

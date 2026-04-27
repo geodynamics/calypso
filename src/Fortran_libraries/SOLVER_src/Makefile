@@ -7,6 +7,9 @@ SOLVER_SRCDIR = $$(F_SRCDIR)/SOLVER_src
 LIB_SOLVER =       -lcalypso_solver
 LIB_SOLVER_FILE = libcalypso_solver.a
 
+MODULE_LIST=   'MOD_SOLVERS'
+UPPER_MODULES=
+
 SUBDIRS = \
 direct_solver
 
@@ -39,7 +42,7 @@ lib_tasks: libtarget lib_archve
 
 libtarget:
 	@echo '' >> $(MAKENAME)
-	@echo  '$$(LIB_SOLVER_FILE): $$(MOD_SOLVERS)' >> $(MAKENAME)
+	@echo  '$$(LIB_SOLVER_FILE): $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -53,16 +56,13 @@ lib_archve:
 
 
 mod_list:
-	@echo  MOD_SOLVERS=  \\ >> $(MAKENAME)
-	@echo  \
-	'$$(MOD_SR)         $$(MOD_DJDS_SOLVER)'  \
-	'$$(MOD_CRS_SOLVER) $$(MOD_CRS_SOLVER_S) ' \
-	'$$(MOD_SOLVER_LU)' >> $(MAKENAME)
+	@echo '$(MODULE_LIST)= ' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES='$(MODULE_LIST)' \
 		mod_list; \
 		) \
 	done

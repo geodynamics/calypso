@@ -4,7 +4,10 @@
 
 FFT_WRAP_DIR = $$(CORE_SRCDIR)/FFT_wrapper
 SOURCES = $(shell ls *.f90 *.F90)
+
 MOD_FFT_WRAP = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_FFT_WRAP'
+UPPER_MODULES=
 
 #
 #  -------------------------------------------------------------------------
@@ -18,12 +21,12 @@ lib_name:
 libtarget:
 
 lib_archve: libtarget
-	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_FFT_WRAP)' >> $(MAKENAME)
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 mod_list:
-	@echo  '$(UPPER_MODULES)+= $$(MOD_FFT_WRAP)' >> $(MAKENAME)
-	@echo  'MOD_FFT_WRAP= '  \\ >> $(MAKENAME)
-	@echo  '$(MOD_FFT_WRAP)'    >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_FFT_WRAP)'      >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
 depends:
