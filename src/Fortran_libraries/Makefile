@@ -7,6 +7,9 @@ F_SRCDIR =  $$(MHDDIR)/Fortran_libraries
 LIB_CALYPSO =       -lcalypso
 LIB_CALYPSO_FILE = libcalypso.a
 
+MODULE_LIST=   'MOD_CALYPSO_F'
+UPPER_MODULES=
+
 SUBDIRS =    \
 \
 SERIAL_src     \
@@ -65,8 +68,7 @@ lib_tasks: libtarget lib_archve
 	done
 
 libtarget:
-	@echo '' >> $(MAKENAME)
-	@echo  '$$(LIB_CALYPSO_FILE): $$(MOD_KEMO_F)'>> $(MAKENAME)
+	@echo  '$$(LIB_CALYPSO_FILE): $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -79,17 +81,14 @@ lib_archve:
 	done
 
 mod_list:
-	@echo  MOD_KEMO_F= \\ >> $(MAKENAME)
-	@echo  \
-	'$$(MOD_CORE)     $$(MOD_MHD)'        \
-	'$$(MOD_PARALLEL) $$(MOD_SOLVERS)'    \
-	'$$(MOD_VIZ)      $$(MOD_KEMO_UTILS)' >> $(MAKENAME)
-	@echo   >> $(MAKENAME)
+	@echo  $(MODULE_LIST)= >> $(MAKENAME)
+	@echo  '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES='$(MODULE_LIST)' \
 		mod_list; \
 		) \
 	done
