@@ -5,7 +5,10 @@
 LIB_VIZ =       -lkemo_viz
 LIB_VIZ_FILE = libkemo_viz.a
 
-SUBDIRS = \
+MODULE_LIST=   'MOD_VIZ'
+UPPER_MODULES=
+
+SUBDIRS= \
 surfacing
 
 #
@@ -38,7 +41,7 @@ lib_tasks: libtarget lib_archve
 
 libtarget:
 	@echo '' >> $(MAKENAME)
-	@echo  '$$(LIB_VIZ_FILE): $$(MOD_VIZ)' >> $(MAKENAME)
+	@echo  '$$(LIB_VIZ_FILE): $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -51,7 +54,7 @@ lib_archve:
 	done;
 
 mod_list:
-	@echo MOD_VIZ= \\ >> $(MAKENAME)
+	@echo $(MODULE_LIST)= >> $(MAKENAME)
 	@echo '$$(MOD_SURFACING)' \\ >> $(MAKENAME)
 	@echo >> $(MAKENAME)
 	
@@ -60,6 +63,7 @@ mod_list:
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES='$(MODULE_LIST)' \
 		mod_list \
 		) \
 	done
