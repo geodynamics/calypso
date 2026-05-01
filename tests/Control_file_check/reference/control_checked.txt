@@ -222,6 +222,7 @@ begin  MHD_control
       coef_imp_v_ctl                     6.000000000000000E-001
       coef_imp_t_ctl                     6.000000000000000E-001
       coef_imp_b_ctl                     6.000000000000000E-001
+      coef_imp_c_ctl                     6.000000000000000E-001
     end  time_loop_ctl
   end  control
   begin  sph_monitor_ctl
