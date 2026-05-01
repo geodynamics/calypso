@@ -152,8 +152,8 @@
       do ismp = 1, Nsmp
         call dfftw_destroy_plan(plan_forward(ismp))
         call dfftw_destroy_plan(plan_backward(ismp))
-        call dfftw_cleanup
       end do
+      call dfftw_cleanup
 !
       end subroutine destroy_single_FFTW_smp
 !

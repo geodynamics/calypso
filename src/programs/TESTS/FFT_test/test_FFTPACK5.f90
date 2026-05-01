@@ -7,11 +7,14 @@
       use m_constants
       use m_machine_parameter
       use m_FFT_size
+      use m_FFT_selector
 !
       use t_fft_test_data
       use t_FFTPACK5_wrapper
 !
       use calypso_multi_fftpack
+!
+      use m_FFT_labels
 !
       implicit none
 !
@@ -21,6 +24,11 @@
       type(working_FFTPACK) :: WK_FFTPACK_T
       type(fft_test_data) :: ft1
       integer(kind = kint) :: iloop = 0
+!
+      character(len = kchara) :: title
+!
+      call init_FFT_mode_flags()
+      call check_FFT_mode_flags(6)
 !
 !
       write(*,'(a)') '-----  Test FFTPACK  -----'

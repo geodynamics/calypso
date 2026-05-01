@@ -180,8 +180,8 @@
       do j = 1, Nsmp
         call dfftw_destroy_plan(plan_forward(j))
         call dfftw_destroy_plan(plan_backward(j))
-        call dfftw_cleanup
       end do
+      call dfftw_cleanup
 !
       end subroutine destroy_FFTW_mul_smp
 !

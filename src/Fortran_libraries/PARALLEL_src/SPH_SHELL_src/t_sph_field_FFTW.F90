@@ -92,10 +92,10 @@
       do ip = 1, np_smp
         call dfftw_destroy_plan(FFTW_f%plan_fwd(ip))
         call dfftw_destroy_plan(FFTW_f%plan_bwd(ip))
-        call dfftw_cleanup
       end do
 !
       call dealloc_fld_FFTW_plan(FFTW_f)
+      call dfftw_cleanup
 !
       end subroutine finalize_sph_field_FFTW
 !

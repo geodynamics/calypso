@@ -167,10 +167,10 @@
       do j = 1, np_smp
         call dfftw_destroy_plan(FFTW_c%plan_fwd(j))
         call dfftw_destroy_plan(FFTW_c%plan_bwd(j))
-        call dfftw_cleanup
       end do
 !
       call dealloc_comp_FFTW_plan(FFTW_c)
+      call dfftw_cleanup
       deallocate(FFTW_c%t_omp)
 !
       end subroutine finalize_sph_component_FFTW
