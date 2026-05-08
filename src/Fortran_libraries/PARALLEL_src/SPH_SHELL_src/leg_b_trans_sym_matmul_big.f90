@@ -9,7 +9,7 @@
 !!       (Blocked loop version)
 !!
 !!@verbatim
-!!      subroutine leg_bwd_trans_sym_matmul_big(ncomp, nvector,         &
+!!      subroutine leg_backward_trans_matmul_big(ncomp, nvector,        &
 !!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,       &
 !!     &          asin_theta_1d_rtm, g_sph_rlm,                         &
 !!     &          n_WR, n_WS, WR, WS, WK_l_bsm)
@@ -40,6 +40,7 @@
       use t_spheric_rtm_data
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
+      use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
       use t_leg_trans_sym_matmul_big
       use m_elapsed_labels_SPH_TRNS
@@ -56,10 +57,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine leg_bwd_trans_sym_matmul_big                           &
+      subroutine leg_backward_trans_matmul_big                          &
      &         (iflag_matmul, ncomp, nvector, nscalar,                  &
-     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,         &
-     &          asin_theta_1d_rtm, g_sph_rlm,                           &
+     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_l_bsm)
 !
       use set_sp_rlm_leg_matmul_big
@@ -69,11 +69,8 @@
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
+      type(legendre_4_sph_trans), intent(in) :: leg
       type(index_4_sph_trans), intent(in) :: idx_trns
-      real(kind = kreal), intent(in)                                    &
-     &           :: asin_theta_1d_rtm(sph_rtm%nidx_rtm(2))
-      real(kind = kreal), intent(in)                                    &
-     &           :: g_sph_rlm(sph_rlm%nidx_rlm(2),17)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR, n_WS
@@ -89,8 +86,9 @@
       integer(kind = kint) :: n_jk_e(np_smp), n_jk_o(np_smp)
 !
 !
+      if(ncomp .le. 0) return
 !$omp parallel workshare
-        WK_l_bsm%time_omp(1:np_smp,1:3) = 0.0d0
+      WK_l_bsm%time_omp(1:np_smp,1:3) = 0.0d0
 !$omp end parallel workshare
 !
 !$omp parallel workshare
@@ -116,12 +114,12 @@
 !
           WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
           call set_sp_rlm_vec_sym_matmul_big                            &
-     &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,    &
-     &        sph_rlm%idx_gl_1d_rlm_j, sph_rlm%ar_1d_rlm, g_sph_rlm,    &
-     &        kst(ip), nkr(ip), jst(ip), n_jk_e(ip), n_jk_o(ip),        &
-     &        ncomp, nvector, comm_rlm%irev_sr, n_WR, WR,               &
-     &        WK_l_bsm%pol_e(1,ip), WK_l_bsm%tor_e(1,ip),               &
-     &        WK_l_bsm%pol_o(1,ip), WK_l_bsm%tor_o(1,ip) )
+     &      (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,     &
+     &       sph_rlm%idx_gl_1d_rlm_j, sph_rlm%ar_1d_rlm, leg%g_sph_rlm, &
+     &       kst(ip), nkr(ip), jst(ip), n_jk_e(ip), n_jk_o(ip),         &
+     &       ncomp, nvector, comm_rlm%irev_sr, n_WR, WR,                &
+     &       WK_l_bsm%pol_e(1,ip), WK_l_bsm%tor_e(1,ip),                &
+     &       WK_l_bsm%pol_o(1,ip), WK_l_bsm%tor_o(1,ip) )
           call set_sp_rlm_scl_sym_matmul_big                            &
      &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,    &
      &        kst(ip), nkr(ip), jst(ip), n_jk_e(ip), n_jk_o(ip),        &
@@ -155,7 +153,7 @@
           WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
           call cal_vr_rtm_vec_sym_matmul_big                            &
      &       (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm, sph_rtm%istep_rtm,    &
-     &        sph_rlm%nidx_rlm, asin_theta_1d_rtm, kst(ip), nkr(ip),    &
+     &        sph_rlm%nidx_rlm, leg%asin_t_rtm, kst(ip), nkr(ip),       &
      &        mp_rlm, idx_trns%mn_rlm(mp_rlm), nl_rtm,                  &
      &        WK_l_bsm%symp_r(1,ip), WK_l_bsm%asmp_p(1,ip),             &
      &        WK_l_bsm%asmp_r(1,ip), WK_l_bsm%symp_p(1,ip),             &
@@ -188,7 +186,7 @@
      &           + WK_l_bsm%time_omp(1,3) / dble(np_smp)
       end if
 !
-      end subroutine leg_bwd_trans_sym_matmul_big
+      end subroutine leg_backward_trans_matmul_big
 !
 ! -----------------------------------------------------------------------
 !

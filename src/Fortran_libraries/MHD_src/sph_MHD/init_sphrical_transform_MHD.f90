@@ -11,11 +11,6 @@
 !!     &         (SPH_model, iphys, trans_p, WK, SPH_MHD, SR_sig, SR_r)
 !!      subroutine init_leg_fourier_trans_MHD(sph, comms_sph,           &
 !!     &          ncomp_max_trans, trans_p, WK, SR_sig, SR_r)
-!!      subroutine sel_sph_transform_MHD                                &
-!!     &         (MHD_prop, sph_MHD_bc, sph, comms_sph, omega_sph,      &
-!!     &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,&
-!!     &          trns_MHD, WK_leg, WK_FFTs_MHD, trans_p, gt_cor,       &
-!!     &          cor_rlm, rj_fld, SR_sig, SR_r)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
@@ -69,6 +64,7 @@
       use set_address_sph_trans_MHD
       use set_address_sph_trans_snap
       use check_sph_mhd_openmp_size
+      use init_legendre_transform_MHD
 !
       type(phys_address), intent(in) :: iphys
       type(SPH_MHD_model_data), intent(in) :: SPH_model
@@ -113,7 +109,7 @@
       call init_work_4_coriolis                                         &
      &   (SPH_model%sph_MHD_bc, SPH_MHD%sph, trans_p, WK)
 !
-      call sel_sph_transform_MHD                                        &
+      call init_leg_trans_sph_MHD                                       &
      &   (SPH_model%MHD_prop, SPH_model%sph_MHD_bc,                     &
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_model%omega_sph,              &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &
@@ -163,62 +159,6 @@
       if(my_rank .eq. 0)  call write_import_table_mode(trans_p)
 !
       end subroutine init_leg_fourier_trans_MHD
-!
-!-----------------------------------------------------------------------
-!
-      subroutine sel_sph_transform_MHD                                  &
-     &         (MHD_prop, sph_MHD_bc, sph, comms_sph, omega_sph,        &
-     &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,  &
-     &          trns_MHD, WK_leg, WK_FFTs_MHD, trans_p, gt_cor,         &
-     &          cor_rlm, rj_fld, SR_sig, SR_r)
-!
-      use m_legendre_transform_list
-      use test_legendre_transforms
-      use skip_comment_f
-!
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!
-      type(sph_grids), intent(in) :: sph
-      type(sph_comm_tables), intent(in) :: comms_sph
-      type(sph_rotation), intent(in) :: omega_sph
-!
-      integer(kind = kint), intent(in) :: ncomp_max_trans
-      integer(kind = kint), intent(in) :: nvector_max_trans
-      integer(kind = kint), intent(in) :: nscalar_max_trans
-!
-      type(parameters_4_sph_trans), intent(inout) :: trans_p
-      type(address_4_sph_trans), intent(inout) :: trns_MHD
-      type(gaunt_coriolis_rlm), intent(inout) :: gt_cor
-      type(coriolis_rlm_data), intent(inout) :: cor_rlm
-      type(legendre_trns_works), intent(inout) :: WK_leg
-      type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
-      type(phys_data), intent(inout) :: rj_fld
-      type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_real_buffer), intent(inout) :: SR_r
-!
-      character(len=kchara) :: tmpchara
-!
-!
-      if (iflag_debug.eq.1) write(*,*) 's_test_legendre_transforms'
-      call s_test_legendre_transforms(sph, comms_sph, MHD_prop%fl_prop, &
-     &    sph_MHD_bc%sph_bc_U, omega_sph, trans_p, gt_cor,              &
-     &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &
-     &    rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD, cor_rlm, SR_sig, SR_r)
-!
-      call sel_init_legendre_trans                                      &
-     &   (ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &
-     &    sph%sph_params, sph%sph_rtm, sph%sph_rlm,                     &
-     &    trans_p%leg, trans_p%idx_trns, WK_leg)
-!
-      if(my_rank .ne. 0) return
-      tmpchara = chosen_legendre_name(WK_leg%id_legendre)
-      call change_2_upper_case(tmpchara)
-      write(*,'(a,i4)', advance='no')                                   &
-     &       'Selected Legendre transform type: ', WK_leg%id_legendre
-      write(*,'(a,a,a)') ' (', trim(tmpchara), ') '
-!
-      end subroutine sel_sph_transform_MHD
 !
 !-----------------------------------------------------------------------
 !
