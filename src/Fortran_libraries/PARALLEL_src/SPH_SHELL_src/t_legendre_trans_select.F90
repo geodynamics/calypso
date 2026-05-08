@@ -1,4 +1,4 @@
-!>@file   t_legendre_trans_select.f90
+!>@file   t_legendre_trans_select.F90
 !!@brief  module t_legendre_trans_select
 !!
 !!@author H. Matsui
@@ -62,7 +62,6 @@
       use legendre_transform_org
       use legendre_transform_spin
       use legendre_trans_sym_matmul
-      use legendre_trans_matmul_big
       use legendre_transform_sym_tomp
       use legendre_transform_testloop
 !
@@ -186,6 +185,7 @@
      &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_leg)
 !
+      use leg_b_trans_sym_matmul_big
       use leg_bwd_trans_on_the_fly
 !
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -200,6 +200,8 @@
       real (kind=kreal), intent(inout):: WS(n_WS)
       type(legendre_trns_works), intent(inout) :: WK_leg
 !
+      integer(kind = kint) :: iflag_matmul
+!
 !
       if(ncomp .le. 0) return
       if(WK_leg%id_legendre .eq. iflag_leg_test_loop) then
@@ -210,60 +212,45 @@
         call leg_backward_trans_sym_spin(ncomp, nvector, nscalar,       &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul) then
+!
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul              &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call leg_backward_trans_sym_matmul                              &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm) then
-        call leg_backward_trans_sym_matmul                              &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul_big) then
+!
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul_big          &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_big) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call leg_backward_trans_matmul_big                              &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_bsm)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_big) then
-        call leg_backward_trans_matmul_big                              &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_bsm)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_jt) then
+!
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_jt              &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_jt) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call leg_backward_trans_smat_jt                                 &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_jt) then
-        call leg_backward_trans_smat_jt                                 &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_tj) then
-        call leg_backward_trans_smat_tj                                 &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_tj) then
-        call leg_backward_trans_smat_tj                                 &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
 !
-      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod) then
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_tj              &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_tj) then
+        iflag_matmul = WK_leg%id_legendre / 10
+        call leg_backward_trans_smat_tj                                 &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
+     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
+     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
+!
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod          &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_matmul           &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call legendre_b_trans_on_the_fly                                &
      &     (iflag_MATPROD, ncomp, nvector, nscalar,                     &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
-      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matmul) then
-        call legendre_b_trans_on_the_fly                                &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
-      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
-        call legendre_b_trans_on_the_fly                                &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
 !
@@ -281,6 +268,7 @@
      &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_leg)
 !
+      use leg_f_trans_sym_matmul_big
       use leg_fwd_trans_on_the_fly
 !
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -295,6 +283,8 @@
       real (kind=kreal), intent(inout):: WS(n_WS)
       type(legendre_trns_works), intent(inout) :: WK_leg
 !
+      integer(kind = kint) :: iflag_matmul
+!
 !
       if(ncomp .le. 0) return
       if(WK_leg%id_legendre .eq. iflag_leg_test_loop) then
@@ -306,63 +296,44 @@
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
 !
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul) then
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul              &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call leg_forward_trans_sym_matmul                               &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm) then
-        call leg_forward_trans_sym_matmul                               &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
 !
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul_big) then
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul_big          &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_big) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call leg_forward_trans_matmul_big                               &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_bsm)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_big) then
-        call leg_forward_trans_matmul_big                               &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_bsm)
 !
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_jt) then
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_jt              &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_jt) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call leg_forward_trans_smat_jt                                  &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_jt) then
-        call leg_forward_trans_smat_jt                                  &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
 !
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_tj) then
+      else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_tj              &
+     &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_tj) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call leg_forward_trans_smat_tj                                  &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
-      else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_tj) then
-        call leg_forward_trans_smat_tj                                  &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
 !
-      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod) then
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod          &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_matmul           &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
+        iflag_matmul = WK_leg%id_legendre / 10
         call legendre_f_trans_on_the_fly                                &
-     &     (iflag_MATPROD, ncomp, nvector, nscalar,                     &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
-      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matmul) then
-        call legendre_f_trans_on_the_fly                                &
-     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
-     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
-      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
-        call legendre_f_trans_on_the_fly                                &
-     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
 !
