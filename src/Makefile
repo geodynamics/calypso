@@ -45,11 +45,6 @@ C_INCLUDE = -I. -I$(MAKEDIR)
 
 CPP_FLAGS =
 
-ifdef PNG_LIBS
-  CPP_FLAGS += -DPNG_OUTPUT
-  C_INCLUDE+= $$(PNG_CFLAGS) 
-  F90LIBS+= $$(PNG_LIBS)
-endif
 ifdef ZLIB_LIBS
   CPP_FLAGS += -DZLIB_IO
   C_INCLUDE+= $$(ZLIB_CFLAGS) 
@@ -131,16 +126,16 @@ makemake:
 	
 	echo "# create module list"
 	$(GMAKE) \
-	GMAKE='$(GMAKE)' \
-	MHDDIR='$(MHDDIR)' \
-	MAKEDIR='$(MAKEDIR)' \
-	MAKENAME='$(MAKENAME)' \
-	CC="$(CC)"   \
-	MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
-	DEPFLAGS='$(DEPFLAGS)' \
-	OPTFLAGS='$(OPTFLAGS)' \
-	C_INCLUDE='$(C_INCLUDE)' \
-	depends
+		GMAKE='$(GMAKE)' \
+		MHDDIR='$(MHDDIR)' \
+		MAKEDIR='$(MAKEDIR)' \
+		MAKENAME='$(MAKENAME)' \
+		CC="$(CC)"   \
+		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
+		DEPFLAGS='$(DEPFLAGS)' \
+		OPTFLAGS='$(OPTFLAGS)' \
+		C_INCLUDE='$(C_INCLUDE)' \
+		depends
 	
 	echo '#' > $(TESTS_MAKEHEAD)
 	echo '# Makefile header for Calypso Dynamo tests' >> $(TESTS_MAKEHEAD)
@@ -294,11 +289,6 @@ makeheaders:
 	@echo 'ZLIB_CFLAGS = $(ZLIB_CFLAGS)' >> $(MAKENAME)
 	@echo 'ZLIB_LIBS =   $(ZLIB_LIBS)'   >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
-	@echo '# libpng settings' >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
-	@echo 'PNG_CFLAGS = $(PNG_CFLAGS)'   >> $(MAKENAME)
-	@echo 'PNG_LIBS =    $(PNG_LIBS)'    >> $(MAKENAME)
-	@echo '#' >> $(MAKENAME)
 	@echo '# BLAS settings' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo 'BLAS_LIBS =   $(BLAS_LIBS)'   >> $(MAKENAME)
@@ -372,7 +362,7 @@ makeinstall:
 	@echo '	mkdir -p $$(INSTDIR)/bin'          >> $(MAKENAME)
 	@echo '	mkdir -p $$(INSTDIR)/include'      >> $(MAKENAME)
 	@echo '	cp $(BUILDDIR)/*  $$(INSTDIR)/bin' >> $(MAKENAME)
-	@echo ''       >> $(MAKENAME)
+	
 
 makeclean:
 	@echo '#' >> $(MAKENAME)

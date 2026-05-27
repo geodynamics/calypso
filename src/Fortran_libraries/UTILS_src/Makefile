@@ -12,7 +12,6 @@ UPPER_MODULES=
 
 SUBDIRS = \
 MESH      \
-jacobian  \
 MERGE
 
 

@@ -14,7 +14,6 @@ SUBDIRS = \
 COMM_src        \
 MPI_IO          \
 MPI_ZLIB_IO     \
-INTERPOLATE     \
 SPH_SHELL_src   \
 CONST_SPH_GRID
 

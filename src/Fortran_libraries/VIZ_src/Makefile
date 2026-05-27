@@ -9,10 +9,7 @@ MODULE_LIST=   'MOD_VIZ'
 UPPER_MODULES=
 
 SUBDIRS= \
-surfacing \
-fieldline \
-map_rendering \
-volume_rendering
+surfacing
 
 #
 #  -------------------------------------------------------------------------
@@ -60,8 +57,6 @@ mod_list:
 	@echo '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
 	@echo '$(MODULE_LIST)='   >> $(MAKENAME)
 	@echo '$$(MOD_SURFACING)' \\ >> $(MAKENAME)
-	@echo '$$(MOD_FIELDLINE)'  \\ >> $(MAKENAME)
-	@echo '$$(MOD_PVR)'        \\ >> $(MAKENAME)
 	@echo >> $(MAKENAME)
 	
 	@for dir in $(SUBDIRS); do \
