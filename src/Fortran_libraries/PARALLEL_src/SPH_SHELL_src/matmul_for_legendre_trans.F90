@@ -78,9 +78,9 @@
 !
       implicit none
 !
-      integer(kind = kint), parameter :: iflag_INTRINSIC = 1
-      integer(kind = kint), parameter :: iflag_DGEMM =     2
-      integer(kind = kint), parameter :: iflag_MATPROD =   3
+      integer(kind = kint), parameter :: iflag_INTRINSIC =   1
+      integer(kind = kint), parameter :: iflag_DGEMM =       2
+      integer(kind = kint), parameter :: iflag_MATPROD =     3
 !
       private :: add_matmat_leg_trans
 !

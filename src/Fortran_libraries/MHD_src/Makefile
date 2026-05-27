@@ -7,6 +7,10 @@ MHD_SRCDIR = $$(F_SRCDIR)/MHD_src
 LIB_MHD=       -lcalypso_MHD
 LIB_MHD_FILE= libcalypso_MHD.a
 
+MODULE_LIST=   'MOD_MHD'
+UPPER_MODULES=
+
+
 SUBDIRS = \
 IO \
 initial_data \
@@ -40,7 +44,7 @@ lib_tasks: libtarget lib_archve
 
 libtarget:
 	@echo '' >> $(MAKENAME)
-	@echo '$$(LIB_MHD_FILE): $$(MOD_MHD)' >> $(MAKENAME)
+	@echo '$$(LIB_MHD_FILE): $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -53,19 +57,15 @@ lib_archve:
 	done
 
 mod_list:
-	@echo MOD_MHD= \\ >> $(MAKENAME)
-	@echo '$$(MOD_MHD_IO)'       \\  >> $(MAKENAME)
-	@echo '$$(MOD_SPH_MHD_FDM)'  \\  >> $(MAKENAME)
-	@echo '$$(MOD_SPH_MHD)'      \\  >> $(MAKENAME)
-	@echo '$$(MOD_SPH_SNAPSHOT)' \\  >> $(MAKENAME)
-	@echo '$$(MOD_INITIAL)'      \\  >> $(MAKENAME)
-	@echo >> $(MAKENAME)
-	
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)= '  >> $(MAKENAME)
+	@echo  '#'>> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES='$(MODULE_LIST)' \
 		mod_list; \
 		) \
 	done

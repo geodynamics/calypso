@@ -1,20 +1,36 @@
-!>@file   t_FFTW_wrapper.f90
-!!@brief  module t_FFTW_wrapper
+!>@file   t_single_FFTW_wrapper.f90
+!!@brief  module t_single_FFTW_wrapper
 !!
 !!@author H. Matsui
 !!@date Programmed in Oct., 2012
 !
-!>@brief  Fourier transform using FFTW Ver.3
+!>@brief  Work area for single FFTW Ver.3
 !!
 !!@verbatim
 !! ------------------------------------------------------------------
-!!      subroutine init_FFTW_type(Nsmp, Nfft, WK)
-!!      subroutine finalize_FFTW_type(Nsmp, WK)
-!!      subroutine verify_wk_FFTW_type(Nsmp, Nfft, WK)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nfft
+!!      subroutine alloc_work_4_FFTW_t(Nsmp, Nfft, WK)
+!!      subroutine dealloc_work_4_FFTW_t(WK)
+!!        integer(kind = kint), intent(in) :: Nsmp, Nfft
 !!        type(working_FFTW), intent(inout) :: WK
 !!
-!!   wrapper subroutine for initierize FFT by FFTW
+!! ------------------------------------------------------------------
+!!
+!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
+!!          * \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
+!!          * \sin (\frac{2\pi j k}{Nfft})
+!!
+!!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
+!!    K = Nfft/2....
+!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
+!!          * \cos (\frac{2\pi j k}{Nfft})
+!!
+!! ------------------------------------------------------------------
+!!
+!!   x_{k} = a_{0} + (-1)^{j} a_{Nfft/2} + sum_{k=1}^{Nfft/2-1}
+!!          (a_{k} \cos(2\pijk/Nfft) + b_{k} \sin(2\pijk/Nfft))
+!!
+!! ------------------------------------------------------------------
 !! ------------------------------------------------------------------
 !!
 !!       i = 1:     a_{0}
@@ -38,13 +54,13 @@
 !!@n @param X(Ncomp, Nfft)  Data for Fourier transform
 !!@n @param WK          Work structure for FFTW3
 !
-      module t_FFTW_wrapper
+      module t_single_FFTW_wrapper
 !
       use m_precision
       use m_constants
       use m_fftw_parameters
 !
-      use FFTW3_wrapper
+      use single_pout_FFTW3_smp
 !
       implicit none
 !
@@ -67,63 +83,10 @@
         integer(kind = kint) :: iflag_fft_len =  -1
       end type working_FFTW
 !
-      private :: alloc_work_4_FFTW_t, dealloc_work_4_FFTW_t
-!
 ! ------------------------------------------------------------------
 !
       contains
 !
-! ------------------------------------------------------------------
-!
-      subroutine init_FFTW_type(Nsmp, Nfft, WK)
-!
-      integer(kind = kint), intent(in) ::  Nsmp, Nfft
-!
-      type(working_FFTW), intent(inout) :: WK
-!
-!
-      call alloc_work_4_FFTW_t(Nsmp, Nfft, WK)
-      call init_4_FFTW_smp(Nsmp, Nfft, WK%Nfft_c, WK%plan_forward,      &
-     &    WK%plan_backward, WK%X_FFTW, WK%C_FFTW)
-!
-      end subroutine init_FFTW_type
-!
-! ------------------------------------------------------------------
-!
-      subroutine finalize_FFTW_type(Nsmp, WK)
-!
-      integer(kind = kint), intent(in) ::  Nsmp
-!
-      type(working_FFTW), intent(inout) :: WK
-!
-!
-      call destroy_FFTW_smp(Nsmp, WK%plan_forward, WK%plan_backward)
-      call dealloc_work_4_FFTW_t(WK)
-!
-      end subroutine finalize_FFTW_type
-!
-! ------------------------------------------------------------------
-!
-      subroutine verify_wk_FFTW_type(Nsmp, Nfft, WK)
-!
-      integer(kind = kint), intent(in) ::  Nsmp, Nfft
-!
-      type(working_FFTW), intent(inout) :: WK
-!
-!
-      if(WK%iflag_fft_len .lt. 0) then
-        call init_FFTW_type(Nsmp, Nfft, WK)
-        return
-      end if
-!
-      if( WK%iflag_fft_len .ne. Nfft*Nsmp) then
-        call finalize_FFTW_type(Nsmp, WK)
-        call init_FFTW_type(Nsmp, Nfft, WK)
-      end if
-!
-      end subroutine verify_wk_FFTW_type
-!
-! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
       subroutine alloc_work_4_FFTW_t(Nsmp, Nfft, WK)
@@ -159,4 +122,4 @@
 !
 ! ------------------------------------------------------------------
 !
-      end module t_FFTW_wrapper
+      end module t_single_FFTW_wrapper

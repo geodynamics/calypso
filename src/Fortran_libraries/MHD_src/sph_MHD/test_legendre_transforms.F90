@@ -4,15 +4,18 @@
 !!@date  Programmed by H.Matsui in Oct., 2009
 !!@n     Modified by H.Matsui in March, 2013
 !!@n     Modified by H.Matsui in Sep., 2020
+!!@n     Modified by H.Matsui in May, 2026
 !
 !>@brief Perform spherical harmonics transform for MHD dynamo model
 !!
 !!@verbatim
-!!      subroutine s_test_legendre_transforms(sph, comms_sph,           &
+!!      subroutine test_legendre_trans(ntest, list, sph, comms_sph,     &
 !!     &          fl_prop, sph_bc_U, omega_sph, trans_p, gt_cor,        &
 !!     &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,&
 !!     &          rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD,                &
-!!     &          cor_rlm, SR_sig, SR_r)
+!!     &          cor_rlm, SR_sig, SR_r, etime_shortest, id_shortest)
+!!        integer(kind = kint), intent(in) :: ntest
+!!        integer(kind = kint), intent(in) :: list(ntest)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fluid_property), intent(in) :: fl_prop
@@ -20,6 +23,9 @@
 !!        type(sph_rotation), intent(in) :: omega_sph
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(gaunt_coriolis_rlm), intent(in) :: gt_cor
+!!        integer(kind = kint), intent(in) :: ncomp_max_trans
+!!        integer(kind = kint), intent(in) :: nvector_max_trans
+!!        integer(kind = kint), intent(in) :: nscalar_max_trans
 !!        type(address_4_sph_trans), intent(inout) :: trns_MHD
 !!        type(legendre_trns_works), intent(inout) :: WK_leg
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
@@ -27,6 +33,8 @@
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
+!!        real(kind = kreal), intent(inout) :: etime_shortest
+!!        integer(kind = kint), intent(inout) :: id_shortest
 !!@endverbatim
 !!
       module test_legendre_transforms
@@ -55,39 +63,24 @@
 !
       implicit  none
 !
-#ifdef BLAS
-      integer(kind = kint), parameter :: num_test =   6
-#else
-      integer(kind = kint), parameter :: num_test =   5
-#endif
-!
-      integer(kind = kint), parameter :: list_test(num_test)            &
-     &        = (/iflag_leg_symmetry,                                   &
-     &            iflag_leg_sym_spin_loop,                              &
-     &            iflag_leg_sym_matmul,                                 &
-     &            iflag_leg_sym_matmul_big,                             &
-#ifdef BLAS
-     &            iflag_leg_sym_dgemm_big,                              &
-#endif
-     &            iflag_on_the_fly_matprod/)
-!
-      private :: num_test, list_test
-!
 !-----------------------------------------------------------------------
 !
       contains
 !
 !-----------------------------------------------------------------------
 !
-      subroutine s_test_legendre_transforms(sph, comms_sph,             &
+      subroutine test_legendre_trans(ntest, list, sph, comms_sph,       &
      &          fl_prop, sph_bc_U, omega_sph, trans_p, gt_cor,          &
      &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,  &
      &          rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD,                  &
-     &          cor_rlm, SR_sig, SR_r)
+     &          cor_rlm, SR_sig, SR_r, etime_shortest, id_shortest)
 !
       use calypso_mpi_real
       use sph_transforms_4_MHD
       use transfer_to_long_integers
+!
+      integer(kind = kint), intent(in) :: ntest
+      integer(kind = kint), intent(in) :: list(ntest)
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
@@ -109,19 +102,20 @@
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
-      real(kind = kreal) :: starttime, etime_shortest
-      real(kind = kreal) :: endtime(num_test)
-      real(kind = kreal) :: etime_trans(num_test)
-      real(kind = kreal) :: etime_max(num_test)
+      real(kind = kreal), intent(inout) :: etime_shortest
+      integer(kind = kint), intent(inout) :: id_shortest
+!
+      real(kind = kreal) :: starttime
+      real(kind = kreal) :: endtime(ntest)
+      real(kind = kreal) :: etime_trans(ntest)
+      real(kind = kreal) :: etime_max(ntest)
 !
       integer(kind = kint) :: id
 !
 !
-      if(WK_leg%id_legendre .ne. iflag_leg_compare) return
-!
-      endtime(1:num_test) =     zero
-      do id = 1, num_test
-        WK_leg%id_legendre = list_test(id)
+      endtime(1:ntest) = zero
+      do id = 1, ntest
+        WK_leg%id_legendre = list(id)
         if(my_rank .eq. 0) write(*,*) 'Test SPH transform for ',        &
      &             trim(chosen_legendre_name(WK_leg%id_legendre))
         call sel_init_legendre_trans                                    &
@@ -142,30 +136,29 @@
         call sel_finalize_legendre_trans(WK_leg)
       end do
 !
-      etime_trans(1:num_test) = zero
-      etime_max(1:num_test) =   zero
+      etime_trans(1:ntest) = zero
+      etime_max(1:ntest) =   zero
       call calypso_mpi_allreduce_real(endtime, etime_trans,             &
-     &    cast_long(num_test), MPI_SUM)
+     &    cast_long(ntest), MPI_SUM)
       call calypso_mpi_allreduce_real(endtime, etime_max,               &
-     &    cast_long(num_test), MPI_SUM)
-      etime_trans(1:num_test) = etime_trans(1:num_test) / dble(nprocs)
+     &    cast_long(ntest), MPI_MAX)
+      etime_trans(1:ntest) = etime_trans(1:ntest) / dble(nprocs)
 !
-      etime_shortest =  1.0d30
-      do id = 1, num_test
+      do id = 1, ntest
         if(etime_max(id) .lt. etime_shortest) then
-          WK_leg%id_legendre = list_test(id)
-          etime_shortest =     etime_max(id)
+          id_shortest =    list(id)
+          etime_shortest = etime_max(id)
         end if
       end do
 !
       if(my_rank .gt. 0) return
       write(*,'(a)') 'Loop ID: type, maximum time, average time'
-      do id = 1, num_test
+      do id = 1, ntest
         call write_elapsed_4_legendre                                   &
-     &     (list_test(id), etime_max(id), etime_trans(id))
+     &     (list(id), etime_max(id), etime_trans(id))
       end do
 !
-      end subroutine s_test_legendre_transforms
+      end subroutine test_legendre_trans
 !
 !-----------------------------------------------------------------------
 !

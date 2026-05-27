@@ -1,5 +1,5 @@
-!>@file   FFTPACK5_wrapper.f90
-!!@brief  module FFTPACK5_wrapper
+!>@file   multi_pout_FFTPACK_smp.f90
+!!@brief  module multi_pout_FFTPACK_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in Apr., 2013
@@ -17,7 +17,7 @@
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
 !!
-!!      subroutine CALYPSO_RFFTMF_SMP(Nsmp, Nstacksmp, M, Nfft,         &
+!!      subroutine multi_pout_RFFTMF_smp(Nsmp, Nstacksmp, M, Nfft,      &
 !!     &          X, X_FFTPACK5, Mmax_smp, lSAVE, WSAVE, WORK,          &
 !!     &          elapsed_fft, elapsed_cpy)
 !!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -35,7 +35,7 @@
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!          *  \cos (\frac{2\pi j k}{Nfft})
 !!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!          *  \cos (\frac{2\pi j k}{Nfft})
+!!          *  \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -44,7 +44,7 @@
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine CALYPSO_RFFTMB_SMP(Nsmp, Nstacksmp, M, Nfft,         &
+!!      subroutine multi_pout_RFFTMB_smp(Nsmp, Nstacksmp, M, Nfft,      &
 !!     &          X, X_FFTPACK5, Mmax_smp, lSAVE, WSAVE, WORK,          &
 !!     &          elapsed_fft, elapsed_cpy)
 !!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -91,7 +91,7 @@
 !!@n @param WSAVE(lSAVE)              Work constatnts for FFTPACK
 !!@n @param WORK(Mmax_smp*Nfft,Nsmp)  Work area for FFTPACK
 !
-      module FFTPACK5_wrapper
+      module multi_pout_FFTPACK_smp
 !
       use omp_lib
 !
@@ -120,7 +120,7 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine CALYPSO_RFFTMF_SMP(Nsmp, Nstacksmp, M, Nfft,           &
+      subroutine multi_pout_RFFTMF_smp(Nsmp, Nstacksmp, M, Nfft,        &
      &          X, X_FFTPACK5, Mmax_smp, lSAVE, WSAVE, WORK,            &
      &          elapsed_fft, elapsed_cpy)
 !
@@ -136,45 +136,45 @@
       real(kind = 8), intent(inout) :: WORK(Mmax_smp*Nfft,Nsmp)
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
-      real(kind = kreal) :: st_c, ed_c, st_f, ed_f
+      real(kind = kreal) :: start, ed_c, ed_f
       integer(kind = kint) :: ismp, ist, num, nsize
       integer(kind = kint) :: ierr
 !
 !
       ed_c = 0.0d0
       ed_f = 0.0d0
-!$omp parallel do private(ist,num,nsize,st_c,st_f)                      &
+!$omp parallel do private(ist,num,nsize,start)                          &
 !$omp&            reduction(+:ed_c,ed_f)
       do ismp = 1, Nsmp
         ist = Nstacksmp(ismp-1)
         num = Nstacksmp(ismp) - Nstacksmp(ismp-1)
         nsize = num*Nfft
 !
-        st_c = OMP_GET_WTIME()
+        start = OMP_GET_WTIME()
         call copy_rtp_fld_to_RFFTMF_smp(ist, num, Nfft, M, X,           &
      &                                  Mmax_smp, X_FFTPACK5(1,ismp))
-        ed_c = ed_c + OMP_GET_WTIME() - st_c
+        ed_c = ed_c + OMP_GET_WTIME() - start
 !
-        st_f = OMP_GET_WTIME()
+        start = OMP_GET_WTIME()
         call RFFTMF(num, ione, Nfft, num, X_FFTPACK5(1,ismp), nsize,    &
      &              WSAVE, lSAVE, WORK(1,ismp), nsize, ierr)
-        ed_f = ed_f + OMP_GET_WTIME() - st_f
+        ed_f = ed_f + OMP_GET_WTIME() - start
 !
-        st_c = OMP_GET_WTIME()
+        start = OMP_GET_WTIME()
         call copy_rtp_spectr_from_RFFTMF_smp(ist, num, Nfft, Mmax_smp,  &
      &                                       X_FFTPACK5(1,ismp), M, X)
-        ed_c = ed_c + OMP_GET_WTIME() - st_c
+        ed_c = ed_c + OMP_GET_WTIME() - start
       end do
 !$omp end parallel do
 !
       elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
       elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
-      end subroutine CALYPSO_RFFTMF_SMP
+      end subroutine multi_pout_RFFTMF_smp
 !
 ! ------------------------------------------------------------------
 !
-      subroutine CALYPSO_RFFTMB_SMP(Nsmp, Nstacksmp, M, Nfft,           &
+      subroutine multi_pout_RFFTMB_smp(Nsmp, Nstacksmp, M, Nfft,        &
      &          X, X_FFTPACK5, Mmax_smp, lSAVE, WSAVE, WORK,            &
      &          elapsed_fft, elapsed_cpy)
 !
@@ -190,14 +190,14 @@
       real(kind = 8), intent(inout) :: WORK(Mmax_smp*Nfft,Nsmp)
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
-      real(kind = kreal) :: st_c, ed_c, st_f, ed_f
+      real(kind = kreal) :: start, ed_c, ed_f
       integer(kind = kint) ::  ismp, ist, num, nsize
       integer(kind = kint) :: ierr
 !
 !
       ed_c = 0.0d0
       ed_f = 0.0d0
-!$omp parallel do private(ist,num,nsize,st_c,st_f)                      &
+!$omp parallel do private(ist,num,nsize,start)                          &
 !$omp&            reduction(+:ed_c,ed_f)
       do ismp = 1, Nsmp
         ist = Nstacksmp(ismp-1)
@@ -205,28 +205,28 @@
         nsize = num*Nfft
 !
 !   normalization
-        st_c = OMP_GET_WTIME()
+        start = OMP_GET_WTIME()
         call copy_rtp_spectr_to_RFFTMB_smp(ist, num, Nfft, M, X,        &
      &                                    Mmax_smp, X_FFTPACK5(1,ismp))
-        ed_c = ed_c + OMP_GET_WTIME() - st_c
+        ed_c = ed_c + OMP_GET_WTIME() - start
 !
-        st_f = OMP_GET_WTIME()
+        start = OMP_GET_WTIME()
         call RFFTMB(num, ione, Nfft, num, X_FFTPACK5(1,ismp), nsize,    &
      &              WSAVE, lSAVE, WORK(1,ismp), nsize, ierr)
-        ed_f = ed_f + OMP_GET_WTIME() - st_f
+        ed_f = ed_f + OMP_GET_WTIME() - start
 !
-        st_c = OMP_GET_WTIME()
+        start = OMP_GET_WTIME()
         call copy_rtp_fld_from_RFFTMB_smp(ist, num, Nfft, Mmax_smp,     &
      &                                    X_FFTPACK5(1,ismp), M, X)
-        ed_c = ed_c + OMP_GET_WTIME() - st_c
+        ed_c = ed_c + OMP_GET_WTIME() - start
       end do
 !$omp end parallel do
 !
       elapsed_fft = elapsed_fft + ed_f / dble(Nsmp)
       elapsed_cpy = elapsed_cpy + ed_c / dble(Nsmp)
 !
-      end subroutine CALYPSO_RFFTMB_SMP
+      end subroutine multi_pout_RFFTMB_smp
 !
 ! ------------------------------------------------------------------
 !
-      end module FFTPACK5_wrapper
+      end module multi_pout_FFTPACK_smp

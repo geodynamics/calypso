@@ -4,7 +4,10 @@
 
 PSF_SECTION_DIR = $$(VIZ_SRCDIR)/surfacing
 SOURCES = $(shell ls *.f90)
+
 MOD_SURFACING = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_SURFACING'
+UPPER_MODULES=
 
 #
 #  --------------------------------------------------------------------
@@ -21,14 +24,13 @@ lib_tasks: lib_archve
 libtarget:
 
 lib_archve: libtarget
-	@echo '	''$$(AR)' '$$(ARFLUGS)' rcsv '$$@' '$$(MOD_SURFACING)' \
-	>> $(MAKENAME)
-
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 mod_list:
-	@echo  MOD_SURFACING=  \\ >> $(MAKENAME)
-	@echo  $(MOD_SURFACING) >> $(MAKENAME)
-	@echo   >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_SURFACING)'     >> $(MAKENAME)
+	@echo  '#' >> $(MAKENAME)
 
 depends:
 	@$(MAKE_MOD_DEP) $(MAKENAME).depends '$$(PSF_SECTION_DIR)' $(SOURCES)

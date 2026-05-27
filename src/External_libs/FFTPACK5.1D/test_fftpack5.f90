@@ -3,7 +3,7 @@
       program test_ispack_fft
 !
 !
-      use FFTPACK5_wrapper
+      use multi_pout_FFTPACK_smp
 !
       implicit none
 !

@@ -10,9 +10,11 @@
 !!  ---------------------------------------------------------------------
 !!
 !!      subroutine init_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
-!!      subroutine finalize_sph_domain_FFTPACK5(fftpack_d)
+!!      subroutine finalize_sph_domain_FFTPACK5(fftpack_d, flag_fft)
 !!      subroutine verify_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+!!        logical, intent(inout) :: flag_fft
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
@@ -20,7 +22,7 @@
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!          *  \cos (\frac{2\pi j k}{Nfft})
 !!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!          *  \cos (\frac{2\pi j k}{Nfft})
+!!          *  \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -117,14 +119,16 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_sph_domain_FFTPACK5(fftpack_d)
+      subroutine finalize_sph_domain_FFTPACK5(fftpack_d, flag_fft)
 !
       type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+      logical, intent(inout) :: flag_fft
 !
 !
       call dealloc_comm_table_sph_FFT(fftpack_d%comm_sph_FFTPACK)
       call dealloc_const_domain_FFTPACK(fftpack_d)
       call dealloc_work_domain_FFTPACK(fftpack_d)
+      flag_fft = .TRUE.
 !
       end subroutine finalize_sph_domain_FFTPACK5
 !

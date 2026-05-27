@@ -38,7 +38,7 @@
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!          *  \cos (\frac{2\pi j k}{Nfft})
 !!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!          *  \cos (\frac{2\pi j k}{Nfft})
+!!          *  \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -107,7 +107,7 @@
 !
       subroutine init_WK_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WK)
 !
-      use FFTPACK5_wrapper
+      use multi_pout_FFTPACK_smp
 !
       integer(kind = kint), intent(in) ::  Nfft
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -137,7 +137,7 @@
       subroutine CALYPSO_RFFTMF_t(Nsmp, Nstacksmp, M, Nfft, X, WK,      &
      &                            elapsed_fft, elapsed_cpy)
 !
-      use FFTPACK5_wrapper
+      use multi_pout_FFTPACK_smp
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
@@ -147,7 +147,7 @@
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
-      call CALYPSO_RFFTMF_SMP(Nsmp, Nstacksmp, M, Nfft, X,              &
+      call multi_pout_RFFTMF_smp(Nsmp, Nstacksmp, M, Nfft, X,           &
      &    WK%X_FFTPACK5, WK%Mmax_smp, WK%lsave_FFTPACK,                 &
      &    WK%WSAVE_FFTPACK, WK%WORK_FFTPACK, elapsed_fft, elapsed_cpy)
 !
@@ -158,7 +158,7 @@
       subroutine CALYPSO_RFFTMB_t(Nsmp, Nstacksmp, M, Nfft, X, WK,      &
      &                            elapsed_fft, elapsed_cpy)
 !
-      use FFTPACK5_wrapper
+      use multi_pout_FFTPACK_smp
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
@@ -168,7 +168,7 @@
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
-      call CALYPSO_RFFTMB_SMP(Nsmp, Nstacksmp, M, Nfft, X,              &
+      call multi_pout_RFFTMB_smp(Nsmp, Nstacksmp, M, Nfft, X,           &
      &    WK%X_FFTPACK5, WK%Mmax_smp, WK%lsave_FFTPACK,                 &
      &    WK%WSAVE_FFTPACK, WK%WORK_FFTPACK, elapsed_fft, elapsed_cpy)
 !

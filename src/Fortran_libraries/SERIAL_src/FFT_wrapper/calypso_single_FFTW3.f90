@@ -9,6 +9,12 @@
 !!
 !!@verbatim
 !!   wrapper subroutine for initierize FFT by FFTW
+!!      subroutine init_FFTW_type(Nsmp, Nfft, WK)
+!!      subroutine finalize_FFTW_type(Nsmp, WK)
+!!      subroutine verify_wk_FFTW_type(Nsmp, Nfft, WK)
+!!        integer(kind = kint), intent(in) ::  Nsmp, Nfft
+!!        type(working_FFTW), intent(inout) :: WK
+!!
 !! ------------------------------------------------------------------
 !!
 !!      subroutine calypso_single_pin_fwd_FFTW3(Nsmp, Nstacksmp,        &
@@ -79,7 +85,7 @@
 !
       use m_precision
       use m_constants
-      use t_FFTW_wrapper
+      use t_single_FFTW_wrapper
 !
       implicit none
 !
@@ -87,6 +93,58 @@
 !
       contains
 !
+! ------------------------------------------------------------------
+!
+      subroutine init_FFTW_type(Nsmp, Nfft, WK)
+!
+      integer(kind = kint), intent(in) ::  Nsmp, Nfft
+!
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      call alloc_work_4_FFTW_t(Nsmp, Nfft, WK)
+      call init_single_FFTW_smp(Nsmp, Nfft, WK%Nfft_c, WK%plan_forward, &
+     &                          WK%plan_backward, WK%X_FFTW, WK%C_FFTW)
+!
+      end subroutine init_FFTW_type
+!
+! ------------------------------------------------------------------
+!
+      subroutine finalize_FFTW_type(Nsmp, WK)
+!
+      integer(kind = kint), intent(in) ::  Nsmp
+!
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      call destroy_single_FFTW_smp                                      &
+     &   (Nsmp, WK%plan_forward, WK%plan_backward)
+      call dealloc_work_4_FFTW_t(WK)
+!
+      end subroutine finalize_FFTW_type
+!
+! ------------------------------------------------------------------
+!
+      subroutine verify_wk_FFTW_type(Nsmp, Nfft, WK)
+!
+      integer(kind = kint), intent(in) ::  Nsmp, Nfft
+!
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      if(WK%iflag_fft_len .lt. 0) then
+        call init_FFTW_type(Nsmp, Nfft, WK)
+        return
+      end if
+!
+      if( WK%iflag_fft_len .ne. Nfft*Nsmp) then
+        call finalize_FFTW_type(Nsmp, WK)
+        call init_FFTW_type(Nsmp, Nfft, WK)
+      end if
+!
+      end subroutine verify_wk_FFTW_type
+!
+! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
       subroutine calypso_single_pin_fwd_FFTW3(Nsmp, Nstacksmp,          &
@@ -135,7 +193,7 @@
       subroutine FFTW_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft,        &
      &                             X, WK, elapsed_fft, elapsed_cpy)
 !
-      use FFTW3_wrapper
+      use single_pout_FFTW3_smp
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: Ncomp, Nfft
@@ -145,7 +203,7 @@
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
-      call FFTW_forward_SMP(WK%plan_forward, Nsmp, Nstacksmp,           &
+      call single_pout_fwd_FFTW3_smp(WK%plan_forward, Nsmp, Nstacksmp,  &
      &    Ncomp, Nfft, WK%aNfft, WK%NFFT_c, X, WK%X_FFTW, WK%C_FFTW,    &
      &    elapsed_fft, elapsed_cpy)
 !
@@ -156,7 +214,7 @@
       subroutine FFTW_backward_type(Nsmp, Nstacksmp, Ncomp, Nfft,       &
      &                              X, WK, elapsed_fft, elapsed_cpy)
 !
-      use FFTW3_wrapper
+      use single_pout_FFTW3_smp
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: Ncomp, Nfft
@@ -166,7 +224,7 @@
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
 !
-      call FFTW_backward_SMP(WK%plan_backward, Nsmp, Nstacksmp,         &
+      call single_pout_bwd_FFTW3_smp(WK%plan_backward, Nsmp, Nstacksmp, &
      &    Ncomp, Nfft, WK%NFFT_c, X, WK%X_FFTW, WK%C_FFTW,              &
      &    elapsed_fft, elapsed_cpy)
 !

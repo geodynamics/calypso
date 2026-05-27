@@ -7,6 +7,9 @@ CORE_SRCDIR = $$(F_SRCDIR)/SERIAL_src
 LIB_MESH =       -lcalypso_core
 LIB_MESH_FILE = libcalypso_core.a
 
+MODULE_LIST=   'MOD_CORE'
+UPPER_MODULES=
+
 SUBDIRS = \
 Fortran2003          \
 \
@@ -18,7 +21,6 @@ spherical_harmonics  \
 gauss_integration    \
 FFT_wrapper          \
 SPH_SPECTR_src
-
 
 #
 #  -------------------------------------------------------------------------
@@ -47,7 +49,7 @@ lib_tasks: libtarget lib_archve
 
 libtarget:
 	@echo '' >> $(MAKENAME)
-	@echo  '$$(LIB_MESH_FILE): $$(MOD_CORE)'>> $(MAKENAME)
+	@echo  '$$(LIB_MESH_FILE): $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -60,19 +62,8 @@ lib_archve:
 	done
 
 mod_list:
-	@echo  MOD_CORE= \\ >> $(MAKENAME)
-	@echo  \
-	'$$(MOD_F2003)'       \
-	'$$(MOD_BASE)'     \
-	'$$(MOD_IO)'       \
-	'$$(MOD_BINARY_IO)'  \
-	'$$(MOD_ZLIB_IO)'    \
-	'$$(MOD_MPI_IO)'     \
-	'$$(MOD_FIELDS)'     \
-	'$$(MOD_GAUSS)'    \
-	'$$(MOD_SPH)'      \
-	'$$(MOD_FFT_WRAP)' \
-	'$$(MOD_SPH_SPECTR)' \
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)='  >> $(MAKENAME)
 	>> $(MAKENAME)
 	@echo   >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
@@ -80,6 +71,7 @@ mod_list:
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES='$(MODULE_LIST)' \
 		mod_list; \
 		) \
 	done

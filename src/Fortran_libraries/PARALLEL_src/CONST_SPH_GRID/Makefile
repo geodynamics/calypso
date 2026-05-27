@@ -4,7 +4,10 @@
 
 SPH_GRID_SRCDIR = $$(PARA_SRCDIR)/CONST_SPH_GRID
 SOURCES = $(shell ls *.f90)
+
 MOD_SPH_GRID = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_SPH_GRID'
+UPPER_MODULES=
 
 #
 #  -------------------------------------------------------------------------
@@ -20,13 +23,13 @@ lib_tasks: lib_archve
 libtarget:
 
 lib_archve: libtarget
-	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_SPH_GRID)' \
-	>> $(MAKENAME)
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 
 mod_list:
-	@echo  MOD_SPH_GRID=  \\ >> $(MAKENAME)
-	@echo  $(MOD_SPH_GRID)   >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_SPH_GRID)'    >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

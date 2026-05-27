@@ -4,7 +4,10 @@
 
 SPH_SPECTR_DIR = $$(CORE_SRCDIR)/SPH_SPECTR_src
 SOURCES = $(shell ls *.f90)
+
 MOD_SPH_SPECTR = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_SPH_SPECTR'
+UPPER_MODULES=
 
 #
 #  -------------------------------------------------------------------------
@@ -13,14 +16,17 @@ MOD_SPH_SPECTR = $(addsuffix .o,$(basename $(SOURCES)) )
 dir_list:
 	@echo 'SPH_SPECTR_DIR = $(SPH_SPECTR_DIR)'  >> $(MAKENAME)
 
+lib_name:
+
 libtarget:
 
 lib_archve: libtarget
-	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_SPH_SPECTR)' >> $(MAKENAME)
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 mod_list:
-	@echo  MOD_SPH_SPECTR=  \\ >> $(MAKENAME)
-	@echo  $(MOD_SPH_SPECTR) >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)=  ' \\ >> $(MAKENAME)
+	@echo  '$(MOD_SPH_SPECTR)'    >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:

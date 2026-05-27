@@ -10,14 +10,36 @@
 !!      subroutine set_comm_item_rtp_4_FFTPACK                          &
 !!     &         (nnod_rtp, nidx_rtp, irt_rtp_smp_stack,                &
 !!     &          ntot_sr_rtp, irev_sr_rtp, comm_sph_FFT)
+!!        integer(kind = kint), intent(in) :: nnod_rtp
+!!        integer(kind = kint), intent(in) :: nidx_rtp(3)
+!!        integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
+!!        integer(kind = kint), intent(in) :: ntot_sr_rtp
+!!        integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
+!!        type(comm_tbl_from_FFT), intent(inout) :: comm_sph_FFT
 !!
 !!      subroutine copy_FFTPACK_field_from_recv(nnod_rtp, nidx_rtp,     &
 !!     &          istep_rtp, irt_rtp_smp_stack, ncomp_bwd, irev_sr_rtp, &
 !!     &          n_WR, WR, X_FFT)
+!!        integer(kind = kint), intent(in) :: nnod_rtp
+!!        integer(kind = kint), intent(in) :: nidx_rtp(3), istep_rtp(3)
+!!        integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
+!!        integer(kind = kint), intent(in) :: ncomp_bwd
+!!        integer(kind = kint), intent(in) :: n_WR
+!!        integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
+!!        real(kind = kreal), intent(in) :: WR(n_WR)
+!!        real(kind = kreal), intent(inout) :: X_FFT(ncomp_bwd*nnod_rtp)
 !!      subroutine copy_FFTPACK_comp_from_recv(nd, nnod_rtp, nidx_rtp,  &
 !!     &          istep_rtp, irt_rtp_smp_stack, ncomp_bwd, irev_sr_rtp, &
 !!     &          n_WR, WR, X_FFT)
-!!        type(comm_tbl_from_FFT), intent(inout) :: comm_sph_FFT
+!!        integer(kind = kint), intent(in) :: nnod_rtp
+!!        integer(kind = kint), intent(in) :: nidx_rtp(3), istep_rtp(3)
+!!        integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
+!!        integer(kind = kint), intent(in) :: nd
+!!        integer(kind = kint), intent(in) :: ncomp_bwd
+!!        integer(kind = kint), intent(in) :: n_WR
+!!        integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
+!!        real(kind = kreal), intent(in) :: WR(n_WR)
+!!        real(kind = kreal), intent(inout) :: X_FFT(nnod_rtp)
 !!@endverbatim
 !!
       module set_comm_table_rtp_FFTPACK
@@ -117,7 +139,7 @@
       integer(kind = kint), intent(in) :: ncomp_bwd
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       real(kind = kreal), intent(inout) :: X_FFT(ncomp_bwd*nnod_rtp)
 !
@@ -183,7 +205,7 @@
       integer(kind = kint), intent(in) :: ncomp_bwd
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       real(kind = kreal), intent(inout) :: X_FFT(nnod_rtp)
 !

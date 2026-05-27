@@ -40,7 +40,7 @@
 !$omp end parallel workshare
         ft3%elapsed(3) = ft3%elapsed(3) + OMP_GET_WTIME() - ft3%start
 !
-        call FFTW_mul_forward_type(np_smp, ft3%nstack,                  &
+        call calypso_multi_pout_fwd_FFTW3(np_smp, ft3%nstack,           &
      &      ft3%nfld, ft3%ngrd, ft3%s_k, WK_MUL_FFTW_t,                 &
      &      ft3%elapsed(2), ft3%elapsed(3))
 !
@@ -50,7 +50,7 @@
 !$omp end parallel workshare
         ft3%elapsed(3) = ft3%elapsed(3) + OMP_GET_WTIME() - ft3%start
 !
-        call FFTW_mul_backward_type(np_smp, ft3%nstack,                 &
+        call calypso_multi_pout_bwd_FFTW3(np_smp, ft3%nstack,           &
      &      ft3%nfld, ft3%ngrd, ft3%f_x, WK_MUL_FFTW_t,                 &
      &      ft3%elapsed(2), ft3%elapsed(3))
       end do

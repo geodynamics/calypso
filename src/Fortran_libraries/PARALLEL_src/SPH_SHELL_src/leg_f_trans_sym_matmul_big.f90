@@ -9,7 +9,7 @@
 !!       (using matrix products version with big array)
 !!
 !!@verbatim
-!!      subroutine leg_fwd_trans_sym_matmul_big                         &
+!!      subroutine leg_forward_trans_matmul_big                         &
 !!     &         (iflag_matmul, ncomp, nvector, nscalar,                &
 !!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,       &
 !!     &          asin_theta_1d_rtm, g_sph_rlm, weight_rtm,             &
@@ -41,6 +41,7 @@
       use t_spheric_rtm_data
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
+      use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
       use t_leg_trans_sym_matmul_big
       use m_elapsed_labels_SPH_TRNS
@@ -49,8 +50,6 @@
 !
       implicit none
 !
-      real(kind = kreal), private :: st_elapsed
-      real(kind = kreal), private :: elaps(4)
       integer, external :: omp_get_max_threads
 !
 ! -----------------------------------------------------------------------
@@ -59,10 +58,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine leg_fwd_trans_sym_matmul_big                           &
+      subroutine leg_forward_trans_matmul_big                           &
      &         (iflag_matmul, ncomp, nvector, nscalar,                  &
-     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,         &
-     &          asin_theta_1d_rtm, g_sph_rlm, weight_rtm,               &
+     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_l_bsm)
 !
       use set_vr_rtm_leg_matmul_big
@@ -72,12 +70,8 @@
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
+      type(legendre_4_sph_trans), intent(in) :: leg
       type(index_4_sph_trans), intent(in) :: idx_trns
-      real(kind = kreal), intent(in)                                    &
-     &           :: asin_theta_1d_rtm(sph_rtm%nidx_rtm(2))
-      real(kind = kreal), intent(in)                                    &
-     &           :: g_sph_rlm(sph_rlm%nidx_rlm(2),17)
-      real(kind = kreal), intent(in) :: weight_rtm(sph_rtm%nidx_rtm(2))
       type(leg_trns_bsym_mul_work), intent(inout) :: WK_l_bsm
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
@@ -91,10 +85,11 @@
       integer(kind = kint) :: jst(np_smp), jst_h(np_smp)
       integer(kind = kint) :: n_jk_e(np_smp), n_jk_o(np_smp)
 !
+      real(kind = kreal) :: start_time, end_time(4)
 !
-!$omp parallel workshare
-        WK_l_bsm%time_omp(1:np_smp,1:3) = 0.0d0
-!$omp end parallel workshare
+!
+      if(ncomp .le. 0) return
+      end_time(1:4) = 0.0d0
 !
 !$omp parallel workshare
       WS(1:ncomp*comm_rlm%ntot_item_sr) = 0.0d0
@@ -102,8 +97,8 @@
 !
       nle_rtm = (sph_rtm%nidx_rtm(2) + 1)/2
       nlo_rtm = sph_rtm%nidx_rtm(2) / 2
-!$omp parallel do private(ip,mp_rlm,st_elapsed)                         &
-!$omp& reduction(+:elaps)
+!$omp parallel do private(ip,mp_rlm,start_time)                         &
+!$omp& reduction(+:end_time)
       do ip = 1, np_smp
         kst(ip) = sph_rlm%istack_rlm_kr_smp(ip-1)
         nkr(ip) = sph_rlm%istack_rlm_kr_smp(ip)                         &
@@ -119,25 +114,24 @@
           n_jk_o(ip) = idx_trns%lstack_rlm(mp_rlm)                      &
      &                - idx_trns%lstack_even_rlm(mp_rlm)
 !
-          WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
+          start_time = MPI_WTIME()
           call set_vr_rtm_vec_sym_matmul_big                            &
      &       (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm, sph_rtm%istep_rtm,    &
-     &        sph_rlm%nidx_rlm, asin_theta_1d_rtm, weight_rtm,          &
+     &        sph_rlm%nidx_rlm, leg%asin_t_rtm, leg%weight_rtm,         &
      &        kst(ip), nkr(ip), mp_rlm, idx_trns%mn_rlm(mp_rlm),        &
      &        nle_rtm, nlo_rtm, ncomp, nvector, comm_rtm%irev_sr,       &
      &        n_WR, WR, WK_l_bsm%symp_r(1,ip), WK_l_bsm%asmp_p(1,ip),   &
      &        WK_l_bsm%asmp_r(1,ip), WK_l_bsm%symp_p(1,ip) )
           call set_vr_rtm_scl_sym_matmul_big                            &
      &       (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm, sph_rtm%istep_rtm,    &
-     &        sph_rlm%nidx_rlm, weight_rtm, kst(ip), nkr(ip),           &
+     &        sph_rlm%nidx_rlm, leg%weight_rtm, kst(ip), nkr(ip),       &
      &        mp_rlm, nle_rtm, nlo_rtm,                                 &
      &        ncomp, nvector, nscalar, comm_rtm%irev_sr, n_WR, WR,      &
      &        WK_l_bsm%symp_r(1,ip), WK_l_bsm%asmp_r(1,ip))
-          WK_l_bsm%time_omp(ip,1) = WK_l_bsm%time_omp(ip,1)             &
-     &                    + MPI_WTIME() - WK_l_bsm%time_omp(ip,0)
+          end_time(1) = end_time(1) + MPI_WTIME() - start_time
 !
 !  even l-m
-          WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
+          start_time = MPI_WTIME()
           call matmul_fwd_leg_trans(iflag_matmul, nkrs(ip), n_jk_e(ip), &
      &        WK_l_bsm%nth_sym, WK_l_bsm%symp_r(1,ip),                  &
      &        WK_l_bsm%Ps_tj(1,jst(ip)+1), WK_l_bsm%pol_e(1,ip))
@@ -152,47 +146,40 @@
           call matmul_fwd_leg_trans(iflag_matmul, nkrt(ip), n_jk_o(ip), &
      &        WK_l_bsm%nth_sym, WK_l_bsm%symp_p(1,ip),                  &
      &        WK_l_bsm%dPsdt_tj(1,jst_h(ip)), WK_l_bsm%tor_o(1,ip))
-          WK_l_bsm%time_omp(ip,2) = WK_l_bsm%time_omp(ip,2)             &
-     &                    + MPI_WTIME() - WK_l_bsm%time_omp(ip,0)
+          end_time(2) = end_time(2) + MPI_WTIME() - start_time
 !
-          WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
+          start_time = MPI_WTIME()
           call cal_sp_rlm_vec_sym_matmul_big                            &
      &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                       &
      &        sph_rlm%istep_rlm, sph_rlm%idx_gl_1d_rlm_j,               &
-     &        sph_rlm%radius_1d_rlm_r, g_sph_rlm,                       &
+     &        sph_rlm%radius_1d_rlm_r, leg%g_sph_rlm,                   &
      &        kst(ip), nkr(ip), jst(ip), n_jk_o(ip), n_jk_e(ip),        &
      &        WK_l_bsm%pol_e(1,ip), WK_l_bsm%pol_o(1,ip),               &
      &        WK_l_bsm%tor_e(1,ip), WK_l_bsm%tor_o(1,ip),               &
      &        ncomp, nvector, comm_rlm%irev_sr, n_WS, WS)
           call cal_sp_rlm_scl_sym_matmul_big(sph_rlm%nnod_rlm,          &
-     &       sph_rlm%nidx_rlm, sph_rlm%istep_rlm, g_sph_rlm,            &
+     &       sph_rlm%nidx_rlm, sph_rlm%istep_rlm, leg%g_sph_rlm,        &
      &        kst(ip), nkr(ip), jst(ip), n_jk_o(ip), n_jk_e(ip),        &
      &        WK_l_bsm%pol_e(1,ip), WK_l_bsm%pol_o(1,ip),               &
      &        ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WS, WS)
-          WK_l_bsm%time_omp(ip,3) = WK_l_bsm%time_omp(ip,3)             &
-     &                    + MPI_WTIME() - WK_l_bsm%time_omp(ip,0)
-!
+          end_time(3) = end_time(3) + MPI_WTIME() - start_time
         end do
       end do
 !$omp end parallel do
 !
       if(iflag_SDT_time) then
-        do ip = 2, np_smp
-          WK_l_bsm%time_omp(1,1:3)                                      &
-     &          = WK_l_bsm%time_omp(ip,1:3) + WK_l_bsm%time_omp(ip,1:3)
-        end do
         elps1%elapsed(ist_elapsed_SDT+13)                               &
      &          = elps1%elapsed(ist_elapsed_SDT+13)                     &
-     &           + WK_l_bsm%time_omp(1,1) / dble(np_smp)
+     &           + end_time(1) / dble(np_smp)
         elps1%elapsed(ist_elapsed_SDT+15)                               &
      &          = elps1%elapsed(ist_elapsed_SDT+15)                     &
-     &           + WK_l_bsm%time_omp(1,2) / dble(np_smp)
+     &           + end_time(2) / dble(np_smp)
         elps1%elapsed(ist_elapsed_SDT+17)                               &
      &          = elps1%elapsed(ist_elapsed_SDT+17)                     &
-     &           + WK_l_bsm%time_omp(1,3) / dble(np_smp)
+     &           + end_time(3) / dble(np_smp)
       end if
 !
-      end subroutine leg_fwd_trans_sym_matmul_big
+      end subroutine leg_forward_trans_matmul_big
 !
 ! -----------------------------------------------------------------------
 !

@@ -7,6 +7,9 @@ UTILS_SRCDIR =  $$(F_SRCDIR)/UTILS_src
 LIB_UTILS =       -lcalypso_utils
 LIB_UTILS_FILE = libcalypso_utils.a
 
+MODULE_LIST=   'MOD_KEMO_UTILS'
+UPPER_MODULES=
+
 SUBDIRS = \
 MESH      \
 jacobian  \
@@ -51,8 +54,7 @@ lib_tasks: libtarget lib_archve
 	@echo '#' >> $(MAKENAME)
 
 libtarget:
-	@echo '' >> $(MAKENAME)
-	@echo  '$$(LIB_UTILS_FILE): $$(MOD_KEMO_UTILS)'>> $(MAKENAME)
+	@echo  '$$(LIB_UTILS_FILE): $$('$(MODULE_LIST)')'>> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -65,17 +67,15 @@ lib_archve:
 	done
 
 mod_list:
-	@echo '' >> $(MAKENAME)
-	@echo MOD_KEMO_UTILS=  \\ >> $(MAKENAME)
-	@echo  \
-	'$$(MOD_MESH)'         \
-	'$$(MOD_MERGE)'        >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
+	@echo '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  $(MODULE_LIST)= >> $(MAKENAME)
+	@echo  '#'  >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		UPPER_MODULES='$(MODULE_LIST)' \
 		mod_list; \
 		) \
 	done

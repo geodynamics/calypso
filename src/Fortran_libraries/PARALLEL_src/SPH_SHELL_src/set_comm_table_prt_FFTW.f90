@@ -12,17 +12,17 @@
 !!     &         Nfft_c, aNfft, comm_sph_FFTW)
 !!        type(comm_tbl_from_FFTW), intent(inout) :: comm_sph_FFTW
 !!
-!!      subroutine copy_prt_field_FFTW_to_send                          &
+!!      subroutine pin_FFTW_fields_to_send                              &
 !!     &         (nnod_rtp, irev_sr_rtp, nnod_rt,                       &
 !!     &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !!      subroutine copy_prt_comp_FFTW_to_send                           &
 !!     &         (nd, nnod_rtp, irev_sr_rtp, nnod_rt,                   &
 !!     &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !!
-!!      subroutine copy_prt_FFTW_field_from_recv                        &
+!!      subroutine pin_FFTW_fields_from_recv                            &
 !!     &         (nnod_rtp, istep_rtp, nnod_rt, irev_sr_rtp,            &
 !!     &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
-!!      subroutine copy_FFTW_field_from_recv_smp                        &
+!!      subroutine pout_FFTW_smp_fields_from_recv                       &
 !!     &         (nnod_rtp, istep_rtp, irt_rtp_smp_stack, irev_sr_rtp,  &
 !!     &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
 !!
@@ -107,7 +107,7 @@
         ic_send = irev_sr_rtp(ic_rtp)
         if(ic_send .le. ntot_sr_rtp) then
           comm_sph_FFTW%kl_fftw(ic_send) = j
-          comm_sph_FFTW%m_fftw(ic_send) =  m
+          comm_sph_FFTW%m_fftw(ic_send) =  Nfft_c
           comm_sph_FFTW%cnrm_sr_rtp(ic_send) = aNfft * ru
         end if
 !        WS(ic_send) = aNfft * real(C_fft(ist_c))
@@ -119,7 +119,7 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine copy_prt_field_FFTW_to_send                            &
+      subroutine pin_FFTW_fields_to_send                                &
      &         (nnod_rtp, irev_sr_rtp, nnod_rt,                         &
      &          ncomp_fwd, Nfft_c, aNfft, C_fft, n_WS, WS)
 !
@@ -167,7 +167,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine copy_prt_field_FFTW_to_send
+      end subroutine pin_FFTW_fields_to_send
 !
 ! ------------------------------------------------------------------
 !
@@ -221,7 +221,7 @@
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine copy_prt_FFTW_field_from_recv                          &
+      subroutine pin_FFTW_fields_from_recv                              &
      &         (nnod_rtp, istep_rtp, nnod_rt, irev_sr_rtp,              &
      &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
 !
@@ -258,16 +258,16 @@
           end do
           ic_rtp = j0_rtp + istep_rtp(3)
           ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
-          C_fft(m,j,nd) = cmplx(WR(ic_recv), zero, kind(0d0))
+          C_fft(Nfft_c,j,nd) = cmplx(WR(ic_recv), zero, kind(0d0))
         end do
       end do
 !$omp end parallel do
 !
-      end subroutine copy_prt_FFTW_field_from_recv
+      end subroutine pin_FFTW_fields_from_recv
 !
 ! ------------------------------------------------------------------
 !
-      subroutine copy_FFTW_field_from_recv_smp                          &
+      subroutine pout_FFTW_smp_fields_from_recv                         &
      &         (nnod_rtp, istep_rtp, irt_rtp_smp_stack, irev_sr_rtp,    &
      &          ncomp_bwd, n_WR, WR, Nfft_c, C_fft)
 !
@@ -318,7 +318,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine copy_FFTW_field_from_recv_smp
+      end subroutine pout_FFTW_smp_fields_from_recv
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------

@@ -38,7 +38,7 @@
 !!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!          *  \cos (\frac{2\pi j k}{Nfft})
 !!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
-!!          *  \cos (\frac{2\pi j k}{Nfft})
+!!          *  \sin (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
@@ -107,7 +107,7 @@
 !
       subroutine calypso_single_RFFTMI(Nsmp, Nstacksmp, Nfft, WK)
 !
-      use FFTPACK5_wrapper
+      use multi_pout_FFTPACK_smp
 !
       integer(kind = kint), intent(in) ::  Nfft
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)

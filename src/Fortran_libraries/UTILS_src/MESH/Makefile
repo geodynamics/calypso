@@ -4,7 +4,10 @@
 
 MESHDIR = $$(UTILS_SRCDIR)/MESH
 SOURCES = $(shell ls *.f90)
+
 MOD_MESH = $(addsuffix .o,$(basename $(SOURCES)) )
+MODULE_LIST=   'MOD_MESH'
+UPPER_MODULES=
 
 #
 #  -------------------------------------------------------------------------
@@ -16,12 +19,14 @@ dir_list:
 libtarget:
 
 lib_archve: libtarget
-	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$(MOD_MESH)' >> $(MAKENAME)
+	@echo '	$$(AR) $$(ARFLUGS) rcsv $$@ $$('$(MODULE_LIST)')' >> $(MAKENAME)
 
 
 mod_list:
-	@echo  MOD_MESH=  \\ >> $(MAKENAME)
-	@echo  $(MOD_MESH) >> $(MAKENAME)
+	@echo  '$(UPPER_MODULES)+= $$('$(MODULE_LIST)')' >> $(MAKENAME)
+	@echo  '#'  >> $(MAKENAME)
+	@echo  '$(MODULE_LIST)= '  \\ >> $(MAKENAME)
+	@echo  '$(MOD_MESH)' >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)
 
 depends:
