@@ -8,14 +8,16 @@
 !>@n      data are strored communication buffer
 !!
 !!@verbatim
-!!      subroutine init_leg_sym_matmul_big(sph_rtm, sph_rlm, leg,       &
+!!      subroutine init_leg_sym_matmul_big(np_smp, sph_rtm, sph_rlm,    &
+!!     &          leg, idx_trns, nvector, nscalar, WK_l_bsm)
+!!      subroutine init_leg_sym_rocblas(sph_rtm, sph_rlm, leg,          &
 !!     &          idx_trns, nvector, nscalar, WK_l_bsm)
-!!      subroutine init_leg_sym_matmul_big2(sph_rtm, sph_rlm, leg,      &
-!!     &          idx_trns, nvector, nscalar, WK_l_bsm)
+!!        integer(kind = kint), intent(in) :: np_smp
 !!        type(sph_rtm_grid), intent(in) :: sph_rtm
 !!        type(sph_rlm_grid), intent(in) :: sph_rlm
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(index_4_sph_trans), intent(in) :: idx_trns
+!!        integer(kind = kint), intent(in) :: nvector, nscalar
 !!        type(leg_trns_bsym_mul_work), intent(inout) :: WK_l_bsm
 !!
 !!      subroutine dealloc_leg_sym_matmul_big(WK_l_bsm)
@@ -41,7 +43,7 @@
 !
       use m_precision
       use m_constants
-      use m_machine_parameter
+!      use m_machine_parameter
 !
       use calypso_mpi
 !
@@ -174,13 +176,10 @@
 !!@n       symp_p = symp_p(          1:  nvec_lk,ip)
 !!@n       symp_t = symp_p(  nvec_lk+1:2*nvec_lk,ip)
         real(kind = kreal), allocatable :: symp_p(:,:)
-!
-!>         work area for timer
-        real(kind = kreal), allocatable :: time_omp(:,:)
       end type leg_trns_bsym_mul_work
 !
       private :: const_symmetric_legendre_lj
-      private :: alloc_leg_sym_matmul_big, alloc_leg_sym_matmul_big2
+      private :: alloc_leg_sym_matmul_big, alloc_leg_sym_rocblas
 !
 ! -----------------------------------------------------------------------
 !
@@ -188,9 +187,10 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_leg_sym_matmul_big(sph_rtm, sph_rlm, leg,         &
-     &          idx_trns, nvector, nscalar, WK_l_bsm)
+      subroutine init_leg_sym_matmul_big(np_smp, sph_rtm, sph_rlm,      &
+     &          leg, idx_trns, nvector, nscalar, WK_l_bsm)
 !
+      integer(kind = kint), intent(in) :: np_smp
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(legendre_4_sph_trans), intent(in) :: leg
@@ -204,17 +204,14 @@
      &    sph_rtm%nidx_rtm(2), sph_rtm%nidx_rtm(3),                     &
      &    leg, idx_trns, WK_l_bsm)
       call alloc_leg_sym_matmul_big                                     &
-     &   (sph_rtm%nidx_rtm(2), sph_rtm%maxidx_rtm_smp(1),               &
+     &   (np_smp, sph_rtm%nidx_rtm(2), sph_rtm%maxidx_rtm_smp(1),       &
      &    nvector, nscalar, idx_trns, WK_l_bsm)
-!
-      allocate(WK_l_bsm%time_omp(np_smp,0:4))
-      WK_l_bsm%time_omp = 0.0d0
 !
       end subroutine init_leg_sym_matmul_big
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_leg_sym_matmul_big2(sph_rtm, sph_rlm, leg,        &
+      subroutine init_leg_sym_rocblas(sph_rtm, sph_rlm, leg,            &
      &          idx_trns, nvector, nscalar, WK_l_bsm)
 !
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -229,14 +226,11 @@
       call const_symmetric_legendre_lj(sph_rlm%nidx_rlm(2),             &
      &    sph_rtm%nidx_rtm(2), sph_rtm%nidx_rtm(3),                     &
      &    leg, idx_trns, WK_l_bsm)
-      call alloc_leg_sym_matmul_big2                                    &
-     &   (sph_rtm%nidx_rtm(1), sph_rtm%maxidx_rtm_smp(1),               &
+      call alloc_leg_sym_rocblas                                        &
+     &   (sph_rtm%nidx_rtm(2), sph_rtm%nidx_rtm(1),                     &
      &    nvector, nscalar, idx_trns, WK_l_bsm)
 !
-      allocate(WK_l_bsm%time_omp(np_smp,0:3))
-      WK_l_bsm%time_omp = 0.0d0
-!
-      end subroutine init_leg_sym_matmul_big2
+      end subroutine init_leg_sym_rocblas
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -266,9 +260,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_leg_sym_matmul_big(nth_rtm, maxidx_rtm_r_smp,    &
+      subroutine alloc_leg_sym_matmul_big                               &
+     &         (np_smp, nth_rtm, maxidx_rtm_r_smp,                      &
      &          nvector, nscalar, idx_trns, WK_l_bsm)
 !
+      integer(kind = kint), intent(in) :: np_smp
       integer(kind = kint), intent(in) :: nth_rtm
       integer(kind = kint), intent(in) :: maxidx_rtm_r_smp
       integer(kind = kint), intent(in) :: nvector, nscalar
@@ -278,9 +274,9 @@
 !
 !
       WK_l_bsm%nvec_jk = ((idx_trns%maxdegree_rlm+1)/2)                 &
-     &         * maxidx_rtm_r_smp * nvector
+     &                  * maxidx_rtm_r_smp * nvector
       WK_l_bsm%nscl_jk = ((idx_trns%maxdegree_rlm+1)/2)                 &
-     &         * maxidx_rtm_r_smp * nscalar
+     &                  * maxidx_rtm_r_smp * nscalar
 !
       WK_l_bsm%n_pol_e = 3*WK_l_bsm%nvec_jk + WK_l_bsm%nscl_jk
       WK_l_bsm%n_tor_e = 2*WK_l_bsm%nvec_jk
@@ -303,11 +299,10 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_leg_sym_matmul_big2(nri_rtm, maxidx_rtm_t_smp,   &
+      subroutine alloc_leg_sym_rocblas(nth_rtm, nri_rtm,                &
      &          nvector, nscalar, idx_trns, WK_l_bsm)
 !
-      integer(kind = kint), intent(in) :: nri_rtm
-      integer(kind = kint), intent(in) :: maxidx_rtm_t_smp
+      integer(kind = kint), intent(in) :: nth_rtm, nri_rtm
       integer(kind = kint), intent(in) :: nvector, nscalar
       type(index_4_sph_trans), intent(in) :: idx_trns
 !
@@ -315,28 +310,28 @@
 !
 !
       WK_l_bsm%nvec_jk = ((idx_trns%maxdegree_rlm+1)/2)                 &
-     &                  * nri_rtm*nvector
+     &                  * nri_rtm * nvector
       WK_l_bsm%nscl_jk = ((idx_trns%maxdegree_rlm+1)/2)                 &
-     &                  * nri_rtm*nscalar
+     &                  * nri_rtm * nscalar
 !
       WK_l_bsm%n_pol_e = 3*WK_l_bsm%nvec_jk + WK_l_bsm%nscl_jk
       WK_l_bsm%n_tor_e = 2*WK_l_bsm%nvec_jk
-      allocate(WK_l_bsm%pol_e(WK_l_bsm%n_pol_e,np_smp))
-      allocate(WK_l_bsm%tor_e(WK_l_bsm%n_tor_e,np_smp))
-      allocate(WK_l_bsm%pol_o(WK_l_bsm%n_pol_e,np_smp))
-      allocate(WK_l_bsm%tor_o(WK_l_bsm%n_tor_e,np_smp))
+      allocate(WK_l_bsm%pol_e(WK_l_bsm%n_pol_e,1))
+      allocate(WK_l_bsm%tor_e(WK_l_bsm%n_tor_e,1))
+      allocate(WK_l_bsm%pol_o(WK_l_bsm%n_pol_e,1))
+      allocate(WK_l_bsm%tor_o(WK_l_bsm%n_tor_e,1))
 !
-      WK_l_bsm%nvec_lk = ((maxidx_rtm_t_smp+1)/2) * nri_rtm*nvector
-      WK_l_bsm%nscl_lk = ((maxidx_rtm_t_smp+1)/2) * nri_rtm*nscalar
+      WK_l_bsm%nvec_lk = ((nth_rtm+1)/2) * nri_rtm * nvector
+      WK_l_bsm%nscl_lk = ((nth_rtm+1)/2) * nri_rtm * nscalar
 !
       WK_l_bsm%n_sym_r = 3*WK_l_bsm%nvec_lk + WK_l_bsm%nscl_lk
       WK_l_bsm%n_sym_p = 2*WK_l_bsm%nvec_lk
-      allocate(WK_l_bsm%symp_r(WK_l_bsm%n_sym_r,np_smp))
-      allocate(WK_l_bsm%symp_p(WK_l_bsm%n_sym_p,np_smp))
-      allocate(WK_l_bsm%asmp_r(WK_l_bsm%n_sym_r,np_smp))
-      allocate(WK_l_bsm%asmp_p(WK_l_bsm%n_sym_p,np_smp))
+      allocate(WK_l_bsm%symp_r(WK_l_bsm%n_sym_r,1))
+      allocate(WK_l_bsm%symp_p(WK_l_bsm%n_sym_p,1))
+      allocate(WK_l_bsm%asmp_r(WK_l_bsm%n_sym_r,1))
+      allocate(WK_l_bsm%asmp_p(WK_l_bsm%n_sym_p,1))
 !
-      end subroutine alloc_leg_sym_matmul_big2
+      end subroutine alloc_leg_sym_rocblas
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -352,8 +347,6 @@
       deallocate(WK_l_bsm%asmp_r, WK_l_bsm%asmp_p)
 !
       deallocate(WK_l_bsm%Ps_tj, WK_l_bsm%dPsdt_tj)
-!
-      deallocate(WK_l_bsm%time_omp)
 !
       end subroutine dealloc_leg_sym_matmul_big
 !

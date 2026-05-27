@@ -226,10 +226,10 @@
           kr_nd = kk + kst*nscalar
           k_rlm = 1 + mod((kr_nd-1),nidx_rlm(1))
           nd = 1 + (kr_nd - k_rlm) / nidx_rlm(1)
-          ip_rtpm = 1 + (lp_rtm-1) * istep_rtm(2)                   &
-     &                + (k_rlm-1) *  istep_rtm(1)                   &
+          ip_rtpm = 1 + (lp_rtm-1) * istep_rtm(2)                       &
+     &                + (k_rlm-1) *  istep_rtm(1)                       &
      &                + (mp_rlm-1) * istep_rtm(3)
-          ipp_recv = nd + 3*nvector                                 &
+          ipp_recv = nd + 3*nvector                                     &
      &                  + (irev_sr_rtm(ip_rtpm) - 1) * ncomp
 !
           symp(kk+3*nkrv,lp_rtm) = WR(ipp_recv) * wp_rtm

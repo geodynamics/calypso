@@ -146,11 +146,13 @@
      &    trans_p%leg, trans_p%idx_trns, SR_sig, SR_r,                  &
      &    trans_p%iflag_SPH_recv)
 !
+!  Initialization of Fourier transform for time integration
       WK%iflag_MHD_FFT = trans_p%iflag_FFT
       call init_fourier_transform_4_MHD                                 &
      &   (sph%sph_rtp, comms_sph%comm_rtp,                              &
      &    WK%trns_MHD, WK%WK_FFTs_MHD, SR_r, WK%iflag_MHD_FFT)
 !
+!  Initialization of Fourier transform for snapshot data
       trans_p%iflag_FFT = set_FFT_mode_4_snapshot(WK%iflag_MHD_FFT)
       call init_sph_FFT_select(my_rank, trans_p%iflag_FFT,              &
      &    sph%sph_rtp, comms_sph%comm_rtp,                              &

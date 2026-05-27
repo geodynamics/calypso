@@ -97,13 +97,13 @@
       character(len = kchara), parameter                                &
      &           :: leg_sym_OMP_target =  'Symmetric_OpenMP_target'
 !>      Character flag to perform Legendre transform
-!@n     with rocBLAS routines
-      character(len = kchara), parameter                                &
-     &           :: leg_sym_rocBLAS =     'Symmetric_rocBLAS'
-!>      Character flag to perform Legendre transform
 !@n     with rocBLAS and OpenMP directives
       character(len = kchara), parameter                                &
      &           :: leg_sym_OMP_rocBLAS = 'Symmetric_OpenMP_rocBLAS'
+!>      Character flag to perform Legendre transform
+!@n     with rocBLAS routines
+      character(len = kchara), parameter                                &
+     &           :: leg_sym_rocBLAS =     'Symmetric_rocBLAS'
 !
 !
 !>      Chalacter flag to perform Legendre transform
@@ -174,11 +174,11 @@
 !@n     with OpenMP offload loop
       integer(kind = kint), parameter :: iflag_leg_OMP_target =     44
 !>      integer flag to perform Legendre transform
-!@n     with rocBLAS routines
-      integer(kind = kint), parameter :: iflag_leg_rocBLAS =        54
-!>      integer flag to perform Legendre transform
 !@n     with rocBLAS and OpenMP directives
-      integer(kind = kint), parameter :: iflag_leg_OMP_rocBLAS =    64
+      integer(kind = kint), parameter :: iflag_leg_OMP_rocBLAS =    54
+!>      integer flag to perform Legendre transform
+!@n     with rocBLAS routines
+      integer(kind = kint), parameter :: iflag_leg_rocBLAS =        64
 !
 !>      integer flag to perform Legendre transform
 !@n     with symmetry and  self matrix product

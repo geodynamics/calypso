@@ -9,10 +9,12 @@
 !!
 !!@verbatim
 !! ------------------------------------------------------------------
-!!      subroutine init_sph_single_FFTW(sph_rtp, FFTW_t)
-!!      subroutine finalize_sph_single_FFTW(FFTW_t)
-!!      subroutine verify_sph_single_FFTW(sph_rtp, FFTW_t)
+!!      subroutine init_sph_single_FFTW(sph_rtp, FFTW_t, flag_fft)
+!!      subroutine finalize_sph_single_FFTW(FFTW_t, flag_fft)
+!!      subroutine verify_sph_single_FFTW(sph_rtp, FFTW_t, flag_fft)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+!!        logical, intent(inout) :: flag_fft
 !!
 !!      subroutine alloc_tmp_ordering_FFTW(sph_rtp, FFTW_t)
 !!      subroutine dealloc_tmp_ordering_FFTW(FFTW_t)
@@ -22,9 +24,16 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine sph_single_fwd_FFTW_to_send(sph_rtp, comm_rtp,       &
-!!     &          ncomp_fwd, n_WS, X_rtp, WS, FFTW_t)
+!!     &          ncomp_fwd, n_WS, X_rtp, WS, FFTW_t, flag_FFT)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in)  :: comm_rtp
+!!        integer(kind = kint), intent(in) :: ncomp_fwd
+!!        real(kind = kreal), intent(in)                                &
+!!     &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_fwd)
+!!        integer(kind = kint), intent(in) :: n_WS
+!!        real (kind=kreal), intent(inout):: WS(n_WS)
+!!        type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+!!        logical, intent(inout) :: flag_FFT
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
@@ -39,9 +48,16 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine sph_single_back_FFTW_from_recv(sph_rtp, comm_rtp,    &
-!!     &          ncomp_bwd, n_WR, WR, X_rtp, FFTW_t)
+!!     &          ncomp_bwd, n_WR, WR, X_rtp, FFTW_t, flag_FFT)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in)  :: comm_rtp
+!!        integer(kind = kint), intent(in) :: ncomp_bwd
+!!        integer(kind = kint), intent(in) :: n_WR
+!!        real(kind = kreal), intent(in) :: WR(n_WR)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_bwd)
+!!        type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+!!        logical, intent(inout) :: flag_FFT
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTW3
@@ -87,7 +103,7 @@
 !
       implicit none
 !
-!>      Structure to use SNGLE FFTW
+!>      Structure to use Single FFTW
       type work_for_sgl_FFTW
 !>        plan ID for backward transform
         integer(kind = fftw_plan), allocatable :: plan_bwd(:)
@@ -119,11 +135,12 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_sph_single_FFTW(sph_rtp, FFTW_t)
+      subroutine init_sph_single_FFTW(sph_rtp, FFTW_t, flag_fft)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
 !
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+      logical, intent(inout) :: flag_fft
 !
       integer(kind = kint) :: ip
       integer(kind = 4) :: Nfft4
@@ -139,14 +156,16 @@
      &      FFTW_t%C(1,ip), FFTW_t%X(1,ip) , FFTW_KEMO_EST)
       end do
       FFTW_t%aNfft = one / dble(sph_rtp%nidx_rtp(3))
+      flag_fft = .TRUE.
 !
       end subroutine init_sph_single_FFTW
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_sph_single_FFTW(FFTW_t)
+      subroutine finalize_sph_single_FFTW(FFTW_t, flag_fft)
 !
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+      logical, intent(inout) :: flag_fft
 !
       integer(kind = kint) :: j
 !
@@ -157,27 +176,30 @@
 !
       call dealloc_FFTW_plan(FFTW_t)
       call dfftw_cleanup
+      flag_fft = .TRUE.
 !
       end subroutine finalize_sph_single_FFTW
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_sph_single_FFTW(sph_rtp, FFTW_t)
+      subroutine verify_sph_single_FFTW(sph_rtp, FFTW_t, flag_fft)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
 !
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+      logical, intent(inout) :: flag_fft
 !
 !
       if(allocated(FFTW_t%X) .eqv. .false.) then
-        call init_sph_single_FFTW(sph_rtp, FFTW_t)
+        call init_sph_single_FFTW(sph_rtp, FFTW_t, flag_fft)
         return
       end if
 !
       if(size(FFTW_t%X) .ne. sph_rtp%nidx_rtp(3)*np_smp) then
-        call finalize_sph_single_FFTW(FFTW_t)
-        call init_sph_single_FFTW(sph_rtp, FFTW_t)
+        call finalize_sph_single_FFTW(FFTW_t, flag_fft)
+        call init_sph_single_FFTW(sph_rtp, FFTW_t, flag_fft)
       end if
+      flag_fft = .TRUE.
 !
       end subroutine verify_sph_single_FFTW
 !
@@ -185,7 +207,7 @@
 ! ------------------------------------------------------------------
 !
       subroutine sph_single_fwd_FFTW_to_send(sph_rtp, comm_rtp,         &
-     &          ncomp_fwd, n_WS, X_rtp, WS, FFTW_t)
+     &          ncomp_fwd, n_WS, X_rtp, WS, FFTW_t, flag_FFT)
 !
       use copy_single_FFT_and_rtp
 !
@@ -199,12 +221,14 @@
       integer(kind = kint), intent(in) :: n_WS
       real (kind=kreal), intent(inout):: WS(n_WS)
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+      logical, intent(inout) :: flag_FFT
 !
       real(kind = kreal) :: start = 0.0d0
       real(kind = kreal) :: elps_smp(3)
       integer(kind = kint) :: j, ip, ist, ied, nd
 !
 !
+      flag_FFT = .TRUE.
       if(iflag_FFT_time)  elps_smp(1:3) = 0.0d0
 !
 !$omp parallel do private(nd,j,ip,ist,ied,start)                        &
@@ -252,7 +276,7 @@
 ! ------------------------------------------------------------------
 !
       subroutine sph_single_back_FFTW_from_recv(sph_rtp, comm_rtp,      &
-     &          ncomp_bwd, n_WR, WR, X_rtp, FFTW_t)
+     &          ncomp_bwd, n_WR, WR, X_rtp, FFTW_t, flag_FFT)
 !
       use copy_single_FFT_and_rtp
 !
@@ -261,17 +285,19 @@
 !
       integer(kind = kint), intent(in) :: ncomp_bwd
       integer(kind = kint), intent(in) :: n_WR
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       real(kind = kreal), intent(inout)                                 &
      &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_bwd)
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+      logical, intent(inout) :: flag_FFT
 !
       real(kind = kreal) :: start = 0.0d0
       real(kind = kreal) :: elps_smp(3)
       integer(kind = kint) :: j, ip, ist, ied, nd
 !
 !
+      flag_FFT = .TRUE.
       if(iflag_FFT_time)  elps_smp(1:3) = 0.0d0
 !
 !$omp parallel do private(nd,j,ip,ist,ied,start)                        &

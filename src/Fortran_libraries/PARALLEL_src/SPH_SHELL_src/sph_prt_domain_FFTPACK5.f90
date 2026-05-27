@@ -10,18 +10,27 @@
 !!  ---------------------------------------------------------------------
 !!
 !!      subroutine init_prt_domain_FFTPACK5                             &
-!!     &         (sph_rtp, comm_rtp, fftpack_d)
+!!     &         (sph_rtp, comm_rtp, fftpack_d, flag_fft)
 !!      subroutine verify_prt_domain_FFTPACK5                           &
-!!     &         (sph_rtp, comm_rtp, fftpack_d)
+!!     &         (sph_rtp, comm_rtp, fftpack_d, flag_fft)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
+!!        type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+!!        logical, intent(inout) :: flag_fft
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
 !!
-!!      subroutine prt_domain_RFFTMF_to_send                            &
-!!     &         (sph_rtp, ncomp_fwd, n_WS, X_rtp, WS, fftpack_d)
+!!      subroutine prt_domain_RFFTMF_to_send(sph_rtp, ncomp_fwd, n_WS,  &
+!!     &          X_rtp, WS, fftpack_d, flag_FFT)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        integer(kind = kint), intent(in) :: ncomp_fwd
+!!        real(kind = kreal), intent(in)                                &
+!!     &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_fwd)
+!!        integer(kind = kint), intent(in) :: n_WS
+!!        real (kind=kreal), intent(inout):: WS(n_WS)
+!!        type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+!!        logical, intent(inout) :: flag_FFT
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTPACK5
@@ -39,9 +48,16 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine prt_domain_RFFTMB_from_recv(sph_rtp, comm_rtp,       &
-!!     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_d)
+!!     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_d, flag_FFT)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
+!!        integer(kind = kint), intent(in) :: ncomp_bwd
+!!        integer(kind = kint), intent(in) :: n_WR
+!!        real(kind = kreal), intent(in) :: WR(n_WR)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_bwd)
+!!        type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+!!        logical, intent(inout) :: flag_FFT
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTPACK5
@@ -93,7 +109,7 @@
 ! ------------------------------------------------------------------
 !
       subroutine init_prt_domain_FFTPACK5                               &
-     &         (sph_rtp, comm_rtp, fftpack_d)
+     &         (sph_rtp, comm_rtp, fftpack_d, flag_fft)
 !
       use set_comm_table_prt_FFTPACK
 !
@@ -101,6 +117,7 @@
       type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+      logical, intent(inout) :: flag_fft
 !
 !
       call init_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
@@ -112,13 +129,14 @@
      &    sph_rtp%nidx_rtp(3), sph_rtp%istep_rtp,                       &
      &    sph_rtp%istack_rtp_rt_smp(np_smp),                            &
      &    fftpack_d%comm_sph_FFTPACK)
+      flag_fft = .TRUE.
 !
       end subroutine init_prt_domain_FFTPACK5
 !
 ! ------------------------------------------------------------------
 !
       subroutine verify_prt_domain_FFTPACK5                             &
-     &         (sph_rtp, comm_rtp, fftpack_d)
+     &         (sph_rtp, comm_rtp, fftpack_d, flag_fft)
 !
       use set_comm_table_prt_FFTPACK
 !
@@ -126,6 +144,7 @@
       type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+      logical, intent(inout) :: flag_fft
 !
 !
       if(fftpack_d%iflag_fft_len .ne. sph_rtp%nidx_rtp(3)) then
@@ -140,14 +159,15 @@
       end if
 !
       call verify_sph_domain_FFTPACK5(sph_rtp, fftpack_d)
+      flag_fft = .TRUE.
 !
       end subroutine verify_prt_domain_FFTPACK5
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine prt_domain_RFFTMF_to_send                              &
-     &         (sph_rtp, ncomp_fwd, n_WS, X_rtp, WS, fftpack_d)
+      subroutine prt_domain_RFFTMF_to_send(sph_rtp, ncomp_fwd, n_WS,    &
+     &          X_rtp, WS, fftpack_d, flag_FFT)
 !
       use copy_field_smp
       use copy_rtp_data_to_FFTPACK
@@ -163,10 +183,13 @@
       real (kind=kreal), intent(inout):: WS(n_WS)
 !
       type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+      logical, intent(inout) :: flag_FFT
 !
       integer(kind = kint) :: num, nsize, ip, nd, ist_fft
       integer(kind = kint) :: ierr
 !
+!
+      flag_FFT = .TRUE.
       do nd = 1, ncomp_fwd
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+4)
         call copy_nod_scalar_smp                                        &
@@ -199,7 +222,7 @@
 ! ------------------------------------------------------------------
 !
       subroutine prt_domain_RFFTMB_from_recv(sph_rtp, comm_rtp,         &
-     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_d)
+     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_d, flag_FFT)
 !
       use copy_field_smp
       use copy_rtp_data_to_FFTPACK
@@ -210,16 +233,19 @@
 !
       integer(kind = kint), intent(in) :: ncomp_bwd
       integer(kind = kint), intent(in) :: n_WR
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       real(kind = kreal), intent(inout)                                 &
      &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_bwd)
 !
       type(work_for_domain_fftpack), intent(inout) :: fftpack_d
+      logical, intent(inout) :: flag_FFT
 !
       integer(kind = kint) :: num, nsize, nd, ip, ist_fft
       integer(kind = kint) :: ierr
 !
+!
+      flag_FFT = .TRUE.
       do nd = 1, ncomp_bwd
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
         call copy_prt_comp_FFTPACK_from_recv                            &

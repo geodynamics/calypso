@@ -114,7 +114,7 @@
      &      idx_trns, nvector, nscalar, WK_leg%WK_l_sml)
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul_big          &
      &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_big) then
-        call init_leg_sym_matmul_big(sph_rtm, sph_rlm, leg,             &
+        call init_leg_sym_matmul_big(np_smp, sph_rtm, sph_rlm, leg,     &
      &      idx_trns, nvector, nscalar, WK_leg%WK_l_bsm)
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_spin_loop) then
         call init_legendre_symmetry                                     &

@@ -9,19 +9,30 @@
 !!@verbatim
 !!  ---------------------------------------------------------------------
 !!
-!!      subroutine init_sph_single_FFTPACK5(sph_rtp, fftpack_t)
-!!      subroutine finalize_sph_single_FFTPACK5(fftpack_t)
-!!      subroutine verify_sph_single_FFTPACK5(sph_rtp, fftpack_t)
+!!      subroutine init_sph_single_FFTPACK5(sph_rtp, fftpack_t,         &
+!!     &                                    flag_fft)
+!!      subroutine finalize_sph_single_FFTPACK5(fftpack_t, flag_fft)
+!!      subroutine verify_sph_single_FFTPACK5(sph_rtp, fftpack_t,       &
+!!     &                                      flag_fft)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
+!!        type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+!!        logical, intent(inout) :: flag_fft
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
 !!
 !!      subroutine sph_single_RFFTMF_to_send(sph_rtp, comm_rtp,         &
-!!     &          ncomp_fwd, n_WS, X_rtp, WS, fftpack_t)
+!!     &          ncomp_fwd, n_WS, X_rtp, WS, fftpack_t, flag_FFT)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
+!!        integer(kind = kint), intent(in) :: ncomp_fwd
+!!        real(kind = kreal), intent(in)                                &
+!!     &                   :: X_rtp(sph_rtp%nnod_rtp,ncomp_fwd)
+!!        integer(kind = kint), intent(in) :: n_WS
+!!        real (kind=kreal), intent(inout):: WS(n_WS)
+!!        type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+!!        logical, intent(inout) :: flag_FFT
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTPACK5
@@ -39,9 +50,16 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine sph_single_RFFTMB_from_recv(sph_rtp, comm_rtp,       &
-!!     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_t)
+!!     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_t, flag_FFT)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
+!!        integer(kind = kint), intent(in) :: ncomp_bwd
+!!        integer(kind = kint), intent(in) :: n_WR
+!!        real(kind = kreal), intent(in) :: WR(n_WR)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_bwd)
+!!        type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+!!        logical, intent(inout) :: flag_FFT
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTPACK5
@@ -111,11 +129,13 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_sph_single_FFTPACK5(sph_rtp, fftpack_t)
+      subroutine init_sph_single_FFTPACK5(sph_rtp, fftpack_t,           &
+     &                                    flag_fft)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
 !
       type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+      logical, intent(inout) :: flag_fft
 !
       integer(kind = kint) :: ierr
 !
@@ -125,28 +145,33 @@
      &            ierr)
 !
       call alloc_work_sgl_FFTPACK(sph_rtp%nidx_rtp(3), fftpack_t)
+      flag_fft = .TRUE.
 !
       end subroutine init_sph_single_FFTPACK5
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_sph_single_FFTPACK5(fftpack_t)
+      subroutine finalize_sph_single_FFTPACK5(fftpack_t, flag_fft)
 !
       type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+      logical, intent(inout) :: flag_fft
 !
 !
       call dealloc_const_sgl_FFTPACK(fftpack_t)
       call dealloc_work_sgl_FFTPACK(fftpack_t)
+      flag_fft = .TRUE.
 !
       end subroutine finalize_sph_single_FFTPACK5
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_sph_single_FFTPACK5(sph_rtp, fftpack_t)
+      subroutine verify_sph_single_FFTPACK5(sph_rtp, fftpack_t,         &
+     &                                      flag_fft)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
 !
       type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+      logical, intent(inout) :: flag_fft
 !
       integer(kind = kint) :: ierr
 !
@@ -171,6 +196,7 @@
         call dealloc_work_sgl_FFTPACK(fftpack_t)
         call alloc_work_sgl_FFTPACK(sph_rtp%nidx_rtp(3), fftpack_t)
       end if
+      flag_fft = .TRUE.
 !
       end subroutine verify_sph_single_FFTPACK5
 !
@@ -178,7 +204,7 @@
 ! ------------------------------------------------------------------
 !
       subroutine sph_single_RFFTMF_to_send(sph_rtp, comm_rtp,           &
-     &          ncomp_fwd, n_WS, X_rtp, WS, fftpack_t)
+     &          ncomp_fwd, n_WS, X_rtp, WS, fftpack_t, flag_FFT)
 !
       use copy_single_FFT_and_rtp
 !
@@ -193,12 +219,14 @@
       real (kind=kreal), intent(inout):: WS(n_WS)
 !
       type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+      logical, intent(inout) :: flag_FFT
 !
       real(kind = kreal) :: start = 0.0d0
       real(kind = kreal) :: elps_smp(3)
       integer(kind = kint) :: j, ip, ist, ied, nd, ierr
 !
 !
+      flag_FFT = .TRUE.
       if(iflag_FFT_time)  elps_smp(1:3) = 0.0d0
 !
 !$omp parallel do private(ip,j,nd,ist,ied,start)                        &
@@ -250,7 +278,7 @@
 ! ------------------------------------------------------------------
 !
       subroutine sph_single_RFFTMB_from_recv(sph_rtp, comm_rtp,         &
-     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_t)
+     &          ncomp_bwd, n_WR, WR, X_rtp, fftpack_t, flag_FFT)
 !
       use copy_single_FFT_and_rtp
 !
@@ -259,18 +287,20 @@
 !
       integer(kind = kint), intent(in) :: ncomp_bwd
       integer(kind = kint), intent(in) :: n_WR
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       real(kind = kreal), intent(inout)                                 &
      &     :: X_rtp(sph_rtp%nnod_rtp,ncomp_bwd)
 !
       type(work_for_sgl_fftpack), intent(inout) :: fftpack_t
+      logical, intent(inout) :: flag_FFT
 !
       real(kind = kreal) :: start = 0.0d0
       real(kind = kreal) :: elps_smp(3)
       integer(kind = kint) :: j, ip, ist, ied, nd, ierr
 !
 !
+      flag_FFT = .TRUE.
       if(iflag_FFT_time)  elps_smp(1:3) = 0.0d0
 !
 !$omp parallel do private(ip,j,nd,ist,ied,start)                        &

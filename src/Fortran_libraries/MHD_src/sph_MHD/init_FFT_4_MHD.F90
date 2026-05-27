@@ -111,15 +111,19 @@
 !
       integer(kind = kint), intent(in) :: iflag_FFT_MHD
 !
+      integer(kind = kint) :: iflag_res, iflag_FFT, iflag_size
 !
+!
+      iflag_size = mod(iflag_FFT_MHD,10)
+      iflag_FFT = iflag_FFT_MHD - iflag_size
+!
+      iflag_res = iflag_FFT_MHD
       if(iflag_FFT_MHD .eq. iflag_FFTW_COMPONENT) then
-        set_FFT_mode_4_snapshot = iflag_FFTW_SINGLE
+        iflag_res = iflag_FFTW_SINGLE
       else if(iflag_FFT_MHD .eq. iflag_FFTW_ONCE) then
-        set_FFT_mode_4_snapshot = iflag_FFTW_DOMAIN
-!
-      else
-        set_FFT_mode_4_snapshot = iflag_FFT_MHD
+        iflag_res = iflag_FFTW_DOMAIN
       end if
+      set_FFT_mode_4_snapshot = iflag_res
 !
       end function set_FFT_mode_4_snapshot
 !
