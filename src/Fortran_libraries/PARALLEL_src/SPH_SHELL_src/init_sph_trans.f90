@@ -70,7 +70,7 @@
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-      trans_p%iflag_FFT = iflag_FFTPACK_ONCE
+      trans_p%iflag_FFT = iflag_FFTPACK + iflag_once_fft
 !
       call initialize_legendre_trans                                    &
      &   (trans_p%nvector_legendre, ncomp_trans, sph, comms_sph,        &

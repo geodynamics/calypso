@@ -39,23 +39,22 @@
       implicit none
 !
 #ifdef FFTW3
-      integer(kind = kint), parameter :: num_test =   8
+      integer(kind = kint), parameter :: num_test =   7
       integer(kind = kint), parameter :: list_test(num_test)            &
-     &        = (/iflag_FFTPACK_ONCE,                                   &
-     &            iflag_FFTPACK_SINGLE,                                 &
-     &            iflag_FFTPACK_COMPONENT,                              &
-     &            iflag_FFTPACK_DOMAIN,                                 &
-     &            iflag_FFTW_ONCE,                                      &
-     &            iflag_FFTW_SINGLE,                                    &
-     &            iflag_FFTW_COMPONENT,                                 &
-     &            iflag_FFTW_DOMAIN/)
+     &        = (/(iflag_FFTPACK + iflag_once_fft),                     &
+     &            (iflag_FFTPACK + iflag_component_once),               &
+     &            (iflag_FFTPACK + iflag_domain_once),                  &
+     &            (iflag_FFTPACK + iflag_single_fft),                   &
+     &            (iflag_FFTW +    iflag_once_fft),                     &
+     &            (iflag_FFTW +    iflag_single_fft),                   &
+     &            (iflag_FFTW +    iflag_component_once)/)
 #else
       integer(kind = kint), parameter :: num_test =   4
       integer(kind = kint), parameter :: list_test(num_test)            &
-     &        = (/iflag_FFTPACK_ONCE,                                   &
-     &            iflag_FFTPACK_COMPONENT,                              &
-     &            iflag_FFTPACK_SINGLE,                                 &
-     &            iflag_FFTPACK_DOMAIN/)
+     &        = (/(iflag_FFTPACK + iflag_once_fft),                     &
+     &            (iflag_FFTPACK + iflag_component_once),               &
+     &            (iflag_FFTPACK + iflag_domain_once),                  &
+     &            (iflag_FFTPACK + iflag_single_fft)/)
 #endif
 !
       real(kind = kreal) :: etime_shortest = -1.0e10
@@ -118,10 +117,12 @@
       iflag_FFT = iflag_FFT_MHD - iflag_size
 !
       iflag_res = iflag_FFT_MHD
-      if(iflag_FFT_MHD .eq. iflag_FFTW_COMPONENT) then
-        iflag_res = iflag_FFTW_SINGLE
-      else if(iflag_FFT_MHD .eq. iflag_FFTW_ONCE) then
-        iflag_res = iflag_FFTW_DOMAIN
+      if(iflag_FFT .eq. iflag_FFTW) then
+        if(iflag_size .eq. iflag_component_once) then
+          iflag_res = iflag_FFT + iflag_single_fft
+        else if(iflag_size .eq. iflag_once_fft) then
+          iflag_res = iflag_FFT + iflag_domain_once
+        end if
       end if
       set_FFT_mode_4_snapshot = iflag_res
 !

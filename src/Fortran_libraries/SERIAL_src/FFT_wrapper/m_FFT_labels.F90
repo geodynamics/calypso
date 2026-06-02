@@ -47,8 +47,7 @@
       use t_multi_flag_labels
       use m_FFT_selector
       use m_FFTPACK_labels
-!      use m_ISPACK1_labels
-!      use m_ISPACK3_labels
+      use m_ISPACK1_labels
 !
 #ifdef FFTW3
       use m_FFTW_labels
@@ -56,37 +55,15 @@
 #ifdef OMP_FFTW3
       use m_OMP_FFTW_labels
 #endif
-!#ifdef _AMD_ROCM_
-!      use m_rocFFT_labels
-!#endif
 !
       implicit none
 !
-!>      Character flag for at once transeform
+!>      Character flag to sarch fastest FFT
       character(len = kchara), parameter, private                       &
-     &                              :: hd_at_once =       'once'
-!>      Character flag for once transform over component
+     &               :: hd_search_fastest_fft = 'Search_fastest'
+!>      Character flag to use test FFT
       character(len = kchara), parameter, private                       &
-     &                              :: hd_once_for_comp = 'component'
-!>      Character flag for once transform over domain
-      character(len = kchara), parameter, private                       &
-     &                              :: hd_once_for_mode = 'domain'
-!>      Character flag single transform
-      character(len = kchara), parameter, private                       &
-     &                              :: hd_single_FFT =    'single'
-!
-!
-!>      flag parts for once FFT over component
-      character(len = kchara), parameter, private                       &
-     &          :: at_once_FFT_names(2) = (/'once   ', 'at_once'/)
-!>      flag parts for once FFT over component
-      character(len = kchara), parameter, private                       &
-     &          :: comps_FFT_names(2)  = (/'component', 'comps    '/)
-!>      flag parts for single FFT
-      character(len = kchara), parameter, private                       &
-     &          :: single_FFT_names(2)  = (/'single', 'sgl   '/)
-!
-      private :: init_FFT_loop_mode_flags
+     &               :: hd_FFT_TEST = 'TEST'
 !
 ! ----------------------------------------------------------------------
 !
@@ -96,24 +73,17 @@
 !
       subroutine init_FFT_mode_flags()
 !
-      type(multi_flag_labels) :: rocFFT_base_flags
-!
 !
       if(allocated(at_once_FFT_flags%flags)) return
 !
       call init_FFT_loop_mode_flags()
 !
       call init_FFTPACK_mode_flags()
-!      call init_ISPACK1_mode_flags()
-!      call init_ISPACK3_mode_flags()
+      call init_ISPACK1_mode_flags()
 !
 #ifdef FFTW3
       call init_all_FFTW_flags()
 #endif
-!
-!#ifdef _AMD_ROCM_
-!      call init_rocFFT_mode_flags()
-!#endif
 !
       end subroutine init_FFT_mode_flags
 !
@@ -127,16 +97,11 @@
 !
       iflag_fft = -1
       iflag_fft = find_set_FFTPACK_flag(label)
-!      if(iflag_fft .lt. 0) iflag_fft = find_set_ISPACK1_flag(label)
-!      if(iflag_fft .lt. 0) iflag_fft = find_set_ISPACK3_flag(label)
+      if(iflag_fft .lt. 0) iflag_fft = find_set_ISPACK1_flag(label)
 !
 #ifdef FFTW3
       if(iflag_fft .lt. 0) iflag_fft = find_set_all_FFTW_flag(label)
 #endif
-!
-!#ifdef _AMD_ROCM_
-!      if(iflag_fft .lt. 0) iflag_fft = find_set_rocFFT_flag(label)
-!#endif
 !
       find_set_FFT_flag = iflag_fft
 !
@@ -156,10 +121,8 @@
       find_FFT_label = tmpchara
       if((iflag_fft/10) .eq. (iflag_FFTPACK/10)) then
         tmpchara = find_FFTPACK_label(iflag_fft)
-!      else if((iflag_fft/10) .eq. (iflag_ISPACK0/10)) then
-!        tmpchara = find_ISPACK1_label(iflag_fft)
-!      else if((iflag_fft/10) .eq. (iflag_ISPACK3/10)) then
-!        tmpchara = find_ISPACK3_label(iflag_fft)
+      else if((iflag_fft/10) .eq. (iflag_ISPACK0/10)) then
+        tmpchara = find_ISPACK1_label(iflag_fft)
       end if
 !
 #ifdef FFTW3
@@ -168,11 +131,6 @@
       end if
 #endif
 !
-#ifdef _AMD_ROCM_
-!      if(cmp_no_case(tmpchara, 'NONE')) then
-!        tmpchara = find_rocFFT_label(iflag_fft)
-!      end if
-#endif
       find_FFT_label = tmpchara
 !
       end function find_FFT_label
@@ -189,106 +147,64 @@
       call check_all_FFTW_mode_flags(id_file)
       write(id_file,*) ''
 #endif
-!      call check_ISPACK1_mode_flags(id_file)
-!      write(id_file,*) ''
-!      call check_ISPACK3_mode_flags(id_file)
-!      write(id_file,*) ''
-!#ifdef _AMD_ROCM_
-!      call check_rocFFT_mode_flags(id_file)
-!      write(id_file,*) ''
-!#endif
+      call check_ISPACK1_mode_flags(id_file)
+      write(id_file,*) ''
 !
       end subroutine check_FFT_mode_flags
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine init_FFT_loop_mode_flags()
-!
-      type(multi_flag_labels) :: tmp_flags
-      integer(kind = kint) :: icou
-!
-!
-      call init_multi_flags_by_labels(itwo, at_once_FFT_names,          &
-     &                                at_once_FFT_flags)
-      call init_multi_flags_by_one_label(hd_once_for_mode,              &
-     &                                   domain_FFT_flags)
-      call init_multi_flags_by_labels(itwo, comps_FFT_names,            &
-     &                                comp_FFT_flags)
-      call init_multi_flags_by_labels(itwo, single_FFT_names,           &
-     &                                single_FFT_flags)
-!
-!
-      end subroutine init_FFT_loop_mode_flags
-!
-! ------------------------------------------------------------------
-!
       subroutine write_elapsed_4_FFT(i_mode, etime_fft)
 !
       integer(kind = kint), intent(in) :: i_mode
       real(kind = kreal), intent(in) :: etime_fft
 !
-      character(len = kchara) :: FFT_name, FFT_type, tmpchara
+      character(len = 20) :: size_label
+      character(len = kchara) :: tmpchara
+      integer(kind = kint) :: iflag_FFT, iflag_size
 !
+!
+      iflag_size = mod(i_mode,10)
+      iflag_FFT =  i_mode - iflag_size
 !
       tmpchara = find_FFT_label(i_mode)
 !
-      if     (i_mode .eq. iflag_FFTPACK_ONCE) then
-        write(*,*) 'elapsed by FFTPACK at once               (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_FFTPACK_SINGLE) then
-        write(*,*) 'elapsed by single FFTPACK                (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_FFTPACK_COMPONENT) then
-        write(*,*) 'elapsed by FFTPACK for all component     (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_FFTPACK_DOMAIN) then
-        write(*,*) 'elapsed by FFTPACK for domain            (',        &
-     &            trim(tmpchara), '): ', etime_fft
-!
-      else if(i_mode .eq. iflag_FFTW_ONCE) then
-        write(*,*) 'elapsed by FFTW3 for at once             (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_FFTW_SINGLE) then
-        write(*,*) 'elapsed by single FFTW3                  (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_FFTW_COMPONENT) then
-        write(*,*) 'elapsed by FFTW3 for all component       (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_FFTW_DOMAIN) then
-        write(*,*) 'elapsed by FFTW3 for domain              (',        &
-     &            trim(tmpchara), '): ', etime_fft
-!
-      else if(i_mode .eq. iflag_OMP_FFTW_ONCE) then
-        write(*,*) 'elapsed by FFTW3 with OpoenMP at once    (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_OMP_FFTW_DOMAIN) then
-        write(*,*) 'elapsed by FFTW3 with OpoenMP for domain (',        &
-     &            trim(tmpchara), '): ', etime_fft
-!
-      else if(i_mode .eq. iflag_ISPACK1_ONCE) then
-        write(*,*) 'elapsed by ISPACK V0.93                  (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_ISPACK1_DOMAIN) then
-        write(*,*) 'elapsed by ISPACK V0.93 for domain       (',        &
-     &            trim(tmpchara), '): ', etime_fft
-!
-      else if(i_mode .eq. iflag_ISPACK3_ONCE) then
-        write(*,*) 'elapsed by ISPACK V3.0.1                 (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_ISPACK3_DOMAIN) then
-        write(*,*) 'elapsed by ISPACK V3.0.1 for domain      (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_ISPACK3_COMPONENT) then
-        write(*,*) 'elapsed by ISPACK V3.0.1 for component   (',        &
-     &            trim(tmpchara), '): ', etime_fft
-      else if(i_mode .eq. iflag_ISPACK3_SINGLE) then
-        write(*,*) 'elapsed by single ISPACK V3.0.1          (',        &
-     &            trim(tmpchara), '): ', etime_fft
+      if     (iflag_size .eq. iflag_once_fft) then
+        write(size_label,'(a20)') 'at once:            '
+      else if(iflag_size .eq. iflag_single_fft) then
+        write(size_label,'(a20)') 'for each transform: '
+      else if(iflag_size .eq. iflag_component_once) then
+        write(size_label,'(a20)') 'for all component:  '
+      else if(iflag_size .eq. iflag_domain_once) then
+        write(size_label,'(a20)') 'for each component: '
+      else
+        write(size_label,'(a20)') 'for unknown size:   '
       end if
+!
+      if     (iflag_FFT .eq. iflag_FFTPACK) then
+        write(*,'(a,a20)',ADVANCE='NO')                                 &
+     &         'Elapsed by FFTPACK ', size_label, '              ('
+      else if(iflag_FFT .eq. iflag_ISPACK0) then
+        write(*,'(a,a20)',ADVANCE='NO')                                 &
+     &         'Elapsed by ISPACK V0.93 ', size_label, '         ('
+      else if(iflag_FFT .eq. iflag_FFTW) then
+        write(*,'(a,a20)',ADVANCE='NO')                                 &
+     &         'Elapsed by FFTW Ver.3 ', size_label, '           ('
+      else if(iflag_FFT .eq. iflag_OMP_FFTW) then
+        write(*,'(a,a20)',ADVANCE='NO')                                 &
+     &         'Elapsed by FFTW V.3 with OpenMP ', size_label, ' ('
+      else
+        write(*,'(a,a20)',ADVANCE='NO')                                 &
+     &         'Elapsed by unknown ', size_label, '              ('
+      end if
+!
+      write(*,'(2a)',ADVANCE='NO') trim(tmpchara), '): '
+      write(*,*) etime_fft
 !
       end subroutine write_elapsed_4_FFT
 !
+! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
       integer(kind = kint) function                                     &
@@ -304,9 +220,9 @@
       call init_FFT_mode_flags()
 !
 #ifdef FFTW3
-      iflag = iflag_FFTW_SINGLE
+      iflag = iflag_FFTW + iflag_single_fft
 #else
-      iflag = iflag_FFTPACK_ONCE
+      iflag = iflag_FFTPACK + iflag_once_fft
 #endif
       if(iflag_ctl .eq. 0) then
         set_fft_library_ctl = iflag

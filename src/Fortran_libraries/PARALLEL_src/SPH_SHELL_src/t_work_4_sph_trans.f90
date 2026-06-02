@@ -80,7 +80,8 @@
 !>      vector length for legendre transform
         integer(kind = kint) :: nvector_legendre = 0
 !>        Integer flag to select FFT
-        integer(kind = kint) :: iflag_FFT = iflag_FFTPACK_ONCE
+        integer(kind = kint) :: iflag_FFT                               &
+     &                         = iflag_FFTPACK + iflag_once_fft
 !>        Integer flag to select routines to get data from recieve buffer
         integer(kind = kint) :: iflag_SPH_recv                          &
      &                         = iflag_import_UNDEFINED

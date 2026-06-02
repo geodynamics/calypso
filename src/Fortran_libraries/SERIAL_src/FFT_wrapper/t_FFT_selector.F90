@@ -133,11 +133,11 @@
       start = 0.0d0
       start = OMP_GET_WTIME()
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
+      if(iflag_FFT .eq. (iflag_FFTW + iflag_once_fft)) then
         if(id_rank .eq. 0) write(*,*) 'Use FFTW'
         call init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WKS%WK_MUL_FFTW)
         return
-      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+      else if(iflag_FFT .eq. (iflag_FFTW + iflag_single_fft)) then
         if(id_rank .eq. 0) write(*,*) 'Use single transform in FFTW'
         call init_FFTW_type(Nsmp, Nfft, WKS%WK_FFTW)
         return
@@ -167,11 +167,11 @@
       start = 0.0d0
       start = OMP_GET_WTIME()
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
+      if(iflag_FFT .eq. (iflag_FFTW + iflag_once_fft)) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
         call finalize_FFTW_mul_type(Nsmp, WKS%WK_MUL_FFTW)
         return
-      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+      else if(iflag_FFT .eq. (iflag_FFTW + iflag_single_fft)) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize single FFTW'
         call finalize_FFTW_type(Nsmp, WKS%WK_FFTW)
         return
@@ -201,12 +201,12 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
+      if(iflag_FFT .eq. (iflag_FFTW + iflag_once_fft)) then
         if(iflag_debug .gt. 0) write(*,*) 'Use FFTW'
         call verify_wk_FFTW_mul_type(Nsmp, Nstacksmp,                   &
      &      Nfft, WKS%WK_MUL_FFTW)
         return
-      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+      else if(iflag_FFT .eq. (iflag_FFTW + iflag_single_fft)) then
         if(iflag_debug .gt. 0) write(*,*) 'Use single FFTW transforms'
         call verify_wk_FFTW_type(Nsmp, Nfft, WKS%WK_FFTW)
         return
@@ -239,11 +239,11 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
+      if(iflag_FFT .eq. (iflag_FFTW + iflag_once_fft)) then
         call calypso_multi_pout_fwd_FFTW3(Nsmp, Nstacksmp, M, Nfft, X,  &
      &      WKS%WK_MUL_FFTW, elapsed_fft, elapsed_cpy)
         return
-      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+      else if(iflag_FFT .eq. (iflag_FFTW + iflag_single_fft)) then
         call FFTW_forward_type(Nsmp, Nstacksmp, M, Nfft, X,             &
      &                         WKS%WK_FFTW, elapsed_fft, elapsed_cpy)
         return
@@ -275,11 +275,11 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
+      if(iflag_FFT .eq. (iflag_FFTW + iflag_once_fft)) then
         call calypso_multi_pout_bwd_FFTW3(Nsmp, Nstacksmp, M, Nfft, X,  &
      &      WKS%WK_MUL_FFTW, elapsed_fft, elapsed_cpy)
         return
-      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+      else if(iflag_FFT .eq. (iflag_FFTW + iflag_single_fft)) then
         call FFTW_backward_type(Nsmp, Nstacksmp, M, Nfft, X,            &
      &                          WKS%WK_FFTW, elapsed_fft, elapsed_cpy)
         return

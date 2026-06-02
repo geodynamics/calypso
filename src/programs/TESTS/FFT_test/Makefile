@@ -40,6 +40,7 @@ m_precision.o \
 m_constants.o \
 m_machine_parameter.o \
 m_FFTPACK_labels.o \
+m_ISPACK1_labels.o \
 m_FFTW_labels.o \
 m_FFT_labels.o \
 m_FFT_selector.o \
