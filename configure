@@ -645,6 +645,7 @@ ac_header_c_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+SHAREDLIB_FLAG
 PKGFLAGS_PNG
 PNG_LIBS
 PNG_CFLAGS
@@ -793,6 +794,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_silent_rules
+enable_shared
 with_fftw3
 with_libpng
 enable_dependency_tracking
@@ -1452,6 +1454,8 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
+  --enable-shared          Make shared library for Python
+   --disable-shared to disable shared library
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -3545,7 +3549,6 @@ fi
 
 
 
-# builtin(include,src/confdb/ax_check_libmpi.m4)
 #
 # SYNOPSIS
 #
@@ -4049,7 +4052,21 @@ fi
 
 
 
-# AC_CONFIG_HEADER([config.h])
+# AC_CONFIG_HEADERS([config.h])
+
+# Check whether --enable-shared was given.
+if test ${enable_shared+y}
+then :
+  enableval=$enable_shared; if test "$enableval" != no ; then
+  MAKE_sharedlib='yes'
+ else
+    MAKE_sharedlib='no'
+ fi
+else case e in #(
+  e) MAKE_sharedlib='no' ;;
+esac
+fi
+
 
 
 # Check whether --with-fftw3 was given.
@@ -4081,12 +4098,14 @@ esac
 fi
 
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: with-fftw3...   \"${USE_fftw3}\"" >&5
-printf "%s\n" "with-fftw3...   \"${USE_fftw3}\"" >&6; }
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: enable-libpng...\"${USE_libpng}\"" >&5
-printf "%s\n" "enable-libpng...\"${USE_libpng}\"" >&6; }
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: with-blas...    \"${with_blas}\"" >&5
-printf "%s\n" "with-blas...    \"${with_blas}\"" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: enable-shared... \"${MAKE_sharedlib}\"" >&5
+printf "%s\n" "enable-shared... \"${MAKE_sharedlib}\"" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: with-fftw3...    \"${USE_fftw3}\"" >&5
+printf "%s\n" "with-fftw3...    \"${USE_fftw3}\"" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: enable-libpng... \"${USE_libpng}\"" >&5
+printf "%s\n" "enable-libpng... \"${USE_libpng}\"" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: with-blas...     \"${with_blas}\"" >&5
+printf "%s\n" "with-blas...     \"${with_blas}\"" >&6; }
 
 # Checks for programs.
 
@@ -10527,6 +10546,17 @@ fi
 
 
 
+
+# Add Shared library flag
+# if test -n "${SHAREDLIB_FLAG}"
+# then
+    if test ${MAKE_sharedlib} = "yes"
+    then
+        SHAREDLIB_FLAG="--enable-shared"
+    fi
+# fi
+
+
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
 printf "%s\n" "" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: -----   Configuration summary   -------------------------------" >&5
@@ -10541,6 +10571,17 @@ printf "%s\n" "host_alias:  \"${host_alias}\"" >&6; }
 printf "%s\n" "XL_FORTRAN:    \"${XL_FORTRAN}\"" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: mpirun command and options: \"${MPIRUN}\"" >&5
 printf "%s\n" "mpirun command and options: \"${MPIRUN}\"" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
+printf "%s\n" "" >&6; }
+if test -n "${SHAREDLIB_FLAG}"; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Make shared library ...  yes" >&5
+printf "%s\n" "Make shared library ...  yes" >&6; }
+else
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Make shared library ...   no" >&5
+printf "%s\n" "Make shared library ...   no" >&6; }
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
+printf "%s\n" "" >&6; }
 if test -n "${OPENMP_FCFLAGS}"; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Use OpenMP ...        yes" >&5
 printf "%s\n" "Use OpenMP ...        yes" >&6; }

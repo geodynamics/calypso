@@ -9,10 +9,10 @@ SHELL           = @SHELL@
 SRCDIR = @abs_top_srcdir@
 INSTDIR= @prefix@
 #
-MHDDIR = $(SRCDIR)/src
-MAKEDIR= $(SRCDIR)/work
-BUILDDIR= $(SRCDIR)/bin
-TESTDIR=  $(SRCDIR)/tests
+MHDDIR =   $(SRCDIR)/src
+MAKEDIR=   $(SRCDIR)/work
+BUILDDIR=  $(SRCDIR)/bin
+TESTDIR=   $(SRCDIR)/tests
 #
 # MPI settings
 #
@@ -27,13 +27,13 @@ MPIRUN =      @MPIRUN@
 #
 
 F90_LOCAL = @FC@
-MPIF90 = @MPIFC@
+MPIF90 =    @MPIFC@
 
-CC =    @CC@
-MPICC = @MPICC@
+CC =        @CC@
+MPICC =     @MPICC@
 
-GMAKE = @GMAKE@
-AR = @ar_bin@
+GMAKE =  @GMAKE@
+AR =     @ar_bin@
 RANLIB = @RANLIB@
 
 #
@@ -47,8 +47,9 @@ XL_FORTRAN =     @XL_FORTRAN@
 #
 #  optimization flags
 #
-F90OPTFLAGS= @FCFLAGS@
-OPTFLAGS =   @CFLAGS@
+F90OPTFLAGS=     @FCFLAGS@
+OPTFLAGS =       @CFLAGS@
+SHAREDLIB_FLAG = @SHAREDLIB_FLAG@
 #
 #   BLAS settings
 #
@@ -111,6 +112,7 @@ makemake: $(MAKE_MOD_DEP)
 		F90OPTFLAGS="$(F90OPTFLAGS)" \
 		OPENMP_FCFLAGS="$(OPENMP_FCFLAGS)" \
 		OPENMP_CFLAGS="$(OPENMP_CFLAGS)" \
+		SHAREDLIB_FLAG="$(SHAREDLIB_FLAG)" \
 		F90LIB="$(F90LIB)" \
 		MPIF90="$(MPIF90)" \
 		MPICC="$(MPICC)"   \

@@ -15,16 +15,17 @@ RANLIB=ranlib
 #
 # Compiler options
 #
-F90OPTFLAGS = -O3 -g -fopenmp  $(F_INCLUDE)
-F90CPPFLAGS =  -DZLIB_IO -DFFTW3 -DBLAS -DHDF5_IO
-OPTFLAGS = -O3 -g  
+SHAREDLIB_FLAG = --enable-shared
+F90OPTFLAGS =     -fPIC -O3 -g -fopenmp  $(F_INCLUDE)
+F90CPPFLAGS =     -DZLIB_IO -DFFTW3 -DBLAS -DHDF5_IO
+OPTFLAGS =        -fPIC -O3 -g  
 #
 # Libralies and includes settting
 #
 
 F90LIBS =   $(ZLIB_LIBS) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LDFLAGS) $(HDF5_FLIBS)
-F_INCLUDE = -I. -I/Users/matsui/Calypso_test/work $(HDF5_FFLAGS)
-C_INCLUDE = -I. -I/Users/matsui/Calypso_test/work $(ZLIB_CFLAGS)  $(FFTW3_CFLAGS)
+F_INCLUDE = -I. -I$(MAKEDIR) $(HDF5_FFLAGS)
+C_INCLUDE = -I. -I$(MAKEDIR) $(ZLIB_CFLAGS)  $(FFTW3_CFLAGS)
 
 #
 # zlib settings
@@ -107,4 +108,14 @@ LIBS_FFT_TEST= \
 $(LIB_MESH) $(LIB_FFTPACK) $(LIB_NETLIB)
 LIB_FILES_FFT_TEST= \
 $(LIB_MESH_FILE) $(LIB_FFTPACK_FILE) $(LIB_NETLIB_FILE)
+#
+LIB_PYTHONS= \
+-L$(PYTHONDIR) -lcalypso_to_pythons
+LIB_FILE_PYTHONS= \
+$(PYTHONDIR)/libcalypso_to_pythons.so
+#
+LIB_PYTHON_UTILS= \
+$(LIB_MESH) $(LIB_KEMO_C)
+LIB_FILES_PYTHON_UTILS= \
+$(LIB_MESH_FILE) $(LIB_KEMO_C_FILE)
 #

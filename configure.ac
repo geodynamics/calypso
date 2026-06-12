@@ -2,8 +2,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-# AC_PREREQ(2.61)
-AC_INIT(FULL-PACKAGE-NAME, VERSION, BUG-REPORT-ADDRESS)
+# AC_PREREQ([2.72])
+AC_INIT([FULL-PACKAGE-NAME],[VERSION],[BUG-REPORT-ADDRESS])
 
 AM_INIT_AUTOMAKE
 AM_CONDITIONAL([am__fastdepOBJC], false)
@@ -17,7 +17,6 @@ builtin(include,src/confdb/ax_pthread.m4)
 builtin(include,src/confdb/ax_openmp.m4)
 
 dnl Include MPI related definitions
-# builtin(include,src/confdb/ax_check_libmpi.m4)
 builtin(include,src/confdb/ax_mpi.m4)
 
 dnl Include BLAS library check
@@ -35,7 +34,17 @@ builtin(include,src/confdb/pkg.m4)
 
 
 AC_CONFIG_SRCDIR([src/programs/SPH_MHD/main_sph_MHD_w_psf.f90])
-# AC_CONFIG_HEADER([config.h])
+# AC_CONFIG_HEADERS([config.h])
+
+AC_ARG_ENABLE(shared,
+[  --enable-shared          Make shared library for Python
+   --disable-shared to disable shared library],
+[if test "$enableval" != no ; then
+  MAKE_sharedlib='yes'
+ else
+    MAKE_sharedlib='no'
+ fi],
+[MAKE_sharedlib='no'])
 
 AC_ARG_WITH(fftw3,
 [  --with-fftw3           Use fftw3 library
@@ -57,9 +66,10 @@ AC_ARG_WITH(libpng,
  fi],
 [USE_libpng='no'])
 
-AC_MSG_RESULT(with-fftw3...   "${USE_fftw3}")
-AC_MSG_RESULT(enable-libpng..."${USE_libpng}")
-AC_MSG_RESULT(with-blas...    "${with_blas}")
+AC_MSG_RESULT(enable-shared... "${MAKE_sharedlib}")
+AC_MSG_RESULT(with-fftw3...    "${USE_fftw3}")
+AC_MSG_RESULT(enable-libpng... "${USE_libpng}")
+AC_MSG_RESULT(with-blas...     "${with_blas}")
 
 # Checks for programs.
 AC_PROG_CC
@@ -150,7 +160,15 @@ AC_SUBST(BLAS_LIBS)
 
 
 # Checks for header files.
-AC_HEADER_STDC
+m4_warn([obsolete],
+[The preprocessor macro 'STDC_HEADERS' is obsolete.
+  Except in unusual embedded environments, you can safely include all
+  C89 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 AC_CHECK_HEADERS([stdlib.h string.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -215,6 +233,17 @@ AC_SUBST(PKGFLAGS_PNG)
 AC_SUBST(PNG_CFLAGS)
 AC_SUBST(PNG_LIBS)
 
+
+# Add Shared library flag
+# if test -n "${SHAREDLIB_FLAG}"
+# then
+    if test ${MAKE_sharedlib} = "yes"
+    then
+        SHAREDLIB_FLAG="--enable-shared"
+    fi
+# fi
+AC_SUBST(SHAREDLIB_FLAG)
+
 AC_MSG_RESULT()
 AC_MSG_RESULT(-----   Configuration summary   -------------------------------)
 AC_MSG_RESULT()
@@ -222,6 +251,13 @@ AC_MSG_RESULT(  host:        "${host}")
 AC_MSG_RESULT(  host_alias:  "${host_alias}")
 AC_MSG_RESULT(XL_FORTRAN:    "${XL_FORTRAN}")
 AC_MSG_RESULT(mpirun command and options: "${MPIRUN}")
+AC_MSG_RESULT()
+if test -n "${SHAREDLIB_FLAG}"; then
+        AC_MSG_RESULT(Make shared library ...  yes)
+else
+        AC_MSG_RESULT(Make shared library ...   no)
+fi
+AC_MSG_RESULT()
 if test -n "${OPENMP_FCFLAGS}"; then
         AC_MSG_RESULT(    Use OpenMP ...        yes)
 else
