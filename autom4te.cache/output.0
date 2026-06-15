@@ -657,6 +657,8 @@ FFTW3_LIBS
 FFTW3_CFLAGS
 LIB@&t@OBJS
 EGREP
+XL_FORTRAN
+COCOA_FLAG
 BLAS_LIBS
 FLIBS
 host_os
@@ -699,7 +701,6 @@ GMAKE
 ifGNUmake
 RANLIB
 ar_bin
-XL_FORTRAN
 ac_ct_FC
 FCFLAGS
 FC
@@ -5630,12 +5631,6 @@ else
 	F77=${FC}
 fi
 
-if test ${host_alias} = "powerpc64-bgq-linux"
-then
-  XL_FORTRAN="__bgq__"
-fi
-
-
 if test -z ${AR}
 then
 	ar_bin="ar"
@@ -9656,6 +9651,23 @@ fi
 fi
 
 
+# Check target system
+case $host in
+    *-apple-darwin*)
+        COCOA_FLAG="-D__APPLE__"
+        XL_FORTRAN=""
+        ;;
+    powerpc64-bgq-linux)
+        COCOA_FLAG=""
+        XL_FORTRAN="__bgq__"
+        ;;
+    *)
+        COCOA_FLAG=""
+        XL_FORTRAN=""
+        ;;
+esac
+
+
 
 # Checks for header files.
 # Autoupdate added the next two lines to ensure that your configure
@@ -10565,8 +10577,13 @@ printf "%s\n" "-----   Configuration summary   -------------------------------" 
 printf "%s\n" "" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: host:        \"${host}\"" >&5
 printf "%s\n" "host:        \"${host}\"" >&6; }
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: host_alias:  \"${host_alias}\"" >&5
-printf "%s\n" "host_alias:  \"${host_alias}\"" >&6; }
+if test -n "${COCOA_FLAG}"; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Apple MacOS:            yes" >&5
+printf "%s\n" "Apple MacOS:            yes" >&6; }
+else
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Apple MacOS:             no" >&5
+printf "%s\n" "Apple MacOS:             no" >&6; }
+fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: XL_FORTRAN:    \"${XL_FORTRAN}\"" >&5
 printf "%s\n" "XL_FORTRAN:    \"${XL_FORTRAN}\"" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: mpirun command and options: \"${MPIRUN}\"" >&5

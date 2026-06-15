@@ -39,9 +39,11 @@ RANLIB = @RANLIB@
 #
 # OPENMP_FCFLAGS OprnMP option for fortran compiler
 # XL_FORTRAN   Set "-WF," option for cpp preprocessor
+# COCOA_FLAG is defined to use cocoa Framework
 #
 OPENMP_FCFLAGS = @OPENMP_FCFLAGS@
 OPENMP_CFLAGS =  @OPENMP_CFLAGS@
+COCOA_FLAG =     @COCOA_FLAG@
 XL_FORTRAN =     @XL_FORTRAN@
 #
 #
@@ -110,6 +112,7 @@ makemake: $(MAKE_MOD_DEP)
 		HDF5_FLIBS="$(HDF5_FLIBS)" \
 		OPTFLAGS="$(OPTFLAGS)" \
 		F90OPTFLAGS="$(F90OPTFLAGS)" \
+		COCOA_FLAG="$(COCOA_FLAG)"         \
 		OPENMP_FCFLAGS="$(OPENMP_FCFLAGS)" \
 		OPENMP_CFLAGS="$(OPENMP_CFLAGS)" \
 		SHAREDLIB_FLAG="$(SHAREDLIB_FLAG)" \

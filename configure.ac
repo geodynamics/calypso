@@ -82,12 +82,6 @@ else
 	F77=${FC}
 fi
 
-if test ${host_alias} = "powerpc64-bgq-linux"
-then
-  XL_FORTRAN="__bgq__"
-fi
-AC_SUBST(XL_FORTRAN)
-
 if test -z ${AR}
 then
 	ar_bin="ar"
@@ -158,6 +152,23 @@ if test -n "${with_blas}"; then
 fi
 AC_SUBST(BLAS_LIBS)
 
+# Check target system
+case $host in
+    *-apple-darwin*)
+        COCOA_FLAG="-D__APPLE__"
+        XL_FORTRAN=""
+        ;;
+    powerpc64-bgq-linux)
+        COCOA_FLAG=""
+        XL_FORTRAN="__bgq__"
+        ;;
+    *)
+        COCOA_FLAG=""
+        XL_FORTRAN=""
+        ;;
+esac
+AC_SUBST(COCOA_FLAG)
+AC_SUBST(XL_FORTRAN)
 
 # Checks for header files.
 m4_warn([obsolete],
@@ -248,7 +259,11 @@ AC_MSG_RESULT()
 AC_MSG_RESULT(-----   Configuration summary   -------------------------------)
 AC_MSG_RESULT()
 AC_MSG_RESULT(  host:        "${host}")
-AC_MSG_RESULT(  host_alias:  "${host_alias}")
+if test -n "${COCOA_FLAG}"; then
+        AC_MSG_RESULT(Apple MacOS:            yes)
+else
+        AC_MSG_RESULT(Apple MacOS:             no)
+fi
 AC_MSG_RESULT(XL_FORTRAN:    "${XL_FORTRAN}")
 AC_MSG_RESULT(mpirun command and options: "${MPIRUN}")
 AC_MSG_RESULT()
