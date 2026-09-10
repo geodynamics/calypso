@@ -34,7 +34,7 @@ target_list:
 
 target_task:
 	@echo gauss_tests:  \
-	'$$(TARGET_GAUSS_TEST)  $$(TARGET_CMP_GAUSS_TEST)'  >> $(MAKENAME)
+	'$$(TARGET_GAUSS_TEST)'  >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '$$(TARGET_GAUSS_TEST)': '$$(MOD_GAUSS_TEST)' \
 	'$$(LIB_CALYPSO_FILE)' >> $(MAKENAME)

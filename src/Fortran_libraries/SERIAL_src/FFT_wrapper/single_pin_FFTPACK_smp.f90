@@ -13,7 +13,8 @@
 !!
 !!      subroutine single_pin_RFFTMF_smp(Nsmp, Nstacksmp, M, Nfft, X,   &
 !!     &          lSAVE, WSAVE, WORK, elapsed_fft, elapsed_cpy)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) :: Nsmp
+!!        integer(kind = kint_gl), intent(in) :: Nstacksmp(0:Nsmp)
 !!        integer(kind = kint), intent(in) :: M, Nfft
 !!        integer(kind = kint), intent(in) :: lSAVE
 !!        real(kind = 8), intent(in) :: WSAVE(lSAVE)
@@ -38,7 +39,8 @@
 !!
 !!      subroutine single_pin_RFFTMB_smp(Nsmp, Nstacksmp, M, Nfft, X,   &
 !!     &          lSAVE, WSAVE, WORK, elapsed_fft, elapsed_cpy)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) :: Nsmp
+!!        integer(kind = kint_gl), intent(in) :: Nstacksmp(0:Nsmp)
 !!        integer(kind = kint), intent(in) :: M, Nfft
 !!        integer(kind = kint), intent(in) :: lSAVE
 !!        real(kind = 8), intent(in) :: WSAVE(lSAVE)
@@ -98,7 +100,8 @@
 !
       use normalize_for_FFTPACK
 !
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) :: Nsmp
+      integer(kind = kint_gl), intent(in) :: Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
       integer(kind = kint), intent(in) :: lSAVE
       real(kind = 8), intent(in) :: WSAVE(lSAVE)
@@ -109,8 +112,8 @@
 !
       real(kind = kreal) :: st_c, ed_c, st_f, ed_f
       real(kind = kreal) :: X_tmp
-      integer(kind = kint) :: ismp, ist, ied, inum
-      integer(kind = kint) :: ierr
+      integer(kind = kint_gl) :: ist, ied, inum
+      integer(kind = kint) :: ismp, ierr
 !
 !
       ed_c = 0.0d0
@@ -148,7 +151,8 @@
 !
       use normalize_for_FFTPACK
 !
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) :: Nsmp
+      integer(kind = kint_gl), intent(in) :: Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
       integer(kind = kint), intent(in) :: lSAVE
       real(kind = 8), intent(in) :: WSAVE(lSAVE)
@@ -159,8 +163,8 @@
 !
       real(kind = kreal) :: st_c, ed_c, st_f, ed_f
       real(kind = kreal) :: X_tmp
-      integer(kind = kint) ::  ismp, ist, ied, inum
-      integer(kind = kint) :: ierr
+      integer(kind = kint_gl) :: ist, ied, inum
+      integer(kind = kint) :: ismp, ierr
 !
 !
       ed_c = 0.0d0

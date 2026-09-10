@@ -1,5 +1,11 @@
-!
-!      program compare_gauss_points
+!>@file   compare_gauss_points.f90
+!!@brief  program compare_gauss_points
+!!
+!!@author H. Matsui
+!!@date Programmed in 2012
+!!
+!!
+!>@brief Compare gauss point position and coefficients from reference
 !
       program compare_gauss_points
 !
@@ -13,10 +19,14 @@
       character(len=kchara) :: file_name1, file_name2
       integer(kind = kint) :: iflag
 !
-      write(*,*) 'input reference data file name'
-      read(*,*) file_name1
-      write(*,*) 'input second data file name'
-      read(*,*) file_name2
+      if(command_argument_count() .lt. 2) then
+        write(*,*) 'compare_gauss_points FILE1 FILE2'
+        write(*,'(i1)') 1
+        stop
+      end if
+!
+      call get_command_argument(1, file_name1)
+      call get_command_argument(2, file_name2)
 !
       call read_alloc_gauss_points(file_name1, gauss_pt_1)
       call read_alloc_gauss_points(file_name2, gauss_pt_2)

@@ -15,6 +15,8 @@
 !!    &     time_ave_sdev_sph_layer_pwr_f(cname, cstart, cend) Bind(C)
 !!      integer(c_int) function                                         &
 !!    &     time_ave_sdev_sph_layer_spec_f(cname, cstart, cend) Bind(C)
+!!      integer(c_int) function                                         &
+!!    &     time_ave_sdev_sph_dynamobench_f(cname, cstart, cend) Bind(C)
 !!        character(1,C_char), intent(in) :: cname(*)
 !!        real(C_double), Value :: cstart, cend
 !!
@@ -53,7 +55,7 @@
       integer(c_int) function                                           &
     &     time_ave_sdev_sph_volume_pwr_f(cname, cstart, cend) Bind(C)
 !
-      use time_ave_sph_volume_mean
+      use t_time_ave_sph_volume_mean
 !
       character(1,C_char), intent(in) :: cname(*)
       real(C_double), Value :: cstart, cend
@@ -137,6 +139,29 @@
 !
       time_ave_sdev_sph_layer_spec_f = 0
       end function time_ave_sdev_sph_layer_spec_f
+!
+! -------------------------------------------------------------------
+!
+      integer(c_int) function                                           &
+    &     time_ave_sdev_sph_dynamobench_f(cname, cstart, cend) Bind(C)
+!
+      use t_tave_sph_layer_spectr
+      use time_ave_sdev_sph_dbench
+!
+      character(1,C_char), intent(in) :: cname(*)
+      real(C_double), Value :: cstart, cend
+!
+      real(kind = kreal) :: start_time, end_time
+      character(len=kchara) :: fname_org
+!
+      write(fname_org,'(a)') trim(c_to_fstring(cname))
+      start_time = cstart
+      end_time = cend
+      call time_ave_sdev_sph_dynamobench(fname_org,                     &
+     &                                   start_time, end_time)
+!
+      time_ave_sdev_sph_dynamobench_f = 0
+      end function time_ave_sdev_sph_dynamobench_f
 !
 ! -------------------------------------------------------------------
 !

@@ -9,18 +9,25 @@
 !!@verbatim
 !! ------------------------------------------------------------------
 !!      subroutine alloc_mul_FFTW_plan_t(Nplan, Ncomp, Nfft, WK)
+!!      subroutine alloc_OMP_FFTW_plan_t(Ncomp, Nfft, WK)
+!!        integer(kind = kint), intent(in) :: Nplan, Ncomp, Nfft
+!!        type(working_mul_FFTW), intent(inout) :: WK
+!!
 !!      subroutine dealloc_mul_FFTW_plan_t(WK)
 !!        integer(kind = kint), intent(in) :: Nplan, Ncomp, Nfft
 !!        type(working_mul_FFTW), intent(inout) :: WK
 !!
 !! ------------------------------------------------------------------
 !!
-!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
+!!   b_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \sin (\frac{2\pi j k}{Nfft})]
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
-!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{1}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
 !!
 !! ------------------------------------------------------------------
 !! ------------------------------------------------------------------
@@ -57,16 +64,21 @@
       use m_constants
       use m_fftw_parameters
 !
-      use multi_pout_FFTW3_smp
-!
       implicit none
 !
 !>      structure for working data for FFTW
       type working_mul_FFTW
+!>        number of FFT plans for SMP
+        integer(kind = kint) :: Nplan_FFTW = 1
 !>        plan ID for backward transform
-        integer(kind = fftw_plan), allocatable :: plan_back_mul(:)
+        integer(kind = fftw_plan), allocatable :: plan_mul_bwd(:)
 !>        plan ID for forward transform
-        integer(kind = fftw_plan), allocatable :: plan_fowd_mul(:)
+        integer(kind = fftw_plan), allocatable :: plan_mul_fwd(:)
+!
+!>        number of component for each FFT
+        integer(kind = kint_gl), allocatable :: istack_FFTW(:)
+!>        Maximum nuber of components for each SMP process
+        integer(kind = kint_gl) :: Mmax_smp
 !
 !>        number of component for complex data
         integer(kind = kint) :: Nfft_c
@@ -92,19 +104,52 @@
       type(working_mul_FFTW), intent(inout) :: WK
 !
 !
-      allocate(WK%plan_fowd_mul(Nplan))
-      allocate(WK%plan_back_mul(Nplan))
+      WK%Nplan_FFTW = Nplan
+      allocate(WK%plan_mul_fwd(WK%Nplan_FFTW))
+      allocate(WK%plan_mul_bwd(WK%Nplan_FFTW))
+!
+      allocate(WK%istack_FFTW(0:WK%Nplan_FFTW))
+      WK%istack_FFTW(0:WK%Nplan_FFTW) = 0
 !
       WK%iflag_fft_mul_len = Nfft*Ncomp
       WK%Nfft_c = (Nfft+1)/2 + 1
       WK%aNfft =  one / dble(Nfft)
-      allocate( WK%X_FFTW_mul(Nfft,Ncomp) )
-      allocate( WK%C_FFTW_mul(WK%Nfft_c,Ncomp) )
-      WK%X_FFTW_mul = 0.0d0
-      WK%C_FFTW_mul = 0.0d0
+      allocate(WK%X_FFTW_mul(Nfft,Ncomp))
+      allocate(WK%C_FFTW_mul(WK%Nfft_c,Ncomp))
+      WK%X_FFTW_mul(1:Nfft,1:Ncomp) = 0.0d0
+      WK%C_FFTW_mul(1:WK%Nfft_c,1:Ncomp) = 0.0d0
 !
       end subroutine alloc_mul_FFTW_plan_t
 !
+! ------------------------------------------------------------------
+!
+      subroutine alloc_OMP_FFTW_plan_t(Ncomp, Nfft, WK)
+!
+      integer(kind = kint), intent(in) :: Ncomp, Nfft
+      type(working_mul_FFTW), intent(inout) :: WK
+!
+!
+      WK%Nplan_FFTW = 1
+      allocate(WK%plan_mul_fwd(WK%Nplan_FFTW))
+      allocate(WK%plan_mul_bwd(WK%Nplan_FFTW))
+!
+      allocate(WK%istack_FFTW(0:WK%Nplan_FFTW))
+      WK%istack_FFTW(0) = 0
+      WK%istack_FFTW(1) = Ncomp
+      WK%Mmax_smp =       Ncomp
+!
+      WK%iflag_fft_mul_len = Nfft*Ncomp
+      WK%Nfft_c = (Nfft+1)/2 + 1
+      WK%aNfft =  one / dble(Nfft)
+!
+      allocate(WK%X_FFTW_mul(Ncomp,Nfft))
+      allocate(WK%C_FFTW_mul(Ncomp,WK%Nfft_c))
+      WK%X_FFTW_mul(1:Ncomp,1:Nfft) = 0.0d0
+      WK%C_FFTW_mul(1:Ncomp,1:WK%Nfft_c) = 0.0d0
+!
+      end subroutine alloc_OMP_FFTW_plan_t
+!
+! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
       subroutine dealloc_mul_FFTW_plan_t(WK)
@@ -112,7 +157,8 @@
       type(working_mul_FFTW), intent(inout) :: WK
 !
       deallocate(WK%X_FFTW_mul, WK%C_FFTW_mul)
-      deallocate(WK%plan_fowd_mul, WK%plan_back_mul)
+      deallocate(WK%istack_FFTW)
+      deallocate(WK%plan_mul_fwd, WK%plan_mul_bwd)
       WK%iflag_fft_mul_len = 0
 !
       end subroutine dealloc_mul_FFTW_plan_t

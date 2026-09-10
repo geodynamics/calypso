@@ -36,12 +36,15 @@
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
-!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
+!!   b_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \sin (\frac{2\pi j k}{Nfft})]
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
-!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{1}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
 !!
 !! ------------------------------------------------------------------
 !!
@@ -176,8 +179,7 @@
      &   (comm_rtp%ntot_item_sr, OFFTW%comm_FFTW)
       call set_comm_item_pout_OMP_FFTW                                  &
      &   (sph_rtp%nnod_rtp, sph_rtp%istack_rtp_rt_smp(np_smp),          &
-     &    comm_rtp%irev_sr, OFFTW%Nfft_c, OFFTW%aNfft,                  &
-     &    OFFTW%comm_FFTW)
+     &    comm_rtp%irev_sr, OFFTW%Nfft_c, OFFTW%comm_FFTW)
       flag_fft = .TRUE.
 !
       end subroutine init_rtp_OMP_FFTW
@@ -242,6 +244,7 @@
      &         (sph_rtp, ncomp_fwd, n_WS, X_rtp, WS, OFFTW, flag_FFT)
 !
       use set_comm_table_rtp_OMP_FFTW
+      use normalize_for_FFTW
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
 !
@@ -254,9 +257,12 @@
       type(work_for_OpenMP_FFTW), intent(inout) :: OFFTW
       logical, intent(inout) :: flag_FFT
 !
+      integer(kind = kint) :: ncomp
+!
 !
       flag_FFT = .TRUE.
       if(ncomp_fwd .le. 0) return
+      ncomp = sph_rtp%istack_rtp_rt_smp(np_smp) * ncomp_fwd
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+4)
       call copy_rtp_field_to_OMP_FFTW(ncomp_fwd,                        &
@@ -266,7 +272,9 @@
 !
       if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+5)
       call dfftw_execute_dft_r2c(OFFTW%plan_fwd,                        &
-     &                            OFFTW%X, OFFTW%C)
+     &                           OFFTW%X, OFFTW%C)
+      call normalize_fwd_OMP_FFTW(OFFTW%aNfft, ncomp, OFFTW%Nfft_c,     &
+     &                            OFFTW%C)
       if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+5)
 !
 !   normalization

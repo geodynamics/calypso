@@ -42,8 +42,8 @@ target_list:
 	done
 
 target_task:
-	@echo tests_with_f: gauss_tests \
-	'fft_test leg_tests compare' \
+	@echo tests_with_f: \
+	'leg_tests' \
 	>> $(MAKENAME)
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)

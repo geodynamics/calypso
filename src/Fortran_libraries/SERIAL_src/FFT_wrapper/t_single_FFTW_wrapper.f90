@@ -66,10 +66,17 @@
 !
 !>      structure for working data for FFTW
       type working_FFTW
+!>        number of FFT plans for SMP
+        integer(kind = kint) :: Nplan_sFFTW = 1
 !>        plan ID for backward transform
         integer(kind = fftw_plan), allocatable :: plan_backward(:)
 !>        plan ID for forward transform
         integer(kind = fftw_plan), allocatable :: plan_forward(:)
+!
+!>        number of component for each FFT
+        integer(kind = kint_gl), allocatable :: istack_sFFTW(:)
+!>        Maximum nuber of components for each SMP process
+        integer(kind = kint_gl) :: Mmax_smp
 !
 !>        Complax data size
         integer(kind = kint) :: NFFT_c
@@ -95,8 +102,12 @@
       type(working_FFTW), intent(inout) :: WK
 !
 !
+      WK%Nplan_sFFTW = Nsmp
       allocate(WK%plan_forward(Nsmp))
       allocate(WK%plan_backward(Nsmp))
+!
+      allocate(WK%istack_sFFTW(0:Nsmp))
+      WK%istack_sFFTW(0:Nsmp) = 0
 !
       WK%iflag_fft_len = Nfft*Nsmp
       WK%Nfft_c =        (Nfft+1)/2 + 1
@@ -114,6 +125,7 @@
 !
       type(working_FFTW), intent(inout) :: WK
 !
+      deallocate(WK%istack_sFFTW)
       deallocate(WK%X_FFTW, WK%C_FFTW)
       deallocate(WK%plan_forward, WK%plan_backward)
       WK%iflag_fft_len = 0

@@ -9,25 +9,51 @@
 !!@verbatim
 !!      subroutine alloc_comm_table_sph_FFTW(ntot_sr_rtp, comm_sph_FFTW)
 !!      subroutine dealloc_comm_table_sph_FFTW(comm_sph_FFTW)
+!!        integer(kind = kint), intent(in) :: ntot_sr_rtp
 !!        type(comm_tbl_from_FFTW), intent(inout) :: comm_sph_FFTW
 !!
 !!      subroutine pout_OMP_FFTW_all_field_to_send                      &
 !!     &         (nnod_rtp, irt_rtp_smp_stack, ncomp_fwd,               &
 !!     &          X_FFT, comm_sph_FFTW, n_WS, WS)
+!!        complex(kind = fftw_complex), intent(in)                      &
+!!     &                             :: C_fft(ncomp_fwd,nnod_rt,Nfft_c)
 !!      subroutine pout_FFTW_smp_all_field_to_send                      &
 !!     &         (irt_rtp_smp_stack, Nfft_c, ncomp_fwd, C_fft,          &
 !!     &          comm_sph_FFTW, n_WS, WS)
+!!        integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
+!!        complex(kind = fftw_complex), intent(in)                      &
+!!     &            :: C_fft(irt_rtp_smp_stack(np_smp)*Nfft_c*ncomp_fwd)
 !!      subroutine pin_FFTW_all_field_to_send(nnod_rt, ncomp_fwd,       &
 !!     &          Nfft_c, C_fft, comm_sph_FFTW, n_WS, WS)
+!!        complex(kind = fftw_complex), intent(in)                      &
+!!     &              :: C_fft(Nfft_c,nnod_rt,ncomp_fwd)
 !!      subroutine copy_1comp_rtp_FFTW_to_send(nd, nnod_rt, Nfft_c,     &
 !!     &          ncomp_fwd, C_fft, comm_sph_FFTW, n_WS, WS)
+!!        integer(kind = kint), intent(in) :: nnod_rt, Nfft_c
+!!        integer(kind = kint), intent(in) :: nd
+!!        integer(kind = kint), intent(in) :: ncomp_fwd
+!!        complex(kind = fftw_complex), intent(in)                      &
+!!     &                             :: C_fft(nnod_rt,Nfft_c)
 !!        type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
+!!        integer(kind = kint), intent(in) :: n_WS
+!!        real(kind = kreal), intent(inout) :: WS(n_WS)
 !!
 !!      subroutine copy_1comp_FFTW_to_send(nd, nnod_rt, ncomp_fwd,      &
 !!     &          Nfft_c, C_fft, comm_sph_FFTW, n_WS, WS)
+!!      complex(kind = fftw_complex), intent(in)                        &
+!!     &                             :: C_fft(Nfft_c,nnod_rt)
 !!      subroutine copy_1comp_FFTW_to_send_smp                          &
 !!     &         (nd, irt_rtp_smp_stack, Nfft_c, ncomp_fwd, C_fft,      &
 !!     &          comm_sph_FFTW, n_WS, WS)
+!!        integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
+!!        integer(kind = kint), intent(in) :: nd
+!!        integer(kind = kint), intent(in) :: ncomp_fwd
+!!        integer(kind = kint), intent(in) :: nnod_rt, Nfft_c
+!!        complex(kind = fftw_complex), intent(in)                      &
+!!     &              :: C_fft(irt_rtp_smp_stack(np_smp)*Nfft_c)
+!!        type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
+!!        integer(kind = kint), intent(in) :: n_WS
+!!        real(kind = kreal), intent(inout) :: WS(n_WS)
 !!@endverbatim
 !!
       module t_sph_comm_table_from_FFTW
@@ -102,7 +128,7 @@
       type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
 !
       integer(kind = kint), intent(in) :: n_WS
-      real (kind=kreal), intent(inout):: WS(n_WS)
+      real(kind = kreal), intent(inout) :: WS(n_WS)
 !
       integer(kind = kint) :: kl, m, inum, ic_send
 !
@@ -137,7 +163,7 @@
       type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
 !
       integer(kind = kint), intent(in) :: n_WS
-      real (kind=kreal), intent(inout):: WS(n_WS)
+      real(kind = kreal), intent(inout) :: WS(n_WS)
 !
       integer(kind = kint) :: inod_fft, inum, num, ic_send, ip
 !
@@ -174,7 +200,7 @@
       type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
 !
       integer(kind = kint), intent(in) :: n_WS
-      real (kind=kreal), intent(inout):: WS(n_WS)
+      real(kind = kreal), intent(inout) :: WS(n_WS)
 !
       integer(kind = kint) :: kl, m, inum, ic_send
 !
@@ -203,11 +229,12 @@
       integer(kind = kint), intent(in) :: nd
       integer(kind = kint), intent(in) :: ncomp_fwd
 !
-      complex(kind = fftw_complex), intent(in) :: C_fft(nnod_rt,Nfft_c)
+      complex(kind = fftw_complex), intent(in)                          &
+     &                             :: C_fft(nnod_rt,Nfft_c)
       type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
 !
       integer(kind = kint), intent(in) :: n_WS
-      real(kind=kreal), intent(inout):: WS(n_WS)
+      real(kind = kreal), intent(inout) :: WS(n_WS)
 !
       integer(kind = kint) :: kl, m, inum, ic_send
 !
@@ -236,11 +263,12 @@
       integer(kind = kint), intent(in) :: nd
       integer(kind = kint), intent(in) :: ncomp_fwd
 !
-      complex(kind = fftw_complex), intent(in) :: C_fft(Nfft_c,nnod_rt)
+      complex(kind = fftw_complex), intent(in)                          &
+     &                             :: C_fft(Nfft_c,nnod_rt)
       type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
 !
       integer(kind = kint), intent(in) :: n_WS
-      real (kind=kreal), intent(inout):: WS(n_WS)
+      real(kind = kreal), intent(inout) :: WS(n_WS)
 !
       integer(kind = kint) :: kl, m, inum, ic_send
 !
@@ -275,7 +303,7 @@
       type(comm_tbl_from_FFTW), intent(in) :: comm_sph_FFTW
 !
       integer(kind = kint), intent(in) :: n_WS
-      real (kind=kreal), intent(inout):: WS(n_WS)
+      real(kind = kreal), intent(inout) :: WS(n_WS)
 !
       integer(kind = kint) :: inod_fft, inum, num, ic_send, ip
 !

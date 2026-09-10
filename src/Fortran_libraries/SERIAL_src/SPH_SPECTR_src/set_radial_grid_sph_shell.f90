@@ -9,11 +9,19 @@
 !!@verbatim
 !!      subroutine set_equi_distance_shell(num_layer, nlayer_ICB,       &
 !!     &          nlayer_CMB, r_ICB, r_CMB, r_grid)
+!!      subroutine set_equi_distance_sphere(num_layer, nlayer_CMB,      &
+!!     &                                    r_CMB, r_grid)
+!!        integer(kind = kint), intent(in) :: num_layer
+!!        integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
+!!        real(kind = kreal), intent(in) :: r_ICB, r_CMB
+!!        real(kind = kreal), intent(inout) :: r_grid(num_layer)
 !!      subroutine count_equi_ext_layers(nri, r_ICB, r_CMB,             &
-!!     &          r_min, r_max, ntot_shell, nlayer_ICB, nlayer_CMB)
-!!
-!!      subroutine set_radial_distance_flag(num_layer, nlayer_ICB,      &
-!!     &          nlayer_CMB, r_ICB, r_CMB, r_grid, iflag_rgrid)
+!!     &          r_min, r_max, ngrid_icore, ngrid_external)
+!!        integer(kind = kint), intent(in) :: nri
+!!        real(kind = kreal), intent(in) :: r_ICB, r_CMB
+!!        real(kind = kreal), intent(in) :: r_min, r_max
+!!        integer(kind = kint), intent(inout) :: ngrid_icore
+!!        integer(kind = kint), intent(inout) :: ngrid_external
 !!@endverbatim
 !
       module set_radial_grid_sph_shell
@@ -38,131 +46,105 @@
 !
       real(kind = kreal), intent(inout) :: r_grid(num_layer)
 !
-      integer(kind = kint) :: k, nri
+      integer(kind = kint) :: k
 !
-!
-      nri = nlayer_CMB - nlayer_ICB
-!
+!$omp parallel do
       do k = 1, num_layer
         r_grid(k) = r_ICB + (r_CMB - r_ICB) * dble(k - nlayer_ICB)      &
-     &             / dble(nri) 
+     &                     / dble(nlayer_CMB - nlayer_ICB) 
       end do
+!$omp end parallel do
 !
       end subroutine set_equi_distance_shell
+!
+!  -------------------------------------------------------------------
+!
+      subroutine set_equi_distance_sphere(num_layer, nlayer_CMB,        &
+     &                                    r_CMB, r_grid)
+!
+      integer(kind = kint), intent(in) :: num_layer
+      integer(kind = kint), intent(in) :: nlayer_CMB
+      real(kind = kreal), intent(in) :: r_CMB
+!
+      real(kind = kreal), intent(inout) :: r_grid(num_layer)
+!
+      integer(kind = kint) :: k
+!
+!$omp parallel do
+      do k = 1, num_layer
+        r_grid(k) =  r_CMB * dble(k) / dble(nlayer_CMB) 
+      end do
+!$omp end parallel do
+!
+      end subroutine set_equi_distance_sphere
 !
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
 !
       subroutine count_equi_ext_layers(nri, r_ICB, r_CMB,               &
-     &          r_min, r_max, ntot_shell, nlayer_ICB, nlayer_CMB)
+     &          r_min, r_max, ngrid_icore, ngrid_external)
 !
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
       real(kind = kreal), intent(in) :: r_min, r_max
 !
-      integer(kind = kint), intent(inout) :: nlayer_ICB, nlayer_CMB
-      integer(kind = kint), intent(inout) :: ntot_shell
+      integer(kind = kint), intent(inout) :: ngrid_icore
+      integer(kind = kint), intent(inout) :: ngrid_external
 !
       real(kind = kreal) :: dr
-      integer(kind = kint) :: ngrid_icore, ngrid_ext
 !
 !
       dr = (r_CMB - r_ICB) / dble(nri)
-!
-      if(r_min .ge. r_ICB) then
-        ngrid_icore = 0
-      else
-        ngrid_icore = int(aint((r_ICB - r_min)/dr), KIND(ngrid_icore))
-      end if
-      if(ngrid_icore .lt. 0) ngrid_icore = 0
-!      r_min = r_ICB - dr * dble(ngrid_icore)
-!
-      if(r_max .le. r_CMB) then
-        ngrid_ext = 0
-      else
-        ngrid_ext = int(aint((r_max - r_CMB)/dr), KIND(ngrid_ext)) + 1
-      end if
-      if(ngrid_ext .lt. 0) ngrid_ext = 0
-!      r_max =  r_CMB + dr * dble(ngrid_ext)
-!
-      nlayer_ICB = ngrid_icore + 1
-      nlayer_CMB = nlayer_ICB +  nri
-      ntot_shell = nlayer_CMB + ngrid_ext
+      ngrid_icore =    count_equi_inner_sphere(dr, r_ICB, r_min)
+      ngrid_external = count_equi_external(dr, r_CMB, r_max)
 !
       end subroutine count_equi_ext_layers
 !
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
 !
-      subroutine set_radial_distance_flag(num_layer, nlayer_ICB,        &
-     &          nlayer_CMB, r_ICB, r_CMB, r_grid, iflag_rgrid)
+      integer(kind = kint) function count_equi_inner_sphere             &
+     &                                            (dr, r_ICB, r_min)
 !
-      use chebyshev_radial_grid
-      use half_chebyshev_radial_grid
-      use m_spheric_constants
+      real(kind = kreal), intent(in) :: dr
+      real(kind = kreal), intent(in) :: r_ICB
+      real(kind = kreal), intent(in) :: r_min
 !
-      integer(kind = kint), intent(in) :: num_layer
-      integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
-      real(kind = kreal), intent(in) :: r_ICB, r_CMB
-      real(kind = kreal), intent(in) :: r_grid(num_layer)
-!
-      integer(kind = kint), intent(inout) :: iflag_rgrid
-!
-      integer(kind = kint) :: k
-      real(kind = kreal) :: diff
-      real(kind = kreal) :: diff_ch_max, diff_eq_max, diff_hch_max
-!
-      real(kind = kreal), allocatable :: r_eq(:), r_ch(:), r_hch(:)
-!
-      if(num_layer .le. 0) then
-        iflag_rgrid = igrid_error
-        return
-      end if
-!
-      allocate( r_eq(num_layer) )
-      allocate( r_ch(num_layer) )
-      allocate( r_hch(num_layer) )
-!
-      r_eq(1:num_layer) =  0.0d0
-      r_ch(1:num_layer) =  0.0d0
-      r_hch(1:num_layer) = 0.0d0
-!
-      call set_equi_distance_shell(num_layer, nlayer_ICB,               &
-     &                             nlayer_CMB, r_ICB, r_CMB, r_eq)
-      call set_chebyshev_distance_shell(num_layer, nlayer_ICB,          &
-     &                                  nlayer_CMB, r_ICB, r_CMB, r_ch)
-      call half_chebyshev_distance_shell(num_layer, nlayer_CMB,         &
-     &                                   r_CMB, r_hch)
+      integer(kind = kint) :: ngrid_icore
 !
 !
-      diff_eq_max =  0.0d0
-      diff_ch_max =  0.0d0
-      diff_hch_max = 0.0d0
+!      r_min = r_ICB - dr * dble(ngrid_icore)
 !
-      do k = 1, num_layer
-        diff = abs( r_grid(k) - r_eq(k)) / r_eq(k)
-        diff_eq_max = max(diff_eq_max,diff)
-!
-        diff = abs( r_grid(k) - r_ch(k)) / r_ch(k)
-        diff_ch_max = max(diff_ch_max,diff)
-!
-        diff = abs( r_grid(k) - r_hch(k)) / r_hch(k)
-        diff_hch_max = max(diff_hch_max,diff)
-      end do
-!
-      if      (diff_ch_max .lt. 1.0d-10) then
-        iflag_rgrid = igrid_Chebyshev
-      else if (diff_eq_max .lt. 1.0d-10) then
-        iflag_rgrid = igrid_equidistance
-      else if (diff_hch_max .lt. 1.0d-10) then
-        iflag_rgrid = igrid_half_Chebyshev
+      if(r_min .ge. r_ICB .or. r_ICB .eq. zero) then
+        ngrid_icore = 0
       else
-        iflag_rgrid = igrid_non_equidist
+        ngrid_icore = int(aint((r_ICB - r_min)/dr), KIND(ngrid_icore))
       end if
+      count_equi_inner_sphere = max(ngrid_icore, 0)
 !
-      deallocate( r_eq, r_ch, r_hch)
+      end function count_equi_inner_sphere
 !
-      end subroutine set_radial_distance_flag
+!  -------------------------------------------------------------------
+!
+      integer(kind = kint) function count_equi_external                 &
+     &                                            (dr, r_CMB, r_max)
+!
+      real(kind = kreal), intent(in) :: dr
+      real(kind = kreal), intent(in) :: r_CMB
+      real(kind = kreal), intent(in) :: r_max
+!
+      integer(kind = kint) :: ngrid_ext
+!
+!
+!      r_max =  r_CMB + dr * dble(ngrid_ext)
+      if(r_max .le. r_CMB) then
+        ngrid_ext = 0
+      else
+        ngrid_ext = int(aint((r_max - r_CMB)/dr), KIND(ngrid_ext)) + 1
+      end if
+      count_equi_external = max(ngrid_ext, 0)
+!
+      end function count_equi_external
 !
 !  -------------------------------------------------------------------
 !

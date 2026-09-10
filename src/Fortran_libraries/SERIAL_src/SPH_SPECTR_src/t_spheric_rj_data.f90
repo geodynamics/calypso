@@ -87,12 +87,12 @@
         integer(kind = kint) :: ied_rj(2)
 !
 !>        SMP stack for spectr data @f$ f(r,j) @f$
-      integer(kind = kint), allocatable :: istack_inod_rj_smp(:)
+        integer(kind = kint), allocatable :: istack_inod_rj_smp(:)
 !
 !>        SMP stacks for indexing @f$ (r,j) @f$
-      integer(kind = kint), allocatable :: istack_rj_kr_smp(:)
+        integer(kind = kint), allocatable :: istack_rj_kr_smp(:)
 !>        SMP stacks for indexing @f$ (r,j) @f$
-      integer(kind = kint), allocatable :: istack_rj_j_smp(:)
+        integer(kind = kint), allocatable :: istack_rj_j_smp(:)
 !
 !>        global address for each direction @f$ f(r,j) @f$
         integer(kind = kint), allocatable :: idx_global_rj(:,:)

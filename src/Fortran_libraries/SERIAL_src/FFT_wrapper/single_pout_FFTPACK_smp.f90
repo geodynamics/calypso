@@ -14,7 +14,8 @@
 !!      subroutine single_pout_RFFTMF_smp(Nsmp, Nstacksmp,              &
 !!     &          M, Nfft, X, X_FFTPACK, lSAVE, WSAVE, WORK,            &
 !!     &          elapsed_fft, elapsed_cpy)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) ::  Nsmp
+!!        integer(kind = kint_gl), intent(in) ::  Nstacksmp(0:Nsmp)
 !!        integer(kind = kint), intent(in) :: M, Nfft
 !!        integer(kind = kint), intent(in) :: lSAVE
 !!        real(kind = 8), intent(in) :: WSAVE(lSAVE)
@@ -41,12 +42,13 @@
 !!      subroutine single_pout_RFFTMB_smp(Nsmp, Nstacksmp,              &
 !!     &          M, Nfft, X, X_FFTPACK, lSAVE, WSAVE, WORK,            &
 !!     &          elapsed_fft, elapsed_cpy)
-!!        integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+!!        integer(kind = kint), intent(in) ::  Nsmp
+!!        integer(kind = kint_gl), intent(in) ::  Nstacksmp(0:Nsmp)
 !!        integer(kind = kint), intent(in) :: M, Nfft
 !!        integer(kind = kint), intent(in) :: lSAVE
 !!        real(kind = 8), intent(in) :: WSAVE(lSAVE)
 !!        real(kind = kreal), intent(inout) :: X(M,Nfft)
-!!       real(kind = 8), intent(inout) :: X_FFTPACK(Nfft,Nsmp)
+!!        real(kind = 8), intent(inout) :: X_FFTPACK(Nfft,Nsmp)
 !!        real(kind = 8), intent(inout) :: WORK(Nfft,Nsmp)
 !!        real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !! ------------------------------------------------------------------
@@ -103,7 +105,8 @@
 !
       use normalize_for_FFTPACK
 !
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) ::  Nsmp
+      integer(kind = kint_gl), intent(in) ::  Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
       integer(kind = kint), intent(in) :: lSAVE
       real(kind = 8), intent(in) :: WSAVE(lSAVE)
@@ -114,8 +117,8 @@
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
       real(kind = kreal) :: st_c, ed_c, st_f, ed_f
-      integer(kind = kint) :: ismp, ist, ied, inum
-      integer(kind = kint) :: ierr
+      integer(kind = kint_gl) :: ist, ied, inum
+      integer(kind = kint) :: ismp, ierr
 !
 !
       ed_c = 0.0d0
@@ -157,7 +160,8 @@
 !
       use normalize_for_FFTPACK
 !
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) ::  Nsmp
+      integer(kind = kint_gl), intent(in) ::  Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
       integer(kind = kint), intent(in) :: lSAVE
       real(kind = 8), intent(in) :: WSAVE(lSAVE)
@@ -168,8 +172,8 @@
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
       real(kind = kreal) :: st_c, ed_c, st_f, ed_f
-      integer(kind = kint) ::  ismp, ist, ied, inum
-      integer(kind = kint) :: ierr
+      integer(kind = kint_gl) :: ist, ied, inum
+      integer(kind = kint) :: ismp, ierr
 !
 !
       ed_c = 0.0d0

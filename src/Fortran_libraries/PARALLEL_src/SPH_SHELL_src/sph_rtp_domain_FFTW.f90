@@ -36,12 +36,15 @@
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
-!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
+!!   b_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \sin (\frac{2\pi j k}{Nfft})]
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
-!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{1}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
 !!
 !! ------------------------------------------------------------------
 !!
@@ -159,7 +162,7 @@
      &   (comm_rtp%ntot_item_sr, FFTW_f%comm_sph_FFTW)
       call set_comm_item_pout_FFTW_smp                                  &
      &   (sph_rtp%nnod_rtp, comm_rtp%ntot_item_sr, comm_rtp%irev_sr,    &
-     &    sph_rtp%istack_rtp_rt_smp, FFTW_f%Nfft_c, FFTW_f%aNfft,       &
+     &    sph_rtp%istack_rtp_rt_smp, FFTW_f%Nfft_c,                     &
      &    FFTW_f%comm_sph_FFTW)
       flag_fft = .TRUE.
 !
@@ -198,6 +201,7 @@
 !
       use set_comm_table_rtp_FFTW
       use copy_rtp_data_to_FFTPACK
+      use normalize_for_FFTW
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in)  :: comm_rtp
@@ -212,7 +216,7 @@
       logical, intent(inout) :: flag_FFT
 !
       integer(kind = kint) ::  ip, nd
-      integer(kind = kint_gl) :: ist_r, ist_c
+      integer(kind = kint_gl) :: ist_r, ist_c, ncomp
 !
 !
       flag_FFT = .TRUE.
@@ -232,6 +236,9 @@
      &        FFTW_f%X(ist_r+1), FFTW_f%C(ist_c+1))
         end do
 !$omp end parallel do
+!
+        call normalize_fwd_OMP_FFTW(FFTW_f%aNfft,                       &
+     &      sph_rtp%istack_rtp_rt_smp(np_smp), FFTW_f%Nfft_c, FFTW_f%C)
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+5)
 !
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+6)
@@ -248,8 +255,8 @@
       subroutine rtp_field_back_FFTW_from_recv(sph_rtp, comm_rtp,       &
      &          ncomp_bwd, n_WR, WR, X_rtp, FFTW_f, flag_FFT)
 !
-      use set_comm_table_prt_FFTW
       use set_comm_table_rtp_FFTW
+      use copy_sph_FFTW_from_recv
       use copy_rtp_data_to_FFTPACK
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -271,7 +278,7 @@
       flag_FFT = .TRUE.
       do nd = 1, ncomp_bwd
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+1)
-          call copy_FFTW_comp_from_recv_smp                             &
+          call copy_rtp_FFTW_comp_from_recv                             &
      &       (nd, sph_rtp%nnod_rtp, sph_rtp%istep_rtp,                  &
      &        sph_rtp%istack_rtp_rt_smp, comm_rtp%irev_sr, ncomp_bwd,   &
      &        n_WR, WR, FFTW_f%Nfft_c, FFTW_f%C)

@@ -31,7 +31,7 @@ target_list:
 
 target_task:
 	@echo assembles: \
-	'$$(TARGET_NEWSPH)  $$(TARGET_CMP_SPH_RST)' >> $(MAKENAME)
+	'$$(TARGET_NEWSPH)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '$$(TARGET_NEWSPH)': '$$(MOD_NEWSPH)' \
 	'$$(LIB_CALYPSO_FILE)' \
