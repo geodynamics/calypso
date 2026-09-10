@@ -115,8 +115,8 @@
       end if
 !
 !   Set spectr monitor
-      call set_ctl_params_layered_spectr                                &
-     &   (smonitor_ctl%lp_ctl, monitor%pwr)
+      call set_ctl_params_layered_spectr(smonitor_ctl%lp_ctl,           &
+     &                                   monitor%pwr)
       call s_set_ctl_sph_spectr_w_dbench(smonitor_ctl, MHD_BC,          &
      &    monitor%pwr, monitor%circ_mid_eq%circle, monitor%bench)
 !   Set parameters for dynamo benchmark output

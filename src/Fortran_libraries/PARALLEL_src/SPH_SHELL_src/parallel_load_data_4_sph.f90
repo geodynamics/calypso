@@ -310,19 +310,19 @@
 !
 !* --------  radius  --------------
 !
+      if(sph_rj%nidx_rj(1) .le. 0) then
+        call calypso_mpi_abort(ierr_sph,                                &
+     &     'Number of radial layers are 0 or negative!')
+      end if
+!
       if (iflag_debug .ge. iflag_routine_msg)                           &
      &      write(*,*) 'set_radius_dat_4_sph_dynamo'
       call set_radius_dat_4_sph_dynamo                                  &
-     &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, radial_rj_grp,      &
-     &    sph_params%iflag_radial_grid, sph_params%nlayer_ICB,          &
-     &    sph_params%nlayer_CMB, sph_params%nlayer_2_center,            &
-     &    sph_rj%r_ele_rj, sph_rj%ar_ele_rj,                            &
-     &    sph_params%radius_ICB, sph_params%radius_CMB,                 &
-     &    sph_params%R_earth)
-      if(sph_params%iflag_radial_grid .eq. igrid_error) then
-        call calypso_mpi_abort(ierr_sph,                                &
-     &     'Numbedr of radial layers are 0 or negative!')
-      end if
+     &  (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, radial_rj_grp,       &
+     &   sph_params%nlayer_ICB, sph_params%nlayer_CMB,                  &
+     &   sph_params%nlayer_2_center, sph_rj%r_ele_rj, sph_rj%ar_ele_rj, &
+     &   sph_params%radius_ICB, sph_params%radius_CMB,                  &
+     &   sph_params%R_earth)
 !
       end subroutine set_radius_dat_sph_MHD
 !

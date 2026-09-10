@@ -85,8 +85,11 @@
       end if
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
-        data_out(jcou+1) = bench%mene_icore(3)
-        jcou = jcou + 1
+        if(     (sph_bc_U%iflag_icb .ne. iflag_sph_fill_center)         &
+     &    .and. (sph_bc_U%iflag_icb .ne. iflag_sph_filter_center)) then
+          data_out(jcou+1) = bench%mene_icore(3)
+          jcou = jcou + 1
+        end if
       end if
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
@@ -119,6 +122,22 @@
         data_out(jcou+1)                                                &
      &     = bench%ave_zero_fld(bench%iphys_dbench%i_light)
         jcou = jcou + 1
+      end if
+!
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
+        if(ipol_base%i_temp .gt. 0) then
+          data_out(jcou+1) = bench%temp_centre
+          jcou = jcou + 1
+        end if
+        if(ipol_base%i_light .gt. 0) then
+          data_out(jcou+1) = bench%comp_centre
+          jcou = jcou + 1
+        end if
+        if(ipol_base%i_entropy .gt. 0) then
+          data_out(jcou+1) = bench%entropy_center
+          jcou = jcou + 1
+        end if
       end if
 !
       data_out(jcou+1) = bench%ave_phase_vr
@@ -157,21 +176,43 @@
         ntot_sph_spec =   ntot_sph_spec + 1
       end if
 !
+!       Magnetic energy in inner core
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
-        nfield_sph_spec = nfield_sph_spec + 1
-        ntot_sph_spec =   ntot_sph_spec + 1
+        if(     (sph_bc_U%iflag_icb .ne. iflag_sph_fill_center)         &
+     &    .and. (sph_bc_U%iflag_icb .ne. iflag_sph_filter_center)) then
+          nfield_sph_spec = nfield_sph_spec + 1
+          ntot_sph_spec =   ntot_sph_spec + 1
+        end if
       end if
 !
+!       Inner core rotation
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         nfield_sph_spec = nfield_sph_spec + 1
         ntot_sph_spec =   ntot_sph_spec + 1
       end if
 !
-!      write(*,*) 'sph_bc_U%iflag_icb', sph_bc_U%iflag_icb
+!       Magnetic torque in inner core
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
      &    .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         nfield_sph_spec = nfield_sph_spec + 1
         ntot_sph_spec =   ntot_sph_spec + 1
+      end if
+!
+!       Scalars at centre
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
+        if(ipol_base%i_temp .gt. 0) then
+          nfield_sph_spec = nfield_sph_spec + 1
+          ntot_sph_spec =   ntot_sph_spec + 1
+        end if
+        if(ipol_base%i_light .gt. 0) then
+          nfield_sph_spec = nfield_sph_spec + 1
+          ntot_sph_spec =   ntot_sph_spec + 1
+        end if
+        if(ipol_base%i_entropy .gt. 0) then
+          nfield_sph_spec = nfield_sph_spec + 1
+          ntot_sph_spec =   ntot_sph_spec + 1
+        end if
       end if
 !
       end subroutine count_dynamobench_monitor_name
@@ -195,7 +236,7 @@
       character(len = kchara), intent(inout)                            &
      &                     :: ene_sph_spec_name(num_labels)
 !
-      integer(kind = kint) :: icou, jcou, i
+      integer(kind = kint) :: icou, jcou
 !
       icou = 0
       ene_sph_spec_name(1) = fhd_t_step
@@ -215,10 +256,13 @@
       end if
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
-        ncomp_sph_spec(icou+1) = 1
-        ene_sph_spec_name(jcou+1) = 'ME_total_icore'
-        icou = icou + 1
-        jcou = jcou + ncomp_sph_spec(icou)
+        if(     (sph_bc_U%iflag_icb .ne. iflag_sph_fill_center)         &
+     &    .and. (sph_bc_U%iflag_icb .ne. iflag_sph_filter_center)) then
+          ncomp_sph_spec(icou+1) = 1
+          ene_sph_spec_name(jcou+1) = 'ME_total_icore'
+          icou = icou + 1
+          jcou = jcou + ncomp_sph_spec(icou)
+        end if
       end if
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
@@ -228,7 +272,6 @@
         jcou = jcou + ncomp_sph_spec(icou)
       end if
 !
-!      write(*,*) 'sph_bc_U%iflag_icb', sph_bc_U%iflag_icb
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
      &    .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         ncomp_sph_spec(icou+1) = 1
@@ -262,6 +305,30 @@
         icou = icou + 1
         jcou = jcou + ncomp_sph_spec(icou)
       end if
+!
+!
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
+        if(ipol_base%i_temp .gt. 0) then
+          ncomp_sph_spec(icou+1) = 1
+          ene_sph_spec_name(jcou+1) = 'centre_temperature'
+          icou = icou + 1
+          jcou = jcou + ncomp_sph_spec(icou)
+        end if
+        if(ipol_base%i_light .gt. 0) then
+          ncomp_sph_spec(icou+1) = 1
+          ene_sph_spec_name(jcou+1) = 'centre_composition'
+          icou = icou + 1
+          jcou = jcou + ncomp_sph_spec(icou)
+        end if
+        if(ipol_base%i_entropy .gt. 0) then
+          ncomp_sph_spec(icou+1) = 1
+          ene_sph_spec_name(jcou+1) = 'centre_entropy'
+          icou = icou + 1
+          jcou = jcou + ncomp_sph_spec(icou)
+        end if
+      end if
+!
 !
       ncomp_sph_spec(icou+1) = 1
       ene_sph_spec_name(jcou+1) = 'Average_drift_vr'

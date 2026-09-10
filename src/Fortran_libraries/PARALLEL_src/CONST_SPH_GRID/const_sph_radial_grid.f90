@@ -58,27 +58,33 @@
       type(sph_rtp_grid), intent(inout) :: sph_rtp
       type(spheric_global_radius), intent(inout) :: s3d_radius
 !
+      integer(kind = kint) :: ngrid_icore, ngrid_external
       integer(kind = kint) :: i, nri_tmp
 !
 !
       sph_param%nlayer_2_center = 1
+      nri_tmp = num_fluid_grid_ctl%intvalue
+      if(sph_param%radius_ICB .eq. zero) nri_tmp = nri_tmp - 1
 !
       if(sph_param%iflag_radial_grid .eq. igrid_Chebyshev) then
-        call count_chebyshev_ext_layers(num_fluid_grid_ctl%intvalue,    &
-     &      sph_param%radius_ICB, sph_param%radius_CMB,                 &
-     &      rmin, rmax, sph_rtp%nidx_global_rtp(1),                     &
-     &      sph_param%nlayer_ICB, sph_param%nlayer_CMB)
-      else if(sph_param%iflag_radial_grid .eq. igrid_half_Chebyshev)    &
-     & then
-        call count_half_chebyshev_external(num_fluid_grid_ctl%intvalue, &
-     &      sph_param%radius_CMB, rmax, sph_rtp%nidx_global_rtp(1),     &
-     &      sph_param%nlayer_ICB, sph_param%nlayer_CMB)
+        call count_chebyshev_ext_layers                                 &
+     &     (nri_tmp, sph_param%radius_ICB, sph_param%radius_CMB,        &
+     &      rmin, rmax, ngrid_icore, ngrid_external)
+      else if(sph_param%iflag_radial_grid                               &
+     &          .eq. igrid_half_Chebyshev)  then
+        call count_half_chebyshev_ext_layers                            &
+     &     (nri_tmp, sph_param%radius_ICB, sph_param%radius_CMB,        &
+     &      rmin, rmax, ngrid_icore, ngrid_external)
       else if(sph_param%iflag_radial_grid .eq. igrid_equidistance) then
-        call count_equi_ext_layers(num_fluid_grid_ctl%intvalue,         &
-     &      sph_param%radius_ICB, sph_param%radius_CMB,                 &
-     &      rmin, rmax, sph_rtp%nidx_global_rtp(1),                     &
-     &      sph_param%nlayer_ICB, sph_param%nlayer_CMB)
+        call count_equi_ext_layers                                      &
+     &     (nri_tmp, sph_param%radius_ICB, sph_param%radius_CMB,        &
+     &      rmin, rmax, ngrid_icore, ngrid_external)
       end if
+!
+      sph_param%nlayer_ICB =       1 + ngrid_icore
+      sph_param%nlayer_CMB =       sph_param%nlayer_ICB + nri_tmp
+      sph_rtp%nidx_global_rtp(1) = sph_param%nlayer_CMB                 &
+     &                            + ngrid_external
 !
       nri_tmp = sph_rtp%nidx_global_rtp(1)
       do i = 1, add_ext_layer_ctl%num
@@ -90,25 +96,44 @@
       call alloc_radius_1d_gl(sph_rtp%nidx_global_rtp(1), s3d_radius)
 !
       if(sph_param%iflag_radial_grid .eq. igrid_Chebyshev) then
-        call set_chebyshev_distance_shell(nri_tmp,                      &
-     &      sph_param%nlayer_ICB, sph_param%nlayer_CMB,                 &
-     &      sph_param%radius_ICB, sph_param%radius_CMB,                 &
-     &      s3d_radius%radius_1d_gl(1))
+        if(sph_param%radius_ICB .eq. zero) then
+          call set_chebyshev_distance_sphere(nri_tmp,                   &
+     &        sph_param%nlayer_CMB, sph_param%radius_CMB,               &
+     &        s3d_radius%radius_1d_gl(1))
+        else
+          call set_chebyshev_distance_shell(nri_tmp,                    &
+     &        sph_param%nlayer_ICB, sph_param%nlayer_CMB,               &
+     &        sph_param%radius_ICB, sph_param%radius_CMB,               &
+     &        s3d_radius%radius_1d_gl(1))
+        end if
       else if(sph_param%iflag_radial_grid .eq. igrid_half_Chebyshev)    &
      & then
-        call half_chebyshev_distance_shell(nri_tmp,                     &
-     &      sph_param%nlayer_CMB, sph_param%radius_CMB,                 &
-     &      s3d_radius%radius_1d_gl(1))
+        if(sph_param%radius_ICB .eq. zero) then
+          call half_chebyshev_distance_sphere(nri_tmp,                  &
+     &        sph_param%nlayer_CMB, sph_param%radius_CMB,               &
+     &        s3d_radius%radius_1d_gl(1))
+        else
+          call half_chebyshev_distance_shell(nri_tmp,                   &
+     &        sph_param%nlayer_ICB, sph_param%nlayer_CMB,               &
+     &        sph_param%radius_ICB, sph_param%radius_CMB,               &
+     &        s3d_radius%radius_1d_gl(1))
+        end if
       else if(sph_param%iflag_radial_grid .eq. igrid_equidistance) then
-        call set_equi_distance_shell(nri_tmp,                           &
-     &      sph_param%nlayer_ICB, sph_param%nlayer_CMB,                 &
-     &      sph_param%radius_ICB, sph_param%radius_CMB,                 &
-     &      s3d_radius%radius_1d_gl(1))
+        if(sph_param%radius_ICB .eq. zero) then
+          call set_equi_distance_sphere(nri_tmp,                        &
+     &        sph_param%nlayer_CMB, sph_param%radius_CMB,               &
+     &        s3d_radius%radius_1d_gl(1))
+        else
+          call set_equi_distance_shell(nri_tmp,                         &
+     &        sph_param%nlayer_ICB, sph_param%nlayer_CMB,               &
+     &        sph_param%radius_ICB, sph_param%radius_CMB,               &
+     &        s3d_radius%radius_1d_gl(1))
+        end if
       end if
 !
       if(sph_param%iflag_radial_grid .eq. igrid_half_Chebyshev          &
      &    .or. sph_param%iflag_radial_grid .eq. igrid_Chebyshev) then
-        call adjust_chebyshev_shell(nri_tmp,                            &
+        call adjust_chebyshev_shell(sph_param%radius_ICB, nri_tmp,      &
      &      sph_param%nlayer_ICB, sph_param%nlayer_CMB,                 &
      &      increment_cheby, s3d_radius%radius_1d_gl(1))
       end if

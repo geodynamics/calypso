@@ -8,10 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine init_mid_equator_point_global(sph_params, sph_rj,    &
-!!     &                                         cdat)
+!!     &                                         sph_bc_U, cdat)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
-!!        type(phys_address), intent(in) :: ipol
+!!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!
 !!      subroutine cal_drift_by_vmm(time, sph_rj, rj_fld, ipol, circle, &
@@ -63,26 +63,36 @@
 ! ----------------------------------------------------------------------
 !
       subroutine init_mid_equator_point_global(sph_params, sph_rj,      &
-     &                                         cdat)
+     &                                         sph_bc_U, cdat)
 !
       use t_spheric_parameter
       use t_spheric_rj_data
+      use t_boundary_params_sph_MHD
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_boundary_type), intent(in) :: sph_bc_U
+!
       type(circle_fld_maker), intent(inout) :: cdat
 !
       integer(kind = kint) :: kr_ICB, kr_CMB
       real(kind = kreal) :: r_MID
 !
 !
-      kr_ICB = sph_params%nlayer_ICB
       kr_CMB = sph_params%nlayer_CMB
-      r_MID = half * (sph_rj%radius_1d_rj_r(kr_ICB)                     &
-     &              + sph_rj%radius_1d_rj_r(kr_CMB))
+      if(     (sph_bc_U%iflag_icb .eq. iflag_sph_fill_center)           &
+     &   .or. (sph_bc_U%iflag_icb .eq. iflag_sph_filter_center)) then
+        r_MID = half * sph_rj%radius_1d_rj_r(kr_CMB)
+      else
+        kr_ICB = sph_params%nlayer_ICB
+        r_MID = half * (sph_rj%radius_1d_rj_r(kr_ICB)                   &
+     &                + sph_rj%radius_1d_rj_r(kr_CMB))
+      end if
 !
       cdat%circle%s_circle = r_MID
       cdat%circle%z_circle = zero
+      cdat%circle%r_circle = cdat%circle%s_circle
+      cdat%circle%colat_circle = acos(0.0d0)
 !
       end subroutine init_mid_equator_point_global
 !

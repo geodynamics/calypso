@@ -132,7 +132,7 @@
      &      monitor%circ_mid_eq%d_circle, monitor%bench)
         call init_mid_equator_point_global                              &
      &     (SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj,                 &
-     &      monitor%circ_mid_eq)
+     &      sph_MHD_bc%sph_bc_U, monitor%circ_mid_eq)
         call init_circle_point_global                                   &
      &     (SPH_MHD%sph, SPH_MHD%comms, trans_p,                        &
      &      monitor%circ_mid_eq, monitor%elapsed_circle_init,           &

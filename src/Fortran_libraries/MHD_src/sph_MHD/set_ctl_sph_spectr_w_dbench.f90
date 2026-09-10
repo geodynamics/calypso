@@ -15,6 +15,10 @@
 !!        type(sph_mean_squares), intent(inout) :: pwr
 !!        type(circle_parameters), intent(inout) :: circle
 !!        type(dynamobench_monitor), intent(inout) :: bench
+!!
+!!      subroutine check_full_sphere_vol_spectr(velo_BC, v_spectr)
+!!        type(boundary_condition_lists), intent(in) :: velo_BC
+!!        type(sph_vol_mean_squares), intent(inout) :: v_spectr
 !!@endverbatim
       module set_ctl_sph_spectr_w_dbench
 !
@@ -31,8 +35,6 @@
 !
       private :: cnt_ctl_params_v_spec_w_dbench
       private :: add_ctl_params_v_spec_w_dbench
-      private :: find_conductive_inner_core_bc
-      private :: find_rotatable_inner_core_bc
 !
 ! -----------------------------------------------------------------------
 !
@@ -63,9 +65,10 @@
      &   (smonitor_ctl%dbench_ctl, MHD_BC, num_vspec, circle, bench)
 
       call alloc_volume_spectr_data(num_vspec, pwr)
-      call set_ctl_params_base_vol_spectr(smonitor_ctl,                 &
-     &                                    pwr%v_spectr(1))
+      call set_base_vol_spectr_prefix(smonitor_ctl,  pwr%v_spectr(1))
       call set_ctl_prm_base_vol_spectr(smonitor_ctl, pwr%v_spectr(1))
+      call check_full_sphere_vol_spectr(MHD_BC%velo_BC,                 &
+     &                                  pwr%v_spectr(1))
 !
       do inum = 1, smonitor_ctl%num_vspec_ctl
         call set_ctl_params_vol_sph_spectr(smonitor_ctl%v_pwr(inum),    &
@@ -85,6 +88,7 @@
       use t_sph_volume_mean_square
       use t_multi_flag_labels
       use m_file_format_labels
+      use find_sph_boudary_condition
       use skip_comment_f
 !
       type(dynamobench_control), intent(in) :: dbench_ctl
@@ -142,8 +146,8 @@
      &                     circle%gzip_flag_circle = .TRUE.
       end if
 !
-      if(find_conductive_inner_core_bc(MHD_BC%magne_BC%nod_BC,          &
-     &                                 MHD_BC%magne_BC%surf_BC)         &
+      if(find_fill_to_centre_bc(MHD_BC%magne_BC%nod_BC,                 &
+     &                          MHD_BC%magne_BC%surf_BC)                &
      &    .eqv. .FALSE.) return 
       if(find_rotatable_inner_core_bc(MHD_BC%velo_BC%nod_BC,            &
      &                                 MHD_BC%velo_BC%surf_BC)          &
@@ -162,6 +166,7 @@
       use t_sph_volume_mean_square
       use t_multi_flag_labels
       use m_file_format_labels
+      use find_sph_boudary_condition
       use skip_comment_f
 !
       type(MHD_BC_lists), intent(in) :: MHD_BC
@@ -181,11 +186,18 @@
 !
       v_spectr(bench%ipwr_ocore)%kr_inside =  -1
       v_spectr(bench%ipwr_ocore)%kr_outside = -1
-      v_spectr(bench%ipwr_ocore)%r_inside =   7.0d0 / 13.0d0
-      v_spectr(bench%ipwr_ocore)%r_outside = 20.0d0 / 13.0d0
 !
-      if(find_conductive_inner_core_bc(MHD_BC%magne_BC%nod_BC,          &
-     &                                 MHD_BC%magne_BC%surf_BC)         &
+      if(find_fill_to_centre_bc(MHD_BC%velo_BC%nod_BC,                  &
+     &                          MHD_BC%velo_BC%surf_BC)) then
+        v_spectr(bench%ipwr_ocore)%r_inside =  0.0d0
+        v_spectr(bench%ipwr_ocore)%r_outside = 1.0d0
+      else
+        v_spectr(bench%ipwr_ocore)%r_inside =   7.0d0 / 13.0d0
+        v_spectr(bench%ipwr_ocore)%r_outside = 20.0d0 / 13.0d0
+      end if
+!
+      if(find_fill_to_centre_bc(MHD_BC%magne_BC%nod_BC,                 &
+     &                          MHD_BC%magne_BC%surf_BC)                &
      &    .eqv. .FALSE.) return 
       if(find_rotatable_inner_core_bc(MHD_BC%velo_BC%nod_BC,            &
      &                                MHD_BC%velo_BC%surf_BC)           &
@@ -207,58 +219,22 @@
 !
 ! -----------------------------------------------------------------------
 !
-      logical function find_conductive_inner_core_bc(magne_nod,         &
-     &                                               magne_surf)
+      subroutine check_full_sphere_vol_spectr(velo_BC, v_spectr)
 !
-      use m_boundary_condition_IDs
+      use t_sph_volume_mean_square
+      use find_sph_boudary_condition
 !
-      type(boundary_condition_list), intent(in) :: magne_nod
-      type(boundary_condition_list), intent(in) :: magne_surf
-      integer(kind = kint) :: i
+      type(boundary_condition_lists), intent(in) :: velo_BC
+      type(sph_vol_mean_squares), intent(inout) :: v_spectr
 !
-      find_conductive_inner_core_bc = .FALSE.
-      do i = 1, magne_nod%num_bc
-        if(magne_nod%ibc_type(i) .eq. iflag_sph_2_center) then
-          find_conductive_inner_core_bc = .TRUE.
-          return
-        end if
-      end do
-      do i = 1, magne_surf%num_bc
-        if(magne_surf%ibc_type(i) .eq. iflag_sph_2_center) then
-          find_conductive_inner_core_bc = .TRUE.
-          return
-        end if
-      end do
 !
-      end function find_conductive_inner_core_bc
+      if(find_fill_to_centre_bc(velo_BC%nod_BC,                         &
+     &                          velo_BC%surf_BC)) then
+        v_spectr%kr_inside =  -1
+        v_spectr%kr_outside = -1
+      end if
 !
-! -----------------------------------------------------------------------
-!
-      logical function find_rotatable_inner_core_bc(velo_nod,           &
-     &                                              torque_surf)
-!
-      use m_boundary_condition_IDs
-!
-      type(boundary_condition_list), intent(in) :: velo_nod
-      type(boundary_condition_list), intent(in) :: torque_surf
-      integer(kind = kint) :: i
-!
-      find_rotatable_inner_core_bc = .FALSE.
-      do i = 1, velo_nod%num_bc
-        if(velo_nod%ibc_type(i) .eq. iflag_rotatable_icore) then
-          find_rotatable_inner_core_bc = .TRUE.
-          return
-        end if
-      end do
-!
-      do i = 1, torque_surf%num_bc
-        if(torque_surf%ibc_type(i) .eq. iflag_rotatable_icore) then
-          find_rotatable_inner_core_bc = .TRUE.
-          return
-        end if
-      end do
-!
-      end function find_rotatable_inner_core_bc
+      end subroutine check_full_sphere_vol_spectr
 !
 ! -----------------------------------------------------------------------
 !

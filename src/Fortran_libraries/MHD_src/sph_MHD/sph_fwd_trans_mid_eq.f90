@@ -180,8 +180,7 @@
      &    leg_circ%d_circ_gl, circle%mphi_circle, d_circle%d_fld(1,1))
 !
       do i_comp = 1, d_circle%ntot_phys
-        call backward_FFT_select                                        &
-     &     (iflag_FFT, np_smp, leg_circ%istack_circfft_smp, ione,       &
+        call backward_FFT_select(iflag_FFT, ione,                       &
      &      circle%mphi_circle, d_circle%d_fld(1,i_comp),               &
      &      WK_circle_fft, elapsed_fft, elapsed_cpy)
       end do

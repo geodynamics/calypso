@@ -75,7 +75,7 @@
       do i = 1, pwr%num_vol_spectr
         call init_sph_vol_spectr_r_param(sph_params, sph_rj,            &
      &                                   pwr%v_spectr(i))
-        call cal_one_over_volume( pwr%v_spectr(i)%r_inside,             &
+        call cal_one_over_volume(pwr%v_spectr(i)%r_inside,              &
      &      pwr%v_spectr(i)%r_outside, pwr%v_spectr(i)%avol)
       end do
 !
