@@ -6,23 +6,37 @@ SHELL           = /bin/sh
 #
 #  directories of Kemo's Dynamo toolkit
 #
+CURRENTDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
 SRCDIR = /Users/matsui/src_kemo
+MAKEDIR = $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
 #
 # Command settings
 #
+GMAKE= make
 MPIRUN= mpirun   
-TARGET_GEN_SPH_GRID= $(SRCDIR)/bin/utilities/gen_sph_grids
-TARGET_NEWSPH= $(SRCDIR)/bin/utilities/assemble_sph
-TARGET_CMP_SPH_RST=  $(SRCDIR)/bin/tests/compare_sph_restart#
+NP = 3
+
+TARGET_GEN_SPH_GRID= $(BUILDDIR)/utilities/gen_sph_grids
+TARGET_NEWSPH=       $(BUILDDIR)/utilities/assemble_sph
+TARGET_CMP_SPH_RST=  $(CURRENTDIR)/compare_sph_restart
+#
 #
 
 all: test
 
-test: 
+target:
+	cd $(MAKEDIR); \
+		$(GMAKE) \
+		TARGET_CMP_SPH_RST='$(TARGET_CMP_SPH_RST)' \
+		$(TARGET_CMP_SPH_RST)
+
+test:  target
 	rm -f *.dat *.txt restart/rst.*
-	$(MPIRUN) -np 3 $(TARGET_GEN_SPH_GRID) > log.txt
-	$(MPIRUN) -np 3 $(TARGET_NEWSPH)  >> log.txt
-	$(MPIRUN) -np 3 $(TARGET_CMP_SPH_RST) >> log.txt
+	$(MPIRUN) -np $(NP) $(TARGET_GEN_SPH_GRID) > log.txt
+	$(MPIRUN) -np $(NP) $(TARGET_NEWSPH)  >> log.txt
+	$(MPIRUN) -np $(NP) $(TARGET_CMP_SPH_RST) >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed ASCII Data assemble check'; \
 		exit 1;\

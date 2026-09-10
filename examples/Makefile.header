@@ -16,14 +16,14 @@ RANLIB=ranlib
 # Compiler options
 #
 SHAREDLIB_FLAG = --enable-shared
-F90OPTFLAGS =     -fPIC -O3 -Wall -g -fopenmp  $(F_INCLUDE)
-F90CPPFLAGS =     -DZLIB_IO -DFFTW3 -DHDF5_IO
-OPTFLAGS =        -fPIC -O3 -Wall -g  -D__APPLE__
+F90OPTFLAGS =     -fPIC -O3 -g -fopenmp  $(F_INCLUDE)
+F90CPPFLAGS =     -DZLIB_IO -DFFTW3 -DBLAS -DHDF5_IO
+OPTFLAGS =        -fPIC -O3 -g  
 #
 # Libralies and includes settting
 #
 
-F90LIBS =   $(ZLIB_LIBS) $(FFTW3_LIBS) $(HDF5_LDFLAGS) $(HDF5_FLIBS)
+F90LIBS =   $(ZLIB_LIBS) $(FFTW3_LIBS) $(BLAS_LIBS) $(HDF5_LDFLAGS) $(HDF5_FLIBS)
 F_INCLUDE = -I. -I$(MAKEDIR) $(HDF5_FFLAGS)
 C_INCLUDE = -I. -I$(MAKEDIR) $(ZLIB_CFLAGS)  $(FFTW3_CFLAGS)
 
@@ -35,7 +35,7 @@ ZLIB_LIBS =   -lz
 #
 # BLAS settings
 #
-BLAS_LIBS =   
+BLAS_LIBS =   -lblas
 #
 # FFTW3 settings
 #
@@ -54,14 +54,14 @@ HDF5_FLIBS = -L/opt/homebrew/lib -lhdf5_fortran -lhdf5
 #
 # Directory lists
 #
-SRCDIR = /Users/matsui/CALYPSO_test
+SRCDIR = /Users/matsui/Calypso_test
 #
-MAKEDIR = /Users/matsui/CALYPSO_test/work
-BUILDDIR = /Users/matsui/CALYPSO_test/bin
-MHDDIR = /Users/matsui/CALYPSO_test/src
-INSTDIR = /Users/matsui/local
-EXPDIR = /Users/matsui/CALYPSO_test/examples
-TESTDIR = /Users/matsui/CALYPSO_test/tests
+MAKEDIR = /Users/matsui/Calypso_test/work
+BUILDDIR = /Users/matsui/Calypso_test/bin
+MHDDIR = /Users/matsui/Calypso_test/src
+INSTDIR = /usr/local
+EXPDIR = /Users/matsui/Calypso_test/examples
+TESTDIR = /Users/matsui/Calypso_test/tests
 #
 #
 # -----------------------------------------------------------
@@ -112,10 +112,10 @@ $(LIB_MESH_FILE) $(LIB_FFTPACK_FILE) $(LIB_NETLIB_FILE)
 LIB_PYTHONS= \
 -L$(PYTHONDIR) -lcalypso_to_pythons
 LIB_FILE_PYTHONS= \
-$(PYTHONDIR)/libcalypso_to_pythons.dylib
+$(PYTHONDIR)/libcalypso_to_pythons.so
 #
 LIB_PYTHON_UTILS= \
-$(LIB_MESH) $(LIB_KEMO_C)
+$(LIB_CALYPSO) $(LIB_CALYPSO_C)
 LIB_FILES_PYTHON_UTILS= \
-$(LIB_MESH_FILE) $(LIB_KEMO_C_FILE)
+$(LIB_CALYPSO_FILE) $(LIB_CALYPSO_C_FILE)
 #

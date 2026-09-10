@@ -6,20 +6,37 @@ SHELL           = /bin/sh
 #
 #  directories of Kemo's Dynamo toolkit
 #
+CURRENTDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
 SRCDIR = /Users/matsui/src_kemo
+BUILDDIR = $(SRCDIR)/bin
+MAKEDIR = $(SRCDIR)/work
 #
-MPIRUN = mpirun
-TARGET_SPH_MHD =       $(SRCDIR)/bin/sph_mhd
-TARGET_SPH_ENE_CHECK = $(SRCDIR)/bin/tests/sph_ene_check
-TARGET_COMPARE_PSF =   $(SRCDIR)/bin/tests/compare_psf
+TARGET_SPH_MHD =       $(BUILDDIR)/sph_mhd
+
+TARGET_SPH_ENE_CHECK = $(CURRENTDIR)/sph_ene_check
+TARGET_COMPARE_PSF =   $(CURRENTDIR)/compare_psf
+
+TARGETS= \
+$(TARGET_SPH_ENE_CHECK) \
+$(TARGET_COMPARE_PSF)
+#
+GMAKE= make
+MPIRUN= mpirun
+NP = 4
 #
 
 all: test
 
-test: 
-	make clean
-	
-	$(MPIRUN) -np 4 $(TARGET_SPH_MHD)
+targets:
+	cd $(MAKEDIR); \
+		$(GMAKE) \
+		TARGET_SPH_ENE_CHECK='$(TARGET_SPH_ENE_CHECK)' \
+		TARGET_COMPARE_PSF='$(TARGET_COMPARE_PSF)' \
+		$(TARGETS)
+
+test: dataclean targets
+	$(MPIRUN) -np $(NP) $(TARGET_SPH_MHD)
 	
 	@sync
 	@echo 'Compare with reference mean square data'
@@ -73,10 +90,13 @@ test:
 	
 	@echo 'Dynamo Benchmark Case 2 continue check finished'
 
-clean:
+dataclean:
 	rm -f *.dat *.txt
 	rm -f monitor/[A-Q,a-q,s-z]*
 	rm -f sections/[A-Q,a-q,s-z]*
 	rm -f isosurfaces/[A-Q,a-q,s-z]*
+
+clean: dataclean
+	rm -rf $(TARGET_SPH_ENE_CHECK)*
 
 distclean: clean

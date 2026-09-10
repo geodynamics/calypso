@@ -6,21 +6,34 @@ SHELL           = /bin/sh
 #
 #  directories of Kemo's Dynamo toolkit
 #
+CURRENTDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
 SRCDIR = /Users/matsui/src_kemo
+MAKEDIR = $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
 #
 # Command settings
 #
-MPIRUN= mpirun   
-TARGET_GEN_SPH_GRID= $(SRCDIR)/bin/utilities/gen_sph_grids
-TARGET_NEWSPH= $(SRCDIR)/bin/utilities/assemble_sph
-TARGET_CMP_SPH_RST=  $(SRCDIR)/bin/tests/compare_sph_restart#
+GMAKE= make
+MPIRUN= mpirun
+NP = 4
+
+TARGET_NEWSPH=      $(SRCDIR)/bin/utilities/assemble_sph
+TARGET_CMP_SPH_RST= $(CURRENTDIR)/compare_sph_restart
+#
 #
 all: test
 
-test: 
+target:
+	cd $(MAKEDIR); \
+		$(GMAKE) \
+		TARGET_CMP_SPH_RST='$(TARGET_CMP_SPH_RST)' \
+		$(TARGET_CMP_SPH_RST)
+
+test:  target
 	rm -f *.dat *.txt rst.*
-	$(MPIRUN) -np 4 $(TARGET_NEWSPH)  >> log.txt
-	$(MPIRUN) -np 4 $(TARGET_CMP_SPH_RST) >> log.txt
+	$(MPIRUN) -np $(NP) $(TARGET_NEWSPH)  >> log.txt
+	$(MPIRUN) -np $(NP) $(TARGET_CMP_SPH_RST) >> log.txt
 	@if [ `tail -n 1 flag.txt` != 0 ]; then\
 		echo 'Failed Merged gziped ASCII Data assemble check'; \
 		exit 1;\

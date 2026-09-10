@@ -6,23 +6,39 @@ SHELL           = /bin/sh
 #
 #  directories of Kemo's Dynamo toolkit
 #
+CURRENTDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
 SRCDIR = /Users/matsui/src_kemo
+BUILDDIR = $(SRCDIR)/bin
+MAKEDIR = $(SRCDIR)/work
 #
-SRCDIR = /Users/matsui/src_kemo
+TARGET_SPH_SNAP =      $(BUILDDIR)/sph_snapshot
+
+TARGET_COMPARE_PSF =   $(CURRENTDIR)/compare_psf
+TARGET_PSF_2_VTK =     $(CURRENTDIR)/section_to_VTK
+
+TARGETS= \
+$(TARGET_COMPARE_PSF) \
+$(TARGET_PSF_2_VTK)
 #
-MPIRUN = mpirun
-TARGET_SPH_SNAP =      $(SRCDIR)/bin/sph_snapshot
-TARGET_COMPARE_PSF =   $(SRCDIR)/bin/tests/compare_psf
-TARGET_PSF_2_VTK =     $(SRCDIR)/bin/utilities/section_to_VTK
+GMAKE= make
+MPIRUN= mpirun
+NP = 4
 #
 
 all: test
 
-test: 
-	make clean
+targets:
+	cd $(MAKEDIR); \
+		$(GMAKE) \
+		TARGET_COMPARE_PSF='$(TARGET_COMPARE_PSF)' \
+		TARGET_PSF_2_VTK='$(TARGET_PSF_2_VTK)' \
+		$(TARGETS)
+
+test: dataclean targets
 	cd rst_4; ln -nsf ../../Dynamobench_Case2/rst_4/rst.* ./
 	
-	$(MPIRUN) -np 4 $(TARGET_SPH_SNAP)
+	$(MPIRUN) -np $(NP) $(TARGET_SPH_SNAP)
 	
 	@echo 'Convert section data'
 	$(TARGET_PSF_2_VTK)  'sections/psf_eq'    'sdt'     2  3  1
@@ -42,11 +58,15 @@ test:
 	fi
 	@echo 'Snapshot program check finished'
 
-clean:
+dataclean:
 	rm -f *.dat *.txt
 	rm -f rst_4/rst.*
 	rm -f sections/psf_* sections/zm_*
 	rm -f isosurfaces/iso_*
 	rm -f monitor/*.dat monitor/*.dat.gz
+
+clean: dataclean
+	rm -rf $(TARGET_COMPARE_PSF)*
+	rm -rf $(TARGET_PSF_2_VTK)*
 
 distclean: clean

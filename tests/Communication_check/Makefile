@@ -6,14 +6,25 @@ SHELL           = /bin/sh
 #
 #  directories of Kemo's Dynamo toolkit
 #
+CURRENTDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
 SRCDIR = /Users/matsui/src_kemo
-BUILDDIR= $(SRCDIR)/bin
+MAKEDIR = $(SRCDIR)/work
 #
 GMAKE = make
+#
+include $(MAKEDIR)/Makefile.header
+#
 
-TARGET_GEN_SPH_GRID =    $(BUILDDIR)/utilities/gen_sph_grids
-TARGET_CHECK_SPH_GRID =  $(BUILDDIR)/tests/check_sph_grids
-TARGET_TEST_SPH_GRID =   $(BUILDDIR)/tests/check_sph_comms
+TARGET_GEN_SPH_GRID =    $(CURRENTDIR)/gen_sph_grids
+TARGET_CHECK_SPH_GRID =  $(CURRENTDIR)/check_sph_grids
+TARGET_TEST_SPH_GRID =   $(CURRENTDIR)/check_sph_comms
+
+TARGETS= \
+$(TARGET_GEN_SPH_GRID)   \
+$(TARGET_CHECK_SPH_GRID) \
+$(TARGET_TEST_SPH_GRID)
+
 #
 NP = 6
 MPIRUN= mpirun
@@ -28,6 +39,14 @@ MPI_TEST =  $(MPIRUN) -np $(NP) $(TARGET_TEST_SPH_GRID)
 all: test
 
 test: 
+	cd $(MAKEDIR); \
+		$(GMAKE) \
+		TARGET_GEN_SPH_GRID='$(TARGET_GEN_SPH_GRID)' \
+		TARGET_CHECK_SPH_GRID='$(TARGET_CHECK_SPH_GRID)' \
+		TARGET_TEST_SPH_GRID='$(TARGET_TEST_SPH_GRID)' \
+		$(TARGETS)
+	
+	
 	@echo '#'
 	@echo '# -------------------------------------------------------------'
 	@echo "#   Test spherical harmonics indexining in ascii directory..."
@@ -124,6 +143,7 @@ clean:
 	
 	cd no_file; make clean
 	
+	rm -f $(TARGETS)
 	rm -f reference/in.*
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 

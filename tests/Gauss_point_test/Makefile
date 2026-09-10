@@ -6,25 +6,47 @@ SHELL           = /bin/sh
 #
 #  directories of Kemo's Dynamo toolkit
 #
-SRCDIR = /Users/matsui/src_kemo
-BUILDDIR= $(SRCDIR)/bin
+CURRENTDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
-TARGET_GAUSS_TEST =     $(BUILDDIR)/tests/gauss_points
-TARGET_CMP_GAUSS_TEST = $(BUILDDIR)/tests/compare_gauss_points
+SRCDIR = /Users/matsui/src_kemo
+MAKEDIR = $(SRCDIR)/work
+
+TESTS_DIR =      $(SRCDIR)/MHD/programs/TESTS
+GAUSS_TEST_DIR = $(TESTS_DIR)/Gauss_point_test
+
+GMAKE = make
+
+include $(MAKEDIR)/Makefile.header
+
+TARGET_GAUSS_TEST =     $(CURRENTDIR)/gauss_points
+TARGET_CMP_GAUSS_TEST = $(CURRENTDIR)/compare_gauss_points
+
+TARGETS = \
+$(TARGET_GAUSS_TEST) \
+$(TARGET_CMP_GAUSS_TEST)
 
 all: test
 
-test: 
-	make clean
-	$(TARGET_GAUSS_TEST) < input.txt
-	$(TARGET_CMP_GAUSS_TEST) < compare.txt > log.txt
+targets:
+	cd $(MAKEDIR); \
+		$(GMAKE) \
+		TARGET_GAUSS_TEST='$(TARGET_GAUSS_TEST)' \
+		TARGET_CMP_GAUSS_TEST='$(TARGET_CMP_GAUSS_TEST)' \
+		$(TARGETS)
+
+test: dataclean targets
+	$(TARGET_GAUSS_TEST) 32
+	$(TARGET_CMP_GAUSS_TEST)  reference/gauss_point32.dat gauss_point32.dat > log.txt
 	@if [ `tail -n 1 log.txt` != 0 ]; then\
 		echo 'Failed Gauss points check'; \
 		exit 1;\
 	fi
 	echo 'Gauss points check finished'
 
-clean:
+dataclean:
 	rm -f *.dat log.txt
+
+clean: dataclean
+	rm -fr $(TARGETS)
 
 distclean: clean
