@@ -7,10 +7,14 @@ C_SRCDIR = $$(MHDDIR)/C_libraries
 LIB_CALYPSO_C =       -lcalypso_c
 LIB_CALYPSO_C_FILE = libcalypso_c.a
 
-OBJS_C= $$(OBJ_BASE_C)
+OBJS_C=
 
 SUBDIRS = \
 BASE
+
+ifdef ZLIB_LIBS
+  SUBDIRS+= ZLIB_wrapper
+endif
 
 #
 #  -------------------------------------------------------------------------
@@ -42,7 +46,7 @@ lib_tasks: libtarget lib_archve
 	@echo '#' >> $(MAKENAME)
 
 libtarget:
-	@echo  '$$(LIB_CALYPSO_C_FILE): $(OBJS_C)' >> $(MAKENAME)
+	@echo  '$$(LIB_CALYPSO_C_FILE): $$(OBJS_C)' >> $(MAKENAME)
 
 lib_archve:
 	@for dir in $(SUBDIRS); do \
@@ -56,6 +60,7 @@ lib_archve:
 
 
 mod_list:
+	@echo  'OBJS_C = $(OBJS_C)' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \

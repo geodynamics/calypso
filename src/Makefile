@@ -83,6 +83,7 @@ CPP_FLAGS =
 
 F_INCLUDE = -I. -I$$(MAKEDIR)
 C_INCLUDE = -I. -I$$(MAKEDIR)
+C_INCLUDE += -I$(MHDDIR)/C_libraries/BASE
 
 ifdef SHAREDLIB_FLAG
   SUBDIRS+=         pythons
@@ -91,7 +92,7 @@ endif
 
 ifdef ZLIB_LIBS
   CPP_FLAGS += -DZLIB_IO
-  C_INCLUDE+= $$(ZLIB_CFLAGS) 
+  C_INCLUDE+= -I$(MHDDIR)/C_libraries/ZLIB_wrapper $$(ZLIB_CFLAGS)
   F90LIBS+= $$(ZLIB_LIBS)
 endif
 
