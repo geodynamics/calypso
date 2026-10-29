@@ -62,6 +62,10 @@
 !
 !>        Ratio of Number of FFT on GPU
         real(kind = kreal) :: ratio_rocFFT = 0.5
+!>        number of date series for FFT on CPU
+        integer(kind = kint) :: nfld_CPU = n_field / 2
+!>        number of date series for FFT on GPU
+        integer(kind = kint) :: nfld_GPU = n_field / 2
       end type FFT_test_parameters
 !
 ! -----------------------------------------------------------------------
@@ -113,6 +117,13 @@
       if(fft_c%loop_counts_ctl%iflag .gt. 0) then
         fft_test_p%nloop_test = fft_c%loop_counts_ctl%intvalue
       end if
+      if(fft_c%GPU_ratio_ctl%iflag .gt. 0) then
+        fft_test_p%ratio_rocFFT = fft_c%GPU_ratio_ctl%realvalue
+      end if
+!
+      fft_test_p%nfld_GPU                                               &
+     &        = fft_test_p%Ncomp_test * fft_test_p%ratio_rocFFT
+      fft_test_p%nfld_CPU = fft_test_p%Ncomp_test - fft_test_p%nfld_GPU
 !
       fft_test_p%iflag_FFT                                              &
      &     = set_fft_library_ctl(fft_c%FFT_lib_ctl%iflag,               &
@@ -128,6 +139,7 @@
       end subroutine set_FFT_test_parameters
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
 !
       subroutine write_fft_test_elapsed(fft_test_p, elapsed)
 !
@@ -138,7 +150,7 @@
 !
 !
       write(*, '(a,i4)') 'Number of threads:  ', np_smp
-      write(*, '(a,3i6)')  'Num (point, field, loop): ',                &
+      write(*, '(a,3i7)')  'Num (point, field, loop): ',                &
      &                   fft_test_p%nfft_test, fft_test_p%Ncomp_test,   &
      &                   fft_test_p%nloop_test
       write(*, '(a,1pE16.6e3)') 'Initialize:      ', elapsed(1)
@@ -163,7 +175,7 @@
 !
 !
       write(*, '(a,i4)') 'Number of threads:  ', np_smp
-      write(*, '(a,3i6)')  'Num (point, field, loop): ',                &
+      write(*, '(a,3i7)')  'Num (point, field, loop): ',                &
      &                   fft_test_p%nfft_test, fft_test_p%Ncomp_test,   &
      &                   fft_test_p%nloop_test
       write(*, '(a,1pE16.6e3)') 'Initialize:      ', elapsed(1)
@@ -190,9 +202,11 @@
 !
 !
       write(*,'(a,i4)') 'Number of threads:  ', np_smp
-      write(*,'(a,3i6)')  'Num (point, field, loop): ',                 &
+      write(*,'(a,3i7)')  'Num (point, field, loop): ',                 &
      &                   fft_test_p%nfft_test, fft_test_p%Ncomp_test,   &
      &                   fft_test_p%nloop_test
+      write(*,'(a,3i7)')  '(for GPU, for CPU): ',                       &
+     &                   fft_test_p%nfld_GPU, fft_test_p%nfld_CPU
       write(*,'(a,1pE16.6e3)') 'Initialize:      ',  elapsed(1)
       write(*,'(4a,1pE16.6e3)') trim(fft_test_p%FFT_name), '_',         &
      &         trim(fft_test_p%CPU_FFT_name), ': ',  elapsed(2)

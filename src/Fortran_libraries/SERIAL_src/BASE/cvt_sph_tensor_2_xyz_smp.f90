@@ -33,23 +33,23 @@
 !!      subroutine cal_zz_tensor_by_sph_smp(np_smp, numnod,             &
 !!     &          inod_smp_stack, tensor, t_zz, xx, yy, zz, r, s, a_r)
 !!
-!!  uxux = (ar*as)^2 *(x*x*s*s *ur*ur + x*x*z*s *ur*ut - x*y*s*r * ur*up
-!!                   + x*x*z*s *ut*ur + x*x*z*z *ut*ut - x*y*z*r * ut*up
-!!                   - x*y*s*r *up*ur - x*y*z*r *up*ut + y*y*r*r * up*up)
-!!  uxuy = (ar*as)^2 *(x*y*s*s *ur*ur + x*y*z*s *ur*ut + x*x*s*r * ur*up
-!!                   + x*y*z*s *ut*ur + x*y*z*z *ut*ut + x*x*z*r * ut*up
-!!                   - y*y*s*r *up*ur - y*y*z*r *up*ut - x*y*r*r * up*up)
-!!  uxuz = (ar*as)^2 *(x*z*s*s *ur*ur - x*s*s*s *ur*ut + 0
-!!                   + x*z*z*s *ut*ur - x*z*s*s *ut*ut + 0
-!!                   - y*z*s*r *up*ur + y*s*s*r *up*ut + 0)
-!!  uyuy = (ar*as)^2 *(y*y*s*s *ur*ur + y*y*s*z *ur*ut + x*y*s*r * ur*up
-!!                   + y*y*z*s *ut*ur + y*y*z*z *ut*ut + x*y*z*r * ut*up
-!!                   + x*y*s*r *up*ur + x*y*z*r *up*ut + x*x*r*r * up*up)
-!!  uyuz = (ar*as)^2 *(y*z*s*s *ur*ur - y*s*s*s *ur*ut + 0
-!!                   + y*z*z*s *ut*ur - y*z*s*s *ut*ut - 0
-!!                   + x*z*s*r *up*ur - x*r*s*s *up*ut + 0)
-!!  uzuz = (ar*as)^2 *(z*z*s*s *ur*ur - z*s*s*s *ur*ut + 0
-!!                   - z*s*s*s *ut*ur + s*s*s*s *ut*ut + 0
+!!  uxux = (ar*as)^2 *(x*x*s*s *urur + x*x*z*s *urut - x*y*s*r * urup
+!!                   + x*x*z*s *utur + x*x*z*z *utut - x*y*z*r * utup
+!!                   - x*y*s*r *upur - x*y*z*r *uput + y*y*r*r * upup)
+!!  uxuy = (ar*as)^2 *(x*y*s*s *urur + x*y*z*s *urut + x*x*s*r * urup
+!!                   + x*y*z*s *utur + x*y*z*z *utut + x*x*z*r * utup
+!!                   - y*y*s*r *upur - y*y*z*r *uput - x*y*r*r * upup)
+!!  uxuz = (ar*as)^2 *(x*z*s*s *urur - x*s*s*s *urut + 0
+!!                   + x*z*z*s *utur - x*z*s*s *utut + 0
+!!                   - y*z*s*r *upur + y*s*s*r *uput + 0)
+!!  uyuy = (ar*as)^2 *(y*y*s*s *urur + y*y*s*z *urut + x*y*s*r * urup
+!!                   + y*y*z*s *utur + y*y*z*z *utut + x*y*z*r * utup
+!!                   + x*y*s*r *upur + x*y*z*r *uput + x*x*r*r * upup)
+!!  uyuz = (ar*as)^2 *(y*z*s*s *urur - y*s*s*s *urut + 0
+!!                   + y*z*z*s *utur - y*z*s*s *utut - 0
+!!                   + x*z*s*r *upur - x*r*s*s *uput + 0)
+!!  uzuz = (ar*as)^2 *(z*z*s*s *urur - z*s*s*s *urut + 0
+!!                   - z*s*s*s *utur + s*s*s*s *utut + 0
 !!                   + 0 + 0 + 0)
 !!@endverbatim
 !!
@@ -113,10 +113,10 @@
        real(kind=kreal), intent(inout) :: txyz(numnod,6)
 !
        integer (kind = kint) :: ip, inod, ist, ied
-       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp
+       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp, ar2s2
 !
 !
-!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp)
+!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp,ar2s2)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -150,57 +150,58 @@
              txyz(inod,2) = - ttp
              txyz(inod,4) =   tpp
            else
+             ar2s2 = a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
              txyz(inod,1)                                               &
-     &          =  ( trr * xx(inod)*xx(inod)* s(inod)  * s(inod)        &
+     &          =  ( trr * xx(inod)*xx(inod)* s(inod)* s(inod)          &
      &         + two*trt * xx(inod)*xx(inod)*zz(inod)* s(inod)          &
-     &         + two*trp * xx(inod)*yy(inod)* s(inod)  * r(inod)        &
+     &         - two*trp * xx(inod)*yy(inod)* s(inod)* r(inod)          &
      &         +     ttt * xx(inod)*xx(inod)*zz(inod)*zz(inod)          &
-     &         + two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
-     &         +     tpp * yy(inod)*yy(inod)* r(inod)  * r(inod) )      &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         - two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
+     &         +     tpp * yy(inod)*yy(inod)* r(inod)* r(inod))         &
+     &          * ar2s2
 !
              txyz(inod,2)                                               &
-     &           = ( trr * xx(inod)*yy(inod)* s(inod)  * s(inod)        &
-     &         +     trt * xx(inod)*yy(inod)*zz(inod)* s(inod)          &
-     &         +     trp *  s(inod)  * s(inod)                          &
+     &           = ( trr * xx(inod)*yy(inod)* s(inod)* s(inod)          &
+     &         + two*trt * xx(inod)*yy(inod)*zz(inod)* s(inod)          &
+     &         +     trp *  s(inod) * r(inod)                           &
      &              * (xx(inod)*xx(inod) - yy(inod)*yy(inod))           &
      &         +     ttt * xx(inod)*yy(inod)*zz(inod)*zz(inod)          &
-     &         +     ttp * zz(inod)* r(inod)                            &
+     &         +     ttp * zz(inod) * r(inod)                           &
      &              * (xx(inod)*xx(inod) - yy(inod)*yy(inod))           &
-     &         -     tpp * xx(inod)*yy(inod)* r(inod)* r(inod) )        &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         -     tpp * xx(inod)*yy(inod)* r(inod)* r(inod))         &
+     &          * ar2s2
 !
              txyz(inod,3)                                               &
-     &           = ( trr * xx(inod)*zz(inod) *s(inod)                   &
+     &           = ( trr * xx(inod)*zz(inod)* s(inod)                   &
      &         +     trt * xx(inod)                                     &
      &              * (zz(inod)*zz(inod) - s(inod)*s(inod))             &
-     &         -     trp * yy(inod)*zz(inod) *r(inod)                   &
-     &         -     ttt * xx(inod)*zz(inod) *s(inod)                   &
-     &         +     ttp * yy(inod) *s(inod)   *r(inod) )               &
+     &         -     trp * yy(inod)*zz(inod)* r(inod)                   &
+     &         -     ttt * xx(inod)*zz(inod)* s(inod)                   &
+     &         +     ttp * yy(inod) *s(inod)* r(inod))                  &
      &          * a_r(inod)*a_r(inod)*a_s(inod)
 !
              txyz(inod,4)                                               &
-     &           = ( trr * yy(inod)*yy(inod)* s(inod)  * s(inod)        &
+     &           = ( trr * yy(inod)*yy(inod)* s(inod)* s(inod)          &
      &         + two*trt * yy(inod)*yy(inod)*zz(inod)* s(inod)          &
-     &         + two*trp * xx(inod)*yy(inod)* s(inod)  * r(inod)        &
+     &         + two*trp * xx(inod)*yy(inod)* s(inod)* r(inod)          &
      &         +     ttt * yy(inod)*yy(inod)*zz(inod)*zz(inod)          &
      &         + two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
-     &         +     tpp * xx(inod)*xx(inod)* r(inod)  * r(inod) )      &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         +     tpp * xx(inod)*xx(inod)* r(inod)* r(inod))         &
+     &          * ar2s2
 !
              txyz(inod,5)                                               &
      &           = ( trr * yy(inod)*zz(inod)*s(inod)                    &
      &         +     trt * yy(inod)                                     &
      &              * (zz(inod)*zz(inod) - s(inod)*s(inod))             &
-     &         -     ttt * yy(inod)*zz(inod)*s(inod)                    &
-     &         +     trp * xx(inod)*zz(inod)*r(inod)                    &
-     &         -     ttp * xx(inod)* s(inod)  *r(inod) )                &
+     &         -     ttt * yy(inod)*zz(inod)* s(inod)                   &
+     &         +     trp * xx(inod)*zz(inod)* r(inod)                   &
+     &         -     ttp * xx(inod)* s(inod)* r(inod))                  &
      &          * a_r(inod)*a_r(inod)*a_s(inod)
 !
              txyz(inod,6)                                               &
      &           = ( trr * zz(inod)*zz(inod)                            &
      &         - two*trt * zz(inod)* s(inod)                            &
-     &         +     ttt *  s(inod)  * s(inod) )                        &
+     &         +     ttt *  s(inod)* s(inod))                           &
      &          * a_r(inod)*a_r(inod)
            end if
 !
@@ -228,10 +229,10 @@
        real(kind=kreal), intent(inout) :: tensor(numnod,6)
 !
        integer (kind = kint) :: ip, inod, ist, ied
-       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp
+       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp, ar2s2
 !
 !
-!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp)
+!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp,ar2s2)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -265,57 +266,58 @@
              tensor(inod,2) = - ttp
              tensor(inod,4) =   tpp
            else
+             ar2s2 = a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
              tensor(inod,1)                                             &
-     &          =  ( trr * xx(inod)*xx(inod)* s(inod)  * s(inod)        &
+     &          =  ( trr * xx(inod)*xx(inod)* s(inod)* s(inod)          &
      &         + two*trt * xx(inod)*xx(inod)*zz(inod)* s(inod)          &
-     &         + two*trp * xx(inod)*yy(inod)* s(inod)  * r(inod)        &
+     &         - two*trp * xx(inod)*yy(inod)* s(inod)* r(inod)          &
      &         +     ttt * xx(inod)*xx(inod)*zz(inod)*zz(inod)          &
-     &         + two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
-     &         +     tpp * yy(inod)*yy(inod)* r(inod)  * r(inod) )      &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         - two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
+     &         +     tpp * yy(inod)*yy(inod)* r(inod)* r(inod))         &
+     &          * ar2s2
 !
              tensor(inod,2)                                             &
      &           = ( trr * xx(inod)*yy(inod)* s(inod)  * s(inod)        &
-     &         +     trt * xx(inod)*yy(inod)*zz(inod)* s(inod)          &
-     &         +     trp *  s(inod)  * s(inod)                          &
+     &         + two*trt * xx(inod)*yy(inod)*zz(inod)* s(inod)          &
+     &         +     trp *  s(inod)* r(inod)                            &
      &              * (xx(inod)*xx(inod) - yy(inod)*yy(inod))           &
      &         +     ttt * xx(inod)*yy(inod)*zz(inod)*zz(inod)          &
      &         +     ttp * zz(inod)* r(inod)                            &
      &              * (xx(inod)*xx(inod) - yy(inod)*yy(inod))           &
      &         -     tpp * xx(inod)*yy(inod)* r(inod)* r(inod) )        &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &          * ar2s2
 !
              tensor(inod,3)                                             &
-     &           = ( trr * xx(inod)*zz(inod) *s(inod)                   &
+     &           = ( trr * xx(inod)*zz(inod)* s(inod)                   &
      &         +     trt * xx(inod)                                     &
      &              * (zz(inod)*zz(inod) - s(inod)*s(inod))             &
-     &         -     trp * yy(inod)*zz(inod) *r(inod)                   &
-     &         -     ttt * xx(inod)*zz(inod) *s(inod)                   &
-     &         +     ttp * yy(inod) *s(inod)   *r(inod) )               &
+     &         -     trp * yy(inod)*zz(inod)* r(inod)                   &
+     &         -     ttt * xx(inod)*zz(inod)* s(inod)                   &
+     &         +     ttp * yy(inod) *s(inod)* r(inod))                 &
      &          * a_r(inod)*a_r(inod)*a_s(inod)
 !
              tensor(inod,4)                                             &
-     &           = ( trr * yy(inod)*yy(inod)* s(inod)  * s(inod)        &
+     &           = ( trr * yy(inod)*yy(inod)* s(inod)* s(inod)          &
      &         + two*trt * yy(inod)*yy(inod)*zz(inod)* s(inod)          &
-     &         + two*trp * xx(inod)*yy(inod)* s(inod)  * r(inod)        &
+     &         + two*trp * xx(inod)*yy(inod)* s(inod)* r(inod)          &
      &         +     ttt * yy(inod)*yy(inod)*zz(inod)*zz(inod)          &
      &         + two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
-     &         +     tpp * xx(inod)*xx(inod)* r(inod)  * r(inod) )      &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         +     tpp * xx(inod)*xx(inod)* r(inod)* r(inod))         &
+     &          * ar2s2
 !
              tensor(inod,5)                                             &
      &           = ( trr * yy(inod)*zz(inod)*s(inod)                    &
      &         +     trt * yy(inod)                                     &
      &              * (zz(inod)*zz(inod) - s(inod)*s(inod))             &
-     &         -     ttt * yy(inod)*zz(inod)*s(inod)                    &
-     &         +     trp * xx(inod)*zz(inod)*r(inod)                    &
-     &         -     ttp * xx(inod)* s(inod)  *r(inod) )                &
+     &         -     ttt * yy(inod)*zz(inod)* s(inod)                   &
+     &         +     trp * xx(inod)*zz(inod)* r(inod)                   &
+     &         -     ttp * xx(inod)* s(inod)* r(inod))                  &
      &          * a_r(inod)*a_r(inod)*a_s(inod)
 !
              tensor(inod,6)                                             &
      &           = ( trr * zz(inod)*zz(inod)                            &
      &         - two*trt * zz(inod)* s(inod)                            &
-     &         +     ttt *  s(inod)  * s(inod) )                        &
+     &         +     ttt *  s(inod)* s(inod))                           &
      &          * a_r(inod)*a_r(inod)
            end if
 !
@@ -345,10 +347,10 @@
        real(kind=kreal), intent(inout) :: t_xx(numnod)
 !
        integer (kind = kint) :: ip, inod, ist, ied
-       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp
+       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp, ar2s2
 !
 !
-!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp)
+!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp,ar2s2)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -367,14 +369,15 @@
            else if ( s(inod).eq.0.0 .and. zz(inod) .lt. 0) then
              t_xx(inod) =   ttt
            else
+             ar2s2 = a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
              t_xx(inod)                                                 &
      &          =  ( trr * xx(inod)*xx(inod)* s(inod)  * s(inod)        &
      &         + two*trt * xx(inod)*xx(inod)*zz(inod)* s(inod)          &
-     &         + two*trp * xx(inod)*yy(inod)* s(inod)  * r(inod)        &
+     &         - two*trp * xx(inod)*yy(inod)* s(inod)  * r(inod)        &
      &         +     ttt * xx(inod)*xx(inod)*zz(inod)*zz(inod)          &
-     &         + two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
-     &         +     tpp * yy(inod)*yy(inod)* r(inod)  * r(inod) )      &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         - two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
+     &         +     tpp * yy(inod)*yy(inod)* r(inod)  * r(inod))       &
+     &          * ar2s2
            end if
 !
         end do
@@ -402,10 +405,10 @@
        real(kind=kreal), intent(inout) :: t_xy(numnod)
 !
        integer (kind = kint) :: ip, inod, ist, ied
-       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp
+       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp, ar2s2
 !
 !
-!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp)
+!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp,ar2s2)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -424,16 +427,17 @@
            else if ( s(inod).eq.0.0 .and. zz(inod) .lt. 0) then
              t_xy(inod) = - ttp
            else
+             ar2s2 = a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
              t_xy(inod)                                                 &
-     &           = ( trr * xx(inod)*yy(inod)* s(inod)  * s(inod)        &
-     &         +     trt * xx(inod)*yy(inod)*zz(inod)* s(inod)          &
-     &         +     trp *  s(inod)  * s(inod)                          &
+     &           = ( trr * xx(inod)*yy(inod)* s(inod)* s(inod)          &
+     &         + two*trt * xx(inod)*yy(inod)*zz(inod)* s(inod)          &
+     &         +     trp *  s(inod)* r(inod)                            &
      &              * (xx(inod)*xx(inod) - yy(inod)*yy(inod))           &
      &         +     ttt * xx(inod)*yy(inod)*zz(inod)*zz(inod)          &
      &         +     ttp * zz(inod)* r(inod)                            &
      &              * (xx(inod)*xx(inod) - yy(inod)*yy(inod))           &
-     &         -     tpp * xx(inod)*yy(inod)* r(inod)* r(inod) )        &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         -     tpp * xx(inod)*yy(inod)* r(inod)* r(inod))         &
+     &          * ar2s2
            end if
 !
         end do
@@ -483,12 +487,12 @@
              t_xz(inod) =   trt
            else
              t_xz(inod)                                                 &
-     &           = ( trr * xx(inod)*zz(inod) *s(inod)                   &
+     &           = ( trr * xx(inod)*zz(inod)* s(inod)                   &
      &         +     trt * xx(inod)                                     &
      &              * (zz(inod)*zz(inod) - s(inod)*s(inod))             &
-     &         -     trp * yy(inod)*zz(inod) *r(inod)                   &
-     &         -     ttt * xx(inod)*zz(inod) *s(inod)                   &
-     &         +     ttp * yy(inod) *s(inod)   *r(inod) )               &
+     &         -     trp * yy(inod)*zz(inod)* r(inod)                   &
+     &         -     ttt * xx(inod)*zz(inod)* s(inod)                   &
+     &         +     ttp * yy(inod) *s(inod)* r(inod))                  &
      &          * a_r(inod)*a_r(inod)*a_s(inod)
            end if
 !
@@ -517,10 +521,10 @@
        real(kind=kreal), intent(inout) :: t_yy(numnod)
 !
        integer (kind = kint) :: ip, inod, ist, ied
-       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp
+       real(kind=kreal) :: trr, trt, trp, ttt, ttp, tpp, ar2s2
 !
 !
-!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp)
+!$omp parallel do private(inod,ist,ied,trr,trt,trp,ttt,ttp,tpp,ar2s2)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -539,14 +543,15 @@
            else if ( s(inod).eq.0.0 .and. zz(inod) .lt. 0) then
              t_yy(inod) =   tpp
            else
+             ar2s2 = a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
              t_yy(inod)                                                 &
-     &           = ( trr * yy(inod)*yy(inod)* s(inod)  * s(inod)        &
+     &           = ( trr * yy(inod)*yy(inod)* s(inod)* s(inod)          &
      &         + two*trt * yy(inod)*yy(inod)*zz(inod)* s(inod)          &
-     &         + two*trp * xx(inod)*yy(inod)* s(inod)  * r(inod)        &
+     &         + two*trp * xx(inod)*yy(inod)* s(inod)* r(inod)          &
      &         +     ttt * yy(inod)*yy(inod)*zz(inod)*zz(inod)          &
      &         + two*ttp * xx(inod)*yy(inod)*zz(inod)* r(inod)          &
-     &         +     tpp * xx(inod)*xx(inod)* r(inod)  * r(inod) )      &
-     &          * a_r(inod)*a_r(inod)*a_s(inod)*a_s(inod)
+     &         +     tpp * xx(inod)*xx(inod)* r(inod)* r(inod))         &
+     &          * ar2s2
            end if
 !
         end do
@@ -598,9 +603,9 @@
      &           = ( trr * yy(inod)*zz(inod)*s(inod)                    &
      &         +     trt * yy(inod)                                     &
      &              * (zz(inod)*zz(inod) - s(inod)*s(inod))             &
-     &         -     ttt * yy(inod)*zz(inod)*s(inod)                    &
-     &         +     trp * xx(inod)*zz(inod)*r(inod)                    &
-     &         -     ttp * xx(inod)* s(inod)  *r(inod) )                &
+     &         -     ttt * yy(inod)*zz(inod)* s(inod)                   &
+     &         +     trp * xx(inod)*zz(inod)* r(inod)                   &
+     &         -     ttp * xx(inod)* s(inod)* r(inod))                  &
      &          * a_r(inod)*a_r(inod)*a_s(inod)
            end if
 !
@@ -647,7 +652,7 @@
              t_zz(inod)                                                 &
      &           = ( trr * zz(inod)*zz(inod)                            &
      &         - two*trt * zz(inod)* s(inod)                            &
-     &         +     ttt *  s(inod)  * s(inod) )                        &
+     &         +     ttt *  s(inod)* s(inod))                           &
      &          * a_r(inod)*a_r(inod)
            end if
 !

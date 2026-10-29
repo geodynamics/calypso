@@ -96,14 +96,14 @@
      &         +     ttt * cos( theta(inod) ) * cos( theta(inod) )
 !
              tcyl(inod,2)                                               &
+     &           =   trp * sin( theta(inod) )                           &
+     &         +     ttp * cos( theta(inod) )
+!
+             tcyl(inod,3)                                               &
      &           =   trr * cos( theta(inod) ) *sin( theta(inod) )       &
      &         +     trt * (cos( theta(inod) )*cos( theta(inod) )       &
      &                    - sin( theta(inod) )*sin( theta(inod) ))      &
      &         -     ttt * sin( theta(inod) ) * cos( theta(inod) )
-!
-             tcyl(inod,3)                                               &
-     &           =   trp * sin( theta(inod) ) * sin( theta(inod) )      &
-     &         +     ttp * cos( theta(inod) ) 
 !
              tcyl(inod,4) = tpp
 !
@@ -155,14 +155,14 @@
      &         +     ttt * cos( theta(inod) ) * cos( theta(inod) )
 !
            tensor(inod,2)                                               &
+     &           =   trp * sin( theta(inod) )                           &
+     &         +     ttp * cos( theta(inod) )
+!
+           tensor(inod,3)                                               &
      &           =   trr * cos( theta(inod) ) *sin( theta(inod) )       &
      &         +     trt * (cos( theta(inod) )*cos( theta(inod) )       &
      &                    - sin( theta(inod) )*sin( theta(inod) ))      &
      &         -     ttt * sin( theta(inod) ) * cos( theta(inod) )
-!
-           tensor(inod,3)                                               &
-     &           =   trp * sin( theta(inod) ) * sin( theta(inod) )      &
-     &         +     ttp * cos( theta(inod) ) 
 !
            tensor(inod,4) = tpp
 !
@@ -229,23 +229,20 @@
        real(kind=kreal), intent(inout) :: t_sp(numnod)
 !
        integer (kind = kint) :: ip, inod, ist, ied
-       real(kind=kreal) :: trr, trt, ttt
+       real(kind=kreal) :: trp, ttp
 !
 !
-!$omp parallel do private(inod,ist,ied,trr,trt,ttt)
+!$omp parallel do private(inod,ist,ied,trp,ttp)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
          do inod = ist, ied
-           trr = tensor(inod,1)
-           trt = tensor(inod,2)
-           ttt = tensor(inod,4)
+           trp = tensor(inod,3)
+           ttp = tensor(inod,5)
 !
              t_sp(inod)                                                 &
-     &           =   trr * cos( theta(inod) ) *sin( theta(inod) )       &
-     &         +     trt * (cos( theta(inod) )*cos( theta(inod) )       &
-     &                    - sin( theta(inod) )*sin( theta(inod) ))      &
-     &         -     ttt * sin( theta(inod) ) * cos( theta(inod) )
+     &           =   trp * sin( theta(inod) )                           &
+     &         +     ttp * cos( theta(inod) )
         end do
       end do
 !$omp end parallel do
@@ -265,21 +262,23 @@
        real(kind=kreal), intent(inout) :: t_sz(numnod)
 !
        integer (kind = kint) :: ip, inod, ist, ied
-       real(kind=kreal) :: trr, trp, ttp
+       real(kind=kreal) :: trr, trt, ttt
 !
 !
-!$omp parallel do private(inod,ist,ied,trr,trp,ttp)
+!$omp parallel do private(inod,ist,ied,trr,trt,ttt)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
          do inod = ist, ied
            trr = tensor(inod,1)
-           trp = tensor(inod,3)
-           ttp = tensor(inod,5)
+           trt = tensor(inod,2)
+           ttt = tensor(inod,4)
 !
              t_sz(inod)                                                 &
-     &           =   trp * sin( theta(inod) ) * sin( theta(inod) )      &
-     &         +     ttp * cos( theta(inod) ) 
+     &           =   trr * cos( theta(inod) ) *sin( theta(inod) )       &
+     &         +     trt * (cos( theta(inod) )*cos( theta(inod) )       &
+     &                    - sin( theta(inod) )*sin( theta(inod) ))      &
+     &         -     ttt * sin( theta(inod) ) * cos( theta(inod) )
         end do
       end do
 !$omp end parallel do

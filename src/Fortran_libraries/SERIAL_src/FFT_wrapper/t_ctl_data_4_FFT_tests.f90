@@ -29,7 +29,7 @@
 !!    num_series_ctl          24
 !!    num_test_loop_ctl       10
 !!
-!!    split_ratio_ctl         0.3
+!!    GPU_ratio_ctl          0.3
 !!  end FFT_test_ctl
 !!
 !! ----------------------------------------------------------------------
@@ -70,7 +70,7 @@
 !>        Structure for loop counts for test
         type(read_integer_item) :: loop_counts_ctl
 !>        Structure for ratio of data for first FFT
-        type(read_real_item) ::    split_ratio_ctl
+        type(read_real_item) ::    GPU_ratio_ctl
 !
         integer(kind = kint) :: i_FFT_tests_ctl = 0
       end type FFT_tests_ctl
@@ -94,7 +94,7 @@
       character(len=kchara), parameter, private                         &
      &      :: hd_loop_counts_ctl  =    'num_test_loop_ctl'
       character(len=kchara), parameter, private                         &
-     &      :: hd_split_ratio_ctl  =    'split_ratio_ctl'
+     &      :: hd_split_ratio_ctl  =    'GPU_ratio_ctl'
 !
       private :: read_FFT_tests_ctl, write_FFT_tests_ctl
       private :: init_FFT_tests_ctl
@@ -174,7 +174,7 @@
       fft_c%num_series_ctl%iflag =      0
       fft_c%loop_counts_ctl%iflag =     0
 !
-      fft_c%split_ratio_ctl%iflag =     0
+      fft_c%GPU_ratio_ctl%iflag =       0
 !
       fft_c%i_FFT_tests_ctl = 0
 !
@@ -218,7 +218,7 @@
      &                             fft_c%loop_counts_ctl)
 !
         call read_real_ctl_type(c_buf, hd_split_ratio_ctl,              &
-     &                          fft_c%split_ratio_ctl)
+     &                          fft_c%GPU_ratio_ctl)
       end do
       fft_c%i_FFT_tests_ctl = 1
 !
@@ -271,7 +271,7 @@
      &                            fft_c%loop_counts_ctl)
 !
       call write_real_ctl_type(id_control, level, maxlen,               &
-     &                         fft_c%split_ratio_ctl)
+     &                         fft_c%GPU_ratio_ctl)
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_FFT_tests_ctl
@@ -302,7 +302,7 @@
      &                             fft_c%loop_counts_ctl)
 !
       call init_real_ctl_item_label(hd_split_ratio_ctl,                 &
-     &                              fft_c%split_ratio_ctl)
+     &                              fft_c%GPU_ratio_ctl)
 !
       end subroutine init_FFT_tests_ctl
 !

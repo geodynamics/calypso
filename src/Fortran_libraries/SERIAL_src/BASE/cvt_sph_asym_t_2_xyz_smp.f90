@@ -24,9 +24,9 @@
 !!     &          inod_smp_stack, t_sph, v_yz, xx, yy, zz, r, s,        &
 !!     &          a_r, a_s)
 !!
-!!   uxuy = (ar) *   (               -s *up*ur + z   *ut*up)
-!!   uzux = (aras) * ( r*x *ur*ut + y*z *up*ur + s*y *ut*up)
-!!   uyuz = (aras) * (-r*y *ur*ut + x*z *up*ur + s*x *ut*up)
+!!   uxuy = (ar) *   (              -s *upur + z   *utup)
+!!   uzux = (aras) * ( r*x *urut + y*z *upur + s*y *utup)
+!!   uyuz = (aras) * (-r*y *urut + x*z *upur + s*x *utup)
 !!@endverbatim
 !!
 !!@n @param  np_smp   Number of SMP processes
@@ -108,7 +108,7 @@
              txyz(inod,1) = -ttp
            else
              txyz(inod,1) = ( -tpr *  s(inod)                           &
-     &                       + ttp * zz(inod) ) * a_r(inod)
+     &                       + ttp * zz(inod)) * a_r(inod)
 !
              txyz(inod,2) = (  trt * xx(inod)* r(inod)                  &
      &                       + tpr * yy(inod)*zz(inod)                  &
@@ -171,7 +171,7 @@
              tensor(inod,1) = -ttp
            else
              tensor(inod,1) = ( -tpr *  s(inod)                         &
-     &                         + ttp * zz(inod) ) * a_r(inod)
+     &                         + ttp * zz(inod)) * a_r(inod)
 !
              tensor(inod,2) = (  trt * xx(inod)* r(inod)                &
      &                         + tpr * yy(inod)*zz(inod)                &
@@ -227,7 +227,7 @@
              v_xy(inod) = -ttp
            else
              v_xy(inod) =   ( -tpr *  s(inod)                           &
-     &                       + ttp * zz(inod) ) * a_r(inod)
+     &                       + ttp * zz(inod)) * a_r(inod)
            end if
         end do
       end do
