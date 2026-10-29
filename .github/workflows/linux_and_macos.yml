@@ -27,13 +27,8 @@ jobs:
     - name: build
       run: |
         sudo apt update
-<<<<<<< HEAD
         sudo apt install pkg-config git gfortran libopenmpi-dev \
           zlib1g zlib1g-dev libblas-dev libfftw3-dev libhdf5-openmpi-dev libpng-dev
-=======
-        sudo apt install pkg-config git libopenmpi-dev \
-          zlib1g zlib1g-dev libblas-dev libfftw3-dev libhdf5-openmpi-dev
->>>>>>> refs/heads/Ver.2.0_alpha
 
         ./configure \
           --with-fftw3 \
