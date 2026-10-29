@@ -20,35 +20,88 @@ EXPDIR=         $(SRCDIR)/examples
 TESTDIR=        $(SRCDIR)/tests
 
 MAKENAME=       $(MAKEDIR)/Makefile
-EXP_MAKEHEAD=   $(EXPDIR)/Makefile.header
-TESTS_MAKEHEAD= $(TESTDIR)/Makefile.header
+TESTS_MAKEHEAD= $(MAKEDIR)/Makefile.header
 
+#
+#   BLAS settings
+#
+BLAS_LIBS =
+#
+#    FFTW3 settings
+#
+PKGFLAGS_FFTW3 =
+FFTW3_CFLAGS =
+FFTW3_LIBS =
+FFTW3_OMP_LIBS =
+#
+#    HDF5 fortran wrapper settings
+#
+HDF5_FFLAGS =
+HDF5_LDFLAGS =
+HDF5_FLIBS =
 #
 #   zlib and libpng settings
 #
 ZLIB_CFLAGS =
 ZLIB_LIBS =
+PNG_CFLAGS =
+PNG_LIBS = 
+#
+#   MacOS flag
+#
+COCOA_FLAG=
 #
 #  -------------------------------------------------------------------------
 #
-
+#
+#   Sub directory list
+#
 SUBDIRS =         \
 Fortran_libraries \
 C_libraries       \
 External_libs     \
 programs
+#
+#    compilers
+#
+F90=
+CC=
+CXX=
+AS=
 
+F90_LOCAL=
+MPIF90=
 
-
-F_INCLUDE = -I. -I$(MAKEDIR)
-C_INCLUDE = -I. -I$(MAKEDIR)
-
+GMAKE=
+AR=
+RANLIB=
+#
+#    Compiler flags
+#
+OPTFLAGS =
+F90OPTFLAGS =
+SHAREDLIB_FLAGS =
 CPP_FLAGS =
+
+F_INCLUDE = -I. -I$$(MAKEDIR)
+C_INCLUDE = -I. -I$$(MAKEDIR)
+C_INCLUDE += -I$(MHDDIR)/C_libraries/BASE
+
+
+ifdef SHAREDLIB_FLAG
+  SUBDIRS+=         pythons
+  SHAREDLIB_FLAGS+= -fPIC
+endif
 
 ifdef ZLIB_LIBS
   CPP_FLAGS += -DZLIB_IO
-  C_INCLUDE+= $$(ZLIB_CFLAGS) 
+  C_INCLUDE+= -I$(MHDDIR)/C_libraries/ZLIB_wrapper $$(ZLIB_CFLAGS)
   F90LIBS+= $$(ZLIB_LIBS)
+endif
+ifdef PNG_LIBS
+  CPP_FLAGS += -DPNG_OUTPUT
+  C_INCLUDE+= -I$(MHDDIR)/C_src/PNG_wrapper $$(PNG_CFLAGS)
+  F90LIBS+= $$(PNG_LIBS)
 endif
 
 ifdef FFTW3_OMP_LIBS
@@ -126,16 +179,16 @@ makemake:
 	
 	echo "# create module list"
 	$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MHDDIR='$(MHDDIR)' \
-		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)' \
-		CC="$(CC)"   \
-		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
-		DEPFLAGS='$(DEPFLAGS)' \
-		OPTFLAGS='$(OPTFLAGS)' \
-		C_INCLUDE='$(C_INCLUDE)' \
-		depends
+	GMAKE='$(GMAKE)' \
+	MHDDIR='$(MHDDIR)' \
+	MAKEDIR='$(MAKEDIR)' \
+	MAKENAME='$(MAKENAME)' \
+	CC="$(CC)"   \
+	MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
+	DEPFLAGS='$(DEPFLAGS)' \
+	OPTFLAGS='$(OPTFLAGS)' \
+	C_INCLUDE='$(C_INCLUDE)' \
+	depends
 	
 	echo '#' > $(TESTS_MAKEHEAD)
 	echo '# Makefile header for Calypso Dynamo tests' >> $(TESTS_MAKEHEAD)
@@ -148,18 +201,6 @@ makemake:
 	@echo '# -----------------------------------------------------------' >> $(TESTS_MAKEHEAD)
 	$(GMAKE) makelib_list \
 		MAKENAME="$(TESTS_MAKEHEAD)"
-	
-	echo '#' > $(EXP_MAKEHEAD)
-	echo '# Makefile header for Calypso Dynamo example' >> $(EXP_MAKEHEAD)
-	echo '#' >> $(EXP_MAKEHEAD)
-	$(GMAKE) makeheaders \
-		MAKENAME="$(EXP_MAKEHEAD)"
-	@echo '#' >> $(EXP_MAKEHEAD)
-	@echo '# -----------------------------------------------------------' >> $(EXP_MAKEHEAD)
-	@echo '# library lists' >> $(EXP_MAKEHEAD)
-	@echo '# -----------------------------------------------------------' >> $(EXP_MAKEHEAD)
-	$(GMAKE) makelib_list \
-		MAKENAME="$(EXP_MAKEHEAD)"
 	
 	echo '#' > $(MAKENAME)
 	echo '# Makefile for Calypso Dynamo simulation package' >> $(MAKENAME)
@@ -221,11 +262,13 @@ makemake:
 	@echo 'create excecution construct list...'
 	@echo '#' >> $(MAKENAME)
 	@echo 'all: $$(PROGRAMS)' >> $(MAKENAME)
+	@echo 'pythons: $$(LIB_FILE_PYTHONS)' >> $(MAKENAME)
 	@for dir in programs ; do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
+		COCOA_FLAG='$(COCOA_FLAG)' \
 		target_task; \
 		) \
 	done
@@ -272,9 +315,10 @@ makeheaders:
 	@echo '#' >> $(MAKENAME)
 	@echo '# Compiler options' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
-	@echo 'F90OPTFLAGS = $(F90OPTFLAGS) $(OPENMP_FCFLAGS)  $$(F_INCLUDE)' >> $(MAKENAME)
-	@echo 'F90CPPFLAGS = $(FORTRAN_C_CONNECT)'          >> $(MAKENAME)
-	@echo 'OPTFLAGS = $(OPTFLAGS) $(OPENMP_CFLAGS) $(COCOA_FLAG)' >> $(MAKENAME)
+	@echo 'SHAREDLIB_FLAG = $(SHAREDLIB_FLAG)' >> $(MAKENAME)
+	@echo 'F90OPTFLAGS =    $(SHAREDLIB_FLAGS) $(F90OPTFLAGS) $(OPENMP_FCFLAGS)  $$(F_INCLUDE)' >> $(MAKENAME)
+	@echo 'F90CPPFLAGS =    $(FORTRAN_C_CONNECT)'                                               >> $(MAKENAME)
+	@echo 'OPTFLAGS =       $(SHAREDLIB_FLAGS) $(OPTFLAGS) $(OPENMP_CFLAGS) $(COCOA_FLAG)'      >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '# Libralies and includes settting' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
@@ -288,6 +332,11 @@ makeheaders:
 	@echo '#' >> $(MAKENAME)
 	@echo 'ZLIB_CFLAGS = $(ZLIB_CFLAGS)' >> $(MAKENAME)
 	@echo 'ZLIB_LIBS =   $(ZLIB_LIBS)'   >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# libpng settings' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'PNG_CFLAGS = $(PNG_CFLAGS)'   >> $(MAKENAME)
+	@echo 'PNG_LIBS =    $(PNG_LIBS)'    >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '# BLAS settings' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
@@ -348,6 +397,8 @@ makelib_list:
 		GMAKE='$(GMAKE)' \
 		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)' \
+		FORTRAN_C_CONNECT='$(FORTRAN_C_CONNECT)' \
+		COCOA_FLAG='$(COCOA_FLAG)' \
 		lib_name; \
 		 ) \
 	done
@@ -362,7 +413,7 @@ makeinstall:
 	@echo '	mkdir -p $$(INSTDIR)/bin'          >> $(MAKENAME)
 	@echo '	mkdir -p $$(INSTDIR)/include'      >> $(MAKENAME)
 	@echo '	cp $(BUILDDIR)/*  $$(INSTDIR)/bin' >> $(MAKENAME)
-	
+	@echo ''       >> $(MAKENAME)
 
 makeclean:
 	@echo '#' >> $(MAKENAME)

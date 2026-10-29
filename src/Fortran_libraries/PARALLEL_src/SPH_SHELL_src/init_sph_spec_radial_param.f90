@@ -51,72 +51,72 @@
       integer(kind = kint) :: kr_st
 !
 !
-        if(v_pwr%r_inside .le. zero                                     &
-     &                         .and. v_pwr%kr_inside(1) .eq. 0) then
+      if(v_pwr%r_inside .le. zero) then
+        v_pwr%c_inter_in = one
+        if(v_pwr%kr_inside(1) .eq. 0) then
           v_pwr%kr_inside(1:2) = sph_params%nlayer_ICB
           v_pwr%r_inside = sph_params%radius_ICB
-          v_pwr%c_inter_in = one
-        else if(v_pwr%r_inside .le. zero) then
-          v_pwr%kr_inside(1:2) = 0
-          v_pwr%r_inside = zero
-          v_pwr%c_inter_in = one
-        else if(v_pwr%r_inside .le. sph_rj%radius_1d_rj_r(1)) then
-          v_pwr%kr_inside(1) = 0
-          v_pwr%kr_inside(2) = 1
-          v_pwr%c_inter_in = (sph_rj%radius_1d_rj_r(1)                  &
-     &                   - v_pwr%r_inside) / sph_rj%radius_1d_rj_r(1)
         else
-          kr_st = 1
-          call s_set_radial_interpolation(sph_rj%nidx_rj(1),            &
-     &        sph_rj%radius_1d_rj_r, v_pwr%r_inside, kr_st,             &
-     &        v_pwr%kr_inside(1), v_pwr%kr_inside(2), v_pwr%c_inter_in)
+          v_pwr%kr_inside(1:2) = 0
+          v_pwr%r_inside =   zero
         end if
+      else if(v_pwr%r_inside .le. sph_rj%radius_1d_rj_r(1)) then
+        v_pwr%kr_inside(1) = 0
+        v_pwr%kr_inside(2) = 1
+        v_pwr%c_inter_in = (sph_rj%radius_1d_rj_r(1)                    &
+     &                  - v_pwr%r_inside) / sph_rj%radius_1d_rj_r(1)
+      else
+        kr_st = 1
+        call s_set_radial_interpolation(sph_rj%nidx_rj(1),              &
+     &      sph_rj%radius_1d_rj_r, v_pwr%r_inside, kr_st,               &
+     &      v_pwr%kr_inside(1), v_pwr%kr_inside(2), v_pwr%c_inter_in)
+      end if
 !
-        if(abs(v_pwr%c_inter_in) .lt. 1.0d-6) then
-          kr_st = v_pwr%kr_inside(2)
-          v_pwr%kr_inside(1) = kr_st
+      if(abs(v_pwr%c_inter_in) .lt. 1.0d-6) then
+        kr_st = v_pwr%kr_inside(2)
+        v_pwr%kr_inside(1) = kr_st
+        v_pwr%r_inside =     sph_rj%radius_1d_rj_r(kr_st)
+        v_pwr%c_inter_in =   one
+      else if(abs(one - v_pwr%c_inter_in) .lt. 1.0d-6) then
+        if(v_pwr%kr_inside(1) .eq. 0) then
+          v_pwr%kr_inside(2) = 0
+          v_pwr%r_inside =     zero
+          v_pwr%c_inter_in =   one
+        else
+          kr_st = v_pwr%kr_inside(1)
+          v_pwr%kr_inside(2) = kr_st
           v_pwr%r_inside =     sph_rj%radius_1d_rj_r(kr_st)
           v_pwr%c_inter_in =   one
-        else if(abs(one - v_pwr%c_inter_in) .lt. 1.0d-6) then
-          if(v_pwr%kr_inside(1) .eq. 0) then
-            v_pwr%kr_inside(2) = 0
-            v_pwr%r_inside =     zero
-            v_pwr%c_inter_in =   one
-          else
-            kr_st = v_pwr%kr_inside(1)
-            v_pwr%kr_inside(2) = kr_st
-            v_pwr%r_inside =     sph_rj%radius_1d_rj_r(kr_st)
-            v_pwr%c_inter_in =   one
-          end if
         end if
+      end if
 !
-        if(v_pwr%r_outside .le. zero) then
-          v_pwr%kr_outside(1:2) = sph_params%nlayer_CMB
-          v_pwr%r_outside = sph_params%radius_CMB
-          v_pwr%c_inter_out = one
-        else if(v_pwr%r_outside                                         &
+      if(v_pwr%r_outside .le. zero) then
+        v_pwr%kr_outside(1:2) = sph_params%nlayer_CMB
+        v_pwr%r_outside = sph_params%radius_CMB
+        v_pwr%c_inter_out = one
+      else if(v_pwr%r_outside                                           &
      &      .ge. sph_rj%radius_1d_rj_r(sph_rj%nidx_rj(1))) then
-          v_pwr%kr_outside(1:2) = sph_rj%nidx_rj(1)
-          v_pwr%r_outside = sph_rj%radius_1d_rj_r(sph_rj%nidx_rj(1))
-          v_pwr%c_inter_out = one
-        else
-          call s_set_radial_interpolation(sph_rj%nidx_rj(1),            &
-     &        sph_rj%radius_1d_rj_r, v_pwr%r_outside, kr_st,            &
-     &        v_pwr%kr_outside(1), v_pwr%kr_outside(2), &
-     &        v_pwr%c_inter_out)
-        end if
+        v_pwr%kr_outside(1:2) = sph_rj%nidx_rj(1)
+        v_pwr%r_outside = sph_rj%radius_1d_rj_r(sph_rj%nidx_rj(1))
+        v_pwr%c_inter_out = one
+      else
+        call s_set_radial_interpolation(sph_rj%nidx_rj(1),              &
+     &      sph_rj%radius_1d_rj_r, v_pwr%r_outside, kr_st,              &
+     &      v_pwr%kr_outside(1), v_pwr%kr_outside(2), &
+     &      v_pwr%c_inter_out)
+      end if
 !
-        if(abs(v_pwr%c_inter_out) .lt. 1.0d-6) then
-          kr_st = v_pwr%kr_outside(2)
-          v_pwr%kr_outside(1) = kr_st
-          v_pwr%r_outside =     sph_rj%radius_1d_rj_r(kr_st)
-          v_pwr%c_inter_out =   one
-        else if(abs(one - v_pwr%c_inter_out) .lt. 1.0d-6) then
-          kr_st = v_pwr%kr_outside(1)
-          v_pwr%kr_outside(2) = kr_st
-          v_pwr%r_outside =     sph_rj%radius_1d_rj_r(kr_st)
-          v_pwr%c_inter_out =   one
-        end if
+      if(abs(v_pwr%c_inter_out) .lt. 1.0d-6) then
+        kr_st = v_pwr%kr_outside(2)
+        v_pwr%kr_outside(1) = kr_st
+        v_pwr%r_outside =     sph_rj%radius_1d_rj_r(kr_st)
+        v_pwr%c_inter_out =   one
+      else if(abs(one - v_pwr%c_inter_out) .lt. 1.0d-6) then
+        kr_st = v_pwr%kr_outside(1)
+        v_pwr%kr_outside(2) = kr_st
+        v_pwr%r_outside =     sph_rj%radius_1d_rj_r(kr_st)
+        v_pwr%c_inter_out =   one
+      end if
 !
       end subroutine init_sph_vol_spectr_r_param
 !
@@ -156,39 +156,39 @@
       real(kind = kreal), allocatable :: r_tmp(:)
 !
 !
-        false_flag = .TRUE.
-        do k = 1, pwr%nri_rms
-          if(pwr%kr_4_rms(k,1) .eq. sph_params%nlayer_CMB) then
-            false_flag = .FALSE.
-            exit
-          end if
-          if(abs(pwr%r_4_rms(k,1) - sph_params%radius_CMB)              &
-     &                                           .lt. 1.0e-7) then
-            pwr%r_4_rms(k,1) = sph_params%radius_CMB
-            false_flag = .FALSE.
-            exit
-          end if
-        end do
-!
-        if(false_flag) then
-          allocate(kr_tmp(1:pwr%nri_rms))
-          allocate(r_tmp(1:pwr%nri_rms))
-          if(pwr%nri_rms .gt. 0) then
-            kr_tmp(1:pwr%nri_rms) = pwr%kr_4_rms(1:pwr%nri_rms,1)
-            r_tmp(1:pwr%nri_rms) =  pwr%r_4_rms(1:pwr%nri_rms,1)
-          end if
-          call dealloc_num_spec_layer(pwr)
-!
-          k = pwr%nri_rms + 1
-          call alloc_num_spec_layer(k, pwr)
-          if(pwr%nri_rms .gt. 1) then
-            pwr%kr_4_rms(1:pwr%nri_rms-1,1) = kr_tmp(1:pwr%nri_rms-1)
-            pwr%r_4_rms(1:pwr%nri_rms-1,1) =  r_tmp(1:pwr%nri_rms-1)
-          end if
-          pwr%kr_4_rms(pwr%nri_rms,1) = sph_params%nlayer_CMB
-          pwr%r_4_rms(pwr%nri_rms,1) =  -one
-          deallocate(kr_tmp)
+      false_flag = .TRUE.
+      do k = 1, pwr%nri_rms
+        if(pwr%kr_4_rms(k,1) .eq. sph_params%nlayer_CMB) then
+          false_flag = .FALSE.
+          exit
         end if
+        if(abs(pwr%r_4_rms(k,1) - sph_params%radius_CMB)                &
+     &                                         .lt. 1.0e-7) then
+          pwr%r_4_rms(k,1) = sph_params%radius_CMB
+          false_flag = .FALSE.
+          exit
+        end if
+      end do
+!
+      if(false_flag) then
+        allocate(kr_tmp(1:pwr%nri_rms))
+        allocate(r_tmp(1:pwr%nri_rms))
+        if(pwr%nri_rms .gt. 0) then
+          kr_tmp(1:pwr%nri_rms) = pwr%kr_4_rms(1:pwr%nri_rms,1)
+          r_tmp(1:pwr%nri_rms) =  pwr%r_4_rms(1:pwr%nri_rms,1)
+        end if
+        call dealloc_num_spec_layer(pwr)
+!
+        k = pwr%nri_rms + 1
+        call alloc_num_spec_layer(k, pwr)
+        if(pwr%nri_rms .gt. 1) then
+          pwr%kr_4_rms(1:pwr%nri_rms-1,1) = kr_tmp(1:pwr%nri_rms-1)
+          pwr%r_4_rms(1:pwr%nri_rms-1,1) =  r_tmp(1:pwr%nri_rms-1)
+        end if
+        pwr%kr_4_rms(pwr%nri_rms,1) = sph_params%nlayer_CMB
+        pwr%r_4_rms(pwr%nri_rms,1) =  -one
+        deallocate(kr_tmp)
+      end if
 !
       end subroutine append_CMB_layer_f_dipolarity
 !

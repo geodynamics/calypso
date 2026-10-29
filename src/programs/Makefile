@@ -67,7 +67,7 @@ target_list:
 	done
 
 target_task:
-	@echo 'parallels: sph_mhd'      \
+	@echo 'parallels: sph_mhd_targets'      \
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo 'utilities: data_utils mesh_utils sph_data_util' >> $(MAKENAME)

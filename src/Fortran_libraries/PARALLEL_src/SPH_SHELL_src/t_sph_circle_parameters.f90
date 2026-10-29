@@ -162,11 +162,6 @@
         circle%mphi_circle = dbench_ctl%nphi_mid_eq_ctl%intvalue
       end if
 !
-      circle%s_circle = 7.0d0/13.0d0 + 0.5d0
-      circle%z_circle = 0.0d0
-      circle%r_circle = circle%s_circle
-      circle%colat_circle = acos(0.0d0)
-!
       end subroutine set_ctl_circle_for_dbench
 !
 ! -----------------------------------------------------------------------

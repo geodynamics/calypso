@@ -20,6 +20,13 @@
 !!      subroutine pick_mag_torque_inner_core(idx_rj_degree_one,        &
 !!     &          nidx_rj, nlayer_ICB, radius_1d_rj_r, is_lorentz,      &
 !!     &          nnod_rj, ntot_phys_rj, d_rj, m_torque_icore)
+!!      real(kind = kreal) function pick_scalar_at_center               &
+!!     &                          (inod_rj_center, is_scalar,           &
+!!     &                           nnod_rj, ntot_phys_rj, d_rj)
+!!        integer(kind = kint), intent(in) :: inod_rj_center
+!!        integer(kind = kint), intent(in) :: is_scalar
+!!        integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+!!        real (kind=kreal), intent(in) :: d_rj(nnod_rj,ntot_phys_rj)
 !!@endverbatim
 !
       module global_field_4_dynamobench
@@ -164,6 +171,33 @@
      &   (m_torque_local, m_torque_icore, cast_long(3), MPI_SUM)
 !
       end subroutine pick_mag_torque_inner_core
+!
+! ----------------------------------------------------------------------
+!
+      real(kind = kreal) function pick_scalar_at_center                 &
+     &                          (inod_rj_center, is_scalar,             &
+     &                           nnod_rj, ntot_phys_rj, d_rj)
+!
+      use calypso_mpi_real
+!
+      integer(kind = kint), intent(in) :: inod_rj_center
+      integer(kind = kint), intent(in) :: is_scalar
+      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
+      real (kind=kreal), intent(in) :: d_rj(nnod_rj,ntot_phys_rj)
+!
+      real(kind = kreal) :: scalar_lc, centre_scalar
+!
+!
+      scalar_lc = zero
+      if(inod_rj_center .gt. 0) then
+          scalar_lc = d_rj(inod_rj_center,is_scalar)
+      end if
+!
+      call calypso_mpi_allreduce_one_real(scalar_lc, centre_scalar,     &
+     &                                    MPI_SUM)
+      pick_scalar_at_center = centre_scalar
+!
+      end function pick_scalar_at_center
 !
 ! ----------------------------------------------------------------------
 !

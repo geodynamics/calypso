@@ -46,7 +46,6 @@ target_list:
 
 target_task:
 	@echo mesh_utils:   \
-	'$$(TARGET_TEST_SPH_GRID) $$(TARGET_CHECK_SPH_GRID)' \
 	'$$(TARGET_GEN_SPH_GRID)'   >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '$$(TARGET_GEN_SPH_GRID)': '$$(MOD_GEN_SPH_GRID)' \

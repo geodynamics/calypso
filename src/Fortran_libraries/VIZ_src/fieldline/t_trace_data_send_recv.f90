@@ -455,7 +455,7 @@
       type(trace_data_send_recv), intent(in) :: fln_SR
       type(each_fieldline_trace), intent(inout) :: fln_tce
 !
-      integer(kind = kint) :: ip, i, max_4_smp
+      integer(kind = kint) :: ip, i
 !
 !
       call count_parallel_current_fline(fln_SR%ntot_recv, fln_tce)

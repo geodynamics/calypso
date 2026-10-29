@@ -76,14 +76,16 @@
 !>        Structure for picked spectrum file prefix
         type(ctl_array_chara) :: picked_mode_file_ctl
 !
-!>        Structure for Nusselt number
+!>        Structure for Nusselt number file prefix
         type(read_character_item) :: Nusselt_file_prefix
-!>        Structure for dipolarity
+!>        Structure for dipolarity data file prefix
         type(read_character_item) :: dipolarity_file_prefix
-!>        Structure for Elsasser number
+!>        Structure for Elsasser number file prefix
         type(read_character_item) :: Elsasser_file_prefix
 !>        Structure for gauss coefficient file prefix
         type(read_character_item) :: gauss_coefs_prefix
+!>        Structure for dynamo benchmark file prefix
+        type(read_character_item) :: dynamobench_file_prefix
 !
         integer (kind = kint) :: i_time_ave_sph = 0
       end type sph_monitor_files_ctl
@@ -102,16 +104,18 @@
      &          :: hd_layer_spec_series = 'layer_sph_spectr_prefix'
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_gauss_coefs_head = 'gauss_coefs_prefix'
+     &     :: hd_gauss_coefs_head =      'gauss_coefs_prefix'
       character(len=kchara), parameter, private                         &
-     &           :: hd_picked_mode_head = 'picked_sph_prefix'
+     &     :: hd_picked_mode_head =      'picked_sph_prefix'
       character(len=kchara), parameter, private                         &
-     &           :: hd_Nusselt_file_head = 'nusselt_number_prefix'
+     &     :: hd_Nusselt_file_head =     'nusselt_number_prefix'
       character(len=kchara), parameter, private                         &
-     &           :: hd_dipolarity_file_head = 'dipolarity_file_prefix'
+     &     :: hd_dipolarity_file_head =  'dipolarity_file_prefix'
+      character(len=kchara), parameter, private                         &
+     &     :: hd_dynamobench_file_head = 'dynamo_benchmark_file_prefix'
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_Elsasser_file_head = 'elsasser_numbers_prefix'
+     &     :: hd_Elsasser_file_head =    'elsasser_numbers_prefix'
 !
 ! -----------------------------------------------------------------------
 !
@@ -142,6 +146,8 @@
      &      monitor_list_ctl%dipolarity_file_prefix)
         call read_chara_ctl_type(c_buf, hd_Elsasser_file_head,          &
      &      monitor_list_ctl%Elsasser_file_prefix)
+        call read_chara_ctl_type(c_buf, hd_dynamobench_file_head,       &
+     &      monitor_list_ctl%dynamobench_file_prefix)
 !
         call read_control_array_c1(id_control,  hd_vol_time_series,     &
      &      monitor_list_ctl%volume_series_file_ctl, c_buf)
@@ -183,10 +189,11 @@
       call dealloc_control_array_chara                                  &
      &   (monitor_list_ctl%picked_mode_file_ctl)
 !
-      monitor_list_ctl%Nusselt_file_prefix%iflag =  0
-      monitor_list_ctl%dipolarity_file_prefix%iflag = 0
-      monitor_list_ctl%Elsasser_file_prefix%iflag = 0
-      monitor_list_ctl%gauss_coefs_prefix%iflag =   0
+      monitor_list_ctl%Nusselt_file_prefix%iflag =     0
+      monitor_list_ctl%dipolarity_file_prefix%iflag =  0
+      monitor_list_ctl%Elsasser_file_prefix%iflag =    0
+      monitor_list_ctl%gauss_coefs_prefix%iflag =      0
+      monitor_list_ctl%dynamobench_file_prefix%iflag = 0
 !
       monitor_list_ctl%i_time_ave_sph = 0
 !

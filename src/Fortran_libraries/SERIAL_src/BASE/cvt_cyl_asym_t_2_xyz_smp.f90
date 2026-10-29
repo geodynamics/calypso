@@ -21,9 +21,9 @@
 !!      subroutine cal_yz_asym_t_by_cyl_smp(np_smp, numnod,             &
 !!     &          inod_smp_stack, t_cyl, v_yz, xx, yy, s, a_s)
 !!
-!!   uxuy =         us*up
-!!   uzux = (as) * (      x* uz*us + y* up*uz)
-!!   uyuz = (as) * (    - y* uz*us + x* up*uz)
+!!   uxuy =         usup
+!!   uzux = (as) * (  x* uzus + y* upuz)
+!!   uyuz = (as) * ( -y* uzus + x* upuz)
 !!@endverbatim
 !!
 !!@n @param  np_smp   Number of SMP processes

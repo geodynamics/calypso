@@ -36,12 +36,15 @@
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
-!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
+!!   b_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \sin (\frac{2\pi j k}{Nfft})]
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
-!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{1}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
 !!
 !! ------------------------------------------------------------------
 !!
@@ -231,6 +234,7 @@
      &          ncomp_fwd, n_WS, X_rtp, WS, FFTW_c, flag_FFT)
 !
       use copy_single_FFT_and_rtp
+      use normalize_for_FFTW
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in)  :: comm_rtp
@@ -270,6 +274,8 @@
           if(iflag_FFT_time) FFTW_c%t_omp(ip,0) = MPI_WTIME()
           call dfftw_execute_dft_r2c(FFTW_c%plan_fwd(ip),               &
      &        FFTW_c%X(1,ip), FFTW_c%C(1,ip))
+          call normalize_fwd_FFTW                                       &
+     &       (FFTW_c%aNfft, ncomp_fwd, FFTW_c%Nfft_c, FFTW_c%C(1,ip))
           if(iflag_FFT_time) FFTW_c%t_omp(ip,2) = FFTW_c%t_omp(ip,2)    &
      &                       + MPI_WTIME() - FFTW_c%t_omp(ip,0)
 !
@@ -277,8 +283,7 @@
           if(iflag_FFT_time) FFTW_c%t_omp(ip,0) = MPI_WTIME()
           call copy_comp_FFTW_to_send                                   &
      &       (j, sph_rtp%nnod_rtp, sph_rtp%istep_rtp, comm_rtp%irev_sr, &
-     &        ncomp_fwd, FFTW_c%Nfft_c, FFTW_c%C(1,ip), FFTW_c%aNfft,   &
-     &        n_WS, WS)
+     &        ncomp_fwd, FFTW_c%Nfft_c, FFTW_c%C(1,ip), n_WS, WS)
           if(iflag_FFT_time) FFTW_c%t_omp(ip,3)= FFTW_c%t_omp(ip,3)     &
      &                       + MPI_WTIME() - FFTW_c%t_omp(ip,0)
         end do
@@ -402,14 +407,13 @@
 ! ------------------------------------------------------------------
 !
       subroutine copy_comp_FFTW_to_send(j, nnod_rtp, istep_rtp,         &
-     &          irev_sr_rtp, ncomp_fwd, Nfft_c, C_fft, aNfft, n_WS, WS)
+     &          irev_sr_rtp, ncomp_fwd, Nfft_c, C_fft, n_WS, WS)
 !
       integer(kind = kint), intent(in) :: j
       integer(kind = kint), intent(in) :: nnod_rtp, istep_rtp(3)
 !
       integer(kind = kint), intent(in) :: ncomp_fwd
       integer(kind = kint), intent(in) :: Nfft_c
-      real(kind = kreal), intent(in) :: aNfft
       complex(kind = fftw_complex), intent(in)                          &
      &              :: C_fft(ncomp_fwd*Nfft_c)
 !
@@ -423,8 +427,7 @@
 !
       j0_rtp = 1 + (j-1) * istep_rtp(1)
       ic_send = ncomp_fwd * (irev_sr_rtp(j0_rtp) - 1)
-      WS(ic_send+1:ic_send+ncomp_fwd)                                   &
-     &          = aNfft * real(C_fft(1:ncomp_fwd))
+      WS(ic_send+1:ic_send+ncomp_fwd) = real(C_fft(1:ncomp_fwd))
       do m = 2, Nfft_c-1
         ic_rtp = j0_rtp + (2*m-2) * istep_rtp(3)
         is_rtp = j0_rtp + (2*m-1) * istep_rtp(3)
@@ -432,15 +435,14 @@
         is_send = ncomp_fwd * (irev_sr_rtp(is_rtp) - 1)
         ms =      ncomp_fwd * (m-1)
         WS(ic_send+1:ic_send+ncomp_fwd)                                 &
-     &          = two*aNfft * real(C_fft(ms+1:ms+ncomp_fwd))
+     &          = two * real(C_fft(ms+1:ms+ncomp_fwd))
         WS(is_send+1:is_send+ncomp_fwd)                                 &
-     &          = two*aNfft * real(C_fft(ms+1:ms+ncomp_fwd)*iu)
+     &          = two * real(C_fft(ms+1:ms+ncomp_fwd)*iu)
       end do 
       ic_rtp = j0_rtp + istep_rtp(3)
       ic_send = ncomp_fwd * (irev_sr_rtp(ic_rtp)-1)
       ms =      ncomp_fwd * (Nfft_c-1)
-      WS(ic_send+1:ic_send+ncomp_fwd)                                   &
-     &        = aNfft * real(C_fft(ms+1:ms+ncomp_fwd))
+      WS(ic_send+1:ic_send+ncomp_fwd) = real(C_fft(ms+1:ms+ncomp_fwd))
 !
       end subroutine copy_comp_FFTW_to_send
 !

@@ -72,16 +72,16 @@
           vt = v_sph(inod,2)
           vp = v_sph(inod,3)
 !
-          vect(inod,1) = ( vr * sin( theta(inod) )*cos( phi(inod) )     &
-     &                   + vt * cos( theta(inod) )*cos( phi(inod) )     &
-     &                   - vp * sin( phi(inod) )   )
+          vect(inod,1) =  vr * sin( theta(inod) )*cos( phi(inod) )      &
+     &                  + vt * cos( theta(inod) )*cos( phi(inod) )      &
+     &                  - vp * sin( phi(inod) )
 !
-          vect(inod,2) = ( vr * sin( theta(inod) )*sin( phi(inod) )     &
-     &                   + vt * cos( theta(inod) )*sin( phi(inod) )     &
-     &                   + vp * cos( phi(inod) )   )
+          vect(inod,2) =  vr * sin( theta(inod) )*sin( phi(inod) )      &
+     &                  + vt * cos( theta(inod) )*sin( phi(inod) )      &
+     &                  + vp * cos( phi(inod) )
 !
-          vect(inod,3) = ( vr * cos( theta(inod) )                      &
-     &                   - vt * sin( theta(inod) ) )
+          vect(inod,3) =  vr * cos( theta(inod) )                       &
+     &                  - vt * sin( theta(inod) )
 !
          end do
 !$omp end parallel do
@@ -110,16 +110,16 @@
           vt = vect(inod,2)
           vp = vect(inod,3)
 !
-          vect(inod,1) = ( vr * sin( theta(inod) )*cos( phi(inod) )     &
-     &                   + vt * cos( theta(inod) )*cos( phi(inod) )     &
-     &                   - vp * sin( phi(inod) )   )
+          vect(inod,1) =  vr * sin( theta(inod) )*cos( phi(inod) )      &
+     &                  + vt * cos( theta(inod) )*cos( phi(inod) )      &
+     &                  - vp * sin( phi(inod) )
 !
-          vect(inod,2) = ( vr * sin( theta(inod) )*sin( phi(inod) )     &
-     &                   + vt * cos( theta(inod) )*sin( phi(inod) )     &
-     &                   + vp * cos( phi(inod) )   )
+          vect(inod,2) =  vr * sin( theta(inod) )*sin( phi(inod) )      &
+     &                  + vt * cos( theta(inod) )*sin( phi(inod) )      &
+     &                  + vp * cos( phi(inod) )
 !
-          vect(inod,3) = ( vr * cos( theta(inod) )                      &
-     &                   - vt * sin( theta(inod) ) )
+          vect(inod,3) =  vr * cos( theta(inod) )                       &
+     &                  - vt * sin( theta(inod) )
 !
          end do
 !$omp end parallel do
@@ -147,9 +147,9 @@
           vt = v_sph(inod,2)
           vp = v_sph(inod,3)
 !
-          v_x(inod) = ( vr * sin(theta(inod))*cos(phi(inod))            &
-     &                + vt * cos(theta(inod))*cos(phi(inod))            &
-     &                - vp * sin(phi(inod))   )
+          v_x(inod) =  vr * sin(theta(inod))*cos(phi(inod))             &
+     &               + vt * cos(theta(inod))*cos(phi(inod))             &
+     &               - vp * sin(phi(inod))
         end do
 !$omp end parallel do
 !
@@ -174,9 +174,9 @@
           vt = v_sph(inod,2)
           vp = v_sph(inod,3)
 !
-          v_y(inod) = ( vr * sin(theta(inod))*sin(phi(inod))            &
-     &                + vt * cos(theta(inod))*sin(phi(inod))            &
-     &                + vp * cos(phi(inod) ))
+          v_y(inod) =  vr * sin(theta(inod))*sin(phi(inod))             &
+     &               + vt * cos(theta(inod))*sin(phi(inod))             &
+     &               + vp * cos(phi(inod))
         end do
 !$omp end parallel do
 !
@@ -200,8 +200,8 @@
           vr = v_sph(inod,1)
           vt = v_sph(inod,2)
 !
-          v_z(inod) = ( vr * cos( theta(inod) )                         &
-     &                - vt * sin( theta(inod) ) )
+          v_z(inod) =  vr * cos( theta(inod) )                          &
+     &               - vt * sin( theta(inod) )
         end do
 !$omp end parallel do
 !

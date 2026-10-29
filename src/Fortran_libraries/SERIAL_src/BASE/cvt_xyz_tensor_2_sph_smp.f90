@@ -565,10 +565,10 @@
              t_tp(inod)                                                 &
      &          = ( -txx * xx(inod)*yy(inod)*zz(inod)                   &
      &         +     txy * zz(inod)                                     &
-     &               *( xx(inod)*xx(inod) - yy(inod)*yy(inod) )         &
-     &         +     txz * yy(inod)* s(inod)  * s(inod)                 &
+     &               * (xx(inod)*xx(inod) - yy(inod)*yy(inod))          &
+     &         +     txz * yy(inod)* s(inod)* s(inod)                   &
      &         +     tyy * xx(inod)*yy(inod)*zz(inod)                   &
-     &         -     tyz * xx(inod)* s(inod)  * s(inod) )               &
+     &         -     tyz * xx(inod)* s(inod)* s(inod))                  &
      &              * a_r(inod) * a_s(inod) * a_s(inod)
            end if
 !
@@ -611,7 +611,7 @@
              t_pp(inod)                                                 &
      &         = (    txx*yy(inod)*yy(inod)                             &
      &          - two*txy*xx(inod)*yy(inod)                             &
-     &          +     tyy*xx(inod)*xx(inod) )                           &
+     &          +     tyy*xx(inod)*xx(inod))                            &
      &              * a_s(inod) * a_s(inod)
            end if
 !

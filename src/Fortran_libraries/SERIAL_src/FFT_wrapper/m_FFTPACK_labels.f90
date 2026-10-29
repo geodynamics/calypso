@@ -34,11 +34,11 @@
       implicit none
 !
 !>      flag parts for FFTPACK
-      character(len = kchara), parameter :: FFTPACK_names(2)            &
-     &                               = (/'FFTPACK ', 'FFTPACK5'/)
+      character(len = kchara), parameter, private                       &
+     &                 :: FFTPACK_names(2) = (/'FFTPACK ', 'FFTPACK5'/)
 !
 !>     Character lables for at once FFTPACK5 for transform
-!!        'FFTPACK', 'FFTPACK5', 'FFTPACK_once', 'FFTPACK_at_once', 
+!!        'FFTPACK', 'FFTPACK5', 'FFTPACK_once', 'FFTPACK_at_once',
 !!        'FFTPACK5_once', 'FFTPACK5_at_once', 'once_FFTPACK', 
 !!        'once_FFTPACK5', 'at_once_FFTPACK', 'at_once_FFTPACK5' 
       type(multi_flag_labels), save :: at_once_FFTPACK_flags

@@ -27,9 +27,6 @@ target_list:
 	@echo >> $(MAKENAME)
 
 target_task:
-	@echo compare:  \
-	'$$(TARGET_COMPARE_PSF)'  >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
 	@echo '$$(TARGET_COMPARE_PSF)': '$$(MOD_COMPARE_PSF)' \
 	'$$(LIB_CALYPSO_FILE)' >> $(MAKENAME)
 	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \

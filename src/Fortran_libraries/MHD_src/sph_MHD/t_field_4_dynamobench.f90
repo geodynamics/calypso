@@ -43,41 +43,48 @@
 !>        Address of volume monitor data for inner core
         integer(kind = kint) :: ipwr_icore =  0
 !
-!>        average kinetic energy (poloidal, toroidal, total)
+!>        Average kinetic energy (poloidal, toroidal, total)
         real(kind = kreal) :: KE_bench(3)
-!>        average magnetic energy (poloidal, toroidal, total)
+!>        Average magnetic energy (poloidal, toroidal, total)
         real(kind = kreal) :: ME_bench(3)
 !
 !>        Taeget wave number in zonal direction
         integer(kind = kint) :: m_bench = 4
-!>        time for previus monitoring of omega
+!>        Time for previus monitoring of omega
         real(kind = kreal) :: t_prev = zero
-!>        longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
+!>        Longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
         real(kind = kreal), allocatable :: phi_zero(:)
-!>        longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
+!>        Longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
 !!        at previous monitoring
         real(kind = kreal), allocatable :: phi_prev(:)
-!>        drift phase velocity for @f$v_r = 0 @f$
+!>        Drift phase velocity for @f$v_r = 0 @f$
         real(kind = kreal), allocatable :: phase_vr(:)
-!>        drift phase velocity for @f$v_r = 0 @f$
+!>        Drift phase velocity for @f$v_r = 0 @f$
         real(kind = kreal) :: ave_phase_vr = 0.0d0
-!>        mangetic energy in inner core
+!>        Magnetic energy in inner core
         real(kind = kreal) :: mene_icore(3)
-!>        rotation rate for inner core
+!>        Rotation rate for inner core
         real(kind = kreal) :: rotate_icore(-1:1)
-!>        magnetic torque for inner core
+!>        Magnetic torque for inner core
         real(kind = kreal) :: m_torque_icore(-1:1)
 !
-!>        phase of by @f$ V_{Sm}^{m} @f$ and @f$ V_{T(m+1)}^{m} @f$
+!>        Temperature at centre
+        real(kind = kreal) :: temp_centre =    zero
+!>        Composition at centre
+        real(kind = kreal) :: comp_centre =    zero
+!>        Entropy at centre
+        real(kind = kreal) :: entropy_center = zero
+!
+!>        Phase of by @f$ V_{Sm}^{m} @f$ and @f$ V_{T(m+1)}^{m} @f$
         real(kind = kreal) :: phase_vmm(2)      = (/zero,zero/)
-!>        phase of by @f$ V_{Sm}^{m} @f$ and @f$ V_{T(m+1)}^{m} @f$
+!>        Phase of by @f$ V_{Sm}^{m} @f$ and @f$ V_{T(m+1)}^{m} @f$
 !!        at previous monitoring
         real(kind = kreal) :: phase_vmm_prev(2) = (/zero,zero/)
-!>        drift frequency obtained by @f$ V_{Sm}^{m} @f$
+!>        Drift frequency obtained by @f$ V_{Sm}^{m} @f$
 !!                                and @f$ V_{T(m+1)}^{m} @f$
         real(kind = kreal) :: omega_vmm(2)      = (/zero,zero/)
 !
-!>        local point data
+!>        Local point data
         real(kind = kreal), allocatable :: d_zero(:,:)
 !>        Average of local point data
         real(kind = kreal), allocatable :: ave_zero_fld(:)

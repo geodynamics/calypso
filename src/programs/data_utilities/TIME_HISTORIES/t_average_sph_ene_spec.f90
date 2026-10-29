@@ -65,6 +65,7 @@
       use t_tave_sph_volume_spectr
       use t_tave_sph_layer_mean
       use t_tave_sph_layer_spectr
+      use t_time_ave_sph_volume_mean
       use tave_sdev_sph_layer_spec
       use tave_sdev_sph_layer_mean
       use tave_sdev_sph_volume_spec
@@ -72,7 +73,6 @@
       use set_parallel_file_name
       use count_monitor_time_series
       use time_ave_sph_monitor_data
-      use time_ave_sph_volume_mean
 !
       implicit none
 !

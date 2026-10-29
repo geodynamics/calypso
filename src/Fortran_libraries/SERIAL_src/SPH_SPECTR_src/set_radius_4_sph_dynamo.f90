@@ -11,14 +11,13 @@
 !!      modified by H. Matsui on Apr., 2009
 !!
 !!      subroutine set_radius_dat_4_sph_dynamo                          &
-!!     &         (nri, radius_1d_rj_r, radial_rj_grp, iflag_radial_grid,&
+!!     &         (nri, radius_1d_rj_r, radial_rj_grp,                   &
 !!     &          nlayer_ICB, nlayer_CMB, nlayer_2_center,              &
 !!     &          r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
 !!        type(group_data), intent(in) :: radial_rj_grp
 !!        integer(kind = kint), intent(in) :: nri
 !!        real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
 !!
-!!        integer(kind = kint), intent(inout) :: iflag_radial_grid
 !!        integer(kind = kint), intent(inout) :: nlayer_ICB
 !!        integer(kind = kint), intent(inout) :: nlayer_CMB
 !!        integer(kind = kint), intent(inout) :: nlayer_2_center
@@ -49,19 +48,19 @@
 !  -------------------------------------------------------------------
 !
       subroutine set_radius_dat_4_sph_dynamo                            &
-     &         (nri, radius_1d_rj_r, radial_rj_grp, iflag_radial_grid,  &
+     &         (nri, radius_1d_rj_r, radial_rj_grp,                     &
      &          nlayer_ICB, nlayer_CMB, nlayer_2_center,                &
      &          r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
 !
-      use set_radial_grid_sph_shell
       use skip_comment_f
+      use set_radial_grid_sph_shell
+!      use find_radial_distance_flag
 !
       type(group_data), intent(in) :: radial_rj_grp
 !
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
 !
-      integer(kind = kint), intent(inout) :: iflag_radial_grid
       integer(kind = kint), intent(inout) :: nlayer_ICB
       integer(kind = kint), intent(inout) :: nlayer_CMB
       integer(kind = kint), intent(inout) :: nlayer_2_center
@@ -71,6 +70,7 @@
       real(kind = kreal), intent(inout) :: r_ICB, r_CMB
 !
       integer(kind = kint) :: k, kk
+      integer(kind = kint) :: iflag_radial_grid
 !
 !
 !* --------  radius  --------------
@@ -98,9 +98,10 @@
       R_earth(1) = one / R_earth(0)
       R_earth(2) = one / R_earth(0)**2
 !
-      call set_radial_distance_flag(nri, nlayer_ICB, nlayer_CMB,        &
-     &    r_ICB, r_CMB, radius_1d_rj_r, iflag_radial_grid)
-      if(iflag_radial_grid .eq. igrid_error) return
+!      iflag_radial_grid                                                &
+!     &      = s_find_radial_distance_flag(nri, nlayer_ICB, nlayer_CMB, &
+!     &                                    r_ICB, r_CMB, radius_1d_rj_r)
+!      if(iflag_radial_grid .eq. igrid_error) return
 !
 !
       r_ele_rj(1) = half * radius_1d_rj_r(1)

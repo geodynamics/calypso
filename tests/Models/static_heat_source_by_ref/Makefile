@@ -2,19 +2,34 @@
 #  Makefile for Kemo's Dynamo toolkit
 #    Written by H. Matsui
 #
+SHELL           = /bin/sh
+#
+#  directories of Kemo's Dynamo toolkit
+#
+CURRENTDIR=$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+
 SRCDIR = /Users/matsui/src_kemo
+MAKEDIR = $(SRCDIR)/work
 BUILDDIR = $(SRCDIR)/bin
 #
-MPIRUN = mpirun
 TARGET_SPH_MHD =             $(BUILDDIR)/sph_mhd
-TARGET_SPH_PICK_MODE_CHECK = $(BUILDDIR)/tests/sph_picked_mode_check
+TARGET_SPH_PICK_MODE_CHECK = $(CURRENTDIR)/sph_picked_mode_check
+
 #
+GMAKE = make
+MPIRUN = mpirun
+NP= 1
 
 all: test
 
-test:
-	make clean
-	$(MPIRUN) -np 1 $(TARGET_SPH_MHD)
+targets:
+	cd $(MAKEDIR); \
+		$(GMAKE) \
+		TARGET_SPH_PICK_MODE_CHECK='$(TARGET_SPH_PICK_MODE_CHECK)' \
+		$(TARGET_SPH_PICK_MODE_CHECK)
+
+test: dataclean targets
+	$(MPIRUN) -np $(NP) $(TARGET_SPH_MHD)
 	
 	@sync
 	$(TARGET_SPH_PICK_MODE_CHECK)  reference/picked_mode_l0_m0c  picked_mode_l0_m0c >> log.txt
@@ -25,9 +40,12 @@ test:
 	@echo 'Static scalar fields with source check is finished'
 
 
-clean:
+dataclean:
 	rm -f *~ *.txt sph_ave_volume_s.dat picked_mode_l0_m0c.dat
 	rm -f radial_point.dat time_total.dat
 	rm -f rst_1/rst.*
+
+clean: dataclean
+	rm -rf $(TARGET_SPH_PICK_MODE_CHECK)*
 
 distclean: clean

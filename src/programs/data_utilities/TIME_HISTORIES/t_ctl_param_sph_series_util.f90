@@ -9,6 +9,7 @@
 !!@verbatim
 !!      subroutine set_spec_series_file_and_time(tave_sph_ctl,          &
 !!     &                                         spec_evo_p)
+!!      subroutine set_spec_series_time_param(tave_sph_ctl, spec_evo_p)
 !!      subroutine set_spec_series_file_param(folder_ctl,               &
 !!     &          monitor_list_ctl, spec_evo_p)
 !!        type(read_character_item), intent(in) :: folder_ctl
@@ -72,7 +73,22 @@
       subroutine set_spec_series_file_and_time(tave_sph_ctl,            &
      &                                         spec_evo_p)
 !
-      use m_file_format_labels
+      use t_ctl_data_tave_sph_monitor
+!
+      type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
+      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
+!
+!
+      call set_spec_series_time_param(tave_sph_ctl, spec_evo_p)
+      call set_spec_series_file_param                                   &
+     &   (dummy_item, tave_sph_ctl%monitor_list_ctl, spec_evo_p)
+!
+      end subroutine set_spec_series_file_and_time
+!
+!   --------------------------------------------------------------------
+!
+      subroutine set_spec_series_time_param(tave_sph_ctl, spec_evo_p)
+!
       use t_ctl_data_tave_sph_monitor
       use skip_comment_f
       use set_parallel_file_name
@@ -105,10 +121,7 @@
         spec_evo_p%led = tave_sph_ctl%degree_range_ctl%intvalue(2)
       end if
 !
-      call set_spec_series_file_param                                   &
-     &   (dummy_item, tave_sph_ctl%monitor_list_ctl, spec_evo_p)
-!
-      end subroutine set_spec_series_file_and_time
+      end subroutine set_spec_series_time_param
 !
 !   --------------------------------------------------------------------
 !

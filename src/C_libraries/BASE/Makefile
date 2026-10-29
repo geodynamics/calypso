@@ -9,6 +9,7 @@ SRC_BASE_C = $(shell ls *.c)
 INC_BASE_C = $(addsuffix .h,$(basename $(SRC_BASE_C)) )
 OBJ_BASE_C = $(addsuffix .o,$(basename $(SRC_BASE_C)) )
 
+OBJS_LIST= OBJS_C
 #
 #  ------------------------------------------------------------------
 #
@@ -25,6 +26,7 @@ lib_archve: libtarget
 
 
 mod_list:
+	@echo  '$(OBJS_LIST)+= $$(OBJ_BASE_C)' >> $(MAKENAME)
 	@echo  OBJ_BASE_C=  \\ >> $(MAKENAME)
 	@echo  $(OBJ_BASE_C)   >> $(MAKENAME)
 	@echo   >> $(MAKENAME)

@@ -76,7 +76,7 @@
       type(dynamobench_monitor), intent(inout) :: bench
       real(kind = kreal), intent(inout) :: elapsed_fft, elapsed_cpy
 !
-      integer(kind = kint) :: irank_copy
+      integer(kind = kint) :: irank_copy, iflag
 !
 !
       if(bench%iflag_dynamobench .le. 0) return
@@ -113,26 +113,54 @@
      &      rj_fld%d_fld, bench%rotate_icore)
       end if
 !
-      if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
-        if(bench%ipwr_icore .gt. 0) then
-          irank_copy = pwr%v_spectr(bench%ipwr_icore)%irank_m
-          if(my_rank .eq. irank_copy)  then
-            call copy_mag_energy_4_dbench(bench%ipwr_icore, pwr,        &
-     &                                    bench%mene_icore)
-          end if
-          call calypso_mpi_bcast_real(bench%mene_icore,                 &
-     &                                cast_long(ithree), irank_copy)
+      iflag = sph_MHD_bc%sph_bc_U%iflag_icb
+!   Obtain scalar at center for full sphere model
+      if(    (iflag .eq. iflag_sph_fill_center)                       &
+     &  .or. (iflag .eq. iflag_sph_filter_center)) then
+        if(ipol%base%i_temp .gt. 0) then
+          bench%temp_centre                                             &
+     &      = pick_scalar_at_center(sph_rj%inod_rj_center,              &
+     &                              ipol%base%i_temp,                   &
+     &                              rj_fld%n_point, rj_fld%ntot_phys,   &
+     &                              rj_fld%d_fld)
         end if
-      end if
+        if(ipol%base%i_light .gt. 0) then
+          bench%comp_centre                                             &
+     &      = pick_scalar_at_center(sph_rj%inod_rj_center,              &
+     &                              ipol%base%i_light,                  &
+     &                              rj_fld%n_point, rj_fld%ntot_phys,   &
+     &                              rj_fld%d_fld)
+        end if
+        if(ipol%base%i_entropy .gt. 0) then
+          bench%entropy_center                                          &
+     &      = pick_scalar_at_center(sph_rj%inod_rj_center,              &
+     &                              ipol%base%i_entropy,                &
+     &                              rj_fld%n_point, rj_fld%ntot_phys,   &
+     &                              rj_fld%d_fld)
+        end if
 !
-      if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center       &
-     &   .and. sph_MHD_bc%sph_bc_U%iflag_icb .eq. iflag_rotatable_ic)   &
-     & then
-        call pick_mag_torque_inner_core                                 &
-     &     (sph_rj%idx_rj_degree_one,  sph_rj%nidx_rj,                  &
-     &      sph_params%nlayer_ICB, sph_rj%radius_1d_rj_r,               &
-     &      ipol%forces%i_lorentz, rj_fld%n_point, rj_fld%ntot_phys,    &
-     &      rj_fld%d_fld, bench%m_torque_icore)
+!    Obtain parameters in inner core
+      else
+        if(sph_MHD_bc%sph_bc_B%iflag_icb                                &
+     &                                .eq. iflag_sph_fill_center) then
+          if(bench%ipwr_icore .gt. 0) then
+            irank_copy = pwr%v_spectr(bench%ipwr_icore)%irank_m
+            if(my_rank .eq. irank_copy)  then
+              call copy_mag_energy_4_dbench(bench%ipwr_icore, pwr,      &
+     &                                      bench%mene_icore)
+            end if
+            call calypso_mpi_bcast_real(bench%mene_icore,               &
+     &                                  cast_long(ithree), irank_copy)
+          end if
+!
+          if(iflag .eq. iflag_rotatable_ic) then
+            call pick_mag_torque_inner_core                             &
+     &         (sph_rj%idx_rj_degree_one,  sph_rj%nidx_rj,              &
+     &          sph_params%nlayer_ICB, sph_rj%radius_1d_rj_r,           &
+     &          ipol%forces%i_lorentz, rj_fld%n_point,                  &
+     &          rj_fld%ntot_phys, rj_fld%d_fld, bench%m_torque_icore)
+          end if
+        end if
       end if
 !
       end subroutine const_dynamobench_data

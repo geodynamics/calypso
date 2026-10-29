@@ -1,0 +1,8 @@
+begin FFT_test_ctl
+  output_file_name    'FFTW_test.dat'
+  FFT_library_ctl     'FFTW'
+!
+  FFT_length_ctl         128
+  num_series_ctl           8
+  num_test_loop_ctl        1
+end FFT_test_ctl

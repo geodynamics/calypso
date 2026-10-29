@@ -95,7 +95,7 @@
 !$omp end parallel workshare
 !
       nl_rtm = (sph_rtm%nidx_rtm(2) + 1)/2
-!$omp parallel do private(ip,mp_rlm,start_time)                              &
+!$omp parallel do private(ip,mp_rlm,start_time)                         &
 !$omp&            reduction(+:end_time)
       do ip = 1, np_smp
         kst(ip) = sph_rlm%istack_rlm_kr_smp(ip-1)

@@ -36,12 +36,15 @@
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
 !!
-!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \sin (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
+!!   b_{k} = \frac{2}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \sin (\frac{2\pi j k}{Nfft})]
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
-!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   a_{k} = \frac{1}{Nfft}
+!!          \sum_{j=0}^{Nfft-1} [x_{j} \cos (\frac{2\pi j k}{Nfft})]
 !!
 !! ------------------------------------------------------------------
 !!
@@ -174,8 +177,7 @@
      &   (comm_rtp%ntot_item_sr, OFFTW_d%comm_FFTW)
       call set_comm_item_pout_OMP_FFTW                                  &
      &   (sph_rtp%nnod_rtp, sph_rtp%istack_rtp_rt_smp(np_smp),          &
-     &    comm_rtp%irev_sr, OFFTW_d%Nfft_c, OFFTW_d%aNfft,              &
-     &    OFFTW_d%comm_FFTW)
+     &    comm_rtp%irev_sr, OFFTW_d%Nfft_c, OFFTW_d%comm_FFTW)
       flag_fft = .TRUE.
 !
       end subroutine init_sph_domain_OMP_FFTW
@@ -234,6 +236,7 @@
 !
       use copy_field_smp
       use set_comm_table_rtp_OMP_FFTW
+      use normalize_for_FFTW
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
 !
@@ -258,7 +261,10 @@
 !
         if(iflag_FFT_time) call start_elapsed_time(ist_elapsed_FFT+5)
         call dfftw_execute_dft_r2c(OFFTW_d%plan_fwd,                    &
-      &                            OFFTW_d%X, OFFTW_d%C)
+     &                            OFFTW_d%X, OFFTW_d%C)
+        call normalize_fwd_OMP_FFTW(OFFTW_d%aNfft,                      &
+     &     sph_rtp%istack_rtp_rt_smp(np_smp), OFFTW_d%Nfft_c,           &
+     &     OFFTW_d%C)
         if(iflag_FFT_time) call end_elapsed_time(ist_elapsed_FFT+5)
 !
 !   normalization
