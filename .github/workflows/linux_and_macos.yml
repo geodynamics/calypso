@@ -50,14 +50,6 @@ jobs:
       run: |
         brew reinstall gcc
         brew info gfortran
-        brew info open-mpi
-        brew install gfortran
-
-        a=`which gfortran-14`; \
-        b=`dirname $a`; \
-        c=$b/gfortran; \
-        ln -s $a $c
-
         brew install open-mpi fftw hdf5-mpi libpng
         
         mpicc -v
